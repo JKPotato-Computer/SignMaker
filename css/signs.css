@@ -631,6 +631,13 @@
 	justify-content: center;
 }
 
+
+.exitFormat {
+	display: inline;
+	position: relative;
+	top: -0.1rem;
+}
+
 .exitOnlyArrow {
 
 	display: inline-block;
