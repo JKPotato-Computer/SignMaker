@@ -1709,13 +1709,12 @@ const app = (function() {
 				
                 
 				const txtArr = panel.exitTab.number.toUpperCase().split(/(\d+\S*)/);
-				const spanTextElmt = document.createElement("div");
+				const spanTextElmt = document.createElement("span");
 				spanTextElmt.appendChild(document.createTextNode(txtArr[0]))
 				exitTabElmt.appendChild(spanTextElmt);
 				
 				
 				if (txtArr.length > 1) {
-					spanTextElmt.className = "exitFormat";
 					const spanNumeralElmt = document.createElement("span");
 					spanNumeralElmt.className = "numeral";
 					spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
