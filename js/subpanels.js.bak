@@ -1,0 +1,31 @@
+class SubPanels {
+    
+    constructor({
+        controlText = "New Sign",
+        actionMessage = "",
+        advisoryMessage = false,
+        shields = [],
+        width = 1,
+        height = "2.rem",
+        } = {}
+    ) {
+        this.controlText = controlText;
+        this.actionMessage = actionMessage;
+        
+        
+        this.shields = shields;
+        this.advisoryMessage = advisoryMessage;
+        if ((parseInt(width) < 1) || (parseInt(width) == undefined)) {
+            this.width = 1;
+        } else {
+            this.width = parseInt(width);
+        }
+        if (height.includes("rem")) {
+            this.height = height.toString();
+        } else {
+            this.height = height.toString() + "rem";
+        }
+    }
+    
+    
+}

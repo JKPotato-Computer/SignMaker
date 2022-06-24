@@ -1,0 +1,192 @@
+@font-face {
+	font-family: 'Arrows One';
+	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_1-webfont.eot');
+	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_1-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Misc/WOFF2/roadgeek_2005_arrows_1-webfont.woff2') format('woff2'),
+		 url('../fonts/Misc/WOFF/roadgeek_2005_arrows_1-webfont.woff') format('woff'),
+		 url('../fonts/Misc/TTF/roadgeek_2005_arrows_1-webfont.ttf') format('truetype'),
+		 url('../fonts/Misc/WEBFONT/roadgeek_2005_arrows_1-webfont.svg#roadgeek_2005_arrows_1regular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Arrows Two';
+	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_2-webfont.eot');
+	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_2-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Misc/WOFF2/roadgeek_2005_arrows_2-webfont.woff2') format('woff2'),
+		 url('../fonts/Misc/WOFF/roadgeek_2005_arrows_2-webfont.woff') format('woff'),
+		 url('../fonts/Misc/TTF/roadgeek_2005_arrows_2-webfont.ttf') format('truetype'),
+		 url('../fonts/Misc/WEBFONT/roadgeek_2005_arrows_2-webfont.svg#roadgeek_2005_arrows_2regular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Mittelschrift';
+	src: url('../fonts/Misc/EOT/roadgeek_2005_mittelschrift-webfont.eot');
+	src: url('../fonts/Misc/EOT/roadgeek_2005_mittelschrift-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Misc/WOFF2/roadgeek_2005_mittelschrift-webfont.woff2') format('woff2'),
+		 url('../fonts/Misc/WOFF/roadgeek_2005_mittelschrift-webfont.woff') format('woff'),
+		 url('../fonts/Misc/TTF/roadgeek_2005_mittelschrift-webfont.ttf') format('truetype'),
+		 url('../fonts/Misc/WEBFONT/roadgeek_2005_mittelschrift-webfont.svg#roadgeek_2005_mittelschriftRg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Parks';
+	src: url('../fonts/Misc/EOT/roadgeek_2005_old_parks-webfont.eot');
+	src: url('../fonts/Misc/EOT/roadgeek_2005_old_parks-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Misc/WOFF2/roadgeek_2005_old_parks-webfont.woff2') format('woff2'),
+		 url('../fonts/Misc/WOFF/roadgeek_2005_old_parks-webfont.woff') format('woff'),
+		 url('../fonts/Misc/TTF/roadgeek_2005_old_parks-webfont.ttf') format('truetype'),
+		 url('../fonts/Misc/WEBFONT/roadgeek_2005_old_parks-webfont.svg#roadgeek_2005_old_parksRg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Series C';
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_c-webfont.eot');
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_c-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_c-webfont.woff2') format('woff2'),
+		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_c-webfont.woff') format('woff'),
+		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_c-webfont.ttf') format('truetype'),
+		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_c-webfont.svg#roadgeek_2005_series_cregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Series D';
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_d-webfont.eot');
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_d-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_d-webfont.woff2') format('woff2'),
+		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_d-webfont.woff') format('woff'),
+		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_d-webfont.ttf') format('truetype'),
+		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_d-webfont.svg#roadgeek_2005_series_dregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Series E';
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_e-webfont.eot');
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_e-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_e-webfont.woff2') format('woff2'),
+		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_e-webfont.woff') format('woff'),
+		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_e-webfont.ttf') format('truetype'),
+		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_e-webfont.svg#roadgeek_2005_series_eregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Series EM';
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_em-webfont.eot');
+	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_em-webfont.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_em-webfont.woff2') format('woff2'),
+		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_em-webfont.woff') format('woff'),
+		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_em-webfont.ttf') format('truetype'),
+		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_em-webfont.svg#roadgeek_2005_series_emRg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Clearview 4W';
+	src: url('../fonts/Clearview/EOT/ClearviewHWY-Five-W-R.eot');
+	src: url('../fonts/Clearview/EOT/ClearviewHWY-Five-W-R.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Clearview/WOFF2/ClearviewHwy-Five-W-R.woff2') format('woff2'),
+		 url('../fonts/Clearview/WOFF/ClearviewHwy-Five-W-R.woff') format('woff'),
+		 url('../fonts/Clearview/TTF/ClearviewHwy5WR.ttf') format('truetype'),
+		 url('../fonts/Clearview/WEBFONT/ClearviewHwy-W-R.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+
+
+:root {
+	--green: rgb(0, 95, 77);
+	--blue: rgb(0, 67, 123);
+	--brown: rgb(98, 51, 30);
+	--yellow: rgb(255, 181, 0);
+	--countyYellow: rgb(247,209,23);
+	--white: rgb(255, 255, 255);
+	--black: rgb(0, 0, 0);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	font-size: 16px;
+
+	width: 100%;
+	height: 100%;
+
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: rgb(144,181,255);
+	font-family: "Roboto";
+	font-size: 20px;
+}
+
+
+footer {
+	border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;
+
+	text-align: center;
+
+	margin-top: 1rem;
+	padding-top: 0.5rem;
+}
+footer a {
+	background-color: rgba(255, 255, 255, 0.25);
+	border-radius: 0.1rem;
+
+	color: black;
+	text-decoration: none;
+
+	display: inline-block;
+	margin: 0.25rem;
+	padding: 0 0.5rem 0;
+
+	transition: background-color 0.5s;
+}
+footer a:hover {
+	background-color: rgba(255, 255, 255, 0.75);
+}
+
+h1, h2 {
+	text-align: center;
+	margin-top: 0.25em;
+	margin-bottom: 0.75em;
+}
+
+p {
+	margin: 0;
+}
+
+#signMaker {
+	display: inline-block;
+
+}
+#oSNum {
+	display: none;
+}
+.left {
+	text-align: left;
+}
+.center {
+	text-align: center;
+}
+.right {
+	text-align: right;
+}

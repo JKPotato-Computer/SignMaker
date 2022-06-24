@@ -1,0 +1,10 @@
+Left;Green;Round: // Panels
+0;Center;Narrow: // Exit Number
+I;1;None;None;None;Above,I;2;TO;None;None;None;Above: // Shields
+Above;false: // Shield Information
+"New Sign";None;1;Down;false: // Sign Information
+None;0;"" // Other
+
+/ - divider
+
+[Panel 1]/[Panel 2]

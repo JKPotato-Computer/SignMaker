@@ -1,0 +1,312 @@
+form {
+	background-color: rgba(255, 255, 255, 0.125);
+
+		width: -moz-max-content;
+		width: -webkit-max-content;
+	width: intrinsic;
+	margin: 1rem auto 0;
+	padding: 0.5rem;
+	text-align: justify;
+}
+
+form nav {
+    width: 100%;
+    background-color: rgba(255,255,255, 0.2);
+}
+
+form nav .scrollmenu {
+    line-style-type: none;
+    width: 60%;
+    overflow: auto;
+    white-space: nowrap;
+    float: left;
+}
+
+form nav label {
+    display: initial;
+    padding-left: 1rem;
+}
+
+form nav input[type=button] {
+    display: inline-block;
+    border-radius: 0rem;
+    transition: 0s;
+    width: auto;
+}
+
+form nav input[type=number] {
+    width: 7%;
+}
+
+.active {
+    background-color: rgb(200,200,200);
+}
+
+not(.active) {
+    background-color: rgb(230,230,230);
+}
+
+form, select, input, textarea {
+	font-family: Roboto;
+	font-size: 1rem;
+}
+
+select, input, textarea, label, legend {
+	width: 7.5rem;
+	margin: 0.25rem;
+}
+
+select, input, textarea {
+	background-color: rgb(230, 230, 230);
+	border: none;
+	border-radius: 0.25rem;
+
+	padding: 0.25rem;
+}
+
+select {
+	background: rgb(230, 230, 230) url(../img/select.svg) no-repeat right ;
+		-moz-appearance: none;
+		-webkit-appearance: none;
+	appearance: none;
+
+	padding-right: 17px;
+}
+
+input[type=button] {
+		-moz-appearance: none;
+		-webkit-appearance: none;
+	appearance: none;
+
+	cursor: pointer;
+	transition: background-color 0.5s;
+}
+input[type=button]:hover {
+	background-color: rgb(200,200,200);
+}
+input[type=checkbox] {
+	width: auto;
+}
+textarea {
+	min-width: 15.5rem;
+}
+
+label {
+	text-align: right;
+	display: inline-block;
+}
+
+.shiftButton {
+	width: 1.5rem;
+    height: auto;
+    background-color: rgb(255,255,255);
+    transition: background-color 0.25s;
+}
+
+.shiftButton:hover {
+    background-color: rgb(225,225,225);
+}
+
+#shieldBacksLabel {
+	width: auto;
+}
+
+fieldset {
+	border: none;
+	margin: 0.5rem 0;
+}
+
+.shields div {
+	border-radius: 0.25rem;
+
+		width: -moz-max-content;
+		width: -webkit-max-content;
+	width: intrinsic;
+}
+.shields div:nth-child(odd) {
+	background-color: rgba(255, 255, 255, 0.33);
+}
+
+.shields div:nth-child(even) {
+	background-color: rgba(255, 255, 255, 0.11);
+}
+
+
+
+.shields label, .shields select:first-of-type {
+	width: auto;
+}
+.shields label {
+	margin: 0;
+}
+
+.clear:hover {
+	background-color: rgb(247, 176, 176);
+}
+
+#controlCitiesLabel {
+	position: relative;
+	top: -5rem;
+}
+
+#guideArrowLanes {
+	width: 2.25rem;
+}
+
+#actionMessage {
+	width: 15.75rem;
+}
+
+#guideArrowLanes {
+	width: 3rem;
+}
+
+#oSNum {
+	margin-left: 8.5rem;
+}
+
+input[value="New Shield"], input[value="New Sign"] {
+	margin-bottom: 0.75rem;
+}
+input[value=Delete]:hover {
+	background-color: rgb(255, 200, 200);
+}
+
+#importFiles {
+	width: 100%;
+	height: 300px;
+	overflow: auto;
+	font-family: Consolas;
+	background-color: rgb(240,240,240);
+	vertical-align: top;
+	text-align: center;
+}
+
+#importFiles:hover {
+	background-color: rgb(230,230,230);
+}
+
+#submitFiles {
+	background-color: rgb(240,240,240);
+}
+
+.new, , .dup , .del {
+    float: left;
+    width: 5%;
+}
+
+#currentPanel {
+    width: 35%;
+    background-color: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    padding: 0.4rem;
+}
+
+#panelNumber {
+    background-color: rgb(255,255,255);
+    border-radius: 8px;
+    padding: 0.1rem;
+    width: 40%;
+}
+
+#panelNumberTitle {
+    font-size: 1.3rem;
+    padding: 0.2rem;
+}
+
+hr {
+    border-width: 0.15rem;
+    border-radius: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: 80%;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.subPanelHolder {
+    background-color: rgba(255,255,255,0.6);
+    border-radius: 0.3rem;
+    padding: 0.1rem;
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    white-space: nowrap;
+    float: left;
+}
+
+
+.subPanel {
+    width: auto;
+    display: inline-block;
+    padding: 0.1rem;
+    background-color: rgba(200,200,200,0.5);
+    margin-left: 0.3rem;
+}
+
+.subPanelHolder:first-child {
+    margin-right: 0.3rem;
+    margin-left: 0rem;
+}
+
+.controlTextArea {
+    font-size: 0.8rem;
+    font-family: "Clearview 4W";
+}
+
+.actionMessage {
+    width: auto;
+    font-family: "Clearview 4W";
+}
+
+.arrow {
+	height: 1.8rem;
+	margin-top: 0.2rem;
+}
