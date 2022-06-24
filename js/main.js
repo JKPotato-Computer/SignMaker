@@ -1456,13 +1456,6 @@ const app = (function() {
                     const shieldElmt = document.createElement("div");
                     shieldElmt.className = "shield";
 					shieldElmt.id = "shield" + subPanel.shields.indexOf(shield).toString();
-					
-					if (position == "Right") {
-						shieldElmt.style.right = subPanel.shieldDistance.toString() + "rem";
-					} else if (position == "Left") {
-						shieldElmt.style.left = subPanel.shieldDistance.toString() + "rem";
-					}
-					
                     bannerShieldContainerElmt.appendChild(shieldElmt);
                     
                     const shieldImgElmt = document.createElement("object");
@@ -1486,10 +1479,8 @@ const app = (function() {
                     
                     shieldElmt.appendChild(shieldImgElmt);
                     
-                    const bannerContainerElmt2 = document.createElement("div");
-                    
+                    const bannerContainerElmt2 = document.createElement("div");                    
                     bannerContainerElmt2.className = `bannerContainer2`
-
                     bannerShieldContainerElmt.appendChild(bannerContainerElmt2);
 
                     const bannerElmt2 = document.createElement("p");
@@ -1540,19 +1531,18 @@ const app = (function() {
                     }
                     
                     shieldImgElmt.data = imgDir + imgFileConstr + ".png";
-                    
 
-                    
-                    //shield
-                    
+                    //shield                    
 					
 					if ((shield.type == "I") && (shield.routeNumber.length == 3)) {
 						shieldImgElmt.style.width = "3.8rem";
 					}
 					
-
-					
-					
+					if (position == "Right") {
+						shieldElmt.style.right = subPanel.shieldDistance.toString() + "rem";
+					} else if (position == "Left") {
+						shieldElmt.style.left = subPanel.shieldDistance.toString() + "rem";
+					}
 
                     // Route Number
                     routeNumberElmt.appendChild(document.createTextNode(shield.routeNumber));
@@ -1574,9 +1564,7 @@ const app = (function() {
                     } else {
                         bannerElmt2.appendChild(document.createTextNode(" "));
                     }
-                    
-                    
-
+                   
                     // Font change
                     
                     if (post.fontType == true) {
@@ -1586,11 +1574,6 @@ const app = (function() {
                     };
                     
                 }
-				
-
-				
-
-				
                 
                 function LineEditor(line) {
                     if (line.includes("</>")) {
