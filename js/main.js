@@ -1414,7 +1414,7 @@ const app = (function() {
 			
                 // Shields
                 for (const shield of subPanel.shields) {
-					if ((shield.bannerPosition != "Above") && ((shield.bannerType != "None") || (shield.bannerType2 != "None") && (! locked) ) {
+					if ((shield.bannerPosition != "Above") && (shield.bannerType != "None") || (shield.bannerType2 != "None") && (! locked)) {
 						position = shield.bannerPosition;
 						locked = true;
 					}
