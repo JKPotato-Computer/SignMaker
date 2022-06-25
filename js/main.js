@@ -1528,7 +1528,7 @@ const app = (function() {
                     var imgFileConstr = shield.type + "-" + lengthValue;
                     
                     if (shield.specialBannerType != "None") {
-                        imgFileConstr += "-" + shield.specialBannerType;  
+                        imgFileConstr += "-" + shield.specialBannerType.toUpperCase();  
                     }
                     
                     shieldImgElmt.data = imgDir + imgFileConstr + ".png";
