@@ -1716,7 +1716,7 @@ const app = (function() {
 				const txtArr = panel.exitTab.number.toUpperCase().split(/(\d+\S*)/);
 				const divTextElmt = document.createElement("div");
 				divTextElmt.appendChild(document.createTextNode(txtArr[0]))
-				exitTabElmt.appendChild(spanTextElmt);
+				exitTabElmt.appendChild(divTextElmt);
 				
 				
 				if (txtArr.length > 1) {
