@@ -106,6 +106,62 @@
 	font-style: normal;
 }
 
+@font-face {
+    font-family: 'Highway Gothic Narrow';
+    src: url('../fonts/Misc/EOT/HighwayGothicNarrow.eot');
+    src: url('../fonts/Misc/EOT/HighwayGothicNarrow.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/Misc/WOFF2/HighwayGothicNarrow.woff2') format('woff2'),
+        url('../fonts/Misc/WOFF/HighwayGothicNarrow.woff') format('woff'),
+        url('../fonts/Misc/TTF/HighwayGothicNarrow.ttf') format('truetype'),
+        url('../fonts/Misc/WEBFONT/HighwayGothicNarrow.svg#HighwayGothicNarrow') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Highway Gothic Wide';
+    src: url('../fonts/Misc/EOT/HighwayGothicWide.eot');
+    src: url('../fonts/Misc/EOT/HighwayGothicWide.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/Misc/WOFF2/HighwayGothicWide.woff2') format('woff2'),
+        url('../fonts/Misc/WOFF/HighwayGothicWide.woff') format('woff'),
+        url('../fonts/Misc/TTF/HighwayGothicWide.ttf') format('truetype'),
+        url('../fonts/Misc/WEBFONT/HighwayGothicWide.svg#HighwayGothicWide') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Highway Gothic';
+    src: url('../fonts/Misc/EOT/HighwayGothic.eot');
+    src: url('../fonts/Misc/EOT/HighwayGothic.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/Misc/WOFF2/HighwayGothic.woff2') format('woff2'),
+        url('../fonts/Misc/WOFF/HighwayGothic.woff') format('woff'),
+        url('../fonts/Misc/TTF/HighwayGothic.ttf') format('truetype'),
+        url('../fonts/Misc/WEBFONT/HighwayGothic.svg#HighwayGothic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Clearview 3W';
+    src: url('../fonts/Clearview/EOT/ClearviewHwy-Three-W.eot');
+    src: url('../fonts/Clearview/EOT/ClearviewHwy-Three-W.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/Clearview/WOFF2/ClearviewHwy-Three-W.woff2') format('woff2'),
+        url('./fonts/Clearview/WOFF/ClearviewHwy-Three-W.woff') format('woff'),
+        url('../fonts/Clearview/TTF/ClearviewHwy-Three-W.ttf') format('truetype'),
+        url('../fonts/Clearview/WEBFONT/ClearviewHwy-Three-W.svg#ClearviewHwy-Three-W') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+
+
+
 
 
 :root {
@@ -134,7 +190,7 @@ html, body {
 
 body {
 	background-color: rgb(144,181,255);
-	font-family: "Roboto";
+	font-family: "Series D";
 	font-size: 20px;
 }
 

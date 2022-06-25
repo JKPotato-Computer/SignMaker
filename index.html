@@ -41,21 +41,18 @@
             <br>
 			<form name="signMaker">
                 <center>
-                    <font size=5>
-                        <b>Sign Editor</b>
-                    </font>
-					<p>note: the settings section is a big mess so i apoligize for that, once features <br> are made it will be cleaned up - JK_Potato/Computer</p>
+                    <img src="img/other-symbols/Banner.png" height=125>
                 </center>
 				<!-- Panel Editing Commands -->
 				<hr>
                 <br />
 				<!-- Post Position -->
-                <p><b>Pole</b></p>
+                <p class="section">Post</p>
 				<label for="postPosition">Post Position</label>
 				<select id="postPosition" onChange="app.readForm();">
 				</select>
 				<hr>
-                <p><b>Panels</b></p>
+                <p class="section">Panels</p>
                 <nav>
                     <div class="scrollmenu" id="panelList">
                     </div>
@@ -69,7 +66,7 @@
                 
                 <center>
                     <div id="currentPanel">
-                        <b id="panelNumberTitle">Current Panel</b>
+                        <b id="panelNumberTitle" class="section">Current Panel</b>
                         <div id="panelNumber">
                             <p id="panelNumberLabel">Panel 1</p>
                         </div>
@@ -109,7 +106,7 @@
                 <select id="LeftPosition" onchange="app.readForm();">
                 </select>
                 <hr>
-                <b>Subpanels</b>
+                <p class="section">Subpanels</p>
                 <!-- Subpanels -->
 				<nav>
                     <div class="scrollmenu" id="subPanelList">
@@ -214,22 +211,10 @@
 
 		<footer>
         <center>
-			<table>
-                <tr>
-                    <td>
-                        <img src="img/other-symbols/icon.png" height=150 alt="Highway Sign Maker">
-                    </td>
-                    <td style="padding-left: 2rem">
-                        <p>Made by Brendon Strowe</p>
-                        <p>Forked and modified by Maplou/dki-os</p>
-                        <p>Modified by JK_Potato/Computer</p>
-                        <br>
-                        <p><a href="https://github.com/JKPotato-Computer/SignMaker" target="_blank">GitHub Page</a></p>
-						<p><a href="https://github.com/dki-os/SignMaker" target="_blank">OG GitHub Page</a></p>
-                    
-					</td>
-                </tr>
-            </table>
+			<img src="img/other-symbols/Banner2.png" height=175>
+			<br>
+			<a style="font-size: 1rem;" href="https://github.com/JKPotato-Computer/SignMaker" target="_blank">GitHub Page</a>
+			<a style="font-size: 1rem; href="https://github.com/dki-os/SignMaker" target="_blank">OG GitHub Page</a>
         </center>
 		</footer>
 	</body>
