@@ -1404,6 +1404,7 @@ const app = (function() {
                 const actionMessageElmt = document.createElement("div");
                 actionMessageElmt.className = `actionMessage`;
                 actionMessageElmt.id = "actionMessage" + subPanelIndex.toString();
+				signContentContainerElmt.appendChild(actionMessageElmt);
 					
 				for (const shield of subPanel.shields) {
 					if ((shield.bannerPosition != "Above") && ((shield.bannerType != "None") || (shield.bannerType2 != "None")) ) {
@@ -1675,6 +1676,8 @@ const app = (function() {
                 else {
                     actionMessageElmt.style.display = "none";
                 }
+				
+				
             }
 
 			// Exit tab
