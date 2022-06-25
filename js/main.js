@@ -1541,8 +1541,10 @@ const app = (function() {
 					
 					if (position == "Right") {
 						shieldElmt.style.right = subPanel.shieldDistance.toString() + "rem";
+						shieldsContainerElmt.style.marginLeft = (subPanel.shields.length * subPanel.shieldDistance).toString() + "rem";
 					} else if (position == "Left") {
 						shieldElmt.style.left = subPanel.shieldDistance.toString() + "rem";
+						shieldsContainerElmt.style.marginRight = (subPanel.shields.length * subPanel.shieldDistance).toString() + "rem";
 					}
 
                     // Route Number
