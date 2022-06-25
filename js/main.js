@@ -1370,8 +1370,8 @@ const app = (function() {
             for (let subPanelIndex = 0;subPanelIndex < panel.sign.subPanels.length;subPanelIndex++) {
       
                 const subPanel = panel.sign.subPanels[subPanelIndex];
-				var position;
-				var locked = false;
+				let position;
+				let locked = false;
 				
 				if (subPanelIndex > 0) {
                     const subDivider = document.createElement("div");
@@ -1542,9 +1542,11 @@ const app = (function() {
 					if (position == "Right") {
 						shieldElmt.style.right = subPanel.shieldDistance.toString() + "rem";
 						shieldsContainerElmt.style.marginLeft = (subPanel.shields.length * subPanel.shieldDistance).toString() + "rem";
+						console.log("check");
 					} else if (position == "Left") {
 						shieldElmt.style.left = subPanel.shieldDistance.toString() + "rem";
 						shieldsContainerElmt.style.marginRight = (subPanel.shields.length * subPanel.shieldDistance).toString() + "rem";
+						console.log("checks");
 					}
 
                     // Route Number

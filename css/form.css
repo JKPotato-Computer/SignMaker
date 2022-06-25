@@ -46,10 +46,32 @@ not(.active) {
     background-color: rgb(230,230,230);
 }
 
-form, select, input, textarea {
-	font-family: Roboto;
+label, input[type=button] {
+	font-family: "Highway Gothic";
+	font-size: 1rem;
+	text-shadow: 0px 0px 20px rgba(40,40,40,0.5);
+	font-weight: 200;
+}
+
+select {
+	font-family: "Highway Gothic Wide";
 	font-size: 1rem;
 }
+
+input[type=number], input[type=text], textarea {
+	font-family: "Clearview 4W";
+	letter-spacing: -0.05rem;
+}
+
+.section {
+	font-family: "Clearview 4W";
+	text-shadow: 0px 0px 5px rgba(40,40,40,0.3);
+	letter-spacing: -0.1rem;
+	font-weight: 500;
+}
+
+
+
 
 select, input, textarea, label, legend {
 	width: 7.5rem;
