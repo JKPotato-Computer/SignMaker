@@ -757,12 +757,6 @@
 .centerText .numeral:last-child, .centerText .fraction:last-child {
 	padding-left: 0rem;
 }
-.centerText .rotate180 {
-	-moz-transform: rotate(180deg) translateY(-1rem);
-    -o-transform: rotate(180deg) translateY(-1rem);
-    -webkit-transform: rotate(180deg) translateY(-1rem);
-	transform: rotate(180deg) translateY(-1rem);
-}
 
 .leftElmt {
     background-color: var(--yellow);
