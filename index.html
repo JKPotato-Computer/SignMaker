@@ -118,6 +118,10 @@
                     <input type="number" class="num" id="SubPanelNumber" name="SubPanelNumber" placeholder="1"  step="1" onchange="app.changEditingSubPanel((Math.floor(document.getElementById(`SubPanelNumber`).value)) - 1)" min="1">
                 </nav>
                 <br />
+				
+				<div id="subPanelSettings">
+				</div>
+				
                 
                 <div class="subPanelHolder" id="subPanelHolder">
                 </div>
@@ -169,7 +173,7 @@
                 <label for="outActionMessage" id="outActionMessageLabel">Advisory Message:</label>
                 <input type="checkbox" id="outActionMessage" name="outActionMessage" value="outActionMessage" onChange="app.readForm();" checked />
                 <hr>
-                <b>Settings</b>
+                <b class="section">Settings</b>
                 <br />
                 <label for="fontChange" id="fontChangeLabel">Old Font</label>
                 <input type="checkbox" id="fontChange" name="fontChange" value="fontChange" onChange="app.readForm();" />
@@ -177,8 +181,8 @@
                 <label for="showPost" id="showPostLabel">Hide Post</label>
                 <input type="checkbox" id="showPost" name="showPost" value="showPost" onChange="app.readForm();" />
                 <br />
-                <hr>
-                <center>
+                <center style="display: none;">
+					<hr>
                     <input type="button" id="Import" value="Import">
                     <input type="button" value="Export" onClick="app.exportData();">
                 </center>

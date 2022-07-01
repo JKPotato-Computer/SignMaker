@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: row;
 	height: 30rem;
+	margin-top: 5rem;
 }
 
 #postContainer.polePositionOverhead .post {
@@ -117,15 +118,20 @@
 	display: none;
 }
 
+.panel.lightgreen .sign {
+	background-color: var(--lightGreen);
+}
 
 .panel.green .sign,
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
+.panel.lightgreen .sign,
 .panel.green .guideArrows,
 .panel.blue .guideArrows,
 .panel.brown .guideArrows,
-.panel.black .guideArrows {
+.panel.black .guideArrows,
+.panel.lightgreen .guideArrows {
 	color: var(--white);
 	border-color: var(--white);
 }
@@ -566,12 +572,12 @@
 }
 
 .guideArrows.half_exit.only.left {
-	background: linear-gradient(to right, var(--yellow) 55%, var(--green) 55%) !important;
+	background: linear-gradient(to right, var(--yellow) 50%, var(--green) 50%) !important;
 	color: var(--black) !important;
 }
 
 .guideArrows.half_exit.only.right {
-	background: linear-gradient(to left, var(--yellow) 55%, var(--green) 55%) !important;
+	background: linear-gradient(to left, var(--yellow) 50%, var(--green) 50%) !important;
 	color: var(--black) !important;
 }
 
@@ -594,12 +600,12 @@
 }
 
 .arrowContainer.half_exit.only.left {
-	margin-right: 5.6rem;
+	margin-right: 7.7rem;
 	margin-left: -0.3rem;
 }
 
 .arrowContainer.half_exit.only.right {
-	margin-left: 5.6rem;
+	margin-left: 7.5rem;
 	margin-right: -0.3rem;
 }
 

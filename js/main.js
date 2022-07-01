@@ -1294,6 +1294,8 @@ const app = (function() {
         
 		postContainerElmt.className = `polePosition${post.polePosition}`;
         
+		// post
+		
         if (post.showPost == true) {
             var item = document.getElementsByClassName("post");
             for (let i = 0; i < item.length; i++) {
@@ -1322,8 +1324,9 @@ const app = (function() {
         }
 
 		const panelContainerElmt = document.getElementById("panelContainer");
-		
 		lib.clearChildren(panelContainerElmt);
+		
+		
 		
 		for (const panel of post.panels) {
 			const panelElmt = document.createElement("div");
@@ -1366,6 +1369,8 @@ const app = (function() {
 			sideLeftArrowElmt.className = "sideLeftArrow";
 			sideLeftArrowElmt.appendChild(document.createTextNode(lib.specialCharacters.sideLeftArrow));
 			signElmt.appendChild(sideLeftArrowElmt);
+			
+			// subpanels
 			
             for (let subPanelIndex = 0;subPanelIndex < panel.sign.subPanels.length;subPanelIndex++) {
       
@@ -1818,16 +1823,17 @@ const app = (function() {
 						
 						if (panel.sign.guideArrowLanes > 1) {
 							
-							var marginLeft = 1;
+							var marginLeft = 2;
 							
 							for (let i=1;i <= panel.sign.guideArrowLanes - 2;i++) {
 								if (i % 2 == 0) {
-								marginLeft += 10;
+								marginLeft += 12;
 								} else {
-								marginLeft += 3;
+								marginLeft += 4;
 								}
 							}
 							
+							path.style.marginLeft = "0rem";
 							arrow.style.marginLeft = marginLeft.toString() + "rem";
 						}
 						
@@ -1837,17 +1843,18 @@ const app = (function() {
 						
 						if (panel.sign.guideArrowLanes > 1) {
 							
-							var marginLeft = 1;
+							var marginLeft = 2;
 							
 							for (let i=1;i <= panel.sign.guideArrowLanes - 2;i++) {
 								if (i % 2 == 0) {
-								marginLeft += 10;
+								marginLeft += 12;
 								} else {
-								marginLeft += 3;
+								marginLeft += 4;
 								}
 								
 							}
 							
+							path.style.marginRight = "0rem";
 							arrow.style.marginRight = marginLeft.toString() + "rem";
 						}
 						
