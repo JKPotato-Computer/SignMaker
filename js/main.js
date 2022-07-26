@@ -1,4 +1,5 @@
 const app = (function() {
+	
 	let post = {};
 	let currentlySelectedPanelIndex = -1;
 	let currentlySelectedSubPanelIndex = 0;
@@ -6,7 +7,7 @@ const app = (function() {
 		
 		fileType : "PNG",
 		panel : -1,
-		showPost : false
+		showPost : true
 		
 	};
 
@@ -874,7 +875,7 @@ const app = (function() {
 		var postClass; 
 		
 		if (fileInfo.panel == -1) {
-			screenshotTarget = document.getElementById("postContainer");
+			screenshotTarget = document.querySelector("#postContainer");
 		} else {
 			screenshotTarget = document.getElementById("panel" + fileinfo.panel.toString());
 		}
@@ -886,7 +887,7 @@ const app = (function() {
 			}
 			
 			const panelContainer = document.getElementById("panelContainer");
-			panelContainer.style.visibility = "hidden";
+			panelContainer.style.background = "";
 		}
 		
 		
@@ -911,20 +912,15 @@ const app = (function() {
 		
 		var file = getFile();
 		
-		html2canvas(file, {
-			useCORS : true,
-			logging : true,
-			backgroundColor : null
-		}).then((canvas) => {
-			const data = canvas.toDataURL("image/" + fileInfo.fileType.toLowerCase());
+		window.scrollTo(0,0);
+		
+		domtoimage.toPng(file) .then(function (dataurl) {
 			var a = document.createElement(`a`);
-			a.setAttribute("href",data);
+			a.setAttribute("href",dataurl);
 			a.setAttribute("download","my-image.png");
 			a.click();
 			a.remove();
 		});
-		
-
 		
 	}
 	
