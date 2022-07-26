@@ -79,11 +79,11 @@ Shield.prototype.specialBannerTypes = [
     "AZ:Loop;3/None",
     "FL:Toll/None",
     "GA:Loop/Spur/Alt/Byp/Conn/None",
-    "I:Bus/None",
+    "I:Business/None",
     "NB:Conn;3/Local;3/None",
     "NE:Link;2/Spur;2/None",
     "NS:Conn;3/None",
-    "TX:Loop;2/Spur/Toll/Express/None"
+    "TX:Loop/Spur/Toll/Express/None"
 ];
 
 Shield.prototype.bannerTypes = [
@@ -100,7 +100,7 @@ Shield.prototype.bannerTypes = [
 	"Alt",
 	"Truck",
 	"Trunk",
-	"Bus",
+	"Business",
 	"Byp",
 	"Loop",
 	"Express",

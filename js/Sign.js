@@ -161,12 +161,6 @@ Sign.prototype.arrowPositions = [
     "Right"
 ]
 
-Sign.prototype.leftPositions = [
-    "Above",
-    "Left",
-    "Right"
-]
-
 Sign.prototype.otherSymbols = [
 	"None",
 	"Quebec-Style Exit Marker",
