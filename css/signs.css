@@ -118,20 +118,18 @@
 	display: none;
 }
 
-.panel.lightgreen .sign {
-	background-color: var(--lightGreen);
+.panel.orange .sign {
+	background-color: var(--orange);
 }
 
 .panel.green .sign,
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
-.panel.lightgreen .sign,
 .panel.green .guideArrows,
 .panel.blue .guideArrows,
 .panel.brown .guideArrows,
-.panel.black .guideArrows,
-.panel.lightgreen .guideArrows {
+.panel.black .guideArrows {
 	color: var(--white);
 	border-color: var(--white);
 }
@@ -139,7 +137,9 @@
 .panel.white .sign,
 .panel.yellow .sign,
 .panel.white .guideArrows,
-.pabel.yellow .guideArrows {
+.panel.yellow .guideArrows,
+.panel.orange .sign,
+.panel.orange .guideArrows {
 	color: var(--black);
 	border-color: var(--black);
 }
@@ -195,6 +195,20 @@
 	background-color: rgb(102, 0, 153);
     border-color: rgb(255,255,255);
     color: rgb(255,255,255);
+}
+
+.panel.orange .sign,
+.panel.orange .signContainer,
+.panel.sorange .exitTabContainer,
+.panel.orange .guideArrows {
+	background-color: var(--orange);
+	border-color: var(--black);
+	color: var(--black);
+}
+
+.panel.orange .arrow {
+	filter: invert(100%);
+	-webkit-filter: invert(100%);
 }
 
 .exitTab.green {

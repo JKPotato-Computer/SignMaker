@@ -12,6 +12,7 @@
 		<link href="css/shields.css" rel="stylesheet" type="text/css" />
 		<link href="css/form.css" rel="stylesheet" type="text/css" />
 
+		<script src="js/HtmlToCanvas.js" type="text/javascript"></script>
 		<script src="js/lib.js" type="text/javascript" ></script>
 		<script src="js/Shield.js" type="text/javascript" ></script>
 		<script src="js/Sign.js" type="text/javascript" ></script>
@@ -20,7 +21,7 @@
 		<script src="js/Post.js" type="text/javascript" ></script>
 		<script src="js/main.js" type="text/javascript" ></script>
         <script src="js/form.js" type="text/javascript" ></script>
-        <script src="js/subpanels.js" type="text/javascript"></script>
+        <script src="js/subPanels.js" type="text/javascript"></script>
 
 		<title>Highway Sign Maker</title>
         
@@ -67,10 +68,8 @@
                 <center>
                     <div id="currentPanel">
                         <b id="panelNumberTitle" class="section">Current Panel</b>
-                        <div id="panelNumber">
-                            <p id="panelNumberLabel">Panel 1</p>
-                        </div>
-                        <input type="button" value="<<" onClick="app.shiftLeft();" class="shiftButton" />
+                        <br />
+						<input type="button" value="<<" onClick="app.shiftLeft();" class="shiftButton" />
                         <input type="button" value=">>" onClick="app.shiftRight();" class="shiftButton" />
                     </div>
                 </center>
@@ -95,16 +94,13 @@
                 <label for="exitColor">Exit Color:</label>
                 <select id="exitColor" onChange="app.readForm();">
                 </select>
+				<br />
                 <label for="exitFont">Old Font:</label>
                 <input type="checkbox" name="exitFont" id="exitFont" value="exitFont" onchange="app.readForm();">
-				<hr>
                 <!-- Left -->
                 <label for = "showLeft">Left:</label>
                 <input type="checkbox" id="showLeft" value="showLeft" name="showLeft" onchange="app.readForm();">
-                
-                <label for = "LeftPosition">Left Position:</label>
-                <select id="LeftPosition" onchange="app.readForm();">
-                </select>
+            
                 <hr>
                 <p class="section">Subpanels</p>
                 <!-- Subpanels -->
@@ -117,34 +113,37 @@
                     <label for="panelNumber">No:</label>
                     <input type="number" class="num" id="SubPanelNumber" name="SubPanelNumber" placeholder="1"  step="1" onchange="app.changEditingSubPanel((Math.floor(document.getElementById(`SubPanelNumber`).value)) - 1)" min="1">
                 </nav>
-                <br />
 				
 				<div id="subPanelSettings">
-				</div>
-				
-                
-                <div class="subPanelHolder" id="subPanelHolder">
-                </div>
-				
-				<!-- Shield and banner -->
-				<fieldset>
-					<legend><b>Sign Shields:</b></legend>
-					<div id="shields">
+					<p class="section">Shields</p>
+					<div class="shields" id="shields">
 					</div>
 					<input type="button" value="New Shield" onclick="app.newShield();" />
                     <input id="clear" type="button" value="Clear all Shields" onclick="app.clearShields();" />
-				</fieldset>
+					<br />
+					<br />
+					
+					<!-- Control Cities -->
+					<label for="controlText" id="controlCitiesLabel">Control Cities:</label>
+					<textarea id="controlText" wrap="hard" rows="4" onBlur="app.readForm();"></textarea>
+					
+					<br />
+					
+					<!-- Action Message -->
+					<label for="actionMessage" id="actionMessageLabel">Action Message: </label>
+					<input type="text" id="actionMessage" name="actionMessage" placeholder="Action Message" onBlur="app.readForm();" />
+					<br />
+					
+				</div>
+				
+				<br />
+				
 				<!-- Position of Shields -->
 				<label for="shieldsPosition">Shield Positions:</label>
 				<select id="shieldsPosition" onChange="app.readForm();">
 				</select>
 				<label for="shieldBacks" id="shieldBacksLabel">Shield Backs: </label><input type="checkbox" id="shieldBacks" name="shieldBacks" value="shieldBacks" onChange="app.readForm();" />
 				<hr>
-				<!-- Control Cities -->
-				<label for="controlText" id="controlCitiesLabel">Control Cities:</label>
-				<textarea id="controlText" wrap="hard" rows="4" onBlur="app.readForm();"></textarea>
-                
-				<br />
 				<!-- Arrows -->
 				<label for="guideArrow">Arrows:</label>
 				<select id="guideArrow" onChange="app.readForm();">
@@ -167,9 +166,6 @@
 				<input type="text" id="oSNum" name="oSNum" placeholder="Exit Num" onBlur="app.readForm();" />
 				</select>
 				<br />
-				<label for="actionMessage" id="actionMessageLabel">Action Message: </label>
-				<input type="text" id="actionMessage" name="actionMessage" placeholder="Action Message" onBlur="app.readForm();" />
-				<br />
                 <label for="outActionMessage" id="outActionMessageLabel">Advisory Message:</label>
                 <input type="checkbox" id="outActionMessage" name="outActionMessage" value="outActionMessage" onChange="app.readForm();" checked />
                 <hr>
@@ -181,35 +177,43 @@
                 <label for="showPost" id="showPostLabel">Hide Post</label>
                 <input type="checkbox" id="showPost" name="showPost" value="showPost" onChange="app.readForm();" />
                 <br />
-                <center style="display: none;">
-					<hr>
-                    <input type="button" id="Import" value="Import">
-                    <input type="button" value="Export" onClick="app.exportData();">
-                </center>
-                <div id="uploadModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Import Files</h2>
-                        <p>Copy the file's content and paste them into the box below, and then submit.</p>
-                        <br>
-                        <form>
-                            <left>
-                                <input type="text" wrap="hard" id="importFiles" name="importFiles" placeholder="File content" />
-                                <br />
-                                <input type="button" id="SubmitFiles" value="Submit" onClick="app.importData(document.getElementById(`importFiles`).value); document.getElementById(`uploadModal`).style.display = `none`;" />
-                            </left>
-                        </form>
-                    </div>
-                </div>
-                
-                <div id="exampleModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Examples</h2>
-                    </div>
-                </div>
+				
+				<br />
+				<center>
+					<input type="button" id="downloadSign" value="Download" />
+				</center>
 			</form>
         
+		<div id="downloadModal">
+			<div id="downloadContent">
+				<div id="downloadContents">
+					<center><b class="section">Download Sign</b></center>
+					<br />
+					<label for="fileType" id="fileTypeLabel">File Type</label>
+					<input type="button" id="PNG" class="activated" value="PNG" onclick="app.updateFileType(`png`);" />
+					<input type="button" id="SVG" value="SVG" onclick="app.updateFileType(`svg`);" />
+					<br />
+					<label for="entirePost" id="entirePostLabel">Entire Post</label>
+					<input type="checkbox" id="entirePost" name="entirePost" value="entirePost" onChange="app.updatePreview();" checked />
+					<br />
+					<div id="singularPanel">
+						<label for="selectPanel" id="selectPanel">Panel Number</label>
+						<input type="number" id="selectPanel" name="selectPanel" onChange="app.updatePreview();" min=1 step="1" />
+						<br />
+					</div>
+					<label for="downloadShowPost" id="downloadShowPostLabel">Show Post:</label>
+					<input type="checkbox" id="downloadShowPost" name="downloadShowPost" value="downloadShowPost" onChange="app.updatePreview();" checked />
+					<br />
+					<br />
+					<center>
+						<input type="button" id="cancelDownload" value="Cancel" />
+						<input type="button" id="download" value="Download" onclick="app.downloadSign();"/>
+					</center>
+				</div>
+				<div id="downloadPreview">
+				</div>
+			</div>
+		</div>
 
 		</main>
 
