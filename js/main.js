@@ -880,16 +880,6 @@ const app = (function() {
 			screenshotTarget = document.getElementById("panel" + fileinfo.panel.toString());
 		}
 		
-		if ((fileInfo.showPost == false) && (fileInfo.panel == -1)) {
-			postClass = document.getElementsByClassName("post");
-			for (const post of postClass) {
-				post.style.visibility = "hidden";
-			}
-			
-			const panelContainer = document.getElementById("panelContainer");
-			panelContainer.style.background = "";
-		}
-		
 		
 		return screenshotTarget;
 	}
@@ -912,12 +902,42 @@ const app = (function() {
 		
 		var file = getFile();
 		
+		if ((fileInfo.showPost == false) && (fileInfo.panel == -1)) {
+			postClass = document.getElementsByClassName("post");
+			for (const post of postClass) {
+				post.style.visibility = "hidden";
+			}
+			
+			const panelContainer = document.getElementById("panelContainer");
+			panelContainer.style.background = "";
+		} else if (fileInfo.showPost == true) {
+			const panelContainer = document.getElementById("panelContainer");
+			panelContainer.style.bottom = "10rem";
+			panelContainer.style.position = "relative";
+			
+			file.style.position = "relative";
+			file.style.left = "-30rem";
+			file.style.height = "20rem";
+		}
+		
+		
 		window.scrollTo(0,0);
 		
-		domtoimage.toPng(file) .then(function (dataurl) {
+		domtoimage.toPng(file)  .then(function (dataurl) {
 			var a = document.createElement(`a`);
 			a.setAttribute("href",dataurl);
-			a.setAttribute("download","my-image.png");
+			a.setAttribute("download","downloadedSign.png");
+			
+			const panelContainer = document.getElementById("panelContainer");
+			panelContainer.style.bottom = "";
+			panelContainer.style.position = "";
+			
+			file.style.position = "";
+			file.style.left = "";
+			file.style.height = "";
+			file.style.transform = "";
+			file.style.transformOrigin = "";
+			
 			a.click();
 			a.remove();
 		});
