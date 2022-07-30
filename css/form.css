@@ -262,6 +262,8 @@ hr {
 	width: 49%;
 	display: inline-block;
 	background-color:rgb(144,181,255);
+	overflow: auto;
+	text-align: center;
 }
 
 #PNG , #SVG {
@@ -270,6 +272,10 @@ hr {
 
 #singularPanel {
 	display: none;
+}
+
+.activated {
+    background-color: rgb(200,200,200);
 }
 
 @-webkit-keyframes animatetop {
