@@ -5,9 +5,8 @@ const app = (function() {
 	let currentlySelectedSubPanelIndex = 0;
 	let fileInfo = {
 		
-		fileType : "PNG",
+		fileType : "png",
 		panel : -1,
-		showPost : true
 		
 	};
 
@@ -250,7 +249,7 @@ const app = (function() {
     const duplicateShield = function(shieldIndex) {
         const sign = post.panels[currentlySelectedPanelIndex].sign;
         sign.duplicateShield(shieldIndex,currentlySelectedSubPanelIndex);
-		updateShieldSubform(subPanelId,currentlySelectedSubPanelIndex);
+		updateShieldSubform(currentlySelectedSubPanelIndex);
 		redraw();
     }
     
@@ -323,18 +322,20 @@ const app = (function() {
 					
 					
 					if (previous2.length != subPanel.shields[shieldIndex].routeNumber.length) {
+						console.log(subPanel.shields[shieldIndex].specialBannerType);
 						
 						for (const specialBannerType of Shield.prototype.specialBannerTypes) {
-							var current =specialBannerType.split(":");
+							var current = specialBannerType.split(":");
+							console.log(current);
 							
 							if (current[0] == subPanel.shields[shieldIndex].type) {
 								if (current[1].includes("/")) {
 									var values = current[1].split("/");
 									
-									for (const value in values) {
+									for (const value of values) {
 										if (value.includes(";")) {
 											const actual_Value = value.split(";");
-											if (actual_value[0] == specialBannerType) {
+											if (actual_value[0] == subPanel.shields[shieldIndex].specialBannerType) {
 												if (actual_value[1].parseInt() != subPanel.shields[shieldIndex].routeNumber.length) {
 													break;
 												} else {
@@ -343,7 +344,7 @@ const app = (function() {
 												}
 											}
 										} else {
-											if (value == specialBannerType) {
+											if (value == subPanel.shields[shieldIndex].specialBannerType) {
 												break_check = true;
 												break;
 											}
@@ -785,14 +786,22 @@ const app = (function() {
                             if (lengths == value[1]) {
                                 const optionElmt = document.createElement("option");
                                 optionElmt.value = value[0];
-                                optionElmt.selected = (shields[shieldIndex].specialBannerType || false);
+								if (value[0] == shields[shieldIndex].specialBannerType) {
+									optionElmt.selected = true;
+								} else {
+									optionElmt.selected = false;
+								}
                                 optionElmt.appendChild(document.createTextNode(value[0]));
                                 specialBannerTypeSelectElmt.appendChild(optionElmt);
                             }
                         } else {
                             const optionElmt = document.createElement("option");
                             optionElmt.value = value;
-                            optionElmt.selected =  (shields[shieldIndex].specialBannerType || false);
+                            if (value == shields[shieldIndex].specialBannerType) {
+									optionElmt.selected = true;
+							} else {
+								optionElmt.selected = false;
+							}
                             optionElmt.appendChild(document.createTextNode(value));
                             specialBannerTypeSelectElmt.appendChild(optionElmt);
                         }
@@ -877,7 +886,7 @@ const app = (function() {
 		if (fileInfo.panel == -1) {
 			screenshotTarget = document.querySelector("#postContainer");
 		} else {
-			screenshotTarget = document.getElementById("panel" + fileinfo.panel.toString());
+			screenshotTarget = document.getElementById("panel" + fileInfo.panel.toString());
 		}
 		
 		
@@ -885,68 +894,116 @@ const app = (function() {
 	}
 	
 	const downloadSign = function() {
-		
-	}
-	
-	const updatePreview = function() {
+		const downloadPreview = document.getElementById("downloadPreview");
 		const entirePost_option = document.getElementById("entirePost");
-		if (entirePost_option.checked = true) {
+		const panelContainer = document.getElementById("panelContainer");
+		const panelNumberSelector = document.getElementById("singularPanel");
+		
+		var background = "";
+		
+			if (entirePost_option.checked == true) {
 			fileInfo.panel = -1;
+			panelNumberSelector.style.display = "none";
+			document.getElementById("downloadContents").style.verticalAlign = "10rem";
 		} else {
 			const panelNumber = document.getElementById("selectPanel");
+			console.log(panelNumber.value);
 			fileInfo.panel = (panelNumber.value - 1);
+			panelNumberSelector.style.display = "block";
+			document.getElementById("downloadContents").style.verticalAlign = "";
 		}
-		
-		const showPost = document.getElementById("downloadShowPost"); 
-		fileInfo.showPost = showPost.checked;
 		
 		var file = getFile();
 		
-		if ((fileInfo.showPost == false) && (fileInfo.panel == -1)) {
-			postClass = document.getElementsByClassName("post");
-			for (const post of postClass) {
-				post.style.visibility = "hidden";
-			}
-			
-			const panelContainer = document.getElementById("panelContainer");
-			panelContainer.style.background = "";
-		} else if (fileInfo.showPost == true) {
-			const panelContainer = document.getElementById("panelContainer");
-			panelContainer.style.bottom = "10rem";
-			panelContainer.style.position = "relative";
-			
-			file.style.position = "relative";
-			file.style.left = "-30rem";
-			file.style.height = "20rem";
+		window.scrollTo(0,0);
+		
+		if (fileInfo.fileType == "png") {
+			domtoimage.toPng(file)  .then(function (dataurl) {
+				var a = document.createElement(`a`);
+				a.setAttribute("href",dataurl);
+				a.setAttribute("download","downloadedSign.png");
+				a.click();
+				a.remove();
+				
+			});
+		} else if (fileInfo.fileType == "svg") {
+			domtoimage.toSvg(file)  .then(function (dataurl) {
+				var a = document.createElement(`a`);
+				a.setAttribute("href",dataurl);
+				a.setAttribute("download","downloadedSign.svg");
+				a.click();
+				a.remove();
+				
+			});
+		}
+	}
+	
+	const updatePreview = function() {
+		const downloadPreview = document.getElementById("downloadPreview");
+		const entirePost_option = document.getElementById("entirePost");
+		const panelContainer = document.getElementById("panelContainer");
+		const panelNumberSelector = document.getElementById("singularPanel");
+		
+		var background = "";
+		
+		if (entirePost_option.checked == true) {
+			fileInfo.panel = -1;
+			panelNumberSelector.style.display = "none";
+			document.getElementById("downloadContents").style.verticalAlign = "10rem";
+		} else {
+			const panelNumber = document.getElementById("selectPanel");
+			console.log(panelNumber.value);
+			fileInfo.panel = (panelNumber.value - 1);
+			panelNumberSelector.style.display = "block";
+			document.getElementById("downloadContents").style.verticalAlign = "";
 		}
 		
+		var file = getFile();
 		
 		window.scrollTo(0,0);
 		
-		domtoimage.toPng(file)  .then(function (dataurl) {
-			var a = document.createElement(`a`);
-			a.setAttribute("href",dataurl);
-			a.setAttribute("download","downloadedSign.png");
-			
-			const panelContainer = document.getElementById("panelContainer");
-			panelContainer.style.bottom = "";
-			panelContainer.style.position = "";
-			
-			file.style.position = "";
-			file.style.left = "";
-			file.style.height = "";
-			file.style.transform = "";
-			file.style.transformOrigin = "";
-			
-			a.click();
-			a.remove();
-		});
+		if (fileInfo.fileType == "png") {
+			domtoimage.toPng(file)  .then(function (dataurl) {
+				
+				while (downloadPreview.firstChild) {
+					downloadPreview.removeChild(downloadPreview.lastChild);
+				}
+				
+				var img = document.createElement(`img`);
+				img.src = dataurl;
+				img.style.height = "100%";
+				downloadPreview.appendChild(img);
+
+				
+			});
+		} else if (fileInfo.fileType == "svg") {
+			domtoimage.toSvg(file)  .then(function (dataurl) {
+				
+				while (downloadPreview.firstChild) {
+					downloadPreview.removeChild(downloadPreview.lastChild);
+				}
+				
+				var img = document.createElement(`img`);
+				img.src = dataurl;
+				img.style.height = "100%";
+				downloadPreview.appendChild(img);
+
+			});
+		}
 		
 	}
 	
 	const updateFileType = function(fileType) {
 		fileInfo.fileType = fileType;
 		updatePreview();
+		
+		if (fileType == "png") {
+			document.getElementById("PNG").className = "activated";
+			document.getElementById("SVG").className = "";
+		} else if (fileType == "svg") {
+			document.getElementById("PNG").className = "";
+			document.getElementById("SVG").className = "activated";
+		}
 	}
 	
 

@@ -49,7 +49,7 @@ class Shield {
                             length = 2
                         }
                         
-                        if ((type = current[0]) && (specialBannerType == currentli[0]) && (length == currentli[1])) {
+                        if ((type == current[0]) && (specialBannerType == currentli[0]) && (length == currentli[1])) {
                             this.specialBannerType = specialBannerType.toUpperCase();
                         } else {
                             this.specialBannerType = this.bannerTypes[0];
