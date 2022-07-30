@@ -430,10 +430,10 @@ const app = (function() {
             subPanel.actionMessage = subPanel.actionMessage.replace("3/4", "¾");
             subPanel.advisoryMessage = form["outActionMessage"].checked;
             if ((panel.sign.subPanels.length > 1) && (sub_index == 0)) {
-                subPanel.width = parseInt(form["subPanelLength" + (sub_index.toString())].value);   
+                subPanel.width = parseInt(form["subPanelLength"].value);   
             } else if (sub_index != 0) {
-                subPanel.height = form["subPanelHeight" + (sub_index.toString())].value + "rem";
-                subPanel.width = parseInt(form["subPanelLength" + (sub_index.toString())].value);   
+                subPanel.height = form["subPanelHeight"].value + "rem";
+                subPanel.width = parseInt(form["subPanelLength"].value);   
             }
         }
         
@@ -798,7 +798,7 @@ const app = (function() {
                             const optionElmt = document.createElement("option");
                             optionElmt.value = value;
                             if (value == shields[shieldIndex].specialBannerType) {
-									optionElmt.selected = true;
+								optionElmt.selected = true;
 							} else {
 								optionElmt.selected = false;
 							}

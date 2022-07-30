@@ -36,18 +36,16 @@ class Post {
 	 */
 	duplicatePanel(panelIndex) {
 		const existingPanel = this.panels[panelIndex];
-		const newShields = [];
-		for (const shield of existingPanel.sign.shields) {
-			newShields.push(Object.assign(new Shield(), shield));
+		const newSubPanels = [];
+		for (const subPanel of existingPanel.sign.subPanels) {
+			newSubPanels.push(Object.assign(new SubPanels(), subPanel));
 		}
 		const newSign = new Sign({
-			controlText : existingPanel.sign.controlText,
 			shieldPosition : existingPanel.sign.shieldPosition,
+			subPanels : newSubPanels,
 			sheildBacks : existingPanel.sign.sheildBacks,
 			guideArrow : existingPanel.sign.guideArrow,
 			guideArrowLanes : existingPanel.sign.guideArrowLanes,
-			actionMessage : existingPanel.sign.actionMessage,
-			shields : newShields
 		});
 		const newExitTab = Object.assign(new ExitTab(), existingPanel.exitTab);
 		const newPanel = Object.assign(new Panel(), existingPanel);
