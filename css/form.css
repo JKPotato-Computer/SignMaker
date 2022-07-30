@@ -200,10 +200,11 @@ input[value=Delete]:hover {
 }
 
 #currentPanel {
-    width: 35%;
+    width: auto;
     background-color: rgba(255,255,255,0.3);
     border-radius: 5px;
     padding: 0.4rem;
+	display: table;
 }
 
 #panelNumber {
@@ -329,10 +330,83 @@ hr {
 }
 
 #subPanelSettings {
-background: linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(255,255,255, 0.5));
+	background: linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(255,255,255, 0.5));
     border-radius: 0.5rem;
     border-top-left-radius: 0rem;
     border-top-right-radius: 0rem;
     padding: 0.4rem;
     border-top: 3px solid rgb(255,255,255);
+}
+
+#panelPositionDiv {
+	display: table-cell;
+	width: 26%;
+	vertical-align: middle;
+}
+
+#panelPadding {
+	display: table-cell;
+}
+
+#paddingTop {
+	display: inline-block;
+    outline: none;
+    -webkit-appearance: none;
+    transform: rotate(270deg);
+    height: 150px;
+    width: 100px;
+}
+
+#paddingBottom {
+	display: inline-block;
+    outline: none;
+    -webkit-appearance: none;
+    transform: rotate(90deg);
+    height: 150px;
+    width: 100px;
+	margin-top: -25px;
+}
+
+#paddingLeft {
+	display: inline-block;
+    outline: none;
+    -webkit-appearance: none;
+    transform: rotate(180deg);
+    height: 75px;
+    width: 100px;
+}
+
+#paddingRight {
+	display: inline-block;
+    outline: none;
+    -webkit-appearance: none;
+    transform: rotate(0deg);
+    height: 75px;
+    width: 100px;
+}
+
+
+
+#panelExample {
+	background-color: rgba(255,255,255,0.9);
+    display: inline-block;
+    width: 150px;
+    height: 75px;
+	margin-top: -25px;
+}
+
+.paddingConfig::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #04AA6D;
+  cursor: pointer;
+}
+
+.paddingConfig::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #04AA6D;
+  cursor: pointer;
 }
