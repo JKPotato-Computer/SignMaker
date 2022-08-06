@@ -23,8 +23,7 @@ class Sign {
 			oSNum = "",
             actionMessage = "",
 			advisoryMessage = true,
-			extraWidth = "0rem",
-			extraHeight = "0rem",
+			padding = "0.5rem 0.75rem 0.5rem 0.75rem",
 			arrowPosition = "Middle"
 		} = {}
 	) {
@@ -54,8 +53,7 @@ class Sign {
 		this.actionMessage = actionMessage;
         this.subPanels = subPanels;
 		this.advisoryMessage = advisoryMessage;
-		this.extraHeight = extraHeight;
-		this.extraWidth = extraWidth;
+		this.padding = padding;
 		this.arrowPosition = arrowPosition
 	}
 

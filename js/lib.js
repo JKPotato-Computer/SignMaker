@@ -40,20 +40,6 @@ const lib = (function() {
 		Orange : "rgb(255, 89, 4)"
 	};
 
-	const specialCharacters = {
-		sideLeftArrow : "h", // "h" is left-side up arrow in Roadgeek 2005 Arrows 1
-		sideRightArrow : "H", // "H" is right-side up arrow in Roadgeek 2005 Arrows 1
-
-		"Left/Down Arrow" : "q", // "f" is left-down arrow in Roadgeek 2005 Arrows 1
-		"Left/Up Arrow" : "4",
-		"Left Arrow" : "3", // "j" is left arrow in Roadgeek 2005 Arrows 1
-		"Right/Down Arrow" : "Q", // "F" is right-down arrow in Roadgeek 2005 Arrows 1
-		"Right/Up Arrow" : "$",
-		"Right Arrow" : "#", // "J" is right arrow in Roadgeek 2005 Arrows 1
-
-		"Up Arrow" : "4", // "4" is up arrow in Roadgeek 2005 Arrows 2
-		"Down Arrow" : "$" // "$" is down arrow in roadgeek 2005 arrows 2
-	};
 
 	const shieldPositions = {
 		Left : "row",
@@ -65,7 +51,6 @@ const lib = (function() {
 		clearChildren : clearChildren,
 		appendOption : appendOption,
 		colors : colors,
-		specialCharacters : specialCharacters,
 		shieldPositions : shieldPositions
 	};
 })();

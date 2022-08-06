@@ -193,8 +193,9 @@ const app = (function() {
 		updateForm();
 	};
 	
-	const changeEditingSubPanel = function(number, panel) {
-		if ((number >= 0) && (number < panel.sign.subPanels.length)) {
+	const changeEditingSubPanel = function(number) {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		if ((number >= -1) && (number < panel.sign.subPanels.length)) {
 			currentlySelectedSubPanelIndex = number;
 		} else if (number > panel.sign.subPanels.length) {
 			currentlySelectedSubPanelIndex = (panel.sign.subPanels.length - 1)
@@ -268,6 +269,9 @@ const app = (function() {
         post.fontType = form["fontChange"].checked;
         
         post.showPost = form["showPost"].checked;
+		
+		post.secondExitOnly = form["secondExitOnly"].checked;
+		
         if (post.firstPanel == false) {
             var current = parseInt(form["panelNo"].value) - 1;
             
@@ -284,144 +288,155 @@ const app = (function() {
         }
         
 
-		// Exit Tab
+		// Panel
 		panel.color = form["panelColor"].value;
 		panel.corner = form["panelCorner"].value;
+		
+		// Exit Tab
 		panel.exitTab.number = form["exitNumber"].value;
 		panel.exitTab.width = form["exitTabWidth"].value;
 		panel.exitTab.position = form["exitTabPosition"].value;
+		panel.exitTab.fullBorder = form["fullBorder"].checked;
+		panel.exitTab.borderThickness = form["borderThickness"].value;
+		panel.exitTab.topOffset = form["topOffset"].checked;
+		panel.exitTab.minHeight = form["minHeight"].value;
+		
         
         // Left Tab
         panel.left = form["showLeft"].checked;
+		panel.exitTab.fullLeft = form["fullLeft"].checked;
 
         // Misc Shields
         panel.sign.shieldBacks = form["shieldBacks"].checked;
 
 		// Sign
-        
-        for (let sub_index = 0;sub_index < panel.sign.subPanels.length;sub_index++) {
-            var subPanel = panel.sign.subPanels[sub_index];
-            // Shields
-            for (let shieldIndex = 0, length = subPanel.shields.length; shieldIndex < length; shieldIndex++) {
-                var previous = subPanel.shields[shieldIndex].type;
-                var previous2 = subPanel.shields[shieldIndex].routeNumber;
-                
-                subPanel.shields[shieldIndex].type = document.getElementById(`shield${shieldIndex}_type`).value;
-                subPanel.shields[shieldIndex].routeNumber = document.getElementById(`shield${shieldIndex}_routeNumber`).value;
-                subPanel.shields[shieldIndex].to = document.getElementById(`shield${shieldIndex}_to`).checked;
-                subPanel.shields[shieldIndex].bannerType = document.getElementById(`shield${shieldIndex}_bannerType`).value;
-                subPanel.shields[shieldIndex].bannerPosition = document.getElementById(`shield${shieldIndex}_bannerPosition`).value;
-                subPanel.shields[shieldIndex].bannerType2 = document.getElementById(`shield${shieldIndex}_bannerType2`).value;
-                
-                if ((previous != subPanel.shields[shieldIndex].type) || (previous2.length != subPanel.shields[shieldIndex].routeNumber.length)) {
+		if (document.getElementById("Visual").style.display == "block") {
+			panel.sign.padding = form["paddingTop"].value.toString() + "rem " + form["paddingRight"].value.toString() + "rem " + form["paddingBottom"].value.toString() + "rem " + form["paddingLeft"].value.toString() + "rem"; 
+ 		} else {
+			panel.sign.padding = form["manualTop"].value.toString() + "rem " + form["manualRight"].value.toString() + "rem " + form["manualBottom"].value.toString() + "rem " + form["manualLeft"].value.toString() + "rem"; 
+		}
+		
+	
+		var subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
+        // Shields
+        for (let shieldIndex = 0, length = subPanel.shields.length; shieldIndex < length; shieldIndex++) {
+            var previous = subPanel.shields[shieldIndex].type;
+            var previous2 = subPanel.shields[shieldIndex].routeNumber;
+            
+            subPanel.shields[shieldIndex].type = document.getElementById(`shield${shieldIndex}_type`).value;
+            subPanel.shields[shieldIndex].routeNumber = document.getElementById(`shield${shieldIndex}_routeNumber`).value;
+		    subPanel.shields[shieldIndex].to = document.getElementById(`shield${shieldIndex}_to`).checked;
+			subPanel.shields[shieldIndex].bannerType = document.getElementById(`shield${shieldIndex}_bannerType`).value;
+			subPanel.shields[shieldIndex].bannerPosition = document.getElementById(`shield${shieldIndex}_bannerPosition`).value;
+			subPanel.shields[shieldIndex].bannerType2 = document.getElementById(`shield${shieldIndex}_bannerType2`).value;
+			
+			if ((previous != subPanel.shields[shieldIndex].type) || (previous2.length != subPanel.shields[shieldIndex].routeNumber.length)) {
+				
+				
+				const specialBannerTypeSelectElmt = document.getElementById(`shield${shieldIndex}_specialBannerType`);
+			
+				var break_check = false;
+				
+				
+				if (previous2.length != subPanel.shields[shieldIndex].routeNumber.length) {
 					
-					
-					const specialBannerTypeSelectElmt = document.getElementById(`shield${shieldIndex}_specialBannerType`);
-                
-					var break_check = false;
-					
-					
-					if (previous2.length != subPanel.shields[shieldIndex].routeNumber.length) {
-						console.log(subPanel.shields[shieldIndex].specialBannerType);
+					for (const specialBannerType of Shield.prototype.specialBannerTypes) {
+						var current = specialBannerType.split(":");
 						
-						for (const specialBannerType of Shield.prototype.specialBannerTypes) {
-							var current = specialBannerType.split(":");
-							console.log(current);
-							
-							if (current[0] == subPanel.shields[shieldIndex].type) {
-								if (current[1].includes("/")) {
-									var values = current[1].split("/");
-									
-									for (const value of values) {
-										if (value.includes(";")) {
-											const actual_Value = value.split(";");
-											if (actual_value[0] == subPanel.shields[shieldIndex].specialBannerType) {
-												if (actual_value[1].parseInt() != subPanel.shields[shieldIndex].routeNumber.length) {
-													break;
-												} else {
-													break_check = true;
-													break;
-												}
-											}
-										} else {
-											if (value == subPanel.shields[shieldIndex].specialBannerType) {
+						if (current[0] == subPanel.shields[shieldIndex].type) {
+							if (current[1].includes("/")) {
+								var values = current[1].split("/");
+								
+								for (const value of values) {
+									if (value.includes(";")) {
+										const actual_Value = value.split(";");
+										if (actual_value[0] == subPanel.shields[shieldIndex].specialBannerType) {
+											if (actual_value[1].parseInt() != subPanel.shields[shieldIndex].routeNumber.length) {
+												break;
+											} else {
 												break_check = true;
 												break;
 											}
 										}
+									} else {
+										if (value == subPanel.shields[shieldIndex].specialBannerType) {
+											break_check = true;
+											break;
+										}
 									}
 								}
-								break;
 							}
+							break;
 						}
 					}
-					
-					if (break_check) {
-						break;
-					}
-					
-					subPanel.shields[shieldIndex].specialBannerType = "None";
-                
-                    // Clearing
-                    while (specialBannerTypeSelectElmt.firstChild) {
-                        specialBannerTypeSelectElmt.removeChild(specialBannerTypeSelectElmt.firstChild);
-                    }
-                    
-                    // Adding
-                    for (const specialBannerType of Shield.prototype.specialBannerTypes) {
-                            var current = specialBannerType;
-                            current = current.split(":");
-                           
-                            
-                            if (subPanel.shields[shieldIndex].type == current[0]) {
-                                
-                                if (current[1].includes("/")) {
-                                    var currently = current[1].split("/")
-                                    
-                                    specialBannerTypeSelectElmt.style.visibility = "visible";
-                                    
-                                    for (let i = 0; i < currently.length; i++) {
-                                        var value = currently[i];
-                            
-                                        if (value.includes(";")) {
-                                            value = value.split(";")
-                                            var lengths = subPanel.shields[shieldIndex].routeNumber.length;
-                                            
-                                            if (lengths < 2) {
-                                                lengths = 2
-                                            }
-                                            
-                                            if (lengths == value[1]) {
-                                                const optionElmt = document.createElement("option");
-                                                optionElmt.value = value[0];
-                                                optionElmt.selected = (subPanel.shields[shieldIndex].specialBannerType || false);
-                                                optionElmt.appendChild(document.createTextNode(value[0]));
-                                                specialBannerTypeSelectElmt.appendChild(optionElmt);
-                                            }
-                                        } else {
-                                            const optionElmt = document.createElement("option");
-                                            optionElmt.value = value;
-                                            optionElmt.selected = (subPanel.shields[shieldIndex].specialBannerType || false);
-                                            optionElmt.appendChild(document.createTextNode(value));
-                                            specialBannerTypeSelectElmt.appendChild(optionElmt);
-                                        }
-                                    }
-                                    
-                                    break;
-                                }
+				}
+				
+				if (break_check) {
+					break;
+				}
+				
+				subPanel.shields[shieldIndex].specialBannerType = "None";
+			
+				// Clearing
+				while (specialBannerTypeSelectElmt.firstChild) {
+					specialBannerTypeSelectElmt.removeChild(specialBannerTypeSelectElmt.firstChild);
+				}
+				
+				// Adding
+				for (const specialBannerType of Shield.prototype.specialBannerTypes) {
+						var current = specialBannerType;
+						current = current.split(":");
+					   
+						
+						if (subPanel.shields[shieldIndex].type == current[0]) {
+							
+							if (current[1].includes("/")) {
+								var currently = current[1].split("/")
 								
-                                
-                            } else {
-                                subPanel.shields[shieldIndex].specialBannerType = "None";
-                                specialBannerTypeSelectElmt.style.visibility = "hidden";           
-                    }
-                }
-                }    else {
-                    subPanel.shields[shieldIndex].specialBannerType = (document.getElementById(`shield${shieldIndex}_specialBannerType`).value || "None");
-					
-                }
-             
-            }
+								specialBannerTypeSelectElmt.style.visibility = "visible";
+								
+								for (let i = 0; i < currently.length; i++) {
+									var value = currently[i];
+						
+									if (value.includes(";")) {
+										value = value.split(";")
+										var lengths = subPanel.shields[shieldIndex].routeNumber.length;
+										
+										if (lengths < 2) {
+											lengths = 2
+										}
+										
+										if (lengths == value[1]) {
+											const optionElmt = document.createElement("option");
+											optionElmt.value = value[0];
+											optionElmt.selected = (subPanel.shields[shieldIndex].specialBannerType || false);
+											optionElmt.appendChild(document.createTextNode(value[0]));
+											specialBannerTypeSelectElmt.appendChild(optionElmt);
+										}
+									} else {
+										const optionElmt = document.createElement("option");
+										optionElmt.value = value;
+										optionElmt.selected = (subPanel.shields[shieldIndex].specialBannerType || false);
+										optionElmt.appendChild(document.createTextNode(value));
+										specialBannerTypeSelectElmt.appendChild(optionElmt);
+									}
+								}
+								
+								break;
+							}
+							
+							
+						} else {
+							subPanel.shields[shieldIndex].specialBannerType = "None";
+							specialBannerTypeSelectElmt.style.visibility = "hidden";           
+				}
+			}
+			}    else {
+				subPanel.shields[shieldIndex].specialBannerType = (document.getElementById(`shield${shieldIndex}_specialBannerType`).value || "None");
+				
+			}
+		 
+		}
             
             subPanel.controlText = form["controlText"].value;
             subPanel.actionMessage = form["actionMessage"].value;
@@ -429,13 +444,12 @@ const app = (function() {
             subPanel.actionMessage = subPanel.actionMessage.replace("1/4", "¼");
             subPanel.actionMessage = subPanel.actionMessage.replace("3/4", "¾");
             subPanel.advisoryMessage = form["outActionMessage"].checked;
-            if ((panel.sign.subPanels.length > 1) && (sub_index == 0)) {
+            if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex == 0)) {
                 subPanel.width = parseInt(form["subPanelLength"].value);   
-            } else if (sub_index != 0) {
+            } else if (currentlySelectedSubPanelIndex != 0) {
                 subPanel.height = form["subPanelHeight"].value + "rem";
                 subPanel.width = parseInt(form["subPanelLength"].value);   
             }
-        }
         
         
 		
@@ -523,7 +537,34 @@ const app = (function() {
             exitOnlyDirection.style.visibility = "visible";
             showExitOnly.style.visibility = "visible";
         }
-        
+		
+		var paddingValues = panel.sign.padding.split("rem");
+		
+		
+		var left = parseFloat(paddingValues[3]);
+		var ctop = parseFloat(paddingValues[0]);
+		var right = parseFloat(paddingValues[1]);
+		var bottom = parseFloat(paddingValues[2]);
+	
+		const paddingLeft = document.getElementById("paddingLeft");
+		const paddingTop = document.getElementById("paddingTop");
+		const paddingRight = document.getElementById("paddingRight");
+		const paddingBottom = document.getElementById("paddingBottom");
+		
+		paddingLeft.value = left;
+		paddingTop.value = ctop;
+		paddingRight.value = right;
+		paddingBottom.value = bottom;
+		
+		const manualLeft = document.getElementById("manualLeft");
+		const manualTop = document.getElementById("manualTop");
+		const manualRight = document.getElementById("manualRight");
+		const manualBottom = document.getElementById("manualBottom");
+		
+		manualLeft.value = left;
+		manualTop.value = ctop;
+		manualRight.value = right;
+		manualBottom.value = bottom;
 
 		redraw();
 	};
@@ -544,6 +585,16 @@ const app = (function() {
 		
 		 while (subPanelList.firstChild) {
 			subPanelList.removeChild(subPanelList.lastChild);
+			
+			if (subPanelList.lastChild == document.getElementById("global")) {
+				if (currentlySelectedSubPanelIndex == -1) {
+					document.getElementById("global").className = "active";
+				} else {
+					document.getElementById("global").className = "";
+				}
+				
+				break;
+			}
         }
 
 
@@ -621,6 +672,38 @@ const app = (function() {
 				break;
 			}
 		}
+		
+		
+		var paddingValues = panel.sign.padding.split("rem");
+		
+		
+		var left = parseFloat(paddingValues[3]);
+		var ctop = parseFloat(paddingValues[0]);
+		var right = parseFloat(paddingValues[1]);
+		var bottom = parseFloat(paddingValues[2]);
+		
+		const paddingLeft = document.getElementById("paddingLeft");
+		const paddingTop = document.getElementById("paddingTop");
+		const paddingRight = document.getElementById("paddingRight");
+		const paddingBottom = document.getElementById("paddingBottom");
+		
+		paddingLeft.value = left;
+		paddingTop.value = ctop;
+		paddingRight.value = right;
+		paddingBottom.value = bottom;
+		
+		const manualLeft = document.getElementById("manualLeft");
+		const manualTop = document.getElementById("manualTop");
+		const manualRight = document.getElementById("manualRight");
+		const manualBottom = document.getElementById("manualBottom");
+		
+		manualLeft.value = left;
+		manualTop.value = ctop;
+		manualRight.value = right;
+		manualBottom.value = bottom;
+
+		
+		
         
         /**
 			Creating subPanel Settings
@@ -907,7 +990,6 @@ const app = (function() {
 			document.getElementById("downloadContents").style.verticalAlign = "10rem";
 		} else {
 			const panelNumber = document.getElementById("selectPanel");
-			console.log(panelNumber.value);
 			fileInfo.panel = (panelNumber.value - 1);
 			panelNumberSelector.style.display = "block";
 			document.getElementById("downloadContents").style.verticalAlign = "";
@@ -952,7 +1034,6 @@ const app = (function() {
 			document.getElementById("downloadContents").style.verticalAlign = "10rem";
 		} else {
 			const panelNumber = document.getElementById("selectPanel");
-			console.log(panelNumber.value);
 			fileInfo.panel = (panelNumber.value - 1);
 			panelNumberSelector.style.display = "block";
 			document.getElementById("downloadContents").style.verticalAlign = "";
@@ -1004,6 +1085,14 @@ const app = (function() {
 			document.getElementById("PNG").className = "";
 			document.getElementById("SVG").className = "activated";
 		}
+	}
+	
+	const resetPadding = function(mode,params) {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.sign.padding = "0.5rem 0.75rem 0.5rem 0.75rem";
+		
+		updateForm();
+		redraw();
 	}
 	
 
@@ -1091,9 +1180,9 @@ const app = (function() {
             arrowContElmt.className = `arrowContainer`;
             guideArrowsElmt.appendChild(arrowContElmt);
 			
-			const sideLeftArrowElmt = document.createElement("div");
+			const sideLeftArrowElmt = document.createElement("img");
 			sideLeftArrowElmt.className = "sideLeftArrow";
-			sideLeftArrowElmt.appendChild(document.createTextNode(lib.specialCharacters.sideLeftArrow));
+			sideLeftArrowElmt.src="img/arrows/MainArrows/A-4.png";
 			signElmt.appendChild(sideLeftArrowElmt);
 			
 			// subpanels
@@ -1121,6 +1210,7 @@ const app = (function() {
                 signContentContainerElmt.className = `signContentContainer shieldPosition${panel.sign.shieldPosition}`;
                 signContentContainerElmt.id = "signContentContainer" + subPanelIndex.toString();
                 signElmt.appendChild(signContentContainerElmt);
+
                 
                 const shieldsContainerElmt = document.createElement("div");
                 shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
@@ -1321,6 +1411,9 @@ const app = (function() {
                     
                 }
                 
+				// sign
+				signContentContainerElmt.style.padding = panel.sign.padding;
+				
                 function LineEditor(line) {
                     if (line.includes("</>")) {
                         line = line.split("</>");
@@ -1340,6 +1433,7 @@ const app = (function() {
                 
                 LineEditor(controlTextArray[controlTextArray.length - 1]);
                 
+
                 if (post.fontType == true) {
                            controlTextElmt.style.fontFamily = "Series EM";
                 }
@@ -1349,7 +1443,7 @@ const app = (function() {
                     if (post.fontType == true) {
                             actionMessageElmt.style.fontFamily = "Series E";
                     } else {
-                        actionMessageElmt.style.fontFamily = "Clearview 4W";
+                        actionMessageElmt.style.fontFamily = "Clearview 5WR";
                     }
                     actionMessageElmt.style.visibility = "visible";
                     actionMessageElmt.style.display = "inline-flex";
@@ -1478,13 +1572,27 @@ const app = (function() {
                 if (post.fontType == true) {
                         exitTabElmt.style.fontFamily = "Series E";
                 };
+
+				
+				if (panel.exitTab.fullBorder == true) {
+					exitTabElmt.style.borderBottomWidth = panel.exitTab.borderThickness.toString() + "rem";
+					exitTabElmt.style.borderBottomStyle = "solid";
+					exitTabElmt.style.borderRadius = "0.5rem";
+				}
+				
+				exitTabElmt.style.borderTopWidth = panel.exitTab.borderThickness.toString() + "rem";
+				exitTabElmt.style.borderLeftWidth = panel.exitTab.borderThickness.toString() + "rem";
+				exitTabElmt.style.borderRightWidth = panel.exitTab.borderThickness.toString() + "rem";
+				
+				exitTabElmt.style.minHeight = panel.exitTab.minHeight.toString() + "rem";
+				
                 
 			}
             
 
-			const sideRightArrowElmt = document.createElement("div");
+			const sideRightArrowElmt = document.createElement("img");
 			sideRightArrowElmt.className = "sideRightArrow";
-			sideRightArrowElmt.appendChild(document.createTextNode(lib.specialCharacters.sideRightArrow));
+			sideRightArrowElmt.src="img/arrows/MainArrows/A-1.png";
 			signElmt.appendChild(sideRightArrowElmt);
 			
 			// Guide arrows
@@ -1549,6 +1657,24 @@ const app = (function() {
 					const secondaryContainer = document.createElement("div");
 					secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
 					
+					if (post.secondExitOnly == true) {
+						secondaryContainer.className += " new2";
+						if (panel.sign.arrowPosition == "Left") {
+							secondaryContainer.style.marginLeft = "-0.35rem";
+						} else if (panel.sign.arrowPosition == "Right") {
+							if (panel.sign.guideArrowLanes > 1) {
+								secondaryContainer.style.marginRight = "0.1rem";
+							} else {
+								secondaryContainer.style.marginRight = "-0.15rem";
+							}
+							
+							secondaryContainer.style.marginTop = "-0.15rem";
+							guideArrowsElmt.style.padding = "0rem 0.27rem 0rem 0.27rem";
+						}
+						
+						guideArrowsElmt.className += " new2";
+					}
+					
 					path = secondaryContainer
 					
 					const arrow = createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly","halfarrow",panel.sign.arrowPosition.toLowerCase());
@@ -1559,7 +1685,7 @@ const app = (function() {
 						
 						if (panel.sign.guideArrowLanes > 1) {
 							
-							var marginLeft = 2;
+							var marginLeft = 4;
 							
 							for (let i=1;i <= panel.sign.guideArrowLanes - 2;i++) {
 								if (i % 2 == 0) {
@@ -1569,8 +1695,10 @@ const app = (function() {
 								}
 							}
 							
-							path.style.marginLeft = "0rem";
-							arrow.style.marginLeft = marginLeft.toString() + "rem";
+							if (!post.secondExitOnly) {
+								path.style.marginLeft = "0rem";
+								arrow.style.marginLeft = marginLeft.toString() + "rem";
+							}
 						}
 						
 					} else {
@@ -1579,7 +1707,7 @@ const app = (function() {
 						
 						if (panel.sign.guideArrowLanes > 1) {
 							
-							var marginLeft = 2;
+							var marginLeft = 11;
 							
 							for (let i=1;i <= panel.sign.guideArrowLanes - 2;i++) {
 								if (i % 2 == 0) {
@@ -1590,8 +1718,10 @@ const app = (function() {
 								
 							}
 							
-							path.style.marginRight = "0rem";
-							arrow.style.marginRight = marginLeft.toString() + "rem";
+							if (!post.secondExitOnly) {
+								path.style.marginLeft = "0rem";
+								arrow.style.marginRight = marginLeft.toString() + "rem";
+							}
 						}
 						
 					}
@@ -1623,12 +1753,22 @@ const app = (function() {
 						guideArrowsElmt.style.padding = "0rem";
 					}
 
+					if ((post.secondExitOnly == true) && (panel.sign.guideArrow == "Exit Only")) {
+						guideArrowsElmt.className += " new";
+						arrowContElmt.className += " new";
+					}
+
+					if (panel.sign.subPanels.length > 1) {
+						arrowContElmt.style.width = "99%";
+					} else {
+						arrowContElmt.style.width = "max-content";
+					}
 
 					/*
 
-                    if (panel.sign.advisoryMessage) {
-                        actionMessageElmt.style.fontFamily = "Series E";
-                    }
+						if (panel.sign.advisoryMessage) {
+							actionMessageElmt.style.fontFamily = "Series E";
+						}
 					
 					*/
 
@@ -1844,6 +1984,7 @@ const app = (function() {
 		duplicateSubPanel : duplicateSubPanel,
 		downloadSign : downloadSign,
 		updatePreview : updatePreview,
-		updateFileType : updateFileType
+		updateFileType : updateFileType,
+		resetPadding : resetPadding
 	};
 })();
