@@ -201,8 +201,8 @@ input[value=Delete]:hover {
 
 #currentPanel {
     width: auto;
-    background-color: rgba(255,255,255,0.3);
-    border-radius: 5px;
+    background: linear-gradient(to bottom, rgba(255,255,255, 0.2), rgba(255,255,255,0.4));
+    border-radius: 0rem 0rem 1rem 2rem;
     padding: 0.4rem;
 	display: table;
 }
@@ -353,8 +353,11 @@ hr {
     outline: none;
     -webkit-appearance: none;
     transform: rotate(270deg);
-    height: 150px;
+    height: 100px;
     width: 100px;
+	position: relative;
+    top: -5px;
+	background: none;
 }
 
 #paddingBottom {
@@ -362,9 +365,10 @@ hr {
     outline: none;
     -webkit-appearance: none;
     transform: rotate(90deg);
-    height: 150px;
+    height: 100px;
     width: 100px;
-	margin-top: -25px;
+	margin-top: -20px;
+	background: none;
 }
 
 #paddingLeft {
@@ -374,6 +378,9 @@ hr {
     transform: rotate(180deg);
     height: 75px;
     width: 100px;
+	position: relative;
+    top: -15px;
+	background: none;
 }
 
 #paddingRight {
@@ -383,6 +390,9 @@ hr {
     transform: rotate(0deg);
     height: 75px;
     width: 100px;
+	position: relative;
+    top: -15px;
+	background: none;
 }
 
 
@@ -392,21 +402,90 @@ hr {
     display: inline-block;
     width: 150px;
     height: 75px;
-	margin-top: -25px;
+	position: relative;
+    top: -15px;
+	vertical-align: 0;
 }
 
 .paddingConfig::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 25px;
-  height: 25px;
-  background: #04AA6D;
+  height: 75px;
+  background: rgba(0,95,77,0.3);
   cursor: pointer;
+  border-radius:2rem;
 }
+
+.horizontalPaddingConfig::webkit-slider-thumb {
+	-webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 125px;
+    background: rgba(0,95,77,0.3);
+    cursor: pointer;
+    border-radius:2rem;
+}
+
+
 
 .paddingConfig::-moz-range-thumb {
   width: 25px;
-  height: 25px;
+  height: 75px;
   background: #04AA6D;
   cursor: pointer;
+  border-radius:2rem;
+}
+
+#currentlyEditing {
+	position: absolute;
+    width: 100%;
+    height: 50%;
+    top: 25%;
+}
+
+#editStep {
+    display: inline;
+    background-color: rgba(255,255,255,.4);
+    border-radius: .75rem;
+    padding: .1rem;
+}
+
+#stepLabel {
+    width: auto;
+    position: relative;
+    top: -0.05rem;
+    left: 0.2rem;
+}
+
+#stepVal {
+	width: auto;
+    padding-bottom: 0;
+    background-color: rgba(255,255,255,0.4);
+    padding-top: 0.3rem;
+}
+
+#EnableGlobal {
+    width: 100%;
+    height: 200px;
+    margin: 0.1rem;
+    font-size: 2rem;
+}
+
+#deleteGlobal:hover {
+	background-color: rgba(247,170,170,1);
+}
+
+#heading {
+	display: inline-block;
+    float: left;
+    widtH: 30%;
+    background-color: rgba(255,255,255,0.3);
+    position: relative;
+    top: 1rem;
+    left: 1rem;
+}
+
+#paddingSection {
+	display: inline-block;
 }

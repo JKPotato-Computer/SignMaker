@@ -96,15 +96,31 @@
 
 @font-face {
 	font-family: 'Clearview 4W';
-	src: url('../fonts/Clearview/EOT/roadgeek_2005_series_em-webfont.eot');
-	src: url('../fonts/Clearview/EOT/roadgeek_2005_series_em-webfont.eot?#iefix') format('rembedded-opentype'),
+	src: url('../fonts/Clearview/EOT/ClearviewHwy-Four-w.eot');
+	src: url('../fonts/Clearview/EOT/ClearviewHwy-Four-W#iefix') format('rembedded-opentype'),
 		 url('../fonts/Clearview/WOFF2/ClearviewHwy-Four-W.woff2') format('woff2'),
 		 url('../fonts/Clearview/WOFF/ClearviewHwy-Four-W.woff') format('woff'),
 		 url('../fonts/Clearview/TTF/ClearviewHwy4W.ttf') format('truetype'),
-		 url('../fonts/Clearview/WEBFONT/roadgeek_2005_series_em-webfont.svg#roadgeek_2005_series_emRg') format('svg');
+		 url('../fonts/Clearview/WEBFONT/ClearviewHwy-Four-W_emRg') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
+
+@font-face {
+	font-family: 'Clearview 5WR';
+	src: url('../fonts/Clearview/EOT/ClearviewHwy-Five-W-R.eot');
+	src: url('../fonts/Clearview/EOT/ClearviewHwy-Five-W-R.eot?#iefix') format('rembedded-opentype'),
+		 url('../fonts/Clearview/WOFF2/ClearviewHwy-Five-W-R.woff2') format('woff2'),
+		 url('../fonts/Clearview/WOFF/ClearviewHwy-Five-W-R.woff') format('woff'),
+		 url('../fonts/Clearview/TTF/ClearviewHwy5WR.ttf') format('truetype'),
+		 url('../fonts/Clearview/WEBFONT/ClearviewHwy-Five-W-R_emRg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+
+
+
 
 @font-face {
     font-family: 'Highway Gothic Narrow';
@@ -168,7 +184,7 @@
 	--green: rgb(0, 95, 77);
 	--blue: rgb(0, 67, 123);
 	--brown: rgb(98, 51, 30);
-	--yellow: rgb(255, 181, 0);
+	--yellow: rgb(252, 207, 52);
 	--countyYellow: rgb(247,209,23);
 	--white: rgb(255, 255, 255);
 	--black: rgb(0, 0, 0);

@@ -39,8 +39,8 @@
 .bannerShieldContainer.rec2 .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
-	top: 0.15em;
-	font-size: 1.8rem;
+	top: 0.08em;
+	font-size: 2rem;
 }
 
 .bannerShieldContainer.C .routeNumber {

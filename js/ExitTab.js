@@ -5,7 +5,7 @@ class ExitTab {
 	 * @param {string} [position=null] - Position to display the exit tab relative to the sign.
 	 * @param {string} [width=null] - Width of the exit tab (narrow or wide).
 	 */
-	constructor (number = null, position = null, width = null,color = null) {
+	constructor (number = null, position = null, width = null,color = null, fullBorder = false, topOffset = true,  fullLeft = false, borderThickness = 0.2, minHeight = 2.25) {
 		this.number = number;
 		if (this.positions.includes(position)) {
 			this.position = position;
@@ -22,6 +22,12 @@ class ExitTab {
         } else {
             this.color = this.colors[0];
         }
+		
+		this.fullBorder = fullBorder;
+		this.borderThickness = borderThickness;
+		this.topOffset = topOffset;
+		this.minHeight = minHeight;
+		this.fullLeft = fullLeft;
 	}
 }
 

@@ -401,30 +401,21 @@
 	visibility: visible;
 }
 .sideLeftArrow, .sideRightArrow {
-	font-family: "Arrows One";
-	font-size: 5rem; /* Makes arrows large and visble */
-	line-height: 0.1rem; /* Makes space text (arrow) takes up minimal */
-
-	display: none;
 	margin-top: auto;
-	margin-bottom: auto;
+    margin-bottom: auto;
+    display: none;
+    height: 2.5rem;
+    padding: 0.2rem;
 }
 
 .sideLeftArrow {
-	padding: 0 0.1rem 3.25rem 0.75rem; /* Patting bumped up on the bottom to bump arrow up from the bottom edge */
-		-moz-transform: rotate(15deg);
-		-o-transform: rotate(15deg);
-		-webkit-transform: rotate(15deg);
-	transform: rotate(15deg);
+	margin-left: 1rem;
 }
 
 .sideRightArrow {
-	padding: 0 0.75rem 3.35rem 0.1rem; /* Patting bumped up on the bottom to bump arrow up from the bottom edge */
-		-moz-transform: rotate(-15deg);
-		-o-transform: rotate(-15deg);
-		-webkit-transform: rotate(-15deg);
-	transform: rotate(-15deg);
+	margin-right: 1rem;
 }
+
 
 .signContentContainer {
 	display: flex;
@@ -483,6 +474,7 @@
 	border-radius: 0.1rem;
 	font-size: 1.35rem;
 	text-transform: uppercase;
+	font-family: "Clearview 4W";
 
 	margin-bottom: auto;
 }
@@ -562,8 +554,8 @@
 .streetName,
 .controlText {
 	font-family: "Clearview 4W";
-	font-size: 1.5rem;
-    line-height: 2rem;
+	font-size: 1.75rem;
+    line-height: 1.8rem;
 }
 
 .guideArrows {
@@ -581,6 +573,13 @@
 	color: var(--black) !important;
 }
 
+.guideArrows.exit_only.new {
+	border-color: var(--white) !important;
+	background-color: var(--green) !important;
+	padding: 0rem 0rem 0.08rem 0rem;
+}
+
+
 .guideArrows.split_exit.only {
     padding: 0 0.25rem 0.7rem 0.25rem;
 }
@@ -593,6 +592,10 @@
 .guideArrows.half_exit.only.right {
 	background: linear-gradient(to left, var(--yellow) 50%, var(--green) 50%) !important;
 	color: var(--black) !important;
+}
+
+.guideArrows.half_exit.only.new2 {
+	background: var(--green) !important;
 }
 
 .halfarrow {
@@ -670,9 +673,11 @@
 
 .exitOnlyText {
 	font-family: "Series E";
-	padding: 0px 10px 0 10px;
+    padding: 0px 10px 0 10px;
     padding-top: 0.18rem;
-    font-size: 1.4rem;
+    font-size: 1.43rem;
+    word-spacing: 0.3rem;
+    letter-spacing: 0.03rem;
 }
 
 .exitOnlyText.split {
@@ -707,6 +712,7 @@
 
 .arrowContainer {
 	display: inline-flex;
+	justify-content: center;
 }
 
 .arrowContainer .left {
@@ -805,3 +811,37 @@
 }
 
 
+.arrowContainer.new {
+	background: var(--yellow);
+    margin-right: 0.1rem;
+    margin-left: -0.1rem;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    padding-top: 0.17rem;
+    padding-bottom: 0.32rem;
+	width: 99%;
+}
+
+.arrowContainer.left.new2 {
+    background-color: var(--yellow);
+    margin-bottom: -0.35rem;
+    border-bottom-left-radius: 0.5rem;
+}
+
+.arrowContainer.right.new2 {
+	background-color: var(--yellow);
+    margin-bottom: -0.35rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+
+
+img.exitOnlyArrow:first-child {
+    padding-left: .8rem;
+    padding-right: 0.3rem;
+}
+
+img.exitOnlyArrow:last-child {
+    padding-right: 0.8rem;
+    padding-left: 0.3rem;
+}
