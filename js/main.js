@@ -3,6 +3,9 @@ const app = (function() {
 	let post = {};
 	let currentlySelectedPanelIndex = -1;
 	let currentlySelectedSubPanelIndex = 0;
+	let currentlySelectedExitTabIndex = 0;
+	let nestedIndex = -1;
+	
 	let fileInfo = {
 		
 		fileType : "png",
@@ -23,16 +26,19 @@ const app = (function() {
 			lib.appendOption(postPositionSelectElmt, polePosition, {selected : (polePosition == "Left")});
 		}
 
+		
 		// Populate color options
 		const colorSelectElmt = document.getElementById("panelColor");
 		for (const color in lib.colors) {
 			lib.appendOption(colorSelectElmt, color, {text : color});
 		}
+		
 		const cornerTypeSelectElmt = document.getElementById("panelCorner");
 		for (const corner of Panel.prototype.cornerType) {
 			lib.appendOption(cornerTypeSelectElmt, corner, {selected : (corner == "Round")});
 		}
 
+		
 		// Populate exit tab position options
 		const exitTabPositionSelectElmt = document.getElementById("exitTabPosition");
 		for (const position of ExitTab.prototype.positions) {
@@ -44,11 +50,35 @@ const app = (function() {
 		for (const width of ExitTab.prototype.widths) {
 			lib.appendOption(exitTabWidthSelectElmt, width, {selected : (width == "Narrow")});
 		}
+		
+		// Populate the exit color options
+        const exitColorSelectElement = document.getElementById("exitColor");
+        for (const exitColor of ExitTab.prototype.colors) {
+            lib.appendOption(exitColorSelectElement,exitColor);
+        }
+		
+		// Populate the exit variants
+		const exitVariantSelectElmt = document.getElementById("exitVariant");
+		for (const exitVariant of ExitTab.prototype.variants) {
+			lib.appendOption(exitVariantSelectElmt,exitVariant)
+		}
+		
+		// Populate the exit icons
+		const iconSelectSelectElmt = document.getElementById("iconSelect");
+		for (const icons of ExitTab.prototype.icons) {
+			lib.appendOption(exitVariantSelectElmt,icons.split(":")[0]);
+		}
 
 		// Populate the shield position options
 		const shieldPositionsSelectElmt = document.getElementById("shieldsPosition");
 		for (const position of Sign.prototype.shieldPositions) {
 			lib.appendOption(shieldPositionsSelectElmt, position, {selected : (position == "Above")});
+		}
+		
+		// Populate global positioning
+		const globalPosition = document.getElementById("globalPosition");
+		for (const position of Sign.prototype.globalPositioning) {
+			lib.appendOption(globalPosition, position, {selected : (position == "Top")});
 		}
 
 		// Populate the guide arrow options
@@ -80,13 +110,7 @@ const app = (function() {
 		for (const otherSymbol of Sign.prototype.otherSymbols) {
 			lib.appendOption(otherSymbolSelectElement, otherSymbol);
 		}
-        
-        // Populate the exit color options
-        const exitColorSelectElement = document.getElementById("exitColor");
-        for (const exitColor of ExitTab.prototype.colors) {
-            lib.appendOption(exitColorSelectElement,exitColor);
-        }
-        
+		
 		const downloadSign = document.getElementById("downloadSign");
 		const downloadModal = document.getElementById("downloadModal");
 		const downloadClose = document.getElementById("cancelDownload");
@@ -205,6 +229,37 @@ const app = (function() {
 		updateForm();
 	}
 	
+	const changeEditingExitTab = function(number, secondary) {
+		
+		const panel = post.panels[currentlySelectedPanelIndex];
+		
+		if (typeof number === `string`) {
+			number = parseInt(number.split("_")[1]);
+		}
+		
+		if ((number >= 0) && (number < panel.exitTabs.length)) {
+			currentlySelectedExitTabIndex = number;
+		} else if (number > panel.exitTabs.length) {
+			currentlySelectedExitTabIndex = (panel.exitTabs.length - 1)
+		} else {
+			currentlySelectedExitTabIndex = 0;
+		}
+		
+		if (secondary != null) {
+			console.log(secondary);
+			
+			if (typeof secondary === `string`) {
+				secondary = parseInt(secondary.split("_")[1]) - 1;
+			}
+			
+			nestedIndex = secondary;
+			
+		}
+		
+		updateForm();
+		
+	}
+	
 	const duplicateSubPanel = function() {
 		const sign = post.panels[currentlySelectedPanelIndex].sign;
 		sign.duplicateSubPanel(currentlySelectedSubPanelIndex);
@@ -253,7 +308,42 @@ const app = (function() {
 		updateShieldSubform(currentlySelectedSubPanelIndex);
 		redraw();
     }
+	
+	const newExitTab = function() {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.newExitTab();
+		updateForm();
+		redraw();
+	}
+	
+	const newNestExitTab = function() {
+		const exitTab = post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex];
+		exitTab.nestExitTab();
+		updateForm();
+		redraw();
+	}
+	
+	const duplicateExitTab = function(index) {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.duplicateExitTab(index);
+		updateForm();
+		redraw();
+	}
+	
+	const removeExitTab = function(index) {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.deleteExitTab(index);
+		updateForm();
+		redraw();
+	}
     
+	const deleteNestExitTab = function(index) {
+		const exitTab = post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex];
+		exitTab.deleteNestExitTab(index);
+		updateForm();
+		redraw();
+	}
+	
 	/**
 	 * Read the form and update the currently selected panel with the new values.
 	 *   Redraw the page.
@@ -262,6 +352,7 @@ const app = (function() {
 	const readForm = function() {
 		const form = document.forms[0];
 		const panel = post.panels[currentlySelectedPanelIndex];
+		var exitTab = panel.exitTabs[currentlySelectedExitTabIndex];
 
 		// Post
 		post.polePosition = form["postPosition"].value;
@@ -293,18 +384,42 @@ const app = (function() {
 		panel.corner = form["panelCorner"].value;
 		
 		// Exit Tab
-		panel.exitTab.number = form["exitNumber"].value;
-		panel.exitTab.width = form["exitTabWidth"].value;
-		panel.exitTab.position = form["exitTabPosition"].value;
-		panel.exitTab.fullBorder = form["fullBorder"].checked;
-		panel.exitTab.borderThickness = form["borderThickness"].value;
-		panel.exitTab.topOffset = form["topOffset"].checked;
-		panel.exitTab.minHeight = form["minHeight"].value;
+		
+		if (nestedIndex > -1) {
+			exitTab = exitTab.nestedExitTabs[nestedIndex];
+		}
+		
+		exitTab.number = form["exitNumber"].value;
+		exitTab.width = form["exitTabWidth"].value;
+		exitTab.position = form["exitTabPosition"].value;
+		exitTab.color = form["exitColor"].value;
+		exitTab.variant = form["exitVariant"].value;
+		
+		if (exitTab.variant == "Toll") {
+			for (const tollOption of document.getElementsByName("tollOption")) {
+				if (tollOption.checked == true) {
+					exitTab.icon == tollOption.value;
+					break;
+				}
+			}
+		} else if (exitTab.variant == "Icon") {
+			exitTab.icon = form["iconSelect"].value;
+		} else {
+			exitTab.icon = null;
+		}
+		
+		exitTab.oldFont = form["exitFont"].checked;
+		exitTab.showLeft = form["showLeft"].checked;
+		exitTab.fullBorder = form["fullBorder"].checked;
+		exitTab.topOffset = form["topOffset"].checked;
+		
+		exitTab.borderThickness = form["borderThickness"].value;
+		exitTab.minHeight = form["minHeight"].value;
+		exitTab.fontSize = form["fontSize"].value;
 		
         
         // Left Tab
-        panel.left = form["showLeft"].checked;
-		panel.exitTab.fullLeft = form["fullLeft"].checked;
+        exitTab.showLeft = form["showLeft"].checked;
 
         // Misc Shields
         panel.sign.shieldBacks = form["shieldBacks"].checked;
@@ -316,8 +431,16 @@ const app = (function() {
 			panel.sign.padding = form["manualTop"].value.toString() + "rem " + form["manualRight"].value.toString() + "rem " + form["manualBottom"].value.toString() + "rem " + form["manualLeft"].value.toString() + "rem"; 
 		}
 		
+		// Global Settings
+		panel.sign.globalPositioning = form["globalPosition"].value;
 	
 		var subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
+		
+		if (currentlySelectedSubPanelIndex == -1) {
+			subPanel = panel.sign;
+		}
+		
+		
         // Shields
         for (let shieldIndex = 0, length = subPanel.shields.length; shieldIndex < length; shieldIndex++) {
             var previous = subPanel.shields[shieldIndex].type;
@@ -444,6 +567,7 @@ const app = (function() {
             subPanel.actionMessage = subPanel.actionMessage.replace("1/4", "¼");
             subPanel.actionMessage = subPanel.actionMessage.replace("3/4", "¾");
             subPanel.advisoryMessage = form["outActionMessage"].checked;
+			subPanel.advisoryText = form["g_actionMessage"].value;
             if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex == 0)) {
                 subPanel.width = parseInt(form["subPanelLength"].value);   
             } else if (currentlySelectedSubPanelIndex != 0) {
@@ -509,10 +633,7 @@ const app = (function() {
         
 		panel.sign.otherSymbol = form["otherSymbol"].value;
 		panel.sign.oSNum = form["oSNum"].value;
-        
-        panel.sign.exitTabColor = form["exitColor"].value;
-        panel.exitTab.oldFont = form["exitFont"].checked;
-
+  
 		// Other Symbols Extra
 		if (panel.sign.otherSymbol != "None") {
 			form["oSNum"].style.display = "block";
@@ -574,10 +695,23 @@ const app = (function() {
 	 */
 	const updateForm = function() {
         const panel = post.panels[currentlySelectedPanelIndex];
-        const subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
+		var subPanel;
+		
+		if (currentlySelectedSubPanelIndex == -1) {
+			subPanel = panel.sign
+		} else {
+			subPanel = subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
+		}
+		var exitTab = panel.exitTabs[currentlySelectedExitTabIndex];
+		
+		if ((nestedIndex != -1) && (exitTab.nestedExitTabs.length > 0)) {
+			exitTab = exitTab.nestedExitTabs[nestedIndex];
+		}
+		
 		
         const panelList = document.getElementById("panelList");
 		const subPanelList = document.getElementById("subPanelList");
+		const exitTabList = document.getElementById("exitTabList");
         
         while (panelList.firstChild) {
             panelList.removeChild(panelList.lastChild);
@@ -596,6 +730,10 @@ const app = (function() {
 				break;
 			}
         }
+		
+		while (exitTabList.firstChild) {
+			exitTabList.removeChild(exitTabList.lastChild);
+		}
 
 
         for (let panelIndex = 0, panelsLength = post.panels.length; panelIndex < panelsLength; panelIndex++) {
@@ -636,6 +774,111 @@ const app = (function() {
             subPanelList.appendChild(new_button);
 		}
 		
+		
+		for (let exitTabIndex = 0, exitTabLength = panel.exitTabs.length; exitTabIndex < exitTabLength; exitTabIndex++) {
+			const nestedExitTab = panel.exitTabs[exitTabIndex].nestedExitTabs.length;
+			
+			var new_button = document.createElement("select"); 
+            new_button.id = "tab_edit" + (exitTabIndex + 1);
+			new_button.className = "exitTabSelect";
+			
+			console.log(currentlySelectedPanelIndex + " " + currentlySelectedExitTabIndex + " " + nestedIndex);
+            
+			for (let nestIndex = 0; nestIndex < nestedExitTab; nestIndex++) {
+				lib.appendOption(new_button, nestIndex, {selected : (nestedIndex == nestIndex), text : "Nest Exit Tab " + (nestIndex + 1).toString()});
+			}
+			
+			lib.appendOption(new_button, -1, {selected : (nestedIndex == -1), text : "Exit Tab " + (exitTabIndex + 1).toString()});
+			
+			if (currentlySelectedExitTabIndex == exitTabIndex) {
+				new_button.className = "exitTabSelect active";
+			} else {
+				new_button.className = "exitTabSelect";
+			}
+			
+			
+			new_button.addEventListener("change", function() {
+				changeEditingExitTab(exitTabIndex, parseInt(new_button.value))
+			})
+			
+            exitTabList.appendChild(new_button);
+		}
+		
+		// Panel Setting Config
+		
+		// Global Panel
+
+		if (currentlySelectedSubPanelIndex == -1) {
+			const outActionMessage = document.getElementById("outActionMessage");
+			const outActionMessageLabel = document.getElementById("outActionMessageLabel");
+			
+			outActionMessage.className = "";
+			outActionMessageLabel.className = "";
+			
+			outActionMessage.checked = panel.sign.advisoryMessage;
+			
+			const globalPositioning = document.getElementById("globalPosition");
+			const globalPositionLabel = document.getElementById("globalPositionLabel");
+			
+			const g_actionMessage = document.getElementById("g_actionMessage");
+			
+			g_actionMessage.className = "";
+		
+			globalPositioning.className = "";
+			globalPositionLabel.className = "";
+			for (const option of globalPositioning.options) {
+				if (option.value == panel.sign.globalPositioning) {
+					option.selected == true;
+					break;
+				}
+			}
+		} else {
+			const globalPositioning = document.getElementById("globalPosition");
+			const outActionMessage = document.getElementById("outActionMessage");
+			const globalPositionLabel = document.getElementById("globalPositionLabel");
+			const outActionMessageLabel = document.getElementById("outActionMessageLabel");
+			const g_actionMessage = document.getElementById("g_actionMessage");
+			
+			g_actionMessage.className = "invisible";
+			
+			outActionMessageLabel.className ="invisible";
+			outActionMessage.className = "invisible";
+			globalPositioning.className = "invisible";
+			globalPositionLabel.className = "invisible";
+			
+		}
+		
+		if (currentlySelectedSubPanelIndex > 0) {
+			const subPanelHeight = document.getElementById("subPanelHeight");
+			subPanelHeight.style.display = "initial";
+			
+			const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
+			subPanelHeightLabel.style.display = "inline-block";
+			
+			
+		} else {
+			const subPanelHeight = document.getElementById("subPanelHeight");
+			subPanelHeight.style.display = "none";
+			
+			const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
+			subPanelHeightLabel.style.display = "none";
+		}
+		
+		if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex != -1)) {
+			const subPanelLength = document.getElementById("subPanelLength");
+			subPanelLength.style.display = "initial";
+			
+			const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
+			subPanelLengthLabel.style.display = "inline-block";
+		} else {
+			const subPanelLength = document.getElementById("subPanelLength");
+			subPanelLength.style.display = "none";
+			
+			const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
+			subPanelLengthLabel.style.display = "none";
+		}
+		
+		
 	
 
 		const panelColorSelectElmt = document.getElementById("panelColor");
@@ -653,13 +896,16 @@ const app = (function() {
 				break;
 			}
 		}
-
+		
+		// Exit Tabs
+		
+		
 		const exitNumberElmt = document.getElementById("exitNumber");
-		exitNumberElmt.value = panel.exitTab.number;
+		exitNumberElmt.value = exitTab.number;
 
 		const exitTabPositionSelectElmt = document.getElementById("exitTabPosition");
 		for (const option of exitTabPositionSelectElmt.options) {
-			if (option.value == panel.exitTab.position) {
+			if (option.value == exitTab.position) {
 				option.selected = true;
 				break;
 			}
@@ -667,47 +913,52 @@ const app = (function() {
 
 		const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
 		for (const option of exitTabWidthSelectElmt.options) {
-			if (option.value == panel.exitTab.width) {
+			if (option.value == exitTab.width) {
 				option.selected = true;
 				break;
 			}
 		}
 		
+        const tollSettingOptions = document.getElementsByName("tollOption");
 		
-		var paddingValues = panel.sign.padding.split("rem");
+		for (const tollSettingOption of tollSettingOptions) {
+			if (tollSettingOption.value == exitTab.icon) {
+				tollSettingOption.selected = true;
+			} else {
+				tollSettingOption.selected = false;
+			}
+		}
+		
+		const iconSetting = document.getElementById("iconSelect");
+		iconSetting.value = exitTab.icon;
+		
+		for (const option of iconSetting.options) {
+			if (option.value == exitTab.icon) {
+				option.selected = true;
+				break;
+			}
+		}
+		
+		const exitFont = document.getElementById("exitFont");
+		exitFont.checked = exitTab.oldFont;
+		
+		const showLeft = document.getElementById("showLeft");
+		showLeft.checked = exitTab.showLeft;
+		
+		const fullBorder = document.getElementById("fullBorder");
+		fullBorder.checked = exitTab.fullBorder;
+		
+		const topOffset = document.getElementById("topOffset");
+		topOffset.checked = exitTab.topOffset;
+		
+		const borderThickness = document.getElementById("borderThickness");
+		borderThickness.value = exitTab.borderThickness;
+		document.getElementById("borderValue").innerHTML = borderThickness.value.toString();
 		
 		
-		var left = parseFloat(paddingValues[3]);
-		var ctop = parseFloat(paddingValues[0]);
-		var right = parseFloat(paddingValues[1]);
-		var bottom = parseFloat(paddingValues[2]);
-		
-		const paddingLeft = document.getElementById("paddingLeft");
-		const paddingTop = document.getElementById("paddingTop");
-		const paddingRight = document.getElementById("paddingRight");
-		const paddingBottom = document.getElementById("paddingBottom");
-		
-		paddingLeft.value = left;
-		paddingTop.value = ctop;
-		paddingRight.value = right;
-		paddingBottom.value = bottom;
-		
-		const manualLeft = document.getElementById("manualLeft");
-		const manualTop = document.getElementById("manualTop");
-		const manualRight = document.getElementById("manualRight");
-		const manualBottom = document.getElementById("manualBottom");
-		
-		manualLeft.value = left;
-		manualTop.value = ctop;
-		manualRight.value = right;
-		manualBottom.value = bottom;
-
-		
-		
-        
-        /**
-			Creating subPanel Settings
-		*/
+		const minHeight = document.getElementById("minHeight");
+		minHeight.value = exitTab.minHeight;
+		document.getElementById("minValue").innerHTML = borderThickness.value.toString();
 		
 		// Shields
 		
@@ -804,7 +1055,13 @@ const app = (function() {
 	const updateShieldSubform = function() {
 		
 		const shieldsContainerElmt = document.getElementById("shields");
-		const subPanel = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex];
+		var subPanel;
+		
+		if (currentlySelectedSubPanelIndex == -1) {
+			subPanel = post.panels[currentlySelectedPanelIndex].sign;
+		} else {
+			subPanel = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex];	
+		}
 		const shields = subPanel.shields;
 		
         while (shieldsContainerElmt.firstChild) {
@@ -1116,7 +1373,7 @@ const app = (function() {
             
             const panelContainer = document.getElementById("panelContainer");
             
-            panelContainer.style.visibility = "hidden";
+            panelContainer.style.background = "none";
             
             
         } else {
@@ -1132,110 +1389,149 @@ const app = (function() {
             
             const panelContainer = document.getElementById("panelContainer");
             
-            panelContainer.style.visibility = "visible";
+            panelContainer.style.background = "linear-gradient( 180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 47%, rgba(191,191,191,1) 47%, rgba(240,240,240,1) 49%, rgba(128,128,128,1) 52%, rgba(255,255,255,0) 52%, rgba(255,255,255,0) 64%, rgba(191,191,191,1) 64%, rgba(240,240,240,1) 66%, rgba(128,128,128,1) 69%, rgba(255,255,255,0) 69%";
         }
 
 		const panelContainerElmt = document.getElementById("panelContainer");
 		lib.clearChildren(panelContainerElmt);
 		
 		var index = -1;
+		var firstExitTab = null;
 		
 		for (const panel of post.panels) {
 			index++
+			
 			
 			const panelElmt = document.createElement("div");
 			panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
 			panelElmt.id = "panel" + index;
 			panelContainerElmt.appendChild(panelElmt);
 
-			const exitTabCont = document.createElement("div");
-			exitTabCont.className = `exitTabContainer ${panel.exitTab.position.toLowerCase()} ${panel.exitTab.width.toLowerCase()}`;
-			panelElmt.appendChild(exitTabCont);
-
-			const exitTabElmt = document.createElement("div");
-			exitTabElmt.className = `exitTab ${panel.exitTab.position.toLowerCase()} ${panel.exitTab.width.toLowerCase()}`;
-            exitTabCont.appendChild(exitTabElmt);
-
-			const signCont = document.createElement("div");
-			signCont.className = `signContainer exit-${panel.exitTab.width.toLowerCase()} exit-${panel.exitTab.position.toLowerCase()}`;
-			panelElmt.appendChild(signCont);
-            
-			const signElmt = document.createElement("div");
-			signElmt.className = `sign exit-${panel.exitTab.width.toLowerCase()} exit-${panel.exitTab.position.toLowerCase()}`;
-			signCont.appendChild(signElmt);
-
-			const guideArrowsElmt = document.createElement("div");
-			guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
-			signCont.appendChild(guideArrowsElmt);
-
-            const otherSymbolsElmt = document.createElement("div");
-			otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol.replace("/", "-").replace(" ", "_").toLowerCase()}`;
-			guideArrowsElmt.appendChild(otherSymbolsElmt);
-
-			const oSNumElmt = document.createElement("div");
-			oSNumElmt.className = `oSNum`;
-			otherSymbolsElmt.appendChild(oSNumElmt);
-
-			const arrowContElmt = document.createElement("div");
-            arrowContElmt.className = `arrowContainer`;
-            guideArrowsElmt.appendChild(arrowContElmt);
-			
-			const sideLeftArrowElmt = document.createElement("img");
-			sideLeftArrowElmt.className = "sideLeftArrow";
-			sideLeftArrowElmt.src="img/arrows/MainArrows/A-4.png";
-			signElmt.appendChild(sideLeftArrowElmt);
-			
-			// subpanels
-			
-            for (let subPanelIndex = 0;subPanelIndex < panel.sign.subPanels.length;subPanelIndex++) {
-      
-                const subPanel = panel.sign.subPanels[subPanelIndex];
-				let position;
-				let locked = false;
+			for (let exitTabIndex = panel.exitTabs.length - 1; exitTabIndex >= 0; exitTabIndex--) {
 				
-				if (subPanelIndex > 0) {
-                    const subDivider = document.createElement("div");
-                    subDivider.className = "subDivider";
-                    subDivider.id = "subDivider" + subPanelIndex.toString();
-                    subDivider.style.height = panel.sign.subPanels[subPanelIndex].height;
-                    signElmt.appendChild(subDivider);
-                }
-                
-                const new_subPanel = document.createElement("div");
-                new_subPanel.className = "subPanelDisplay";
-                new_subPanel.id = "S_subPanel" + subPanelIndex.toString();
-                signElmt.appendChild(new_subPanel);
-                
-                const signContentContainerElmt = document.createElement("div");
-                signContentContainerElmt.className = `signContentContainer shieldPosition${panel.sign.shieldPosition}`;
-                signContentContainerElmt.id = "signContentContainer" + subPanelIndex.toString();
-                signElmt.appendChild(signContentContainerElmt);
-
-                
-                const shieldsContainerElmt = document.createElement("div");
-                shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
-                shieldsContainerElmt.id = "shieldsContainer" + subPanelIndex.toString();
-                signContentContainerElmt.appendChild(shieldsContainerElmt);
-                
-                const controlTextElmt = document.createElement("p");
-                controlTextElmt.className = "controlText";
-                controlTextElmt.id = "controlText" + subPanelIndex.toString();
-                signContentContainerElmt.appendChild(controlTextElmt);
-                
-                const actionMessageElmt = document.createElement("div");
-                actionMessageElmt.className = `actionMessage`;
-                actionMessageElmt.id = "actionMessage" + subPanelIndex.toString();
-				signContentContainerElmt.appendChild(actionMessageElmt);
+				var exitTab = panel.exitTabs[exitTabIndex];
+				
+				const exitTabCont = document.createElement("div");
+				exitTabCont.className = `exitTabContainer ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
+				panelElmt.appendChild(exitTabCont);
+				
+				var nestedExitTabs = exitTab.nestedExitTabs.length;
+				
+				for (let nestIndex = -1; nestIndex < nestedExitTabs ; nestIndex++) {
+					if (nestIndex != -1) {
+						exitTab = exitTab.nestedExitTabs[nestIndex];
+					}
 					
-				for (const shield of subPanel.shields) {
+					const exitTabElmt = document.createElement("div");
+					exitTabElmt.className = `exitTab ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
+					exitTabCont.appendChild(exitTabElmt);
+					
+					if ((exitTab.color != "Panel Color") && (exitTab.color != undefined)) {
+						exitTabElmt.className += ` ${exitTab.color.toLowerCase()}`
+					} else {
+						exitTabElmt.className += ` ${panel.color.toLowerCase()}`
+					}
+					
+					if (exitTab.oldFont) {
+						exitTabElmt.style.fontFamily = "Series E";
+					}
+					
+					
+					if ((exitTab.number) || (exitTab.showLeft)) {
+							
+							if (exitTab.variant == "Default") {
+								const leftElmt = document.createElement("div");
+							
+							if (exitTab.showLeft) {
+								leftElmt.className = `leftElmt`;
+								leftElmt.appendChild(document.createTextNode("LEFT"));
+								exitTabElmt.appendChild(leftElmt);
+								exitTabElmt.style.display = "inline-block";
+								
+								if (exitTab.number) {
+									leftElmt.style.marginRight = "0.4rem";
+								}
+								
+								
+							}
+
+							const txtArr = exitTab.number.toUpperCase().split(/(\d+\S*)/);
+							const divTextElmt = document.createElement("div");
+							divTextElmt.appendChild(document.createTextNode(txtArr[0]))
+							exitTabElmt.appendChild(divTextElmt);
+							
+							
+							if (txtArr.length > 1) {
+								divTextElmt.className = "exitFormat";
+								const spanNumeralElmt = document.createElement("span");
+								spanNumeralElmt.className = "numeral";
+								spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
+								exitTabElmt.appendChild(spanNumeralElmt);
+								exitTabElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
+								if (exitTab.topOffset == false) {
+									divTextElmt.style.top = "0rem";
+								}
+							}
+							exitTabElmt.style.visibility = "visible";
+							exitTabCont.className += " tabVisible";
+							
+							
+							if (post.fontType == true) {
+									exitTabElmt.style.fontFamily = "Series E";
+							};
+						} else if (exitTab.variant == "Toll") {
+							
+						} else if (exittab.variant == "Icon") {
+							
+						} else if (exitTab.variant == "Full Left") {
+							
+						} else if (exitTab.variant == "HOV 1") {
+							
+						} else if (exitTab.variant == "HOV 2") {
+							
+						}
+						
+						if (exitTab.fullBorder == true) {
+							exitTabElmt.style.borderBottomWidth = exitTab.borderThickness.toString() + "rem";
+							exitTabElmt.style.borderBottomStyle = "solid";
+							exitTabElmt.style.borderRadius = "0.5rem";
+						}
+						
+						exitTabElmt.style.borderTopWidth = exitTab.borderThickness.toString() + "rem";
+						exitTabElmt.style.borderLeftWidth = exitTab.borderThickness.toString() + "rem";
+						exitTabElmt.style.borderRightWidth = exitTab.borderThickness.toString() + "rem";
+						exitTabElmt.style.fontSize = exitTab.fontSize.toString() + "px";
+						
+						exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
+						
+					}
+				}
+				
+				
+				if (exitTabIndex == 0) {
+					firstExitTab = exitTabCont;
+				}
+				
+				exitTabCont.style.display = "flex";
+
+			}
+
+			function createShield(i,p) {
+				/*
+					i: index (table parent)
+					p: parent (object)
+				*/
+				
+				var position;
+				
+				for (const shield of i) {
 					if ((shield.bannerPosition != "Above") && ((shield.bannerType != "None") || (shield.bannerType2 != "None")) ) {
 						position = shield.bannerPosition;
 						break;
 					}
 				}
-			
-                // Shields
-                for (const shield of subPanel.shields) {
+				
+				for (const shield of i) {
 					if ((shield.bannerPosition != "Above") && (shield.bannerType != "None") || (shield.bannerType2 != "None") && (! locked)) {
 						position = shield.bannerPosition;
 						locked = true;
@@ -1244,7 +1540,7 @@ const app = (function() {
                     const toElmt = document.createElement("p");
                     toElmt.className = "to";
                     toElmt.appendChild(document.createTextNode("TO"));
-                    shieldsContainerElmt.appendChild(toElmt);
+                    p.appendChild(toElmt);
 
                     const bannerShieldContainerElmt = document.createElement("div");
                     bannerShieldContainerElmt.className = `bannerShieldContainer ${shield.type} ${shield.specialBannerType.toLowerCase()} bannerPosition${shield.bannerPosition}`;
@@ -1264,7 +1560,7 @@ const app = (function() {
                             break;
                     }
                     
-					shieldsContainerElmt.appendChild(bannerShieldContainerElmt);
+					p.appendChild(bannerShieldContainerElmt);
 
                     const bannerContainerElmt = document.createElement("div");
                     bannerContainerElmt.className = `bannerContainer`
@@ -1277,7 +1573,7 @@ const app = (function() {
 
                     const shieldElmt = document.createElement("div");
                     shieldElmt.className = "shield";
-					shieldElmt.id = "shield" + subPanel.shields.indexOf(shield).toString();
+					shieldElmt.id = "shield" + i.indexOf(shield).toString();
                     bannerShieldContainerElmt.appendChild(shieldElmt);
                     
                     const shieldImgElmt = document.createElement("object");
@@ -1294,6 +1590,9 @@ const app = (function() {
                         case 3:
                             shieldImgElmt.className += " three";
                             break;
+						case 4:
+							shieldImgElmt.className += " four";
+							break;
                         default:
                             shieldImgElmt.className += " three";
                             break;
@@ -1333,14 +1632,12 @@ const app = (function() {
                     
                     // Shield type
                     var lengthValue = shield.routeNumber.length;
-                    if (shield.routeNumber.length > 3) {
-                        lengthValue = 3;
-                    }
-                    else if (shield.routeNumber.length == 1) {
+                    
+					if (shield.routeNumber.length == 1) {
                         lengthValue = 2;
                     }
                     
-                    const sameElement = ["AK","C","CO","FL","CD","DC","HI","ID","LA","MI","MN","MT","MT2","NB","NC","NE","NH","NM","NV","PEI","QC2","REC2","SC","TN","TX","UT","VA2","WA","WI","WY"];
+                    const sameElement = ["AK","C","CO","FL","CD","DC","HI","ID","LA","MI","MN","MT","MT2","NB","NC","NE","NH","NM","NV","PEI","QC2","REC2","SC","TN","UT","VA2","WA","WI","WY"];
                     
                     if (sameElement.includes(shield.type)) {
                                     lengthValue = 2;
@@ -1360,23 +1657,42 @@ const app = (function() {
 						shieldImgElmt.style.width = "3.8rem";
 					}
 					
+					
 					if (position == "Right") {
-						shieldElmt.style.right = subPanel.shieldDistance.toString() + "rem";
-						if (shield.bannerType2 != "None") {
-							bannerContainerElmt2.style.right = (subPanel.shieldDistance * 2).toString() + "rem";
-							bannerContainerElmt2.style.position = "relative"
-							shieldsContainerElmt.style.marginLeft = (subPanel.shields.length * subPanel.shieldDistance * 2).toString() + "rem";
+						var shieldDistance;
+						
+						if (i == panel.sign.shields) {
+							shieldDistance = panel.sign.shieldDistance;
 						} else {
-							shieldsContainerElmt.style.marginLeft = (subPanel.shields.length * subPanel.shieldDistance).toString() + "rem";
+							shieldDistance = panel.sign.subPanels[currentlySelectedSubPanelIndex].shieldDistance;
+						}
+						
+						shieldElmt.style.right = shieldDistance.toString() + "rem";
+						
+						if (shield.bannerType2 != "None") {
+							bannerContainerElmt2.style.right = (shieldDistance * 2).toString() + "rem";
+							bannerContainerElmt2.style.position = "relative"
+							p.style.marginLeft = (i.length * shieldDistance * 2).toString() + "rem";
+						} else {
+							p.style.marginLeft = (i.length * shieldDistance).toString() + "rem";
 						}
 					} else if (position == "Left") {
-						shieldElmt.style.left = subPanel.shieldDistance.toString() + "rem";
-						if (shield.bannerType2 != "None") {
-							bannerContainerElmt2.style.left = (subPanel.shieldDistance * 2).toString()  + "rem";
-							bannerContainerElmt2.style.position = "relative"
-							shieldsContainerElmt.style.marginRight = (subPanel.shields.length * subPanel.shieldDistance * 2).toString() + "rem";
+						var shieldDistance;
+						
+						if (i == panel.sign.shields) {
+							shieldDistance = panel.sign.shieldDistance;
 						} else {
-							shieldsContainerElmt.style.marginRight= (subPanel.shields.length * subPanel.shieldDistance).toString() + "rem";
+							shieldDistance = panel.sign.subPanels[currentlySelectedSubPanelIndex].shieldDistance;
+						}
+						
+						shieldElmt.style.left = shieldDistance.toString() + "rem";
+						
+						if (shield.bannerType2 != "None") {
+							bannerContainerElmt2.style.left = (shieldDistance * 2).toString()  + "rem";
+							bannerContainerElmt2.style.position = "relative"
+							p.style.marginRight = (i.length * shieldDistance * 2).toString() + "rem";
+						} else {
+							p.style.marginRight= (i.length * shieldDistance).toString() + "rem";
 						}
 					}
 
@@ -1410,52 +1726,31 @@ const app = (function() {
                     };
                     
                 }
-                
-				// sign
-				signContentContainerElmt.style.padding = panel.sign.padding;
-				
-                function LineEditor(line) {
-                    if (line.includes("</>")) {
-                        line = line.split("</>");
-                        controlTextElmt.appendChild(document.createTextNode(line[0] + "⠀⠀⠀⠀⠀⠀⠀⠀⠀" + line[1]));
-                    } else if (line.includes("<-->")) {
-                        // Line elmt
-                    } else {
-                        controlTextElmt.appendChild(document.createTextNode(line));   
-                    }
-                }
-                
-                const controlTextArray = subPanel.controlText.split("\n");
-                for (let lineNum = 0, length = controlTextArray.length - 1; lineNum < length; lineNum++) {
-                    LineEditor(controlTextArray[lineNum])             
-                    controlTextElmt.appendChild(document.createElement("br"));
-                }
-                
-                LineEditor(controlTextArray[controlTextArray.length - 1]);
-                
+			}
 
-                if (post.fontType == true) {
-                           controlTextElmt.style.fontFamily = "Series EM";
-                }
-                
-                
-                if (subPanel.actionMessage != "") {
+			function monitorActionMessage(i,p) {
+				/*
+					i: Array
+					p: Parent (element)
+				*/
+				
+				if (i.actionMessage != "") {
                     if (post.fontType == true) {
-                            actionMessageElmt.style.fontFamily = "Series E";
+                            p.style.fontFamily = "Series E";
                     } else {
-                        actionMessageElmt.style.fontFamily = "Clearview 5WR";
+                        p.style.fontFamily = "Clearview 5WR";
                     }
-                    actionMessageElmt.style.visibility = "visible";
-                    actionMessageElmt.style.display = "inline-flex";
-                    actionMessageElmt.className = `actionMessage action_message`;
-                    const txtArr = subPanel.actionMessage.split(/(\d+\S*)/);
+                    p.style.visibility = "visible";
+                    p.style.display = "inline-flex";
+                    p.className = `actionMessage action_message`;
+                    const txtArr = i.actionMessage.split(/(\d+\S*)/);
                     const txtFrac = txtArr[0].split(/([\u00BC-\u00BE]+\S*)/);
                     
-                    actionMessageElmt.appendChild(document.createTextNode(txtFrac[0]));
+                    p.appendChild(document.createTextNode(txtFrac[0]));
 
                     
                     
-                    if (((subPanel.actionMessage.includes("½")) || (subPanel.actionMessage.includes("¼")) || (subPanel.actionMessage.includes("¾"))) && (txtArr.length > 2)) {
+                    if (((i.actionMessage.includes("½")) || (i.actionMessage.includes("¼")) || (i.actionMessage.includes("¾"))) && (txtArr.length > 2)) {
                             const spanElmt = document.createElement("span");
                             spanElmt.className = "numeral special";
                             
@@ -1464,7 +1759,7 @@ const app = (function() {
                             }
                             
                             spanElmt.appendChild(document.createTextNode(txtArr[1]));
-                            actionMessageElmt.appendChild(spanElmt);
+                            p.appendChild(spanElmt);
                             
                             const spanFractionElmt = document.createElement("span");
                             spanFractionElmt.className = "fraction special";
@@ -1477,8 +1772,8 @@ const app = (function() {
                                 
                                 
                             spanFractionElmt.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/)[1]));
-                            actionMessageElmt.appendChild(spanFractionElmt);
-                            actionMessageElmt.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/).slice(2).join("")));
+                            p.appendChild(spanFractionElmt);
+                            p.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/).slice(2).join("")));
                             
                             
                     } else {
@@ -1491,8 +1786,8 @@ const app = (function() {
                             }
                             
                             spanElmt.appendChild(document.createTextNode(txtArr[1]));
-                            actionMessageElmt.appendChild(spanElmt);
-                            actionMessageElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
+                            p.appendChild(spanElmt);
+                            p.appendChild(document.createTextNode(txtArr.slice(2).join("")));
                             }
                             if (txtFrac.length > 1) {
                                 const spanFractionElmt = document.createElement("span");
@@ -1505,95 +1800,188 @@ const app = (function() {
                                 }
                                 
                                 spanFractionElmt.appendChild(document.createTextNode(txtFrac[1]));
-                                actionMessageElmt.appendChild(spanFractionElmt);
-                                actionMessageElmt.appendChild(document.createTextNode(txtFrac.slice(2).join("")));
+                                p.appendChild(spanFractionElmt);
+                                p.appendChild(document.createTextNode(txtFrac.slice(2).join("")));
                             }
                     }
                     
                     
                 }
                 else {
-                    actionMessageElmt.style.display = "none";
+                    p.style.display = "none";
                 }
-				
-				
-            }
-
-			// Exit tab
-			
-			if ((panel.sign.exitTabColor != "Panel Color") && (panel.sign.exitTabColor != undefined)) {
-                exitTabElmt.className += ` ${panel.sign.exitTabColor.toLowerCase()}`
-            } else {
-                exitTabElmt.className += ` ${panel.color.toLowerCase()}`
-            }
-            
-            if (panel.exitTab.oldFont) {
-                exitTabElmt.style.fontFamily = "Series E";
-            }
-			
-			
-			if ((panel.exitTab.number) || (panel.left)) {
-                
-                const leftElmt = document.createElement("div");
-                
-                if (panel.left) {
-                    leftElmt.className = `leftElmt`;
-                    leftElmt.appendChild(document.createTextNode("LEFT"));
-                    exitTabElmt.appendChild(leftElmt);
-					exitTabElmt.style.display = "inline-block";
-                    
-                    if (panel.exitTab.number) {
-                        leftElmt.style.marginRight = "0.4rem";
-                    }
-                    
-                    
-                }
-				
-                
-				const txtArr = panel.exitTab.number.toUpperCase().split(/(\d+\S*)/);
-				const divTextElmt = document.createElement("div");
-				divTextElmt.appendChild(document.createTextNode(txtArr[0]))
-				exitTabElmt.appendChild(divTextElmt);
-				
-				
-				if (txtArr.length > 1) {
-					divTextElmt.className = "exitFormat";
-					const spanNumeralElmt = document.createElement("span");
-					spanNumeralElmt.className = "numeral";
-					spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
-					exitTabElmt.appendChild(spanNumeralElmt);
-					exitTabElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
-				}
-				exitTabElmt.style.visibility = "visible";
-				exitTabCont.className += " tabVisible";
-				signElmt.className += " tabVisible";
-                
-                
-                if (post.fontType == true) {
-                        exitTabElmt.style.fontFamily = "Series E";
-                };
-
-				
-				if (panel.exitTab.fullBorder == true) {
-					exitTabElmt.style.borderBottomWidth = panel.exitTab.borderThickness.toString() + "rem";
-					exitTabElmt.style.borderBottomStyle = "solid";
-					exitTabElmt.style.borderRadius = "0.5rem";
-				}
-				
-				exitTabElmt.style.borderTopWidth = panel.exitTab.borderThickness.toString() + "rem";
-				exitTabElmt.style.borderLeftWidth = panel.exitTab.borderThickness.toString() + "rem";
-				exitTabElmt.style.borderRightWidth = panel.exitTab.borderThickness.toString() + "rem";
-				
-				exitTabElmt.style.minHeight = panel.exitTab.minHeight.toString() + "rem";
-				
-                
 			}
+			
+			function monitorControlText(i,p) {
+				function LineEditor(line) {
+                    if (line.includes("</>")) {
+                        line = line.split("</>");
+                        p.appendChild(document.createTextNode(line[0] + "⠀⠀⠀⠀⠀⠀⠀⠀⠀" + line[1]));
+                    } else if (line.includes("<-->")) {
+                        // Line elmt
+                    } else {
+                        p.appendChild(document.createTextNode(line));   
+                    }
+                }
+                
+                const controlTextArray = i.controlText.split("\n");
+                for (let lineNum = 0, length = controlTextArray.length - 1; lineNum < length; lineNum++) {
+                    LineEditor(controlTextArray[lineNum])             
+                    p.appendChild(document.createElement("br"));
+                }
+                
+                LineEditor(controlTextArray[controlTextArray.length - 1]);
+			}
+
+			const signCont = document.createElement("div");
+			signCont.className = `signContainer ${panel.exitTabs[0].width.toLowerCase()}`;
+			panelElmt.appendChild(signCont);
             
+			const signElmt = document.createElement("div");
+			signElmt.className = `sign ${panel.exitTabs[0].width.toLowerCase()}`;
+			
+			if ((panel.exitTabs.length > 0) && (panel.exitTabs[0].number != null)) {
+				signElmt.className += " tabVisible";
+			}
+			
+			signCont.appendChild(signElmt);
+			
+			const g_top = document.createElement("div");
+			g_top.className = `globalTop`;
+			signElmt.appendChild(g_top);
+			
+			const signHolderElmt = document.createElement("div");
+			signHolderElmt.className = `signHolder`;
+			signElmt.appendChild(signHolderElmt);
+			
+			const g_bottom = document.createElement("div");
+			g_bottom.className = `globalBottom`;
+			signElmt.appendChild(g_bottom);
+			
+			const g_shieldsContainerElmt = document.createElement("div");
+            g_shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
+			
+			createShield(panel.sign.shields,g_shieldsContainerElmt);
+
+			const g_controlTextElmt = document.createElement("p");
+            g_controlTextElmt.className = "controlText";
+			
+			monitorControlText(panel.sign,g_controlTextElmt);
+			
+			const g_actionMessageElmt = document.createElement("div");
+            g_actionMessageElmt.className = `actionMessage`;
+			
+			monitorActionMessage(panel.sign,g_actionMessageElmt);
+			
+			if ((panel.sign.shields.length != 0) || (panel.sign.controlText != "") || (panel.sign.actionMessage != "")) {
+				if (panel.sign.globalPositioning.toLowerCase() == "top") {
+					g_top.appendChild(g_shieldsContainerElmt);
+					g_top.appendChild(g_controlTextElmt);
+					g_top.appendChild(g_actionMessageElmt);
+					g_top.style.padding = "0.5rem 0rem 0.5rem 0rem";
+				} else if (panel.sign.globalPositioning.toLowerCase() == "bottom") {
+					g_bottom.appendChild(g_shieldsContainerElmt);
+					g_bottom.appendChild(g_controlTextElmt);
+					g_bottom.appendChild(g_actionMessageElmt);
+					g_bottom.style.padding = "0.5rem 0rem 0.5rem 0rem";
+				} else if (panel.sign.globalPositioning.toLowerCase() == "shield top") {
+					g_top.appendChild(g_shieldsContainerElmt);
+					g_bottom.appendChild(g_controlTextElmt);
+					g_bottom.appendChild(g_actionMessageElmt);
+					g_top.style.padding = "0.5rem 0rem 0.5rem 0rem";
+					g_bottom.style.padding = "0.5rem 0rem 0.5rem 0rem";
+				} else if (panel.sign.globalPositioning.toLowerCase() == "control top") {
+					g_bottom.appendChild(g_shieldsContainerElmt);
+					g_top.appendChild(g_controlTextElmt);
+					g_top.appendChild(g_actionMessageElmt);
+					g_top.style.padding = "0.5rem 0rem 0.5rem 0rem";
+					g_bottom.style.padding = "0.5rem 0rem 0.5rem 0rem";
+				}
+			}
+
+			const guideArrowsElmt = document.createElement("div");
+			guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
+			signCont.appendChild(guideArrowsElmt);
+
+            const otherSymbolsElmt = document.createElement("div");
+			otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol.replace("/", "-").replace(" ", "_").toLowerCase()}`;
+			guideArrowsElmt.appendChild(otherSymbolsElmt);
+
+			const oSNumElmt = document.createElement("div");
+			oSNumElmt.className = `oSNum`;
+			otherSymbolsElmt.appendChild(oSNumElmt);
+
+			const arrowContElmt = document.createElement("div");
+            arrowContElmt.className = `arrowContainer`;
+            guideArrowsElmt.appendChild(arrowContElmt);
+			
+			const sideLeftArrowElmt = document.createElement("img");
+			sideLeftArrowElmt.className = "sideLeftArrow";
+			sideLeftArrowElmt.src="img/arrows/MainArrows/A-4.png";
+			signHolderElmt.appendChild(sideLeftArrowElmt);
+			
+			// subpanels
+			
+            for (let subPanelIndex = 0;subPanelIndex < panel.sign.subPanels.length;subPanelIndex++) {
+      
+                const subPanel = panel.sign.subPanels[subPanelIndex];
+				let locked = false;
+				
+				if (subPanelIndex > 0) {
+                    const subDivider = document.createElement("div");
+                    subDivider.className = "subDivider";
+                    subDivider.id = "subDivider" + subPanelIndex.toString();
+                    subDivider.style.height = panel.sign.subPanels[subPanelIndex].height;
+                    signHolderElmt.appendChild(subDivider);
+                }
+                
+                const new_subPanel = document.createElement("div");
+                new_subPanel.className = "subPanelDisplay";
+                new_subPanel.id = "S_subPanel" + subPanelIndex.toString();
+                signHolderElmt.appendChild(new_subPanel);
+                
+                const signContentContainerElmt = document.createElement("div");
+                signContentContainerElmt.className = `signContentContainer shieldPosition${panel.sign.shieldPosition}`;
+                signContentContainerElmt.id = "signContentContainer" + subPanelIndex.toString();
+                signHolderElmt.appendChild(signContentContainerElmt);
+
+                
+                const shieldsContainerElmt = document.createElement("div");
+                shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
+                shieldsContainerElmt.id = "shieldsContainer" + subPanelIndex.toString();
+                signContentContainerElmt.appendChild(shieldsContainerElmt);
+                
+                const controlTextElmt = document.createElement("p");
+                controlTextElmt.className = "controlText";
+                controlTextElmt.id = "controlText" + subPanelIndex.toString();
+                signContentContainerElmt.appendChild(controlTextElmt);
+                
+                const actionMessageElmt = document.createElement("div");
+                actionMessageElmt.className = `actionMessage`;
+                actionMessageElmt.id = "actionMessage" + subPanelIndex.toString();
+				signContentContainerElmt.appendChild(actionMessageElmt);
+			
+                // Shields
+				createShield(subPanel.shields,shieldsContainerElmt);
+                
+				// sign
+				signContentContainerElmt.style.padding = panel.sign.padding;
+				
+				monitorControlText(subPanel,controlTextElmt);
+                
+
+                if (post.fontType == true) {
+                           controlTextElmt.style.fontFamily = "Series EM";
+                }
+				
+				monitorActionMessage(subPanel,actionMessageElmt);
+				
+            }
 
 			const sideRightArrowElmt = document.createElement("img");
 			sideRightArrowElmt.className = "sideRightArrow";
 			sideRightArrowElmt.src="img/arrows/MainArrows/A-1.png";
-			signElmt.appendChild(sideRightArrowElmt);
+			signHolderElmt.appendChild(sideRightArrowElmt);
 			
 			// Guide arrows
 			
@@ -1668,7 +2056,7 @@ const app = (function() {
 								secondaryContainer.style.marginRight = "-0.15rem";
 							}
 							
-							secondaryContainer.style.marginTop = "-0.15rem";
+							// secondaryContainer.style.marginTop = "-0.15rem";
 							guideArrowsElmt.style.padding = "0rem 0.27rem 0rem 0.27rem";
 						}
 						
@@ -1742,12 +2130,9 @@ const app = (function() {
 				signElmt.style.borderBottomLeftRadius = "0";
 				signElmt.style.borderBottomRightRadius = "0";
 				signElmt.style.borderBottomWidth = "0";
+				signElmt.style.width = "100%";
 				guideArrowsElmt.style.display = "block";
 				guideArrowsElmt.style.visibility = "visible";
-				if (panel.sign.guideArrowLanes %2 == 0 && panel.sign.guideArrow != "Exit Only" && panel.sign.actionMessage != "") {
-					path.appendChild(actionMessageElmt);
-					path.className += ` centerText`;
-				}
 				if (("Exit Only" == panel.sign.guideArrow) || ("Split Exit Only" == panel.sign.guideArrow) || ("Half Exit Only" == panel.sign.guideArrow)) {
 					if (panel.sign.guideArrowLanes > 1) {
 						guideArrowsElmt.style.padding = "0rem";
@@ -1774,123 +2159,130 @@ const app = (function() {
 
 					// Interlase arrows and the words EXIT and ONLY, ensuring
 					//   EXIT ONLY is centered between all the arrows.
-					for (let arrowIndex = 0, length = panel.sign.guideArrowLanes; arrowIndex < length; arrowIndex++) {
-						// Evens
-						if (length %2 == 0) {
-							if (arrowIndex == Math.floor(length/2)) {
-								const textExitOnlySpanElmt = document.createElement("span");
-                                if (panel.sign.showExitOnly == false) {
-                                    textExitOnlySpanElmt.appendChild(document.createTextNode("EXIT ONLY"));
-                                    
-                                    var bonus = "";
-                                    
-                                    if (panel.sign.guideArrow == "Split Exit Only") {
-                                        bonus = " split"
-                                    }
-                                    
-                                    textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
-                                }
-                                else {
-                                    textExitOnlySpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀"));
-								textExitOnlySpanElmt.className = "exitOnlyText";
-                                }
-								path.appendChild(textExitOnlySpanElmt);
-								
-								if (panel.sign.guideArrow == "Split Exit Only") {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+					if (panel.sign.guideArrowLanes == 0 && panel.sign.advisoryMessage == true) {
+						const actionMessage = document.createElement("span");
+						actionMessage.className = "exitOnlyText";
+						actionMessage.appendChild(document.createTextNode(panel.sign.advisoryText));
+						path.appendChild(actionMessage);
+					} else {
+						for (let arrowIndex = 0, length = panel.sign.guideArrowLanes; arrowIndex < length; arrowIndex++) {
+							// Evens
+							if (length %2 == 0) {
+								if (arrowIndex == Math.floor(length/2)) {
+									const textExitOnlySpanElmt = document.createElement("span");
+									if (panel.sign.showExitOnly == false) {
+										textExitOnlySpanElmt.appendChild(document.createTextNode("EXIT ONLY"));
+										
+										var bonus = "";
+										
+										if (panel.sign.guideArrow == "Split Exit Only") {
+											bonus = " split"
+										}
+										
+										textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
+									}
+									else {
+										textExitOnlySpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀"));
+									textExitOnlySpanElmt.className = "exitOnlyText";
+									}
+									path.appendChild(textExitOnlySpanElmt);
+									
+									if (panel.sign.guideArrow == "Split Exit Only") {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+									} else {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									}
+									
+									if ((arrowIndex + 1 < length) && (length != 2)) {
+										const space = document.createElement("span")
+										space.className = "exitOnlySpace";
+										path.appendChild(space);
+									}
 								} else {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									
+									if (panel.sign.guideArrow == "Split Exit Only") {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+									} else {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									}
+									
+									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.ceil(length/2))&& (length != 2)) {
+										const space = document.createElement("span")
+										space.className = "exitOnlySpace";
+										path.appendChild(space);
+									}
 								}
-                                
-                                if ((arrowIndex + 1 < length) && (length != 2)) {
-                                    const space = document.createElement("span")
-                                    space.className = "exitOnlySpace";
-                                    path.appendChild(space);
-                                }
-							} else {
-								
-                                if (panel.sign.guideArrow == "Split Exit Only") {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+							} else { // Odds
+								if (arrowIndex == Math.floor(length/2)) {
+									const textExitSpanElmt = document.createElement("span");
+									if (panel.sign.showExitOnly == false) {
+										textExitSpanElmt.appendChild(document.createTextNode("EXIT"));
+										
+										var bonus = "";
+										
+										if (panel.sign.guideArrow == "Split Exit Only") {
+											bonus = " split"
+										}
+										
+										textExitSpanElmt.className = "exitOnlyText" + bonus;
+									}
+									else {
+										textExitSpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀"));
+										textExitSpanElmt.className = "exitOnlyText";
+									}
+									
+									path.appendChild(textExitSpanElmt);
+									
+									if (panel.sign.guideArrow == "Split Exit Only") {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+									} else {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									}
+									
+									const textOnlySpanElmt = document.createElement("span");
+									if (panel.sign.showExitOnly == false) {
+										textOnlySpanElmt.appendChild(document.createTextNode("ONLY"));
+										
+										var bonus = "";
+										
+										if (panel.sign.guideArrow == "Split Exit Only") {
+											bonus = " split"
+										}
+										
+										textOnlySpanElmt.className = "exitOnlyText" + bonus;
+									}
+									else {
+										textOnlySpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀"));
+										textOnlySpanElmt.className = "exitOnlyText";
+									}
+									path.appendChild(textOnlySpanElmt);
+								} else if (arrowIndex == Math.ceil(length/2)) {
+									
+									if (panel.sign.guideArrow == "Split Exit Only") {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+									} else {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									}
+									
+									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length/2))&& (length != 2)) {
+										const space = document.createElement("span")
+										space.className = "exitOnlySpace";
+										path.appendChild(space);
+									}
 								} else {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									
+									if (panel.sign.guideArrow == "Split Exit Only") {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+									} else {
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+									}
+									
+									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length/2))&& (length != 2)) {
+										const space = document.createElement("span")
+										space.className = "exitOnlySpace";
+										path.appendChild(space);
+									}
 								}
-								
-								if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.ceil(length/2))&& (length != 2)) {
-                                    const space = document.createElement("span")
-                                    space.className = "exitOnlySpace";
-                                    path.appendChild(space);
-                                }
-							}
-						} else { // Odds
-							if (arrowIndex == Math.floor(length/2)) {
-                                const textExitSpanElmt = document.createElement("span");
-                                if (panel.sign.showExitOnly == false) {
-                                    textExitSpanElmt.appendChild(document.createTextNode("EXIT"));
-                                    
-                                    var bonus = "";
-                                    
-                                    if (panel.sign.guideArrow == "Split Exit Only") {
-                                        bonus = " split"
-                                    }
-                                    
-                                    textExitSpanElmt.className = "exitOnlyText" + bonus;
-                                }
-                                else {
-                                    textExitSpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀"));
-                                    textExitSpanElmt.className = "exitOnlyText";
-                                }
-								
-								path.appendChild(textExitSpanElmt);
-								
-								if (panel.sign.guideArrow == "Split Exit Only") {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
-								} else {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
-								}
-								
-                                const textOnlySpanElmt = document.createElement("span");
-                                if (panel.sign.showExitOnly == false) {
-                                    textOnlySpanElmt.appendChild(document.createTextNode("ONLY"));
-                                    
-                                    var bonus = "";
-                                    
-                                    if (panel.sign.guideArrow == "Split Exit Only") {
-                                        bonus = " split"
-                                    }
-                                    
-                                    textOnlySpanElmt.className = "exitOnlyText" + bonus;
-                                }
-                                else {
-                                    textOnlySpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀"));
-                                    textOnlySpanElmt.className = "exitOnlyText";
-                                }
-								path.appendChild(textOnlySpanElmt);
-							} else if (arrowIndex == Math.ceil(length/2)) {
-								
-								if (panel.sign.guideArrow == "Split Exit Only") {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
-								} else {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
-								}
-                                
-								if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length/2))&& (length != 2)) {
-                                    const space = document.createElement("span")
-                                    space.className = "exitOnlySpace";
-                                    path.appendChild(space);
-                                }
-							} else {
-								
-								if (panel.sign.guideArrow == "Split Exit Only") {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
-								} else {
-									path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
-								}
-                                
-								if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length/2))&& (length != 2)) {
-                                    const space = document.createElement("span")
-                                    space.className = "exitOnlySpace";
-                                    path.appendChild(space);
-                                }
 							}
 						}
 					}
@@ -1953,11 +2345,11 @@ const app = (function() {
 			}
 		
             var width = signCont.offsetWidth;
-            var exitWidth = exitTabCont.offsetWidth;
+            var exitWidth = firstExitTab.offsetWidth;
             
-            if ((exitWidth > width) && (panel.exitTab.width == "Full") ) {
+            if ((exitWidth > width) && (firstExitTab.className.includes("full")) ) {
                 signCont.style.width = (exitWidth + 1) + "px";
-            } else if ((exitWidth > width) && (panel.exitTab.width == "Wide") )
+            } else if ((exitWidth > width) && (firstExitTab.className.includes("wide")) )
                  signCont.style.width = Math.floor(exitWidth * 1.1) + "px";
             
         
@@ -1985,6 +2377,12 @@ const app = (function() {
 		downloadSign : downloadSign,
 		updatePreview : updatePreview,
 		updateFileType : updateFileType,
-		resetPadding : resetPadding
+		resetPadding : resetPadding,
+		newExitTab : newExitTab,
+		duplicateExitTab : duplicateExitTab,
+		removeExitTab : removeExitTab,
+		changeEditingExitTab : changeEditingExitTab,
+		newNestExitTab : newNestExitTab,
+		deleteNestExitTab : deleteNestExitTab
 	};
 })();

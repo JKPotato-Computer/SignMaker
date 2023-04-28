@@ -38,7 +38,8 @@ form nav input[type=number] {
     width: 7%;
 }
 
-.active {
+.active,
+.exitTabSelect.active {
     background-color: rgb(200,200,200);
 }
 
@@ -175,7 +176,7 @@ fieldset {
 	width: 2.25rem;
 }
 
-#actionMessage {
+#actionMessage, #g_actionMessage {
 	width: 15.75rem;
 }
 
@@ -338,6 +339,15 @@ hr {
     border-top: 3px solid rgb(255,255,255);
 }
 
+#exitTabSettings {
+	background: linear-gradient(0deg, rgba(255,255,255, 0.2), rgba(255,255,255, 0.5));
+    border-radius: 0.5rem;
+    border-bottom-left-radius: 0rem;
+    border-bottom-right-radius: 0rem;
+    padding: 0.4rem;
+    border-bottom: 3px solid rgb(255,255,255);
+}
+
 #panelPositionDiv {
 	display: table-cell;
 	width: 26%;
@@ -488,4 +498,28 @@ hr {
 
 #paddingSection {
 	display: inline-block;
+}
+
+.radioOption {
+	width: auto;
+}
+
+#extraSettings {
+    border-radius: 1rem;
+    background: rgba(255,255,255,0.3);
+	padding: 1rem;
+}
+
+.exitTabSelect {
+    background: rgb(230,230,230);
+    width: auto;
+    border-radius: 0rem;
+}
+
+.exitTabSelect:hover {
+	background: rgb(200,200,200);
+}
+
+.invisible {
+	display: none;
 }

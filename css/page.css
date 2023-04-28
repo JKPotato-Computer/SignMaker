@@ -95,6 +95,20 @@
 }
 
 @font-face {
+    font-family: 'Series F';
+    src: url('../fonts/Roadgeek/EOT/Roadgeek2005SeriesF.eot');
+    src: url('../fonts/Roadgeek/EOT/Roadgeek2005SeriesF.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/Roadgeek/WOFF2/Roadgeek2005SeriesF.woff2') format('woff2'),
+        url('../fonts/Roadgeek/WOFF/Roadgeek2005SeriesF.woff') format('woff'),
+        url('../fonts/Roadgeek/TTF/Roadgeek2005SeriesF.ttf') format('truetype'),
+        url('../fonts/Roadgeek/WEBFONT/Roadgeek2005SeriesF.svg#Roadgeek2005SeriesF') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+@font-face {
 	font-family: 'Clearview 4W';
 	src: url('../fonts/Clearview/EOT/ClearviewHwy-Four-w.eot');
 	src: url('../fonts/Clearview/EOT/ClearviewHwy-Four-W#iefix') format('rembedded-opentype'),
