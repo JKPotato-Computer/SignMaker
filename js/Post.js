@@ -22,11 +22,14 @@ class Post {
 	 * Create a new panel for the post. Add it to the end of the list of existing panels.
 	 */
 	newPanel() {
-		const newSign = new Sign({controlText : "New Sign"});
+		const newSign = new Sign();
         newSign.newSubPanel();
-        
-		const newExitTab = new ExitTab();
-		const newPanel = new Panel(newSign, undefined, newExitTab);
+		
+		
+		const newPanel = new Panel(newSign, undefined);
+		const exitTab = new ExitTab();
+		newPanel.exitTabs.push(exitTab);
+
 		this.panels.push(newPanel);
 	}
 
@@ -40,6 +43,12 @@ class Post {
 		for (const subPanel of existingPanel.sign.subPanels) {
 			newSubPanels.push(Object.assign(new SubPanels(), subPanel));
 		}
+		
+		const newExitTabs = [];
+		for (const exitTab of existingPanel.exitTabs) {
+			newExitTab.push(Object.assign(new ExitTab(), exitTab));
+		}
+		
 		const newSign = new Sign({
 			shieldPosition : existingPanel.sign.shieldPosition,
 			subPanels : newSubPanels,
@@ -47,10 +56,9 @@ class Post {
 			guideArrow : existingPanel.sign.guideArrow,
 			guideArrowLanes : existingPanel.sign.guideArrowLanes,
 		});
-		const newExitTab = Object.assign(new ExitTab(), existingPanel.exitTab);
 		const newPanel = Object.assign(new Panel(), existingPanel);
 		newPanel.sign = newSign;
-		newPanel.exitTab = newExitTab;
+		newPanel.exitTab = newExitTabs;
 		this.panels.splice(++panelIndex, 0, newPanel);
 	}
 

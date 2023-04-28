@@ -14,15 +14,41 @@ class Sign {
 	 * @param {Shield[]} [opt.shields] - Array of shields to include on sign.
 	 */
 	constructor({
+			// shield
 			shieldPosition,
 			shieldBacks = false,
+			
+			// arrow
+			arrowMode = "singular",
+			arrows = [],
 			guideArrow,
 			guideArrowLanes = 1,
-            subPanels = [],
+            
+			// other
 			otherSymbol,
 			oSNum = "",
+			
+			// subpanel
+			subPanels = [],
+			
+			// global settings
+			
+			// shields
+			shields = [],
+			shieldDistance = 0.8,
+			
+			// main info
+			controlText = "",
+			
+			// settings
+			globalPositioning = "Top",
+			
+			// action message
             actionMessage = "",
 			advisoryMessage = true,
+			advisoryText = "",
+			
+			// panel
 			padding = "0.5rem 0.75rem 0.5rem 0.75rem",
 			arrowPosition = "Middle"
 		} = {}
@@ -54,16 +80,51 @@ class Sign {
         this.subPanels = subPanels;
 		this.advisoryMessage = advisoryMessage;
 		this.padding = padding;
-		this.arrowPosition = arrowPosition
+		this.arrowPosition = arrowPosition;
+		this.shields = shields;
+		this.controlText = controlText;
+		this.shieldDistance = shieldDistance;
+		this.advisoryText = advisoryText;
+		this.arrowMode = arrowMode;
+		this.arrows = arrows;
+		
+		if (this.globalPositioning.includes(globalPositioning)) {
+			this.globalPositioning = globalPositioning;
+		} else {
+			this.globalPositioning = "Top";
+		}
+		
 	}
 
 	/**
 	 * Create a new shield for the post. Add it to the end of the list of existing shields.
 	 */
      
+	newArrow() {
+		const newArrow = new Arrow();
+		this.arrows.push(newArrow);
+	}
+	
+	deleteArrow(parentIndex,arrowIndex) {
+		var selectedArrow;
+		
+		for (const arrow of this.arrows) {
+			if (arrow.parentIndex == parentIndex && arrow.arrowIndex == arrowIndex) {
+				selectedArrow = arrow;
+				break;
+			}
+		}
+		
+		this.arrows.splice(this.arrows.indexOf(selectedArrow),1);
+	}
+	 
 	newShield(number) {
 		const newShield = new Shield();
-		this.subPanels[number].shields.push(newShield);
+		if (number != -1) {
+			this.subPanels[number].shields.push(newShield);
+		} else {
+			this.shields.push(newShield);
+		}
 	}
     
     duplicateShield(shieldIndex,number) {
@@ -77,7 +138,11 @@ class Sign {
             bannerType2: existingShield.bannerType2,
             bannerPosition: existingShield.bannerPosition
         })
-        this.subPanels[number].shields.splice(++shieldIndex,0,newShield)
+		if (number != -1) {
+			this.subPanels[number].shields.splice(++shieldIndex,0,newShield);
+		} else {
+			this.shields.splice(++shieldIndex,0,newShield)
+		}
         
     }
 
@@ -86,7 +151,11 @@ class Sign {
 	 * @param {number} shieldIndex - Position of the shield in the array of shields on this sign to delete.
 	 */
 	deleteShield(shieldIndex,number) {
-		this.subPanels[number].shields.splice(shieldIndex, 1);
+		if (number != -1) {
+			this.subPanels[number].shields.splice(shieldIndex, 1);
+		} else {
+			this.shields.splice(shieldIndex, 1);
+		}
 	}
     
     /**
@@ -163,4 +232,11 @@ Sign.prototype.otherSymbols = [
 	"None",
 	"Quebec-Style Exit Marker",
 	"Quebec-Left"
+]
+
+Sign.prototype.globalPositioning = [
+	"Top",
+	"Bottom",
+	"Shield Top",
+	"Control Top"
 ]

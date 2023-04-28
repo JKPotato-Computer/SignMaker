@@ -199,7 +199,7 @@
 
 .panel.orange .sign,
 .panel.orange .signContainer,
-.panel.sorange .exitTabContainer,
+.panel.orange .exitTabContainer,
 .panel.orange .guideArrows {
 	background-color: var(--orange);
 	border-color: var(--black);
@@ -211,7 +211,7 @@
 	-webkit-filter: invert(100%);
 }
 
-.exitTab.green {
+.exitTab.green, .exitTabContainer {
     background-color: var(--green);
     border-color: var(--white);
     color: var(--white);
@@ -333,6 +333,7 @@
 .signContainer {
 	z-index: 2;	
 }
+
 .signContainer,
 .exitTabContainer.narrow,
 .exitTabContainer.edge {
@@ -359,17 +360,16 @@
 	justify-content: flex-end;
 }
 .exitTab.full {
-	margin-left: 0rem;
-	margin-right: 0rem;
+	width: 100%;
 	border-radius: 0.75rem 0.75rem 0 0;
 }
-.sign.exit-full.tabVisible {
+.sign.full.tabVisible {
 	border-radius: 0 0 0.75rem 0.75rem;
 }
-.sign.exit-edge.exit-right.tabVisible {
+.sign.edge.right.tabVisible {
 	border-radius: 0.75rem 0 0.75rem 0.75rem;
 }
-.sign.exit-edge.exit-left.tabVisible {
+.sign.edge.left.tabVisible {
 	border-radius: 0 0.75rem 0.75rem 0.75rem;
 }
 
@@ -383,10 +383,15 @@
 	border-radius: 0.75rem;
 	border-style: solid;
 	border-width: 0.2rem;
-	display: flex;
+	display: block;
 	clear: both;
-	flex-direction: row;
 	visibility: visible;
+}
+
+.signHolder {
+	display: flex;
+    clear: both;
+    flex-direction: row;
 }
 
 .panel.round .exitTabContainer,
@@ -472,14 +477,14 @@
 
 .bannerA , .bannerB {
 	border-radius: 0.1rem;
-	font-size: 1.35rem;
-	text-transform: uppercase;
-	font-family: "Clearview 4W";
-
-	margin-bottom: auto;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    font-family: "Clearview 4W";
+    margin-bottom: auto;
 }
 .bannerA::first-letter , .bannerB::first-letter {
-	font-size: 1.15em;
+	font-size: 1.8rem;
+	margin-right: -0.1rem;
 }
 
 .shield {
@@ -488,7 +493,7 @@
 }
 
 .shieldImg {
-	width:3rem;
+	width:max-content;
 	height: 3rem;
 }
 
@@ -555,7 +560,7 @@
 .controlText {
 	font-family: "Clearview 4W";
 	font-size: 1.75rem;
-    line-height: 1.8rem;
+    line-height: 2rem;
 }
 
 .guideArrows {
@@ -600,7 +605,8 @@
 
 .halfarrow {
 	height: 1.8rem;
-	margin-top: 0.2rem;
+	top: 0.1rem;
+    position: relative;
 	margin-left: 0rem;
 }
 
@@ -757,6 +763,7 @@
 
 .numeral {
 	font-size: 1.5rem;
+	word-spacing: -0.4rem;
 }
 .fraction {
     font-size: 1.5rem;
@@ -824,13 +831,11 @@
 
 .arrowContainer.left.new2 {
     background-color: var(--yellow);
-    margin-bottom: -0.35rem;
     border-bottom-left-radius: 0.5rem;
 }
 
 .arrowContainer.right.new2 {
 	background-color: var(--yellow);
-    margin-bottom: -0.35rem;
     border-bottom-right-radius: 0.5rem;
 }
 
