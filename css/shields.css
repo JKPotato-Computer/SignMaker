@@ -1,12 +1,15 @@
-.bannerShieldContainer.toll .banner {
+.bannerA.TOLL , .bannerB.TOLL {
 	background-color: var(--yellow);
 	color: var(--black);
-	padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+	padding: 0rem 0.2rem 0rem 0.2rem;
+	font-size: .75em;
+	font-family: "Series E";
 }
 
 .bannerShieldContainer.I .routeNumber {
 	color: var(--white);
 	top: 0.17em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.I.one .routeNumber,
 .bannerShieldContainer.I.two .routeNumber {
@@ -28,15 +31,14 @@
 .bannerShieldContainer.rec2 .routeNumber {
 	color: var(--black);
     font-size: 1.8rem;
-    transform: scale(1,1.2);
 	font-family: "Series D";
 	top: 0.15em;
 }
 
 .bannerShieldContainer.C .routeNumber {
 	color: var(--countyYellow);
-	font-size: 1.25em;
-	top: 0.3em;
+	font-size: 1.4em;
+	top: 0.1em;
 }
 .bannerShieldContainer.C.one .routeNumber,
 .bannerShieldContainer.Ctwo .routeNumber {
@@ -44,17 +46,19 @@
 }
 .bannerShieldContainer.C.three .routeNumber {
 	font-family: "Series C";
+	font-size: 1.3em;
 }
 
 .bannerShieldContainer.AL .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0;
+	font-size: 1.5em;
 }
 
 .bannerShieldContainer.AK .routeNumber {
 	color: var(--black);
-	top: 0.1em;
+	top: 0.27em;
 }
 .bannerShieldContainer.AK.one .routeNumber {
 	font-family: "Series E";
@@ -72,6 +76,7 @@
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.2em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.AZ.loop.three .banner {
 	display: none;
@@ -80,7 +85,8 @@
 .bannerShieldContainer.AR .routeNumber {
 	color: var(--black);
 	top: 0.15em;
-	right: 0.05em;
+	right: 0.125em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.AR.one .routeNumber,
 .bannerShieldContainer.AR.two .routeNumber {
@@ -88,12 +94,14 @@
 }
 .bannerShieldContainer.AR.three .routeNumber {
 	font-family: "Series C";
+	right: 0.15em;
 }
 
 .bannerShieldContainer.CA .routeNumber {
 	color: var(--white);
 	font-family: "Series D";
 	top: 0.45em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.CO .routeNumber {
@@ -120,6 +128,7 @@
 	color: var(--black);
 	top: 0.3em;
 	right: 0.15em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.FL.one .routeNumber,
 .bannerShieldContainer.FL.two .routeNumber {
@@ -158,6 +167,7 @@
 
 .bannerShieldContainer.HI .routeNumber {
 	color: var(--black);
+	font-size: 1.35em;
 }
 .bannerShieldContainer.HI.one .routeNumber,
 .bannerShieldContainer.HI.two .routeNumber {
@@ -174,6 +184,7 @@
 	font-family: "Series C";
 	text-align: right;
 	top: -0.15em;
+	font-size: 1.25em;
 }
 .bannerShieldContainer.ID.one .routeNumber,
 .bannerShieldContainer.ID.two .routeNumber {
@@ -181,7 +192,7 @@
 }
 .bannerShieldContainer.ID.three .routeNumber {
 	font-size: 1.15em;
-	right: 0.4em;
+	right: 0.2em;
 }
 .shieldsContainer.shieldBacks .ID .routeNumber {
 	color: var(--white);
@@ -194,18 +205,21 @@
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.35em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.IN .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.35em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.KS .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.15em;
+	font-size: 1.45em;
 }
 
 .bannerShieldContainer.LA .routeNumber {
@@ -219,6 +233,7 @@
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.35em;
+	font-size: 1.5em;
 }
 
 .bannerShieldContainer.MI .routeNumber {
@@ -236,9 +251,9 @@
 
 .bannerShieldContainer.MN .routeNumber {
 	color: var(--white);
-	font-family: "Series D";
-	font-size: 1.25em;
-	top: 0.55em;
+	font-family: "Series C";
+	font-size: 1.6em;
+	top: 0.25em;
 }
 .bannerShieldContainer.MN.bus .banner {
 	display: none;
@@ -260,6 +275,7 @@
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.3em;
+	font-size: 1.5em;
 }
 
 .bannerShieldContainer.MT2 .routeNumber {
@@ -334,11 +350,11 @@
 }
 .bannerShieldContainer.NS.three .routeNumber {
 	font-size: 1.05em;
-	top: 0.88em;
+	top: 0.8em;
 	letter-spacing: .05em;
-	left: .035em;
+	left: 0.02em;
 	color: white;
-	font-family: "Series D";
+	font-family: "Series C";
 }
 .bannerShieldContainer.bannerShieldContainer.NS.conn.three .routeNumber {
 	font-size: 1.05em;
@@ -399,6 +415,7 @@
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.15em;
+	font-size: 1.5em;
 }
 
 .bannerShieldContainer.NC .routeNumber {
@@ -429,13 +446,15 @@
 .bannerShieldContainer.OK .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
-	text-shadow: "-1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF";
+	text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
 	top: 0.35em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.OR .routeNumber {
 	color: var(--black);
-	top: 0.15em;
+	top: 0.1em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.OR.one .routeNumber,
 .bannerShieldContainer.OR.two .routeNumber {
@@ -449,19 +468,20 @@
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.2em;
+	font-size: 1.4em;
 }
 .bannerShieldContainer.PEI .routeNumber {
 	font-size: 1.2em;
-	top: 0.7em;
+	top: 0.5em;
 	color: var(--black);
 	font-family: "Series C";
 }
 .bannerShieldContainer.PEI.three .routeNumber {
 	font-size: 1.1em;
-	top: .8em;
+	top: .6em;
 }
 .bannerShieldContainer.QC .routeNumber {
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	color: var(--white);
 	top: 0.4em;
 	font-family: "Series EM";
@@ -473,36 +493,42 @@
 .bannerShieldContainer.QC2 .routeNumber {
 	font-size: 1.2rem;
 	color: var(--white);
-	top: 0.55em;
-	font-family: "Series C";
+	top: 0.4em;
+	font-family: "Series D";
+	font-size: 1.3em;
 }
 .bannerShieldContainer.RI .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.35em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.SC .routeNumber {
 	color: var(--blue);
 	font-family: "Series D";
 	top: 0.4em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.SD .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.15em;
+	font-size: 1.35em;
 }
 
 .bannerShieldContainer.TN .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0.05em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.TN2 .routeNumber {
 	color: var(--black);
 	top: -0.15em;
+	font-size: 1.35em;
 }
 .bannerShieldContainer.TN2.one .routeNumber,
 .bannerShieldContainer.TN2.two .routeNumber {
@@ -514,8 +540,8 @@
 
 .bannerShieldContainer.TX .routeNumber {
 	color: var(--black);
-    font-size: 30px;
-	top: -0.05em;
+    font-size: 1.6em;
+	top: 0.25em;
 }
 .bannerShieldContainer.TX.one .routeNumber,
 .bannerShieldContainer.TX.two .routeNumber {
@@ -560,10 +586,6 @@
 .bannerShieldContainer.TX.spur .banner {
 	display: none;
 }
-.bannerShieldContainer.TX.loop .routeNumber,
-.bannerShieldContainer.TX.spur .routeNumber {
-	top: 0.4em;
-}
 
 .bannerShieldContainer.UT .routeNumber {
 	color: var(--black);
@@ -577,24 +599,29 @@
 .bannerShieldContainer.UT.three .routeNumber {
 	font-family: "Series C";
 	font-size: 1em;
-	top: 0.65em;
+	top: 0.45em;
 }
 
 .bannerShieldContainer.VT .routeNumber {
 	color: var(--green);
 	font-family: "Series D";
 	top: 0.4em;
+	font-size: 1.4em;
 }
 
 .bannerShieldContainer.VA .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
 	top: 0em;
+	left: 0.025em;
+	font-size: 1.6em;
 }
 
 .bannerShieldContainer.VA2 .routeNumber {
 	color: var(--black);
 	top: 0.15em;
+	left: 0.025em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.VA2.one .routeNumber,
 .bannerShieldContainer.VA2.two .routeNumber {
@@ -622,6 +649,7 @@
 .bannerShieldContainer.WI .routeNumber {
 	color: var(--black);
 	top: 0.15em;
+	font-size: 1.5em;
 }
 .bannerShieldContainer.WI.one .routeNumber,
 .bannerShieldContainer.WI.two .routeNumber {
@@ -634,6 +662,7 @@
 .bannerShieldContainer.WY .routeNumber {
 	color: var(--black);
 	top: 0.2em;
+	font-size: 1.4em;
 }
 .bannerShieldContainer.WY.one .routeNumber,
 .bannerShieldContainer.WY.two .routeNumber {

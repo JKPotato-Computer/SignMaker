@@ -29,6 +29,12 @@
         <link rel="icon" type="image/x-icon" href="img/other-symbols/icon.png">
         
         <style>
+			#warning {
+				background: yellow;
+				font-family: Arial;
+				padding: 1rem;
+				font-size: 1rem;
+			}
         </style>
 	</head>
 	<body onLoad="app.init();">
@@ -44,7 +50,11 @@
 			<form name="signMaker">
                 <center>
                     <img src="img/other-symbols/Banner.png" height=125>
-					<div id="warning">NOTE: Current version MAY be buggy, specifically the Exit Tabs. Just be careful. =) </div>
+					<div id="warning">
+						Hey yall, whoever actually uses this website. This website definitely looks like its under construction (which it is). I haven't had enough time to fully complete my projects for this website, so you can probably see alot of incomplete work around here. Sorry for that, but don't worry, they'll be rolled out slowly but surely. This is a passion project, never intended to be a full-scale project. By the way, feel free to contribute yourself. I hope yall enjoyed this creation, and remember to thank <a href="https://github.com/dki-os/SignMaker">the dki-os SignMaker</a> first!
+						<br>
+						- JK_Potato / Computer
+					</div>
                 </center>
 				<!-- Panel Editing Commands -->
 				<hr>
@@ -149,14 +159,14 @@
 					
 					<div id="extraSettings">
 						<div id="tollSettings" style="display: block;">
-							<input type="radio" name="tollOption" id="ezPass" class="radioOption" value="EZPass" />
-							<label for="ezPass" style="text-align: left;"><img src="img/tolls/EZPass.png" height=20px></label>
-							<input type="radio" name="tollOption" id="FASTrak" class="radioOption" value="FASTrak" />
-							<label for="FASTrak" style="text-align: left;"><img src="img/tolls/FASTrak.png" height=50px></label>
-							<input type="radio" name="tollOption" id="SUNPass" class="radioOption" value="SUNPass" />
-							<label for="SUNPass" style="text-align: left;"><img src="img/tolls/SUNPass.png" height=50px></label>
-							<input type="radio" name="tollOption" id="custom" class="radioOption" value="custom" />
-							<label for="custom" style="text-align: left;">Custom Tag <br /> <input type="text" id="customTag" name="customTag" placeholder="Tag"/> </label>
+							<input type="radio" name="tollOption" id="ezPass" class="radioOption" value="EZPass" onchange="app.readForm();" />
+							<label for="ezPass" style="text-align: left;">E-ZPASS</label>
+							<input type="radio" name="tollOption" id="FASTrak" class="radioOption" value="FASTrak" onchange="app.readForm();" />
+							<label for="FASTrak" style="text-align: left;">FASTrak</label>
+							<input type="radio" name="tollOption" id="SUNPass" class="radioOption" value="SUNPass" onchange="app.readForm();" />
+							<label for="SUNPass" style="text-align: left;">SunPass</label>
+							<input type="radio" name="tollOption" id="custom" class="radioOption" value="custom" onchange="app.readForm();" />
+							<label for="custom" style="text-align: left;">Custom Tag <br /> <input type="text" id="customTag" name="customTag" placeholder="Tag" onchange="app.readForm();"/> </label>
 						</div>
 						<div id="iconSettings" style="display: none;">
 							<label for="iconSelect">Select icon:</label>

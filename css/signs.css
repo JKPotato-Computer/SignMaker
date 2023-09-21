@@ -211,51 +211,53 @@
 	-webkit-filter: invert(100%);
 }
 
-.exitTab.green, .exitTabContainer {
+.exitTab.green, .exitTabHolder.green {
     background-color: var(--green);
     border-color: var(--white);
     color: var(--white);
 
 }
 
-.exitTab.blue {
+.exitTab.blue, .exitTabHolder.blue {
     background-color: var(--blue);
     border-color: var(--white);
     color: var(--white);
 }
 
-.exitTab.brown {
+.exitTab.brown, .exitTabHolder.brown {
     background-color: var(--brown);
     border-color: var(--white);
     color: var(--white);
 }
 
-.exitTab.yellow {
+.exitTab.yellow, .exitTabHolder.yellow {
     background-color: var(--yellow);
     border-color: var(--black);
     color: var(--black);
+	padding: 1px;
 }
 
-.exitTab.white {
+.exitTab.white, .exitTabHolder.white {
     background-color: var(--white);
     border-color: var(--black);
     color: var(--black);
 }
 
-.exitTab.black {
+.exitTab.black, .exitTabHolder.black {
     background-color: var(--black);
     border-color: var(--white);
     color: var(--white);
 }
 
-.exitTab.purple {
+.exitTab.purple, .exitTabHolder.purple {
 	background-color: rgb(102, 0, 153);
     border-color: var(--white);
     color: var(--white);
 }
 
-
-
+.exitTabHolder {
+	flex-grow: 1;
+}
 
 .exitTab {
 	border-radius: 0.5rem 0.5rem 0 0;
@@ -482,8 +484,8 @@
     font-family: "Clearview 4W";
     margin-bottom: auto;
 }
-.bannerA::first-letter , .bannerB::first-letter {
-	font-size: 1.8rem;
+.bannerA:not(.TOLL):first-letter , .bannerB:not(.TOLL):first-letter {
+	font-size: 1.6rem;
 	margin-right: -0.1rem;
 }
 
@@ -849,4 +851,19 @@ img.exitOnlyArrow:first-child {
 img.exitOnlyArrow:last-child {
     padding-right: 0.8rem;
     padding-left: 0.3rem;
+}
+
+
+.tagOnlyText {
+	color: black;
+	background: white;
+	padding: .05rem .1rem 0.05rem .1rem;
+	font-family: "Series E";
+}
+
+.exitTab:has(.tagOnlyText) {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: .4rem;
 }
