@@ -398,7 +398,13 @@ const app = (function() {
 		if (exitTab.variant == "Toll") {
 			for (const tollOption of document.getElementsByName("tollOption")) {
 				if (tollOption.checked == true) {
-					exitTab.icon == tollOption.value;
+					if (tollOption.value != "custom") {
+						exitTab.icon = tollOption.value;
+						exitTab.useTextBasedIcon = false;
+					} else {
+						exitTab.icon = form["customTag"].value;
+						exitTab.useTextBasedIcon = true;
+					}
 					break;
 				}
 			}
@@ -473,8 +479,8 @@ const app = (function() {
 								for (const value of values) {
 									if (value.includes(";")) {
 										const actual_Value = value.split(";");
-										if (actual_value[0] == subPanel.shields[shieldIndex].specialBannerType) {
-											if (actual_value[1].parseInt() != subPanel.shields[shieldIndex].routeNumber.length) {
+										if (actual_Value[0] == subPanel.shields[shieldIndex].specialBannerType) {
+											if (parseInt(actual_Value[1]) != subPanel.shields[shieldIndex].routeNumber.length) {
 												break;
 											} else {
 												break_check = true;
@@ -798,8 +804,13 @@ const app = (function() {
 			
 			
 			new_button.addEventListener("change", function() {
-				changeEditingExitTab(exitTabIndex, parseInt(new_button.value))
+				changeEditingExitTab(exitTabIndex, parseInt(new_button.value));
 			})
+			
+			new_button.addEventListener("click", function() {
+				changeEditingExitTab(exitTabIndex);
+			})
+			
 			
             exitTabList.appendChild(new_button);
 		}
@@ -1424,12 +1435,19 @@ const app = (function() {
 					
 					const exitTabElmt = document.createElement("div");
 					exitTabElmt.className = `exitTab ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
-					exitTabCont.appendChild(exitTabElmt);
+					
+					const exitTabHolderElmt = document.createElement("div");
+					exitTabHolderElmt.className = "exitTabHolder"
+					exitTabHolderElmt.appendChild(exitTabElmt);
+					
+					exitTabCont.appendChild(exitTabHolderElmt);
 					
 					if ((exitTab.color != "Panel Color") && (exitTab.color != undefined)) {
 						exitTabElmt.className += ` ${exitTab.color.toLowerCase()}`
+						exitTabHolderElmt.className += ` ${exitTab.color.toLowerCase()}`
 					} else {
 						exitTabElmt.className += ` ${panel.color.toLowerCase()}`
+						exitTabHolderElmt.className += ` ${panel.color.toLowerCase()}`
 					}
 					
 					if (exitTab.oldFont) {
@@ -1437,50 +1455,60 @@ const app = (function() {
 					}
 					
 					
-					if ((exitTab.number) || (exitTab.showLeft)) {
+					if ((exitTab.number) || (exitTab.showLeft) || (exitTab.variant != "Default")) {
+							
+							console.log("hola");
 							
 							if (exitTab.variant == "Default") {
 								const leftElmt = document.createElement("div");
 							
-							if (exitTab.showLeft) {
-								leftElmt.className = `leftElmt`;
-								leftElmt.appendChild(document.createTextNode("LEFT"));
-								exitTabElmt.appendChild(leftElmt);
-								exitTabElmt.style.display = "inline-block";
-								
-								if (exitTab.number) {
-									leftElmt.style.marginRight = "0.4rem";
+								if (exitTab.showLeft) {
+									leftElmt.className = `leftElmt`;
+									leftElmt.appendChild(document.createTextNode("LEFT"));
+									exitTabElmt.appendChild(leftElmt);
+									exitTabElmt.style.display = "inline-block";
+									
+									if (exitTab.number) {
+										leftElmt.style.marginRight = "0.4rem";
+									}
+									
+									
 								}
-								
-								
-							}
 
-							const txtArr = exitTab.number.toUpperCase().split(/(\d+\S*)/);
-							const divTextElmt = document.createElement("div");
-							divTextElmt.appendChild(document.createTextNode(txtArr[0]))
-							exitTabElmt.appendChild(divTextElmt);
-							
-							
-							if (txtArr.length > 1) {
-								divTextElmt.className = "exitFormat";
-								const spanNumeralElmt = document.createElement("span");
-								spanNumeralElmt.className = "numeral";
-								spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
-								exitTabElmt.appendChild(spanNumeralElmt);
-								exitTabElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
-								if (exitTab.topOffset == false) {
-									divTextElmt.style.top = "0rem";
+								const txtArr = exitTab.number.toUpperCase().split(/(\d+\S*)/);
+								const divTextElmt = document.createElement("div");
+								divTextElmt.appendChild(document.createTextNode(txtArr[0]))
+								exitTabElmt.appendChild(divTextElmt);
+								
+								
+								if (txtArr.length > 1) {
+									divTextElmt.className = "exitFormat";
+									const spanNumeralElmt = document.createElement("span");
+									spanNumeralElmt.className = "numeral";
+									spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
+									exitTabElmt.appendChild(spanNumeralElmt);
+									exitTabElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
+									if (exitTab.topOffset == false) {
+										divTextElmt.style.top = "0rem";
+									}
 								}
-							}
-							exitTabElmt.style.visibility = "visible";
-							exitTabCont.className += " tabVisible";
-							
-							
-							if (post.fontType == true) {
-									exitTabElmt.style.fontFamily = "Series E";
-							};
 						} else if (exitTab.variant == "Toll") {
-							
+							let tollAuthority = exitTab.icon;
+							console.log(exitTab.icon);
+							console.log(exitTab.useTextBasedIcon);
+							if (exitTab.useTextBasedIcon) {
+								console.log("hola");
+								const tagElement = document.createElement("span");
+								tagElement.textContent = tollAuthority.toUpperCase();
+								tagElement.className = "tagText";
+								
+								const onlyElement = document.createElement("span");
+								onlyElement.textContent = "ONLY";
+								onlyElement.className = "tagOnlyText"
+								
+								exitTabElmt.appendChild(tagElement);
+								exitTabElmt.appendChild(onlyElement);
+							}
 						} else if (exittab.variant == "Icon") {
 							
 						} else if (exitTab.variant == "Full Left") {
@@ -1490,6 +1518,13 @@ const app = (function() {
 						} else if (exitTab.variant == "HOV 2") {
 							
 						}
+						
+						exitTabElmt.style.visibility = "visible";
+						exitTabCont.className += " tabVisible";
+						
+						if (post.fontType == true) {
+							exitTabElmt.style.fontFamily = "Series E";
+						};
 						
 						if (exitTab.fullBorder == true) {
 							exitTabElmt.style.borderBottomWidth = exitTab.borderThickness.toString() + "rem";
@@ -1818,7 +1853,6 @@ const app = (function() {
                         line = line.split("</>");
                         p.appendChild(document.createTextNode(line[0] + "⠀⠀⠀⠀⠀⠀⠀⠀⠀" + line[1]));
                     } else if (line.includes("<-->")) {
-                        // Line elmt
                     } else {
                         p.appendChild(document.createTextNode(line));   
                     }

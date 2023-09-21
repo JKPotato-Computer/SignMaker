@@ -12,6 +12,7 @@ class ExitTab {
 		color = null,
 		variant = "Default",
 		icon = null,
+		useTextBasedIcon = false,
 		fullBorder = false,
 		topOffset = true,
 		showLeft = false,
