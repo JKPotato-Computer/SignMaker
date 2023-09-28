@@ -1,21 +1,25 @@
 const app = (function() {
-	
+
 	let post = {};
 	let currentlySelectedPanelIndex = -1;
 	let currentlySelectedSubPanelIndex = 0;
 	let currentlySelectedExitTabIndex = 0;
-	let nestedIndex = -1;
-	
+	let currentlySelectedNestedExitTabIndex = -1;
+
 	let fileInfo = {
-		
-		fileType : "png",
-		panel : -1,
-		
+
+		fileType: "png",
+		panel: -1,
+
 	};
 
-	/**
-	 * Initialize the application.
-	 */
+
+	const clamp = function(number, min, max) {
+		return Math.max(min, Math.min(number, max));
+	}
+
+	// Initialize the application, and populates dropdowns and the default post.
+
 	const init = function() {
 		// Create the post on which to place panels
 		post = new Post(Post.prototype.polePositions[0]);
@@ -23,123 +27,132 @@ const app = (function() {
 		// Populate post position options
 		const postPositionSelectElmt = document.getElementById("postPosition");
 		for (const polePosition of Post.prototype.polePositions) {
-			lib.appendOption(postPositionSelectElmt, polePosition, {selected : (polePosition == "Left")});
+			lib.appendOption(postPositionSelectElmt, polePosition, {
+				selected: (polePosition == "Left")
+			});
 		}
 
-		
+
 		// Populate color options
 		const colorSelectElmt = document.getElementById("panelColor");
 		for (const color in lib.colors) {
-			lib.appendOption(colorSelectElmt, color, {text : color});
-		}
-		
-		const cornerTypeSelectElmt = document.getElementById("panelCorner");
-		for (const corner of Panel.prototype.cornerType) {
-			lib.appendOption(cornerTypeSelectElmt, corner, {selected : (corner == "Round")});
+			lib.appendOption(colorSelectElmt, color, {
+				text: color
+			});
 		}
 
-		
+		const cornerTypeSelectElmt = document.getElementById("panelCorner");
+		for (const corner of Panel.prototype.cornerType) {
+			lib.appendOption(cornerTypeSelectElmt, corner, {
+				selected: (corner == "Round")
+			});
+		}
+
+
 		// Populate exit tab position options
 		const exitTabPositionSelectElmt = document.getElementById("exitTabPosition");
 		for (const position of ExitTab.prototype.positions) {
-			lib.appendOption(exitTabPositionSelectElmt, position, {selected : (position == "Right")});
+			lib.appendOption(exitTabPositionSelectElmt, position, {
+				selected: (position == "Right")
+			});
 		}
 
 		// Populate exit tab width options
 		const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
 		for (const width of ExitTab.prototype.widths) {
-			lib.appendOption(exitTabWidthSelectElmt, width, {selected : (width == "Narrow")});
+			lib.appendOption(exitTabWidthSelectElmt, width, {
+				selected: (width == "Narrow")
+			});
 		}
-		
+
 		// Populate the exit color options
-        const exitColorSelectElement = document.getElementById("exitColor");
-        for (const exitColor of ExitTab.prototype.colors) {
-            lib.appendOption(exitColorSelectElement,exitColor);
-        }
-		
+		const exitColorSelectElement = document.getElementById("exitColor");
+		for (const exitColor of ExitTab.prototype.colors) {
+			lib.appendOption(exitColorSelectElement, exitColor);
+		}
+
 		// Populate the exit variants
 		const exitVariantSelectElmt = document.getElementById("exitVariant");
 		for (const exitVariant of ExitTab.prototype.variants) {
-			lib.appendOption(exitVariantSelectElmt,exitVariant)
+			lib.appendOption(exitVariantSelectElmt, exitVariant)
 		}
-		
+
 		// Populate the exit icons
 		const iconSelectSelectElmt = document.getElementById("iconSelect");
 		for (const icons of ExitTab.prototype.icons) {
-			lib.appendOption(exitVariantSelectElmt,icons.split(":")[0]);
+			lib.appendOption(exitVariantSelectElmt, icons.split(":")[0]);
 		}
 
 		// Populate the shield position options
 		const shieldPositionsSelectElmt = document.getElementById("shieldsPosition");
 		for (const position of Sign.prototype.shieldPositions) {
-			lib.appendOption(shieldPositionsSelectElmt, position, {selected : (position == "Above")});
+			lib.appendOption(shieldPositionsSelectElmt, position, {
+				selected: (position == "Above")
+			});
 		}
-		
+
 		// Populate global positioning
 		const globalPosition = document.getElementById("globalPosition");
 		for (const position of Sign.prototype.globalPositioning) {
-			lib.appendOption(globalPosition, position, {selected : (position == "Top")});
+			lib.appendOption(globalPosition, position, {
+				selected: (position == "Top")
+			});
 		}
 
 		// Populate the guide arrow options
 		const guideArrowSelectElmt = document.getElementById("guideArrow");
 		for (const guideArrow of Sign.prototype.guideArrows) {
-			
+
 			const display = guideArrow.split(":")[0];
-			
+
 			lib.appendOption(guideArrowSelectElmt, display);
 		}
-        
-        // Populate the exit only guide arrow options
-        const exitOnlyDirectionElmt = document.getElementById("exitOnlyDirection");
+
+		// Populate the exit only guide arrow options
+		const exitOnlyDirectionElmt = document.getElementById("exitOnlyDirection");
 		for (const exitguideArrows of Sign.prototype.exitguideArrows) {
-			
+
 			const display = exitguideArrows.split(":")[0];
-			
+
 			lib.appendOption(exitOnlyDirectionElmt, display);
 		}
-        
-        // Populate the arrow directions
-        const arrowDirectionElmt = document.getElementById("arrowLocations");
-        for (const arrowDirection of Sign.prototype.arrowPositions) {
-            lib.appendOption(arrowDirectionElmt, arrowDirection);
-        }
-        
+
+		// Populate the arrow directions
+		const arrowDirectionElmt = document.getElementById("arrowLocations");
+		for (const arrowDirection of Sign.prototype.arrowPositions) {
+			lib.appendOption(arrowDirectionElmt, arrowDirection);
+		}
+
 		// Populate the other symbol options
 		const otherSymbolSelectElement = document.getElementById("otherSymbol");
 		for (const otherSymbol of Sign.prototype.otherSymbols) {
 			lib.appendOption(otherSymbolSelectElement, otherSymbol);
 		}
-		
+
 		const downloadSign = document.getElementById("downloadSign");
 		const downloadModal = document.getElementById("downloadModal");
 		const downloadClose = document.getElementById("cancelDownload");
-		
+
 		downloadSign.onclick = function() {
 			downloadModal.style.display = "block";
 			updatePreview();
 		}
-		
+
 		downloadClose.onclick = function() {
 			downloadModal.style.display = "none";
 		}
-		
+
 		window.onclick = function(event) {
-		  if (event.target == downloadModal) {
-			downloadModal.style.display = "none";
-		  }
+			if (event.target == downloadModal) {
+				downloadModal.style.display = "none";
+			}
 		}
-		
+
 
 		newPanel();
 	};
 
-	/**
-	 * Create a new panel and add it to the post.
-	 *   Set the currently selected panel for editing to the new panel.
-	 *   Update the form to reflect the new panel.
-	 *   Redraw the page.
-	 */
+	// Create a new panel, set the current editing panel to that panel, update the form, and redraw.
 	const newPanel = function() {
 		post.newPanel();
 		currentlySelectedPanelIndex = post.panels.length - 1;
@@ -147,12 +160,7 @@ const app = (function() {
 		redraw();
 	};
 
-	/**
-	 * Duplicate the currently selected panel.
-	 *   Set the currently selected panel for editing to the newly duplicated panel.
-	 *   Update the form to reflect the new panel.
-	 *   Redraw the page.
-	 */
+	// Clone the panel, set the current editing panel to that panel, update the form and redraw.
 	const duplicatePanel = function() {
 		post.duplicatePanel(currentlySelectedPanelIndex);
 		currentlySelectedPanelIndex++;
@@ -160,12 +168,10 @@ const app = (function() {
 		redraw();
 	};
 
-	/**
-	 * Delete the currently selected panel.
-	 *   Set the currently selected panel for editing to the panel ahead of the deleted panel.
-	 *   Update the form to reflect the newly selected panel.
-	 *   Redraw the page.
-	 */
+	/*
+		Delete the current panel, set the current editing panel to the panel before, update the form and redraw.
+		If no panel is found, create a new one.
+	*/
 	const deletePanel = function() {
 		post.deletePanel(currentlySelectedPanelIndex);
 		if (currentlySelectedPanelIndex > 0) {
@@ -179,99 +185,93 @@ const app = (function() {
 		}
 	};
 
-	/**
-	 * Shift the currently selected panel left.
-	 *   Set the currently selected panel for editing to the new index.
-	 *   Redraw the page.
-	 */
+	// Shift a panel to the left, and redraw.
 	const shiftLeft = function() {
 		currentlySelectedPanelIndex = post.shiftLeft(currentlySelectedPanelIndex);
 		redraw();
 	};
 
-	/**
-	 * Shift the currently selected panel right.
-	 *   Set the currently selected panel for editing to the new index.
-	 *   Redraw the page.
-	 */
+	// Shift a panel to the right, and redraw.
 	const shiftRight = function() {
 		currentlySelectedPanelIndex = post.shiftRight(currentlySelectedPanelIndex);
 		redraw();
 	};
 
-	/**
-	 * Change the current panel being edited.
-	 *   Update the form to reflect the newly selected panel.
-	 */
-	const changeEditingPanel = function(number) {
-        if ((number >= 0) && (number < post.panels.length)) {
-            currentlySelectedPanelIndex = number;
-        } else if (number > post.panels.length) {
-            currentlySelectedPanelIndex = (post.panels.length - 1);
-        } else {
-            currentlySelectedPanelIndex = 0;
-        }
-		
+	// Set the current panel based off parameter number, within the correct range (0 < # of panels - 1)
+	const changeEditingPanel = function(panelNumber) {
+		currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1)
 		currentlySelectedSubPanelIndex = 0;
-		
 		updateForm();
 	};
-	
-	const changeEditingSubPanel = function(number) {
-		const panel = post.panels[currentlySelectedPanelIndex];
-		if ((number >= -1) && (number < panel.sign.subPanels.length)) {
-			currentlySelectedSubPanelIndex = number;
-		} else if (number > panel.sign.subPanels.length) {
-			currentlySelectedSubPanelIndex = (panel.sign.subPanels.length - 1)
-		} else {
-			currentlySelectedSubPanelIndex = 0;
-		}
-		updateForm();
-	}
-	
-	const changeEditingExitTab = function(number, secondary) {
-		
-		const panel = post.panels[currentlySelectedPanelIndex];
-		
-		if (typeof number === `string`) {
-			number = parseInt(number.split("_")[1]);
-		}
-		
-		if ((number >= 0) && (number < panel.exitTabs.length)) {
-			currentlySelectedExitTabIndex = number;
-		} else if (number > panel.exitTabs.length) {
-			currentlySelectedExitTabIndex = (panel.exitTabs.length - 1)
-		} else {
-			currentlySelectedExitTabIndex = 0;
-		}
-		
-		if (secondary != null) {
-			console.log(secondary);
-			
-			if (typeof secondary === `string`) {
-				secondary = parseInt(secondary.split("_")[1]) - 1;
-			}
-			
-			nestedIndex = secondary;
-			
-		}
-		
-		updateForm();
-		
-	}
-	
+
+	// Duplicate the current subpanel, set the editing to that subpanel, update the form, and redraw.
 	const duplicateSubPanel = function() {
 		const sign = post.panels[currentlySelectedPanelIndex].sign;
 		sign.duplicateSubPanel(currentlySelectedSubPanelIndex);
-		currentlySelectedSubPanelIndex++
+		currentlySelectedSubPanelIndex++;
+		updateForm();
+		redraw();
+	};
+
+	// Set the current editing (SUB)panel based off paramter number, within the correct range (0 < # of panels - 1)
+	const changeEditingSubPanel = function(subPanelNumber) {
+		currentlySelectedSubPanelIndex = clamp(subPanelNumber, 0, post.panels[currentlySelectedPanelIndex].subPanels.length - 1)
+		updateForm();
+	};
+
+	// Create a new exit tab, update the form, and redraw.
+	const newExitTab = function() {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.newExitTab();
+		currentlySelectedExitTabIndex = panel.exitTabs.length - 1;
 		updateForm();
 		redraw();
 	}
-	
-	/**
-	 * Add a new shield to the current panel's sign.
-	 *   Update the shield subform with the new shield.
-	 */
+
+	// Create a new nested exit tab within the parent exit tab.
+	const newNestExitTab = function() {
+		const exitTab = post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex];
+		exitTab.nestExitTab();
+		currentlySelectedNestedExitTabIndex = exitTab.nestedExitTabs.length - 1;
+		updateForm();
+		redraw();
+	}
+
+	// Create a duplicate of the exit tab.
+	const duplicateExitTab = function(exitTabIndex) {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.duplicateExitTab(exitTabIndex);
+		currentlySelectedExitTabIndex++;
+		updateForm();
+		redraw();
+	}
+
+	// Delete the exit tab.
+	const removeExitTab = function(exitTabIndex) {
+		const panel = post.panels[currentlySelectedPanelIndex];
+		panel.deleteExitTab(exitTabIndex);
+		currentlySelectedExitTabIndex--
+		updateForm();
+		redraw();
+	}
+
+	// Delete the exit tab within the parent exitTab
+	const deleteNestExitTab = function(nestExitTabIndex) {
+		const exitTab = post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex];
+		exitTab.deleteNestExitTab(nestExitTabIndex);
+		currentlySelectedNestedExitTabIndex--
+		updateForm();
+		redraw();
+	}
+
+	// Set the current editing exit tab based off paramter number, its child, within the correct range (0 < # of exit Tabs - 1 // Secondary: 0 < # of child exit Tabs)
+	const changeEditingExitTab = function(exitTabNumber, nestedExitTabNumber) {
+		currentlySelectedExitTabIndex = clamp(exitTabNumber, 0, post.panels[currentlySelectedPanelIndex].exitTabs.length - 1);
+		currentlySelectedNestedExitTabIndex = (nestedExitTabNumber != null) ? clamp(nestedExitTabNumber, -1, post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex].nestedExitTabs.length - 1) : -1;
+		updateForm();
+	};
+
+	// Add a new shield to the current panel's sign, update the shield subform, and redraw the sign.
 	const newShield = function() {
 		const sign = post.panels[currentlySelectedPanelIndex].sign;
 		sign.newShield(currentlySelectedSubPanelIndex);
@@ -279,122 +279,70 @@ const app = (function() {
 		redraw();
 	};
 
-	/**
-	 * Delete a shield to the current panel's sign.
-	 *   Update the shield subform with the new shield.
-	 */
-	const deleteShield = function(index) {
+	// Delete the current shield, update the shield subform, and redraw the sign
+	const deleteShield = function(shieldIndex) {
 		const sign = post.panels[currentlySelectedPanelIndex].sign;
-		sign.deleteShield(index,currentlySelectedSubPanelIndex);
+		sign.deleteShield(shieldIndex, currentlySelectedSubPanelIndex);
 		updateShieldSubform();
 		redraw();
 	};
-    
-    const clearShields = function() {
-        var items = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex].shields.length;
-        if (items != 0) {
-            const sign = post.panels[currentlySelectedPanelIndex].sign;
-            for (let i = 0 - items; i < items; i++) {
-                sign.deleteShield(i,currentlySelectedSubPanelIndex);
-                redraw();
-            }
-			updateShieldSubform();
-        }
-    };
-    
-    const duplicateShield = function(shieldIndex) {
-        const sign = post.panels[currentlySelectedPanelIndex].sign;
-        sign.duplicateShield(shieldIndex,currentlySelectedSubPanelIndex);
-		updateShieldSubform(currentlySelectedSubPanelIndex);
-		redraw();
-    }
-	
-	const newExitTab = function() {
-		const panel = post.panels[currentlySelectedPanelIndex];
-		panel.newExitTab();
-		updateForm();
+
+	// Delete all shields of a sign
+	const clearShields = function() {
+		const subPanel = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex];
+		const shields = subPanel.shields;
+
+		while (shields.length > 0) {
+			deleteShield(shields.length - 1, currentlySelectedSubPanelIndex);
+		};
+	};
+
+	// Duplicate a shield
+	const duplicateShield = function(shieldIndex) {
+		const sign = post.panels[currentlySelectedPanelIndex].sign;
+		sign.duplicateShield(shieldIndex, currentlySelectedSubPanelIndex);
+		updateShieldSubform();
 		redraw();
 	}
-	
-	const newNestExitTab = function() {
-		const exitTab = post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex];
-		exitTab.nestExitTab();
-		updateForm();
-		redraw();
+
+	const checkSpecialShield = function(shieldIndex, specialShield) {
+		const shields = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex].shields;
+		const shield = shields[shieldIndex];
+		const specialShieldType = Shield.prototype.specialBannerTypes[shield.type][specialShield];
+
+		if (specialShieldType != undefined) {
+			if (shield.routeNumber.length >= specialShieldType) {
+				return true;
+			}
+		}
+
+		return false;
 	}
-	
-	const duplicateExitTab = function(index) {
-		const panel = post.panels[currentlySelectedPanelIndex];
-		panel.duplicateExitTab(index);
-		updateForm();
-		redraw();
-	}
-	
-	const removeExitTab = function(index) {
-		const panel = post.panels[currentlySelectedPanelIndex];
-		panel.deleteExitTab(index);
-		updateForm();
-		redraw();
-	}
-    
-	const deleteNestExitTab = function(index) {
-		const exitTab = post.panels[currentlySelectedPanelIndex].exitTabs[currentlySelectedExitTabIndex];
-		exitTab.deleteNestExitTab(index);
-		updateForm();
-		redraw();
-	}
-	
-	/**
-	 * Read the form and update the currently selected panel with the new values.
-	 *   Redraw the page.
-	 */
-	 
+
+	// Read the form and update the page by redrawing it.
 	const readForm = function() {
 		const form = document.forms[0];
 		const panel = post.panels[currentlySelectedPanelIndex];
-		var exitTab = panel.exitTabs[currentlySelectedExitTabIndex];
+		const subPanel = (currentlySelectedSubPanelIndex != -1) ? panel.sign.subPanels[currentlySelectedSubPanelIndex] : panel.sign;
+		const exitTab = (currentlySelectedNestedExitTabIndex != -1) ? exitTab.nestedExitTabs[currentlySelectedNestedExitTabIndex] : panel.exitTabs[currentlySelectedExitTabIndex];
 
 		// Post
 		post.polePosition = form["postPosition"].value;
-        
-        post.fontType = form["fontChange"].checked;
-        
-        post.showPost = form["showPost"].checked;
-		
+		post.fontType = form["fontChange"].checked;
+		post.showPost = form["showPost"].checked;
 		post.secondExitOnly = form["secondExitOnly"].checked;
-		
-        if (post.firstPanel == false) {
-            var current = parseInt(form["panelNo"].value) - 1;
-            
-            if (current < 0) {
-                current = 0
-            } else if (current > post.panels.length - 1) {
-                current = post.panels.length - 1
-            }
-            
-            post.panelNo = current;
-            
-        } else {
-            post.panelNo = 0;
-        }
-        
 
 		// Panel
 		panel.color = form["panelColor"].value;
 		panel.corner = form["panelCorner"].value;
-		
+
 		// Exit Tab
-		
-		if (nestedIndex > -1) {
-			exitTab = exitTab.nestedExitTabs[nestedIndex];
-		}
-		
 		exitTab.number = form["exitNumber"].value;
 		exitTab.width = form["exitTabWidth"].value;
 		exitTab.position = form["exitTabPosition"].value;
 		exitTab.color = form["exitColor"].value;
 		exitTab.variant = form["exitVariant"].value;
-		
+
 		if (exitTab.variant == "Toll") {
 			for (const tollOption of document.getElementsByName("tollOption")) {
 				if (tollOption.checked == true) {
@@ -413,281 +361,196 @@ const app = (function() {
 		} else {
 			exitTab.icon = null;
 		}
-		
+
 		exitTab.oldFont = form["exitFont"].checked;
 		exitTab.showLeft = form["showLeft"].checked;
 		exitTab.fullBorder = form["fullBorder"].checked;
 		exitTab.topOffset = form["topOffset"].checked;
-		
+
 		exitTab.borderThickness = form["borderThickness"].value;
 		exitTab.minHeight = form["minHeight"].value;
 		exitTab.fontSize = form["fontSize"].value;
-		
-        
-        // Left Tab
-        exitTab.showLeft = form["showLeft"].checked;
 
-        // Misc Shields
-        panel.sign.shieldBacks = form["shieldBacks"].checked;
+		// Misc Shields
+		panel.sign.shieldBacks = form["shieldBacks"].checked;
 
 		// Sign
 		if (document.getElementById("Visual").style.display == "block") {
-			panel.sign.padding = form["paddingTop"].value.toString() + "rem " + form["paddingRight"].value.toString() + "rem " + form["paddingBottom"].value.toString() + "rem " + form["paddingLeft"].value.toString() + "rem"; 
- 		} else {
-			panel.sign.padding = form["manualTop"].value.toString() + "rem " + form["manualRight"].value.toString() + "rem " + form["manualBottom"].value.toString() + "rem " + form["manualLeft"].value.toString() + "rem"; 
+			panel.sign.padding = form["paddingTop"].value.toString() + "rem " + form["paddingRight"].value.toString() + "rem " + form["paddingBottom"].value.toString() + "rem " + form["paddingLeft"].value.toString() + "rem";
+		} else {
+			panel.sign.padding = form["manualTop"].value.toString() + "rem " + form["manualRight"].value.toString() + "rem " + form["manualBottom"].value.toString() + "rem " + form["manualLeft"].value.toString() + "rem";
 		}
-		
+
 		// Global Settings
 		panel.sign.globalPositioning = form["globalPosition"].value;
-	
-		var subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
-		
-		if (currentlySelectedSubPanelIndex == -1) {
-			subPanel = panel.sign;
-		}
-		
-		
-        // Shields
-        for (let shieldIndex = 0, length = subPanel.shields.length; shieldIndex < length; shieldIndex++) {
-            var previous = subPanel.shields[shieldIndex].type;
-            var previous2 = subPanel.shields[shieldIndex].routeNumber;
-            
-            subPanel.shields[shieldIndex].type = document.getElementById(`shield${shieldIndex}_type`).value;
-            subPanel.shields[shieldIndex].routeNumber = document.getElementById(`shield${shieldIndex}_routeNumber`).value;
-		    subPanel.shields[shieldIndex].to = document.getElementById(`shield${shieldIndex}_to`).checked;
-			subPanel.shields[shieldIndex].bannerType = document.getElementById(`shield${shieldIndex}_bannerType`).value;
-			subPanel.shields[shieldIndex].bannerPosition = document.getElementById(`shield${shieldIndex}_bannerPosition`).value;
-			subPanel.shields[shieldIndex].bannerType2 = document.getElementById(`shield${shieldIndex}_bannerType2`).value;
-			
-			if ((previous != subPanel.shields[shieldIndex].type) || (previous2.length != subPanel.shields[shieldIndex].routeNumber.length)) {
-				
-				
-				const specialBannerTypeSelectElmt = document.getElementById(`shield${shieldIndex}_specialBannerType`);
-			
-				var break_check = false;
-				
-				
-				if (previous2.length != subPanel.shields[shieldIndex].routeNumber.length) {
-					
-					for (const specialBannerType of Shield.prototype.specialBannerTypes) {
-						var current = specialBannerType.split(":");
-						
-						if (current[0] == subPanel.shields[shieldIndex].type) {
-							if (current[1].includes("/")) {
-								var values = current[1].split("/");
-								
-								for (const value of values) {
-									if (value.includes(";")) {
-										const actual_Value = value.split(";");
-										if (actual_Value[0] == subPanel.shields[shieldIndex].specialBannerType) {
-											if (parseInt(actual_Value[1]) != subPanel.shields[shieldIndex].routeNumber.length) {
-												break;
-											} else {
-												break_check = true;
-												break;
-											}
-										}
-									} else {
-										if (value == subPanel.shields[shieldIndex].specialBannerType) {
-											break_check = true;
-											break;
-										}
-									}
-								}
-							}
-							break;
+
+
+		// Shields
+		for (let shieldIndex = 0, length = subPanel.shields.length; shieldIndex < length; shieldIndex++) {
+			let shield = subPanel.shields[shieldIndex];
+			shield.type = document.getElementById(`shield${shieldIndex}_type`).value;
+			shield.routeNumber = document.getElementById(`shield${shieldIndex}_routeNumber`).value;
+			shield.to = document.getElementById(`shield${shieldIndex}_to`).checked;
+			shield.bannerType = document.getElementById(`shield${shieldIndex}_bannerType`).value;
+			shield.bannerPosition = document.getElementById(`shield${shieldIndex}_bannerPosition`).value;
+			shield.bannerType2 = document.getElementById(`shield${shieldIndex}_bannerType2`).value;
+			shield.specialBannerType = (document.getElementById(`shield${shieldIndex}_specialBannerType`).value || "None");
+
+			const specialBannerTypeSelectElmt = document.getElementById(`shield${shieldIndex}_specialBannerType`);
+
+			if (Shield.prototype.specialBannerTypes[shield.type] != undefined) {
+
+				while (specialBannerTypeSelectElmt.firstChild) {
+					specialBannerTypeSelectElmt.removeChild(specialBannerTypeSelectElmt.firstChild);
+				}
+
+				for (const specialBannerType of Object.keys(Shield.prototype.specialBannerTypes[shield.type])) {
+					if (checkSpecialShield(shieldIndex, specialBannerType)) {
+						const optionElmt = document.createElement("option");
+						optionElmt.value = specialBannerType;
+						optionElmt.selected = (shield.specialBannerType == specialBannerType || false);
+						optionElmt.appendChild(document.createTextNode(specialBannerType));
+						specialBannerTypeSelectElmt.appendChild(optionElmt);
+					} else {
+						if (shield.specialBannerType == specialBannerType) {
+							shield.specialBannerType = "None";
 						}
 					}
 				}
 				
-				if (break_check) {
-					break;
-				}
-				
-				subPanel.shields[shieldIndex].specialBannerType = "None";
-			
-				// Clearing
-				while (specialBannerTypeSelectElmt.firstChild) {
-					specialBannerTypeSelectElmt.removeChild(specialBannerTypeSelectElmt.firstChild);
-				}
-				
-				// Adding
-				for (const specialBannerType of Shield.prototype.specialBannerTypes) {
-						var current = specialBannerType;
-						current = current.split(":");
-					   
-						
-						if (subPanel.shields[shieldIndex].type == current[0]) {
-							
-							if (current[1].includes("/")) {
-								var currently = current[1].split("/")
-								
-								specialBannerTypeSelectElmt.style.visibility = "visible";
-								
-								for (let i = 0; i < currently.length; i++) {
-									var value = currently[i];
-						
-									if (value.includes(";")) {
-										value = value.split(";")
-										var lengths = subPanel.shields[shieldIndex].routeNumber.length;
-										
-										if (lengths < 2) {
-											lengths = 2
-										}
-										
-										if (lengths == value[1]) {
-											const optionElmt = document.createElement("option");
-											optionElmt.value = value[0];
-											optionElmt.selected = (subPanel.shields[shieldIndex].specialBannerType || false);
-											optionElmt.appendChild(document.createTextNode(value[0]));
-											specialBannerTypeSelectElmt.appendChild(optionElmt);
-										}
-									} else {
-										const optionElmt = document.createElement("option");
-										optionElmt.value = value;
-										optionElmt.selected = (subPanel.shields[shieldIndex].specialBannerType || false);
-										optionElmt.appendChild(document.createTextNode(value));
-										specialBannerTypeSelectElmt.appendChild(optionElmt);
-									}
-								}
-								
-								break;
-							}
-							
-							
-						} else {
-							subPanel.shields[shieldIndex].specialBannerType = "None";
-							specialBannerTypeSelectElmt.style.visibility = "hidden";           
-				}
+				let optionElmt = document.createElement("option");
+				optionElmt.value = "None";
+				optionElmt.selected = ("None" == shield.specialBannerType || false);
+				optionElmt.appendChild(document.createTextNode("None"));
+				specialBannerTypeSelectElmt.appendChild(optionElmt);
+				specialBannerTypeSelectElmt.style.visibility = "";
+			} else {
+				shield.specialBannerType = "None";
+				specialBannerTypeSelectElmt.style.visibility = "hidden";
 			}
-			}    else {
-				subPanel.shields[shieldIndex].specialBannerType = (document.getElementById(`shield${shieldIndex}_specialBannerType`).value || "None");
-				
-			}
-		 
+
 		}
-            
-            subPanel.controlText = form["controlText"].value;
-            subPanel.actionMessage = form["actionMessage"].value;
-            subPanel.actionMessage = subPanel.actionMessage.replace("1/2", "½");
-            subPanel.actionMessage = subPanel.actionMessage.replace("1/4", "¼");
-            subPanel.actionMessage = subPanel.actionMessage.replace("3/4", "¾");
-            subPanel.advisoryMessage = form["outActionMessage"].checked;
-			subPanel.advisoryText = form["g_actionMessage"].value;
-            if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex == 0)) {
-                subPanel.width = parseInt(form["subPanelLength"].value);   
-            } else if (currentlySelectedSubPanelIndex != 0) {
-                subPanel.height = form["subPanelHeight"].value + "rem";
-                subPanel.width = parseInt(form["subPanelLength"].value);   
-            }
-        
-        
-		
+
+		subPanel.controlText = form["controlText"].value;
+		subPanel.actionMessage = form["actionMessage"].value;
+		subPanel.actionMessage = subPanel.actionMessage.replace("1/2", "½");
+		subPanel.actionMessage = subPanel.actionMessage.replace("1/4", "¼");
+		subPanel.actionMessage = subPanel.actionMessage.replace("3/4", "¾");
+		subPanel.advisoryMessage = form["outActionMessage"].checked;
+		subPanel.advisoryText = form["g_actionMessage"].value;
+		if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex == 0)) {
+			subPanel.width = parseInt(form["subPanelLength"].value);
+		} else if (currentlySelectedSubPanelIndex != 0) {
+			subPanel.height = form["subPanelHeight"].value + "rem";
+			subPanel.width = parseInt(form["subPanelLength"].value);
+		}
+
+
+
 		panel.sign.shieldPosition = form["shieldsPosition"].value;
-		
+
 		var guideArrow_result = form["guideArrow"].value;
-		
-		
+
+
 		for (const guideArrow_value of Sign.prototype.guideArrows) {
 			if (guideArrow_result == guideArrow_value.split(":")[0]) {
 				guideArrow_result = guideArrow_value;
 				break;
 			}
 		}
-        
-		
+
+
 		panel.sign.guideArrow = guideArrow_result;
 		panel.sign.guideArrowLanes = form["guideArrowLanes"].value;
-        panel.sign.arrowPosition = form["arrowLocations"].value;
-		
+		panel.sign.arrowPosition = form["arrowLocations"].value;
+
 		var exitOnlyDirection_result = form["exitOnlyDirection"].value;
-		
-		
+
+
 		for (const exitOnlyDirection_value of Sign.prototype.exitguideArrows) {
 			if (exitOnlyDirection_result == exitOnlyDirection_value.split(":")[0]) {
 				exitOnlyDirection_result = exitOnlyDirection_value;
 				break;
 			}
 		}
-        
-		
+
+
 		if (panel.sign.guideArrow == "Split Exit Only") {
-			
+
 			if (form["arrowLocations"].childNodes[0] == "Middle") {
 				while (form["arrowLocations"].firstChild) {
 					form["arrowLocations"].removeChild(form["arrowLocations"].lastChild);
 				}
-				
+
 				for (const arrowPosition of Sign.prototype.arrowPositions) {
 					if (arrowPosition != "Middle") {
 						lib.appendOption(form["arrowLocations"], arrowPosition);
 					}
 				}
-				
+
 				form["arrowLocations"].value = "Left";
-				panel.sign.arrowPosition = "Left";					
-				
-				} else {
-					panel.sign.arrowPosition = form["arrowLocations"].value;
-				}	
+				panel.sign.arrowPosition = "Left";
+
 			} else {
 				panel.sign.arrowPosition = form["arrowLocations"].value;
 			}
-		
-        panel.sign.exitguideArrows = exitOnlyDirection_result;
-        panel.sign.showExitOnly = form["showExitOnly"].checked;
-        
+		} else {
+			panel.sign.arrowPosition = form["arrowLocations"].value;
+		}
+
+		panel.sign.exitguideArrows = exitOnlyDirection_result;
+		panel.sign.showExitOnly = form["showExitOnly"].checked;
+
 		panel.sign.otherSymbol = form["otherSymbol"].value;
 		panel.sign.oSNum = form["oSNum"].value;
-  
+
 		// Other Symbols Extra
 		if (panel.sign.otherSymbol != "None") {
 			form["oSNum"].style.display = "block";
 		} else {
 			form["oSNum"].style.display = "none";
 		}
-        
-        const exitOnlyDirectionLabel = document.getElementById("exitOnlyDirectionLabel");
-        const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
-        const exitOnlyDirection = document.getElementById("exitOnlyDirection");
-        const showExitOnly = document.getElementById("showExitOnly");
-        
-        if ((panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Split Exit Only") && (panel.sign.guideArrow != "Half Exit Only")) {
-            exitOnlyDirectionLabel.style.visibility = "hidden";
-            showExitOnlyLabel.style.visibility = "hidden";
-            exitOnlyDirection.style.visibility = "hidden";
-            showExitOnly.style.visibility = "hidden";
-        }
-        else {
-            exitOnlyDirectionLabel.style.visibility = "visible";
-            showExitOnlyLabel.style.visibility = "visible";
-            exitOnlyDirection.style.visibility = "visible";
-            showExitOnly.style.visibility = "visible";
-        }
-		
+
+		const exitOnlyDirectionLabel = document.getElementById("exitOnlyDirectionLabel");
+		const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
+		const exitOnlyDirection = document.getElementById("exitOnlyDirection");
+		const showExitOnly = document.getElementById("showExitOnly");
+
+		if ((panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Split Exit Only") && (panel.sign.guideArrow != "Half Exit Only")) {
+			exitOnlyDirectionLabel.style.visibility = "hidden";
+			showExitOnlyLabel.style.visibility = "hidden";
+			exitOnlyDirection.style.visibility = "hidden";
+			showExitOnly.style.visibility = "hidden";
+		} else {
+			exitOnlyDirectionLabel.style.visibility = "visible";
+			showExitOnlyLabel.style.visibility = "visible";
+			exitOnlyDirection.style.visibility = "visible";
+			showExitOnly.style.visibility = "visible";
+		}
+
 		var paddingValues = panel.sign.padding.split("rem");
-		
-		
+
+
 		var left = parseFloat(paddingValues[3]);
 		var ctop = parseFloat(paddingValues[0]);
 		var right = parseFloat(paddingValues[1]);
 		var bottom = parseFloat(paddingValues[2]);
-	
+
 		const paddingLeft = document.getElementById("paddingLeft");
 		const paddingTop = document.getElementById("paddingTop");
 		const paddingRight = document.getElementById("paddingRight");
 		const paddingBottom = document.getElementById("paddingBottom");
-		
+
 		paddingLeft.value = left;
 		paddingTop.value = ctop;
 		paddingRight.value = right;
 		paddingBottom.value = bottom;
-		
+
 		const manualLeft = document.getElementById("manualLeft");
 		const manualTop = document.getElementById("manualTop");
 		const manualRight = document.getElementById("manualRight");
 		const manualBottom = document.getElementById("manualBottom");
-		
+
 		manualLeft.value = left;
 		manualTop.value = ctop;
 		manualRight.value = right;
@@ -700,141 +563,149 @@ const app = (function() {
 	 * Update the fields in the form to the values of the currently selected panel.
 	 */
 	const updateForm = function() {
-        const panel = post.panels[currentlySelectedPanelIndex];
+		const panel = post.panels[currentlySelectedPanelIndex];
 		var subPanel;
-		
+
 		if (currentlySelectedSubPanelIndex == -1) {
 			subPanel = panel.sign
 		} else {
 			subPanel = subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
 		}
 		var exitTab = panel.exitTabs[currentlySelectedExitTabIndex];
-		
-		if ((nestedIndex != -1) && (exitTab.nestedExitTabs.length > 0)) {
-			exitTab = exitTab.nestedExitTabs[nestedIndex];
+
+		if ((currentlySelectedNestedExitTabIndex != -1) && (exitTab.nestedExitTabs.length > 0)) {
+			exitTab = exitTab.nestedExitTabs[currentlySelectedNestedExitTabIndex];
 		}
-		
-		
-        const panelList = document.getElementById("panelList");
+
+
+		const panelList = document.getElementById("panelList");
 		const subPanelList = document.getElementById("subPanelList");
 		const exitTabList = document.getElementById("exitTabList");
-        
-        while (panelList.firstChild) {
-            panelList.removeChild(panelList.lastChild);
-        }
-		
-		 while (subPanelList.firstChild) {
+
+		while (panelList.firstChild) {
+			panelList.removeChild(panelList.lastChild);
+		}
+
+		while (subPanelList.firstChild) {
 			subPanelList.removeChild(subPanelList.lastChild);
-			
+
 			if (subPanelList.lastChild == document.getElementById("global")) {
 				if (currentlySelectedSubPanelIndex == -1) {
 					document.getElementById("global").className = "active";
 				} else {
 					document.getElementById("global").className = "";
 				}
-				
+
 				break;
 			}
-        }
-		
+		}
+
 		while (exitTabList.firstChild) {
 			exitTabList.removeChild(exitTabList.lastChild);
 		}
 
 
-        for (let panelIndex = 0, panelsLength = post.panels.length; panelIndex < panelsLength; panelIndex++) {
+		for (let panelIndex = 0, panelsLength = post.panels.length; panelIndex < panelsLength; panelIndex++) {
 			var new_button = document.createElement("input");
-            new_button.type = "button";
-            new_button.id = "edit" + (panelIndex + 1);
-            new_button.value = "Panel " + (panelIndex + 1);
-			
+			new_button.type = "button";
+			new_button.id = "edit" + (panelIndex + 1);
+			new_button.value = "Panel " + (panelIndex + 1);
+
 			if (currentlySelectedPanelIndex == panelIndex) {
 				new_button.className = "active"
 			} else {
 				new_button.className = "";
 			}
-			
-            new_button.addEventListener("click", function() {
-                changeEditingPanel(panelIndex);
+
+			new_button.addEventListener("click", function() {
+				changeEditingPanel(panelIndex);
 				new_button.className = "active";
-            });
-            panelList.appendChild(new_button);
+			});
+			panelList.appendChild(new_button);
 		}
-		
+
 		for (let subPanelIndex = 0, subPanelsLength = panel.sign.subPanels.length; subPanelIndex < subPanelsLength; subPanelIndex++) {
 			var new_button = document.createElement("input");
-            new_button.type = "button";
-            new_button.id = "sub_edit" + (subPanelIndex + 1);
-            new_button.value = "SubPanel " + (subPanelIndex + 1);
-			
+			new_button.type = "button";
+			new_button.id = "sub_edit" + (subPanelIndex + 1);
+			new_button.value = "SubPanel " + (subPanelIndex + 1);
+
 			if (currentlySelectedSubPanelIndex == subPanelIndex) {
 				new_button.className = "active";
 			} else {
 				new_button.className = "";
 			}
-			
-            new_button.addEventListener("click", function() {
-                changeEditingSubPanel(subPanelIndex,panel);
+
+			new_button.addEventListener("click", function() {
+				changeEditingSubPanel(subPanelIndex, panel);
 				new_button.className = "active";
-            });
-            subPanelList.appendChild(new_button);
+			});
+			subPanelList.appendChild(new_button);
 		}
-		
-		
+
+
 		for (let exitTabIndex = 0, exitTabLength = panel.exitTabs.length; exitTabIndex < exitTabLength; exitTabIndex++) {
 			const nestedExitTab = panel.exitTabs[exitTabIndex].nestedExitTabs.length;
-			
-			var new_button = document.createElement("select"); 
-            new_button.id = "tab_edit" + (exitTabIndex + 1);
+
+			const new_button = document.createElement("select");
+			new_button.id = "tab_edit" + (exitTabIndex + 1);
 			new_button.className = "exitTabSelect";
-			
-			console.log(currentlySelectedPanelIndex + " " + currentlySelectedExitTabIndex + " " + nestedIndex);
-            
+
+			console.log(currentlySelectedPanelIndex + " " + currentlySelectedExitTabIndex + " " + currentlySelectedNestedExitTabIndex);
+
 			for (let nestIndex = 0; nestIndex < nestedExitTab; nestIndex++) {
-				lib.appendOption(new_button, nestIndex, {selected : (nestedIndex == nestIndex), text : "Nest Exit Tab " + (nestIndex + 1).toString()});
+				lib.appendOption(new_button, nestIndex, {
+					selected: (currentlySelectedNestedExitTabIndex == nestIndex),
+					text: "Nest Exit Tab " + (nestIndex + 1).toString()
+				});
 			}
-			
-			lib.appendOption(new_button, -1, {selected : (nestedIndex == -1), text : "Exit Tab " + (exitTabIndex + 1).toString()});
-			
+
+			lib.appendOption(new_button, -1, {
+				selected: (currentlySelectedNestedExitTabIndex == -1),
+				text: "Exit Tab " + (exitTabIndex + 1).toString()
+			});
+
 			if (currentlySelectedExitTabIndex == exitTabIndex) {
 				new_button.className = "exitTabSelect active";
 			} else {
 				new_button.className = "exitTabSelect";
 			}
-			
-			
+
+
 			new_button.addEventListener("change", function() {
+				console.log(new_button.value);
+				console.log(new_button.id);
 				changeEditingExitTab(exitTabIndex, parseInt(new_button.value));
 			})
-			
+
 			new_button.addEventListener("click", function() {
 				changeEditingExitTab(exitTabIndex);
 			})
-			
-			
-            exitTabList.appendChild(new_button);
+
+
+			exitTabList.appendChild(new_button);
 		}
-		
+
 		// Panel Setting Config
-		
+
 		// Global Panel
 
 		if (currentlySelectedSubPanelIndex == -1) {
 			const outActionMessage = document.getElementById("outActionMessage");
 			const outActionMessageLabel = document.getElementById("outActionMessageLabel");
-			
+
 			outActionMessage.className = "";
 			outActionMessageLabel.className = "";
-			
+
 			outActionMessage.checked = panel.sign.advisoryMessage;
-			
+
 			const globalPositioning = document.getElementById("globalPosition");
 			const globalPositionLabel = document.getElementById("globalPositionLabel");
-			
+
 			const g_actionMessage = document.getElementById("g_actionMessage");
-			
+
 			g_actionMessage.className = "";
-		
+
 			globalPositioning.className = "";
 			globalPositionLabel.className = "";
 			for (const option of globalPositioning.options) {
@@ -849,48 +720,48 @@ const app = (function() {
 			const globalPositionLabel = document.getElementById("globalPositionLabel");
 			const outActionMessageLabel = document.getElementById("outActionMessageLabel");
 			const g_actionMessage = document.getElementById("g_actionMessage");
-			
+
 			g_actionMessage.className = "invisible";
-			
-			outActionMessageLabel.className ="invisible";
+
+			outActionMessageLabel.className = "invisible";
 			outActionMessage.className = "invisible";
 			globalPositioning.className = "invisible";
 			globalPositionLabel.className = "invisible";
-			
+
 		}
-		
+
 		if (currentlySelectedSubPanelIndex > 0) {
 			const subPanelHeight = document.getElementById("subPanelHeight");
 			subPanelHeight.style.display = "initial";
-			
+
 			const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
 			subPanelHeightLabel.style.display = "inline-block";
-			
-			
+
+
 		} else {
 			const subPanelHeight = document.getElementById("subPanelHeight");
 			subPanelHeight.style.display = "none";
-			
+
 			const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
 			subPanelHeightLabel.style.display = "none";
 		}
-		
+
 		if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex != -1)) {
 			const subPanelLength = document.getElementById("subPanelLength");
 			subPanelLength.style.display = "initial";
-			
+
 			const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
 			subPanelLengthLabel.style.display = "inline-block";
 		} else {
 			const subPanelLength = document.getElementById("subPanelLength");
 			subPanelLength.style.display = "none";
-			
+
 			const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
 			subPanelLengthLabel.style.display = "none";
 		}
-		
-		
-	
+
+
+
 
 		const panelColorSelectElmt = document.getElementById("panelColor");
 		for (const option of panelColorSelectElmt.options) {
@@ -899,7 +770,7 @@ const app = (function() {
 				break;
 			}
 		}
-		
+
 		const panelCornerSelectElmt = document.getElementById("panelCorner");
 		for (const option of panelCornerSelectElmt.options) {
 			if (option.value == panel.corner) {
@@ -907,10 +778,10 @@ const app = (function() {
 				break;
 			}
 		}
-		
+
 		// Exit Tabs
-		
-		
+
+
 		const exitNumberElmt = document.getElementById("exitNumber");
 		exitNumberElmt.value = exitTab.number;
 
@@ -929,9 +800,9 @@ const app = (function() {
 				break;
 			}
 		}
-		
-        const tollSettingOptions = document.getElementsByName("tollOption");
-		
+
+		const tollSettingOptions = document.getElementsByName("tollOption");
+
 		for (const tollSettingOption of tollSettingOptions) {
 			if (tollSettingOption.value == exitTab.icon) {
 				tollSettingOption.selected = true;
@@ -939,46 +810,46 @@ const app = (function() {
 				tollSettingOption.selected = false;
 			}
 		}
-		
+
 		const iconSetting = document.getElementById("iconSelect");
 		iconSetting.value = exitTab.icon;
-		
+
 		for (const option of iconSetting.options) {
 			if (option.value == exitTab.icon) {
 				option.selected = true;
 				break;
 			}
 		}
-		
+
 		const exitFont = document.getElementById("exitFont");
 		exitFont.checked = exitTab.oldFont;
-		
+
 		const showLeft = document.getElementById("showLeft");
 		showLeft.checked = exitTab.showLeft;
-		
+
 		const fullBorder = document.getElementById("fullBorder");
 		fullBorder.checked = exitTab.fullBorder;
-		
+
 		const topOffset = document.getElementById("topOffset");
 		topOffset.checked = exitTab.topOffset;
-		
+
 		const borderThickness = document.getElementById("borderThickness");
 		borderThickness.value = exitTab.borderThickness;
 		document.getElementById("borderValue").innerHTML = borderThickness.value.toString();
-		
-		
+
+
 		const minHeight = document.getElementById("minHeight");
 		minHeight.value = exitTab.minHeight;
 		document.getElementById("minValue").innerHTML = borderThickness.value.toString();
-		
+
 		// Shields
-		
+
 		updateShieldSubform()
-		
-		
+
+
 		const controlTextElmt = document.getElementById("controlText");
 		controlTextElmt.value = subPanel.controlText;
-		
+
 		const actionMessageElmt = document.getElementById("actionMessage");
 		actionMessageElmt.value = subPanel.actionMessage;
 
@@ -1003,28 +874,27 @@ const app = (function() {
 
 		const guideArrowLanesElmt = document.getElementById("guideArrowLanes");
 		guideArrowLanesElmt.value = panel.sign.guideArrowLanes;
-        
-        const exitOnlyDirectionLabel = document.getElementById("exitOnlyDirectionLabel");
-        const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
-        const exitOnlyDirection = document.getElementById("exitOnlyDirection");
-        const showExitOnly = document.getElementById("showExitOnly");
-        
-        
-        if (panel.sign.guideArrow != "Exit Only") {
-            exitOnlyDirectionLabel.style.visibility = "hidden";
-            showExitOnlyLabel.style.visibility = "hidden";
-            exitOnlyDirection.style.visibility = "hidden";
-            showExitOnly.style.visibility = "hidden";
-        }
-        else {
-            exitOnlyDirectionLabel.style.visibility = "visible";
-            showExitOnlyLabel.style.visibility = "visible";
-            exitOnlyDirection.style.visibility = "visible";
-            showExitOnly.style.visibility = "visible";
-            showExitOnly.value = panel.sign.showExitOnly;
+
+		const exitOnlyDirectionLabel = document.getElementById("exitOnlyDirectionLabel");
+		const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
+		const exitOnlyDirection = document.getElementById("exitOnlyDirection");
+		const showExitOnly = document.getElementById("showExitOnly");
+
+
+		if (panel.sign.guideArrow != "Exit Only") {
+			exitOnlyDirectionLabel.style.visibility = "hidden";
+			showExitOnlyLabel.style.visibility = "hidden";
+			exitOnlyDirection.style.visibility = "hidden";
+			showExitOnly.style.visibility = "hidden";
+		} else {
+			exitOnlyDirectionLabel.style.visibility = "visible";
+			showExitOnlyLabel.style.visibility = "visible";
+			exitOnlyDirection.style.visibility = "visible";
+			showExitOnly.style.visibility = "visible";
+			showExitOnly.value = panel.sign.showExitOnly;
 			exitOnlyDirection.value = panel.sign.exitOnlyDirection;
-			
-        }
+
+		}
 
 		const otherSymbolSelectElement = document.getElementById("otherSymbol");
 		for (const option of otherSymbolSelectElement.options) {
@@ -1036,53 +906,53 @@ const app = (function() {
 
 		const oSNumElmt = document.getElementById("oSNum");
 		oSNumElmt.value = panel.sign.oSNum;
-		
+
 		const advisoryMessageElmt = document.getElementById("outActionMessage");
 		advisoryMessageElmt.checked = panel.sign.advisoryMessage;
-		
-	};
-    
-    const addSubPanel = function() {
-        const sign = post.panels[currentlySelectedPanelIndex].sign;
-        sign.newSubPanel();
-		currentlySelectedSubPanelIndex++
-        updateForm();
-        redraw();
-    }
-    
-    const removeSubPanel = function() {
-        const sign = post.panels[currentlySelectedPanelIndex].sign;
-        if (sign.subPanels.length > 1) {
-            sign.deleteSubPanel((sign.subPanels.length - 2));
-			currentlySelectedSubPanelIndex--
-            updateForm();
-            redraw();   
-        }
-    }
 
-/**
+	};
+
+	const addSubPanel = function() {
+		const sign = post.panels[currentlySelectedPanelIndex].sign;
+		sign.newSubPanel();
+		currentlySelectedSubPanelIndex++
+		updateForm();
+		redraw();
+	}
+
+	const removeSubPanel = function() {
+		const sign = post.panels[currentlySelectedPanelIndex].sign;
+		if (sign.subPanels.length > 1) {
+			sign.deleteSubPanel((sign.subPanels.length - 2));
+			currentlySelectedSubPanelIndex--
+			updateForm();
+			redraw();
+		}
+	}
+
+	/**
 	 * Update the fields in the form relating to shields to the values of the currently selected panel.
 	 */
 	const updateShieldSubform = function() {
-		
+
 		const shieldsContainerElmt = document.getElementById("shields");
 		var subPanel;
-		
+
 		if (currentlySelectedSubPanelIndex == -1) {
 			subPanel = post.panels[currentlySelectedPanelIndex].sign;
 		} else {
-			subPanel = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex];	
+			subPanel = post.panels[currentlySelectedPanelIndex].sign.subPanels[currentlySelectedSubPanelIndex];
 		}
 		const shields = subPanel.shields;
-		
-        while (shieldsContainerElmt.firstChild) {
-            shieldsContainerElmt.removeChild(shieldsContainerElmt.lastChild);
-        }
+
+		while (shieldsContainerElmt.firstChild) {
+			shieldsContainerElmt.removeChild(shieldsContainerElmt.lastChild);
+		}
 
 		for (let shieldIndex = 0, length = shields.length; shieldIndex < length; shieldIndex++) {
-            
+
 			const rowContainerElmt = document.createElement("div");
-            rowContainerElmt.style.width = "100%";
+			rowContainerElmt.style.width = "100%";
 
 			const toCheckElmt = document.createElement("input");
 			toCheckElmt.type = "checkbox";
@@ -1100,7 +970,10 @@ const app = (function() {
 			// Populate shield options
 			const typeSelectElmt = document.createElement("select");
 			for (const type in Shield.prototype.types) {
-				lib.appendOption(typeSelectElmt, Shield.prototype.types[type], {selected : (shields[shieldIndex].type == Shield.prototype.types[type]), text : type});
+				lib.appendOption(typeSelectElmt, Shield.prototype.types[type], {
+					selected: (shields[shieldIndex].type == Shield.prototype.types[type]),
+					text: type
+				});
 			}
 			typeSelectElmt.id = `shield${shieldIndex}_type`;
 			typeSelectElmt.addEventListener("change", readForm);
@@ -1114,67 +987,54 @@ const app = (function() {
 			routeNumberElmt.addEventListener("change", readForm);
 			rowContainerElmt.appendChild(routeNumberElmt);
 
-            // Populate special banner type options
-            const specialBannerTypeSelectElmt = document.createElement("select");
-            
-            for (const specialBannerType of Shield.prototype.specialBannerTypes) {
-                var current = specialBannerType;
-                current = current.split(":");
-                if (typeSelectElmt.value == current[0]) {
-                    var currently = current[1].split("/")
-                    
-                    for (let i = 0; i < currently.length; i++) {
-                        var value = currently[i];
-                        
-                        if (value.includes(";")) {
-                            value = value.split(";")
-                            var lengths = value[1].length;
-                            
-                            if (lengths < 2) {
-                                lengths = 2
-                            }
-                            
-                            if (lengths == value[1]) {
-                                const optionElmt = document.createElement("option");
-                                optionElmt.value = value[0];
-								if (value[0] == shields[shieldIndex].specialBannerType) {
-									optionElmt.selected = true;
-								} else {
-									optionElmt.selected = false;
-								}
-                                optionElmt.appendChild(document.createTextNode(value[0]));
-                                specialBannerTypeSelectElmt.appendChild(optionElmt);
-                            }
-                        } else {
-                            const optionElmt = document.createElement("option");
-                            optionElmt.value = value;
-                            if (value == shields[shieldIndex].specialBannerType) {
-								optionElmt.selected = true;
-							} else {
-								optionElmt.selected = false;
-							}
-                            optionElmt.appendChild(document.createTextNode(value));
-                            specialBannerTypeSelectElmt.appendChild(optionElmt);
-                        }
-                        
-                    }
-                }
-            }
-            
-            specialBannerTypeSelectElmt.id = `shield${shieldIndex}_specialBannerType`;
-            specialBannerTypeSelectElmt.addEventListener("change",readForm);
-            rowContainerElmt.appendChild(specialBannerTypeSelectElmt);
-            
-            rowContainerElmt.appendChild(document.createElement("br"));
-            
-            rowContainerElmt.appendChild(document.createTextNode("Banners:"));
-            
-            rowContainerElmt.appendChild(document.createElement("br")); 
-            
-            // Populate banner type options
+			// Populate special banner type options
+			const specialBannerTypeSelectElmt = document.createElement("select");
+
+			if (Shield.prototype.specialBannerTypes[shields[shieldIndex].type] != undefined) {
+				for (const specialBannerType of Object.keys(Shield.prototype.specialBannerTypes[shields[shieldIndex].type])) {
+					if (checkSpecialShield(shieldIndex,specialBannerType)) {
+						const optionElmt = document.createElement("option");
+						optionElmt.value = specialBannerType
+						if (specialBannerType == shields[shieldIndex].specialBannerType) {
+							optionElmt.selected = true;
+						} else {
+							optionElmt.selected = false;
+						}
+						optionElmt.appendChild(document.createTextNode(specialBannerType));
+						specialBannerTypeSelectElmt.appendChild(optionElmt);
+					}
+				}
+				
+				let optionElmt = document.createElement("option");
+				optionElmt.value = "None";
+				if ("None" == shields[shieldIndex].specialBannerType) {
+					optionElmt.selected = true;
+				} else {
+					optionElmt.selected = false;
+				}
+				optionElmt.appendChild(document.createTextNode("None"));
+				specialBannerTypeSelectElmt.appendChild(optionElmt);
+				specialBannerTypeSelectElmt.style.visibility = "";
+			} else {
+				specialBannerTypeSelectElmt.style.visibility = "hidden";
+			}
+
+			specialBannerTypeSelectElmt.id = `shield${shieldIndex}_specialBannerType`;
+			specialBannerTypeSelectElmt.addEventListener("change", readForm);
+			rowContainerElmt.appendChild(specialBannerTypeSelectElmt);
+
+			rowContainerElmt.appendChild(document.createElement("br"));
+
+			rowContainerElmt.appendChild(document.createTextNode("Banners:"));
+
+			rowContainerElmt.appendChild(document.createElement("br"));
+
+			// Populate banner type options
 			const bannerTypeSelectElmt = document.createElement("select");
 			for (const bannerType of Shield.prototype.bannerTypes) {
-				lib.appendOption(bannerTypeSelectElmt, bannerType, {selected : (shields[shieldIndex].bannerType == bannerType)});
+				lib.appendOption(bannerTypeSelectElmt, bannerType, {
+					selected: (shields[shieldIndex].bannerType == bannerType)
+				});
 			}
 			bannerTypeSelectElmt.id = `shield${shieldIndex}_bannerType`;
 			bannerTypeSelectElmt.addEventListener("change", readForm);
@@ -1183,17 +1043,21 @@ const app = (function() {
 			// Populate banner position options
 			const bannerPositionSelectElmt = document.createElement("select");
 			for (const bannerPosition of Shield.prototype.bannerPositions) {
-				lib.appendOption(bannerPositionSelectElmt, bannerPosition, {selected : (shields[shieldIndex].bannerPosition == bannerPosition)});
+				lib.appendOption(bannerPositionSelectElmt, bannerPosition, {
+					selected: (shields[shieldIndex].bannerPosition == bannerPosition)
+				});
 			}
 			bannerPositionSelectElmt.id = `shield${shieldIndex}_bannerPosition`;
 			bannerPositionSelectElmt.addEventListener("change", readForm);
 			rowContainerElmt.appendChild(bannerPositionSelectElmt);
-            
-            rowContainerElmt.appendChild(document.createElement("br"));
-            
-            const bannerType2SelectElmt = document.createElement("select");
+
+			rowContainerElmt.appendChild(document.createElement("br"));
+
+			const bannerType2SelectElmt = document.createElement("select");
 			for (const bannerType2 of Shield.prototype.bannerTypes) {
-				lib.appendOption(bannerType2SelectElmt, bannerType2, {selected : (shields[shieldIndex].bannerType2 == bannerType2)});
+				lib.appendOption(bannerType2SelectElmt, bannerType2, {
+					selected: (shields[shieldIndex].bannerType2 == bannerType2)
+				});
 			}
 			bannerType2SelectElmt.id = `shield${shieldIndex}_bannerType2`;
 			bannerType2SelectElmt.addEventListener("change", readForm);
@@ -1201,15 +1065,15 @@ const app = (function() {
 
 			// Populate banner position options
 
-            rowContainerElmt.appendChild(document.createElement("br"));
-            
-            const duplicateElmt = document.createElement("input");
+			rowContainerElmt.appendChild(document.createElement("br"));
+
+			const duplicateElmt = document.createElement("input");
 			duplicateElmt.type = "button";
 			duplicateElmt.value = "Duplicate";
 			duplicateElmt.dataset.shieldIndex = shieldIndex;
 			duplicateElmt.addEventListener("click", function() {
-                duplicateShield(shieldIndex)
-            });
+				duplicateShield(shieldIndex)
+			});
 			rowContainerElmt.appendChild(duplicateElmt);
 
 			const deleteElmt = document.createElement("input");
@@ -1217,9 +1081,9 @@ const app = (function() {
 			deleteElmt.value = "Delete";
 			deleteElmt.dataset.shieldIndex = shieldIndex;
 			deleteElmt.addEventListener("click", function() {
-                deleteShield(deleteElmt.dataset.shieldIndex);
-            });
-            
+				deleteShield(deleteElmt.dataset.shieldIndex);
+			});
+
 			rowContainerElmt.appendChild(deleteElmt);
 
 			shieldsContainerElmt.appendChild(rowContainerElmt);
@@ -1229,73 +1093,29 @@ const app = (function() {
 	/**
 		Download the sign from options
 	*/
-	
+
 	function getFile() {
 		var screenshotTarget;
-		var postClass; 
-		
+		var postClass;
+
 		if (fileInfo.panel == -1) {
 			screenshotTarget = document.querySelector("#postContainer");
 		} else {
 			screenshotTarget = document.getElementById("panel" + fileInfo.panel.toString());
 		}
-		
-		
+
+
 		return screenshotTarget;
 	}
-	
+
 	const downloadSign = function() {
 		const downloadPreview = document.getElementById("downloadPreview");
 		const entirePost_option = document.getElementById("entirePost");
 		const panelContainer = document.getElementById("panelContainer");
 		const panelNumberSelector = document.getElementById("singularPanel");
-		
+
 		var background = "";
-		
-			if (entirePost_option.checked == true) {
-			fileInfo.panel = -1;
-			panelNumberSelector.style.display = "none";
-			document.getElementById("downloadContents").style.verticalAlign = "10rem";
-		} else {
-			const panelNumber = document.getElementById("selectPanel");
-			fileInfo.panel = (panelNumber.value - 1);
-			panelNumberSelector.style.display = "block";
-			document.getElementById("downloadContents").style.verticalAlign = "";
-		}
-		
-		var file = getFile();
-		
-		window.scrollTo(0,0);
-		
-		if (fileInfo.fileType == "png") {
-			domtoimage.toPng(file)  .then(function (dataurl) {
-				var a = document.createElement(`a`);
-				a.setAttribute("href",dataurl);
-				a.setAttribute("download","downloadedSign.png");
-				a.click();
-				a.remove();
-				
-			});
-		} else if (fileInfo.fileType == "svg") {
-			domtoimage.toSvg(file)  .then(function (dataurl) {
-				var a = document.createElement(`a`);
-				a.setAttribute("href",dataurl);
-				a.setAttribute("download","downloadedSign.svg");
-				a.click();
-				a.remove();
-				
-			});
-		}
-	}
-	
-	const updatePreview = function() {
-		const downloadPreview = document.getElementById("downloadPreview");
-		const entirePost_option = document.getElementById("entirePost");
-		const panelContainer = document.getElementById("panelContainer");
-		const panelNumberSelector = document.getElementById("singularPanel");
-		
-		var background = "";
-		
+
 		if (entirePost_option.checked == true) {
 			fileInfo.panel = -1;
 			panelNumberSelector.style.display = "none";
@@ -1306,32 +1126,76 @@ const app = (function() {
 			panelNumberSelector.style.display = "block";
 			document.getElementById("downloadContents").style.verticalAlign = "";
 		}
-		
+
 		var file = getFile();
-		
-		window.scrollTo(0,0);
-		
+
+		window.scrollTo(0, 0);
+
 		if (fileInfo.fileType == "png") {
-			domtoimage.toPng(file)  .then(function (dataurl) {
-				
+			domtoimage.toPng(file).then(function(dataurl) {
+				var a = document.createElement(`a`);
+				a.setAttribute("href", dataurl);
+				a.setAttribute("download", "downloadedSign.png");
+				a.click();
+				a.remove();
+
+			});
+		} else if (fileInfo.fileType == "svg") {
+			domtoimage.toSvg(file).then(function(dataurl) {
+				var a = document.createElement(`a`);
+				a.setAttribute("href", dataurl);
+				a.setAttribute("download", "downloadedSign.svg");
+				a.click();
+				a.remove();
+
+			});
+		}
+	}
+
+	const updatePreview = function() {
+		const downloadPreview = document.getElementById("downloadPreview");
+		const entirePost_option = document.getElementById("entirePost");
+		const panelContainer = document.getElementById("panelContainer");
+		const panelNumberSelector = document.getElementById("singularPanel");
+
+		var background = "";
+
+		if (entirePost_option.checked == true) {
+			fileInfo.panel = -1;
+			panelNumberSelector.style.display = "none";
+			document.getElementById("downloadContents").style.verticalAlign = "10rem";
+		} else {
+			const panelNumber = document.getElementById("selectPanel");
+			fileInfo.panel = (panelNumber.value - 1);
+			panelNumberSelector.style.display = "block";
+			document.getElementById("downloadContents").style.verticalAlign = "";
+		}
+
+		var file = getFile();
+
+		window.scrollTo(0, 0);
+
+		if (fileInfo.fileType == "png") {
+			domtoimage.toPng(file).then(function(dataurl) {
+
 				while (downloadPreview.firstChild) {
 					downloadPreview.removeChild(downloadPreview.lastChild);
 				}
-				
+
 				var img = document.createElement(`img`);
 				img.src = dataurl;
 				img.style.height = "100%";
 				downloadPreview.appendChild(img);
 
-				
+
 			});
 		} else if (fileInfo.fileType == "svg") {
-			domtoimage.toSvg(file)  .then(function (dataurl) {
-				
+			domtoimage.toSvg(file).then(function(dataurl) {
+
 				while (downloadPreview.firstChild) {
 					downloadPreview.removeChild(downloadPreview.lastChild);
 				}
-				
+
 				var img = document.createElement(`img`);
 				img.src = dataurl;
 				img.style.height = "100%";
@@ -1339,13 +1203,13 @@ const app = (function() {
 
 			});
 		}
-		
+
 	}
-	
+
 	const updateFileType = function(fileType) {
 		fileInfo.fileType = fileType;
 		updatePreview();
-		
+
 		if (fileType == "png") {
 			document.getElementById("PNG").className = "activated";
 			document.getElementById("SVG").className = "";
@@ -1354,94 +1218,94 @@ const app = (function() {
 			document.getElementById("SVG").className = "activated";
 		}
 	}
-	
-	const resetPadding = function(mode,params) {
+
+	const resetPadding = function(mode, params) {
 		const panel = post.panels[currentlySelectedPanelIndex];
 		panel.sign.padding = "0.5rem 0.75rem 0.5rem 0.75rem";
-		
+
 		updateForm();
 		redraw();
 	}
-	
+
 
 
 	/**
 	 * Redraw the panels on the post.
 	 */
-     
+
 	const redraw = function() {
 		const postContainerElmt = document.getElementById("postContainer");
-        
+
 		postContainerElmt.className = `polePosition${post.polePosition}`;
-        
+
 		// post
-		
-        if (post.showPost == true) {
-            var item = document.getElementsByClassName("post");
-            for (let i = 0; i < item.length; i++) {
-                item[i].style.visibility = "hidden";
-            }
-            
-            const panelContainer = document.getElementById("panelContainer");
-            
-            panelContainer.style.background = "none";
-            
-            
-        } else {
-            var item = document.getElementsByClassName("post");
-            for (let i = 0; i < item.length; i++) {
-                
-                if (post.polePosition.toLowerCase() != "overhead") {
-                    item[0].style.visibility = "visible";
-                } else {
-                    item[i].style.visibility = "visible";
-                }
-            }
-            
-            const panelContainer = document.getElementById("panelContainer");
-            
-            panelContainer.style.background = "linear-gradient( 180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 47%, rgba(191,191,191,1) 47%, rgba(240,240,240,1) 49%, rgba(128,128,128,1) 52%, rgba(255,255,255,0) 52%, rgba(255,255,255,0) 64%, rgba(191,191,191,1) 64%, rgba(240,240,240,1) 66%, rgba(128,128,128,1) 69%, rgba(255,255,255,0) 69%";
-        }
+
+		if (post.showPost == true) {
+			var item = document.getElementsByClassName("post");
+			for (let i = 0; i < item.length; i++) {
+				item[i].style.visibility = "hidden";
+			}
+
+			const panelContainer = document.getElementById("panelContainer");
+
+			panelContainer.style.background = "none";
+
+
+		} else {
+			var item = document.getElementsByClassName("post");
+			for (let i = 0; i < item.length; i++) {
+
+				if (post.polePosition.toLowerCase() != "overhead") {
+					item[0].style.visibility = "visible";
+				} else {
+					item[i].style.visibility = "visible";
+				}
+			}
+
+			const panelContainer = document.getElementById("panelContainer");
+
+			panelContainer.style.background = "linear-gradient( 180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 47%, rgba(191,191,191,1) 47%, rgba(240,240,240,1) 49%, rgba(128,128,128,1) 52%, rgba(255,255,255,0) 52%, rgba(255,255,255,0) 64%, rgba(191,191,191,1) 64%, rgba(240,240,240,1) 66%, rgba(128,128,128,1) 69%, rgba(255,255,255,0) 69%";
+		}
 
 		const panelContainerElmt = document.getElementById("panelContainer");
 		lib.clearChildren(panelContainerElmt);
-		
+
 		var index = -1;
 		var firstExitTab = null;
-		
+
 		for (const panel of post.panels) {
 			index++
-			
-			
+
+
 			const panelElmt = document.createElement("div");
 			panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
 			panelElmt.id = "panel" + index;
 			panelContainerElmt.appendChild(panelElmt);
 
-			for (let exitTabIndex = panel.exitTabs.length - 1; exitTabIndex >= 0; exitTabIndex--) {
-				
+			for (let exitTabIndex = panel.exitTabs.length - 1; exitTabIndex > -1; exitTabIndex--) {
+
 				var exitTab = panel.exitTabs[exitTabIndex];
-				
+
 				const exitTabCont = document.createElement("div");
 				exitTabCont.className = `exitTabContainer ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
 				panelElmt.appendChild(exitTabCont);
-				
+
 				var nestedExitTabs = exitTab.nestedExitTabs.length;
-				
-				for (let nestIndex = -1; nestIndex < nestedExitTabs ; nestIndex++) {
+
+				for (let nestIndex = -1; nestIndex < nestedExitTabs; nestIndex++) {
 					if (nestIndex != -1) {
 						exitTab = exitTab.nestedExitTabs[nestIndex];
 					}
-					
+
 					const exitTabElmt = document.createElement("div");
 					exitTabElmt.className = `exitTab ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
-					
+
 					const exitTabHolderElmt = document.createElement("div");
 					exitTabHolderElmt.className = "exitTabHolder"
 					exitTabHolderElmt.appendChild(exitTabElmt);
-					
+
 					exitTabCont.appendChild(exitTabHolderElmt);
-					
+
 					if ((exitTab.color != "Panel Color") && (exitTab.color != undefined)) {
 						exitTabElmt.className += ` ${exitTab.color.toLowerCase()}`
 						exitTabHolderElmt.className += ` ${exitTab.color.toLowerCase()}`
@@ -1449,49 +1313,49 @@ const app = (function() {
 						exitTabElmt.className += ` ${panel.color.toLowerCase()}`
 						exitTabHolderElmt.className += ` ${panel.color.toLowerCase()}`
 					}
-					
+
 					if (exitTab.oldFont) {
 						exitTabElmt.style.fontFamily = "Series E";
 					}
-					
-					
+
+
 					if ((exitTab.number) || (exitTab.showLeft) || (exitTab.variant != "Default")) {
-							
-							console.log("hola");
-							
-							if (exitTab.variant == "Default") {
-								const leftElmt = document.createElement("div");
-							
-								if (exitTab.showLeft) {
-									leftElmt.className = `leftElmt`;
-									leftElmt.appendChild(document.createTextNode("LEFT"));
-									exitTabElmt.appendChild(leftElmt);
-									exitTabElmt.style.display = "inline-block";
-									
-									if (exitTab.number) {
-										leftElmt.style.marginRight = "0.4rem";
-									}
-									
-									
+
+						console.log("hola");
+
+						if (exitTab.variant == "Default") {
+							const leftElmt = document.createElement("div");
+
+							if (exitTab.showLeft) {
+								leftElmt.className = `leftElmt`;
+								leftElmt.appendChild(document.createTextNode("LEFT"));
+								exitTabElmt.appendChild(leftElmt);
+								exitTabElmt.style.display = "inline-block";
+
+								if (exitTab.number) {
+									leftElmt.style.marginRight = "0.4rem";
 								}
 
-								const txtArr = exitTab.number.toUpperCase().split(/(\d+\S*)/);
-								const divTextElmt = document.createElement("div");
-								divTextElmt.appendChild(document.createTextNode(txtArr[0]))
-								exitTabElmt.appendChild(divTextElmt);
-								
-								
-								if (txtArr.length > 1) {
-									divTextElmt.className = "exitFormat";
-									const spanNumeralElmt = document.createElement("span");
-									spanNumeralElmt.className = "numeral";
-									spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
-									exitTabElmt.appendChild(spanNumeralElmt);
-									exitTabElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
-									if (exitTab.topOffset == false) {
-										divTextElmt.style.top = "0rem";
-									}
+
+							}
+
+							const txtArr = exitTab.number.toUpperCase().split(/(\d+\S*)/);
+							const divTextElmt = document.createElement("div");
+							divTextElmt.appendChild(document.createTextNode(txtArr[0]))
+							exitTabElmt.appendChild(divTextElmt);
+
+
+							if (txtArr.length > 1) {
+								divTextElmt.className = "exitFormat";
+								const spanNumeralElmt = document.createElement("span");
+								spanNumeralElmt.className = "numeral";
+								spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
+								exitTabElmt.appendChild(spanNumeralElmt);
+								exitTabElmt.appendChild(document.createTextNode(txtArr.slice(2).join("")));
+								if (exitTab.topOffset == false) {
+									divTextElmt.style.top = "0rem";
 								}
+							}
 						} else if (exitTab.variant == "Toll") {
 							let tollAuthority = exitTab.icon;
 							console.log(exitTab.icon);
@@ -1501,209 +1365,209 @@ const app = (function() {
 								const tagElement = document.createElement("span");
 								tagElement.textContent = tollAuthority.toUpperCase();
 								tagElement.className = "tagText";
-								
+
 								const onlyElement = document.createElement("span");
 								onlyElement.textContent = "ONLY";
 								onlyElement.className = "tagOnlyText"
-								
+
 								exitTabElmt.appendChild(tagElement);
 								exitTabElmt.appendChild(onlyElement);
 							}
 						} else if (exittab.variant == "Icon") {
-							
+
 						} else if (exitTab.variant == "Full Left") {
-							
+
 						} else if (exitTab.variant == "HOV 1") {
-							
+
 						} else if (exitTab.variant == "HOV 2") {
-							
+
 						}
-						
+
 						exitTabElmt.style.visibility = "visible";
 						exitTabCont.className += " tabVisible";
-						
+
 						if (post.fontType == true) {
 							exitTabElmt.style.fontFamily = "Series E";
 						};
-						
+
 						if (exitTab.fullBorder == true) {
 							exitTabElmt.style.borderBottomWidth = exitTab.borderThickness.toString() + "rem";
 							exitTabElmt.style.borderBottomStyle = "solid";
 							exitTabElmt.style.borderRadius = "0.5rem";
 						}
-						
+
 						exitTabElmt.style.borderTopWidth = exitTab.borderThickness.toString() + "rem";
 						exitTabElmt.style.borderLeftWidth = exitTab.borderThickness.toString() + "rem";
 						exitTabElmt.style.borderRightWidth = exitTab.borderThickness.toString() + "rem";
 						exitTabElmt.style.fontSize = exitTab.fontSize.toString() + "px";
-						
+
 						exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
-						
+
 					}
 				}
-				
-				
+
+
 				if (exitTabIndex == 0) {
 					firstExitTab = exitTabCont;
 				}
-				
+
 				exitTabCont.style.display = "flex";
 
 			}
 
-			function createShield(i,p) {
+			function createShield(i, p) {
 				/*
 					i: index (table parent)
 					p: parent (object)
 				*/
-				
+
 				var position;
-				
+
 				for (const shield of i) {
-					if ((shield.bannerPosition != "Above") && ((shield.bannerType != "None") || (shield.bannerType2 != "None")) ) {
+					if ((shield.bannerPosition != "Above") && ((shield.bannerType != "None") || (shield.bannerType2 != "None"))) {
 						position = shield.bannerPosition;
 						break;
 					}
 				}
-				
+
 				for (const shield of i) {
-					if ((shield.bannerPosition != "Above") && (shield.bannerType != "None") || (shield.bannerType2 != "None") && (! locked)) {
+					if ((shield.bannerPosition != "Above") && (shield.bannerType != "None") || (shield.bannerType2 != "None") && (!locked)) {
 						position = shield.bannerPosition;
 						locked = true;
 					}
-					
-                    const toElmt = document.createElement("p");
-                    toElmt.className = "to";
-                    toElmt.appendChild(document.createTextNode("TO"));
-                    p.appendChild(toElmt);
 
-                    const bannerShieldContainerElmt = document.createElement("div");
-                    bannerShieldContainerElmt.className = `bannerShieldContainer ${shield.type} ${shield.specialBannerType.toLowerCase()} bannerPosition${shield.bannerPosition}`;
-                    
+					const toElmt = document.createElement("p");
+					toElmt.className = "to";
+					toElmt.appendChild(document.createTextNode("TO"));
+					p.appendChild(toElmt);
+
+					const bannerShieldContainerElmt = document.createElement("div");
+					bannerShieldContainerElmt.className = `bannerShieldContainer ${shield.type} ${shield.specialBannerType.toLowerCase()} bannerPosition${shield.bannerPosition}`;
+
 					switch (shield.routeNumber.length) {
-                        case 1:
-                            bannerShieldContainerElmt.className += " one";
-                            break;
-                        case 2:
-                            bannerShieldContainerElmt.className += " two";
-                            break;
-                        case 3:
-                            bannerShieldContainerElmt.className += " three";
-                            break;
-                        default:
-                            bannerShieldContainerElmt.className += " three";
-                            break;
-                    }
-                    
+						case 1:
+							bannerShieldContainerElmt.className += " one";
+							break;
+						case 2:
+							bannerShieldContainerElmt.className += " two";
+							break;
+						case 3:
+							bannerShieldContainerElmt.className += " three";
+							break;
+						default:
+							bannerShieldContainerElmt.className += " three";
+							break;
+					}
+
 					p.appendChild(bannerShieldContainerElmt);
 
-                    const bannerContainerElmt = document.createElement("div");
-                    bannerContainerElmt.className = `bannerContainer`
-                    bannerShieldContainerElmt.appendChild(bannerContainerElmt);
-                    
-                    const bannerElmt = document.createElement("p");
-                    bannerElmt.className = "bannerA";
-                    bannerContainerElmt.appendChild(bannerElmt);
+					const bannerContainerElmt = document.createElement("div");
+					bannerContainerElmt.className = `bannerContainer`
+					bannerShieldContainerElmt.appendChild(bannerContainerElmt);
+
+					const bannerElmt = document.createElement("p");
+					bannerElmt.className = "bannerA";
+					bannerContainerElmt.appendChild(bannerElmt);
 
 
-                    const shieldElmt = document.createElement("div");
-                    shieldElmt.className = "shield";
+					const shieldElmt = document.createElement("div");
+					shieldElmt.className = "shield";
 					shieldElmt.id = "shield" + i.indexOf(shield).toString();
-                    bannerShieldContainerElmt.appendChild(shieldElmt);
-                    
-                    const shieldImgElmt = document.createElement("object");
-                    shieldImgElmt.type = "image/png";
-                    shieldImgElmt.className = "shieldImg";
-                    
-                    switch (shield.routeNumber.length) {
-                        case 1:
-                            shieldImgElmt.className += " one";
-                            break;
-                        case 2:
-                            shieldImgElmt.className += " two";
-                            break;
-                        case 3:
-                            shieldImgElmt.className += " three";
-                            break;
+					bannerShieldContainerElmt.appendChild(shieldElmt);
+
+					const shieldImgElmt = document.createElement("object");
+					shieldImgElmt.type = "image/png";
+					shieldImgElmt.className = "shieldImg";
+
+					switch (shield.routeNumber.length) {
+						case 1:
+							shieldImgElmt.className += " one";
+							break;
+						case 2:
+							shieldImgElmt.className += " two";
+							break;
+						case 3:
+							shieldImgElmt.className += " three";
+							break;
 						case 4:
 							shieldImgElmt.className += " four";
 							break;
-                        default:
-                            shieldImgElmt.className += " three";
-                            break;
-                    }
-                    
-                    shieldElmt.appendChild(shieldImgElmt);
-                    
-                    const bannerContainerElmt2 = document.createElement("div");                    
-                    bannerContainerElmt2.className = `bannerContainer2`
-                    bannerShieldContainerElmt.appendChild(bannerContainerElmt2);
+						default:
+							shieldImgElmt.className += " three";
+							break;
+					}
 
-                    const bannerElmt2 = document.createElement("p");
-                    bannerElmt2.className = "bannerB";
-                    bannerContainerElmt2.appendChild(bannerElmt2);
-                    
-                    if (shield.bannerType2 == "Toll") {
-                        bannerElmt2.className += "TOLL"
-                    }
+					shieldElmt.appendChild(shieldImgElmt);
 
-                    const routeNumberElmt = document.createElement("p");
-                    routeNumberElmt.className = "routeNumber";
-                    shieldElmt.appendChild(routeNumberElmt);
+					const bannerContainerElmt2 = document.createElement("div");
+					bannerContainerElmt2.className = `bannerContainer2`
+					bannerShieldContainerElmt.appendChild(bannerContainerElmt2);
 
-                    if (shield.to) {
-                        toElmt.style.display = "inline";
-                        bannerShieldContainerElmt.style.marginLeft = "0";
-                    }
+					const bannerElmt2 = document.createElement("p");
+					bannerElmt2.className = "bannerB";
+					bannerContainerElmt2.appendChild(bannerElmt2);
 
-                    // If "Shield Backs" is checked, use directory with images of shields with backs
-                    //   else, use directory with images of shields with no backs
-                    let imgDir;
-                    if (panel.sign.shieldBacks) {
-                        imgDir = "img/shields-with-backs/";
-                    } else {
-                        imgDir = "img/shields-without-backs/";
-                    }
-                    
-                    // Shield type
-                    var lengthValue = shield.routeNumber.length;
-                    
+					if (shield.bannerType2 == "Toll") {
+						bannerElmt2.className += "TOLL"
+					}
+
+					const routeNumberElmt = document.createElement("p");
+					routeNumberElmt.className = "routeNumber";
+					shieldElmt.appendChild(routeNumberElmt);
+
+					if (shield.to) {
+						toElmt.style.display = "inline";
+						bannerShieldContainerElmt.style.marginLeft = "0";
+					}
+
+					// If "Shield Backs" is checked, use directory with images of shields with backs
+					//   else, use directory with images of shields with no backs
+					let imgDir;
+					if (panel.sign.shieldBacks) {
+						imgDir = "img/shields-with-backs/";
+					} else {
+						imgDir = "img/shields-without-backs/";
+					}
+
+					// Shield type
+					var lengthValue = shield.routeNumber.length;
+
 					if (shield.routeNumber.length == 1) {
-                        lengthValue = 2;
-                    }
-                    
-                    const sameElement = ["AK","C","CO","FL","CD","DC","HI","ID","LA","MI","MN","MT","MT2","NB","NC","NE","NH","NM","NV","PEI","QC2","REC2","SC","TN","UT","VA2","WA","WI","WY"];
-                    
-                    if (sameElement.includes(shield.type)) {
-                                    lengthValue = 2;
-                    }
-                    
-                    var imgFileConstr = shield.type + "-" + lengthValue;
-                    
-                    if (shield.specialBannerType != "None") {
-                        imgFileConstr += "-" + shield.specialBannerType.toUpperCase();  
-                    }
-                    
-                    shieldImgElmt.data = imgDir + imgFileConstr + ".png";
+						lengthValue = 2;
+					}
 
-                    //shield                    
-					
+					const sameElement = ["AK", "C", "CO", "FL", "CD", "DC", "HI", "ID", "LA", "MI", "MN", "MT", "MT2", "NB", "NC", "NE", "NH", "NM", "NV", "PEI", "QC2", "REC2", "SC", "TN", "UT", "VA2", "WA", "WI", "WY"];
+
+					if (sameElement.includes(shield.type)) {
+						lengthValue = 2;
+					}
+
+					var imgFileConstr = shield.type + "-" + lengthValue;
+
+					if (shield.specialBannerType != "None") {
+						imgFileConstr += "-" + shield.specialBannerType.toUpperCase();
+					}
+
+					shieldImgElmt.data = imgDir + imgFileConstr + ".png";
+
+					//shield                    
+
 					if ((shield.type == "I") && (shield.routeNumber.length == 3)) {
 						shieldImgElmt.style.width = "3.8rem";
 					}
-					
-					
+
+
 					if (position == "Right") {
 						var shieldDistance;
-						
+
 						if (i == panel.sign.shields) {
 							shieldDistance = panel.sign.shieldDistance;
 						} else {
 							shieldDistance = panel.sign.subPanels[currentlySelectedSubPanelIndex].shieldDistance;
 						}
-						
+
 						shieldElmt.style.right = shieldDistance.toString() + "rem";
-						
+
 						if (shield.bannerType2 != "None") {
 							bannerContainerElmt2.style.right = (shieldDistance * 2).toString() + "rem";
 							bannerContainerElmt2.style.position = "relative"
@@ -1713,200 +1577,198 @@ const app = (function() {
 						}
 					} else if (position == "Left") {
 						var shieldDistance;
-						
+
 						if (i == panel.sign.shields) {
 							shieldDistance = panel.sign.shieldDistance;
 						} else {
 							shieldDistance = panel.sign.subPanels[currentlySelectedSubPanelIndex].shieldDistance;
 						}
-						
+
 						shieldElmt.style.left = shieldDistance.toString() + "rem";
-						
+
 						if (shield.bannerType2 != "None") {
-							bannerContainerElmt2.style.left = (shieldDistance * 2).toString()  + "rem";
+							bannerContainerElmt2.style.left = (shieldDistance * 2).toString() + "rem";
 							bannerContainerElmt2.style.position = "relative"
 							p.style.marginRight = (i.length * shieldDistance * 2).toString() + "rem";
 						} else {
-							p.style.marginRight= (i.length * shieldDistance).toString() + "rem";
+							p.style.marginRight = (i.length * shieldDistance).toString() + "rem";
 						}
 					}
 
-                    // Route Number
-                    routeNumberElmt.appendChild(document.createTextNode(shield.routeNumber));
+					// Route Number
+					routeNumberElmt.appendChild(document.createTextNode(shield.routeNumber));
 
-                    // Route banner
-					
-					 if (shield.bannerType == "Toll") {
-                        bannerElmt.className += " TOLL"
-                    }
-					
-                    if (shield.bannerType != "None") {
-                        bannerElmt.appendChild(document.createTextNode(shield.bannerType));
-                    } else {
-                        bannerElmt.appendChild(document.createTextNode(" "));
-                    }
-                    
-                    if (shield.bannerType2 != "None") {
-                        bannerElmt2.appendChild(document.createTextNode(shield.bannerType2));
-                    } else {
-                        bannerElmt2.appendChild(document.createTextNode(" "));
-                    }
-                   
-                    // Font change
-                    
-                    if (post.fontType == true) {
-                            toElmt.style.fontFamily = "Series E";
-                            bannerElmt.style.fontFamily = "Series E";
-                            bannerElmt2.style.fontFamily = "Series E";
-                    };
-                    
-                }
+					// Route banner
+
+					if (shield.bannerType == "Toll") {
+						bannerElmt.className += " TOLL"
+					}
+
+					if (shield.bannerType != "None") {
+						bannerElmt.appendChild(document.createTextNode(shield.bannerType));
+					} else {
+						bannerElmt.appendChild(document.createTextNode(" "));
+					}
+
+					if (shield.bannerType2 != "None") {
+						bannerElmt2.appendChild(document.createTextNode(shield.bannerType2));
+					} else {
+						bannerElmt2.appendChild(document.createTextNode(" "));
+					}
+
+					// Font change
+
+					if (post.fontType == true) {
+						toElmt.style.fontFamily = "Series E";
+						bannerElmt.style.fontFamily = "Series E";
+						bannerElmt2.style.fontFamily = "Series E";
+					};
+
+				}
 			}
 
-			function monitorActionMessage(i,p) {
+			function monitorActionMessage(i, p) {
 				/*
 					i: Array
 					p: Parent (element)
 				*/
-				
-				if (i.actionMessage != "") {
-                    if (post.fontType == true) {
-                            p.style.fontFamily = "Series E";
-                    } else {
-                        p.style.fontFamily = "Clearview 5WR";
-                    }
-                    p.style.visibility = "visible";
-                    p.style.display = "inline-flex";
-                    p.className = `actionMessage action_message`;
-                    const txtArr = i.actionMessage.split(/(\d+\S*)/);
-                    const txtFrac = txtArr[0].split(/([\u00BC-\u00BE]+\S*)/);
-                    
-                    p.appendChild(document.createTextNode(txtFrac[0]));
 
-                    
-                    
-                    if (((i.actionMessage.includes("½")) || (i.actionMessage.includes("¼")) || (i.actionMessage.includes("¾"))) && (txtArr.length > 2)) {
-                            const spanElmt = document.createElement("span");
-                            spanElmt.className = "numeral special";
-                            
-                            if (post.fontType) {
-                                spanElmt.style.fontSize = "1.5rem";
-                            }
-                            
-                            spanElmt.appendChild(document.createTextNode(txtArr[1]));
-                            p.appendChild(spanElmt);
-                            
-                            const spanFractionElmt = document.createElement("span");
-                            spanFractionElmt.className = "fraction special";
-                            
-                            if (post.fontType) {
-                                spanFractionElmt.style.fontSize = "1.15rem";
-                                spanFractionElmt.style.top = "-0.15rem";
-                                spanFractionElmt.style.position = "relative";
-                            }
-                                
-                                
-                            spanFractionElmt.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/)[1]));
-                            p.appendChild(spanFractionElmt);
-                            p.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/).slice(2).join("")));
-                            
-                            
-                    } else {
-                        if (txtArr.length > 1) {
-                            const spanElmt = document.createElement("span");
-                            spanElmt.className = "numeral";
-                            
-                            if (post.fontType) {
-                                spanElmt.style.fontSize = "1.5rem";
-                            }
-                            
-                            spanElmt.appendChild(document.createTextNode(txtArr[1]));
-                            p.appendChild(spanElmt);
-                            p.appendChild(document.createTextNode(txtArr.slice(2).join("")));
-                            }
-                            if (txtFrac.length > 1) {
-                                const spanFractionElmt = document.createElement("span");
-                                spanFractionElmt.className = "fraction";
-                                
-                                if (post.fontType) {
-                                    spanFractionElmt.style.fontSize = "1.15rem";
-                                    spanFractionElmt.style.top = "-0.15rem";
-                                    spanFractionElmt.style.position = "relative";
-                                }
-                                
-                                spanFractionElmt.appendChild(document.createTextNode(txtFrac[1]));
-                                p.appendChild(spanFractionElmt);
-                                p.appendChild(document.createTextNode(txtFrac.slice(2).join("")));
-                            }
-                    }
-                    
-                    
-                }
-                else {
-                    p.style.display = "none";
-                }
+				if (i.actionMessage != "") {
+					if (post.fontType == true) {
+						p.style.fontFamily = "Series E";
+					} else {
+						p.style.fontFamily = "Clearview 5WR";
+					}
+					p.style.visibility = "visible";
+					p.style.display = "inline-flex";
+					p.className = `actionMessage action_message`;
+					const txtArr = i.actionMessage.split(/(\d+\S*)/);
+					const txtFrac = txtArr[0].split(/([\u00BC-\u00BE]+\S*)/);
+
+					p.appendChild(document.createTextNode(txtFrac[0]));
+
+
+
+					if (((i.actionMessage.includes("½")) || (i.actionMessage.includes("¼")) || (i.actionMessage.includes("¾"))) && (txtArr.length > 2)) {
+						const spanElmt = document.createElement("span");
+						spanElmt.className = "numeral special";
+
+						if (post.fontType) {
+							spanElmt.style.fontSize = "1.5rem";
+						}
+
+						spanElmt.appendChild(document.createTextNode(txtArr[1]));
+						p.appendChild(spanElmt);
+
+						const spanFractionElmt = document.createElement("span");
+						spanFractionElmt.className = "fraction special";
+
+						if (post.fontType) {
+							spanFractionElmt.style.fontSize = "1.15rem";
+							spanFractionElmt.style.top = "-0.15rem";
+							spanFractionElmt.style.position = "relative";
+						}
+
+
+						spanFractionElmt.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/)[1]));
+						p.appendChild(spanFractionElmt);
+						p.appendChild(document.createTextNode(txtArr[2].split(/([\u00BC-\u00BE]+\S*)/).slice(2).join("")));
+
+
+					} else {
+						if (txtArr.length > 1) {
+							const spanElmt = document.createElement("span");
+							spanElmt.className = "numeral";
+
+							if (post.fontType) {
+								spanElmt.style.fontSize = "1.5rem";
+							}
+
+							spanElmt.appendChild(document.createTextNode(txtArr[1]));
+							p.appendChild(spanElmt);
+							p.appendChild(document.createTextNode(txtArr.slice(2).join("")));
+						}
+						if (txtFrac.length > 1) {
+							const spanFractionElmt = document.createElement("span");
+							spanFractionElmt.className = "fraction";
+
+							if (post.fontType) {
+								spanFractionElmt.style.fontSize = "1.15rem";
+								spanFractionElmt.style.top = "-0.15rem";
+								spanFractionElmt.style.position = "relative";
+							}
+
+							spanFractionElmt.appendChild(document.createTextNode(txtFrac[1]));
+							p.appendChild(spanFractionElmt);
+							p.appendChild(document.createTextNode(txtFrac.slice(2).join("")));
+						}
+					}
+
+
+				} else {
+					p.style.display = "none";
+				}
 			}
-			
-			function monitorControlText(i,p) {
+
+			function monitorControlText(i, p) {
 				function LineEditor(line) {
-                    if (line.includes("</>")) {
-                        line = line.split("</>");
-                        p.appendChild(document.createTextNode(line[0] + "⠀⠀⠀⠀⠀⠀⠀⠀⠀" + line[1]));
-                    } else if (line.includes("<-->")) {
-                    } else {
-                        p.appendChild(document.createTextNode(line));   
-                    }
-                }
-                
-                const controlTextArray = i.controlText.split("\n");
-                for (let lineNum = 0, length = controlTextArray.length - 1; lineNum < length; lineNum++) {
-                    LineEditor(controlTextArray[lineNum])             
-                    p.appendChild(document.createElement("br"));
-                }
-                
-                LineEditor(controlTextArray[controlTextArray.length - 1]);
+					if (line.includes("</>")) {
+						line = line.split("</>");
+						p.appendChild(document.createTextNode(line[0] + "⠀⠀⠀⠀⠀⠀⠀⠀⠀" + line[1]));
+					} else if (line.includes("<-->")) {} else {
+						p.appendChild(document.createTextNode(line));
+					}
+				}
+
+				const controlTextArray = i.controlText.split("\n");
+				for (let lineNum = 0, length = controlTextArray.length - 1; lineNum < length; lineNum++) {
+					LineEditor(controlTextArray[lineNum])
+					p.appendChild(document.createElement("br"));
+				}
+
+				LineEditor(controlTextArray[controlTextArray.length - 1]);
 			}
 
 			const signCont = document.createElement("div");
 			signCont.className = `signContainer ${panel.exitTabs[0].width.toLowerCase()}`;
 			panelElmt.appendChild(signCont);
-            
+
 			const signElmt = document.createElement("div");
 			signElmt.className = `sign ${panel.exitTabs[0].width.toLowerCase()}`;
-			
+
 			if ((panel.exitTabs.length > 0) && (panel.exitTabs[0].number != null)) {
 				signElmt.className += " tabVisible";
 			}
-			
+
 			signCont.appendChild(signElmt);
-			
+
 			const g_top = document.createElement("div");
 			g_top.className = `globalTop`;
 			signElmt.appendChild(g_top);
-			
+
 			const signHolderElmt = document.createElement("div");
 			signHolderElmt.className = `signHolder`;
 			signElmt.appendChild(signHolderElmt);
-			
+
 			const g_bottom = document.createElement("div");
 			g_bottom.className = `globalBottom`;
 			signElmt.appendChild(g_bottom);
-			
+
 			const g_shieldsContainerElmt = document.createElement("div");
-            g_shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
-			
-			createShield(panel.sign.shields,g_shieldsContainerElmt);
+			g_shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
+
+			createShield(panel.sign.shields, g_shieldsContainerElmt);
 
 			const g_controlTextElmt = document.createElement("p");
-            g_controlTextElmt.className = "controlText";
-			
-			monitorControlText(panel.sign,g_controlTextElmt);
-			
+			g_controlTextElmt.className = "controlText";
+
+			monitorControlText(panel.sign, g_controlTextElmt);
+
 			const g_actionMessageElmt = document.createElement("div");
-            g_actionMessageElmt.className = `actionMessage`;
-			
-			monitorActionMessage(panel.sign,g_actionMessageElmt);
-			
+			g_actionMessageElmt.className = `actionMessage`;
+
+			monitorActionMessage(panel.sign, g_actionMessageElmt);
+
 			if ((panel.sign.shields.length != 0) || (panel.sign.controlText != "") || (panel.sign.actionMessage != "")) {
 				if (panel.sign.globalPositioning.toLowerCase() == "top") {
 					g_top.appendChild(g_shieldsContainerElmt);
@@ -1937,7 +1799,7 @@ const app = (function() {
 			guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
 			signCont.appendChild(guideArrowsElmt);
 
-            const otherSymbolsElmt = document.createElement("div");
+			const otherSymbolsElmt = document.createElement("div");
 			otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol.replace("/", "-").replace(" ", "_").toLowerCase()}`;
 			guideArrowsElmt.appendChild(otherSymbolsElmt);
 
@@ -1946,139 +1808,139 @@ const app = (function() {
 			otherSymbolsElmt.appendChild(oSNumElmt);
 
 			const arrowContElmt = document.createElement("div");
-            arrowContElmt.className = `arrowContainer`;
-            guideArrowsElmt.appendChild(arrowContElmt);
-			
+			arrowContElmt.className = `arrowContainer`;
+			guideArrowsElmt.appendChild(arrowContElmt);
+
 			const sideLeftArrowElmt = document.createElement("img");
 			sideLeftArrowElmt.className = "sideLeftArrow";
-			sideLeftArrowElmt.src="img/arrows/MainArrows/A-4.png";
+			sideLeftArrowElmt.src = "img/arrows/MainArrows/A-4.png";
 			signHolderElmt.appendChild(sideLeftArrowElmt);
-			
-			// subpanels
-			
-            for (let subPanelIndex = 0;subPanelIndex < panel.sign.subPanels.length;subPanelIndex++) {
-      
-                const subPanel = panel.sign.subPanels[subPanelIndex];
-				let locked = false;
-				
-				if (subPanelIndex > 0) {
-                    const subDivider = document.createElement("div");
-                    subDivider.className = "subDivider";
-                    subDivider.id = "subDivider" + subPanelIndex.toString();
-                    subDivider.style.height = panel.sign.subPanels[subPanelIndex].height;
-                    signHolderElmt.appendChild(subDivider);
-                }
-                
-                const new_subPanel = document.createElement("div");
-                new_subPanel.className = "subPanelDisplay";
-                new_subPanel.id = "S_subPanel" + subPanelIndex.toString();
-                signHolderElmt.appendChild(new_subPanel);
-                
-                const signContentContainerElmt = document.createElement("div");
-                signContentContainerElmt.className = `signContentContainer shieldPosition${panel.sign.shieldPosition}`;
-                signContentContainerElmt.id = "signContentContainer" + subPanelIndex.toString();
-                signHolderElmt.appendChild(signContentContainerElmt);
 
-                
-                const shieldsContainerElmt = document.createElement("div");
-                shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
-                shieldsContainerElmt.id = "shieldsContainer" + subPanelIndex.toString();
-                signContentContainerElmt.appendChild(shieldsContainerElmt);
-                
-                const controlTextElmt = document.createElement("p");
-                controlTextElmt.className = "controlText";
-                controlTextElmt.id = "controlText" + subPanelIndex.toString();
-                signContentContainerElmt.appendChild(controlTextElmt);
-                
-                const actionMessageElmt = document.createElement("div");
-                actionMessageElmt.className = `actionMessage`;
-                actionMessageElmt.id = "actionMessage" + subPanelIndex.toString();
+			// subpanels
+
+			for (let subPanelIndex = 0; subPanelIndex < panel.sign.subPanels.length; subPanelIndex++) {
+
+				const subPanel = panel.sign.subPanels[subPanelIndex];
+				let locked = false;
+
+				if (subPanelIndex > 0) {
+					const subDivider = document.createElement("div");
+					subDivider.className = "subDivider";
+					subDivider.id = "subDivider" + subPanelIndex.toString();
+					subDivider.style.height = panel.sign.subPanels[subPanelIndex].height;
+					signHolderElmt.appendChild(subDivider);
+				}
+
+				const new_subPanel = document.createElement("div");
+				new_subPanel.className = "subPanelDisplay";
+				new_subPanel.id = "S_subPanel" + subPanelIndex.toString();
+				signHolderElmt.appendChild(new_subPanel);
+
+				const signContentContainerElmt = document.createElement("div");
+				signContentContainerElmt.className = `signContentContainer shieldPosition${panel.sign.shieldPosition}`;
+				signContentContainerElmt.id = "signContentContainer" + subPanelIndex.toString();
+				signHolderElmt.appendChild(signContentContainerElmt);
+
+
+				const shieldsContainerElmt = document.createElement("div");
+				shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""}`;
+				shieldsContainerElmt.id = "shieldsContainer" + subPanelIndex.toString();
+				signContentContainerElmt.appendChild(shieldsContainerElmt);
+
+				const controlTextElmt = document.createElement("p");
+				controlTextElmt.className = "controlText";
+				controlTextElmt.id = "controlText" + subPanelIndex.toString();
+				signContentContainerElmt.appendChild(controlTextElmt);
+
+				const actionMessageElmt = document.createElement("div");
+				actionMessageElmt.className = `actionMessage`;
+				actionMessageElmt.id = "actionMessage" + subPanelIndex.toString();
 				signContentContainerElmt.appendChild(actionMessageElmt);
-			
-                // Shields
-				createShield(subPanel.shields,shieldsContainerElmt);
-                
+
+				// Shields
+				createShield(subPanel.shields, shieldsContainerElmt);
+
 				// sign
 				signContentContainerElmt.style.padding = panel.sign.padding;
-				
-				monitorControlText(subPanel,controlTextElmt);
-                
 
-                if (post.fontType == true) {
-                           controlTextElmt.style.fontFamily = "Series EM";
-                }
-				
-				monitorActionMessage(subPanel,actionMessageElmt);
-				
-            }
+				monitorControlText(subPanel, controlTextElmt);
+
+
+				if (post.fontType == true) {
+					controlTextElmt.style.fontFamily = "Series EM";
+				}
+
+				monitorActionMessage(subPanel, actionMessageElmt);
+
+			}
 
 			const sideRightArrowElmt = document.createElement("img");
 			sideRightArrowElmt.className = "sideRightArrow";
-			sideRightArrowElmt.src="img/arrows/MainArrows/A-1.png";
+			sideRightArrowElmt.src = "img/arrows/MainArrows/A-1.png";
 			signHolderElmt.appendChild(sideRightArrowElmt);
-			
+
 			// Guide arrows
-			
-			const ExitKeys = ["EA","EB","EC"];
-			const MainKeys = ["A","B","C","D","E"];
+
+			const ExitKeys = ["EA", "EB", "EC"];
+			const MainKeys = ["A", "B", "C", "D", "E"];
 			var path;
-			
-			
-			const createArrowElmt = function(key,dir,name,extra) {
-				
+
+
+			const createArrowElmt = function(key, dir, name, extra) {
+
 				if (dir == "MainArrows!ExitOnly") {
 					key = key.split("/")[1];
 				} else {
 					key = key.split("/")[0];
 				}
-				
-				
-				if ((ExitKeys.includes(key.split("-")[0])) || (MainKeys.includes(key.split("-")[0])))  {
+
+
+				if ((ExitKeys.includes(key.split("-")[0])) || (MainKeys.includes(key.split("-")[0]))) {
 					const downArrowElmt = document.createElement("img");
 					downArrowElmt.className = name || "exitOnlyArrow ";
-					
+
 					if (extra) {
 						downArrowElmt.className += " " + extra;
 					}
-					
+
 					var directory = "ExitOnlyArrows";
-					
+
 					if (dir == "MainArrows!ExitOnly") {
 						directory = "MainArrows";
 					} else if (dir) {
 						directory = dir;
 					}
-					
+
 					downArrowElmt.src = "img/arrows/" + directory + "/" + key + ".png";
 					return downArrowElmt;
 				}
 			}
-			
+
 			if ((panel.sign.arrowPosition == "Left") && (panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Side Left") && (panel.sign.guideArrow != "Side Right") && (panel.sign.guideArrow != "Half Exit Only")) {
-                arrowContElmt.style.cssFloat = "left";
-                arrowContElmt.style.paddingLeft = "1rem";
-                if (panel.sign.actionMessage != "") {
-                    guideArrowsElmt.style.paddingBottom = "0.6rem";
-                } else {
-                    guideArrowsElmt.style.paddingBottom = "1rem";
-                }
-            } else if (panel.sign.arrowPosition == "Middle") {
-                arrowContElmt.style.cssFloat = "none";
-            } else if ((panel.sign.arrowPosition == "Right") && (panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Side Left") && (panel.sign.guideArrow != "Side Right") && (panel.sign.guideArrow != "Half Exit Only")) {
-                arrowContElmt.style.cssFloat = "right";
-                arrowContElmt.style.paddingRight = "1rem";
-                if (panel.sign.actionMessage != "") {
-                    guideArrowsElmt.style.paddingBottom = "0.6rem";
-                } else {
-                    guideArrowsElmt.style.paddingBottom = "1rem";
-                }
-            }
-			
+				arrowContElmt.style.cssFloat = "left";
+				arrowContElmt.style.paddingLeft = "1rem";
+				if (panel.sign.actionMessage != "") {
+					guideArrowsElmt.style.paddingBottom = "0.6rem";
+				} else {
+					guideArrowsElmt.style.paddingBottom = "1rem";
+				}
+			} else if (panel.sign.arrowPosition == "Middle") {
+				arrowContElmt.style.cssFloat = "none";
+			} else if ((panel.sign.arrowPosition == "Right") && (panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Side Left") && (panel.sign.guideArrow != "Side Right") && (panel.sign.guideArrow != "Half Exit Only")) {
+				arrowContElmt.style.cssFloat = "right";
+				arrowContElmt.style.paddingRight = "1rem";
+				if (panel.sign.actionMessage != "") {
+					guideArrowsElmt.style.paddingBottom = "0.6rem";
+				} else {
+					guideArrowsElmt.style.paddingBottom = "1rem";
+				}
+			}
+
 			if (panel.sign.guideArrow.includes("Exit Only")) {
 				if (panel.sign.guideArrow == "Half Exit Only") {
 					const secondaryContainer = document.createElement("div");
 					secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
-					
+
 					if (post.secondExitOnly == true) {
 						secondaryContainer.className += " new2";
 						if (panel.sign.arrowPosition == "Left") {
@@ -2089,73 +1951,73 @@ const app = (function() {
 							} else {
 								secondaryContainer.style.marginRight = "-0.15rem";
 							}
-							
+
 							// secondaryContainer.style.marginTop = "-0.15rem";
 							guideArrowsElmt.style.padding = "0rem 0.27rem 0rem 0.27rem";
 						}
-						
+
 						guideArrowsElmt.className += " new2";
 					}
-					
+
 					path = secondaryContainer
-					
-					const arrow = createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly","halfarrow",panel.sign.arrowPosition.toLowerCase());
-					
+
+					const arrow = createArrowElmt(panel.sign.exitguideArrows.split(":")[1], "MainArrows!ExitOnly", "halfarrow", panel.sign.arrowPosition.toLowerCase());
+
 					if (panel.sign.arrowPosition.toLowerCase() == "left") {
 						arrowContElmt.appendChild(secondaryContainer);
 						arrowContElmt.appendChild(arrow);
-						
+
 						if (panel.sign.guideArrowLanes > 1) {
-							
+
 							var marginLeft = 4;
-							
-							for (let i=1;i <= panel.sign.guideArrowLanes - 2;i++) {
+
+							for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
 								if (i % 2 == 0) {
-								marginLeft += 12;
+									marginLeft += 12;
 								} else {
-								marginLeft += 4;
+									marginLeft += 4;
 								}
 							}
-							
+
 							if (!post.secondExitOnly) {
 								path.style.marginLeft = "0rem";
 								arrow.style.marginLeft = marginLeft.toString() + "rem";
 							}
 						}
-						
+
 					} else {
 						arrowContElmt.appendChild(arrow);
 						arrowContElmt.appendChild(secondaryContainer);
-						
+
 						if (panel.sign.guideArrowLanes > 1) {
-							
+
 							var marginLeft = 11;
-							
-							for (let i=1;i <= panel.sign.guideArrowLanes - 2;i++) {
+
+							for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
 								if (i % 2 == 0) {
-								marginLeft += 12;
+									marginLeft += 12;
 								} else {
-								marginLeft += 4;
+									marginLeft += 4;
 								}
-								
+
 							}
-							
+
 							if (!post.secondExitOnly) {
 								path.style.marginLeft = "0rem";
 								arrow.style.marginRight = marginLeft.toString() + "rem";
 							}
 						}
-						
+
 					}
-					
-					
+
+
 				} else {
 					path = arrowContElmt
 				}
 			}
-			
-			
-			
+
+
+
 			if ("Side Left" == panel.sign.guideArrow) {
 				sideLeftArrowElmt.style.display = "block";
 			} else if ("Side Right" == panel.sign.guideArrow) {
@@ -2201,117 +2063,114 @@ const app = (function() {
 					} else {
 						for (let arrowIndex = 0, length = panel.sign.guideArrowLanes; arrowIndex < length; arrowIndex++) {
 							// Evens
-							if (length %2 == 0) {
-								if (arrowIndex == Math.floor(length/2)) {
+							if (length % 2 == 0) {
+								if (arrowIndex == Math.floor(length / 2)) {
 									const textExitOnlySpanElmt = document.createElement("span");
 									if (panel.sign.showExitOnly == false) {
 										textExitOnlySpanElmt.appendChild(document.createTextNode("EXIT ONLY"));
-										
+
 										var bonus = "";
-										
+
 										if (panel.sign.guideArrow == "Split Exit Only") {
 											bonus = " split"
 										}
-										
+
 										textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
-									}
-									else {
+									} else {
 										textExitOnlySpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀"));
-									textExitOnlySpanElmt.className = "exitOnlyText";
+										textExitOnlySpanElmt.className = "exitOnlyText";
 									}
 									path.appendChild(textExitOnlySpanElmt);
-									
+
 									if (panel.sign.guideArrow == "Split Exit Only") {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1], "MainArrows!ExitOnly"));
 									} else {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));
 									}
-									
+
 									if ((arrowIndex + 1 < length) && (length != 2)) {
 										const space = document.createElement("span")
 										space.className = "exitOnlySpace";
 										path.appendChild(space);
 									}
 								} else {
-									
+
 									if (panel.sign.guideArrow == "Split Exit Only") {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1], "MainArrows!ExitOnly"));
 									} else {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));
 									}
-									
-									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.ceil(length/2))&& (length != 2)) {
+
+									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.ceil(length / 2)) && (length != 2)) {
 										const space = document.createElement("span")
 										space.className = "exitOnlySpace";
 										path.appendChild(space);
 									}
 								}
 							} else { // Odds
-								if (arrowIndex == Math.floor(length/2)) {
+								if (arrowIndex == Math.floor(length / 2)) {
 									const textExitSpanElmt = document.createElement("span");
 									if (panel.sign.showExitOnly == false) {
 										textExitSpanElmt.appendChild(document.createTextNode("EXIT"));
-										
+
 										var bonus = "";
-										
+
 										if (panel.sign.guideArrow == "Split Exit Only") {
 											bonus = " split"
 										}
-										
+
 										textExitSpanElmt.className = "exitOnlyText" + bonus;
-									}
-									else {
+									} else {
 										textExitSpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀"));
 										textExitSpanElmt.className = "exitOnlyText";
 									}
-									
+
 									path.appendChild(textExitSpanElmt);
-									
+
 									if (panel.sign.guideArrow == "Split Exit Only") {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1], "MainArrows!ExitOnly"));
 									} else {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));
 									}
-									
+
 									const textOnlySpanElmt = document.createElement("span");
 									if (panel.sign.showExitOnly == false) {
 										textOnlySpanElmt.appendChild(document.createTextNode("ONLY"));
-										
+
 										var bonus = "";
-										
+
 										if (panel.sign.guideArrow == "Split Exit Only") {
 											bonus = " split"
 										}
-										
+
 										textOnlySpanElmt.className = "exitOnlyText" + bonus;
-									}
-									else {
+									} else {
 										textOnlySpanElmt.appendChild(document.createTextNode("⠀⠀⠀⠀"));
 										textOnlySpanElmt.className = "exitOnlyText";
 									}
 									path.appendChild(textOnlySpanElmt);
-								} else if (arrowIndex == Math.ceil(length/2)) {
-									
+								} else if (arrowIndex == Math.ceil(length / 2)) {
+
 									if (panel.sign.guideArrow == "Split Exit Only") {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1], "MainArrows!ExitOnly"));
 									} else {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));
 									}
-									
-									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length/2))&& (length != 2)) {
+
+									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length / 2)) && (length != 2)) {
 										const space = document.createElement("span")
 										space.className = "exitOnlySpace";
 										path.appendChild(space);
 									}
 								} else {
-									
+
 									if (panel.sign.guideArrow == "Split Exit Only") {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1],"MainArrows!ExitOnly"));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1], "MainArrows!ExitOnly"));
 									} else {
-										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));	
+										path.appendChild(createArrowElmt(panel.sign.exitguideArrows.split(":")[1]));
 									}
-									
-									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length/2))&& (length != 2)) {
+
+									if ((arrowIndex + 1 < length) && (arrowIndex + 1 != Math.floor(length / 2)) && (length != 2)) {
 										const space = document.createElement("span")
 										space.className = "exitOnlySpace";
 										path.appendChild(space);
@@ -2321,20 +2180,19 @@ const app = (function() {
 						}
 					}
 				} else {
-					
+
 					for (let arrowIndex = 0, length = panel.sign.guideArrowLanes; arrowIndex < length; arrowIndex++) {
-						if (arrowIndex %2 == 0) {
-							arrowContElmt.insertBefore(createArrowElmt(panel.sign.guideArrow.split(":")[1],"MainArrows","arrow",panel.sign.guideArrow.split(":")[0].toLowerCase().replace(/ /g,'')), arrowContElmt.childNodes[0]);
-						}
-						else {
-							arrowContElmt.appendChild(createArrowElmt(panel.sign.guideArrow.split(":")[1],"MainArrows","arrow",panel.sign.guideArrow.split(":")[0]));
+						if (arrowIndex % 2 == 0) {
+							arrowContElmt.insertBefore(createArrowElmt(panel.sign.guideArrow.split(":")[1], "MainArrows", "arrow", panel.sign.guideArrow.split(":")[0].toLowerCase().replace(/ /g, '')), arrowContElmt.childNodes[0]);
+						} else {
+							arrowContElmt.appendChild(createArrowElmt(panel.sign.guideArrow.split(":")[1], "MainArrows", "arrow", panel.sign.guideArrow.split(":")[0]));
 						}
 					}
 				}
 			}
 			// Bottom Symbols
-			
-			
+
+
 			if (panel.sign.oSNum != "" && panel.sign.otherSymbol != "None") {
 				signElmt.style.borderBottomLeftRadius = "0";
 				signElmt.style.borderBottomRightRadius = "0";
@@ -2362,8 +2220,8 @@ const app = (function() {
 						break;
 				}
 			}
-			
-			switch(panel.sign.otherSymbol) {
+
+			switch (panel.sign.otherSymbol) {
 				case "Quebec-Style Exit Marker": //Fallthrough
 				case "Quebec-Left":
 					const markerElmt = document.createElement("object");
@@ -2375,48 +2233,46 @@ const app = (function() {
 					}
 					otherSymbolsElmt.appendChild(markerElmt);
 				default:
-					
+
 			}
-		
-            var width = signCont.offsetWidth;
-            var exitWidth = firstExitTab.offsetWidth;
-            
-            if ((exitWidth > width) && (firstExitTab.className.includes("full")) ) {
-                signCont.style.width = (exitWidth + 1) + "px";
-            } else if ((exitWidth > width) && (firstExitTab.className.includes("wide")) )
-                 signCont.style.width = Math.floor(exitWidth * 1.1) + "px";
-            
-        
-        }
-        
-        
-        
+
+			var width = signCont.clientWidth;
+			var exitWidth = firstExitTab.clientWidth;
+
+			if (exitWidth > width) {
+				signCont.style.width = firstExitTab.clientWidth + "px";
+			}
+
+		}
+
+
+
 	};
 
 	return {
-		init : init,
-		newPanel : newPanel,
-		duplicatePanel : duplicatePanel,
-		deletePanel : deletePanel,
-		shiftLeft : shiftLeft,
-		shiftRight : shiftRight,
-		changeEditingPanel : changeEditingPanel,
-		newShield : newShield,
-        clearShields : clearShields,
-		readForm : readForm,
-        newSubPanel : addSubPanel,
-        removeSubPanel : removeSubPanel,
-		changeEditingSubPanel : changeEditingSubPanel,
-		duplicateSubPanel : duplicateSubPanel,
-		downloadSign : downloadSign,
-		updatePreview : updatePreview,
-		updateFileType : updateFileType,
-		resetPadding : resetPadding,
-		newExitTab : newExitTab,
-		duplicateExitTab : duplicateExitTab,
-		removeExitTab : removeExitTab,
-		changeEditingExitTab : changeEditingExitTab,
-		newNestExitTab : newNestExitTab,
-		deleteNestExitTab : deleteNestExitTab
+		init: init,
+		newPanel: newPanel,
+		duplicatePanel: duplicatePanel,
+		deletePanel: deletePanel,
+		shiftLeft: shiftLeft,
+		shiftRight: shiftRight,
+		changeEditingPanel: changeEditingPanel,
+		newShield: newShield,
+		clearShields: clearShields,
+		readForm: readForm,
+		newSubPanel: addSubPanel,
+		removeSubPanel: removeSubPanel,
+		changeEditingSubPanel: changeEditingSubPanel,
+		duplicateSubPanel: duplicateSubPanel,
+		downloadSign: downloadSign,
+		updatePreview: updatePreview,
+		updateFileType: updateFileType,
+		resetPadding: resetPadding,
+		newExitTab: newExitTab,
+		duplicateExitTab: duplicateExitTab,
+		removeExitTab: removeExitTab,
+		changeEditingExitTab: changeEditingExitTab,
+		newNestExitTab: newNestExitTab,
+		deleteNestExitTab: deleteNestExitTab
 	};
 })();
