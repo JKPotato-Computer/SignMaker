@@ -7,7 +7,16 @@ class Shield {
 	 * @param {string} [bannerType] - Directional banner to display.
 	 * @param {string} [bannerPosition] - Where to place the directional banner relative to the shield.
 	 */
-	constructor({type = "I", routeNumber = "1", to = false, specialBannerType, bannerType, bannerType2, bannerPosition} = {}) {
+	constructor({
+		type = "I", 
+		routeNumber = "1", 
+		to = false, 
+		specialBannerType, 
+		bannerType, 
+		bannerType2, 
+		bannerPosition
+		} = {}
+	) {
 		if (Object.keys(this.types).includes(type)) {
 			this.type = type;
 		} else {
@@ -33,58 +42,59 @@ class Shield {
 			this.bannerPosition = this.bannerPositions[0];
 		}
         
-        
-        for (let i = 0; i < this.specialBannerTypes.length; i++) {
-            var current = this.specialBannerTypes[i];
-            current = current.split(":")
-            if (current[1].includes("/")) {
-                var currently = current[1].split("/");
-                for (let ice = 0; ice < currently.length; ice++) {
-                    var currentli = currently[ice];
-                    if (currentli.includes(";")) {
-                        currentli = currentli.split(";")
-                        var length = routeNumber.length
-                        
-                        if (routeNumber.length < 2) {
-                            length = 2
-                        }
-                        
-                        if ((type == current[0]) && (specialBannerType == currentli[0]) && (length == currentli[1])) {
-                            this.specialBannerType = specialBannerType.toUpperCase();
-                        } else {
-                            this.specialBannerType = this.bannerTypes[0];
-                        }
-                    } else {
-                        if ((type == current[0]) && (specialBannerType == currentli)) {
-                            this.specialBannerType = specialBannerType.toUpperCase();
-                        } else {
-                            this.specialBannerType = this.bannerTypes[0];
-                        }
-                    }
-                    break;
-                }
-            } else {
-                if ((type == current[0]) && (specialBannerType == current[1])) {
-                    this.specialBannerType = specialBannerType.toUpperCase();
-                } else {
-                    this.specialBannerType = this.bannerTypes[0];
-                }
-                break;
-            }
-        }
+		let selectedSpecialBannerType = this.specialBannerTypes[type][specialBannerType];
+		
+		if (selectedSpecialBannerType == undefined) {
+			this.specialBannerType = this.bannerTypes[0];
+		} else {
+			if (routeNumber.length >= selectedSpecialBannerType) {
+				this.specialBannerType = specialBannerType;
+			} else {
+				this.specialBannerType = this.bannerTypes[0];
+			}
+		}
+		
 	}
 }
 
-Shield.prototype.specialBannerTypes = [
-    "AZ:Loop;3/None",
-    "FL:Toll/None",
-    "GA:Loop/Spur/Alt/Byp/Conn/None",
-    "I:Business/None",
-    "NB:Conn;3/Local;3/None",
-    "NE:Link;2/Spur;2/None",
-    "NS:Conn;3/None",
-    "TX:Loop/Spur/Toll/Express/Fm/Park/Rm/None"
-];
+Shield.prototype.specialBannerTypes = {
+    ["AZ"] : {
+		["Loop"] : 3
+	},
+	["FL"] : {
+		["Toll"] : 0
+	},
+	["GA"] : {
+		["Loop"] : 0,
+		["Spur"] : 0,
+		["Alt"] : 0,
+		["Byp"] : 0,
+		["Conn"] : 0
+	},
+	["I"] : {
+		["Business"] : 0
+	},
+	["NB"] : {
+		["Conn"] : 3,
+		["Local"] : 3
+	},
+	["NE"] : {
+		["Link"] : 2,
+		["Spur"] : 2
+	},
+	["NS"] : {
+		["Conn"] : 3
+	},
+	["TX"] : {
+		["Loop"] : 0,
+		["Spur"] : 0,
+		["Toll"] : 0,
+		["Express"] : 0,
+		["Fm"] : 4,
+		["Park"] : 0,
+		["Rm"] : 0
+	}
+};
 
 Shield.prototype.bannerTypes = [
 	"None",
