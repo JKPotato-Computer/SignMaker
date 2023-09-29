@@ -203,6 +203,24 @@ const app = (function() {
 		currentlySelectedSubPanelIndex = 0;
 		updateForm();
 	};
+	
+	const addSubPanel = function() {
+		const sign = post.panels[currentlySelectedPanelIndex].sign;
+		sign.newSubPanel();
+		currentlySelectedSubPanelIndex++
+		updateForm();
+		redraw();
+	}
+
+	const removeSubPanel = function() {
+		const sign = post.panels[currentlySelectedPanelIndex].sign;
+		if (sign.subPanels.length > 1) {
+			sign.deleteSubPanel((sign.subPanels.length - 2));
+			currentlySelectedSubPanelIndex--
+			updateForm();
+			redraw();
+		}
+	}
 
 	// Duplicate the current subpanel, set the editing to that subpanel, update the form, and redraw.
 	const duplicateSubPanel = function() {
@@ -215,7 +233,7 @@ const app = (function() {
 
 	// Set the current editing (SUB)panel based off paramter number, within the correct range (0 < # of panels - 1)
 	const changeEditingSubPanel = function(subPanelNumber) {
-		currentlySelectedSubPanelIndex = clamp(subPanelNumber, 0, post.panels[currentlySelectedPanelIndex].subPanels.length - 1)
+		currentlySelectedSubPanelIndex = clamp(subPanelNumber, -1, post.panels[currentlySelectedPanelIndex].sign.subPanels.length - 1)
 		updateForm();
 	};
 
@@ -362,11 +380,10 @@ const app = (function() {
 			exitTab.icon = null;
 		}
 
-		exitTab.oldFont = form["exitFont"].checked;
+		exitTab.FHWAFont = form["exitFont"].checked;
 		exitTab.showLeft = form["showLeft"].checked;
 		exitTab.fullBorder = form["fullBorder"].checked;
 		exitTab.topOffset = form["topOffset"].checked;
-
 		exitTab.borderThickness = form["borderThickness"].value;
 		exitTab.minHeight = form["minHeight"].value;
 		exitTab.fontSize = form["fontSize"].value;
@@ -395,6 +412,8 @@ const app = (function() {
 			shield.bannerPosition = document.getElementById(`shield${shieldIndex}_bannerPosition`).value;
 			shield.bannerType2 = document.getElementById(`shield${shieldIndex}_bannerType2`).value;
 			shield.specialBannerType = (document.getElementById(`shield${shieldIndex}_specialBannerType`).value || "None");
+			shield.indentFirstLetter = document.getElementById(`shield${shieldIndex}_indentFirstLetter`).checked;
+			shield.fontSize = String(document.getElementById(`shield${shieldIndex}_fontSize`).value) + "rem";
 
 			const specialBannerTypeSelectElmt = document.getElementById(`shield${shieldIndex}_specialBannerType`);
 
@@ -556,6 +575,7 @@ const app = (function() {
 		manualRight.value = right;
 		manualBottom.value = bottom;
 
+		updateForm();
 		redraw();
 	};
 
@@ -564,19 +584,8 @@ const app = (function() {
 	 */
 	const updateForm = function() {
 		const panel = post.panels[currentlySelectedPanelIndex];
-		var subPanel;
-
-		if (currentlySelectedSubPanelIndex == -1) {
-			subPanel = panel.sign
-		} else {
-			subPanel = subPanel = panel.sign.subPanels[currentlySelectedSubPanelIndex];
-		}
-		var exitTab = panel.exitTabs[currentlySelectedExitTabIndex];
-
-		if ((currentlySelectedNestedExitTabIndex != -1) && (exitTab.nestedExitTabs.length > 0)) {
-			exitTab = exitTab.nestedExitTabs[currentlySelectedNestedExitTabIndex];
-		}
-
+		const sign = (currentlySelectedSubPanelIndex != -1) ? (panel.sign.subPanels[currentlySelectedPanelIndex]) : (panel.sign);
+		const exitTab = (currentlySelectedNestedExitTabIndex != -1) ? (panel.exitTabs[currentlySelectedExitTabIndex].nestedExitTabs[currentlySelectedNestedExitTabIndex]) : (panel.exitTabs[currentlySelectedExitTabIndex]);
 
 		const panelList = document.getElementById("panelList");
 		const subPanelList = document.getElementById("subPanelList");
@@ -604,165 +613,65 @@ const app = (function() {
 			exitTabList.removeChild(exitTabList.lastChild);
 		}
 
-
 		for (let panelIndex = 0, panelsLength = post.panels.length; panelIndex < panelsLength; panelIndex++) {
-			var new_button = document.createElement("input");
-			new_button.type = "button";
-			new_button.id = "edit" + (panelIndex + 1);
-			new_button.value = "Panel " + (panelIndex + 1);
-
-			if (currentlySelectedPanelIndex == panelIndex) {
-				new_button.className = "active"
-			} else {
-				new_button.className = "";
-			}
-
-			new_button.addEventListener("click", function() {
+			const panelButton = document.createElement("input");
+			panelButton.type = "button";
+			panelButton.id = "edit" + (panelIndex + 1);
+			panelButton.value = "Panel " + (panelIndex + 1);
+			panelButton.className = (currentlySelectedPanelIndex == panelIndex) ? "active" : "";
+			
+			panelButton.addEventListener("click", function() {
 				changeEditingPanel(panelIndex);
-				new_button.className = "active";
+				panelButton.className = "active";
 			});
-			panelList.appendChild(new_button);
+			
+			panelList.appendChild(panelButton);
 		}
 
 		for (let subPanelIndex = 0, subPanelsLength = panel.sign.subPanels.length; subPanelIndex < subPanelsLength; subPanelIndex++) {
-			var new_button = document.createElement("input");
-			new_button.type = "button";
-			new_button.id = "sub_edit" + (subPanelIndex + 1);
-			new_button.value = "SubPanel " + (subPanelIndex + 1);
+			const subPanelButton = document.createElement("input");
+			subPanelButton.type = "button";
+			subPanelButton.id = "sub_edit" + (subPanelIndex + 1);
+			subPanelButton.value = "SubPanel " + (subPanelIndex + 1);
+			subPanelButton.className = (currentlySelectedSubPanelIndex == subPanelIndex) ? "active" : "";
 
-			if (currentlySelectedSubPanelIndex == subPanelIndex) {
-				new_button.className = "active";
-			} else {
-				new_button.className = "";
-			}
-
-			new_button.addEventListener("click", function() {
+			subPanelButton.addEventListener("click", function() {
 				changeEditingSubPanel(subPanelIndex, panel);
-				new_button.className = "active";
+				subPanelButton.className = "active";
 			});
-			subPanelList.appendChild(new_button);
+			
+			subPanelList.appendChild(subPanelButton);
 		}
 
 
 		for (let exitTabIndex = 0, exitTabLength = panel.exitTabs.length; exitTabIndex < exitTabLength; exitTabIndex++) {
 			const nestedExitTab = panel.exitTabs[exitTabIndex].nestedExitTabs.length;
 
-			const new_button = document.createElement("select");
-			new_button.id = "tab_edit" + (exitTabIndex + 1);
-			new_button.className = "exitTabSelect";
+			const exitTabButton = document.createElement("select");
+			exitTabButton.id = "tab_edit" + (exitTabIndex + 1);
+			exitTabButton.className = "exitTabSelect" + (currentlySelectedExitTabIndex == exitTabIndex) ? " active" : "";
 
-			console.log(currentlySelectedPanelIndex + " " + currentlySelectedExitTabIndex + " " + currentlySelectedNestedExitTabIndex);
-
-			for (let nestIndex = 0; nestIndex < nestedExitTab; nestIndex++) {
-				lib.appendOption(new_button, nestIndex, {
+			for (let nestIndex = -1; nestIndex < nestedExitTab; nestIndex++) {
+				lib.appendOption(exitTabButton, nestIndex, {
 					selected: (currentlySelectedNestedExitTabIndex == nestIndex),
-					text: "Nest Exit Tab " + (nestIndex + 1).toString()
+					text: (nestIndex == -1) ? "Exit Tab " : "Nest Exit Tab " + (nestIndex + 1).toString()
 				});
 			}
 
-			lib.appendOption(new_button, -1, {
-				selected: (currentlySelectedNestedExitTabIndex == -1),
-				text: "Exit Tab " + (exitTabIndex + 1).toString()
-			});
-
-			if (currentlySelectedExitTabIndex == exitTabIndex) {
-				new_button.className = "exitTabSelect active";
-			} else {
-				new_button.className = "exitTabSelect";
-			}
-
-
-			new_button.addEventListener("change", function() {
-				console.log(new_button.value);
-				console.log(new_button.id);
-				changeEditingExitTab(exitTabIndex, parseInt(new_button.value));
+			exitTabButton.addEventListener("change", function() {
+				changeEditingExitTab(exitTabIndex, parseInt(exitTabButton.value));
 			})
 
-			new_button.addEventListener("click", function() {
+			exitTabButton.addEventListener("click", function() {
 				changeEditingExitTab(exitTabIndex);
 			})
-
-
-			exitTabList.appendChild(new_button);
+			
+			exitTabList.appendChild(exitTabButton);
 		}
 
 		// Panel Setting Config
-
-		// Global Panel
-
-		if (currentlySelectedSubPanelIndex == -1) {
-			const outActionMessage = document.getElementById("outActionMessage");
-			const outActionMessageLabel = document.getElementById("outActionMessageLabel");
-
-			outActionMessage.className = "";
-			outActionMessageLabel.className = "";
-
-			outActionMessage.checked = panel.sign.advisoryMessage;
-
-			const globalPositioning = document.getElementById("globalPosition");
-			const globalPositionLabel = document.getElementById("globalPositionLabel");
-
-			const g_actionMessage = document.getElementById("g_actionMessage");
-
-			g_actionMessage.className = "";
-
-			globalPositioning.className = "";
-			globalPositionLabel.className = "";
-			for (const option of globalPositioning.options) {
-				if (option.value == panel.sign.globalPositioning) {
-					option.selected == true;
-					break;
-				}
-			}
-		} else {
-			const globalPositioning = document.getElementById("globalPosition");
-			const outActionMessage = document.getElementById("outActionMessage");
-			const globalPositionLabel = document.getElementById("globalPositionLabel");
-			const outActionMessageLabel = document.getElementById("outActionMessageLabel");
-			const g_actionMessage = document.getElementById("g_actionMessage");
-
-			g_actionMessage.className = "invisible";
-
-			outActionMessageLabel.className = "invisible";
-			outActionMessage.className = "invisible";
-			globalPositioning.className = "invisible";
-			globalPositionLabel.className = "invisible";
-
-		}
-
-		if (currentlySelectedSubPanelIndex > 0) {
-			const subPanelHeight = document.getElementById("subPanelHeight");
-			subPanelHeight.style.display = "initial";
-
-			const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
-			subPanelHeightLabel.style.display = "inline-block";
-
-
-		} else {
-			const subPanelHeight = document.getElementById("subPanelHeight");
-			subPanelHeight.style.display = "none";
-
-			const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
-			subPanelHeightLabel.style.display = "none";
-		}
-
-		if ((panel.sign.subPanels.length > 1) && (currentlySelectedSubPanelIndex != -1)) {
-			const subPanelLength = document.getElementById("subPanelLength");
-			subPanelLength.style.display = "initial";
-
-			const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
-			subPanelLengthLabel.style.display = "inline-block";
-		} else {
-			const subPanelLength = document.getElementById("subPanelLength");
-			subPanelLength.style.display = "none";
-
-			const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
-			subPanelLengthLabel.style.display = "none";
-		}
-
-
-
-
+		
+		// Panel Config
 		const panelColorSelectElmt = document.getElementById("panelColor");
 		for (const option of panelColorSelectElmt.options) {
 			if (option.value == panel.color) {
@@ -779,9 +688,35 @@ const app = (function() {
 			}
 		}
 
+		// Global Panel
+		const outActionMessage = document.getElementById("outActionMessage");
+		const outActionMessageLabel = document.getElementById("outActionMessageLabel");
+		const globalPositioning = document.getElementById("globalPosition");
+		const globalPositionLabel = document.getElementById("globalPositionLabel");
+		const g_actionMessage = document.getElementById("g_actionMessage");
+
+		g_actionMessage.className = (currentlySelectedSubPanelIndex != -1) ? "invisible" : "";
+		outActionMessage.className = (currentlySelectedSubPanelIndex != -1) ? "invisible" : "";
+		outActionMessageLabel.className = (currentlySelectedSubPanelIndex != -1) ? "invisible" : "";
+		g_actionMessage.className = (currentlySelectedSubPanelIndex != -1) ? "invisible" : "";
+		globalPositioning.className = (currentlySelectedSubPanelIndex != -1) ? "invisible" : "";
+		globalPositionLabel.className = (currentlySelectedSubPanelIndex != -1) ? "invisible" : "";
+	
+		outActionMessage.checked = panel.sign.advisoryMessage;
+		
+		// Sub Panel
+		const subPanelHeight = document.getElementById("subPanelHeight");
+		const subPanelHeightLabel = document.getElementById("subPanelHeightLabel");
+		const subPanelLength = document.getElementById("subPanelLength");
+		const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
+		
+		subPanelHeight.style.display = (currentlySelectedSubPanelIndex > 0) ? "initial" : "none";
+		subPanelHeightLabel.style.display = (currentlySelectedSubPanelIndex > 0) ? "inline-block" : "none";
+		
+		subPanelLength.style.display = (currentlySelectedSubPanelIndex != -1 && panel.sign.subPanels.length > 1) ? "initial" : "none";
+		subPanelLengthLabel.style.display = (currentlySelectedSubPanelIndex != -1 && panel.sign.subPanels.length > 1) ? "inline-block" : "none";
+
 		// Exit Tabs
-
-
 		const exitNumberElmt = document.getElementById("exitNumber");
 		exitNumberElmt.value = exitTab.number;
 
@@ -800,14 +735,29 @@ const app = (function() {
 				break;
 			}
 		}
+		
+		const exitTabColorElmt = document.querySelector("#exitColor");
+		for (const option of exitTabColorElmt.options) {
+			if (option.value == exitTab.color) {
+				option.selected = true;
+				break;
+			}
+		}
+		
+		const exitTabVariantElmt = document.querySelector("#exitVariant");
+		for (const option of exitTabColorElmt.options) {
+			if (option.value == exitTab.color) {
+				option.selected = true;
+				break;
+			}
+		}
+
 
 		const tollSettingOptions = document.getElementsByName("tollOption");
-
 		for (const tollSettingOption of tollSettingOptions) {
 			if (tollSettingOption.value == exitTab.icon) {
 				tollSettingOption.selected = true;
-			} else {
-				tollSettingOption.selected = false;
+				break;
 			}
 		}
 
@@ -820,9 +770,11 @@ const app = (function() {
 				break;
 			}
 		}
+		
+		document.getElementById("extraSettings").style.display = (exitTab.variant == "Default") ? "none" : "";
 
 		const exitFont = document.getElementById("exitFont");
-		exitFont.checked = exitTab.oldFont;
+		exitFont.checked = exitTab.FHWAFont;
 
 		const showLeft = document.getElementById("showLeft");
 		showLeft.checked = exitTab.showLeft;
@@ -840,18 +792,17 @@ const app = (function() {
 
 		const minHeight = document.getElementById("minHeight");
 		minHeight.value = exitTab.minHeight;
-		document.getElementById("minValue").innerHTML = borderThickness.value.toString();
+		document.getElementById("minValue").innerHTML = minHeight.value.toString();
 
 		// Shields
 
-		updateShieldSubform()
-
-
+		updateShieldSubform();
+		
 		const controlTextElmt = document.getElementById("controlText");
-		controlTextElmt.value = subPanel.controlText;
+		controlTextElmt.value = sign.controlText;
 
 		const actionMessageElmt = document.getElementById("actionMessage");
-		actionMessageElmt.value = subPanel.actionMessage;
+		actionMessageElmt.value = sign.actionMessage;
 
 		const shieldPositionsSelectElmt = document.getElementById("shieldsPosition");
 		for (const option of shieldPositionsSelectElmt.options) {
@@ -880,20 +831,17 @@ const app = (function() {
 		const exitOnlyDirection = document.getElementById("exitOnlyDirection");
 		const showExitOnly = document.getElementById("showExitOnly");
 
-
-		if (panel.sign.guideArrow != "Exit Only") {
-			exitOnlyDirectionLabel.style.visibility = "hidden";
-			showExitOnlyLabel.style.visibility = "hidden";
-			exitOnlyDirection.style.visibility = "hidden";
-			showExitOnly.style.visibility = "hidden";
-		} else {
-			exitOnlyDirectionLabel.style.visibility = "visible";
-			showExitOnlyLabel.style.visibility = "visible";
-			exitOnlyDirection.style.visibility = "visible";
-			showExitOnly.style.visibility = "visible";
-			showExitOnly.value = panel.sign.showExitOnly;
-			exitOnlyDirection.value = panel.sign.exitOnlyDirection;
-
+		exitOnlyDirectionLabel.className = (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
+		showExitOnlyLabel.className= (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
+		exitOnlyDirection.className= (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
+		showExitOnly.className = (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
+		showExitOnly.value = panel.sign.showExitOnly;
+		
+		for (const option of exitOnlyDirection.options) {
+			if (option.value == panel.sign.exitguideArrows) {
+				option.selected = true;
+				break;
+			}
 		}
 
 		const otherSymbolSelectElement = document.getElementById("otherSymbol");
@@ -911,24 +859,6 @@ const app = (function() {
 		advisoryMessageElmt.checked = panel.sign.advisoryMessage;
 
 	};
-
-	const addSubPanel = function() {
-		const sign = post.panels[currentlySelectedPanelIndex].sign;
-		sign.newSubPanel();
-		currentlySelectedSubPanelIndex++
-		updateForm();
-		redraw();
-	}
-
-	const removeSubPanel = function() {
-		const sign = post.panels[currentlySelectedPanelIndex].sign;
-		if (sign.subPanels.length > 1) {
-			sign.deleteSubPanel((sign.subPanels.length - 2));
-			currentlySelectedSubPanelIndex--
-			updateForm();
-			redraw();
-		}
-	}
 
 	/**
 	 * Update the fields in the form relating to shields to the values of the currently selected panel.
@@ -1023,6 +953,38 @@ const app = (function() {
 			specialBannerTypeSelectElmt.addEventListener("change", readForm);
 			rowContainerElmt.appendChild(specialBannerTypeSelectElmt);
 
+			rowContainerElmt.appendChild(document.createElement("br"));
+			
+			const indentElmt = document.createElement("input");
+			indentElmt.type = "checkbox";
+			indentElmt.id = `shield${shieldIndex}_indentFirstLetter`;
+			indentElmt.checked = shields[shieldIndex].indentFirstLetter;
+			indentElmt.onchange = readForm;
+			rowContainerElmt.appendChild(indentElmt);
+			
+			const indentLabelElmt = document.createElement("label");
+			indentLabelElmt.setAttribute("for",`shield${shieldIndex}_indentFirstLetter`)
+			indentLabelElmt.appendChild(document.createTextNode("Enlarge First Letter"));
+			rowContainerElmt.appendChild(indentLabelElmt);
+			
+			const fontSizeLabelElmt = document.createElement("label");
+			fontSizeLabelElmt.setAttribute("for",`shield${shieldIndex}_fontSize`);
+			fontSizeLabelElmt.appendChild(document.createTextNode("Text Size: "));
+			fontSizeLabelElmt.style.marginLeft = "2rem";
+			rowContainerElmt.appendChild(fontSizeLabelElmt);
+			
+			const fontSizeText = document.createElement("input");
+			fontSizeText.type = "number";
+			fontSizeText.id = `shield${shieldIndex}_fontSize`;
+			fontSizeText.placeholder = 1.4;
+			fontSizeText.value = parseFloat(shields[shieldIndex].fontSize.split("rem")[0]);
+			fontSizeText.min = 1;
+			fontSizeText.max = 3;
+			fontSizeText.style.width = "4rem";
+			fontSizeText.onchange = readForm;
+			rowContainerElmt.appendChild(fontSizeText);
+
+			
 			rowContainerElmt.appendChild(document.createElement("br"));
 
 			rowContainerElmt.appendChild(document.createTextNode("Banners:"));
@@ -1314,20 +1276,17 @@ const app = (function() {
 						exitTabHolderElmt.className += ` ${panel.color.toLowerCase()}`
 					}
 
-					if (exitTab.oldFont) {
+					if (exitTab.FHWAFont) {
 						exitTabElmt.style.fontFamily = "Series E";
 					}
 
 
 					if ((exitTab.number) || (exitTab.showLeft) || (exitTab.variant != "Default")) {
-
-						console.log("hola");
-
 						if (exitTab.variant == "Default") {
 							const leftElmt = document.createElement("div");
 
 							if (exitTab.showLeft) {
-								leftElmt.className = `leftElmt`;
+								leftElmt.className = `yellowElmt`;
 								leftElmt.appendChild(document.createTextNode("LEFT"));
 								exitTabElmt.appendChild(leftElmt);
 								exitTabElmt.style.display = "inline-block";
@@ -1358,10 +1317,8 @@ const app = (function() {
 							}
 						} else if (exitTab.variant == "Toll") {
 							let tollAuthority = exitTab.icon;
-							console.log(exitTab.icon);
-							console.log(exitTab.useTextBasedIcon);
+	
 							if (exitTab.useTextBasedIcon) {
-								console.log("hola");
 								const tagElement = document.createElement("span");
 								tagElement.textContent = tollAuthority.toUpperCase();
 								tagElement.className = "tagText";
@@ -1466,7 +1423,8 @@ const app = (function() {
 					bannerShieldContainerElmt.appendChild(bannerContainerElmt);
 
 					const bannerElmt = document.createElement("p");
-					bannerElmt.className = "bannerA";
+					bannerElmt.className = "bannerA" + ((! shield.indentFirstLetter) ? " noIndent" : "");
+					bannerElmt.style = "--fontSize:" + shield.fontSize;
 					bannerContainerElmt.appendChild(bannerElmt);
 
 
@@ -1504,11 +1462,12 @@ const app = (function() {
 					bannerShieldContainerElmt.appendChild(bannerContainerElmt2);
 
 					const bannerElmt2 = document.createElement("p");
-					bannerElmt2.className = "bannerB";
+					bannerElmt2.className = "bannerB" + ((! shield.indentFirstLetter) ? " noIndent" : "");
+					bannerElmt2.style = "--fontSize:" + shield.fontSize;
 					bannerContainerElmt2.appendChild(bannerElmt2);
 
 					if (shield.bannerType2 == "Toll") {
-						bannerElmt2.className += "TOLL"
+						bannerElmt2.className += " TOLL"
 					}
 
 					const routeNumberElmt = document.createElement("p");
@@ -1762,10 +1721,18 @@ const app = (function() {
 			const g_controlTextElmt = document.createElement("p");
 			g_controlTextElmt.className = "controlText";
 
+			if (post.fontType) {
+				g_controlTextElmt.style.fontFamily = "Series EM";
+			}
+
 			monitorControlText(panel.sign, g_controlTextElmt);
 
 			const g_actionMessageElmt = document.createElement("div");
 			g_actionMessageElmt.className = `actionMessage`;
+
+			if (post.fontType) {
+				g_actionMessage.className = "Series E";
+			}
 
 			monitorActionMessage(panel.sign, g_actionMessageElmt);
 
@@ -1941,23 +1908,7 @@ const app = (function() {
 					const secondaryContainer = document.createElement("div");
 					secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
 
-					if (post.secondExitOnly == true) {
-						secondaryContainer.className += " new2";
-						if (panel.sign.arrowPosition == "Left") {
-							secondaryContainer.style.marginLeft = "-0.35rem";
-						} else if (panel.sign.arrowPosition == "Right") {
-							if (panel.sign.guideArrowLanes > 1) {
-								secondaryContainer.style.marginRight = "0.1rem";
-							} else {
-								secondaryContainer.style.marginRight = "-0.15rem";
-							}
-
-							// secondaryContainer.style.marginTop = "-0.15rem";
-							guideArrowsElmt.style.padding = "0rem 0.27rem 0rem 0.27rem";
-						}
-
-						guideArrowsElmt.className += " new2";
-					}
+					guideArrowsElmt.className += (post.secondExitOnly) ? " new2" : " default";
 
 					path = secondaryContainer
 
@@ -1978,11 +1929,6 @@ const app = (function() {
 									marginLeft += 4;
 								}
 							}
-
-							if (!post.secondExitOnly) {
-								path.style.marginLeft = "0rem";
-								arrow.style.marginLeft = marginLeft.toString() + "rem";
-							}
 						}
 
 					} else {
@@ -2000,11 +1946,6 @@ const app = (function() {
 									marginLeft += 4;
 								}
 
-							}
-
-							if (!post.secondExitOnly) {
-								path.style.marginLeft = "0rem";
-								arrow.style.marginRight = marginLeft.toString() + "rem";
 							}
 						}
 
@@ -2030,21 +1971,20 @@ const app = (function() {
 				guideArrowsElmt.style.display = "block";
 				guideArrowsElmt.style.visibility = "visible";
 				if (("Exit Only" == panel.sign.guideArrow) || ("Split Exit Only" == panel.sign.guideArrow) || ("Half Exit Only" == panel.sign.guideArrow)) {
-					if (panel.sign.guideArrowLanes > 1) {
-						guideArrowsElmt.style.padding = "0rem";
-					}
 
-					if ((post.secondExitOnly == true) && (panel.sign.guideArrow == "Exit Only")) {
-						guideArrowsElmt.className += " new";
-						arrowContElmt.className += " new";
+					if ((post.secondExitOnly == true) || (panel.sign.guideArrow == "Half Exit Only")) {
+						if (panel.sign.guideArrow == "Exit Only") {
+							guideArrowsElmt.className += " new";
+							arrowContElmt.className += " new";
+						} if (panel.sign.guideArrow == "Half Exit Only") {
+							path.className += " new2";
+							arrowContElmt.className += " new2";
+							arrowContElmt.style.justifyContent = "space-between";
+							arrowContElmt.style.gap = "5rem";
+						}
+						guideArrowsElmt.style.display = "flex";
 					}
-
-					if (panel.sign.subPanels.length > 1) {
-						arrowContElmt.style.width = "99%";
-					} else {
-						arrowContElmt.style.width = "max-content";
-					}
-
+					
 					/*
 
 						if (panel.sign.advisoryMessage) {
@@ -2072,7 +2012,7 @@ const app = (function() {
 										var bonus = "";
 
 										if (panel.sign.guideArrow == "Split Exit Only") {
-											bonus = " split"
+											bonus = " yellowElmt"
 										}
 
 										textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
@@ -2116,7 +2056,7 @@ const app = (function() {
 										var bonus = "";
 
 										if (panel.sign.guideArrow == "Split Exit Only") {
-											bonus = " split"
+											bonus = " yellowElmt"
 										}
 
 										textExitSpanElmt.className = "exitOnlyText" + bonus;
@@ -2140,7 +2080,7 @@ const app = (function() {
 										var bonus = "";
 
 										if (panel.sign.guideArrow == "Split Exit Only") {
-											bonus = " split"
+											bonus = " yellowElmt"
 										}
 
 										textOnlySpanElmt.className = "exitOnlyText" + bonus;
@@ -2219,6 +2159,8 @@ const app = (function() {
 						oSNumElmt.className += " three";
 						break;
 				}
+			} else {
+				otherSymbolsElmt.style.display = "none";
 			}
 
 			switch (panel.sign.otherSymbol) {

@@ -5,126 +5,113 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 		<meta name="author" content="Brendon Strowe, Maplou, JK_Potato/Computer" />
-		<meta name="description" content="Highway, Freeway, and Expressway Sign Maker." />
-
+		<meta name="description" content="The ULTIMATE Sign Maker for Highways, Expressways, and Freeways!" />
 		<link href="css/page.css" rel="stylesheet" type="text/css" />
 		<link href="css/signs.css" rel="stylesheet" type="text/css" />
 		<link href="css/shields.css" rel="stylesheet" type="text/css" />
 		<link href="css/form.css" rel="stylesheet" type="text/css" />
-
 		<script src="js/HtmlToCanvas.js" type="text/javascript"></script>
-		<script src="js/lib.js" type="text/javascript" ></script>
-		<script src="js/Shield.js" type="text/javascript" ></script>
-		<script src="js/Sign.js" type="text/javascript" ></script>
-		<script src="js/ExitTab.js" type="text/javascript" ></script>
-		<script src="js/Panel.js" type="text/javascript" ></script>
-		<script src="js/Post.js" type="text/javascript" ></script>
-		<script src="js/main.js" type="text/javascript" ></script>
-        <script src="js/form.js" type="text/javascript" ></script>
-        <script src="js/Arrows.js" type="text/javascript" ></script>
+		<script src="js/lib.js" type="text/javascript"></script>
+		<script src="js/Shield.js" type="text/javascript"></script>
+		<script src="js/Sign.js" type="text/javascript"></script>
+		<script src="js/ExitTab.js" type="text/javascript"></script>
+		<script src="js/Panel.js" type="text/javascript"></script>
+		<script src="js/Post.js" type="text/javascript"></script>
+		<script src="js/main.js" type="text/javascript"></script>
+		<script src="js/form.js" type="text/javascript" defer></script>
+		<script src="js/Arrows.js" type="text/javascript"></script>
 		<script src="js/SubPanels.js" type="text/javascript"></script>
-
 		<title>Highway Sign Maker</title>
-        
-        <link rel="icon" type="image/x-icon" href="img/other-symbols/icon.png">
-        
-        <style>
+		<link rel="icon" type="image/x-icon" href="img/other-symbols/icon.png">
+		<style>
 			#warning {
 				background: yellow;
 				font-family: Arial;
 				padding: 1rem;
 				font-size: 1rem;
 			}
-        </style>
+		</style>
 	</head>
 	<body onLoad="app.init();">
 		<main>
-            <div id="postContainer">
-                <div class="post"></div>
-                <div id="panelContainer">
-                </div>
-                <div class="post"></div>
-            </div>
-            
-            <br>
+			<div id="postContainer">
+				<div class="post"></div>
+				<div id="panelContainer"></div>
+				<div class="post"></div>
+			</div>
+			<br>
 			<form name="signMaker">
-                <center>
-                    <img src="img/other-symbols/Banner.png" height=125>
-					<div id="warning">
-						Hey yall, whoever actually uses this website. This website definitely looks like its under construction (which it is). I haven't had enough time to fully complete my projects for this website, so you can probably see alot of incomplete work around here. Sorry for that, but don't worry, they'll be rolled out slowly but surely. This is a passion project, never intended to be a full-scale project. By the way, feel free to contribute yourself. I hope yall enjoyed this creation, and remember to thank <a href="https://github.com/dki-os/SignMaker">the dki-os SignMaker</a> first!
-						<br>
-						- JK_Potato / Computer
-					</div>
-                </center>
+				<center>
+					<img src="img/other-symbols/Banner.png" height=125>
+					<div id="warning"> Hey yall, whoever actually uses this website. This website definitely looks like its under construction (which it is). I haven't had enough time to fully complete my projects for this website, so you can probably see alot of incomplete work around here. Sorry for that, but don't worry, they'll be rolled out slowly but surely. This is a passion project, never intended to be a full-scale project. By the way, feel free to contribute yourself. I hope yall enjoyed this creation, and remember to thank <a href="https://github.com/dki-os/SignMaker">the dki-os SignMaker</a> first! <br> - JK_Potato / Computer </div>
+				</center>
 				<!-- Panel Editing Commands -->
 				<hr>
-                <br />
+				<br />
 				<!-- Post Position -->
-                <p class="section">Post</p>
+				<p class="section">Post</p>
 				<label for="postPosition">Post Position</label>
-				<select id="postPosition" onChange="app.readForm();">
-				</select>
+				<select id="postPosition" onChange="app.readForm();"></select>
 				<hr>
-                <p class="section">Panels</p>
-                <nav>
-                    <div class="scrollmenu" id="panelList">
-                    </div>
-                    <input type="button" class="new" id="newPanel" value="+" onClick="app.newPanel();" />
-                    <input type="button" class="del" id="deletePanel" value="-" onClick="app.deletePanel();" />
-                    <input type="button" class="dup" id="duplicatePanel" value="&#9986;" onClick="app.duplicatePanel();" />
-                    <label for="panelNumber">No:</label>
-                    <input type="number" class="num" id="PanelNumber" name="PanelNumber" placeholder="1"  step="1" onchange="app.changeEditingPanel((Math.floor(document.getElementById(`PanelNumber`).value)) - 1)" min="1">
-                </nav>
-                <br />
-                
-                <center>
-                    <div id="currentPanel">
+				<p class="section">Panels</p>
+				<nav>
+					<div class="scrollmenu" id="panelList"></div>
+					<input type="button" class="new" id="newPanel" value="+" onClick="app.newPanel();" />
+					<input type="button" class="del" id="deletePanel" value="-" onClick="app.deletePanel();" />
+					<input type="button" class="dup" id="duplicatePanel" value="&#9986;" onClick="app.duplicatePanel();" />
+					<label for="panelNumber">No:</label>
+					<input type="number" class="num" id="PanelNumber" name="PanelNumber" placeholder="1" step="1" onchange="app.changeEditingPanel((Math.floor(document.getElementById(`PanelNumber`).value)) - 1)" min="1">
+				</nav>
+				<br />
+				<center>
+					<div id="currentPanel">
 						<nav style="display: table-caption; background-color: rgba(255,255,255,0.3); display: table-caption; padding: 1rem;">
 							<div id="heading">
 								<b id="panelNumberTitle" class="section">Current Panel</b>
 							</div>
 							<div id="paddingSection">
-								<center><b class="section">Panel Padding</b></center>
+								<center>
+									<b class="section">Panel Padding</b>
+								</center>
 								<input type="button" id="VisualBtn" value="Set with demo" onclick="document.getElementById(`Visual`).style.display=`block`; document.getElementById(`Manual`).style.display=`none`;" />
-								<input type="Button" id="ManualBtn" value="Set manually" onclick="document.getElementById(`Visual`).style.display=`none`; document.getElementById(`Manual`).style.display=`block`;"/>
+								<input type="Button" id="ManualBtn" value="Set manually" onclick="document.getElementById(`Visual`).style.display=`none`; document.getElementById(`Manual`).style.display=`block`;" />
 							</div>
 						</nav>
 						<div id="panelPositionDiv">
 							<label style="text-align: center">Move Panel</label>
 							<br />
-							<input type="button" value="<<" onClick="app.shiftLeft();" class="shiftButton" />
+							<input type="button" value="<
+															
+															<" onClick="app.shiftLeft();" class="shiftButton" />
 							<input type="button" value=">>" onClick="app.shiftRight();" class="shiftButton" />
 							<br />
 							<!-- Color -->
 							<label for="panelColor" style="text-align: center;">Panel Color:</label>
-							<select id="panelColor" onChange="app.readForm();">
-							</select>
+							<select id="panelColor" onChange="app.readForm();"></select>
 							<br />
 							<!-- Corner -->
 							<label for="panelCorner" style="text-align: center;">Panel Corners:</label>
-							<select id="panelCorner" onChange="app.readForm();">
-							</select>
+							<select id="panelCorner" onChange="app.readForm();"></select>
 						</div>
 						<div id="panelPadding">
 							<div id="Visual" style="display: block;">
-								<input type="range" class="paddingConfig" id="paddingTop" name="paddingTop" min="0" max="20" step="0.05" value=".5" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `top: ` + this.value;"/>
+								<input type="range" class="paddingConfig" id="paddingTop" name="paddingTop" min="0" max="20" step="0.05" value=".5" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `top: ` + this.value;" />
 								<br />
-								<input type="range" class="paddingConfig" id="paddingLeft" name="paddingLeft" min="0" max="20" step="0.05" value=".75" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `left: ` + value;  "/>
+								<input type="range" class="paddingConfig" id="paddingLeft" name="paddingLeft" min="0" max="20" step="0.05" value=".75" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `left: ` + value;  " />
 								<div id="panelExample">
 									<p id="currentlyEditing"></p>
 								</div>
-								<input type="range" class="paddingConfig" id="paddingRight" name="paddingRight" min="0" max="20" step="0.05" value=".75" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `right: ` + this.value;"/>
+								<input type="range" class="paddingConfig" id="paddingRight" name="paddingRight" min="0" max="20" step="0.05" value=".75" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `right: ` + this.value;" />
 								<br />
-								<input type="range" class="paddingConfig" id="paddingBottom" name="paddingBottom" min="0" max="20" step="0.05" value=".5" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);"  oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `bottom: ` + this.value; "/>
+								<input type="range" class="paddingConfig" id="paddingBottom" name="paddingBottom" min="0" max="20" step="0.05" value=".5" onchange="setTimeout(function() {document.getElementById(`currentlyEditing`).innerHTML = ``;}, 2000);" oninput="app.readForm(); document.getElementById(`currentlyEditing`).innerHTML = `bottom: ` + this.value; " />
 								<br />
 								<br />
-								<input type="button" id="ResetPadding" value="Reset" onclick="app.resetPadding();"/>
+								<input type="button" id="ResetPadding" value="Reset" onclick="app.resetPadding();" />
 								<div id="editStep">
 									<label for="stepVal" id="stepLabel">Step</label>
 									<input type="number" id="stepVal" name="stepVal" min=".01" step=".01" max="2" placeholder=".05" value=".05" onchange="var paddingConfig = document.getElementsByClassName(`paddingConfig`); for (const padding of paddingConfig) { padding.step = this.value;}" />
 								</div>
 							</div>
-							
 							<div id="Manual" style="display: none;">
 								<label for="manualTop">Padding Top: </label>
 								<input type="number" id="manualTop" value=".5" placeholder=".5" step=".01" min="0" max="20" onblur="app.readForm();" />
@@ -141,22 +128,17 @@
 								<p>(note: measured in rem)</p>
 							</div>
 						</div>
-                    </div>
-                </center>
-                <br />
-				
+					</div>
+				</center>
+				<br />
 				<div id="exitTabSettings">
-					<label for="exitNumber" id="exitNumberLabel">Exit:</label>
-					<input type="text" id="exitNumber" name="exitNumber" placeholder="Exit 00" onChange="app.readForm();" />
-					<select id="exitTabPosition" onChange="app.readForm();">
-					</select>
-					<select id="exitTabWidth" onChange="app.readForm();">
-					</select>
-					<select id="exitColor" onChange="app.readForm();">
-					</select>
-					<select id="exitVariant" onChange="app.readForm();">
-					</select>
-					
+					<div id="exitTabMain">
+						<input type="text" id="exitNumber" name="exitNumber" placeholder="Exit 00" onChange="app.readForm();" />
+						<select id="exitTabPosition" onChange="app.readForm();"></select>
+						<select id="exitTabWidth" onChange="app.readForm();"></select>
+						<select id="exitColor" onChange="app.readForm();"></select>
+						<select id="exitVariant" onChange="app.readForm();"></select>
+					</div>
 					<div id="extraSettings">
 						<div id="tollSettings" style="display: block;">
 							<input type="radio" name="tollOption" id="ezPass" class="radioOption" value="EZPass" onchange="app.readForm();" />
@@ -166,196 +148,172 @@
 							<input type="radio" name="tollOption" id="SUNPass" class="radioOption" value="SUNPass" onchange="app.readForm();" />
 							<label for="SUNPass" style="text-align: left;">SunPass</label>
 							<input type="radio" name="tollOption" id="custom" class="radioOption" value="custom" onchange="app.readForm();" />
-							<label for="custom" style="text-align: left;">Custom Tag <br /> <input type="text" id="customTag" name="customTag" placeholder="Tag" onchange="app.readForm();"/> </label>
+							<label for="custom" style="text-align: left;">Custom Tag <br />
+								<input type="text" id="customTag" name="customTag" placeholder="Tag" onchange="app.readForm();" />
+							</label>
 						</div>
 						<div id="iconSettings" style="display: none;">
 							<label for="iconSelect">Select icon:</label>
-							<select id="iconSelect">
-							</select>
+							<select id="iconSelect"></select>
 						</div>
 					</div>
-					
-					<br />
 					<label for="exitFont" id="exitFontLabel">FHWA Font:</label>
 					<input type="checkbox" name="exitFont" id="exitFont" value="exitFont" onchange="app.readForm();">
-					
-					<label for = "showLeft" id="showLeftLabel">Left:</label>
+					<label for="showLeft" id="showLeftLabel">Left:</label>
 					<input type="checkbox" id="showLeft" value="showLeft" name="showLeft" onchange="app.readForm();">
-					
-					<label for = "fullBorder">Full Border: </label>
+					<label for="fullBorder">Full Border: </label>
 					<input type="checkbox" id="fullBorder" value="fullBorder" name="fullBorder" onchange="app.readForm();">
 					<label for="topOffset">Top Offset:</label>
-					<input type="checkbox" id="topOffset" value="topOffset" name="topOffset" onChange = "app.readForm();" checked>
+					<input type="checkbox" id="topOffset" value="topOffset" name="topOffset" onChange="app.readForm();" checked>
 					<br />
-					<label for="borderThickness">Border Thickness (rem): </label>
+					<label for="borderThickness">Border Thickness (rem): <input type="button" class="resetBtn clear" id="borderReset" value="Reset">
+					</label>
 					<input type="range" id="borderThickness" min="0.01" max="0.2" step="0.01" value="0.2" oninput="document.getElementById(`borderValue`).innerHTML = this.value;" onchange="app.readForm();">
 					<label for="borderThickness" id="borderValue" style="text-align: left; margin: 0; font-size: 2rem; width: auto;">0.2</label>
-					<label for="minHeight">Minimum Height (rem): </label>
+					<label for="minHeight">Minimum Height (rem): <input type="button" class="resetBtn clear" id="minimumReset" value="Reset">
+					</label>
 					<input type="range" id="minHeight" min="0" max="5" value="2.25" step="0.05" oninput="document.getElementById(`minValue`).innerHTML = this.value" onchange="app.readForm();" />
 					<label for="minHeight" id="minValue" style="text-align: left; margin: 0; font-size: 2rem; widtH: auto;">2.25</label>
 					<br />
-					<label for="fontSize">Text Size (px): </label>
+					<label for="fontSize">Text Size (px): <input type="button" class="resetBtn clear" id="sizeReset" value="Reset">
+					</label>
 					<input type="range" id="fontSize" min="10" max="100" value="18" step="1" oninput="document.getElementById(`fontValue`).innerHTML = this.value" onchange="app.readForm();" />
 					<label for="fontSize" id="fontValue" style="text-align: left; margin: 0; font-size: 2rem; widtH: auto;">16</label>
-					
 					<p class="section">Exit Tab</p>
 				</div>
 				<nav>
-                    <div class="scrollmenu" id="exitTabList">
-					
-                    </div>
-                    <input type="button" class="new" id="newexitTab" value="++" onClick="app.newNestExitTab();" />
+					<div class="scrollmenu" id="exitTabList"></div>
+					<input type="button" class="new" id="newexitTab" value="++" onClick="app.newNestExitTab();" />
 					<input type="button" class="new" id="newexitTab" value="+" onClick="app.newExitTab();" />
-                    <input type="button" class="del" id="deleteexitTab" value="--" onClick="app.deleteNestExitTab();" />
-                    <input type="button" class="del" id="deleteexitTab" value="-" onClick="app.removeExitTab();" />
+					<input type="button" class="del" id="deleteexitTab" value="--" onClick="app.deleteNestExitTab();" />
+					<input type="button" class="del" id="deleteexitTab" value="-" onClick="app.removeExitTab();" />
 					<input type="button" class="dup" id="duplicateexitTab" value="&#9986;" onClick="app.duplicateExitTab();" />
-                    <label for="panelNumber">No:</label>
-                    <input type="text" class="num" id="exitTabNumber" name="exitTabNumber" placeholder="1"  step="1" onchange="app.changeEditingExitTab(Math.floor(document.getElementById(parseInt(this.value.toString().split(`:`)[0]),parseInt(this.value.toString().split(`:`)[1]))));" style="widtH: 7%;" min="1">
-                </nav>
-                <!-- Subpanels -->
+					<label for="panelNumber">No:</label>
+					<input type="text" class="num" id="exitTabNumber" name="exitTabNumber" placeholder="1" step="1" onchange="app.changeEditingExitTab(Math.floor(document.getElementById(parseInt(this.value.toString().split(`:`)[0]),parseInt(this.value.toString().split(`:`)[1]))));" style="widtH: 7%;" min="1">
+				</nav>
+				<!-- Subpanels -->
 				<nav>
-                    <div class="scrollmenu" id="subPanelList">
+					<div class="scrollmenu" id="subPanelList">
 						<input type="button" id="global" value="Global" onClick="app.changeEditingSubPanel(-1);" />
-                    </div>
-                    <input type="button" class="new" id="newSubPanel" value="+" onClick="app.newSubPanel();" />
-                    <input type="button" class="del" id="deleteSubPanel" value="-" onClick="app.removeSubPanel();" />
-                    <input type="button" class="dup" id="duplicateSubPanel" value="&#9986;" onClick="app.duplicateSubPanel();" />
-                    <label for="panelNumber">No:</label>
-                    <input type="number" class="num" id="SubPanelNumber" name="SubPanelNumber" placeholder="1"  step="1" onchange="app.changeEditingSubPanel(Math.floor(document.getElementById(this.value - 1)));" min="1">
-                </nav>
-				
+					</div>
+					<input type="button" class="new" id="newSubPanel" value="+" onClick="app.newSubPanel();" />
+					<input type="button" class="del" id="deleteSubPanel" value="-" onClick="app.removeSubPanel();" />
+					<input type="button" class="dup" id="duplicateSubPanel" value="&#9986;" onClick="app.duplicateSubPanel();" />
+					<label for="panelNumber">No:</label>
+					<input type="number" class="num" id="SubPanelNumber" name="SubPanelNumber" placeholder="1" step="1" onchange="app.changeEditingSubPanel(Math.floor(document.getElementById(this.value - 1)));" min="1">
+				</nav>
 				<div id="subPanelSettings">
-					<input type="button" id="EnableGlobal" value="Click to enable Global Panel" style="display: none;"/>
 					<div id="NormalSubPanel">
 						<p class="section">Sub-Panel</p>
-						<div class="shields" id="shields">
-						</div>
+						<div class="shields" id="shields"></div>
 						<input type="button" value="New Shield" onclick="app.newShield();" />
 						<input id="clear" type="button" value="Clear all Shields" onclick="app.clearShields();" />
 						<br />
 						<br />
-						
 						<!-- Control Cities -->
 						<label for="controlText" id="controlCitiesLabel">Control Cities:</label>
 						<textarea id="controlText" wrap="hard" rows="4" onBlur="app.readForm();"></textarea>
-						
 						<br />
-						
 						<!-- Action Message -->
 						<label for="actionMessage" id="actionMessageLabel">Action Message: </label>
 						<input type="text" id="actionMessage" name="actionMessage" placeholder="Action Message" onBlur="app.readForm();" />
 						<br />
 						<label for="outActionMessage" id="outActionMessageLabel" class="invisible">Advisory Message:</label>
-						<input type="checkbox" id="outActionMessage" name="outActionMessage" class="invisible" value="outActionMessage" onChange="app.readForm();" checked />							
+						<input type="checkbox" id="outActionMessage" name="outActionMessage" class="invisible" value="outActionMessage" onChange="app.readForm();" checked />
 						<input type="text" class="invisible" id="g_actionMessage" name="g_actionMessage" placeholder="Action Message" onBlur="app.readForm();" />
 						<br />
 						<label for="globalPosition" id="globalPositionLabel" class="invisible">Global Position:</label>
-						<select id="globalPosition" class="invisible" onChange="app.readForm();">
-						</select>
-						
+						<select id="globalPosition" class="invisible" onChange="app.readForm();"></select>
 						<!--Sub Panel Height/Length -->
 						<label for="subPanelHeight" id="subPanelHeightLabel">Divider Height: </label>
 						<input type="number" id="subPanelHeight" name="subPanelHeight" onBlur="app.readForm();" />
 						<br />
-						
 						<label for="subPanelLength" id="subPanelLengthLabel">Length: </label>
 						<input type="number" id="subPanelLength" name="subPanelLength" onBlur="app.readForm();" />
 						<br />
-						
 					</div>
-					</div>
-
-					
-					
 				</div>
-				
+				</div>
 				<br />
-				
 				<!-- Position of Shields -->
 				<label for="shieldsPosition">Shield Positions:</label>
-				<select id="shieldsPosition" onChange="app.readForm();">
-				</select>
-				<label for="shieldBacks" id="shieldBacksLabel">Shield Backs: </label><input type="checkbox" id="shieldBacks" name="shieldBacks" value="shieldBacks" onChange="app.readForm();" />
+				<select id="shieldsPosition" onChange="app.readForm();"></select>
+				<label for="shieldBacks" id="shieldBacksLabel">Shield Backs: </label>
+				<input type="checkbox" id="shieldBacks" name="shieldBacks" value="shieldBacks" onChange="app.readForm();" />
 				<hr>
 				<div id="selectArrow">
-				<!-- Arrows -->
-				<label for="guideArrow">Arrows:</label>
-				<select id="guideArrow" onChange="app.readForm();">
-				</select>
-				<input type="number" id="guideArrowLanes" name="guideArrowLanes" min=1 max=6 onBlur="app.readForm();" />
-			    <br />
-                <label id="arrowLocationLabel" for="arrowLocations">Arrow Location:</label>
-                <select id="arrowLocations" onChange="app.readForm();">
-                </select>
-                <br />
-                <label id="exitOnlyDirectionLabel" for="exitOnlyDirection">Direction:</label>
-                <select id="exitOnlyDirection" onChange="app.readForm();">
-                </select>
-                <label id="showExitOnlyLabel" for="showExitOnly">Hide Label</label>
-                <input type="checkbox" id="showExitOnly" name="showExitOnly" value="showExitOnly" onChange="app.readForm();" />
-                <hr>
-                <!-- OsNum -->
-				<label for="otherSymbol">Other Bottom Symbols:</label>
-				<select id="otherSymbol" onChange="app.readForm();">
-				<input type="text" id="oSNum" name="oSNum" placeholder="Exit Num" onBlur="app.readForm();" />
-				</select>
-				<br />
-                <hr>
-                <b class="section">Settings</b>
-                <br />
-                <label for="fontChange" id="fontChangeLabel">FHWA Font </label>
-                <input type="checkbox" id="fontChange" name="fontChange" value="fontChange" onChange="app.readForm();" />
-                <br />
-                <label for="showPost" id="showPostLabel">Hide Post </label>
-                <input type="checkbox" id="showPost" name="showPost" value="showPost" onChange="app.readForm();" />
-                <br />
-				<label for="secondExitOnly" id="secondExitOnlyLabel">2nd Exit Only Design </label>
-				<input type="checkbox" id="secondExitOnly" name="secondExitOnly" value="secondExitOnly" onChange="app.readForm();" />
-				
-				<br />
-				<center>
-					<input type="button" id="downloadSign" value="Download" />
-				</center>
-			</form>
-        
-		<div id="downloadModal">
-			<div id="downloadContent">
-				<div id="downloadContents">
-					<center><b class="section">Download Sign</b></center>
+					<!-- Arrows -->
+					<label for="guideArrow">Arrows:</label>
+					<select id="guideArrow" onChange="app.readForm();"></select>
+					<input type="number" id="guideArrowLanes" name="guideArrowLanes" min=1 max=6 onBlur="app.readForm();" />
 					<br />
-					<label for="fileType" id="fileTypeLabel">File Type</label>
-					<input type="button" id="PNG" class="activated" value="PNG" onclick="app.updateFileType(`png`);" />
-					<input type="button" id="SVG" value="SVG" onclick="app.updateFileType(`svg`);" />
+					<label id="arrowLocationLabel" for="arrowLocations">Arrow Location:</label>
+					<select id="arrowLocations" onChange="app.readForm();"></select>
 					<br />
-					<label for="entirePost" id="entirePostLabel">Entire Post</label>
-					<input type="checkbox" id="entirePost" name="entirePost" value="entirePost" onChange="app.updatePreview();" checked />
+					<label id="exitOnlyDirectionLabel" for="exitOnlyDirection">Direction:</label>
+					<select id="exitOnlyDirection" onChange="app.readForm();"></select>
+					<label id="showExitOnlyLabel" for="showExitOnly">Hide Label</label>
+					<input type="checkbox" id="showExitOnly" name="showExitOnly" value="showExitOnly" onChange="app.readForm();" />
+					<hr>
+					<!-- OsNum -->
+					<label for="otherSymbol">Other Bottom Symbols:</label>
+					<select id="otherSymbol" onChange="app.readForm();">
+						<input type="text" id="oSNum" name="oSNum" placeholder="Exit Num" onBlur="app.readForm();" />
+					</select>
 					<br />
-					<div id="singularPanel">
-						<label for="selectPanel" id="selectPanelLabel">Panel Number</label>
-						<input type="number" id="selectPanel" name="selectPanel" onChange="app.updatePreview();" min=1 step="1" value=1 />
-						<br />
-					</div>
+					<hr>
+					<b class="section">Settings</b>
 					<br />
+					<label for="fontChange" id="fontChangeLabel">FHWA Font </label>
+					<input type="checkbox" id="fontChange" name="fontChange" value="fontChange" onChange="app.readForm();" />
+					<br />
+					<label for="showPost" id="showPostLabel">Hide Post </label>
+					<input type="checkbox" id="showPost" name="showPost" value="showPost" onChange="app.readForm();" />
+					<br />
+					<label for="secondExitOnly" id="secondExitOnlyLabel">2nd Exit Only Design </label>
+					<input type="checkbox" id="secondExitOnly" name="secondExitOnly" value="secondExitOnly" onChange="app.readForm();" />
 					<br />
 					<center>
-						<input type="button" id="cancelDownload" value="Cancel" />
-						<input type="button" id="download" value="Download" onclick="app.downloadSign();"/>
+						<input type="button" id="downloadSign" value="Download" />
 					</center>
-				</div>
-				<div id="downloadPreview">
+			</form>
+			<div id="downloadModal">
+				<div id="downloadContent">
+					<div id="downloadContents">
+						<center>
+							<b class="section">Download Sign</b>
+						</center>
+						<br />
+						<label for="fileType" id="fileTypeLabel">File Type</label>
+						<input type="button" id="PNG" class="activated" value="PNG" onclick="app.updateFileType(`png`);" />
+						<input type="button" id="SVG" value="SVG" onclick="app.updateFileType(`svg`);" />
+						<br />
+						<label for="entirePost" id="entirePostLabel">Entire Post</label>
+						<input type="checkbox" id="entirePost" name="entirePost" value="entirePost" onChange="app.updatePreview();" checked />
+						<br />
+						<div id="singularPanel">
+							<label for="selectPanel" id="selectPanelLabel">Panel Number</label>
+							<input type="number" id="selectPanel" name="selectPanel" onChange="app.updatePreview();" min=1 step="1" value=1 />
+							<br />
+						</div>
+						<br />
+						<br />
+						<center>
+							<input type="button" id="cancelDownload" value="Cancel" />
+							<input type="button" id="download" value="Download" onclick="app.downloadSign();" />
+						</center>
+					</div>
+					<div id="downloadPreview"></div>
 				</div>
 			</div>
-		</div>
-
 		</main>
-
 		<footer>
-        <center>
-			<img src="img/other-symbols/Banner2.png" height=175>
-			<br>
-			<a style="font-size: 1rem;" href="https://github.com/JKPotato-Computer/SignMaker" target="_blank">GitHub Page</a>
-			<a style="font-size: 1rem;" href="https://github.com/dki-os/SignMaker" target="_blank">OG GitHub Page</a>
-        </center>
+			<center>
+				<img src="img/other-symbols/Banner2.png" height=175>
+				<br>
+				<a style="font-size: 1rem;" href="https://github.com/JKPotato-Computer/SignMaker" target="_blank">GitHub Page</a>
+				<a style="font-size: 1rem;" href="https://github.com/dki-os/SignMaker" target="_blank">OG GitHub Page</a>
+			</center>
 		</footer>
 	</body>
 </html>

@@ -3,7 +3,7 @@ form {
 
 		width: -moz-max-content;
 		width: -webkit-max-content;
-	width: 55%;
+	width: 100vh;
 	margin: 1rem auto 0;
 	padding: 0.5rem;
 	text-align: justify;
@@ -102,7 +102,7 @@ input[type=button] {
 	appearance: none;
 
 	cursor: pointer;
-	transition: background-color 0.5s;
+	transition: background-color 0.1s;
 }
 input[type=button]:hover {
 	background-color: rgb(200,200,200);
@@ -164,7 +164,7 @@ fieldset {
 }
 
 .clear:hover {
-	background-color: rgb(247, 176, 176);
+	background-color: rgb(247, 176, 176) !important;
 }
 
 #controlCitiesLabel {
@@ -508,6 +508,7 @@ hr {
     border-radius: 1rem;
     background: rgba(255,255,255,0.3);
 	padding: 1rem;
+	margin-bottom: .25rem;
 }
 
 .exitTabSelect {
@@ -522,4 +523,12 @@ hr {
 
 .invisible {
 	display: none;
+}
+
+#exitTabMain {
+	margin-bottom: .1rem;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: middle;
 }
