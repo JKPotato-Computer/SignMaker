@@ -1,11 +1,3 @@
-.bannerA.TOLL , .bannerB.TOLL {
-	background-color: var(--yellow);
-	color: var(--black);
-	padding: 0rem 0.2rem 0rem 0.2rem;
-	font-size: .75em;
-	font-family: "Series E";
-}
-
 .bannerShieldContainer.I .routeNumber {
 	color: var(--white);
 	top: 0.17em;

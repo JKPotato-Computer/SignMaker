@@ -19,7 +19,7 @@ class ExitTab {
 		borderThickness = 0.2,
 		minHeight = 2.25,
 		nestedExitTabs = [],
-		oldFont = false,
+		FHWAFont = false,
 		fontSize = 18
 		} = {}
 	)  {
@@ -51,7 +51,7 @@ class ExitTab {
 		this.topOffset = topOffset;
 		this.minHeight = minHeight;
 		this.nestedExitTabs = nestedExitTabs;
-		this.oldFont = oldFont;
+		this.FHWAFont = FHWAFont;
 		this.icon = icon;
 		this.showLeft = showLeft;
 		this.fontSize = fontSize;

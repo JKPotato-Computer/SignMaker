@@ -11,6 +11,8 @@ class Shield {
 		type = "I", 
 		routeNumber = "1", 
 		to = false, 
+		indentFirstLetter = true,
+		fontSize = "1.4rem",
 		specialBannerType, 
 		bannerType, 
 		bannerType2, 
@@ -25,6 +27,9 @@ class Shield {
 		this.type = type;
 		this.routeNumber = routeNumber;
 		this.to = to;
+		this.indentFirstLetter = indentFirstLetter;
+		this.fontSize = fontSize;
+		
 		if (this.bannerTypes.includes(bannerType)) {
 			this.bannerType = bannerType;
 		} else {

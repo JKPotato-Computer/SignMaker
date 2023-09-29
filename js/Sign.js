@@ -23,6 +23,7 @@ class Sign {
 			arrows = [],
 			guideArrow,
 			guideArrowLanes = 1,
+			exitguideArrows = "Down Arrow",
             
 			// other
 			otherSymbol,
@@ -87,6 +88,7 @@ class Sign {
 		this.advisoryText = advisoryText;
 		this.arrowMode = arrowMode;
 		this.arrows = arrows;
+		this.exitguideArrows = exitguideArrows;
 		
 		if (this.globalPositioning.includes(globalPositioning)) {
 			this.globalPositioning = globalPositioning;
