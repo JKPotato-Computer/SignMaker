@@ -453,7 +453,7 @@
 	display: none;
 	margin: auto 0 auto auto;
 	padding-left: 0.25rem;
-	font-family: "Clearview 4W";
+	font-family: "Clearview 5WR";
 	margin-bottom: 1.8rem;
     margin-right: 1.8rem;
     font-size: 1.5rem;
@@ -482,7 +482,7 @@
 	border-radius: 0.1rem;
     font-size: var(--fontSize);
     text-transform: uppercase;
-    font-family: "Clearview 4W";
+    font-family: "Clearview 5WR";
     margin-bottom: auto;
 }
 .bannerA:not(.TOLL,.noIndent):first-letter , .bannerB:not(.TOLL,.noIndent):first-letter {
@@ -561,7 +561,7 @@
 }
 .streetName,
 .controlText {
-	font-family: "Clearview 4W";
+	font-family: "Clearview 5WR";
 	font-size: 1.75rem;
     line-height: 2rem;
 }
@@ -573,7 +573,6 @@
 	border-radius: 0 0 0.75rem 0.75rem;
 
 	display: none;
-	padding: 0 0.25rem 0.25rem 0.25rem;
 }
 .guideArrows.exit_only {
 	background-color: var(--yellow) !important;
@@ -605,7 +604,7 @@
 	padding: 0;
 }
 
-.guideArrows.half_exit only {
+.guideArrows.half_exit.only {
 	color: black !important;
 }
 
@@ -639,7 +638,7 @@
 .action_message {
 	display: inline-flex;
 	align-items: center;
-	font-family: "Clearview 4W";
+	font-family: "Clearview 5WR";
 }
 .action_message {
 	justify-content: center;

@@ -468,6 +468,9 @@ const app = (function() {
 
 		panel.sign.shieldPosition = form["shieldsPosition"].value;
 
+
+		panel.sign.arrowMode = document.getElementById("guideArrowSettings").dataset.arrowMode;
+
 		var guideArrow_result = form["guideArrow"].value;
 
 
@@ -494,9 +497,9 @@ const app = (function() {
 		}
 
 
-		if (panel.sign.guideArrow == "Split Exit Only") {
+		if (panel.sign.guideArrow == "Half Exit Only") {
 
-			if (form["arrowLocations"].childNodes[0] == "Middle") {
+			if (form["arrowLocations"].value == "Middle") {
 				while (form["arrowLocations"].firstChild) {
 					form["arrowLocations"].removeChild(form["arrowLocations"].lastChild);
 				}
@@ -512,13 +515,24 @@ const app = (function() {
 
 			} else {
 				panel.sign.arrowPosition = form["arrowLocations"].value;
+				
+				if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
+					lib.appendOption(form["arrowLocations"], "Middle")
+				}
+				
 			}
 		} else {
 			panel.sign.arrowPosition = form["arrowLocations"].value;
+			
+			if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
+				lib.appendOption(form["arrowLocations"], "Middle")
+			}
+			
 		}
 
 		panel.sign.exitguideArrows = exitOnlyDirection_result;
 		panel.sign.showExitOnly = form["showExitOnly"].checked;
+		panel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
 
 		panel.sign.otherSymbol = form["otherSymbol"].value;
 		panel.sign.oSNum = form["oSNum"].value;
@@ -830,12 +844,22 @@ const app = (function() {
 		const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
 		const exitOnlyDirection = document.getElementById("exitOnlyDirection");
 		const showExitOnly = document.getElementById("showExitOnly");
+		const exitOnlyPadding = document.getElementById("exitOnlyPadding");
+		const exitOnlyPaddingValue = document.getElementById("paddingValue");
+		const exitOnlyPaddingLabel = document.getElementById("exitOnlyPaddingLabel");
 
-		exitOnlyDirectionLabel.className = (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
-		showExitOnlyLabel.className= (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
-		exitOnlyDirection.className= (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
-		showExitOnly.className = (panel.sign.guideArrow != "Exit Only") ? "invisible" : "";
+		exitOnlyDirectionLabel.className = (!panel.sign.guideArrow.includes("Exit Only")) ? "invisible" : "";
+		exitOnlyPaddingLabel.className = ((!panel.sign.guideArrow.includes("Exit Only"))  || (panel.sign.guideArrow == "Split Exit Only")) ? "invisible" : "";
+		showExitOnlyLabel.className= (!panel.sign.guideArrow.includes("Exit Only")) ? "invisible" : "";
+		exitOnlyDirection.className= (!panel.sign.guideArrow.includes("Exit Only")) ? "invisible" : "";
+		exitOnlyPadding.className= ((!panel.sign.guideArrow.includes("Exit Only"))  || (panel.sign.guideArrow == "Split Exit Only")) ? "invisible" : "";
+		showExitOnly.className = (!panel.sign.guideArrow.includes("Exit Only")) ? "invisible" : "";
+		paddingValue.className = ((!panel.sign.guideArrow.includes("Exit Only")) || (panel.sign.guideArrow == "Split Exit Only")) ? "invisible" : "";
 		showExitOnly.value = panel.sign.showExitOnly;
+		
+		document.getElementById("standardArrows").style.display = (panel.sign.arrowMode == "Standard") ? "block" : "none";
+		document.getElementById("aplArrows").style.display = (panel.sign.arrowMode == "APL") ? "flex" : "none";
+	
 		
 		for (const option of exitOnlyDirection.options) {
 			if (option.value == panel.sign.exitguideArrows) {
@@ -1184,7 +1208,12 @@ const app = (function() {
 	const resetPadding = function(mode, params) {
 		const panel = post.panels[currentlySelectedPanelIndex];
 		panel.sign.padding = "0.5rem 0.75rem 0.5rem 0.75rem";
-
+		
+		document.getElementById("paddingTop").value = 0.5;
+		document.getElementById("paddingRight").value = 0.75;
+		document.getElementById("paddingBottom").value = 0.5;
+		document.getElementById("paddingLeft").value = 0.75;
+		
 		updateForm();
 		redraw();
 	}
@@ -1904,11 +1933,17 @@ const app = (function() {
 			}
 
 			if (panel.sign.guideArrow.includes("Exit Only")) {
+				
+				if ((!post.secondExitOnly) && (panel.sign.guideArrow != "Split Exit Only")) {
+					guideArrowsElmt.style.padding = panel.sign.exitOnlyPadding + "rem";
+				}
+				
 				if (panel.sign.guideArrow == "Half Exit Only") {
 					const secondaryContainer = document.createElement("div");
 					secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow.replace("/", "-").replace(" ", "_").toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
 
 					guideArrowsElmt.className += (post.secondExitOnly) ? " new2" : " default";
+					
 
 					path = secondaryContainer
 
@@ -1948,9 +1983,12 @@ const app = (function() {
 
 							}
 						}
-
 					}
-
+					
+					if (post.secondExitOnly && (panel.sign.guideArrow != "Split Exit Only")) {
+						path.style.padding = panel.sign.exitOnlyPadding + "rem";
+					}
+					
 
 				} else {
 					path = arrowContElmt
@@ -1983,6 +2021,11 @@ const app = (function() {
 							arrowContElmt.style.gap = "5rem";
 						}
 						guideArrowsElmt.style.display = "flex";
+					}
+					
+					if ((post.secondExitOnly) && (panel.sign.guideArrow == "Exit Only")) {
+						console.log("hi");
+						path.style.padding = panel.sign.exitOnlyPadding + "rem";
 					}
 					
 					/*
