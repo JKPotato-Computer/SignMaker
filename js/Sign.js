@@ -19,12 +19,13 @@ class Sign {
 			shieldBacks = false,
 			
 			// arrow
-			arrowMode = "singular",
+			arrowMode = "Standard",
 			arrows = [],
 			guideArrow,
 			guideArrowLanes = 1,
 			exitguideArrows = "Down Arrow",
-            
+            exitOnlyPadding = 0,
+			
 			// other
 			otherSymbol,
 			oSNum = "",
@@ -89,6 +90,7 @@ class Sign {
 		this.arrowMode = arrowMode;
 		this.arrows = arrows;
 		this.exitguideArrows = exitguideArrows;
+		this.exitOnlyPadding = exitOnlyPadding;
 		
 		if (this.globalPositioning.includes(globalPositioning)) {
 			this.globalPositioning = globalPositioning;
