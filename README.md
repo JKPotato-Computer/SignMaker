@@ -1,20 +1,21 @@
 ![SignMaker Preview Thumbnail](https://github.com/JKPotato-Computer/SignMaker/blob/main/img/other-symbols/Banner.png)
+Version: 2.1
 
 SignMaker is a JavaScript-based app for creating highway guide signs. Based off of [Kurumi's Sign Maker](http://www.kurumi.com/roads/signmaker). Allows for the creation of highway guide signs in the style defined by the United States FHWA in their [MUTCD](https://mutcd.fhwa.dot.gov/kno_2009r1r2.htm).
 
-While the other versions (dki-os/SignMaker) and its forks do exist, this fork attempts to recreate (most) of the existing signs inside the US. Features include:
+This version of SignMaker is an attempt to reproduce most of the sign mechanics used in the real world, including:
 
-* Clearview font (some states use Clearview on their signs)
+* The usage of the Clearview font (some states/provinces use Clearview on their signs)
 * Realistic arrows (Uses PNGs of Arrows rather than fonts)
-* Subpanels (multiple panels in a panel)
-* Advanced Exit Tabs (allow multiple exit tabs at once and more options)
-* Two Shield Banners
+* Subpanels (multiple signs in one panel for advanced navigation)
+* Advanced Exit Tabs (allow multiple exit tabs at once + more configuration)
+* Two Shield Banners (allows the usage of more than one shield banner, future updates on positioning + type will be made)
 * Panel Padding (make the infamous Katy Freeway signs)
 * and more to come soon..
 
 ## Acknowledgements
 
-Forked from [dki-os/SignMaker](https://https://github.com/dki-os/SignMaker).
+Forked from [dki-os/SignMaker](https://github.com/dki-os/SignMaker).
 Originally created by [Brendon Strowe](https://github.com/BrenStro).
 
 Typefaces sourced from the:
