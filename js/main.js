@@ -1224,8 +1224,6 @@ const app = (function() {
 		redraw();
 	}
 
-
-
 	/**
 	 * Redraw the panels on the post.
 	 */
