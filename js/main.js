@@ -1077,37 +1077,25 @@ const app = (function() {
 		Download the sign from options
 	*/
 
-	function getFile() {
-		var screenshotTarget;
-		var postClass;
-
-		if (fileInfo.panel == -1) {
-			screenshotTarget = document.querySelector("#postContainer");
-		} else {
-			screenshotTarget = document.getElementById("panel" + fileInfo.panel.toString());
-		}
-
-
-		return screenshotTarget;
-	}
-
-		const downloadFile = function(dataURL) {
+	const downloadFile = function(dataURL,ending) {
 		let a = document.createElement(`a`);
 		a.setAttribute("href", dataURL);
-		a.setAttribute("download", "downloadedSign.png");
+		a.setAttribute("download", "downloadedSign" + ending);
 		a.click();
 		a.remove();
 	}
 	
 	const saveToPng = async function(file,isPreview,isSVG) {
+		file.style.scale = "2";
 		return new Promise((resolve, reject) => {
 			let svg = htmlToImage.toSvg(file);
+			file.style.scale = "";
 			svg.then(function(dataUrl) {
 				if (isSVG) {
 					if (isPreview) {
 						resolve(dataUrl);
 					}
-					downloadFile(dataUrl);
+					downloadFile(dataUrl,".svg");
 					return;
 				}
 
@@ -1132,7 +1120,7 @@ const app = (function() {
 					if (isPreview) {
 						resolve(tmpCanvas.toDataURL());
 					} else {
-						downloadFile(tmpCanvas.toDataURL());
+						downloadFile(tmpCanvas.toDataURL(),".png");
 						resolve(true);
 					}
 				};
@@ -1465,7 +1453,7 @@ const app = (function() {
 					shieldElmt.id = "shield" + i.indexOf(shield).toString();
 					bannerShieldContainerElmt.appendChild(shieldElmt);
 
-					const shieldImgElmt = document.createElement("object");
+					const shieldImgElmt = document.createElement("img");
 					shieldImgElmt.type = "image/png";
 					shieldImgElmt.className = "shieldImg";
 
@@ -1539,7 +1527,7 @@ const app = (function() {
 						imgFileConstr += "-" + shield.specialBannerType.toUpperCase();
 					}
 
-					shieldImgElmt.data = imgDir + imgFileConstr + ".png";
+					shieldImgElmt.src = imgDir + imgFileConstr + ".png";
 
 					//shield                    
 
@@ -2237,6 +2225,17 @@ const app = (function() {
 
 	};
 
+	const getPost = function() {
+		return post;
+	}
+	
+	const setPost = function(newPost) {
+		post = newPost;
+		currentlySelectedPanelIndex = 0;
+		updateForm();
+		redraw();
+	}
+
 	return {
 		init: init,
 		newPanel: newPanel,
@@ -2261,6 +2260,8 @@ const app = (function() {
 		removeExitTab: removeExitTab,
 		changeEditingExitTab: changeEditingExitTab,
 		newNestExitTab: newNestExitTab,
-		deleteNestExitTab: deleteNestExitTab
+		deleteNestExitTab: deleteNestExitTab,
+		getPost: getPost,
+		setPost: setPost
 	};
 })();
