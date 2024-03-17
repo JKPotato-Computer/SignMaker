@@ -1184,6 +1184,33 @@ const app = (function() {
 		}
 	}
 
+	const updatePreview = function() {
+		const downloadPreview = document.getElementById("downloadPreview");
+		const entirePost_option = document.getElementById("entirePost");
+		const panelContainer = document.getElementById("panelContainer");
+		const panelNumberSelector = document.getElementById("singularPanel");
+
+		let background = "";
+
+		if (entirePost_option.checked == true) {
+			fileInfo.panel = -1;
+			panelNumberSelector.style.display = "none";
+			document.getElementById("downloadContents").style.verticalAlign = "10rem";
+		} else {
+			const panelNumber = document.getElementById("selectPanel");
+			fileInfo.panel = (panelNumber.value - 1);
+			panelNumberSelector.style.display = "block";
+			document.getElementById("downloadContents").style.verticalAlign = "";
+		}
+		
+		while (downloadPreview.firstChild) {
+			downloadPreview.removeChild(downloadPreview.lastChild);
+		}
+		
+		const img = saveToPng(getFile(),true);
+		downloadPreview.appendChild(img);
+	}
+
 	const resetPadding = function(mode, params) {
 		const panel = post.panels[currentlySelectedPanelIndex];
 		panel.sign.padding = "0.5rem 0.75rem 0.5rem 0.75rem";
