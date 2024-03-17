@@ -1093,8 +1093,8 @@ const app = (function() {
 
 		return screenshotTarget;
 	}
-	
-	const downloadFile = function(dataURL) {
+
+		const downloadFile = function(dataURL) {
 		let a = document.createElement(`a`);
 		a.setAttribute("href", dataURL);
 		a.setAttribute("download", "downloadedSign.png");
@@ -1102,50 +1102,51 @@ const app = (function() {
 		a.remove();
 	}
 	
-	const saveToPng = function(file,isPreview,isSVG) {
-		let svg = htmlToImage.toSvg(file);
-		svg.then(function(dataUrl) {
-			if (isSVG) {
-				if (isPreview) {
-					return dataUrl;
+	const saveToPng = async function(file,isPreview,isSVG) {
+		return new Promise((resolve, reject) => {
+			let svg = htmlToImage.toSvg(file);
+			svg.then(function(dataUrl) {
+				if (isSVG) {
+					if (isPreview) {
+						resolve(dataUrl);
+					}
+					downloadFile(dataUrl);
+					return;
 				}
-				downloadFile(dataUrl);
-				return;
-			}
 
-			let tmpCanvas = document.createElement("canvas");
-			let ctx = tmpCanvas.getContext("2d");
-		
-			let tmpImg = new Image();
-			tmpImg.addEventListener("load", onTempImageLoad);
-			tmpImg.src = dataUrl;
-		
-			console.log(tmpImg.width, tmpImg.height);
-
-			tmpCanvas.width = tmpCanvas.height = 512;
-
-			// let targetImg = new Image();
-
-			function onTempImageLoad(e) {
-				tmpCanvas.width = e.target.width;
-				tmpCanvas.height = e.target.height;
-
-				ctx.drawImage(e.target, 0, 0);
-				if (isPreview) {
-					let targetImg = new Image();
-					targetImg.src = tmpCanvas.toDataURL();
-					return targetImg;
-				} else {
-					downloadFile(tmpCanvas.toDataURL());
-				}
-			};
+				let tmpCanvas = document.createElement("canvas");
+				let ctx = tmpCanvas.getContext("2d");
 			
-		}).catch(function(error) {
-			console.error("Error Saving!", error);
-		});
+				let tmpImg = new Image();
+				tmpImg.addEventListener("load", onTempImageLoad);
+				tmpImg.src = dataUrl;
+			
+				console.log(tmpImg.width, tmpImg.height);
+
+				tmpCanvas.width = tmpCanvas.height = 512;
+
+				// let targetImg = new Image();
+
+				function onTempImageLoad(e) {
+					tmpCanvas.width = e.target.width;
+					tmpCanvas.height = e.target.height;
+
+					ctx.drawImage(e.target, 0, 0);
+					if (isPreview) {
+						resolve(tmpCanvas.toDataURL());
+					} else {
+						downloadFile(tmpCanvas.toDataURL());
+						resolve(true);
+					}
+				};
+				
+			}).catch(function(error) {
+				console.error("Error Saving!", error);
+			});
+		})
 	}
 
-	const downloadSign = function() {
+	const downloadSign = async function() {
 		const downloadPreview = document.getElementById("downloadPreview");
 		const entirePost_option = document.getElementById("entirePost");
 		const panelContainer = document.getElementById("panelContainer");
@@ -1171,20 +1172,7 @@ const app = (function() {
 		}
 	}
 
-	const updateFileType = function(fileType) {
-		fileInfo.fileType = fileType;
-		updatePreview();
-
-		if (fileType == "png") {
-			document.getElementById("PNG").className = "activated";
-			document.getElementById("SVG").className = "";
-		} else if (fileType == "svg") {
-			document.getElementById("PNG").className = "";
-			document.getElementById("SVG").className = "activated";
-		}
-	}
-
-	const updatePreview = function() {
+	const updatePreview = async function() {
 		const downloadPreview = document.getElementById("downloadPreview");
 		const entirePost_option = document.getElementById("entirePost");
 		const panelContainer = document.getElementById("panelContainer");
@@ -1207,10 +1195,24 @@ const app = (function() {
 			downloadPreview.removeChild(downloadPreview.lastChild);
 		}
 		
-		const img = saveToPng(getFile(),true);
-		downloadPreview.appendChild(img);
+		const targetImg = new Image();
+		targetImg.src = await saveToPng(getFile(),true);
+		downloadPreview.appendChild(targetImg);
 	}
 
+	const updateFileType = function(fileType) {
+		fileInfo.fileType = fileType;
+		updatePreview();
+
+		if (fileType == "png") {
+			document.getElementById("PNG").className = "activated";
+			document.getElementById("SVG").className = "";
+		} else if (fileType == "svg") {
+			document.getElementById("PNG").className = "";
+			document.getElementById("SVG").className = "activated";
+		}
+	}
+	
 	const resetPadding = function(mode, params) {
 		const panel = post.panels[currentlySelectedPanelIndex];
 		panel.sign.padding = "0.5rem 0.75rem 0.5rem 0.75rem";
