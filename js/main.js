@@ -1093,6 +1093,57 @@ const app = (function() {
 
 		return screenshotTarget;
 	}
+	
+	const downloadFile = function(dataURL) {
+		let a = document.createElement(`a`);
+		a.setAttribute("href", dataURL);
+		a.setAttribute("download", "downloadedSign.png");
+		a.click();
+		a.remove();
+	}
+	
+	const saveToPng = function(file,isPreview,isSVG) {
+		let svg = htmlToImage.toSvg(file);
+		svg.then(function(dataUrl) {
+			if (isSVG) {
+				if (isPreview) {
+					return dataUrl;
+				}
+				downloadFile(dataUrl);
+				return;
+			}
+
+			let tmpCanvas = document.createElement("canvas");
+			let ctx = tmpCanvas.getContext("2d");
+		
+			let tmpImg = new Image();
+			tmpImg.addEventListener("load", onTempImageLoad);
+			tmpImg.src = dataUrl;
+		
+			console.log(tmpImg.width, tmpImg.height);
+
+			tmpCanvas.width = tmpCanvas.height = 512;
+
+			// let targetImg = new Image();
+
+			function onTempImageLoad(e) {
+				tmpCanvas.width = e.target.width;
+				tmpCanvas.height = e.target.height;
+
+				ctx.drawImage(e.target, 0, 0);
+				if (isPreview) {
+					let targetImg = new Image();
+					targetImg.src = tmpCanvas.toDataURL();
+					return targetImg;
+				} else {
+					downloadFile(tmpCanvas.toDataURL());
+				}
+			};
+			
+		}).catch(function(error) {
+			console.error("Error Saving!", error);
+		});
+	}
 
 	const downloadSign = function() {
 		const downloadPreview = document.getElementById("downloadPreview");
@@ -1100,7 +1151,7 @@ const app = (function() {
 		const panelContainer = document.getElementById("panelContainer");
 		const panelNumberSelector = document.getElementById("singularPanel");
 
-		var background = "";
+		let background = "";
 
 		if (entirePost_option.checked == true) {
 			fileInfo.panel = -1;
@@ -1113,83 +1164,11 @@ const app = (function() {
 			document.getElementById("downloadContents").style.verticalAlign = "";
 		}
 
-		var file = getFile();
-
-		window.scrollTo(0, 0);
-
 		if (fileInfo.fileType == "png") {
-			domtoimage.toPng(file).then(function(dataurl) {
-				var a = document.createElement(`a`);
-				a.setAttribute("href", dataurl);
-				a.setAttribute("download", "downloadedSign.png");
-				a.click();
-				a.remove();
-
-			});
+			saveToPng(getFile(),false);
 		} else if (fileInfo.fileType == "svg") {
-			domtoimage.toSvg(file).then(function(dataurl) {
-				var a = document.createElement(`a`);
-				a.setAttribute("href", dataurl);
-				a.setAttribute("download", "downloadedSign.svg");
-				a.click();
-				a.remove();
-
-			});
+			saveToPng(getFile(),false,true);
 		}
-	}
-
-	const updatePreview = function() {
-		const downloadPreview = document.getElementById("downloadPreview");
-		const entirePost_option = document.getElementById("entirePost");
-		const panelContainer = document.getElementById("panelContainer");
-		const panelNumberSelector = document.getElementById("singularPanel");
-
-		var background = "";
-
-		if (entirePost_option.checked == true) {
-			fileInfo.panel = -1;
-			panelNumberSelector.style.display = "none";
-			document.getElementById("downloadContents").style.verticalAlign = "10rem";
-		} else {
-			const panelNumber = document.getElementById("selectPanel");
-			fileInfo.panel = (panelNumber.value - 1);
-			panelNumberSelector.style.display = "block";
-			document.getElementById("downloadContents").style.verticalAlign = "";
-		}
-
-		var file = getFile();
-
-		window.scrollTo(0, 0);
-
-		if (fileInfo.fileType == "png") {
-			domtoimage.toPng(file).then(function(dataurl) {
-
-				while (downloadPreview.firstChild) {
-					downloadPreview.removeChild(downloadPreview.lastChild);
-				}
-
-				var img = document.createElement(`img`);
-				img.src = dataurl;
-				img.style.height = "100%";
-				downloadPreview.appendChild(img);
-
-
-			});
-		} else if (fileInfo.fileType == "svg") {
-			domtoimage.toSvg(file).then(function(dataurl) {
-
-				while (downloadPreview.firstChild) {
-					downloadPreview.removeChild(downloadPreview.lastChild);
-				}
-
-				var img = document.createElement(`img`);
-				img.src = dataurl;
-				img.style.height = "100%";
-				downloadPreview.appendChild(img);
-
-			});
-		}
-
 	}
 
 	const updateFileType = function(fileType) {
