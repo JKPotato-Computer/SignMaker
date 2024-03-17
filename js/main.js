@@ -487,16 +487,13 @@ const app = (function() {
 		panel.sign.arrowPosition = form["arrowLocations"].value;
 
 		var exitOnlyDirection_result = form["exitOnlyDirection"].value;
-
-
 		for (const exitOnlyDirection_value of Sign.prototype.exitguideArrows) {
 			if (exitOnlyDirection_result == exitOnlyDirection_value.split(":")[0]) {
 				exitOnlyDirection_result = exitOnlyDirection_value;
 				break;
 			}
 		}
-
-
+		
 		if (panel.sign.guideArrow == "Half Exit Only") {
 
 			if (form["arrowLocations"].value == "Middle") {
