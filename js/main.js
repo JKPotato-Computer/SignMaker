@@ -1084,6 +1084,20 @@ const app = (function() {
 		a.click();
 		a.remove();
 	}
+
+	function getFile() {
+		var screenshotTarget;
+		var postClass;
+
+		if (fileInfo.panel == -1) {
+			screenshotTarget = document.querySelector("#postContainer");
+		} else {
+			screenshotTarget = document.getElementById("panel" + fileInfo.panel.toString());
+		}
+
+
+		return screenshotTarget;
+	}
 	
 	const saveToPng = async function(file,isPreview,isSVG) {
 		file.style.scale = "2";
