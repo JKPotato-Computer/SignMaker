@@ -13,6 +13,9 @@ This version of SignMaker is an attempt to reproduce most of the sign mechanics 
 * Panel Padding (make the infamous Katy Freeway signs)
 * and more to come soon..
 
+## Social Links
+Join us on **DISCORD:** https://discord.gg/6UsjC7QM
+
 ## Acknowledgements
 
 Forked from [dki-os/SignMaker](https://github.com/dki-os/SignMaker).
