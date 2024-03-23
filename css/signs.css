@@ -486,7 +486,7 @@
     margin-bottom: auto;
 }
 .bannerA:not(.TOLL,.noIndent):first-letter , .bannerB:not(.TOLL,.noIndent):first-letter {
-	font-size: calc(var(--fontSize) + 0.4rem);
+	font-size: calc(var(--fontSize) + 0.3rem);
 	margin-right: -0.1rem;
 }
 
