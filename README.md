@@ -14,7 +14,7 @@ This version of SignMaker is an attempt to reproduce most of the sign mechanics 
 * and more to come soon..
 
 ## Social Links
-Join us on **DISCORD:** https://discord.gg/6UsjC7QM
+Join us on **DISCORD:** https://discord.gg/yJBWggf7p4
 
 ## Acknowledgements
 
