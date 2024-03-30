@@ -595,7 +595,7 @@ const app = (function() {
 	 */
 	const updateForm = function() {
 		const panel = post.panels[currentlySelectedPanelIndex];
-		const sign = (currentlySelectedSubPanelIndex != -1) ? (panel.sign.subPanels[currentlySelectedPanelIndex]) : (panel.sign);
+		const sign = (currentlySelectedSubPanelIndex != -1) ? (panel.sign.subPanels[currentlySelectedSubPanelIndex]) : (panel.sign);
 		const exitTab = (currentlySelectedNestedExitTabIndex != -1) ? (panel.exitTabs[currentlySelectedExitTabIndex].nestedExitTabs[currentlySelectedNestedExitTabIndex]) : (panel.exitTabs[currentlySelectedExitTabIndex]);
 
 		const panelList = document.getElementById("panelList");
