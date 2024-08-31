@@ -692,7 +692,7 @@
 	font-size: 4rem; /* Makes arrows large and visble */
 	line-height: 0; /* Makes space text (arrow) takes up minimal */
 	display: inline-block;
-	margin: .5rem 5rem;
+	margin: .0rem 5rem .5rem;
 	padding: 0 0.1rem 0 0.05rem;
 }
 
