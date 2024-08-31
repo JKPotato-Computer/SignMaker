@@ -90,7 +90,6 @@
 		width: -moz-max-content;
 		width: -webkit-max-content;
 	width: intrinsic;
-	z-index: -2;
 }
 
 .panel {
