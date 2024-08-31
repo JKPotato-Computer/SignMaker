@@ -1918,18 +1918,16 @@ const app = (function() {
 			}
 
 			if ((panel.sign.arrowPosition == "Left") && (panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Side Left") && (panel.sign.guideArrow != "Side Right") && (panel.sign.guideArrow != "Half Exit Only")) {
-				arrowContElmt.style.cssFloat = "left";
-				arrowContElmt.style.paddingLeft = "1rem";
+				arrowContElmt.style.justifyContent = "left";
 				if (panel.sign.actionMessage != "") {
 					guideArrowsElmt.style.paddingBottom = "0.6rem";
 				} else {
 					guideArrowsElmt.style.paddingBottom = "1rem";
 				}
 			} else if (panel.sign.arrowPosition == "Middle") {
-				arrowContElmt.style.cssFloat = "none";
+				arrowContElmt.style.justifyContent = "";
 			} else if ((panel.sign.arrowPosition == "Right") && (panel.sign.guideArrow != "Exit Only") && (panel.sign.guideArrow != "Side Left") && (panel.sign.guideArrow != "Side Right") && (panel.sign.guideArrow != "Half Exit Only")) {
-				arrowContElmt.style.cssFloat = "right";
-				arrowContElmt.style.paddingRight = "1rem";
+				arrowContElmt.style.justifyContent = "right";
 				if (panel.sign.actionMessage != "") {
 					guideArrowsElmt.style.paddingBottom = "0.6rem";
 				} else {
