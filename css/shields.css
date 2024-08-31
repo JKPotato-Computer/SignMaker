@@ -443,6 +443,26 @@
 	font-size: 1.4em;
 }
 
+.bannerShieldContainer.ON .routeNumber {
+	color: var(--black);
+	top: 0.25em;
+	font-size: 1.75em;
+}
+.bannerShieldContainer.ON.one .routeNumber,
+.bannerShieldContainer.ON.two .routeNumber {
+	font-family: "Series D";
+}
+.bannerShieldContainer.ON.three .routeNumber {
+	font-family: "Series C";
+}
+
+.bannerShieldContainer.ON2 .routeNumber {
+	color: var(--black);
+	font-family: "Series D";
+	top: -0.05em;
+	font-size: 2em;
+}
+
 .bannerShieldContainer.OR .routeNumber {
 	color: var(--black);
 	top: 0.1em;
