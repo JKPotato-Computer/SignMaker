@@ -12,8 +12,7 @@ const app = (function() {
 		panel: -1,
 
 	};
-
-
+	
 	const clamp = function(number, min, max) {
 		return Math.max(min, Math.min(number, max));
 	}
