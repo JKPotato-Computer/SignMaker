@@ -206,7 +206,10 @@
 	color: var(--black);
 }
 
-.panel.orange .arrow {
+.panel.orange .arrow,
+.panel.orange .halfarrow,
+.panel.white .arrow,
+.panel.white .halfarrow {
 	filter: invert(100%);
 	-webkit-filter: invert(100%);
 }
