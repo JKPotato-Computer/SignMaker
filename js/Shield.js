@@ -174,6 +174,8 @@ Shield.prototype.types = {
 	"OH" : "OH",
 	"OK" : "OK",
 	"OR" : "OR",
+	"ON" : "ON",
+	"ON2" : "ON2",
 	"PA" : "PA",
 	"PEI" : "PEI",
 	"QC" : "QC",
