@@ -87,9 +87,10 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-		width: -moz-max-content;
-		width: -webkit-max-content;
+	width: -moz-max-content;
+	width: -webkit-max-content;
 	width: intrinsic;
+	/* z-index: -2; */
 }
 
 .panel {
@@ -684,15 +685,14 @@
 }
 
 .oText {
-	margin: 0 1rem;
+	margin: 0.1rem;
 }
 
 .arrow {
 	font-size: 4rem; /* Makes arrows large and visble */
 	line-height: 0; /* Makes space text (arrow) takes up minimal */
-
 	display: inline-block;
-	margin: -0.5rem 0.05rem 0.05rem 5rem;
+	margin: .5rem 5rem;
 	padding: 0 0.1rem 0 0.05rem;
 }
 
@@ -721,10 +721,10 @@
 	margin-top: -.25rem;
 }
 .arrow:first-child {
-	margin-left: 0.05rem;
+	margin-left: 1rem;
 }
 .arrow:last-child {
-	margin-right: .05rem;
+	margin-right: 1rem;
 }
 .actionMessage + .arrow {
 	margin-left: .5rem;
