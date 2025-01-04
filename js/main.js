@@ -1251,7 +1251,18 @@ const app = (function() {
 			for (let i = 0; i < item.length; i++) {
 
 				if (post.polePosition.toLowerCase() != "overhead") {
-					item[0].style.visibility = "visible";
+					if (post.polePosition.toLowerCase() == "left") {
+						item[0].style.visibility = "visible";
+						item[1].style.visibility = "hidden";
+					} else if (post.polePosition.toLowerCase() == "right") {
+						item[0].style.visibility = "hidden";
+						item[1].style.visibility = "visible";
+					} else if (post.polePosition.toLowerCase() == "center" || post.polePosition.toLowerCase() == "rural") {
+						//hide both
+						item[0].style.visibility = "hidden";
+						item[1].style.visibility = "hidden";
+					}
+					
 				} else {
 					item[i].style.visibility = "visible";
 				}
@@ -1259,7 +1270,13 @@ const app = (function() {
 
 			const panelContainer = document.getElementById("panelContainer");
 
-			panelContainer.style.background = "linear-gradient( 180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 47%, rgba(191,191,191,1) 47%, rgba(240,240,240,1) 49%, rgba(128,128,128,1) 52%, rgba(255,255,255,0) 52%, rgba(255,255,255,0) 64%, rgba(191,191,191,1) 64%, rgba(240,240,240,1) 66%, rgba(128,128,128,1) 69%, rgba(255,255,255,0) 69%";
+			if (post.polePosition.toLowerCase() == "center") {
+				panelContainer.style.background = "linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 45%,rgba(191,191,191,1) 45%,rgba(240,240,240,1) 49%,rgba(128,128,128,1) 55%,rgba(255,255,255,0) 55%)";
+			} else if (post.polePosition.toLowerCase() == "rural") {
+				panelContainer.style.background = "linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 20%,rgba(191,191,191,1) 20%,rgba(240,240,240,1) 22%,rgba(128,128,128,1) 25%,rgba(255,255,255,0) 25%,rgba(255,255,255,0) 75%,rgba(191,191,191,1) 75%,rgba(240,240,240,1) 77%,rgba(128,128,128,1) 80%,rgba(255,255,255,0) 80%)"
+			} else {
+				panelContainer.style.background = "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 47%, rgba(191,191,191,1) 47%, rgba(240,240,240,1) 49%, rgba(128,128,128,1) 52%, rgba(255,255,255,0) 52%, rgba(255,255,255,0) 64%, rgba(191,191,191,1) 64%, rgba(240,240,240,1) 66%, rgba(128,128,128,1) 69%, rgba(255,255,255,0) 69%";
+			}
 		}
 
 		const panelContainerElmt = document.getElementById("panelContainer");
