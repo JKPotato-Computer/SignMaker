@@ -126,7 +126,9 @@ Shield.prototype.bannerTypes = [
 	"Toll",
 	"City",
 	"Conn",
-	"To"
+	"To",
+	"Old",
+	"Historic"
 ];
 Shield.prototype.bannerPositions = ["Above", "Right", "Left"];
 Shield.prototype.types = {
