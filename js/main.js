@@ -1119,7 +1119,7 @@ const app = (function() {
 				tmpImg.addEventListener("load", onTempImageLoad);
 				tmpImg.src = dataUrl;
 			
-				console.log(tmpImg.width, tmpImg.height);
+				//console.log(tmpImg.width, tmpImg.height);
 
 				tmpCanvas.width = tmpCanvas.height = 512;
 
@@ -2033,18 +2033,9 @@ const app = (function() {
 					}
 					
 					if ((post.secondExitOnly) && (panel.sign.guideArrow == "Exit Only")) {
-						console.log("hi");
 						path.style.padding = panel.sign.exitOnlyPadding + "rem";
 					}
 					
-					/*
-
-						if (panel.sign.advisoryMessage) {
-							actionMessageElmt.style.fontFamily = "Series E";
-						}
-					
-					*/
-
 					// Interlase arrows and the words EXIT and ONLY, ensuring
 					//   EXIT ONLY is centered between all the arrows.
 					if (panel.sign.guideArrowLanes == 0 && panel.sign.advisoryMessage == true) {
