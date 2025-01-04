@@ -2015,7 +2015,7 @@ const app = (function() {
 				signElmt.style.borderBottomRightRadius = "0";
 				signElmt.style.borderBottomWidth = "0";
 				signElmt.style.width = "100%";
-				guideArrowsElmt.style.display = "block";
+				guideArrowsElmt.style.display = "flex";
 				guideArrowsElmt.style.visibility = "visible";
 				if (("Exit Only" == panel.sign.guideArrow) || ("Split Exit Only" == panel.sign.guideArrow) || ("Half Exit Only" == panel.sign.guideArrow)) {
 
