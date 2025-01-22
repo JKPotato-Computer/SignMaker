@@ -3,6 +3,8 @@
 	flex-direction: row;
 	height: 30rem;
 	margin-top: 5rem;
+	width: fit-content;
+	justify-self: center;
 }
 
 #postContainer.polePositionOverhead .post {
