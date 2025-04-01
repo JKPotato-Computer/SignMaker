@@ -219,12 +219,33 @@ html, body {
 	padding: 0;
 }
 
+/*
 body {
 	background-color: rgb(144,181,255);
 	font-family: "Series D";
 	font-size: 20px;
 }
+*/
 
+body {
+	background-color: rgb(247 0 0);
+	font-family: Comic Sans MS, "Series E";
+	font-size: 20px;
+}
+
+form * {
+	font-family: Comic Sans MS, "Series E" !important;
+	letter-spacing: 0 !important;
+	transition: 1s ease-in-out !important;
+}
+
+form *:hover, #postContainer:hover {
+	rotate: 360deg;
+}
+
+#postContainer {
+	transition: 1s ease-in-out;
+}
 
 footer {
 	border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;
