@@ -5,10 +5,13 @@
 # Windows
 Thumbs.db
 
-# dirs
 node_modules
+<<<<<<< HEAD
 dist
 
 # files
 build.sh
 .vscode
+=======
+dist
+>>>>>>> parent of 5389540 (modified package so that it actually fucking works)
