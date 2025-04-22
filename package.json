@@ -1,6 +1,6 @@
 {
   "name": "signmaker",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Highway Sign Maker but in Electron",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/polygondev/SignMaker#readme",
   "devDependencies": {
     "@electron/packager": "^18.3.2",
-    "electron": "^30.0.1",
+    "electron": "^35.2.0",
     "electron-builder": "^24.13.3"
   },
   "build": {
@@ -35,14 +35,17 @@
       ]
     },
     "win": {
-      "icon": "/icons/windows.ico",
+      "icon": "./icons/windows.ico",
       "target": [
+        "nsis",
         "portable"
       ]
     }
   },
+  "start": "electron .",
   "dependencies": {
     "electron-builder-squirrel-windows": "24.13.3",
+    "global": "^4.4.0",
     "open": "^10.1.0"
   }
 }

@@ -33,6 +33,9 @@
       }
     </style>
   </head>
+
+
+
   <body onLoad="app.init();">
     <main>
       <div id="postContainer">
@@ -43,13 +46,10 @@
       <br>
       <form name="signMaker">
         <center>
-          <img src="img/other-symbols/Banner.png" height=125>
-          <div id="changelog"><b>SignMaker v2.2 is still in progress... unfortunately.</b><br>
-		  Discord Server:  <a href="https://discord.gg/yJBWggf7p4">https://discord.gg/yJBWggf7p4</a>
+          <h1 style="padding-top: 1rem;">Highway Sign Maker</h1>
         </center>
         <!-- Panel Editing Commands -->
         <hr>
-        <br />
         <!-- Post Position -->
         <p class="section">Post</p>
         <label for="postPosition">Post Position</label>
@@ -67,7 +67,7 @@
         <br />
         <center>
           <div id="currentPanel">
-            <nav style="display: table-caption; background-color: rgba(255,255,255,0.3); display: table-caption; padding: 1rem;">
+            <nav style="display: table-caption; background-color: rgba(255,255,255,0.3); display: table-caption; padding: 1rem; border-radius: .5rem .5rem 0 0;">
               <div id="heading">
                 <b id="panelNumberTitle" class="section">Current Panel</b>
               </div>
@@ -181,7 +181,7 @@
           <label for="fontSize" id="fontValue" style="text-align: left; margin: 0; font-size: 2rem; widtH: auto;">16</label>
           <p class="section">Exit Tab</p>
         </div>
-        <nav>
+        <nav style="border-radius: 0;">
           <div class="scrollmenu" id="exitTabList"></div>
           <input type="button" class="new" id="newexitTab" value="++" onClick="app.newNestExitTab();" />
           <input type="button" class="new" id="newexitTab" value="+" onClick="app.newExitTab();" />
@@ -192,7 +192,7 @@
           <input type="text" class="num" id="exitTabNumber" name="exitTabNumber" placeholder="1" step="1" onchange="app.changeEditingExitTab(Math.floor(document.getElementById(parseInt(this.value.toString().split(`:`)[0]),parseInt(this.value.toString().split(`:`)[1]))));" style="widtH: 7%;" min="1">
         </nav>
         <!-- Subpanels -->
-        <nav>
+        <nav style="border-radius: 0;">
           <div class="scrollmenu" id="subPanelList">
             <input type="button" id="global" value="Global" onClick="app.changeEditingSubPanel(-1);" />
           </div>
@@ -345,12 +345,10 @@
       </div>
     </main>
     <footer>
-      <center>
-        <img src="img/other-symbols/Banner2.png" height=175>
-        <br>
-        <a style="font-size: 1rem;" href="https://github.com/JKPotato-Computer/SignMaker" target="_blank">GitHub Page</a>
-        <a style="font-size: 1rem;" href="https://github.com/dki-os/SignMaker" target="_blank">OG GitHub Page</a>
-      </center>
+      SignMaker Native / By JKPotato / Ported to a native app by Polygon<br>
+      <a id="openbrowser" href="https://github.com/polygondev/SignMaker">GitHub Page</a> /
+      <a style="font-size: 1rem;" href="https://github.com/dki-os/SignMaker" target="_blank">Original GitHub Page</a> /
+      <a href="https://discord.gg/yJBWggf7p4">Discord server</a>
     </footer>
   </body>
 </html>
