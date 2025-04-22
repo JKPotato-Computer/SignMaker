@@ -7,11 +7,13 @@ form {
 	margin: 1rem auto 0;
 	padding: 0.5rem;
 	text-align: justify;
+    border-radius: 1rem;
 }
 
 form nav {
     width: 100%;
     background-color: rgba(255,255,255, 0.2);
+    border-radius: 0.5rem;
 }
 
 form nav .scrollmenu {
@@ -32,6 +34,7 @@ form nav input[type=button] {
     border-radius: 0rem;
     transition: 0s;
     width: auto;
+    border-radius: .25rem;
 }
 
 form nav input[type=number] {
@@ -203,7 +206,7 @@ input[value=Delete]:hover {
 #currentPanel {
     width: auto;
     background: linear-gradient(to bottom, rgba(255,255,255, 0.2), rgba(255,255,255,0.4));
-    border-radius: 0rem 0rem 1rem 2rem;
+    border-radius: 0rem 0rem .5rem .5rem;
     padding: 0.4rem;
 	display: table;
 }
@@ -306,7 +309,7 @@ hr {
 
 .subPanelHolder {
     background-color: rgba(255,255,255,0.6);
-    border-radius: 0.3rem;
+    border-radius: 0.45rem;
     padding: 0.1rem;
     width: 100%;
     height: auto;
@@ -490,7 +493,6 @@ hr {
 	display: inline-block;
     float: left;
     widtH: 30%;
-    background-color: rgba(255,255,255,0.3);
     position: relative;
     top: 1rem;
     left: 1rem;
