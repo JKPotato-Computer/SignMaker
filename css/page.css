@@ -274,7 +274,25 @@ p {
 	text-align: right;
 }
 
+
+/* Width of the scrollbar */
 ::-webkit-scrollbar {
-	display: none;
+	width: 20px;
+  }
+  
+  /* Track (background) */
+  ::-webkit-scrollbar-track {
+	background: #005F4DFF;
+  }
+  
+  /* Handle (thumb) */
+  ::-webkit-scrollbar-thumb {
+	background-color: #888;
+	border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+	background: #555;
   }
   
