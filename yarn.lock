@@ -15,6 +15,16 @@
     ajv "^6.12.0"
     ajv-keywords "^3.4.1"
 
+"@electron-uikit/core@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@electron-uikit/core/-/core-1.1.0.tgz#dc5378c09c4955774f39c25c9652cac83d611b51"
+  integrity sha512-PH0QL5RVn7NWyA9lxihOuNZa1oDFjnX8MZOyef6x4Q/fu7yr2qVxNsu4imxBPP5p/oZjJ/HD2vswKWIiTqk4hg==
+
+"@electron-uikit/titlebar@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@electron-uikit/titlebar/-/titlebar-1.2.0.tgz#c73592fbac3ff195f3802eb39acb9e643bfa31e0"
+  integrity sha512-qxPD+UydsSN9eZCasLLW6LCdf5E/mLMHpqjZiVSbjYIFZDD1UDBdoknnu/J4La5a7LhccjkihPRZdUhA0Le2cw==
+
 "@electron/asar@^3.2.1", "@electron/asar@^3.2.13", "@electron/asar@^3.3.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@electron/asar/-/asar-3.4.1.tgz#4e9196a4b54fba18c56cd8d5cac67c5bdc588065"

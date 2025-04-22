@@ -44,6 +44,8 @@
   },
   "start": "electron .",
   "dependencies": {
+    "@electron-uikit/core": "^1.1.0",
+    "@electron-uikit/titlebar": "^1.2.0",
     "electron-builder-squirrel-windows": "24.13.3",
     "global": "^4.4.0",
     "open": "^10.1.0"

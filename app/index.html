@@ -32,16 +32,16 @@
         font-size: 1rem;
       }
     </style>
+    <script type="module">
+      import '@electron-uikit/titlebar/renderer'
+    </script>
   </head>
 
 
 
   <body onLoad="app.init();">
-
-    	  <!-- mount your title bar at the top of you application's body tag -->
         <div class="titlebar">Highway Sign Maker</div><div class="content"></div>
-    <main>
-      <div id="postContainer">
+        <div id="postContainer">
         <div class="post"></div>
         <div id="panelContainer"></div>
         <div class="post"></div>
