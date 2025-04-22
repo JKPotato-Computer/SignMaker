@@ -287,12 +287,21 @@ p {
   
   /* Handle (thumb) */
   ::-webkit-scrollbar-thumb {
-	background-color: #888;
+	background-color: #ffffff;
 	border-radius: 10px;
   }
   
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-	background: #555;
+	background: rgb(0, 194, 159);
   }
   
+  .titlebar {
+	height: 30px;
+	background: blue;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	app-region: drag;
+  }
