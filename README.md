@@ -1,3 +1,17 @@
+# SignMaker Electron
+**Prerequisites**
+* NodeJS
+* Yarn or NPM
+* *Optional:* Electron Packager installed globally to build for all platforms
+  
+**To build:**
+1. Clone the repo
+2. `cd` to SignMaker
+3. Run either `yarn install` or `npm install`
+4. Run `yarn build` or `npm build` or `electron-builder -mwl --x64 --arm64`
+5. Builds should be located in ./dist/
+***
+
 ![SignMaker Preview Thumbnail](https://github.com/JKPotato-Computer/SignMaker/blob/main/img/other-symbols/Banner.png)
 Version: 2.1
 
