@@ -9,7 +9,9 @@ function createWindow () {
     const win = new BrowserWindow({
         width: 900,
         height: 750, // width of the main control panel appears to be linked to height not width for some reason
-        titleBarStyle: 'hidden'
+        titleBarStyle: 'hidden',
+            // expose window controlls in Windows/Linux
+        ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {})
     })
 
     win.loadFile('index.html')
