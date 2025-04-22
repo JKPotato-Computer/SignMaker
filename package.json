@@ -1,10 +1,6 @@
 {
   "name": "signmaker",
-<<<<<<< HEAD
-  "version": "25.5.0",
-=======
-  "version": "1.1.0",
->>>>>>> parent of 5389540 (modified package so that it actually fucking works)
+  "version": "25.4.3",
   "description": "Highway Sign Maker but in Electron",
   "main": "index.js",
   "scripts": {

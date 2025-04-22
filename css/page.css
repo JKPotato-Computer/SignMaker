@@ -277,31 +277,52 @@ p {
 
 /* Width of the scrollbar */
 ::-webkit-scrollbar {
-	width: 20px;
+	width: 10px;
   }
   
-  /* Track (background) */
-  ::-webkit-scrollbar-track {
+/* Track (background) */
+::-webkit-scrollbar-track {
 	background: #005F4DFF;
-  }
-  
-  /* Handle (thumb) */
-  ::-webkit-scrollbar-thumb {
-	background-color: #ffffff;
+	scroll-padding: 2px;  
+}
+
+/* Handle (thumb) */
+::-webkit-scrollbar-thumb {
+	background-color: #ffffff5a;
 	border-radius: 10px;
-  }
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #ffffff82;
+}
   
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-	background: rgb(0, 194, 159);
-  }
-  
-  .titlebar {
+.titlebar {
 	height: 30px;
-	background: blue;
+	background: transparent;
 	color: white;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	app-region: drag;
-  }
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	font-size: small;
+}
+
+.titlebar {
+	height: 40px;
+	background-color: #005F4DFF;
+	display: flex;
+	align-items: center;
+	padding: 0 10px;
+	-webkit-app-region: drag;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000; /* ensure it’s on top of other content */
+}
+
+.content {
+	padding-top: 40px;
+}
