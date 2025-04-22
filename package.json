@@ -1,6 +1,6 @@
 {
   "name": "signmaker",
-  "version": "1.1.0",
+  "version": "25.5 beta",
   "description": "Highway Sign Maker but in Electron",
   "main": "index.js",
   "scripts": {
