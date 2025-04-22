@@ -1,0 +1,48 @@
+{
+  "name": "signmaker",
+  "version": "1.0.1",
+  "description": "Highway Sign Maker but in Electron",
+  "main": "index.js",
+  "scripts": {
+    "build": "electron-builder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polygondev/SignMaker.git"
+  },
+  "author": "Polygon hello@polyhedra.au",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/polygondev/SignMaker/issues"
+  },
+  "homepage": "https://github.com/polygondev/SignMaker#readme",
+  "devDependencies": {
+    "@electron/packager": "^18.3.2",
+    "electron": "^30.0.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "productName": "SignMaker",
+    "appId": "au.polyhedra.signmaker",
+    "linux": {
+      "icon": "./icons/linux.png",
+      "target": "AppImage"
+    },
+    "mac": {
+      "icon": "./icons/mac.icns",
+      "target": [
+        "dir"
+      ]
+    },
+    "win": {
+      "icon": "/icons/windows.ico",
+      "target": [
+        "portable"
+      ]
+    }
+  },
+  "dependencies": {
+    "electron-builder-squirrel-windows": "24.13.3",
+    "open": "^10.1.0"
+  }
+}
