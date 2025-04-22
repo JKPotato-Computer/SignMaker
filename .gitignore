@@ -5,5 +5,9 @@
 # Windows
 Thumbs.db
 
+# dirs
 node_modules
 dist
+
+# files
+build.sh
