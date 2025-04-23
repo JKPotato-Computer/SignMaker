@@ -59,6 +59,7 @@ class Shield {
 			}
 		}
 		
+		
 	}
 }
 
@@ -98,7 +99,10 @@ Shield.prototype.specialBannerTypes = {
 		["Fm"] : 4,
 		["Park"] : 0,
 		["Rm"] : 0
-	}
+	},
+	["AU"]: {
+        ["National"] : 0 // Example special banner type for Australia
+    }
 };
 
 Shield.prototype.bannerTypes = [
@@ -197,5 +201,6 @@ Shield.prototype.types = {
 	"WV" : "rec2",
 	"WI" : "WI",
 	"WY" : "WY",
-	"C-" : "C"
+	"C-" : "C",
+	"AU": "AU"
 };

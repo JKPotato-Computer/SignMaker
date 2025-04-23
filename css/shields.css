@@ -683,3 +683,15 @@
 .bannerShieldContainer.WY.three .routeNumber {
 	font-family: "Series C";
 }
+
+.bannerShieldContainer.AU .routeNumber {
+    color: #fcb103;
+    font-family: "Series EM";
+    font-size: 1.4em; /* Adjust size as needed */
+    top: 0em; /* Adjust positioning as needed */
+	bottom: 0em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
