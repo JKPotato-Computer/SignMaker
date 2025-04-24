@@ -1,4 +1,4 @@
-# SignMaker Electron
+# SignMaker Enhanced
 **Prerequisites**
 * NodeJS
 * Yarn or NPM
