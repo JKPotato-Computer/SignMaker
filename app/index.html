@@ -27,20 +27,18 @@
       #changelog {
         background: white;
 	color: black;
-        font-family: Arial;
+        font-family: 'Series E', sans-serif;
         padding: 1rem;
         font-size: 1rem;
       }
     </style>
-    <script type="module">
-      import '@electron-uikit/titlebar/renderer'
-    </script>
   </head>
 
 
 
   <body onLoad="app.init();">
         <div class="titlebar">Highway Sign Maker</div><div class="content"></div>
+        <!--<div id="electron-titlebar"></div>-->
         <div id="postContainer">
         <div class="post"></div>
         <div id="panelContainer"></div>
@@ -345,12 +343,11 @@
       </div>
     </main>
     <footer>
-      SignMaker Native / By JKPotato / Ported to Electron by Polygon<br>
-      <a id="openbrowser" href="https://github.com/polygondev/SignMaker">GitHub Page</a> /
+      <span style="color: #FCCF34FF;">SignMaker Enhanced</span> by Polygon / Based on Highway Sign Maker by JKPotato<br>
+      <!--<a id="openbrowser" href="https://github.com/polygondev/SignMaker">GitHub Page</a> /
       <a style="font-size: 1rem;" href="https://github.com/dki-os/SignMaker" target="_blank">Original GitHub Page</a> /
-      <a href="https://discord.gg/yJBWggf7p4">Discord server</a> • don't click these links. it breaks the app and i can't be fucked fixing it right now.
+      <a href="https://discord.gg/yJBWggf7p4">Discord server</a> • don't click these links. it breaks the app and i can't be fucked fixing it right now.-->
     </footer>
   </div>
-  <script src="misc.js"></script>
   </body>
 </html>

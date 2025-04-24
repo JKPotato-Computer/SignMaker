@@ -1,0 +1,9 @@
+{
+    "name": "Highway Sign Maker",
+    "short_name": "SignMaker",
+    "theme_color": "#005f4d",
+    "background_color": "#005f4d",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/"
+  }

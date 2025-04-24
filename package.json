@@ -1,6 +1,6 @@
 {
   "name": "signmaker",
-  "version": "25.5 beta",
+  "version": "25.5.0",
   "description": "Highway Sign Maker but in Electron",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "devDependencies": {
     "@electron/packager": "^18.3.2",
     "electron": "^35.2.0",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^26.0.12"
   },
   "build": {
     "productName": "SignMaker",
@@ -46,7 +46,9 @@
   "dependencies": {
     "@electron-uikit/core": "^1.1.0",
     "@electron-uikit/titlebar": "^1.2.0",
-    "electron-builder-squirrel-windows": "24.13.3",
+    "dmg-builder": "26.0.12",
+    "electron-builder-squirrel-windows": "26.0.12",
+    "electron-titlebar": "^0.0.3",
     "global": "^4.4.0",
     "open": "^10.1.0"
   }

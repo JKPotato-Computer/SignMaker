@@ -209,6 +209,11 @@
 	box-sizing: border-box;
 }
 
+html {
+    overflow: overlay;
+}
+
+
 html, body {
 	font-size: 16px;
 
@@ -228,13 +233,14 @@ body {
 
 
 footer {
-	border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;
+	/*border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;*/
 	margin-top: 1rem;
 	padding-top: 0.5rem;
 	padding-left: 2rem;
 	font-size: 1rem;
 	padding-bottom: 1rem;
 	font-family: "Clearview 3W", sans-serif;
+	text-align: center;
 }
 footer a {
 	color: #FCCF34FF;
@@ -298,7 +304,7 @@ p {
 }
   
 .titlebar {
-	height: 30px;
+	height: 32px;
 	background: transparent;
 	color: white;
 	display: flex;
@@ -310,7 +316,7 @@ p {
 }
 
 .titlebar {
-	height: 40px;
+	height: 32px;
 	background-color: #005F4DFF;
 	display: flex;
 	align-items: center;

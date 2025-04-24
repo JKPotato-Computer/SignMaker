@@ -138,6 +138,7 @@ Shield.prototype.bannerPositions = ["Above", "Right", "Left"];
 Shield.prototype.types = {
 	"I-" : "I",
 	"US" : "US",
+	"AUS": "AU",
 	"AL" : "AL",
 	"AK" : "AK",
 	"AZ" : "AZ",
@@ -201,6 +202,5 @@ Shield.prototype.types = {
 	"WV" : "rec2",
 	"WI" : "WI",
 	"WY" : "WY",
-	"C-" : "C",
-	"AU": "AU"
+	"C-" : "C"
 };

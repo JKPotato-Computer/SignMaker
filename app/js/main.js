@@ -1119,9 +1119,11 @@ const app = (function() {
 				tmpImg.addEventListener("load", onTempImageLoad);
 				tmpImg.src = dataUrl;
 			
-				//console.log(tmpImg.width, tmpImg.height);
+				console.log("tmpImg", tmpImg.width, tmpImg.height);
 
 				tmpCanvas.width = tmpCanvas.height = 512;
+
+				console.log("tmpCanvas", tmpCanvas.width, tmpCanvas.height);
 
 				// let targetImg = new Image();
 

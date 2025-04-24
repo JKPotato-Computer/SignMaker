@@ -11,7 +11,8 @@ function createWindow () {
         height: 750, // width of the main control panel appears to be linked to height not width for some reason
         titleBarStyle: 'hidden',
             // expose window controlls in Windows/Linux
-        ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {})
+        ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+        trafficLightPosition: { x: 8, y: 9 }
     })
 
     win.loadFile('./app/index.html')
