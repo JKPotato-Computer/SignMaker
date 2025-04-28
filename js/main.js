@@ -1102,17 +1102,22 @@ const app = (function() {
 		let scaleMultiplier = 5;
 		//let result = -11.09773 * (Math.log(scaleMultiplier) / Math.log(0.469922)) + 11.4557;
 		return new Promise((resolve, reject) => {
-			let svg = htmlToImage.toSvg(file, {
-				width: file.getBoundingClientRect().width * scaleMultiplier,
-				height: file.getBoundingClientRect().height * scaleMultiplier,
-				canvasWidth: file.getBoundingClientRect().width * scaleMultiplier,
-				canvasHeight: file.getBoundingClientRect().height * scaleMultiplier,
-				style: {
-					position: "fixed",
-					inset: "40%",
-					scale: scaleMultiplier,
-				}
-			});
+			let svg;
+			if (fileInfo.panel == -1) {
+				svg = htmlToImage.toSvg(file);
+			} else {
+				svg = htmlToImage.toSvg(file, {
+					width: file.getBoundingClientRect().width * scaleMultiplier,
+					height: file.getBoundingClientRect().height * scaleMultiplier,
+					canvasWidth: file.getBoundingClientRect().width * scaleMultiplier,
+					canvasHeight: file.getBoundingClientRect().height * scaleMultiplier,
+					style: {
+						position: "fixed",
+						inset: "40%",
+						scale: scaleMultiplier,
+					}
+				});
+			}
 			svg.then(function(dataUrl) {
 				if (isSVG) {
 					if (isPreview) {
