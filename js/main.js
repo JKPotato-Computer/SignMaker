@@ -1099,10 +1099,20 @@ const app = (function() {
 	}
 	
 	const saveToPng = async function(file,isPreview,isSVG) {
-		file.style.scale = "2";
+		let scaleMultiplier = 5;
+		//let result = -11.09773 * (Math.log(scaleMultiplier) / Math.log(0.469922)) + 11.4557;
 		return new Promise((resolve, reject) => {
-			let svg = htmlToImage.toSvg(file);
-			file.style.scale = "";
+			let svg = htmlToImage.toSvg(file, {
+				width: file.getBoundingClientRect().width * scaleMultiplier,
+				height: file.getBoundingClientRect().height * scaleMultiplier,
+				canvasWidth: file.getBoundingClientRect().width * scaleMultiplier,
+				canvasHeight: file.getBoundingClientRect().height * scaleMultiplier,
+				style: {
+					position: "fixed",
+					inset: "40%",
+					scale: scaleMultiplier,
+				}
+			});
 			svg.then(function(dataUrl) {
 				if (isSVG) {
 					if (isPreview) {
@@ -1121,7 +1131,8 @@ const app = (function() {
 			
 				//console.log(tmpImg.width, tmpImg.height);
 
-				tmpCanvas.width = tmpCanvas.height = 512;
+				tmpCanvas.width = file.getBoundingClientRect().width;
+				
 
 				// let targetImg = new Image();
 
