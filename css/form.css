@@ -47,7 +47,7 @@ nav#sMConfigBar {
 }
 
 .sMModal {
-  max-width: 70vh;
+  max-width: 80vh;
   background: var(--hotbarColor);
   display: none;
   min-width: 45vh;

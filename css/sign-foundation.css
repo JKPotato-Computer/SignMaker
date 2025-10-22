@@ -1,0 +1,73 @@
+/* sign-foundation.css
+Serves as the most minimum needed to support sign making before adopting MUTCDs
+*/
+
+.blockElementMaster {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0rem;
+}
+
+.blockElementRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.bE-textElement {
+  font-family: var(--fontFamily);
+  font-size: var(--fontSize);
+  background-color: var(--blockBgColor);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 var(--spacing);
+  white-space: pre;
+}
+
+.bE-advisoryMessage {
+  padding: calc(var(--fontSize) * 0.3) calc(var(--fontSize) * 0.4)
+    calc(var(--fontSize) * 0.1);
+  line-height: var(--fontSize);
+  border-radius: var(--borderRadius);
+}
+
+.bE-numeral {
+  font-size: calc(var(--fontSize) * (var(--numeralSize) / 100));
+}
+
+.bE-banner {
+  font-size: calc(var(--fontSize) * (var(--bannerSize) / 100));
+}
+
+.bE-banner:first-letter {
+  font-size: calc(
+    var(--fontSize) * (var(--bannerSize) / 100) *
+      (var(--bannerFirstLetterSize) / 100)
+  );
+}
+
+.blockElementLeft,
+.blockElementCenter,
+.blockElementRight {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.blockElementLeft {
+  justify-content: left;
+}
+
+.blockElementCenter {
+  justify-content: center;
+}
+
+.blockElementRight {
+  justify-content: right;
+}

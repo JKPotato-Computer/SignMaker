@@ -10,7 +10,7 @@ class TextElement {
     bannerFormattingSize = 100,
     bannerFirstLetterSize = 120,
     useNumeralFormatting = false,
-    numeralFormattingSize = 120,
+    numeralFormattingSize = 150,
     alignment = "Center",
   } = {}) {
     this.textContent = textContent;
@@ -27,16 +27,21 @@ class TextElement {
 
   splitString() {
     let result = [this.textContent];
+    let tagged = [];
 
     // Define the banner types to split by if useBannerFormating is true
     const numeralPattern = /(\d+\S*)|([\u00BC-\u00BE]+\S*)/;
+    const bannerPattern = new RegExp(
+      `(\\s*)(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)(\\s*)`,
+      "gi"
+    );
+    const lightBannerPattern = new RegExp(
+      `(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)`,
+      "gi"
+    );
 
     if (this.useBannerFormatting) {
-      const bannerPattern = new RegExp(
-        `(${Shield.prototype.bannerTypes.join("|")})`,
-        "g"
-      );
-      result = result[0].split(bannerPattern).filter(Boolean); // Filter to remove empty strings
+      result = result[0].split(bannerPattern).filter(Boolean);
     }
 
     if (this.useNumeralFormatting) {
@@ -49,16 +54,78 @@ class TextElement {
       result = newResult;
     }
 
-    return result;
+    for (let i = 0; i < result.length; i++) {
+      let r = result[i];
+      if (new RegExp(numeralPattern).test(r) && this.useNumeralFormatting) {
+        tagged[i] = { type: "numeral", value: r };
+      } else if (lightBannerPattern.test(r) && this.useBannerFormatting) {
+        tagged[i] = { type: "banner", value: r };
+      } else {
+        tagged[i] = { type: "text", value: r };
+      }
+    }
+
+    return tagged;
   }
 
-  createTextElement() {
+  createElement(panel) {
     const newText = document.createElement("div");
+    newText.className = "bE-textElement";
 
     // Set custom CSS properties here based off the this. properties
-    newText.style["--fontFamily"] = this.fontFamily;
-    newText.style["--fontSize"] = 1.75 * (this.fontSize / 100) + "rem";
-    newText.style["--backgroundColor"] = lib.colors[this.backgroundColor] || this.backgroundColor;
+    newText.style.setProperty("--fontFamily", '"' + this.fontFamily + '"');
+    newText.style.setProperty(
+      "--fontSize",
+      1.75 * (this.fontSize / 100) + "rem"
+    );
+    newText.style.setProperty(
+      "--blockBgColor",
+      this.backgroundColor == "Inherit"
+        ? ""
+        : (
+            lib.colors[this.backgroundColor] || this.backgroundColor
+          ).toLowerCase()
+    );
+    newText.style.setProperty("--alignment", this.alignment);
+    newText.style.setProperty("--numeralSize", this.numeralFormattingSize);
+    newText.style.setProperty("--bannerSize", this.bannerFormattingSize);
+    newText.style.setProperty(
+      "--bannerFirstLetterSize",
+      this.bannerFirstLetterSize
+    );
+
+    if (
+      this.backgroundColor == "Orange" ||
+      this.backgroundColor == "White" ||
+      this.backgroundColor == "Yellow"
+    ) {
+      newText.style.color = "black";
+    }
+
+    let splitTextContent = this.splitString();
+    for (let i = 0; i < splitTextContent.length; i++) {
+      let text = splitTextContent[i];
+      if (text.value == "" || text.value == " ") {
+        if (i + 1 >= splitTextContent.length) {
+          continue;
+        } else if (
+          i + 1 < splitTextContent.length &&
+          splitTextContent[i + 1].type != "banner" &&
+          i - 1 > 0 &&
+          splitTextContent[i - 1].type != "banner"
+        ) {
+          continue;
+        }
+      }
+
+      const newTextFragment = document.createElement("span");
+      newTextFragment.className = "bE-" + text.type;
+      newTextFragment.textContent = text.value;
+
+      newText.appendChild(newTextFragment);
+    }
+
+    return newText;
   }
 }
 
@@ -92,6 +159,14 @@ class ControlTextElement extends TextElement {
     this.smallCapitals = smallCapitals;
     this.firstLetterSize = firstLetterSize;
   }
+
+  createElement(panel) {
+    const newText = super.createElement(panel);
+    newText.style.setProperty("--spacing", this.spacing + "rem");
+    newText.style.fontVariant = this.smallCapitals ? "small-caps" : "normal";
+    newText.style.setProperty("--firstLetterSize", this.firstLetterSize);
+    return newText;
+  }
 }
 
 class ActionMessageElement extends TextElement {
@@ -115,6 +190,13 @@ class AdvisoryMessageElement extends TextElement {
     this.formatNumeral = formatNumeral;
     this.borderRadius = borderRadius;
     this.useNumeralFormatting = useNumeralFormatting;
+  }
+
+  createElement(panel) {
+    const newText = super.createElement(panel);
+    newText.style.setProperty("--borderRadius", this.borderRadius + "px");
+    newText.className = "bE-textElement bE-advisoryMessage";
+    return newText;
   }
 }
 
@@ -216,6 +298,51 @@ class Control {
 
   deleteRow(row) {
     this.rows.splice(row, 1);
+  }
+
+  createElement(panel, subPanel) {
+    const flexBox = document.createElement("div");
+    flexBox.className = "blockElementMaster";
+
+    for (const row of this.rows) {
+      const flexRow = document.createElement("div");
+      flexRow.className = "blockElementRow";
+
+      const leftAlignment = document.createElement("div");
+      leftAlignment.className = "blockElementLeft";
+
+      const centerAlignment = document.createElement("div");
+      centerAlignment.className = "blockElementCenter";
+
+      const rightAlignment = document.createElement("div");
+      rightAlignment.className = "blockElementRight";
+
+      let lastKnownAlignment = centerAlignment;
+      for (let i = 0; i < row.length; i++) {
+        let elem = row[i];
+        switch (elem.alignment) {
+          case "Left":
+            lastKnownAlignment = leftAlignment;
+            break;
+          case "Right":
+            lastKnownAlignment = rightAlignment;
+            break;
+          case "Center":
+            lastKnownAlignment = centerAlignment;
+            break;
+          default:
+        }
+
+        lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
+      }
+
+      flexRow.appendChild(leftAlignment);
+      flexRow.appendChild(centerAlignment);
+      flexRow.appendChild(rightAlignment);
+      flexBox.appendChild(flexRow);
+    }
+
+    return flexBox;
   }
 }
 

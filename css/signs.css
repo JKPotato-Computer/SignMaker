@@ -560,7 +560,7 @@
 	font-family: "Clearview 5WR";
 	font-size: 1.75rem;
 	line-height: 2rem;
-
+	white-space: pre-wrap;
 }
 
 .guideArrows {

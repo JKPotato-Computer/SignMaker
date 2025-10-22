@@ -12,6 +12,7 @@
 		<link href="css/signs.css" rel="stylesheet" type="text/css">
 		<link href="css/shields.css" rel="stylesheet" type="text/css">
 		<link href="css/form.css" rel="stylesheet" type="text/css">
+		<link href="css/sign-foundation.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 		<!-- Page Links -->
@@ -26,8 +27,8 @@
 		<script src="js/Arrows.js" type="text/javascript"></script>
 		<script src="js/Control.js" type="text/javascript"></script>
 		<script src="js/SubPanels.js" type="text/javascript"></script>
+		<script src="js/form.js" type="text/javascript"></script>
 		<script src="js/main.js" type="text/javascript"></script>
-		<script src="js/form.js" type="text/javascript" defer></script>
 	</head>
 	<body onload="app.init();">
 		<main>
@@ -95,10 +96,10 @@
 						<div id="sMPostSettings">
 							<div>
 								<label for="postPosition" data-toolTip="Controls the type of post that will display on the screen.">Post Position: </label>
-								<select id="postPosition" onchange="app.readForm();"></select>
+								<select id="postPosition" onchange="formHandler.readForm();"></select>
 								<br>
 								<label for="showPost" id="showPostLabel"> Hide Post: </label>
-								<input type="checkbox" id="showPost" name="showPost" value="showPost" onchange="app.readForm();">
+								<input type="checkbox" id="showPost" name="showPost" value="showPost" onchange="formHandler.readForm();">
 							</div>
 						</div>
 					</div>
@@ -115,23 +116,23 @@
 						<div id="sMPanelAppearance">
 							<div>
 								<label for="panelColor">Panel Color: </label>
-								<select id="panelColor" onchange="app.readForm();"></select>
+								<select id="panelColor" onchange="formHandler.readForm();"></select>
 								<br>
 								<label for="panelCorner">Panel Corners: </label>
-								<select id="panelCorner" onchange="app.readForm();"></select>
+								<select id="panelCorner" onchange="formHandler.readForm();"></select>
 							</div>
 						</div>
 						<div id="sMPanelPadding" class="tabHidden">
 							<div>
 								<label for="paddingTop">Padding Top: </label>
-								<input type="number" id="paddingTop" value=".5" placeholder=".5" step=".01" min="0" max="20" onblur="app.readForm();">
+								<input type="number" id="paddingTop" value=".5" placeholder=".5" step=".01" min="0" max="20" onblur="formHandler.readForm();">
 								<label for="paddingRight">Padding Right: </label>
-								<input type="number" id="paddingRight" value=".75" placeholder=".75" step=".01" min="0" max="20" onblur="app.readForm();">
+								<input type="number" id="paddingRight" value=".75" placeholder=".75" step=".01" min="0" max="20" onblur="formHandler.readForm();">
 								<br>
 								<label for="paddingBottom">Padding Bottom: </label>
-								<input type="number" id="paddingBottom" value=".5" placeholder=".5" step=".01" min="0" max="20" onblur="app.readForm();">
+								<input type="number" id="paddingBottom" value=".5" placeholder=".5" step=".01" min="0" max="20" onblur="formHandler.readForm();">
 								<label for="paddingLeft">Padding Left: </label>
-								<input type="number" id="paddingLeft" value=".75" placeholder=".75" step=".01" min="0" max="20" onblur="app.readForm();">
+								<input type="number" id="paddingLeft" value=".75" placeholder=".75" step=".01" min="0" max="20" onblur="formHandler.readForm();">
 								<button id="resetPadding" class="resetClass" onclick="app.resetPadding();">Reset to Default</button>
 							</div>
 						</div>
@@ -167,35 +168,35 @@
 						<div id="sMExitTabSetting">
 							<div>
 								<legend>Main Settings</legend>
-								<input type="text" id="exitNumber" name="exitNumber" placeholder="Exit 00" onchange="app.readForm();">
-								<select id="exitTabPosition" onchange="app.readForm();"></select>
-								<select id="exitTabWidth" onchange="app.readForm();"></select>
-								<select id="exitColor" onchange="app.readForm();"></select>
-								<select id="exitVariant" onchange="app.readForm();"></select>
+								<input type="text" id="exitNumber" name="exitNumber" placeholder="Exit 00" onchange="formHandler.readForm();">
+								<select id="exitTabPosition" onchange="formHandler.readForm();"></select>
+								<select id="exitTabWidth" onchange="formHandler.readForm();"></select>
+								<select id="exitColor" onchange="formHandler.readForm();"></select>
+								<select id="exitVariant" onchange="formHandler.readForm();"></select>
 							</div>
 							<div>
 								<legend>Extra Settings</legend>
 								<label for="exitFont" id="exitFontLabel">FHWA Font:</label>
-								<input type="checkbox" name="exitFont" id="exitFont" value="exitFont" onchange="app.readForm();">
+								<input type="checkbox" name="exitFont" id="exitFont" value="exitFont" onchange="formHandler.readForm();">
 								<label for="showLeft" id="showLeftLabel">Left:</label>
-								<input type="checkbox" id="showLeft" value="showLeft" name="showLeft" onchange="app.readForm();">
+								<input type="checkbox" id="showLeft" value="showLeft" name="showLeft" onchange="formHandler.readForm();">
 								<label for="fullBorder">Full Border: </label>
-								<input type="checkbox" id="fullBorder" value="fullBorder" name="fullBorder" onchange="app.readForm();">
+								<input type="checkbox" id="fullBorder" value="fullBorder" name="fullBorder" onchange="formHandler.readForm();">
 								<label for="topOffset">Top Offset:</label>
-								<input type="checkbox" id="topOffset" value="topOffset" name="topOffset" onchange="app.readForm();" checked="">
+								<input type="checkbox" id="topOffset" value="topOffset" name="topOffset" onchange="formHandler.readForm();" checked="">
 								<br>
 								<label for="borderThickness">Border Thickness (rem): <input type="button" class="resetBtn clear" id="borderReset" value="Reset">
 								</label>
-								<input type="range" id="borderThickness" min="0.01" max="0.2" step="0.01" value="0.2" oninput="document.getElementById(`borderValue`).innerHTML = this.value;" onchange="app.readForm();">
+								<input type="range" id="borderThickness" min="0.01" max="0.2" step="0.01" value="0.2" oninput="document.getElementById(`borderValue`).innerHTML = this.value;" onchange="formHandler.readForm();">
 								<label for="borderThickness" id="borderValue" style="text-align: left; margin: 0; font-size: 2rem; width: auto;">0.2</label>
 								<label for="minHeight">Minimum Height (rem): <input type="button" class="resetBtn clear" id="minimumReset" value="Reset">
 								</label>
-								<input type="range" id="minHeight" min="0" max="5" value="2.25" step="0.05" oninput="document.getElementById(`minValue`).innerHTML = this.value" onchange="app.readForm();">
+								<input type="range" id="minHeight" min="0" max="5" value="2.25" step="0.05" oninput="document.getElementById(`minValue`).innerHTML = this.value" onchange="formHandler.readForm();">
 								<label for="minHeight" id="minValue" style="text-align: left; margin: 0; font-size: 2rem; widtH: auto;">2.25</label>
 								<br>
 								<label for="fontSize">Text Size (px): <input type="button" class="resetBtn clear" id="sizeReset" value="Reset">
 								</label>
-								<input type="range" id="fontSize" min="10" max="100" value="18" step="1" oninput="document.getElementById(`fontValue`).innerHTML = this.value" onchange="app.readForm();">
+								<input type="range" id="fontSize" min="10" max="100" value="18" step="1" oninput="document.getElementById(`fontValue`).innerHTML = this.value" onchange="formHandler.readForm();">
 								<label for="fontSize" id="fontValue" style="text-align: left; margin: 0; font-size: 2rem; widtH: auto;">16</label>
 							</div>
 						</div>
@@ -203,15 +204,15 @@
 							<div>
 								<legend>Toll Settings</legend>
 								<div id="tollSettings" style="display: block;">
-									<input type="radio" name="tollOption" id="ezPass" class="radioOption" value="EZPass" onchange="app.readForm();">
+									<input type="radio" name="tollOption" id="ezPass" class="radioOption" value="EZPass" onchange="formHandler.readForm();">
 									<label for="ezPass" style="text-align: left;">E-ZPASS</label>
-									<input type="radio" name="tollOption" id="FASTrak" class="radioOption" value="FASTrak" onchange="app.readForm();">
+									<input type="radio" name="tollOption" id="FASTrak" class="radioOption" value="FASTrak" onchange="formHandler.readForm();">
 									<label for="FASTrak" style="text-align: left;">FASTrak</label>
-									<input type="radio" name="tollOption" id="SUNPass" class="radioOption" value="SUNPass" onchange="app.readForm();">
+									<input type="radio" name="tollOption" id="SUNPass" class="radioOption" value="SUNPass" onchange="formHandler.readForm();">
 									<label for="SUNPass" style="text-align: left;">SunPass</label>
-									<input type="radio" name="tollOption" id="custom" class="radioOption" value="custom" onchange="app.readForm();">
+									<input type="radio" name="tollOption" id="custom" class="radioOption" value="custom" onchange="formHandler.readForm();">
 									<label for="custom" style="text-align: left;">Custom Tag <br>
-										<input type="text" id="customTag" name="customTag" placeholder="Tag" onchange="app.readForm();">
+										<input type="text" id="customTag" name="customTag" placeholder="Tag" onchange="formHandler.readForm();">
 									</label>
 								</div>
 							</div>
@@ -245,10 +246,12 @@
 						</nav>
 					</nav>
 					<nav class="sMModalBar sMModalSubBar">
-						<div data-tab="sMSPSettings" class="sMModalTab selected">Settings</div>
+						<div data-tab="sMSPBlocks" class="sMModalTab selected">Block Elements</div>
+						<div data-tab="sMSPShield" class="sMModalTab">Shields</div>
+						<div data-tab="sMSPExtra" class="sMModalTab">Extra Settings</div>
 					</nav>
 					<div class="sMModalContent">
-						<div id="sMSPSettings">
+						<div id="sMSPShield" class="tabHidden">
 							<div>
 								<div class="shields" id="shields"></div>
 								<input type="button" value="New Shield" onclick="app.newShield();">
@@ -256,7 +259,10 @@
 								<br>
 								<br>
 								<!-- Control Cities Revision -->
-								<div id="sMSPTextEditor">
+							</div>
+						</div>
+						<div id="sMSPBlocks">
+							<div id="sMSPTextEditor">
 									<div id="sMSPCreate">
 										<span id="SMSPSelectLabel">Selected: Row 1</span>
 										<button id="sMSPCreateRow" onclick="app.newRow();"><span class="material-symbols-outlined">add</span> New</button>
@@ -407,37 +413,38 @@
 										</div>
 									</div>
 								</div>
-								<div style="display: block;">
+								<div style="display: none;">
 									<!-- Control Cities -->
 									<label for="controlText" id="controlCitiesLabel">Control Cities:</label>
-									<textarea id="controlText" wrap="hard" rows="4" onblur="app.readForm();"></textarea>
+									<textarea id="controlText" wrap="hard" rows="4" onblur="formHandler.readForm();"></textarea>
 									<br>
 									<!-- Action Message -->
 									<label for="actionMessage" id="actionMessageLabel">Action Message: </label>
-									<input type="text" id="actionMessage" name="actionMessage" placeholder="Action Message" onblur="app.readForm();">
+									<input type="text" id="actionMessage" name="actionMessage" placeholder="Action Message" onblur="formHandler.readForm();">
 									<br>
 									<label for="outActionMessage" id="outActionMessageLabel" class="invisible">Advisory Message:</label>
-									<input type="checkbox" id="outActionMessage" name="outActionMessage" class="invisible" value="outActionMessage" onchange="app.readForm();" checked="">
-									<input type="text" class="invisible" id="g_actionMessage" name="g_actionMessage" placeholder="Action Message" onblur="app.readForm();">
+									<input type="checkbox" id="outActionMessage" name="outActionMessage" class="invisible" value="outActionMessage" onchange="formHandler.readForm();" checked="">
+									<input type="text" class="invisible" id="g_actionMessage" name="g_actionMessage" placeholder="Action Message" onblur="formHandler.readForm();">
 									<br>
 									<label for="shieldsPosition">Shield Positions:</label>
-									<select id="shieldsPosition" onchange="app.readForm();"></select>
+									<select id="shieldsPosition" onchange="formHandler.readForm();"></select>
 									<label for="shieldBacks" id="shieldBacksLabel">Shield Backs: </label>
-									<input type="checkbox" id="shieldBacks" name="shieldBacks" value="shieldBacks" onchange="app.readForm();">
+									<input type="checkbox" id="shieldBacks" name="shieldBacks" value="shieldBacks" onchange="formHandler.readForm();">
 								</div>
-							</div>
+						</div>
+						<div id="sMSPExtra" class="tabHidden">
 							<div>
 								<legend>Global Positioning</legend>
 								<label for="globalPosition" id="globalPositionLabel" class="invisible">Global Position:</label>
-								<select id="globalPosition" class="invisible" onchange="app.readForm();"></select>
+								<select id="globalPosition" class="invisible" onchange="formHandler.readForm();"></select>
 							</div>
 							<div>
 								<legend>Extra Subpanel Settings</legend>
 								<label for="subPanelHeight" id="subPanelHeightLabel" style="display: none;">Divider Height: </label>
-								<input type="number" id="subPanelHeight" name="subPanelHeight" onblur="app.readForm();" style="display: none;">
+								<input type="number" id="subPanelHeight" name="subPanelHeight" onblur="formHandler.readForm();" style="display: none;">
 								<br>
 								<label for="subPanelLength" id="subPanelLengthLabel" style="display: none;">Length: </label>
-								<input type="number" id="subPanelLength" name="subPanelLength" onblur="app.readForm();" style="display: none;">
+								<input type="number" id="subPanelLength" name="subPanelLength" onblur="formHandler.readForm();" style="display: none;">
 								<br>
 							</div>
 						</div>
@@ -456,25 +463,25 @@
 							<div>
 								<legend>Standard Arrows</legend>
 								<label for="guideArrow">Arrows:</label>
-								<select id="guideArrow" onchange="app.readForm();"></select>
-								<input type="number" id="guideArrowLanes" name="guideArrowLanes" min="1" max="6" onblur="app.readForm();">
+								<select id="guideArrow" onchange="formHandler.readForm();"></select>
+								<input type="number" id="guideArrowLanes" name="guideArrowLanes" min="1" max="6" onblur="formHandler.readForm();">
 								<br>
 								<label id="arrowLocationLabel" for="arrowLocations">Arrow Location:</label>
-								<select id="arrowLocations" onchange="app.readForm();"></select>
+								<select id="arrowLocations" onchange="formHandler.readForm();"></select>
 								<br>
 								<label id="exitOnlyDirectionLabel" for="exitOnlyDirection" class="invisible">Direction:</label>
-								<select id="exitOnlyDirection" onchange="app.readForm();" class="invisible"></select>
+								<select id="exitOnlyDirection" onchange="formHandler.readForm();" class="invisible"></select>
 								<label id="showExitOnlyLabel" for="showExitOnly" class="invisible">Hide Label</label>
-								<input type="checkbox" id="showExitOnly" name="showExitOnly" value="undefined" onchange="app.readForm();" class="invisible">
+								<input type="checkbox" id="showExitOnly" name="showExitOnly" value="undefined" onchange="formHandler.readForm();" class="invisible">
 								<br>
 								<label id="exitOnlyPaddingLabel" for="exitOnlyPadding" class="invisible">Spacing: <input type="button" class="resetBtn clear" id="paddingReset" value="Reset">
 								</label>
-								<input id="exitOnlyPadding" type="range" min="0" max="2" step="0.05" value="0.25" oninput="document.querySelector('#paddingValue').textContent = this.value;" onchange="app.readForm();" class="invisible">
+								<input id="exitOnlyPadding" type="range" min="0" max="2" step="0.05" value="0.25" oninput="document.querySelector('#paddingValue').textContent = this.value;" onchange="formHandler.readForm();" class="invisible">
 								<label for="exitOnlyPadding" id="paddingValue" style="text-align: left; margin: 0; font-size: 2rem; width: auto;" class="invisible">0.25</label>
 								<hr>
 								<label for="otherSymbol">Other Bottom Symbols:</label>
-								<select id="otherSymbol" onchange="app.readForm();"></select>
-								<input type="text" id="oSNum" name="oSNum" placeholder="Exit Num" onblur="app.readForm();">
+								<select id="otherSymbol" onchange="formHandler.readForm();"></select>
+								<input type="text" id="oSNum" name="oSNum" placeholder="Exit Num" onblur="formHandler.readForm();">
 							</div>
 						</div>
 						<div id="sMAPL" class="tabHidden"></div>
@@ -492,10 +499,10 @@
 							<div>
 								<legend>Settings</legend>
 								<label for="fontChange" id="fontChangeLabel">FHWA Font </label>
-								<input type="checkbox" id="fontChange" name="fontChange" value="fontChange" onchange="app.readForm();">
+								<input type="checkbox" id="fontChange" name="fontChange" value="fontChange" onchange="formHandler.readForm();">
 								<br>
 								<label for="secondExitOnly" id="secondExitOnlyLabel">2nd Exit Only Design </label>
-								<input type="checkbox" id="secondExitOnly" name="secondExitOnly" value="secondExitOnly" onchange="app.readForm();">
+								<input type="checkbox" id="secondExitOnly" name="secondExitOnly" value="secondExitOnly" onchange="formHandler.readForm();">
 							</div>
 						</div>
 					</div>
