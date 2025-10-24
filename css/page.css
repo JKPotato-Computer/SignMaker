@@ -211,6 +211,18 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Electronic Highway Sign';
+    src: url('fonts/ElectronicHighwaySign.woff2') format('woff2'),
+        url('fonts/ElectronicHighwaySign.woff') format('woff'),
+        url('fonts/ElectronicHighwaySign.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+
 :root {
 	--green: rgb(0, 95, 77);
 	--blue: rgb(0, 67, 123);
@@ -309,10 +321,6 @@ footer a {
 	transition: 0.2s;
 }
 
-footer h3 {
-	font-family: "Clearview 3W";
-}
-
 footer p {
 	font-size: 16px;
 }
@@ -327,8 +335,8 @@ h1, h2, h3, h4, h5, h6, p {
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: "Series D";
-	font-weight: 400;
+	font-family: "Overpass";
+	font-weight: 600;
 }
 
 #oSNum {

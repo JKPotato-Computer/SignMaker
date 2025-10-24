@@ -1,4 +1,25 @@
 // Control.js
+const fractionMap = {
+  "1/2": "½",
+  "1/3": "⅓",
+  "2/3": "⅔",
+  "1/4": "¼",
+  "3/4": "¾",
+  "1/5": "⅕",
+  "2/5": "⅖",
+  "3/5": "⅗",
+  "4/5": "⅘",
+  "1/6": "⅙",
+  "5/6": "⅚",
+  "1/7": "⅐",
+  "1/8": "⅛",
+  "3/8": "⅜",
+  "5/8": "⅝",
+  "7/8": "⅞",
+  "1/9": "⅑",
+  "1/10": "⅒",
+};
+const fractionRegex = new RegExp(Object.keys(fractionMap).join("|"), "g");
 
 class TextElement {
   constructor({
@@ -12,6 +33,7 @@ class TextElement {
     useNumeralFormatting = false,
     numeralFormattingSize = 150,
     alignment = "Center",
+    lineHeight = 100,
   } = {}) {
     this.textContent = textContent;
     this.fontFamily = fontFamily;
@@ -23,6 +45,7 @@ class TextElement {
     this.numeralFormattingSize = numeralFormattingSize;
     this.bannerFirstLetterSize = bannerFirstLetterSize;
     this.alignment = alignment;
+    this.lineHeight = lineHeight;
   }
 
   splitString() {
@@ -31,6 +54,11 @@ class TextElement {
 
     // Define the banner types to split by if useBannerFormating is true
     const numeralPattern = /(\d+\S*)|([\u00BC-\u00BE]+\S*)/;
+    const lightNumeralPattern = new RegExp(
+      numeralPattern.source + "|" + Object.values(fractionMap).join("|"),
+      "g"
+    );
+
     const bannerPattern = new RegExp(
       `(\\s*)(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)(\\s*)`,
       "gi"
@@ -46,17 +74,22 @@ class TextElement {
 
     if (this.useNumeralFormatting) {
       let newResult = [];
-      console.log(result);
       for (let i = 0; i < result.length; i++) {
-        let currentResult = result[i].split(numeralPattern).filter(Boolean);
+        let currentResult = result[i]
+          .split(numeralPattern)
+          .filter(Boolean)
+          .map((val) =>
+            val.replace(fractionRegex, (match) => fractionMap[match])
+          );
         newResult = newResult.concat(currentResult);
       }
       result = newResult;
     }
 
+    result = result.map((val) => val.replace("\\t", "\t").replace("\\n", "\n"));
     for (let i = 0; i < result.length; i++) {
       let r = result[i];
-      if (new RegExp(numeralPattern).test(r) && this.useNumeralFormatting) {
+      if (lightNumeralPattern.test(r) && this.useNumeralFormatting) {
         tagged[i] = { type: "numeral", value: r };
       } else if (lightBannerPattern.test(r) && this.useBannerFormatting) {
         tagged[i] = { type: "banner", value: r };
@@ -93,6 +126,7 @@ class TextElement {
       "--bannerFirstLetterSize",
       this.bannerFirstLetterSize
     );
+    newText.style.setProperty("--lineHeight", this.lineHeight);
 
     if (
       this.backgroundColor == "Orange" ||
@@ -100,24 +134,13 @@ class TextElement {
       this.backgroundColor == "Yellow"
     ) {
       newText.style.color = "black";
+    } else if (this.backgroundColor != "Inherit") {
+      newText.style.color = "white";
     }
 
     let splitTextContent = this.splitString();
     for (let i = 0; i < splitTextContent.length; i++) {
       let text = splitTextContent[i];
-      if (text.value == "" || text.value == " ") {
-        if (i + 1 >= splitTextContent.length) {
-          continue;
-        } else if (
-          i + 1 < splitTextContent.length &&
-          splitTextContent[i + 1].type != "banner" &&
-          i - 1 > 0 &&
-          splitTextContent[i - 1].type != "banner"
-        ) {
-          continue;
-        }
-      }
-
       const newTextFragment = document.createElement("span");
       newTextFragment.className = "bE-" + text.type;
       newTextFragment.textContent = text.value;
@@ -149,29 +172,25 @@ TextElement.prototype.backgroundColor = ["Inherit"].concat(
 );
 
 class ControlTextElement extends TextElement {
-  constructor({
-    spacing = 0,
-    smallCapitals = false,
-    firstLetterSize = 120,
-  } = {}) {
+  constructor({ spacing = 0, smallCapitals = false } = {}) {
     super();
     this.spacing = spacing;
     this.smallCapitals = smallCapitals;
-    this.firstLetterSize = firstLetterSize;
   }
 
   createElement(panel) {
     const newText = super.createElement(panel);
     newText.style.setProperty("--spacing", this.spacing + "rem");
     newText.style.fontVariant = this.smallCapitals ? "small-caps" : "normal";
-    newText.style.setProperty("--firstLetterSize", this.firstLetterSize);
+    newText.classList.add("bE-controlTextElement");
     return newText;
   }
 }
 
 class ActionMessageElement extends TextElement {
-  constructor({ useNumeralFormatting = true } = {}) {
+  constructor({ fontSize = 70, useNumeralFormatting = true } = {}) {
     super();
+    this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
   }
 }
@@ -180,25 +199,83 @@ class AdvisoryMessageElement extends TextElement {
   constructor({
     backgroundColor = "Yellow",
     fontFamily = "Series E",
-    formatNumeral = true,
     borderRadius = 4,
     useNumeralFormatting = true,
+    horizPadding = 0.3,
+    vertPadding = 0.3,
   } = {}) {
     super();
     this.backgroundColor = backgroundColor;
     this.fontFamily = fontFamily;
-    this.formatNumeral = formatNumeral;
     this.borderRadius = borderRadius;
     this.useNumeralFormatting = useNumeralFormatting;
+    this.horizPadding = horizPadding;
+    this.vertPadding = vertPadding;
   }
 
   createElement(panel) {
     const newText = super.createElement(panel);
     newText.style.setProperty("--borderRadius", this.borderRadius + "px");
+    newText.style.setProperty("--horizPadding", this.horizPadding);
+    newText.style.setProperty("--vertPadding", this.vertPadding);
     newText.className = "bE-textElement bE-advisoryMessage";
+
+    if (this.fontFamily.includes("Series")) {
+      newText.classList.add("hgFix");
+    }
+
     return newText;
   }
 }
+
+class ElectronicSignElement extends TextElement {
+  constructor({
+    fontFamily = "Electronic Highway Sign",
+    textColor = "Orange",
+    padding = 0.5,
+    glow = true,
+    setWidth = 0,
+  } = {}) {
+    super();
+    this.fontFamily = fontFamily;
+    this.textColor = textColor;
+    this.backgroundColor = "Black";
+    this.useNumeralFormatting = false;
+    this.useBannerFormatting = false;
+    this.padding = padding;
+    this.glow = glow;
+    this.setWidth = setWidth;
+  }
+
+  createElement(panel) {
+    const newText = super.createElement(panel);
+    newText.className = "bE-textElement bE-electronicSign";
+    newText.style.setProperty(
+      "--textColor",
+      (lib.colors[this.textColor] || this.textColor).toLowerCase()
+    );
+    newText.style.setProperty("--padding", this.padding + "rem");
+    newText.style.setProperty(
+      "--textShadow",
+      this.glow
+        ? "0 0 0.25rem var(--textColor), 0 0 0.25rem var(--textColor)"
+        : ""
+    );
+    newText.style.width = this.setWidth != 0 ? this.setWidth + "rem" : "";
+
+    if (
+      this.fontFamily.includes("Series") ||
+      this.fontFamily.includes("Electronic")
+    ) {
+      newText.classList.add("hgFix");
+    }
+
+    return newText;
+  }
+}
+ElectronicSignElement.prototype.fontFamily =
+  TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
+ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow"];
 
 class ShieldElement extends Shield {
   constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {
@@ -213,13 +290,28 @@ class DividerElement {
   constructor({
     dividerWidth = 100,
     dividerMeasurement = "%",
-    dividerHeight = 0.5,
+    dividerHeight = 0.2,
     alignment = "Center",
+    visible = true,
   } = {}) {
     this.dividerWidth = dividerWidth;
     this.dividerMeasurement = dividerMeasurement;
     this.dividerHeight = dividerHeight;
     this.alignment = alignment;
+    this.visible = visible;
+  }
+
+  createElement(panel) {
+    const newDivider = document.createElement("div");
+    newDivider.className = "dividerElement";
+    newDivider.style.visibility = this.visible ? "visible" : "hidden";
+    newDivider.style.setProperty(
+      "--dividerWidth",
+      this.dividerWidth + this.dividerMeasurement
+    );
+    newDivider.style.setProperty("--dividerHeight", this.dividerHeight + "rem");
+
+    return newDivider;
   }
 }
 
@@ -247,15 +339,35 @@ class IconElement {
 
 IconElement.prototype.icons = ["Airplane"];
 
+class Block {
+  constructor({
+    padding = 0,
+    backgroundColor = "Inherit",
+    width = 0,
+    stretchLeft = true,
+    stretchCenter = true,
+    stretchRight = true,
+  } = {}) {
+    this.padding = padding;
+    this.backgroundColor = backgroundColor;
+    this.width = width;
+    this.stretchLeft = stretchLeft;
+    this.stretchCenter = stretchCenter;
+    this.stretchRight = stretchRight;
+  }
+}
+
 class Control {
-  constructor({ rows = [] } = {}) {
+  constructor({ rows = [], blockProperties = [] } = {}) {
     this.rows = rows;
+    this.blockProperties = blockProperties;
   }
 
   addElement(element, properties, row, column) {
     let newElement = new element(properties);
     if (!this.rows[row]) {
       this.rows[row] = [];
+      this.blockProperties[row] = new Block();
     }
 
     if (column) {
@@ -273,13 +385,18 @@ class Control {
     this.rows[row].splice(column, 1);
     if (this.rows[row].length == 0) {
       this.rows.splice(row, 1);
+      this.blockProperties.splice(row, 1);
       return true;
     }
     return false;
   }
 
-  addRow(row) {
-    this.addElement(ControlTextElement, {}, row, 0);
+  addRow(row, element) {
+    if (this.rows[row] && this.rows[row].length != 0) {
+      this.rows.splice(row, 0, []);
+      this.blockProperties.splice(row, 0, new Block());
+    }
+    this.addElement(Control.prototype.blockToClassElems[element], {}, row, 0);
   }
 
   duplicateRow(row) {
@@ -294,28 +411,56 @@ class Control {
       );
     }
     this.rows.splice(row + 1, 0, newRows);
+    this.blockProperties.splice(row + 1, 0, new Block());
   }
 
   deleteRow(row) {
     this.rows.splice(row, 1);
+    this.blockProperties.splice(row, 1);
   }
 
   createElement(panel, subPanel) {
     const flexBox = document.createElement("div");
     flexBox.className = "blockElementMaster";
 
-    for (const row of this.rows) {
+    for (let i = 0; i < this.rows.length; i++) {
+      const row = this.rows[i];
+      const properties = this.blockProperties[i];
+
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
+      flexRow.style.setProperty("--margin", properties.padding + "rem");
+      flexRow.style.setProperty(
+        "--masterBlockBgColor",
+        properties.backgroundColor == "Inherit"
+          ? ""
+          : (
+              lib.colors[properties.backgroundColor] ||
+              properties.backgroundColor
+            ).toLowerCase()
+      );
+      flexRow.style.width =
+        properties.width == 0 ? "" : properties.width + "rem";
+
+      if (
+        properties.backgroundColor == "Orange" ||
+        properties.backgroundColor == "White" ||
+        properties.backgroundColor == "Yellow"
+      ) {
+        flexRow.style.color = "black";
+      }
 
       const leftAlignment = document.createElement("div");
       leftAlignment.className = "blockElementLeft";
+      leftAlignment.style.flexGrow = properties.stretchLeft ? "1" : "0";
 
       const centerAlignment = document.createElement("div");
       centerAlignment.className = "blockElementCenter";
+      centerAlignment.style.flexGrow = properties.stretchCenter ? "1" : "0";
 
       const rightAlignment = document.createElement("div");
       rightAlignment.className = "blockElementRight";
+      rightAlignment.style.flexGrow = properties.stretchRight ? "1" : "0";
 
       let lastKnownAlignment = centerAlignment;
       for (let i = 0; i < row.length; i++) {
@@ -353,6 +498,7 @@ Control.prototype.blockToClassElems = {
   AdvisoryMessageElement: AdvisoryMessageElement,
   IconElement: IconElement,
   ActionMessageElement: ActionMessageElement,
+  ElectronicSignElement: ElectronicSignElement,
   getElem: (elemObj) => {
     for (const key in Control.prototype.blockToClassElems) {
       if (elemObj instanceof Control.prototype.blockToClassElems[key]) {
@@ -370,6 +516,7 @@ Control.prototype.blockElements = {
   AdvisoryMessageElement: "Advisory Message",
   IconElement: "Icon",
   ActionMessageElement: "Action Message",
+  ElectronicSignElement: "Electronic Sign",
 };
 
 Control.prototype.blockInternalElements = {
@@ -379,4 +526,5 @@ Control.prototype.blockInternalElements = {
   AdvisoryMessageElement: "sdAdvisory",
   IconElement: "sdIcon",
   ActionMessageElement: "sdActionMessage",
+  ElectronicSignElement: "sdElectronicSign",
 };

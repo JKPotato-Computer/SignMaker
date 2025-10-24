@@ -204,6 +204,189 @@ const formHandler = (function () {
       document.querySelector("#modalHolder").style.display = "flex";
       document.querySelector("#welcomeToSignMaker").showModal();
     }
+
+    // Populate post position options
+    const postPositionSelectElmt = document.getElementById("postPosition");
+    for (const polePosition of Post.prototype.polePositions) {
+      lib.appendOption(postPositionSelectElmt, polePosition, {
+        selected: polePosition == "Left",
+      });
+    }
+
+    // Populate color options
+    const colorSelectElmt = document.getElementById("panelColor");
+    for (const color in lib.colors) {
+      lib.appendOption(colorSelectElmt, color, {
+        text: color,
+      });
+    }
+
+    const cornerTypeSelectElmt = document.getElementById("panelCorner");
+    for (const corner of Panel.prototype.cornerType) {
+      lib.appendOption(cornerTypeSelectElmt, corner, {
+        selected: corner == "Round",
+      });
+    }
+
+    // Populate exit tab position options
+    const exitTabPositionSelectElmt =
+      document.getElementById("exitTabPosition");
+    for (const position of ExitTab.prototype.positions) {
+      lib.appendOption(exitTabPositionSelectElmt, position, {
+        selected: position == "Right",
+      });
+    }
+
+    // Populate exit tab width options
+    const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
+    for (const width of ExitTab.prototype.widths) {
+      lib.appendOption(exitTabWidthSelectElmt, width, {
+        selected: width == "Narrow",
+      });
+    }
+
+    // Populate the exit color options
+    const exitColorSelectElement = document.getElementById("exitColor");
+    for (const exitColor of ExitTab.prototype.colors) {
+      lib.appendOption(exitColorSelectElement, exitColor);
+    }
+
+    // Populate the exit variants
+    const exitVariantSelectElmt = document.getElementById("exitVariant");
+    for (const exitVariant of ExitTab.prototype.variants) {
+      lib.appendOption(exitVariantSelectElmt, exitVariant);
+    }
+
+    // Populate the exit icons
+    const iconSelectSelectElmt = document.getElementById("iconSelect");
+    for (const icons of ExitTab.prototype.icons) {
+      lib.appendOption(iconSelectSelectElmt, icons.split(":")[0]);
+    }
+
+    // Populate the shield position options
+    const shieldPositionsSelectElmt =
+      document.getElementById("shieldsPosition");
+    for (const position of Sign.prototype.shieldPositions) {
+      lib.appendOption(shieldPositionsSelectElmt, position, {
+        selected: position == "Above",
+      });
+    }
+
+    // Populate global positioning
+    const globalPosition = document.getElementById("globalPosition");
+    for (const position of Sign.prototype.globalPositioning) {
+      lib.appendOption(globalPosition, position, {
+        selected: position == "Top",
+      });
+    }
+
+    // Populate the element list
+    const sMSPElementSelect = document.getElementById("sMSPElementSelect");
+    for (const element in Control.prototype.blockElements) {
+      lib.appendOption(sMSPElementSelect, element, {
+        selected: element == "Standard Control Text",
+        text: Control.prototype.blockElements[element],
+      });
+    }
+
+    // Populate the guide arrow options
+    const guideArrowSelectElmt = document.getElementById("guideArrow");
+    for (const guideArrow of Sign.prototype.guideArrows) {
+      const display = guideArrow.split(":")[0];
+
+      lib.appendOption(guideArrowSelectElmt, display);
+    }
+
+    // Populate the exit only guide arrow options
+    const exitOnlyDirectionElmt = document.getElementById("exitOnlyDirection");
+    for (const exitguideArrows of Sign.prototype.exitguideArrows) {
+      const display = exitguideArrows.split(":")[0];
+
+      lib.appendOption(exitOnlyDirectionElmt, display);
+    }
+
+    // Populate the arrow directions
+    const arrowDirectionElmt = document.getElementById("arrowLocations");
+    for (const arrowDirection of Sign.prototype.arrowPositions) {
+      lib.appendOption(arrowDirectionElmt, arrowDirection);
+    }
+
+    // Populate the other symbol options
+    const otherSymbolSelectElement = document.getElementById("otherSymbol");
+    for (const otherSymbol of Sign.prototype.otherSymbols) {
+      lib.appendOption(otherSymbolSelectElement, otherSymbol);
+    }
+
+    // Control Signs Revision
+    let textElem_fontFamilySelects = [
+      document.querySelector("#sdCtrlText_fontFamily"),
+      document.querySelector("#sdAdvisory_fontFamily"),
+      document.querySelector("#sdActionMessage_fontFamily"),
+    ];
+    let textElem_alignmentSelects = [
+      document.querySelector("#sdCtrlText_alignment"),
+      document.querySelector("#sdAdvisory_alignment"),
+      document.querySelector("#sdActionMessage_alignment"),
+      document.querySelector("#sdBlocker_alignment"),
+      document.querySelector("#sdElectronicSign_alignment"),
+    ];
+    let textElem_bgColorSelects = [
+      document.querySelector("#sdCtrlText_backgroundColor"),
+      document.querySelector("#sdAdvisory_backgroundColor"),
+      document.querySelector("#sdActionMessage_backgroundColor"),
+      document.querySelector("#sdIcon_borderColor"),
+      document.querySelector("#sdIcon_backgroundColor"),
+      document.querySelector("#sdBlock_backgroundColor"),
+    ];
+    let divider_widthMeasurement = document.querySelector(
+      "#sdblocker_dividerMeasurement"
+    );
+    let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
+    let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
+
+    for (const elem of textElem_fontFamilySelects) {
+      for (const fontFamily of TextElement.prototype.fontFamily) {
+        lib.appendOption(elem, fontFamily);
+      }
+    }
+
+    for (const elem of textElem_alignmentSelects) {
+      for (const alignment of TextElement.prototype.alignment) {
+        lib.appendOption(elem, alignment);
+      }
+    }
+
+    for (const elem of textElem_bgColorSelects) {
+      for (const backgroundColor of TextElement.prototype.backgroundColor) {
+        lib.appendOption(elem, backgroundColor);
+      }
+    }
+
+    for (const fontFamily of ElectronicSignElement.prototype.fontFamily) {
+      lib.appendOption(
+        document.querySelector("#sdElectronicSign_fontFamily"),
+        fontFamily
+      );
+    }
+
+    for (const textColor of ElectronicSignElement.prototype.textColors) {
+      lib.appendOption(
+        document.querySelector("#sdElectronicSign_textColor"),
+        textColor
+      );
+    }
+
+    for (const measurement of DividerElement.prototype.dividerMeasurement) {
+      lib.appendOption(divider_widthMeasurement, measurement);
+    }
+
+    for (const shieldType in Shield.prototype.types) {
+      lib.appendOption(shield_shieldBase, shieldType);
+    }
+
+    for (const icon of IconElement.prototype.icons) {
+      lib.appendOption(iconElem_iconsSelect, icon);
+    }
   };
 
   // Show/hide dependent small inputs for a given block (e.g. sdCtrlText, sdAdvisory, sdActionMessage, sdIcon)
@@ -412,13 +595,27 @@ const formHandler = (function () {
       }
     }
 
-    subPanel.controlText = form["controlText"].value;
-    subPanel.actionMessage = form["actionMessage"].value;
-    subPanel.actionMessage = subPanel.actionMessage.replace("1/2", "½");
-    subPanel.actionMessage = subPanel.actionMessage.replace("1/4", "¼");
-    subPanel.actionMessage = subPanel.actionMessage.replace("3/4", "¾");
-    subPanel.advisoryMessage = form["outActionMessage"].checked;
-    subPanel.advisoryText = form["g_actionMessage"].value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].padding = document.querySelector("#sdBlock_padding").value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].backgroundColor = document.querySelector(
+      "#sdBlock_backgroundColor"
+    ).value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].width = document.querySelector("#sdBlock_width").value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].stretchLeft = document.querySelector("#sdBlock_stretchLeft").checked;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].stretchCenter = document.querySelector("#sdBlock_stretchCenter").checked;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].stretchRight = document.querySelector("#sdBlock_stretchRight").checked;
+
     if (
       currentPanel.sign.subPanels.length > 1 &&
       exposed.vars.currentlySelectedSubPanelIndex == 0
@@ -843,15 +1040,23 @@ const formHandler = (function () {
         textEditorBlock.textContent =
           Control.prototype.blockElements[blockElement.constructor.name];
         sMControlRow.appendChild(textEditorBlock);
-        textEditorBlock.addEventListener("click", () => {
-          exposed.setSelectedControlElem(item);
-        });
+        textEditorBlock.addEventListener(
+          "click",
+          () => {
+            exposed.setSelectedControlElem(item);
+          },
+          { once: true }
+        );
       }
 
       sMSPTextList.appendChild(sMControlRow);
-      sMControlRow.addEventListener("click", () => {
-        exposed.setSelectedRow(row);
-      });
+      sMControlRow.addEventListener(
+        "click",
+        () => {
+          exposed.setSelectedRow(row);
+        },
+        { once: true }
+      );
     }
 
     for (const divConfig of document.querySelectorAll(
@@ -880,6 +1085,7 @@ const formHandler = (function () {
     for (const propertyName in currentBlockElem) {
       const elementId = `${blockElemType}_${propertyName}`;
       const element = document.getElementById(elementId);
+      const displayElement = document.getElementById(elementId + "Val");
       if (element) {
         if (element.type === "checkbox") {
           element.checked = currentBlockElem[propertyName];
@@ -901,15 +1107,75 @@ const formHandler = (function () {
           );
         }
       }
+
+      if (displayElement) {
+        displayElement.textContent = currentBlockElem[propertyName];
+      }
     }
 
+    document.querySelector("#sdBlock_padding").value =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].padding;
+    document
+      .querySelector("#sdBlock_padding")
+      .addEventListener("change", readForm, { once: true });
+
+    document.querySelector("#sdBlock_paddingVal").textContent =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].padding;
+
+    document.querySelector("#sdBlock_backgroundColor").value =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].backgroundColor;
+
+    document
+      .querySelector("#sdBlock_backgroundColor")
+      .addEventListener("blur", readForm, { once: true });
+
+    document.querySelector("#sdBlock_width").value =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].width;
+    document
+      .querySelector("#sdBlock_width")
+      .addEventListener("change", readForm, { once: true });
+
+    document
+      .querySelector("#sdBlock_stretchLeft")
+      .addEventListener("change", readForm, { once: true });
+
+    document.querySelector("#sdBlock_stretchLeft").checked =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].stretchLeft;
+
+    document
+      .querySelector("#sdBlock_stretchCenter")
+      .addEventListener("change", readForm, { once: true });
+    document.querySelector("#sdBlock_stretchCenter").checked =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].stretchCenter;
+
+    document
+      .querySelector("#sdBlock_stretchRight")
+      .addEventListener("change", readForm, { once: true });
+    document.querySelector("#sdBlock_stretchRight").checked =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].stretchRight;
+
+    /*
     // Old Control Text
     const controlTextElmt = document.getElementById("controlText");
     controlTextElmt.value = sign.controlText;
 
     const actionMessageElmt = document.getElementById("actionMessage");
     actionMessageElmt.value = sign.actionMessage;
-
+    */
     const shieldPositionsSelectElmt =
       document.getElementById("shieldsPosition");
     for (const option of shieldPositionsSelectElmt.options) {

@@ -428,6 +428,10 @@ label {
   display: inline-block;
 }
 
+label.noLabelAlignment {
+  width: max-content;
+}
+
 label:hover {
   font-weight: 600;
 }
@@ -761,7 +765,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   color: white;
 }
 
-#smSPProperties {
+#smSPProperties, #smSPBlockProperties {
   background-color: rgb(255, 255, 255, 0.225);
   padding: 0.5rem;
   width: 100%;

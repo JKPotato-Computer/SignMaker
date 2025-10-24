@@ -34,178 +34,8 @@ const app = (function () {
   // Initialize the application, and populates dropdowns and the default post.
 
   const init = function () {
-    // Create the post on which to place panels
     post = new Post(Post.prototype.polePositions[0]);
-
-    // Initialize formHandler with exposed functions
     formHandler.init(exposeToFormHandler);
-
-    // Populate post position options
-    const postPositionSelectElmt = document.getElementById("postPosition");
-    for (const polePosition of Post.prototype.polePositions) {
-      lib.appendOption(postPositionSelectElmt, polePosition, {
-        selected: polePosition == "Left",
-      });
-    }
-
-    // Populate color options
-    const colorSelectElmt = document.getElementById("panelColor");
-    for (const color in lib.colors) {
-      lib.appendOption(colorSelectElmt, color, {
-        text: color,
-      });
-    }
-
-    const cornerTypeSelectElmt = document.getElementById("panelCorner");
-    for (const corner of Panel.prototype.cornerType) {
-      lib.appendOption(cornerTypeSelectElmt, corner, {
-        selected: corner == "Round",
-      });
-    }
-
-    // Populate exit tab position options
-    const exitTabPositionSelectElmt =
-      document.getElementById("exitTabPosition");
-    for (const position of ExitTab.prototype.positions) {
-      lib.appendOption(exitTabPositionSelectElmt, position, {
-        selected: position == "Right",
-      });
-    }
-
-    // Populate exit tab width options
-    const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
-    for (const width of ExitTab.prototype.widths) {
-      lib.appendOption(exitTabWidthSelectElmt, width, {
-        selected: width == "Narrow",
-      });
-    }
-
-    // Populate the exit color options
-    const exitColorSelectElement = document.getElementById("exitColor");
-    for (const exitColor of ExitTab.prototype.colors) {
-      lib.appendOption(exitColorSelectElement, exitColor);
-    }
-
-    // Populate the exit variants
-    const exitVariantSelectElmt = document.getElementById("exitVariant");
-    for (const exitVariant of ExitTab.prototype.variants) {
-      lib.appendOption(exitVariantSelectElmt, exitVariant);
-    }
-
-    // Populate the exit icons
-    const iconSelectSelectElmt = document.getElementById("iconSelect");
-    for (const icons of ExitTab.prototype.icons) {
-      lib.appendOption(exitVariantSelectElmt, icons.split(":")[0]);
-    }
-
-    // Populate the shield position options
-    const shieldPositionsSelectElmt =
-      document.getElementById("shieldsPosition");
-    for (const position of Sign.prototype.shieldPositions) {
-      lib.appendOption(shieldPositionsSelectElmt, position, {
-        selected: position == "Above",
-      });
-    }
-
-    // Populate global positioning
-    const globalPosition = document.getElementById("globalPosition");
-    for (const position of Sign.prototype.globalPositioning) {
-      lib.appendOption(globalPosition, position, {
-        selected: position == "Top",
-      });
-    }
-
-    // Populate the element list
-    const sMSPElementSelect = document.getElementById("sMSPElementSelect");
-    for (const element in Control.prototype.blockElements) {
-      lib.appendOption(sMSPElementSelect, element, {
-        selected: element == "Standard Control Text",
-        text: Control.prototype.blockElements[element],
-      });
-    }
-
-    // Populate the guide arrow options
-    const guideArrowSelectElmt = document.getElementById("guideArrow");
-    for (const guideArrow of Sign.prototype.guideArrows) {
-      const display = guideArrow.split(":")[0];
-
-      lib.appendOption(guideArrowSelectElmt, display);
-    }
-
-    // Populate the exit only guide arrow options
-    const exitOnlyDirectionElmt = document.getElementById("exitOnlyDirection");
-    for (const exitguideArrows of Sign.prototype.exitguideArrows) {
-      const display = exitguideArrows.split(":")[0];
-
-      lib.appendOption(exitOnlyDirectionElmt, display);
-    }
-
-    // Populate the arrow directions
-    const arrowDirectionElmt = document.getElementById("arrowLocations");
-    for (const arrowDirection of Sign.prototype.arrowPositions) {
-      lib.appendOption(arrowDirectionElmt, arrowDirection);
-    }
-
-    // Populate the other symbol options
-    const otherSymbolSelectElement = document.getElementById("otherSymbol");
-    for (const otherSymbol of Sign.prototype.otherSymbols) {
-      lib.appendOption(otherSymbolSelectElement, otherSymbol);
-    }
-
-    // Control Signs Revision
-    let textElem_fontFamilySelects = [
-      document.querySelector("#sdCtrlText_fontFamily"),
-      document.querySelector("#sdAdvisory_fontFamily"),
-      document.querySelector("#sdActionMessage_fontFamily"),
-    ];
-    let textElem_alignmentSelects = [
-      document.querySelector("#sdCtrlText_alignment"),
-      document.querySelector("#sdAdvisory_alignment"),
-      document.querySelector("#sdActionMessage_alignment"),
-      document.querySelector("#sdBlocker_alignment"),
-    ];
-    let textElem_bgColorSelects = [
-      document.querySelector("#sdCtrlText_backgroundColor"),
-      document.querySelector("#sdAdvisory_backgroundColor"),
-      document.querySelector("#sdActionMessage_backgroundColor"),
-      document.querySelector("#sdIcon_borderColor"),
-      document.querySelector("#sdIcon_backgroundColor"),
-    ];
-    let divider_widthMeasurement = document.querySelector(
-      "#sdblocker_dividerMeasurement"
-    );
-    let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
-    let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
-
-    for (const elem of textElem_fontFamilySelects) {
-      for (const fontFamily of TextElement.prototype.fontFamily) {
-        lib.appendOption(elem, fontFamily);
-      }
-    }
-
-    for (const elem of textElem_alignmentSelects) {
-      for (const alignment of TextElement.prototype.alignment) {
-        lib.appendOption(elem, alignment);
-      }
-    }
-
-    for (const elem of textElem_bgColorSelects) {
-      for (const backgroundColor of TextElement.prototype.backgroundColor) {
-        lib.appendOption(elem, backgroundColor);
-      }
-    }
-
-    for (const measurement of DividerElement.prototype.dividerMeasurement) {
-      lib.appendOption(divider_widthMeasurement, measurement);
-    }
-
-    for (const shieldType in Shield.prototype.types) {
-      lib.appendOption(shield_shieldBase, shieldType);
-    }
-
-    for (const icon of IconElement.prototype.icons) {
-      lib.appendOption(iconElem_iconsSelect, icon);
-    }
 
     newPanel();
   };
@@ -413,10 +243,10 @@ const app = (function () {
   };
 
   // Revised Control Panel
-  const newRow = () => {
+  const newRow = (selectedBlock) => {
     const blockElems = getCurrentSubPanel().blockElements;
     currentlySelectedBlockIndex = 0;
-    blockElems.addRow(++currentlySelectedRowIndex);
+    blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
     formHandler.updateForm();
     redraw();
   };
@@ -430,7 +260,13 @@ const app = (function () {
 
   const delRow = () => {
     const blockElems = getCurrentSubPanel().blockElements;
-    blockElems.deleteRow(currentlySelectedRowIndex--);
+    if (blockElems.rows.length == 1) {
+      return;
+    }
+
+    blockElems.deleteRow(currentlySelectedRowIndex);
+    currentlySelectedRowIndex = Math.max(currentlySelectedRowIndex - 1, 0);
+
     formHandler.updateForm();
     redraw();
   };
@@ -458,15 +294,16 @@ const app = (function () {
 
   const delControlElem = () => {
     const blockElems = getCurrentSubPanel().blockElements;
-    console.log(currentlySelectedRowIndex, currentlySelectedBlockIndex);
     if (
       blockElems.removeElement(
         currentlySelectedRowIndex,
-        currentlySelectedBlockIndex--
+        currentlySelectedBlockIndex
       )
     ) {
       currentlySelectedRowIndex--;
       currentlySelectedBlockIndex = getCurrentBlockRows().length - 1;
+    } else {
+      currentlySelectedBlockIndex--;
     }
     formHandler.updateForm();
     redraw();

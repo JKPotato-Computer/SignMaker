@@ -6,9 +6,6 @@ class SubPanels {
         height = "2",
 		shieldDistance = 0.8,
 		blockElements,
-		
-		controlText = "New Sign",
-        actionMessage = "",
 		} = {}
     ) {
         this.controlText = controlText;

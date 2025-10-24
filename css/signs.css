@@ -1,123 +1,123 @@
 #postContainer {
-	display: flex;
-	flex-direction: row;
-	height: 30rem;
+  display: flex;
+  flex-direction: row;
+  height: 30rem;
 }
 
 #postContainer.polePositionOverhead .post {
-	visibility: visible;
+  visibility: visible;
 }
 #postContainer.polePositionLeft .post:last-child,
 #postContainer.polePositionRight .post:first-child,
 #postContainer.polePositionRural .post,
 #postContainer.polePositionCenter .post {
-	visibility: hidden;
+  visibility: hidden;
 }
 
 #postContainer.polePositionLeft #panelContainer,
 #postContainer.polePositionRight #panelContainer,
 #postContainer.polePositionOverhead #panelContainer {
-	background: linear-gradient(
-		180deg,
-		rgba(255,255,255,0) 0%,
-		rgba(255,255,255,0) 47%,
-		rgba(191,191,191,1) 47%,
-		rgba(240,240,240,1) 49%,
-		rgba(128,128,128,1) 52%,
-		rgba(255,255,255,0) 52%,
-		rgba(255,255,255,0) 64%,
-		rgba(191,191,191,1) 64%,
-		rgba(240,240,240,1) 66%,
-		rgba(128,128,128,1) 69%,
-		rgba(255,255,255,0) 69%
-	);
-	height: 15rem;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 47%,
+    rgba(191, 191, 191, 1) 47%,
+    rgba(240, 240, 240, 1) 49%,
+    rgba(128, 128, 128, 1) 52%,
+    rgba(255, 255, 255, 0) 52%,
+    rgba(255, 255, 255, 0) 64%,
+    rgba(191, 191, 191, 1) 64%,
+    rgba(240, 240, 240, 1) 66%,
+    rgba(128, 128, 128, 1) 69%,
+    rgba(255, 255, 255, 0) 69%
+  );
+  height: 15rem;
 }
 #postContainer.polePositionRural #panelContainer {
-	background: linear-gradient(
-		90deg,
-		rgba(255,255,255,0) 0%,
-		rgba(255,255,255,0) 20%,
-		rgba(191,191,191,1) 20%,
-		rgba(240,240,240,1) 22%,
-		rgba(128,128,128,1) 25%,
-		rgba(255,255,255,0) 25%,
-		rgba(255,255,255,0) 75%,
-		rgba(191,191,191,1) 75%,
-		rgba(240,240,240,1) 77%,
-		rgba(128,128,128,1) 80%,
-		rgba(255,255,255,0) 80%
-	);
-	margin-top: 20rem;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(191, 191, 191, 1) 20%,
+    rgba(240, 240, 240, 1) 22%,
+    rgba(128, 128, 128, 1) 25%,
+    rgba(255, 255, 255, 0) 25%,
+    rgba(255, 255, 255, 0) 75%,
+    rgba(191, 191, 191, 1) 75%,
+    rgba(240, 240, 240, 1) 77%,
+    rgba(128, 128, 128, 1) 80%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  margin-top: 20rem;
 }
 #postContainer.polePositionCenter #panelContainer {
-	background: linear-gradient(
-		90deg,
-		rgba(255,255,255,0) 0%,
-		rgba(255,255,255,0) 45%,
-		rgba(191,191,191,1) 45%,
-		rgba(240,240,240,1) 49%,
-		rgba(128,128,128,1) 55%,
-		rgba(255,255,255,0) 55%
-	);
-	margin-top: 7.5rem;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 45%,
+    rgba(191, 191, 191, 1) 45%,
+    rgba(240, 240, 240, 1) 49%,
+    rgba(128, 128, 128, 1) 55%,
+    rgba(255, 255, 255, 0) 55%
+  );
+  margin-top: 7.5rem;
 }
 
 .post {
-	background: linear-gradient(
-		90deg,
-		rgb(191, 191, 191) 0%,
-		rgb(240, 240, 240) 40%,
-		rgb(128, 128, 128) 100%
-	);
-	width: 1rem;
-	height: 24rem;
+  background: linear-gradient(
+    90deg,
+    rgb(191, 191, 191) 0%,
+    rgb(240, 240, 240) 40%,
+    rgb(128, 128, 128) 100%
+  );
+  width: 1rem;
+  height: 24rem;
 
-	align-self: flex-end;
+  align-self: flex-end;
 }
 .post:first-child {
-	margin-left: auto;
+  margin-left: auto;
 }
 .post:last-child {
-	margin-right: auto;
+  margin-right: auto;
 }
 
 #panelContainer {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-		width: -moz-max-content;
-		width: -webkit-max-content;
-	width: intrinsic;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: intrinsic;
 }
 
 .panel {
-	text-align: center;
-	display: block;
-	padding: 0rem;
-	position: relative;
+  text-align: center;
+  display: block;
+  padding: 0rem;
+  position: relative;
 }
 
 .panel:first-child {
-	padding-left: 1rem;
+  padding-left: 1rem;
 }
 .panel:last-child {
-	padding-right: 1rem;	
+  padding-right: 1rem;
 }
 
 #postContainer.polePositionRural .panel {
-	margin-top: -10rem;
+  margin-top: -10rem;
 }
 #postContainer.polePositionCenter .panel {
-	margin-top: -22.5rem;
+  margin-top: -22.5rem;
 }
 #postContainer.polePositionRural .panel:not(:first-child),
 #postContainer.polePositionCenter .panel:not(:first-child) {
-	display: none;
+  display: none;
 }
 
 .panel.orange .sign {
-	background-color: var(--orange);
+  background-color: var(--orange);
 }
 
 .panel.green .sign,
@@ -128,8 +128,8 @@
 .panel.blue .guideArrows,
 .panel.brown .guideArrows,
 .panel.black .guideArrows {
-	color: var(--white);
-	border-color: var(--white);
+  color: var(--white);
+  border-color: var(--white);
 }
 
 .panel.white .sign,
@@ -138,723 +138,727 @@
 .panel.yellow .guideArrows,
 .panel.orange .sign,
 .panel.orange .guideArrows {
-	color: var(--black);
-	border-color: var(--black);
+  color: var(--black);
+  border-color: var(--black);
 }
-
 
 .panel.green .sign,
 .panel.green .signContainer,
 .panel.green .exitTabContainer,
 .panel.green .guideArrows {
-	background-color: var(--green);
+  background-color: var(--green);
 }
 
 .panel.blue .sign,
 .panel.blue .signContainer,
 .panel.blue .exitTabContainer,
 .panel.blue .guideArrows {
-	background-color: var(--blue);
+  background-color: var(--blue);
 }
 
 .panel.brown .sign,
 .panel.brown .signContainer,
 .panel.brown .exitTabContainer,
 .panel.brown .guideArrows {
-	background-color: var(--brown);
+  background-color: var(--brown);
 }
 
 .panel.yellow .sign,
 .panel.yellow .signContainer,
 .panel.yellow .exitTabContainer,
 .panel.yellow .guideArrows {
-	background-color: var(--yellow);
+  background-color: var(--yellow);
 }
 
 .panel.white .sign,
 .panel.white .signContainer,
 .panel.white .exitTabContainer,
 .panel.white .guideArrows {
-	background-color: var(--white);
+  background-color: var(--white);
 }
 
 .panel.black .sign,
 .panel.black .signContainer,
 .panel.black .exitTabContainer,
 .panel.black .guideArrows {
-	background-color: var(--black);
+  background-color: var(--black);
 }
-
 
 .panel.purple .sign,
 .panel.purple .signContainer,
 .panel.purple .exitTabContainer,
 .panel.purple .guideArrows {
-	background-color: var(--purple);
-    border-color: rgb(255,255,255);
-    color: rgb(255,255,255);
+  background-color: var(--purple);
+  border-color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
 }
 
 .panel.orange .sign,
 .panel.orange .signContainer,
 .panel.orange .exitTabContainer,
 .panel.orange .guideArrows {
-	background-color: var(--orange);
-	border-color: var(--black);
-	color: var(--black);
+  background-color: var(--orange);
+  border-color: var(--black);
+  color: var(--black);
+}
+
+.panel.white .dividerElement,
+.panel.orange .dividerElement,
+.panel.yellow .dividerElement {
+  background-color: black;
 }
 
 .panel.orange .arrow {
-	filter: invert(100%);
-	-webkit-filter: invert(100%);
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
 }
 
-.exitTab.green, .exitTabHolder.green {
-    background-color: var(--green);
-    border-color: var(--white);
-    color: var(--white);
-
+.exitTab.green,
+.exitTabHolder.green {
+  background-color: var(--green);
+  border-color: var(--white);
+  color: var(--white);
 }
 
-.exitTab.blue, .exitTabHolder.blue {
-    background-color: var(--blue);
-    border-color: var(--white);
-    color: var(--white);
+.exitTab.blue,
+.exitTabHolder.blue {
+  background-color: var(--blue);
+  border-color: var(--white);
+  color: var(--white);
 }
 
-.exitTab.brown, .exitTabHolder.brown {
-    background-color: var(--brown);
-    border-color: var(--white);
-    color: var(--white);
+.exitTab.brown,
+.exitTabHolder.brown {
+  background-color: var(--brown);
+  border-color: var(--white);
+  color: var(--white);
 }
 
-.exitTab.yellow, .exitTabHolder.yellow {
-    background-color: var(--yellow);
-    border-color: var(--black);
-    color: var(--black);
-	padding: 1px;
+.exitTab.yellow,
+.exitTabHolder.yellow {
+  background-color: var(--yellow);
+  border-color: var(--black);
+  color: var(--black);
+  padding: 1px;
 }
 
-.exitTab.white, .exitTabHolder.white {
-    background-color: var(--white);
-    border-color: var(--black);
-    color: var(--black);
+.exitTab.white,
+.exitTabHolder.white {
+  background-color: var(--white);
+  border-color: var(--black);
+  color: var(--black);
 }
 
-.exitTab.black, .exitTabHolder.black {
-    background-color: var(--black);
-    border-color: var(--white);
-    color: var(--white);
+.exitTab.black,
+.exitTabHolder.black {
+  background-color: var(--black);
+  border-color: var(--white);
+  color: var(--white);
 }
 
-.exitTab.purple, .exitTabHolder.purple {
-	background-color: var(--purple);
-    border-color: var(--white);
-    color: var(--white);
+.exitTab.purple,
+.exitTabHolder.purple {
+  background-color: var(--purple);
+  border-color: var(--white);
+  color: var(--white);
 }
 
 .exitTabHolder {
-	flex-grow: 1;
+  flex-grow: 1;
 }
 
 .exitTab {
-	border-radius: 0.5rem 0.5rem 0 0;
-	border-top-style: solid;
-	border-top-width: 0.2rem;
-	border-right-style: solid;
-	border-right-width: 0.2rem;
-	border-bottom: none;
-	border-left-style: solid;
-	border-left-width: 0.2rem;
-	font-size: 1rem;
-	visibility: hidden; /* hides exitTab by default when loading page */
-	float: none;
-	min-height: 2.25rem;
-	padding: 0 .5rem;
+  border-radius: 0.5rem 0.5rem 0 0;
+  border-top-style: solid;
+  border-top-width: 0.2rem;
+  border-right-style: solid;
+  border-right-width: 0.2rem;
+  border-bottom: none;
+  border-left-style: solid;
+  border-left-width: 0.2rem;
+  font-size: 1rem;
+  visibility: hidden; /* hides exitTab by default when loading page */
+  float: none;
+  min-height: 2.25rem;
+  padding: 0 0.5rem;
 }
 
 .exitTab.out {
-	width: -moz-max-content;
-	width: -webkit-max-content;
-	width: intrinsic;
-	width: max-content;
-	border-bottom-width: 0.2rem;
-	border-bottom-style: solid;
-	border-radius: 0.5rem;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: intrinsic;
+  width: max-content;
+  border-bottom-width: 0.2rem;
+  border-bottom-style: solid;
+  border-radius: 0.5rem;
 }
 
 .out.center {
-	margin: auto;
-	margin-bottom: 0.25rem;
+  margin: auto;
+  margin-bottom: 0.25rem;
 }
 
 .exitTab.narrow,
 .exitTab.edge {
-		width: -moz-max-content;
-		width: -webkit-max-content;
-		width: intrinsic;
-	width: max-content;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: intrinsic;
+  width: max-content;
 }
 
 .exitTabContainer.out.left {
-	float: left;
+  float: left;
 }
 
-
 .exitTabContainer.out {
-	margin-bottom: 0.25rem;
-	margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-	margin-left: 0.75rem; /* curved corners of the panel below */
+  margin-bottom: 0.25rem;
+  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
+  margin-left: 0.75rem; /* curved corners of the panel below */
 }
 
 .exitTabContainer.out.right {
-	float: right;
+  float: right;
 }
 
-
-.exitTabContainer.wide, 
+.exitTabContainer.wide,
 .exitTabContainer.narrow {
-	margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-	margin-left: 0.75rem; /* curved corners of the panel below */
+  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
+  margin-left: 0.75rem; /* curved corners of the panel below */
 }
 .exitTabContainer.edge.right {
-	margin-right: 0rem;
+  margin-right: 0rem;
 }
 .exitTabContainer.edge.left {
-	margin-left: 0rem;
+  margin-left: 0rem;
 }
 .narrow.center,
 .edge.center {
-	margin: auto;
+  margin: auto;
 }
 .exitTabContainer,
 .signContainer {
-	z-index: 2;	
+  z-index: 2;
 }
 
 .signContainer,
 .exitTabContainer.narrow,
 .exitTabContainer.edge {
-	width: max-content;
+  width: max-content;
 }
 .exitTabContainer.narrow.left,
 .exitTabContainer.edge.left {
-	margin-right: auto;
+  margin-right: auto;
 }
 .exitTabContainer.narrow.right,
 .exitTabContainer.edge.right {
-	margin-left: auto;
+  margin-left: auto;
 }
 .exitTab.wide.left,
 .exitTab.full.left {
-	justify-content: flex-start;
+  justify-content: flex-start;
 }
 .exitTab.wide.center,
 .exitTab.full.center {
-	justify-content: center;
+  justify-content: center;
 }
 .exitTab.wide.right,
 .exitTab.full.right {
-	justify-content: flex-end;
+  justify-content: flex-end;
 }
 .exitTab.full {
-	width: 100%;
-	border-radius: 0.75rem 0.75rem 0 0;
+  width: 100%;
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 .sign.full.tabVisible {
-	border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 0.75rem 0.75rem;
 }
 .sign.edge.right.tabVisible {
-	border-radius: 0.75rem 0 0.75rem 0.75rem;
+  border-radius: 0.75rem 0 0.75rem 0.75rem;
 }
 .sign.edge.left.tabVisible {
-	border-radius: 0 0.75rem 0.75rem 0.75rem;
+  border-radius: 0 0.75rem 0.75rem 0.75rem;
 }
 
 .panel.round .exitTabContainer,
 .panel.round .signContainer {
-	visibility: hidden;
+  visibility: hidden;
 }
 
-
 .sign {
-	border-radius: 0.75rem;
-	border-style: solid;
-	border-width: 0.2rem;
-	display: block;
-	clear: both;
-	visibility: visible;
+  border-radius: 0.75rem;
+  border-style: solid;
+  border-width: 0.2rem;
+  display: block;
+  clear: both;
+  visibility: visible;
 }
 
 .signHolder {
-	display: flex;
-    clear: both;
-    flex-direction: row;
+  display: flex;
+  clear: both;
+  flex-direction: row;
 }
 
 .panel.round .exitTabContainer,
 .panel.round .signContainer {
-	visibility: hidden;
+  visibility: hidden;
 }
 
 .panel .exitTabContainer {
-	visibility: hidden;
+  visibility: hidden;
 }
 .panel .tabVisible {
-	visibility: visible;
+  visibility: visible;
 }
-.sideLeftArrow, .sideRightArrow {
-	margin-top: auto;
-    margin-bottom: auto;
-    display: none;
-    height: 2.5rem;
-    padding: 0.2rem;
+.sideLeftArrow,
+.sideRightArrow {
+  margin-top: auto;
+  margin-bottom: auto;
+  display: none;
+  height: 2.5rem;
+  padding: 0.2rem;
 }
 
 .sideLeftArrow {
-	margin-left: 1rem;
+  margin-left: 1rem;
 }
 
 .sideRightArrow {
-	margin-right: 1rem;
+  margin-right: 1rem;
 }
-
 
 .signContentContainer {
-	display: flex;
-	width: 100%;
-	padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+  display: flex;
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 0.75rem;
 }
 .signContentContainer.shieldPositionLeft {
-	flex-direction: row;
-	align-items: center;
+  flex-direction: row;
+  align-items: center;
 }
 .signContentContainer.shieldPositionAbove {
-	flex-direction: column;
-	justify-content: center;
+  flex-direction: column;
+  justify-content: center;
 }
 .signContentContainer.shieldPositionRight {
-	flex-direction: row-reverse;
-	align-items: center;
+  flex-direction: row-reverse;
+  align-items: center;
 }
 
 .shieldsContainer {
-	text-align: center;
-	display: flex;
-	flex-direction: row;
-	align-items: flex-end;
-	justify-content: center;
-	gap: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .to {
-	display: none;
-	margin: auto 0 auto auto;
-	padding-left: 0.25rem;
-	font-family: "Clearview 5WR";
-	margin-bottom: 1.8rem;
-    margin-right: 1.8rem;
-    font-size: 1.5rem;
+  display: none;
+  margin: auto 0 auto auto;
+  padding-left: 0.25rem;
+  font-family: "Clearview 5WR";
+  margin-bottom: 1.8rem;
+  margin-right: 1.8rem;
+  font-size: 1.5rem;
 }
 
 .bannerShieldContainer {
-	display: flex;
-	flex-direction: column;
-	/* margin-right: auto; */
-	/* margin-left: auto; */
-	padding: 0.1rem;
+  display: flex;
+  flex-direction: column;
+  /* margin-right: auto; */
+  /* margin-left: auto; */
+  padding: 0.1rem;
 }
 .bannerShieldContainer.bannerPositionLeft {
-	flex-direction: row;
+  flex-direction: row;
 }
-.bannerShieldContainer.bannerPositionAbove {flex-direction: column;}
+.bannerShieldContainer.bannerPositionAbove {
+  flex-direction: column;
+}
 .bannerShieldContainer.bannerPositionRight {
-	flex-direction: row-reverse;
+  flex-direction: row-reverse;
 }
 
-
-
-.bannerA , .bannerB {
-	border-radius: 0.1rem;
-	font-size: var(--fontSize);
-	text-transform: uppercase;
-	font-family: "Clearview 5WR";
-	margin-bottom: auto;
+.bannerA,
+.bannerB {
+  border-radius: 0.1rem;
+  font-size: var(--fontSize);
+  text-transform: uppercase;
+  font-family: "Clearview 5WR";
+  margin-bottom: auto;
 }
-.bannerA:not(.TOLL,.noIndent):first-letter , .bannerB:not(.TOLL,.noIndent):first-letter {
-	font-size: calc(var(--fontSize) + 0.3rem);
-	/* margin-right: -0.1rem; */
+.bannerA:not(.TOLL, .noIndent):first-letter,
+.bannerB:not(.TOLL, .noIndent):first-letter {
+  font-size: calc(var(--fontSize) + 0.3rem);
+  /* margin-right: -0.1rem; */
 }
 
 .shield {
-	margin: 0.15rem;
-	position: relative;
+  margin: 0.15rem;
+  position: relative;
 }
 
 .shieldImg {
-	/* width:max-content; */
-	height: 3rem;
+  /* width:max-content; */
+  height: 3rem;
 }
 
 .markerImg {
-	height: 1.5rem;
-	top: 0.25rem;
-	position: relative;
-	z-index: 0;
+  height: 1.5rem;
+  top: 0.25rem;
+  position: relative;
+  z-index: 0;
 }
 .left .markerImg {
-	transform: scaleX(-1);
-	-webkit-transform: scaleX(-1);
-	-moz-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  -moz-transform: scaleX(-1);
 }
 .otherSymbols {
-	display: inline-flex;
-	flex-direction: column;
-	margin-right: auto;
-	margin-left: auto;
-	padding: 0.1rem;
-	position:relative;
-	margin-bottom: 0.5rem;
+  display: inline-flex;
+  flex-direction: column;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0.1rem;
+  position: relative;
+  margin-bottom: 0.5rem;
 }
-.oSNum { /* Add .left and .right */
-	font-family: "Series EM";
-	position: absolute;
-	width: 100%;
-	z-index: 1;
-	text-align: center;
-	top: .1rem;
-    font-size: 1.25em;
-	left: -.3rem;
-	color: black;
+.oSNum {
+  /* Add .left and .right */
+  font-family: "Series EM";
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+  text-align: center;
+  top: 0.1rem;
+  font-size: 1.25em;
+  left: -0.3rem;
+  color: black;
 }
 .left .oSNum {
-	left: 0.3rem;
+  left: 0.3rem;
 }
 .oSNum.short {
-	letter-spacing: .1rem;
+  letter-spacing: 0.1rem;
 }
 .oSNum.five {
-	font-family: "Series C";
-	top: .29rem;
-	font-size: 1.2em;
+  font-family: "Series C";
+  top: 0.29rem;
+  font-size: 1.2em;
 }
 .routeNumber {
-	font-size: 1.5rem;
+  font-size: 1.5rem;
 
-	width: 100%;
+  width: 100%;
 
-	position: absolute;
+  position: absolute;
 }
 
 .streetName {
-	border: solid var(--white) 0.15rem;
-	border-radius: 0.25rem;
-	margin-bottom: 0.5rem;
-	padding: 0 1rem;
+  border: solid var(--white) 0.15rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
 }
 .streetName:last-child {
-	margin-bottom: 0
+  margin-bottom: 0;
 }
 .streetName,
 .controlText {
-	font-family: "Clearview 5WR";
-	font-size: 1.75rem;
-	line-height: 2rem;
-	white-space: pre-wrap;
+  font-family: "Clearview 5WR";
+  font-size: 1.75rem;
+  line-height: 2rem;
+  white-space: pre-wrap;
 }
 
 .guideArrows {
-	border-style: solid;
-	border-width: 0.2rem;
-	border-top-width: 0;
-	border-radius: 0 0 0.75rem 0.75rem;
+  border-style: solid;
+  border-width: 0.2rem;
+  border-top-width: 0;
+  border-radius: 0 0 0.75rem 0.75rem;
 
-	display: none;
+  display: none;
 }
 .guideArrows.exit_only {
-	background-color: var(--yellow) !important;
-	border-color: var(--black) !important;
-	color: var(--black) !important;
+  background-color: var(--yellow) !important;
+  border-color: var(--black) !important;
+  color: var(--black) !important;
 }
 
-.guideArrows.new,.guideArrows.new2 {
-	border-color: var(--white) !important;
-	background-color: var(--green) !important;
-	padding: 0px 2px 2px 2px;
+.guideArrows.new,
+.guideArrows.new2 {
+  border-color: var(--white) !important;
+  background-color: var(--green) !important;
+  padding: 0px 2px 2px 2px;
 }
-
 
 .guideArrows.split_exit.only {
-    padding: 0rem 0.5rem 0.25rem 0.5rem;
+  padding: 0rem 0.5rem 0.25rem 0.5rem;
 }
 
 .guideArrows.split_exit.only .arrowContainer {
-	gap: .5rem;
+  gap: 0.5rem;
 }
 
-
 .guideArrows.half_exit.only.new2 {
-	background: var(--green) !important;
+  background: var(--green) !important;
 }
 
 .guideArrows.half_exit.only.default {
-	padding: 0;
+  padding: 0;
 }
 
 .guideArrows.half_exit.only {
-	color: black !important;
+  color: black !important;
 }
 
 .halfarrow {
-	height: 1.8rem;
-    position: relative;
-	margin-left: 0rem;
+  height: 1.8rem;
+  position: relative;
+  margin-left: 0rem;
 }
 
 .specialExitOnly {
-    color: var(--black);
-    background-color: var(--yellow);
-    font-family: "Series EM";
-    border-radius: 0.2rem;
-    border-width: 0rem;
-    padding: 0.1rem;
+  color: var(--black);
+  background-color: var(--yellow);
+  font-family: "Series EM";
+  border-radius: 0.2rem;
+  border-width: 0rem;
+  padding: 0.1rem;
 }
 
 .otherSymbols + .actionMessage {
-	padding-right: .2rem;
+  padding-right: 0.2rem;
 }
 
 .exitTab {
-	display: flex;
-	align-items: center;
-	font-family: "Clearview 4W";
-	font-size: 18px;
+  display: flex;
+  align-items: center;
+  font-family: "Clearview 4W";
+  font-size: 18px;
 }
 
-
 .action_message {
-	display: inline-flex;
-	align-items: center;
-	font-family: "Clearview 5WR";
+  display: inline-flex;
+  align-items: center;
+  font-family: "Clearview 5WR";
 }
 .action_message {
-	justify-content: center;
+  justify-content: center;
 }
 
 .exitFormat {
-	display: inline;
-	position: relative;
-	top: -0.1rem;
+  display: inline;
+  position: relative;
+  top: -0.1rem;
 }
 
 .exitOnlyArrow {
+  display: inline-block;
 
-display: inline-block;
+  margin-top: 0.1em;
 
-margin-top: .1em;
+  height: 2rem;
 
-height: 2rem;
-
-padding: 2px;
+  padding: 2px;
 }
 
-
 .exitOnlyText {
-	font-family: "Series E";
-	padding: 0px 10px 0 10px;
-	padding-top: 0.18rem;
-	font-size: 1.55rem;
-	word-spacing: 0.3rem;
-	letter-spacing: 0.03rem;
-	margin: -1rem 0rem;
+  font-family: "Series E";
+  padding: 0px 10px 0 10px;
+  padding-top: 0.18rem;
+  font-size: 1.55rem;
+  word-spacing: 0.3rem;
+  letter-spacing: 0.03rem;
+  margin: -1rem 0rem;
 }
 
 .exitOnlyText.split {
-    background-color: var(--yellow);
-    color: var(--black);
-    border-radius: 0.1rem;
-    font-size: .95rem;
-    padding: 0px 3px 0px 3px;
-    margin-left: 0.3rem;
-    margin-right: 0.3rem;
-    margin-top: 0.5rem;
-    font-family: "Series EM";
-    height: 1.15rem
+  background-color: var(--yellow);
+  color: var(--black);
+  border-radius: 0.1rem;
+  font-size: 0.95rem;
+  padding: 0px 3px 0px 3px;
+  margin-left: 0.3rem;
+  margin-right: 0.3rem;
+  margin-top: 0.5rem;
+  font-family: "Series EM";
+  height: 1.15rem;
 }
 
 .exitOnlySpace {
-    margin-right: 5rem;
+  margin-right: 5rem;
 }
 
 .oText {
-	margin: 0 1rem;
+  margin: 0 1rem;
 }
 
 .arrow {
-	font-size: 4rem; /* Makes arrows large and visble */
-	line-height: 0; /* Makes space text (arrow) takes up minimal */
-	display: inline-block;
-	margin: .5rem 5rem;
-	padding: 0 0.1rem 0 0.05rem;
-	height: 1.8rem;
+  font-size: 4rem; /* Makes arrows large and visble */
+  line-height: 0; /* Makes space text (arrow) takes up minimal */
+  display: inline-block;
+  margin: 0.5rem 5rem;
+  padding: 0 0.1rem 0 0.05rem;
+  height: 1.8rem;
 }
 
 .arrowContainer {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	/* gap: 3rem; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* gap: 3rem; */
 }
 
 .arrow:first-child {
-	margin-left: 1rem;
+  margin-left: 1rem;
 }
 .arrow:last-child {
-	margin-right: 1rem;
+  margin-right: 1rem;
 }
 
 .arrowContainer .left {
-    margin-right: 1rem;
+  margin-right: 1rem;
 }
 
 .arrowContainer .middle {
-    float: none;
+  float: none;
 }
 
 .arrowContainer .right {
-    margin-left: 1rem;
+  margin-left: 1rem;
 }
 
-
-
 .centerText .arrow {
-	margin-right: .5rem;
-	margin-top: -.25rem;
+  margin-right: 0.5rem;
+  margin-top: -0.25rem;
 }
 
 .actionMessage + .arrow {
-	margin-left: .5rem;
+  margin-left: 0.5rem;
 }
 
 .arrow.sharpleft,
 .arrow.sharpright,
 .arrow.leftarrow,
 .arrow.rightarrow {
-	height: 3rem;
+  height: 3rem;
 }
 
-
 .actionMessage {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .numeral {
-	font-size: 1.5em;
-	word-spacing: -0.4rem;
-	line-height: 0;
+  font-size: 1.5em;
+  word-spacing: -0.4rem;
+  line-height: 0;
 }
 .fraction {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }
 
-.numeral:first-child, .fraction:first-child {
-	padding-right: 0.5rem;
+.numeral:first-child,
+.fraction:first-child {
+  padding-right: 0.5rem;
 }
-.numeral:last-child, .fraction:last-child {
-	padding-left: .5rem;
+.numeral:last-child,
+.fraction:last-child {
+  padding-left: 0.5rem;
 }
 
-.numeral.special, .fraction.special {
-    padding-left: 0rem;
+.numeral.special,
+.fraction.special {
+  padding-left: 0rem;
 }
 
 .numeral.special {
-    padding-left: 0.4rem;
-    padding-right: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.2rem;
 }
 
 .fraction.special {
-    padding-right: 0.4rem;
+  padding-right: 0.4rem;
 }
 
-.centerText .numeral:last-child, .centerText .fraction:last-child {
-	padding-left: 0rem;
+.centerText .numeral:last-child,
+.centerText .fraction:last-child {
+  padding-left: 0rem;
 }
 
 .yellowElmt {
-    background-color: var(--yellow);
-    color: var(--black);
-    border-radius: 5px;
-    font-family: "Series E";
-    padding: .15rem .7rem;
-    width: max-content;
-    width: -webkit-max-content;
-    width: -moz-max-content;
-    font-size: 1.3rem;
-    line-height: 1.2rem;
-    margin: .4rem 0rem;
+  background-color: var(--yellow);
+  color: var(--black);
+  border-radius: 5px;
+  font-family: "Series E";
+  padding: 0.15rem 0.7rem;
+  width: max-content;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  font-size: 1.3rem;
+  line-height: 1.2rem;
+  margin: 0.4rem 0rem;
 }
 
-.exitOnlyText.yellowElmt, .TOLL {
-	margin-top: 0;
+.exitOnlyText.yellowElmt,
+.TOLL {
+  margin-top: 0;
 }
 
 .subPanelDisplay {
-    height: auto;
+  height: auto;
 }
 
 .subDivider {
-    width: 8px;
-    background-color: var(--white);
+  width: 8px;
+  background-color: var(--white);
 }
 
-
 .arrowContainer.new {
-	background: var(--yellow);
-    border-bottom-left-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
-    width: 100%;
-	padding: 0.32rem 0 0.32rem 0;
+  background: var(--yellow);
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  width: 100%;
+  padding: 0.32rem 0 0.32rem 0;
 }
 
 .arrowContainer.left.new2 {
-    background-color: var(--yellow);
-    border-bottom-left-radius: 0.5rem;
+  background-color: var(--yellow);
+  border-bottom-left-radius: 0.5rem;
 }
 
 .arrowContainer.right.new2 {
-	background-color: var(--yellow);
-    border-bottom-right-radius: 0.5rem;
+  background-color: var(--yellow);
+  border-bottom-right-radius: 0.5rem;
 }
 
-
-
 img.exitOnlyArrow:first-child {
-    padding-left: .8rem;
-    padding-right: .45rem;
+  padding-left: 0.8rem;
+  padding-right: 0.45rem;
 }
 
 img.exitOnlyArrow:last-child {
-    padding-right: 0.8rem;
-    padding-left: .6rem;
+  padding-right: 0.8rem;
+  padding-left: 0.6rem;
 }
 
-
 .tagOnlyText {
-	color: black;
-	background: white;
-	padding: .3rem .3rem .2rem .3rem;
-	font-family: "Series E";
-	line-height: .8rem;
+  color: black;
+  background: white;
+  padding: 0.3rem 0.3rem 0.2rem 0.3rem;
+  font-family: "Series E";
+  line-height: 0.8rem;
 }
 
 .exitTab:has(.tagOnlyText) {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: .4rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .signContainer:has(.guideArrows.exit_only) {
-    /* background: linear-gradient(180deg, var(--green), var(--yellow)); */
+  /* background: linear-gradient(180deg, var(--green), var(--yellow)); */
 }

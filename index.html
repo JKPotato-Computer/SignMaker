@@ -265,7 +265,7 @@
 							<div id="sMSPTextEditor">
 									<div id="sMSPCreate">
 										<span id="SMSPSelectLabel">Selected: Row 1</span>
-										<button id="sMSPCreateRow" onclick="app.newRow();"><span class="material-symbols-outlined">add</span> New</button>
+										<button id="sMSPCreateRow" onclick="app.newRow(document.querySelector('#sMSPElementSelect').value);"><span class="material-symbols-outlined">add</span> New</button>
 										<button id="sMSPDuplicateRow" onclick="app.dupRow();"><span class="material-symbols-outlined">content_copy</span> Duplicate</button>
 										<button id="sMSPDeleteSelectedRow" onclick="app.delRow();" disabled><span class="material-symbols-outlined">delete</span> Selected</button>
 									</div>
@@ -309,9 +309,12 @@
 											<br>
 											<label for="sdCtrlText_smallCapitals">Small Capitals:</label>
 											<input type="checkbox" id="sdCtrlText_smallCapitals" />
-											<input type="number" class="sdTextEditorSmall hidden" id="sdCtrlText_firstLetterSize" data-toolTip="First Letter Size (%)" placeholder="120" max="150" min="50" step="1" value="120" />
 											<label for="sdCtrlText_alignment">Alignment: </label>
 											<select id="sdCtrlText_alignment"></select>
+											<br>
+											<label for="sdCtrlText_lineHeight">Line Height (%): </label>
+											<input type="range" min="0" max="300" value="100" step="1" id="sdCtrlText_lineHeight" />
+											<span id="sdCtrlText_lineHeightVal">100</span>
 											<br>
 											<label for="sdCtrlText_useNumeralFormatting">Enlarge Numerals:</label>
 											<input type="checkbox" id="sdCtrlText_useNumeralFormatting" />
@@ -326,11 +329,13 @@
 											<label for="sdBlocker_dividerWidth">Divider Width: </label>
 											<input type="number" id="sdBlocker_dividerWidth" placeholder="100" min="0" max="100" value="100" step="1" />
 											<select id="sdBlocker_dividerMeasurement" data-toolTip="Unit (%/rem)" class="sdTextEditorSmall"></select>
-											<br>
 											<label for="sdBlocker_dividerHeight">Divider Height (rem): </label>
 											<input type="number" id="sdBlocker_dividerHeight" placeholder=".5" max="2" min="0" value=".5" step=".1" />
+											<br>
 											<label for="sdBlocker_alignment">Alignment: </label>
 											<select id="sdBlocker_alignment"></select>
+											<label for="sdBlocker_visible">Visibility:</label>
+											<input type="checkbox" id="sdBlocker_visible" />
 										</div>
 										
 										<div data-property="sdShield" class="hidden">
@@ -349,15 +354,17 @@
 											<label for="sdAdvisory_fontFamily">Font:</label>
 											<select id="sdAdvisory_fontFamily"></select>
 											<br>
-											<label for="sdAdvisory_spacing" data-toolTip="Spacing of the Control Text element on the left-right axis">Spacing:</label>
-											<input type="number" id="sdAdvisory_spacing" placeholder="0" max="20" min="0" step="1" value="0"/>
+											<label for="sdAdvisory_alignment">Alignment: </label>
+											<select id="sdAdvisory_alignment"></select>
 											<label for="sdAdvisory_fontSize">Font Size (%):</label>
 											<input type="number" id="sdAdvisory_fontSize" placeholder="100" max="150" min="50" step="1" value="100" />
 											<br>
 											<label for="sdAdvisory_borderRadius">Border Radius (px): </label>
 											<input type="number" id="sdAdvisory_borderRadius" placeholder="4" max="16" min="0" step="1" value="4" />
-											<label for="sdAdvisory_alignment">Alignment: </label>
-											<select id="sdAdvisory_alignment"></select>
+											<br>
+											<label for="sdAdvisory_lineHeight">Line Height (%): </label>
+											<input type="range" min="0" max="300" value="100" step="1" id="sdAdvisory_lineHeight" />
+											<span id="sdAdvisory_lineHeightVal">100</span>
 											<br>
 											<label for="sdAdvisory_useNumeralFormatting">Enlarge Numerals:</label>
 											<input type="checkbox" id="sdAdvisory_useNumeralFormatting" />
@@ -366,6 +373,14 @@
 											<input type="checkbox" id="sdAdvisory_useBannerFormatting" />
 											<input type="number" class="sdTextEditorSmall hidden" id="sdAdvisory_bannerFormattingSize" data-toolTip="Relative Size (%)" placeholder="100" max="150" min="50" step="1" value="100"/>
 											<input type="number" class="sdTextEditorSmall hidden" id="sdAdvisory_bannerFirstLetterSize" data-toolTip="First Letter Size (%)" placeholder="120" max="150" min="50" step="1" value="120"/>
+											<br>
+											<label for="sdAdvisory_horizPadding">Horizontal Padding (rem): </label>
+											<input type="range" min="0" max="3" value=".3" step=".1" id="sdAdvisory_horizPadding" />
+											<span id="sdAdvisory_horizPaddingVal">.3</span>
+
+											<label for="sdAdvisory_vertPadding">Vertical Padding (rem): </label>
+											<input type="range" min="0" max="3" value=".3" step=".1" id="sdAdvisory_vertPadding" />
+											<span id="sdAdvisory_vertPaddingVal">.3</span>
 										</div>
 										
 										<div data-property="sdIcon" class="hidden">
@@ -395,10 +410,14 @@
 											<label for="sdActionMessage_fontFamily">Font:</label>
 											<select id="sdActionMessage_fontFamily"></select>
 											<br>
-											<label for="sdActionMessage_spacing" data-toolTip="Spacing of the Control Text element on the left-right axis">Spacing:</label>
-											<input type="number" id="sdActionMessage_spacing" placeholder="0" max="20" min="0" step="1" value="0"/>
+											<label for="sdActionMessage_alignment">Alignment: </label>
+											<select id="sdActionMessage_alignment"></select>
 											<label for="sdActionMessage_fontSize">Font Size (%):</label>
 											<input type="number" id="sdActionMessage_fontSize" placeholder="100" max="150" min="50" step="1" value="100" />
+											<br>
+											<label for="sdActionMessage_lineHeight">Line Height (%): </label>
+											<input type="range" min="0" max="300" value="100" step="1" id="sdActionMessage_lineHeight" />
+											<span id="sdActionMessage_lineHeightVal">100</span>
 											<br>
 											<label for="sdActionMessage_useNumeralFormatting">Enlarge Numerals:</label>
 											<input type="checkbox" id="sdActionMessage_useNumeralFormatting" />
@@ -407,13 +426,57 @@
 											<input type="checkbox" id="sdActionMessage_useBannerFormatting" />
 											<input type="number" class="sdTextEditorSmall hidden" id="sdActionMessage_bannerFormattingSize" data-toolTip="Relative Size (%)" placeholder="100" max="150" min="50" step="1" value="100"/>
 											<input type="number" class="sdTextEditorSmall hidden" id="sdActionMessage_bannerFirstLetterSize" data-toolTip="First Letter Size (%)" placeholder="120" max="150" min="50" step="1" value="120"/>
+										</div>
+
+										<div data-property="sdElectronicSign" class="hidden">
+											<label for="sdElectronicSign_textContent">Content:</label>
+											<input type="text" id="sdElectronicSign_textContent" class="sdTextEditorWide" placeholder="New Sign" value="New Sign"/>
 											<br>
-											<label for="sdActionMessage_alignment">Alignment: </label>
-											<select id="sdActionMessage_alignment"></select>
+											<label for="sdElectronicSign_fontFamily">Font:</label>
+											<select id="sdElectronicSign_fontFamily"></select>
+											<label for="sdElectronicSign_fontSize">Font Size (%):</label>
+											<input type="number" id="sdElectronicSign_fontSize" placeholder="100" max="150" min="50" step="1" value="100" />
+											<br>
+											<label for="sdElectronicSign_textColor">Text Color:</label>
+											<select id="sdElectronicSign_textColor"></select>
+											<label for="sdElectronicSign_lineHeight">Line Height (%): </label>
+											<input type="range" min="0" max="300" value="100" step="1" id="sdElectronicSign_lineHeight" />
+											<span id="sdElectronicSign_lineHeightVal">100</span>
+											<br>
+											<label for="sdElectronicSign_glow">Glow:</label>
+											<input type="checkbox" id="sdElectronicSign_glow" />
+											<label for="sdElectronicSign_padding">Padding (rem): </label>
+											<input type="range" min="0" max="3" value=".5" step=".1" id="sdElectronicSign_padding" />
+											<span id="sdElectronicSign_paddingVal">.5</span>
+											<br>
+											<label for="sdElectronicSign_setWidth" data-toolTip="Width of the electronic sign - set to 0 to adjust to text size.">Set Width (rem):</label>
+											<input type="number" id="sdElectronicSign_setWidth" placeholder="0" max="100" min="0" step=".5" value="0" />
+											<label for="sdElectronicSign_alignment">Alignment: </label>
+											<select id="sdElectronicSign_alignment"></select>
 										</div>
 									</div>
-								</div>
-								<div style="display: none;">
+									<div id="smSPBlockProperties">
+										<h4>Block Properties</h4>
+										<label for="sdBlock_padding">Padding (rem): </label>
+										<input type="range" min="0" max="3" value="0" step=".01" id="sdBlock_padding" />
+										<span id="sdBlock_paddingVal">0</span>
+										<br>
+										<label for="sdBlock_backgroundColor">BG:</label>
+										<select id="sdBlock_backgroundColor"></select>
+										<br>
+										<label for="sdBlock_width" data-toolTip="Width of the block, set to 0 to automatically resize">Width (rem):</label>
+										<input type="number" id="sdBlock_width" placeholder="0" max="100" min="0" step=".05" value="0" />
+										<br>
+										<label for="sdBlock_stretchLeft" data-toolTip="Allow the alignment to take up the remaining space.">Stretch:</label>
+										<input type="checkbox" id="sdBlock_stretchLeft" />
+										<label for="sdBlock_stretchLeft" class="noLabelAlignment">Left </label>
+										<input type="checkbox" id="sdBlock_stretchCenter" />
+										<label for="sdBlock_stretchCenter" class="noLabelAlignment">Center </label>
+										<input type="checkbox" id="sdBlock_stretchRight" />
+										<label for="sdBlock_stretchRight" class="noLabelAlignment">Right</label>										
+									</div>
+							</div>
+							<div style="display: none;">
 									<!-- Control Cities -->
 									<label for="controlText" id="controlCitiesLabel">Control Cities:</label>
 									<textarea id="controlText" wrap="hard" rows="4" onblur="formHandler.readForm();"></textarea>
@@ -430,7 +493,7 @@
 									<select id="shieldsPosition" onchange="formHandler.readForm();"></select>
 									<label for="shieldBacks" id="shieldBacksLabel">Shield Backs: </label>
 									<input type="checkbox" id="shieldBacks" name="shieldBacks" value="shieldBacks" onchange="formHandler.readForm();">
-								</div>
+							</div>
 						</div>
 						<div id="sMSPExtra" class="tabHidden">
 							<div>
