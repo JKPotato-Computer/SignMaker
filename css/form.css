@@ -667,7 +667,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   display: none;
 }
 
-#smSPTextEditor {
+#smSPTextEditor,
+#smSPShieldEditor {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -678,7 +679,9 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 }
 
 #sMSPCreate,
-#smSPElement {
+#smSPElement,
+#smSPShieldHeader,
+#smSPShieldList {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -689,12 +692,15 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   width: 100%;
 }
 
-#smSPElement {
+#smSPElement,
+#smSPShieldList {
   gap: 1rem;
 }
 
 #sMSPCreate > span,
-#sMSPElement > span {
+#sMSPElement > span,
+#smSPShieldHeader > span,
+#smSPShieldList > span {
   font-size: 16px;
 }
 
@@ -765,7 +771,9 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   color: white;
 }
 
-#smSPProperties, #smSPBlockProperties {
+#smSPProperties,
+#smSPBlockProperties,
+#smSPShieldProperties {
   background-color: rgb(255, 255, 255, 0.225);
   padding: 0.5rem;
   width: 100%;
@@ -781,4 +789,392 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 
 .hidden {
   display: none;
+}
+
+.smSPShieldVisual {
+  height: 30px;
+  width: auto;
+}
+
+.smSPShieldLargeVisual {
+  height: 90px;
+  width: auto;
+}
+
+.smSPShieldRow,
+.smSPShieldGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.smSPShieldRow:hover,
+.smSPShieldGroup:hover {
+  background-color: rgb(200, 200, 200, 0.5);
+}
+
+.smSPShieldRow.selected {
+  background-color: rgb(255, 255, 255, 1);
+}
+
+.smSPShieldGroupHolder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem;
+}
+
+.newBlock {
+  background-color: rgb(0, 0, 0, 0.3);
+  color: white;
+  width: 100%;
+  padding: 0.25rem;
+  text-align: center;
+  font-weight: bold;
+  height: 1.5rem;
+  border: 3px dashed black;
+}
+
+.smSPShieldBlock {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  flex-grow: 1;
+  padding: 0.25rem;
+}
+
+.dragIndicator {
+  height: stretch;
+  aspect-ratio: 1 / 1;
+  display: none;
+  background: none;
+}
+
+.dragIndicator:hover {
+  background-color: rgb(0, 0, 0, 0.2) !important;
+}
+
+.smSPShieldRow.selected .dragIndicator,
+.smSPShieldGroup.selected > .dragIndicator {
+  display: block;
+}
+
+#smSPShieldList {
+  flex-direction: column;
+}
+
+#smSPShieldImgConfig {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgb(255, 255, 255, 0.25);
+  padding: 1rem;
+}
+
+#smSPShieldImgConfig > div {
+  background-color: rgb(255, 255, 255, 0.125);
+  height: stretch;
+}
+
+#smSPShieldImgConfig > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+#smSPShieldImgConfig > div:nth-child(2) {
+  padding: 0.5rem;
+}
+
+#changeImgBtn,
+#smSPShieldAdvanced {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+#advancedMenu {
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: rgb(255, 255, 255, 0.2);
+}
+
+#shieldImgSelector {
+  background: none;
+  padding: 0;
+  flex-direction: row;
+  width: 50%;
+  height: 80%;
+}
+
+#shieldImgSelector > div {
+  padding: 1rem;
+}
+
+#shieldImgSelector > div {
+  background: canvas;
+}
+
+.shieldLibrary {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shieldLibrary > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#shieldImgSelectorClose {
+  font-size: 20px;
+  padding: 0.125rem 1rem;
+  background-color: rgb(255, 0, 0, 0.2);
+}
+
+#shieldImgSelectorClose:hover {
+  background-color: rgb(255, 0, 0, 0.6);
+}
+
+.shieldLibrary > nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shieldLibrary > nav button {
+  font-size: 24px;
+  padding: 0.5rem 2rem;
+}
+
+.shieldLibrary > nav button.selected {
+  background-color: rgb(0, 0, 255, 0.7);
+  color: white;
+}
+
+.shieldLibrary[data-tab="presetShieldList"] #uploadShield {
+  display: none;
+}
+
+.shieldLibrary[data-tab="uploadShield"] #presetShieldList,
+.shieldLibrary[data-tab="uploadShield"] #presetShieldSearch {
+  display: none;
+}
+
+.shieldLibrary > nav button.selected:hover {
+  background-color: rgb(0, 0, 255, 1) !important;
+}
+
+.shieldLibrary > nav button:not(.selected):hover {
+  background-color: rgb(0, 0, 255, 0.125) !important;
+}
+
+#presetShieldList {
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.shieldItemImg {
+  height: 70px;
+  background: rgb(0, 0, 255, 0.8);
+  padding: 0.25rem;
+}
+
+.shieldCategoryType {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.shieldCategoryType.selected,
+.customShieldItem.selected {
+  background-color: rgb(0, 0, 255, 0.1);
+}
+
+.shieldCategoryType.selected .shieldItemName {
+  font-weight: 600;
+}
+
+.shieldCategoryHead {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  padding: 0.5rem;
+  color: white;
+  margin-left: -1rem;
+  cursor: pointer;
+}
+
+.shieldCategory {
+  padding-left: 1rem;
+}
+
+.shieldCategoryHead:hover {
+  background-color: rgb(0, 0, 255, 0.75);
+}
+
+.shieldItemName {
+  font-size: 24px;
+  text-align: center;
+}
+
+.shieldCategoryType:not(.selected):nth-child(odd),
+.customShieldItem:not(.selected):nth-child(odd) {
+  background-color: rgb(0, 0, 0, 0.075);
+}
+
+.shieldCategoryType:not(.selected):nth-child(even),
+.customShieldItem:not(.selected):nth-child(even) {
+  background-color: rgb(0, 0, 0, 0.025);
+}
+
+.shieldCategoryType:hover,
+.customShieldItem:hover {
+  background-color: rgb(0, 0, 255, 0.2) !important;
+}
+
+#presetShieldSearch {
+  width: 100%;
+  border: 1px solid black;
+  padding: 0.75rem;
+  margin: 0;
+  font-size: 20px;
+}
+
+.shieldPreview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.selectedShieldPreview {
+  height: 164px;
+  background-color: var(--shieldBackColor, rgb(0, 0, 255, 0.8));
+  border-radius: var(--shieldBackRadius);
+}
+
+.selectedShieldName {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.shieldPreview > footer {
+  margin-top: auto;
+}
+
+#setShield {
+  font-size: 24px;
+  padding: 0.25rem 2rem;
+}
+
+#uploadShield {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+#shieldUploadField {
+  background-color: rgb(0, 0, 0, 0.1);
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+#shieldUploadField > span.material-symbols-outlined {
+  font-size: 64px;
+}
+
+#shieldUploadField {
+  cursor: pointer;
+}
+
+#shieldUploadField:hover {
+  background-color: rgb(0, 0, 0, 0.2);
+  border-color: #666;
+}
+
+#shieldUploadField.dragover {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: #4caf50;
+}
+
+.shieldUploadDisclaimer {
+  font-size: 12px;
+  padding: 0.25rem;
+  color: rgb(100, 100, 100);
+}
+
+#linkUpload {
+  width: 15rem;
+  border: 1px solid black;
+}
+
+#savedCustomShieldsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.customShieldItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.deleteCustomShieldBtn {
+  background: none;
+}
+
+#uploadShield h3 {
+  margin-bottom: 0.5rem;
+}
+
+dialog {
+  display: none;
+}
+
+.shieldCategory:not(.open) .shieldCategoryType,
+.shieldCategory:not(.open) > .shieldCategory {
+  display: none;
+}
+
+#selectedBackRoudness {
+  background-color: rgb(0, 0, 0, 0.05);
 }

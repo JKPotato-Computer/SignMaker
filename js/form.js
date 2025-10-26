@@ -7,13 +7,19 @@ const formHandler = (function () {
   let exposed;
   let post;
 
-  const initialize = (appExposed) => {
+  const initialize = async (appExposed) => {
     exposed = appExposed;
     post = exposed.getPost();
-    initUI();
+    await initUI();
+
+    try {
+      console.log(promptShield(null));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const initUI = () => {
+  const initUI = async () => {
     const sMConfigBar = document.querySelector("#sMConfigBar");
 
     function reDisplay() {
@@ -181,6 +187,18 @@ const formHandler = (function () {
           ? "light"
           : "dark";
     });
+
+    document
+      .querySelector("#smSPShieldAdvanced")
+      .addEventListener("click", () => {
+        if (
+          document.querySelector("#advancedMenu").classList.contains("hidden")
+        ) {
+          document.querySelector("#advancedMenu").classList.remove("hidden");
+        } else {
+          document.querySelector("#advancedMenu").classList.add("hidden");
+        }
+      });
 
     const horizontalScrollOnWheel = document.querySelectorAll(
       ".horizontal-scroll-on-wheel"
@@ -387,6 +405,152 @@ const formHandler = (function () {
     for (const icon of IconElement.prototype.icons) {
       lib.appendOption(iconElem_iconsSelect, icon);
     }
+
+    // Populate shield directory
+    const presetShieldList = document.querySelector("#presetShieldList");
+
+    const createShieldRow = (name, properties) => {
+      const shieldCategoryType = document.createElement("div");
+      const shieldCategoryImg = document.createElement("img");
+      const shieldItemName = document.createElement("span");
+      const shieldItemSeleted = document.createElement("span");
+      shieldCategoryType.className = "shieldCategoryType";
+      shieldCategoryImg.className = "shieldItemImg";
+      shieldItemName.className = "shieldItemName";
+      shieldItemSeleted.className =
+        "shieldItemSelected material-symbols-outlined";
+
+      shieldCategoryImg.src = Shield.prototype.getDirectoryFromShield(
+        name,
+        properties.variants[0] || ""
+      );
+
+      shieldItemName.textContent = properties.name;
+      shieldItemSeleted.textContent = "radio_button_unchecked";
+
+      shieldCategoryType.appendChild(shieldCategoryImg);
+      shieldCategoryType.appendChild(shieldItemName);
+      shieldCategoryType.appendChild(shieldItemSeleted);
+
+      shieldCategoryType.dataset.name = name;
+
+      return shieldCategoryType;
+    };
+
+    const createShieldCategory = (name) => {
+      const shieldCategory = document.createElement("div");
+      const shieldCategoryHead = document.createElement("div");
+      const dropdownArrow = document.createElement("span");
+      const shieldCategoryName = document.createElement("span");
+
+      shieldCategory.className = "shieldCategory";
+      shieldCategoryHead.className = "shieldCategoryHead";
+      dropdownArrow.className = "material-symbols-outlined";
+      dropdownArrow.textContent = "arrow_drop_down";
+      shieldCategoryName.className = "shieldCategoryName";
+      shieldCategoryName.textContent = name + " (Expand)";
+
+      shieldCategoryHead.addEventListener("click", () => {
+        shieldCategory.classList.toggle("open");
+        dropdownArrow.textContent = shieldCategory.classList.contains("open")
+          ? "arrow_drop_up"
+          : "arrow_drop_down";
+        shieldCategoryName.textContent =
+          name +
+          (shieldCategory.classList.contains("open")
+            ? " (Collapse)"
+            : " (Expand)");
+      });
+
+      shieldCategoryHead.appendChild(dropdownArrow);
+      shieldCategoryHead.appendChild(shieldCategoryName);
+      shieldCategory.append(shieldCategoryHead);
+      shieldCategory.dataset.category = name;
+
+      return shieldCategory;
+    };
+
+    const createFromDir = (dir, parentElem) => {
+      for (const category in dir) {
+        if (category == "type") {
+          continue;
+        }
+        const cat = dir[category];
+        if (cat.type == "category") {
+          const holder = createShieldCategory(category);
+          createFromDir(cat, holder);
+          parentElem.appendChild(holder);
+        } else if (cat.type == "shield") {
+          parentElem.appendChild(createShieldRow(category, cat));
+        }
+      }
+    };
+
+    createFromDir(Shield.prototype.shieldDirectory, presetShieldList);
+
+    document.querySelector("#presetShields").addEventListener("click", () => {
+      document.querySelector(".shieldLibrary").dataset.tab = "presetShieldList";
+      document.querySelector("#presetShields").className = "selected";
+      document.querySelector("#customShields").className = "";
+    });
+
+    document.querySelector("#customShields").addEventListener("click", () => {
+      document.querySelector(".shieldLibrary").dataset.tab = "uploadShield";
+      document.querySelector("#customShields").className = "selected";
+      document.querySelector("#presetShields").className = "";
+    });
+
+    // Search
+    document
+      .querySelector("#presetShieldSearch")
+      .addEventListener("input", () => {
+        const query = document
+          .querySelector("#presetShieldSearch")
+          .value.toLowerCase();
+        const searchFromDir = (dir, parentElem) => {
+          let hasAnything = false;
+          for (const category in dir) {
+            const cat = dir[category];
+            if (category == "type") {
+              continue;
+            }
+
+            if (cat.type == "category") {
+              const childElem = parentElem.querySelector(
+                '.shieldCategory[data-category="' + category + '"]'
+              );
+              if (searchFromDir(cat, childElem)) {
+                hasAnything = true;
+                childElem.classList.remove("hidden");
+
+                if (query != "") {
+                  console.log(query);
+                  childElem.classList.remove("open");
+                  childElem.querySelector(".shieldCategoryHead").click();
+                }
+              } else {
+                childElem.classList.add("hidden");
+                childElem.classList.add("open");
+                childElem.querySelector(".shieldCategoryHead").click();
+              }
+            } else if (
+              cat.type == "shield" &&
+              cat.name.toLowerCase().includes(query)
+            ) {
+              hasAnything = true;
+              parentElem.querySelector(
+                '.shieldCategoryType[data-name="' + category + '"]'
+              ).style.display = "";
+            } else {
+              parentElem.querySelector(
+                '.shieldCategoryType[data-name="' + category + '"]'
+              ).style.display = "none";
+            }
+          }
+          return hasAnything;
+        };
+        searchFromDir(Shield.prototype.shieldDirectory, presetShieldList);
+      });
   };
 
   // Show/hide dependent small inputs for a given block (e.g. sdCtrlText, sdAdvisory, sdActionMessage, sdIcon)
@@ -597,7 +761,10 @@ const formHandler = (function () {
 
     subPanel.blockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
-    ].padding = document.querySelector("#sdBlock_padding").value;
+    ].topPadding = document.querySelector("#sdBlock_topPadding").value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].bottomPadding = document.querySelector("#sdBlock_bottomPadding").value;
     subPanel.blockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].backgroundColor = document.querySelector(
@@ -1113,18 +1280,31 @@ const formHandler = (function () {
       }
     }
 
-    document.querySelector("#sdBlock_padding").value =
+    document.querySelector("#sdBlock_topPadding").value =
       sign.blockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
-      ].padding;
+      ].topPadding;
     document
-      .querySelector("#sdBlock_padding")
+      .querySelector("#sdBlock_topPadding")
       .addEventListener("change", readForm, { once: true });
 
-    document.querySelector("#sdBlock_paddingVal").textContent =
+    document.querySelector("#sdBlock_bottomPadding").value =
       sign.blockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
-      ].padding;
+      ].bottomPadding;
+    document
+      .querySelector("#sdBlock_bottomPadding")
+      .addEventListener("change", readForm, { once: true });
+
+    document.querySelector("#sdBlock_topPaddingVal").textContent =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].topPadding;
+
+    document.querySelector("#sdBlock_bottomPaddingVal").textContent =
+      sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].bottomPadding;
 
     document.querySelector("#sdBlock_backgroundColor").value =
       sign.blockElements.blockProperties[
@@ -1472,6 +1652,306 @@ const formHandler = (function () {
 
       shieldsContainerElmt.appendChild(rowContainerElmt);
     }
+  };
+
+  const updateShieldModalVisual = (selected, differentShield) => {
+    const holder = document.querySelector(".shieldPreview");
+    const img = holder.querySelector(".selectedShieldPreview");
+
+    if (selected.shieldType === "custom" && selected.imageData) {
+      img.src = selected.imageData;
+    } else {
+      img.src = Shield.prototype.getDirectoryFromShield(
+        selected.shieldValue,
+        selected.variant
+      );
+    }
+
+    if (selected.shieldBacks) {
+      img.style.setProperty(
+        "--shieldBackColor",
+        (
+          lib.colors[selected.shieldBackColor] || selected.shieldBackColor
+        ).toLowerCase()
+      );
+      img.style.setProperty(
+        "--shieldBackRadius",
+        selected.shieldBorderRadius + "px"
+      );
+    } else {
+      img.style.setProperty("--shieldBackColor", "");
+      img.style.setProperty("--shieldBackRadius", "");
+    }
+
+    holder.querySelector(".selectedShieldName").textContent =
+      selected.shieldName;
+
+    if (differentShield) {
+      document.querySelector("#selectedShieldVariant").innerHTML = "";
+      for (const variant of Shield.prototype.getPropertiesFromName(
+        selected.shieldValue
+      ).variants) {
+        lib.appendOption(
+          document.querySelector("#selectedShieldVariant"),
+          variant,
+          { selected: selected.variant == variant }
+        );
+      }
+    }
+
+    document.querySelector("#selectedShieldBacks").value = selected.shieldBacks;
+    document.querySelector("#selectedBackColor").value = selected.backColor;
+    document.querySelector("#selectedBackRoudness").value =
+      selected.shieldBorderRadius;
+  };
+
+  const promptShield = function (currentValue, returnMethod = null) {
+    const modal = document.querySelector("#shieldImgSelector");
+    const holder = document.querySelector("#modalHolder");
+    let eventListeners = [];
+    return new Promise((resolve, reject) => {
+      let selectedShield = {
+        shieldType: currentValue?.shieldType || "preset",
+        shieldName: currentValue?.shieldName || "Interstate",
+        shieldValue: currentValue?.shieldValue || "I",
+        variant: currentValue?.variant || "2 Digit",
+
+        shieldBacks: currentValue?.shieldBacks || false,
+        shieldBackColor: currentValue?.shieldBackColor || "Black",
+        shieldBorderRadius: currentValue?.shieldBorderRadius || 4,
+
+        imageType: currentValue?.imageType || "file",
+        imageData: currentValue?.imageData || "",
+      };
+
+      // Setup tabs
+      document.querySelector("#presetShields").addEventListener("click", () => {
+        document.querySelector(".shieldLibrary").dataset.tab =
+          "presetShieldList";
+        document.querySelector("#presetShields").className = "selected";
+        document.querySelector("#customShields").className = "";
+        selectedShield.shieldType = "preset";
+      });
+
+      document.querySelector("#customShields").addEventListener("click", () => {
+        document.querySelector(".shieldLibrary").dataset.tab = "uploadShield";
+        document.querySelector("#customShields").className = "selected";
+        document.querySelector("#presetShields").className = "";
+        selectedShield.shieldType = "custom";
+      });
+
+      updateShieldModalVisual(selectedShield, true);
+
+      holder.style.display = "flex";
+      modal.style.display = "flex";
+      modal.showModal();
+
+      // Setup close button
+      // Setup file upload
+      const fileInput = document.querySelector("#uploadCustomShield");
+      if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              selectedShield.shieldType = "custom";
+              selectedShield.imageType = "data";
+              selectedShield.imageData = e.target.result;
+              selectedShield.shieldName = file.name.split(".")[0];
+              updateShieldModalVisual(selectedShield, true);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Setup tabs
+      document
+        .querySelector("#presetShields")
+        ?.addEventListener("click", () => {
+          document.querySelector(".shieldLibrary").dataset.tab =
+            "presetShieldList";
+          document.querySelector("#presetShields").className = "selected";
+          document.querySelector("#customShields").className = "";
+          selectedShield.shieldType = "preset";
+        });
+
+      document
+        .querySelector("#customShields")
+        ?.addEventListener("click", () => {
+          document.querySelector(".shieldLibrary").dataset.tab = "uploadShield";
+          document.querySelector("#customShields").className = "selected";
+          document.querySelector("#presetShields").className = "";
+          selectedShield.shieldType = "custom";
+        });
+
+      // Setup close button
+      document.querySelector("#shieldImgSelectorClose")?.addEventListener(
+        "click",
+        () => {
+          holder.style.display = "none";
+          modal.style.display = "none";
+          modal.close();
+
+          // Cleanup event listeners
+          for (const e of eventListeners) {
+            e.element.removeEventListener("click", e.handler);
+          }
+          eventListeners.length = 0;
+
+          if (returnMethod) returnMethod(null);
+          resolve(null);
+        },
+        { once: true }
+      );
+
+      const setShield = (event) => {
+        let isDifferent =
+          selectedShield.shieldValue != event.currentTarget.dataset.name;
+        selectedShield.shieldName =
+          event.currentTarget.querySelector(".shieldItemName").textContent;
+        selectedShield.shieldValue = event.currentTarget.dataset.name;
+        searchFromDir(
+          Shield.prototype.shieldDirectory,
+          document.querySelector("#presetShieldList")
+        );
+
+        if (
+          isDifferent &&
+          !Shield.prototype
+            .getPropertiesFromName(selectedShield.shieldValue)
+            .variants.includes(selectedShield.variant)
+        ) {
+          selectedShield.variant =
+            Shield.prototype.getPropertiesFromName(selectedShield.shieldValue)
+              .variants[0] || "";
+        }
+
+        updateShieldModalVisual(selectedShield, isDifferent);
+      };
+
+      const searchFromDir = (dir, parentElem, createListeners) => {
+        let hasAnything = false;
+        for (const category in dir) {
+          const cat = dir[category];
+          if (category == "type") {
+            continue;
+          }
+
+          if (cat.type == "category") {
+            const childElem = parentElem.querySelector(
+              '.shieldCategory[data-category="' + category + '"]'
+            );
+            if (searchFromDir(cat, childElem, createListeners)) {
+              hasAnything = true;
+              if (selectedShield.name != "") {
+                childElem.classList.remove("open");
+                childElem.querySelector(".shieldCategoryHead").click();
+              }
+            }
+          } else if (cat.type == "shield") {
+            const childElem = parentElem.querySelector(
+              '.shieldCategoryType[data-name="' + category + '"]'
+            );
+
+            if (cat.name == selectedShield.shieldName) {
+              hasAnything = true;
+              childElem.classList.add("selected");
+              childElem.querySelector(".shieldItemSelected").textContent =
+                "radio_button_checked";
+            } else {
+              childElem.classList.remove("selected");
+              childElem.querySelector(".shieldItemSelected").textContent =
+                "radio_button_unchecked";
+            }
+
+            if (createListeners) {
+              childElem.addEventListener("click", setShield);
+              eventListeners.push({ element: childElem, handler: setShield });
+            }
+          }
+        }
+        return hasAnything;
+      };
+
+      searchFromDir(
+        Shield.prototype.shieldDirectory,
+        document.querySelector("#presetShieldList"),
+        true
+      );
+
+      const handleVariant = (e) => {
+        selectedShield.variant = e.currentTarget.value;
+        updateShieldModalVisual(selectedShield, false);
+      };
+      document
+        .querySelector("#selectedShieldVariant")
+        .addEventListener("change", handleVariant);
+      eventListeners.push({
+        element: document.querySelector("#selectedShieldVariant"),
+        handler: handleVariant,
+      });
+
+      const handleBackColor = (e) => {
+        selectedShield.shieldBackColor = e.currentTarget.value;
+        updateShieldModalVisual(selectedShield, false);
+      };
+      document
+        .querySelector("#selectedBackColor")
+        .addEventListener("change", handleBackColor);
+      eventListeners.push({
+        element: document.querySelector("#selectedBackColor"),
+        handler: handleBackColor,
+      });
+
+      const handleBorderRadius = (e) => {
+        selectedShield.shieldBorderRadius = parseInt(e.currentTarget.value);
+        updateShieldModalVisual(selectedShield, false);
+      };
+      document
+        .querySelector("#selectedBackRoudness")
+        .addEventListener("change", handleBorderRadius);
+      eventListeners.push({
+        element: document.querySelector("#selectedBackRoudness"),
+        handler: handleBorderRadius,
+      });
+
+      const handleShieldBackCheckbox = (e) => {
+        selectedShield.shieldBacks = e.currentTarget.checked;
+        updateShieldModalVisual(selectedShield, false);
+      };
+      document
+        .querySelector("#selectedShieldBacks")
+        .addEventListener("change", handleShieldBackCheckbox);
+      eventListeners.push({
+        element: document.querySelector("#selectedShieldBacks"),
+        handler: handleShieldBackCheckbox,
+      });
+
+      window.customShields.loadSavedShields((shield) => {
+        selectedShield.shieldType = "custom";
+        selectedShield.shieldName = shield.fileName;
+        selectedShield.imageType = "data";
+        selectedShield.imageData = shield.data;
+        updateShieldModalVisual(selectedShield, true);
+      });
+
+      document.querySelector("#setShield").addEventListener("click", () => {
+        holder.style.display = "none";
+        modal.style.display = "none";
+        modal.close();
+
+        // Cleanup event listeners
+        for (const e of eventListeners) {
+          e.element.removeEventListener("click", e.handler);
+        }
+        eventListeners.length = 0;
+
+        if (returnMethod) returnMethod(selectedShield);
+        resolve(selectedShield);
+      });
+    });
   };
 
   return {

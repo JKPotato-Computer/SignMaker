@@ -33,9 +33,13 @@ const app = (function () {
 
   // Initialize the application, and populates dropdowns and the default post.
 
-  const init = function () {
+  const init = async function () {
     post = new Post(Post.prototype.polePositions[0]);
     formHandler.init(exposeToFormHandler);
+
+    // Initialize CustomShields after formHandler and wait for it
+    window.customShields = new CustomShields();
+    await window.customShields.initialized;
 
     newPanel();
   };

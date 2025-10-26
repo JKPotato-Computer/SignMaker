@@ -15,7 +15,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin: var(--margin) 0;
+  margin: var(--marginTop) 0 var(--marginBottom) 0;
   background-color: var(--masterBlockBgColor);
 }
 

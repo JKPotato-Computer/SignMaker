@@ -163,6 +163,8 @@ TextElement.prototype.fontFamily = [
   "Series E",
   "Series EM",
   "Series F",
+  "Arial",
+  "Arial Bold"
 ];
 
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
@@ -341,14 +343,16 @@ IconElement.prototype.icons = ["Airplane"];
 
 class Block {
   constructor({
-    padding = 0,
+    topPadding = 0,
+    bottomPadding = 0,
     backgroundColor = "Inherit",
     width = 0,
     stretchLeft = true,
     stretchCenter = true,
     stretchRight = true,
   } = {}) {
-    this.padding = padding;
+    this.topPadding = topPadding;
+    this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
     this.width = width;
     this.stretchLeft = stretchLeft;
@@ -429,7 +433,8 @@ class Control {
 
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
-      flexRow.style.setProperty("--margin", properties.padding + "rem");
+      flexRow.style.setProperty("--marginTop", properties.topPadding + "rem");
+      flexRow.style.setProperty("--marginBottom", properties.bottomPadding + "rem");
       flexRow.style.setProperty(
         "--masterBlockBgColor",
         properties.backgroundColor == "Inherit"
