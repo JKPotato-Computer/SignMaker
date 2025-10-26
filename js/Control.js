@@ -153,9 +153,18 @@ class TextElement {
 }
 
 TextElement.prototype.fontFamily = [
+  "Clearview 1B",
+  "Clearview 1W",
+  "Clearview 2B",
+  "Clearivew 2W",
+  "Clearview 3B",
   "Clearview 3W",
-  "Clearview 5WR",
+  "Clearview 4B",
   "Clearview 4W",
+  "Clearivew 5B",
+  "Clearivew 5W",
+  "Clearview 5WR",
+  "Clearview 6B",
   "Series A",
   "Series B",
   "Series C",
@@ -164,7 +173,8 @@ TextElement.prototype.fontFamily = [
   "Series EM",
   "Series F",
   "Arial",
-  "Arial Bold"
+  "Arial Bold",
+  "Transport",
 ];
 
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
@@ -434,7 +444,10 @@ class Control {
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
       flexRow.style.setProperty("--marginTop", properties.topPadding + "rem");
-      flexRow.style.setProperty("--marginBottom", properties.bottomPadding + "rem");
+      flexRow.style.setProperty(
+        "--marginBottom",
+        properties.bottomPadding + "rem"
+      );
       flexRow.style.setProperty(
         "--masterBlockBgColor",
         properties.backgroundColor == "Inherit"

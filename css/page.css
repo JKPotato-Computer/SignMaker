@@ -213,10 +213,20 @@
 
 @font-face {
   font-family: "Electronic Highway Sign";
-  src: url("fonts/ElectronicHighwaySign.woff2") format("woff2"),
-    url("fonts/ElectronicHighwaySign.woff") format("woff"),
-    url("fonts/ElectronicHighwaySign.ttf") format("truetype");
+  src: url("../fonts/ElectronicHighwaySign.woff2") format("woff2"),
+    url("../fonts/ElectronicHighwaySign.woff") format("woff"),
+    url("../fonts/ElectronicHighwaySign.ttf") format("truetype");
   font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Transport";
+  src: url("../fonts/Transport.woff2") format("woff2"),
+    url("../fonts/Transport.woff") format("woff"),
+    url("../fonts/Transport.ttf") format("truetype");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
