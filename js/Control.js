@@ -287,7 +287,7 @@ class ElectronicSignElement extends TextElement {
 }
 ElectronicSignElement.prototype.fontFamily =
   TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
-ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow"];
+ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow", "Red"];
 
 class ShieldElement extends Shield {
   constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {

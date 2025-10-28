@@ -14,6 +14,7 @@ class ExitTab {
 		icon = null,
 		useTextBasedIcon = false,
 		fullBorder = false,
+		squareCorners = false,
 		topOffset = true,
 		showLeft = false,
 		borderThickness = 0.2,
@@ -47,6 +48,7 @@ class ExitTab {
 		}
 		
 		this.fullBorder = fullBorder;
+		this.squareCorners = squareCorners;
 		this.borderThickness = borderThickness;
 		this.topOffset = topOffset;
 		this.minHeight = minHeight;
@@ -75,6 +77,7 @@ class ExitTab {
 			color : exisitingTab.color,
 			variant : exisitingTab.variant,
 			icon : exisitingTab.icon,
+			squareCorners : exisitingTab.squareCorners,
 			fullBorder : exisitingTab.fullBorder,
 			borderThickness : exisitingTab.borderThickness,
 			minHeight : exisitingTab.minHeight

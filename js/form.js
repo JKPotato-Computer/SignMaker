@@ -648,6 +648,7 @@ const formHandler = (function () {
     exitTab.FHWAFont = form["exitFont"].checked;
     exitTab.showLeft = form["showLeft"].checked;
     exitTab.fullBorder = form["fullBorder"].checked;
+    exitTab.squareCorners = form["squareCorners"].checked;
     exitTab.topOffset = form["topOffset"].checked;
     exitTab.borderThickness = form["borderThickness"].value;
     exitTab.minHeight = form["minHeight"].value;
@@ -1167,6 +1168,9 @@ const formHandler = (function () {
 
     const fullBorder = document.getElementById("fullBorder");
     fullBorder.checked = exitTab.fullBorder;
+
+    const squareCorners = document.getElementById("squareCorners");
+    squareCorners.checked = exitTab.squareCorners;
 
     const topOffset = document.getElementById("topOffset");
     topOffset.checked = exitTab.topOffset;
