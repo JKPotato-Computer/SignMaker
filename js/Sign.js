@@ -25,6 +25,7 @@ class Sign {
 			guideArrowLanes = 1,
 			exitguideArrows = "Down Arrow",
             exitOnlyPadding = 0,
+			exitOnlyLabelPreset = "EXIT ONLY",
 			
 			// other
 			otherSymbol,
@@ -91,6 +92,11 @@ class Sign {
 		this.arrows = arrows;
 		this.exitguideArrows = exitguideArrows;
 		this.exitOnlyPadding = exitOnlyPadding;
+		if (typeof exitOnlyLabelPreset === "string" && exitOnlyLabelPreset.trim().length > 0) {
+			this.exitOnlyLabelPreset = exitOnlyLabelPreset.trim();
+		} else {
+			this.exitOnlyLabelPreset = "EXIT ONLY";
+		}
 		
 		if (this.globalPositioning.includes(globalPositioning)) {
 			this.globalPositioning = globalPositioning;
@@ -224,6 +230,18 @@ Sign.prototype.exitguideArrows = [
 	"Right/Up Arrow:EB-1/B-1",
 	"alt. Right/Up Arrow:EA-1/A-1"
 
+];
+
+Sign.prototype.exitOnlyLabels = [
+	"EXIT ONLY",
+	"LEFT EXIT",
+	"LEFT ONLY",
+	"RIGHT EXIT",
+	"RIGHT ONLY",
+	"RAMP ONLY",
+	"EXPRESS ONLY",
+	"EXPRESS LANE",
+	"EXPRESS LANES"
 ];
 
 Sign.prototype.arrowPositions = [
