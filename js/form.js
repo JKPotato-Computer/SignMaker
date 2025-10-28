@@ -323,6 +323,12 @@ const formHandler = (function () {
       lib.appendOption(exitOnlyDirectionElmt, display);
     }
 
+    // exit-only labels
+    const exitOnlyLabelElmt = document.getElementById("exitOnlyLabel");
+    for (const label of Sign.prototype.exitOnlyLabels) {
+      lib.appendOption(exitOnlyLabelElmt, label);
+    }
+
     // Populate the arrow directions
     const arrowDirectionElmt = document.getElementById("arrowLocations");
     for (const arrowDirection of Sign.prototype.arrowPositions) {
@@ -847,6 +853,7 @@ const formHandler = (function () {
 
     currentPanel.sign.exitguideArrows = exitOnlyDirection_result;
     currentPanel.sign.showExitOnly = form["showExitOnly"].checked;
+    currentPanel.sign.exitOnlyLabelPreset = form["exitOnlyLabel"].value;
     currentPanel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
 
     currentPanel.sign.otherSymbol = form["otherSymbol"].value;
@@ -865,6 +872,10 @@ const formHandler = (function () {
     const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
     const exitOnlyDirection = document.getElementById("exitOnlyDirection");
     const showExitOnly = document.getElementById("showExitOnly");
+    const exitOnlyLabelTextLabel = document.getElementById(
+      "exitOnlyLabelTextLabel"
+    );
+    const exitOnlyLabelSelect = document.getElementById("exitOnlyLabel");
 
     if (
       currentPanel.sign.guideArrow != "Exit Only" &&
@@ -875,11 +886,15 @@ const formHandler = (function () {
       showExitOnlyLabel.style.visibility = "hidden";
       exitOnlyDirection.style.visibility = "hidden";
       showExitOnly.style.visibility = "hidden";
+      exitOnlyLabelTextLabel.style.visibility = "hidden";
+      exitOnlyLabelSelect.style.visibility = "hidden";
     } else {
       exitOnlyDirectionLabel.style.visibility = "visible";
       showExitOnlyLabel.style.visibility = "visible";
       exitOnlyDirection.style.visibility = "visible";
       showExitOnly.style.visibility = "visible";
+      exitOnlyLabelTextLabel.style.visibility = "visible";
+      exitOnlyLabelSelect.style.visibility = "visible";
     }
 
     var paddingValues = currentPanel.sign.padding.split("rem");
@@ -1385,6 +1400,10 @@ const formHandler = (function () {
     const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
     const exitOnlyDirection = document.getElementById("exitOnlyDirection");
     const showExitOnly = document.getElementById("showExitOnly");
+    const exitOnlyLabelTextLabel = document.getElementById(
+      "exitOnlyLabelTextLabel"
+    );
+    const exitOnlyLabelSelect = document.getElementById("exitOnlyLabel");
     const exitOnlyPadding = document.getElementById("exitOnlyPadding");
     const exitOnlyPaddingValue = document.getElementById("paddingValue");
     const exitOnlyPaddingLabel = document.getElementById(
@@ -1415,15 +1434,32 @@ const formHandler = (function () {
     showExitOnly.className = !panel.sign.guideArrow.includes("Exit Only")
       ? "invisible"
       : "";
+    exitOnlyLabelTextLabel.className = !panel.sign.guideArrow.includes(
+      "Exit Only"
+    )
+      ? "invisible"
+      : "";
+    exitOnlyLabelSelect.className = !panel.sign.guideArrow.includes("Exit Only")
+      ? "invisible"
+      : "";
     paddingValue.className =
       !panel.sign.guideArrow.includes("Exit Only") ||
       panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
     showExitOnly.value = panel.sign.showExitOnly;
+    exitOnlyPadding.value = panel.sign.exitOnlyPadding;
+    exitOnlyPaddingValue.textContent = panel.sign.exitOnlyPadding;
 
     for (const option of exitOnlyDirection.options) {
       if (option.value == panel.sign.exitguideArrows) {
+        option.selected = true;
+        break;
+      }
+    }
+
+    for (const option of exitOnlyLabelSelect.options) {
+      if (option.value == panel.sign.exitOnlyLabelPreset) {
         option.selected = true;
         break;
       }

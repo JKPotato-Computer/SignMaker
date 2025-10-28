@@ -1424,6 +1424,20 @@ const app = (function () {
             );
             path.appendChild(actionMessage);
           } else {
+            const exitOnlyLabelFull =
+              typeof panel.sign.exitOnlyLabelPreset === "string" &&
+              panel.sign.exitOnlyLabelPreset.trim().length > 0
+                ? panel.sign.exitOnlyLabelPreset.trim().toUpperCase()
+                : "EXIT ONLY";
+            const exitOnlyLabelParts = exitOnlyLabelFull.split(/\s+/);
+            const exitOnlyLabelLeft =
+              exitOnlyLabelParts[0] && exitOnlyLabelParts[0].length > 0
+                ? exitOnlyLabelParts[0]
+                : "EXIT";
+            const exitOnlyLabelRight =
+              exitOnlyLabelParts.length > 1
+                ? exitOnlyLabelParts.slice(1).join(" ")
+                : exitOnlyLabelLeft;
             for (
               let arrowIndex = 0, length = panel.sign.guideArrowLanes;
               arrowIndex < length;
@@ -1435,7 +1449,7 @@ const app = (function () {
                   const textExitOnlySpanElmt = document.createElement("span");
                   if (panel.sign.showExitOnly == false) {
                     textExitOnlySpanElmt.appendChild(
-                      document.createTextNode("EXIT ONLY")
+                      document.createTextNode(exitOnlyLabelFull)
                     );
 
                     var bonus = "";
@@ -1501,7 +1515,7 @@ const app = (function () {
                   const textExitSpanElmt = document.createElement("span");
                   if (panel.sign.showExitOnly == false) {
                     textExitSpanElmt.appendChild(
-                      document.createTextNode("EXIT")
+                      document.createTextNode(exitOnlyLabelLeft)
                     );
 
                     var bonus = "";
@@ -1536,7 +1550,7 @@ const app = (function () {
                   const textOnlySpanElmt = document.createElement("span");
                   if (panel.sign.showExitOnly == false) {
                     textOnlySpanElmt.appendChild(
-                      document.createTextNode("ONLY")
+                      document.createTextNode(exitOnlyLabelRight)
                     );
 
                     var bonus = "";
