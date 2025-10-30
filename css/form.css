@@ -22,11 +22,11 @@ nav#sMConfigBar {
 }
 
 :root[data-theme="dark"] .sMConfigOption:not(.selected) {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--baseColor), 0.1);
 }
 
 .sMConfigOption {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(var(--baseColor), 0.25);
   padding: 0.4rem;
   display: flex;
   flex-direction: row;
@@ -133,7 +133,7 @@ label span.toolTip,
   width: 8rem;
   height: 10rem;
   position: absolute;
-  background-color: rgb(210, 225, 255);
+  background-color: var(--hotbarColor);
   top: -10.5rem;
   left: 0;
   padding: 0.25rem;
@@ -154,7 +154,7 @@ label span.toolTip,
 }
 
 #panelNumber {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(var(--baseColor));
   text-align: center;
   padding: 0.1rem;
   border-radius: 0;
@@ -208,7 +208,7 @@ label span.toolTip,
 }
 
 legend {
-  font-family: "Clearview 3W";
+  font-family: "Overpass" !important;
   text-align: center;
   width: max-content !important;
   padding: 0 0.5rem;
@@ -221,7 +221,16 @@ nav.sMModalBar {
   justify-content: left;
   align-items: center;
   height: max-content;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(var(--baseColor), 0.5);
+}
+
+:root[data-theme="dark"] nav.sMModalBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  height: max-content;
+  background-color: rgb(50,75,255,1);
 }
 
 nav.sMModalBar *:not(.material-symbols-outlined, select, button, input) {
@@ -234,8 +243,12 @@ nav.sMModalSubBar {
   padding: 0.2rem;
 }
 
+:root[data-theme="dark"] div.sMModalTitle {
+  background-color: rgb(50,50,200,1);
+}
+
 div.sMModalTitle {
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(var(--baseColor), .75);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -244,7 +257,6 @@ div.sMModalTitle {
   gap: 0.25rem;
   margin-right: 0.5rem;
 }
-
 div.sMModalTab {
   padding: 0rem 0.5rem;
   font-size: 15px;
@@ -393,7 +405,7 @@ div.options a {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  background-color: rgb(255, 255, 255, 0.4);
+  background-color: rgb(var(--baseColor), 0.4);
 }
 
 .SMSPNewElementHolder > span {
@@ -449,8 +461,14 @@ select {
 
 select:hover,
 select:focus {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(var(--baseColor));
   font-weight: 700;
+}
+
+
+input, select {
+  background-color: rgb(var(--inputColor));
+  color: var(--textColor);
 }
 
 button,
@@ -466,9 +484,10 @@ input[type="button"] {
   transition: 0.15s ease-in-out;
   border: 0;
   width: max-content;
-  background-color: rgb(240, 240, 240);
+  background-color: rgb(var(--inputColor));
   font-family: "Inter";
   font-weight: 500;
+  color: var(--textColor);
 }
 
 button:not(.textEditorBlock, .sMControlRow .sMConfigOption):enabled:hover,
@@ -508,11 +527,11 @@ textarea {
   width: intrinsic;
 }
 .shields div:nth-child(odd) {
-  background-color: rgba(255, 255, 255, 0.33);
+  background-color: rgba(var(--baseColor), 0.33);
 }
 
 .shields div:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.11);
+  background-color: rgba(var(--baseColor), 0.11);
 }
 
 .shields label,
@@ -553,8 +572,8 @@ textarea {
   width: auto;
   background: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.4)
+    rgba(var(--baseColor), 0.2),
+    rgba(var(--baseColor), 0.4)
   );
   border-radius: 0rem 0rem 1rem 2rem;
   padding: 0.4rem;
@@ -562,7 +581,7 @@ textarea {
 }
 
 #panelNumber {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(var(--baseColor));
   text-align: center;
   padding: 0.1rem;
   border-radius: 0;
@@ -673,7 +692,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(var(--baseColor), 0.2);
   padding: 1rem;
   gap: 1rem;
 }
@@ -688,7 +707,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem;
-  background-color: rgb(255, 255, 255, 0.3);
+  background-color: rgb(var(--baseColor), 0.3);
   width: 100%;
 }
 
@@ -709,7 +728,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   flex-direction: column;
   justify-content: center;
   gap: 0.5rem;
-  background-color: rgb(255, 255, 255, 0.15);
+  background-color: rgb(var(--baseColor), 0.15);
   padding: 0.5rem;
   width: 100%;
 }
@@ -720,18 +739,18 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  background-color: rgb(255, 255, 255, 0.15);
+  background-color: rgb(var(--baseColor), 0.15);
   padding: 0.25rem;
   width: 100%;
   height: m;
 }
 
 :root[data-theme="dark"] .smControlRow.selected {
-  background-color: rgb(255, 255, 255, 0.25);
+  background-color: rgb(var(--baseColor), 0.25);
 }
 
 .smControlRow.selected {
-  background-color: rgb(255, 255, 255, 0.5);
+  background-color: rgb(var(--baseColor), 0.5);
 }
 
 .smControlRow * {
@@ -774,7 +793,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 #smSPProperties,
 #smSPBlockProperties,
 #smSPShieldProperties {
-  background-color: rgb(255, 255, 255, 0.225);
+  background-color: rgb(var(--baseColor), 0.225);
   padding: 0.5rem;
   width: 100%;
 }
@@ -808,7 +827,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: rgb(255, 255, 255, 0.5);
+  background-color: rgb(var(--baseColor), 0.5);
   cursor: pointer;
 }
 
@@ -818,7 +837,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 }
 
 .smSPShieldRow.selected {
-  background-color: rgb(255, 255, 255, 1);
+  background-color: rgb(var(--baseColor), 1);
 }
 
 .smSPShieldGroupHolder {
@@ -879,12 +898,12 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  background-color: rgb(255, 255, 255, 0.25);
+  background-color: rgb(var(--baseColor), 0.25);
   padding: 1rem;
 }
 
 #smSPShieldImgConfig > div {
-  background-color: rgb(255, 255, 255, 0.125);
+  background-color: rgb(var(--baseColor), 0.125);
   height: stretch;
 }
 
@@ -913,7 +932,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 #advancedMenu {
   padding: 0.5rem;
   margin-top: 0.5rem;
-  background-color: rgb(255, 255, 255, 0.2);
+  background-color: rgb(var(--baseColor), 0.2);
 }
 
 #shieldImgSelector {

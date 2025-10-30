@@ -1,12 +1,11 @@
+/*
 class Shield {
-  /**
    * Creates anew a route shield.
    * @param {string} [type="I-"] - Type of shield.
    * @param {number} [routeNumber="1"] - Route number to display on shield.
    * @param {boolean} [to=false] - Whether or not the shield should be signed as "TO".
    * @param {string} [bannerType] - Directional banner to display.
    * @param {string} [bannerPosition] - Where to place the directional banner relative to the shield.
-   */
   constructor({
     type = "I",
     routeNumber = "1",
@@ -59,6 +58,76 @@ class Shield {
       }
     }
   }
+}
+*/
+
+class Shield {
+  constructor({
+    shieldType = "preset",
+    shieldName = "Interstate",
+    shieldValue = "I",
+    variant = "2 Digit",
+
+    shieldBacks = false,
+    shieldBackColor = "Black",
+    shieldBorderRadius = 4,
+
+    imageType = "",
+    imageData = "",
+  } = {}) {
+    this.shieldType = shieldType;
+    this.shieldName = shieldName;
+    this.shieldValue = shieldValue;
+    this.variant = variant;
+    this.shieldBacks = shieldBacks;
+    this.shieldBackColor = shieldBackColor;
+    this.shieldBorderRadius = shieldBorderRadius;
+    this.imageType = imageType;
+    this.imageData = imageData;
+  }
+}
+
+class Banner {
+  constructor({
+    textContent = "",
+    firstLetterSize = 100,
+    fontSize = 1,
+    backgroundColor = "None",
+    padding = .01,
+    borderRadius = 4,
+    fontFamily = "Clearview 5WR",
+    margins = {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0
+    }
+  } = {}) {
+    this.textContent = textContent;
+    this.firstLetterSize = firstLetterSize;
+    this.fontSize = fontSize;
+    this.backgroundColor = backgroundColor;
+    this.padding = padding;
+    this.borderRadius = borderRadius;
+    this.fontFamily = fontFamily;
+    this.margins = margins;
+  }
+}
+
+class BannerGroup {
+  constructor({
+    position = "left",
+    gap = .5,
+    direction = "vertical",
+  } = {}) {}
+}
+
+class ShieldBlock {
+  constructor({} = {}) {}
+}
+
+class ShieldContainer {
+  constructor({} = {}) {}
 }
 
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
