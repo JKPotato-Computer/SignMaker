@@ -53,6 +53,7 @@ class Panel {
 			color : exisitingTab.color,
 			variant : exisitingTab.variant,
 			icon : exisitingTab.icon,
+			squareCorners : exisitingTab.squareCorners,
 			fullBorder : exisitingTab.fullBorder,
 			borderThickness : exisitingTab.borderThickness,
 			minHeight : exisitingTab.minHeight,

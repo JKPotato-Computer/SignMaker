@@ -565,6 +565,9 @@ const app = (function () {
 
           const exitTabElmt = document.createElement("div");
           exitTabElmt.className = `exitTab ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
+          if (exitTab.squareCorners) {
+            exitTabElmt.className += " squareCorners";
+          }
 
           const exitTabHolderElmt = document.createElement("div");
           exitTabHolderElmt.className = "exitTabHolder";
@@ -649,11 +652,17 @@ const app = (function () {
               exitTabElmt.style.fontFamily = "Series E";
             }
 
+            const cornerRadius = exitTab.squareCorners ? "0.25rem" : "0.5rem";
+
             if (exitTab.fullBorder == true) {
               exitTabElmt.style.borderBottomWidth =
                 exitTab.borderThickness.toString() + "rem";
               exitTabElmt.style.borderBottomStyle = "solid";
-              exitTabElmt.style.borderRadius = "0.5rem";
+              exitTabElmt.style.borderRadius = cornerRadius;
+            } else {
+              exitTabElmt.style.borderBottomWidth = "";
+              exitTabElmt.style.borderBottomStyle = "";
+              exitTabElmt.style.borderRadius = "";
             }
 
             exitTabElmt.style.borderTopWidth =

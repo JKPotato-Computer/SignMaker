@@ -283,6 +283,15 @@
   padding: 0 0.5rem;
 }
 
+.exitTab.squareCorners {
+  border-radius: 0.25rem 0.25rem 0 0;
+  padding: 0 1.30rem;
+}
+
+.exitTab.squareCorners.out {
+  border-radius: 0.25rem;
+}
+
 .exitTab.out {
   width: -moz-max-content;
   width: -webkit-max-content;

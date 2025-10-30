@@ -250,19 +250,23 @@
 }
 
 :root[data-theme="light"] {
-  --backgroundColor: #90b5ff;
+  --backgroundColor: rgb(144 181 255);
   --hotbarColor: rgb(210, 225, 255);
   --textColor: rgb(0, 0, 0);
   --selectedColor: rgb(255, 255, 255);
   --hoverColor: rgb(255, 255, 255, 0.5);
+  --baseColor: 255,255,255;
+  --inputColor: 240,240,240;
 }
 
 :root[data-theme="dark"] {
-  --backgroundColor: #0f1a37;
-  --hotbarColor: #1d3678;
-  --textColor: #f7f9fb;
+  --backgroundColor: rgb(10 28 77);
+  --hotbarColor: rgb(43 63 118);
+  --textColor: rgb(247 249 251);
   --selectedColor: rgb(255, 255, 255, 0.25);
-  --hoverColor: #18274e;
+  --hoverColor: rgb(24 39 78);
+  --baseColor: 0,0,0;
+  --inputColor: 15,15,15;
 }
 
 * {

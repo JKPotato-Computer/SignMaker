@@ -86,7 +86,9 @@ class TextElement {
       result = newResult;
     }
 
-    result = result.map((val) => val.replace("\\t", "\t").replace("\\n", "\n"));
+    result = result.map((val) =>
+      val.replace(/\\t/g, "\t").replace(/\\n/g, "\n")
+    );
     for (let i = 0; i < result.length; i++) {
       let r = result[i];
       if (lightNumeralPattern.test(r) && this.useNumeralFormatting) {
@@ -287,7 +289,7 @@ class ElectronicSignElement extends TextElement {
 }
 ElectronicSignElement.prototype.fontFamily =
   TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
-ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow"];
+ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow", "Red"];
 
 class ShieldElement extends Shield {
   constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {
