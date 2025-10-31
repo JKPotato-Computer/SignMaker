@@ -353,6 +353,7 @@ const formHandler = (function () {
       document.querySelector("#sdActionMessage_alignment"),
       document.querySelector("#sdBlocker_alignment"),
       document.querySelector("#sdElectronicSign_alignment"),
+      document.querySelector("#sdTollLogo_alignment"),
     ];
     let textElem_bgColorSelects = [
       document.querySelector("#sdCtrlText_backgroundColor"),
@@ -410,6 +411,17 @@ const formHandler = (function () {
 
     for (const icon of IconElement.prototype.icons) {
       lib.appendOption(iconElem_iconsSelect, icon);
+    }
+
+    const tollLogoSelectElmt = document.getElementById("sdTollLogo_logo");
+    if (tollLogoSelectElmt) {
+      for (const logoKey in TollLogoElement.prototype.logos) {
+        const logoDef = TollLogoElement.prototype.logos[logoKey];
+        lib.appendOption(tollLogoSelectElmt, logoKey, {
+          text: logoDef.label,
+          selected: logoKey == TollLogoElement.prototype.defaultLogo,
+        });
+      }
     }
 
     // Populate shield directory

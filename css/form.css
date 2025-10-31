@@ -780,6 +780,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   border-radius: 8px;
 }
 
+.sdTollLogo {
+  background-color: var(--purple);
+  color: white;
+}
+
 .sdIcon {
   background-color: var(--brown);
   color: white;
