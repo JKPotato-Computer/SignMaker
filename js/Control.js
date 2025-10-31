@@ -289,7 +289,12 @@ class ElectronicSignElement extends TextElement {
 }
 ElectronicSignElement.prototype.fontFamily =
   TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
-ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow", "Red"];
+ElectronicSignElement.prototype.textColors = [
+  "Orange",
+  "White",
+  "Yellow",
+  "Red",
+];
 
 class ShieldElement extends Shield {
   constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {
@@ -359,7 +364,10 @@ class TollLogoElement {
     logoHeight = 3,
     spacing = 0,
     background = false,
+    backgroundColor = "White",
     alignment = "Center",
+    squareIcon = false,
+    borderRadius = 8,
   } = {}) {
     this.logo = TollLogoElement.prototype.logos[logo]
       ? logo
@@ -367,6 +375,9 @@ class TollLogoElement {
     this.logoHeight = logoHeight;
     this.spacing = spacing;
     this.background = background;
+    this.squareIcon = squareIcon;
+    this.borderRadius = borderRadius;
+    this.backgroundColor = backgroundColor;
     const validAlignments = Array.isArray(TextElement.prototype.alignment)
       ? TextElement.prototype.alignment
       : [];
@@ -380,6 +391,11 @@ class TollLogoElement {
     const parsedSpacing = parseFloat(this.spacing);
     const spacing = isNaN(parsedSpacing) ? 0 : parsedSpacing;
     container.style.setProperty("--spacing", spacing + "rem");
+    container.style.setProperty(
+      "--tollBgColor",
+      lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase()
+    );
+    container.style.setProperty("--borderRadius", this.borderRadius + "px");
 
     const parsedHeight = parseFloat(this.logoHeight);
     const height = isNaN(parsedHeight) ? 3 : Math.max(parsedHeight, 0.5);
@@ -391,6 +407,10 @@ class TollLogoElement {
 
     if (this.background) {
       container.classList.add("hasBackground");
+    }
+
+    if (this.squareIcon) {
+      container.style.aspectRatio = "1 / 1";
     }
 
     const logoDefinition =
@@ -560,15 +580,10 @@ class Control {
 
       const leftAlignment = document.createElement("div");
       leftAlignment.className = "blockElementLeft";
-      leftAlignment.style.flexGrow = properties.stretchLeft ? "1" : "0";
-
       const centerAlignment = document.createElement("div");
       centerAlignment.className = "blockElementCenter";
-      centerAlignment.style.flexGrow = properties.stretchCenter ? "1" : "0";
-
       const rightAlignment = document.createElement("div");
       rightAlignment.className = "blockElementRight";
-      rightAlignment.style.flexGrow = properties.stretchRight ? "1" : "0";
 
       let lastKnownAlignment = centerAlignment;
       for (let i = 0; i < row.length; i++) {
@@ -588,6 +603,17 @@ class Control {
 
         lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
       }
+
+      leftAlignment.style.flexGrow =
+        properties.stretchLeft && leftAlignment.children.length > 0 ? "1" : "0";
+      centerAlignment.style.flexGrow =
+        properties.stretchCenter && centerAlignment.children.length > 0
+          ? "1"
+          : "0";
+      rightAlignment.style.flexGrow =
+        properties.stretchRight && rightAlignment.children.length > 0
+          ? "1"
+          : "0";
 
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);

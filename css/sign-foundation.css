@@ -74,7 +74,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .bE-tollLogoElement {
-  display: inline-flex;
+  display: block;
   justify-content: center;
   align-items: center;
   flex: 0 0 auto;
@@ -83,9 +83,9 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .bE-tollLogoElement.hasBackground {
-  background-color: white;
+  background-color: var(--tollBgColor, white);
   padding: 0.2rem 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: var(--borderRadius, 4px);
 }
 
 .bE-tollLogoElement img {
@@ -111,6 +111,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   gap: 1rem;
   flex-grow: 1;
   flex-basis: 0;
+  min-width: max-content;
 }
 
 .blockElementCenter:empty,

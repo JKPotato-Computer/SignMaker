@@ -13,7 +13,7 @@ const formHandler = (function () {
     await initUI();
 
     try {
-      console.log(promptShield(null));
+      //console.log(promptShield(null));
     } catch (e) {
       console.error(e);
     }
@@ -362,6 +362,7 @@ const formHandler = (function () {
       document.querySelector("#sdIcon_borderColor"),
       document.querySelector("#sdIcon_backgroundColor"),
       document.querySelector("#sdBlock_backgroundColor"),
+      document.querySelector("#sdTollLogo_backgroundColor"),
     ];
     let divider_widthMeasurement = document.querySelector(
       "#sdblocker_dividerMeasurement"
@@ -600,6 +601,10 @@ const formHandler = (function () {
     // icon border -> border color / radius (sdIcon_border)
     toggleTargets(`${block}_border`, [
       `${block}_borderColor`,
+      `${block}_borderRadius`,
+    ]);
+    toggleTargets(`${block}_background`, [
+      `${block}_backgroundColor`,
       `${block}_borderRadius`,
     ]);
   };
@@ -1496,9 +1501,13 @@ const formHandler = (function () {
     advisoryMessageElmt.checked = panel.sign.advisoryMessage;
 
     // Ensure dependent small inputs reflect the corresponding checkbox state
-    ["sdCtrlText", "sdAdvisory", "sdActionMessage", "sdIcon"].forEach((block) =>
-      setDependentVisibility(block)
-    );
+    [
+      "sdCtrlText",
+      "sdAdvisory",
+      "sdActionMessage",
+      "sdIcon",
+      "sdTollLogo",
+    ].forEach((block) => setDependentVisibility(block));
   };
 
   /**

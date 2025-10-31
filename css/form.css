@@ -230,7 +230,7 @@ nav.sMModalBar {
   justify-content: left;
   align-items: center;
   height: max-content;
-  background-color: rgb(50,75,255,1);
+  background-color: rgb(50, 75, 255, 1);
 }
 
 nav.sMModalBar *:not(.material-symbols-outlined, select, button, input) {
@@ -244,11 +244,11 @@ nav.sMModalSubBar {
 }
 
 :root[data-theme="dark"] div.sMModalTitle {
-  background-color: rgb(50,50,200,1);
+  background-color: rgb(50, 50, 200, 1);
 }
 
 div.sMModalTitle {
-  background-color: rgba(var(--baseColor), .75);
+  background-color: rgba(var(--baseColor), 0.75);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -465,8 +465,8 @@ select:focus {
   font-weight: 700;
 }
 
-
-input, select {
+input,
+select {
   background-color: rgb(var(--inputColor));
   color: var(--textColor);
 }
@@ -757,7 +757,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   font-size: 16px;
   padding: 4px 8px;
 }
-.smcontrolrow *.selected {
+
+.smControlRow *.selected {
   text-decoration: underline;
 }
 
@@ -768,6 +769,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 
 .sdBlocker {
   background-color: white;
+  color: black;
 }
 
 .sdShield {
@@ -793,6 +795,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .sdActionMessage {
   background-color: var(--green);
   color: white;
+}
+
+.sdElectronicSign {
+  background-color: var(--black);
+  color: var(--orange);
 }
 
 #smSPProperties,

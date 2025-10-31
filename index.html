@@ -594,7 +594,6 @@
         <div
           class="sMModal subPanelConfig"
           data-current-menu="sMSPShield"
-          style="display: block"
         >
           <nav class="sMModalBar">
             <div class="sMModalTitle">
@@ -642,7 +641,7 @@
             <div data-tab="sMSPExtra" class="sMModalTab">Extra Settings</div>
           </nav>
           <div class="sMModalContent">
-            <div id="sMSPShield" class="">
+            <div id="sMSPShield" class="tabHidden">
               <div style="display: none">
                 <div class="shields" id="shields"></div>
                 <input
@@ -877,7 +876,7 @@
               <label for="sdShield_direction">Shield Direction:</label>
               <select id="sdShield_direction"></select>
             </div>
-            <div id="sMSPBlocks" class="tabHidden">
+            <div id="sMSPBlocks" class="">
               <div id="sMSPTextEditor">
                 <div id="sMSPCreate">
                   <span id="SMSPSelectLabel">Selected: Row 1</span>
@@ -1281,7 +1280,6 @@
                   <div data-property="sdTollLogo" class="hidden">
                     <label for="sdTollLogo_logo">Toll Logo:</label>
                     <select id="sdTollLogo_logo"></select>
-                    <br />
                     <label for="sdTollLogo_logoHeight">Size (rem):</label>
                     <input
                       type="number"
@@ -1292,6 +1290,7 @@
                       step="0.1"
                       value="3"
                     />
+                    <br />
                     <label for="sdTollLogo_spacing">Spacing (rem):</label>
                     <input
                       type="number"
@@ -1307,6 +1306,10 @@
                     <br />
                     <label for="sdTollLogo_background">Background:</label>
                     <input type="checkbox" id="sdTollLogo_background" />
+                    <select id="sdTollLogo_backgroundColor" class="hidden" data-toolTip="Toll Logo Background Color"></select>
+                    <input type="number" id="sdTollLogo_borderRadius" class="hidden" min="0" max="100" step="1" value="8" data-toolTip="Toll Logo Border Radius (px)">
+                    <label for="sdTollLogo_squareIcon">Square Icon:</label>
+                    <input type="checkbox" id="sdTollLogo_squareIcon" />
                   </div>
 
                   <div data-property="sdActionMessage" class="hidden">
@@ -1474,7 +1477,7 @@
                 </div>
                 <div id="smSPBlockProperties">
                   <h4>Block Properties</h4>
-                  <label for="sdBlock_topPadding">Top Padding (rem): </label>
+                  <label for="sdBlock_topPadding">Top Margin (rem): </label>
                   <input
                     type="range"
                     min="0"
@@ -1485,7 +1488,7 @@
                   />
                   <span id="sdBlock_topPaddingVal">0</span>
                   <label for="sdBlock_bottomPadding"
-                    >Bottom Padding (rem):
+                    >Bottom Margin (rem):
                   </label>
                   <input
                     type="range"
