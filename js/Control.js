@@ -289,7 +289,12 @@ class ElectronicSignElement extends TextElement {
 }
 ElectronicSignElement.prototype.fontFamily =
   TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
-ElectronicSignElement.prototype.textColors = ["Orange", "White", "Yellow", "Red"];
+ElectronicSignElement.prototype.textColors = [
+  "Orange",
+  "White",
+  "Yellow",
+  "Red",
+];
 
 class ShieldElement extends Shield {
   constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {
@@ -352,6 +357,109 @@ class IconElement {
 }
 
 IconElement.prototype.icons = ["Airplane"];
+
+class TollLogoElement {
+  constructor({
+    logo = TollLogoElement.prototype.defaultLogo,
+    logoHeight = 3,
+    spacing = 0,
+    background = false,
+    backgroundColor = "White",
+    alignment = "Center",
+    squareIcon = false,
+    borderRadius = 8,
+  } = {}) {
+    this.logo = TollLogoElement.prototype.logos[logo]
+      ? logo
+      : TollLogoElement.prototype.defaultLogo;
+    this.logoHeight = logoHeight;
+    this.spacing = spacing;
+    this.background = background;
+    this.squareIcon = squareIcon;
+    this.borderRadius = borderRadius;
+    this.backgroundColor = backgroundColor;
+    const validAlignments = Array.isArray(TextElement.prototype.alignment)
+      ? TextElement.prototype.alignment
+      : [];
+    this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
+  }
+
+  createElement() {
+    const container = document.createElement("div");
+    container.className = "bE-tollLogoElement";
+
+    const parsedSpacing = parseFloat(this.spacing);
+    const spacing = isNaN(parsedSpacing) ? 0 : parsedSpacing;
+    container.style.setProperty("--spacing", spacing + "rem");
+    container.style.setProperty(
+      "--tollBgColor",
+      lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase()
+    );
+    container.style.setProperty("--borderRadius", this.borderRadius + "px");
+
+    const parsedHeight = parseFloat(this.logoHeight);
+    const height = isNaN(parsedHeight) ? 3 : Math.max(parsedHeight, 0.5);
+    container.style.setProperty("--tollLogoHeight", height + "rem");
+    container.style.height = height + "rem";
+    container.style.alignSelf = "center";
+    container.style.flexShrink = "0";
+    container.style.flexBasis = "auto";
+
+    if (this.background) {
+      container.classList.add("hasBackground");
+    }
+
+    if (this.squareIcon) {
+      container.style.aspectRatio = "1 / 1";
+    }
+
+    const logoDefinition =
+      TollLogoElement.prototype.logos[this.logo] ||
+      TollLogoElement.prototype.logos[TollLogoElement.prototype.defaultLogo];
+
+    if (logoDefinition) {
+      const img = document.createElement("img");
+      img.src = logoDefinition.src;
+      img.alt = logoDefinition.label;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      container.appendChild(img);
+    } else {
+      container.textContent = "Toll logo unavailable";
+    }
+
+    return container;
+  }
+}
+
+TollLogoElement.prototype.defaultLogo = "EZPass";
+TollLogoElement.prototype.logos = {
+  EZPass: { label: "E-ZPass", src: "img/tolls/EZPass.png" },
+  TollTag: { label: "TollTag", src: "img/tolls/NTTA.svg" },
+  TxTag: { label: "TxTag", src: "img/tolls/TXTAG.svg" },
+  EZTAG: { label: "EZ TAG", src: "img/tolls/EZTAG.svg" },
+  FasTrak: { label: "FasTrak", src: "img/tolls/FASTrak.png" },
+  FreedomPass: { label: "Freedom Pass", src: "img/tolls/FREEDOMPASS.svg" },
+  PeachPass: { label: "Peach Pass", src: "img/tolls/PEACHPASS.svg" },
+  NCQuickPass: { label: "NC Quick Pass", src: "img/tolls/NCQUICKPASS.svg" },
+  EPASS: { label: "E-PASS", src: "img/tolls/EPASS.svg" },
+  SunPassOld: { label: "SunPass (old)", src: "img/tolls/SUNPASS-1.svg" },
+  SunPassNew: { label: "SunPass (new)", src: "img/tolls/SUNPASS-2.svg" },
+  ZipCash: { label: "ZipCash", src: "img/tolls/ZIPCASH.svg" },
+  LEEWAY: { label: "LeeWay", src: "img/tolls/LEEWAY.svg" },
+  KTAG: { label: "K-TAG", src: "img/tolls/KTAG.svg" },
+  PikePassOld: { label: "Pikepass (old)", src: "img/tolls/PIKEPASS-OLD.svg" },
+  PikePassNew: { label: "Pikepass (new)", src: "img/tolls/PIKEPASS-NEW.svg" },
+  PlatePay: { label: "PlatePay", src: "img/tolls/PLATEPAY.svg" },
+  IPASS: { label: "I-Pass", src: "img/tolls/I-Pass.svg" },
+  GeauxPass: { label: "GeauxPass", src: "img/tolls/GEAUXPASS.svg" },
+  GoodToGo: { label: "Good To Go!", src: "img/tolls/GOODTOGO.svg" },
+  ExpressToll: { label: "ExpressToll", src: "img/tolls/EXPRESSTOLL.svg" },
+  DPASS: { label: "D-PASS", src: "img/tolls/DPASS.svg" },
+  MUTCD: { label: "MUTCD", src: "img/tolls/MUTCD.svg" },
+};
+TollLogoElement.prototype.alignment = TextElement.prototype.alignment;
 
 class Block {
   constructor({
@@ -472,15 +580,10 @@ class Control {
 
       const leftAlignment = document.createElement("div");
       leftAlignment.className = "blockElementLeft";
-      leftAlignment.style.flexGrow = properties.stretchLeft ? "1" : "0";
-
       const centerAlignment = document.createElement("div");
       centerAlignment.className = "blockElementCenter";
-      centerAlignment.style.flexGrow = properties.stretchCenter ? "1" : "0";
-
       const rightAlignment = document.createElement("div");
       rightAlignment.className = "blockElementRight";
-      rightAlignment.style.flexGrow = properties.stretchRight ? "1" : "0";
 
       let lastKnownAlignment = centerAlignment;
       for (let i = 0; i < row.length; i++) {
@@ -501,6 +604,17 @@ class Control {
         lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
       }
 
+      leftAlignment.style.flexGrow =
+        properties.stretchLeft && leftAlignment.children.length > 0 ? "1" : "0";
+      centerAlignment.style.flexGrow =
+        properties.stretchCenter && centerAlignment.children.length > 0
+          ? "1"
+          : "0";
+      rightAlignment.style.flexGrow =
+        properties.stretchRight && rightAlignment.children.length > 0
+          ? "1"
+          : "0";
+
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);
       flexRow.appendChild(rightAlignment);
@@ -517,6 +631,7 @@ Control.prototype.blockToClassElems = {
   ShieldElement: ShieldElement,
   AdvisoryMessageElement: AdvisoryMessageElement,
   IconElement: IconElement,
+  TollLogoElement: TollLogoElement,
   ActionMessageElement: ActionMessageElement,
   ElectronicSignElement: ElectronicSignElement,
   getElem: (elemObj) => {
@@ -535,6 +650,7 @@ Control.prototype.blockElements = {
   ShieldElement: "Shield",
   AdvisoryMessageElement: "Advisory Message",
   IconElement: "Icon",
+  TollLogoElement: "Toll Logo",
   ActionMessageElement: "Action Message",
   ElectronicSignElement: "Electronic Sign",
 };
@@ -545,6 +661,7 @@ Control.prototype.blockInternalElements = {
   ShieldElement: "sdShield",
   AdvisoryMessageElement: "sdAdvisory",
   IconElement: "sdIcon",
+  TollLogoElement: "sdTollLogo",
   ActionMessageElement: "sdActionMessage",
   ElectronicSignElement: "sdElectronicSign",
 };

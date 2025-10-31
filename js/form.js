@@ -13,7 +13,7 @@ const formHandler = (function () {
     await initUI();
 
     try {
-      console.log(promptShield(null));
+      //console.log(promptShield(null));
     } catch (e) {
       console.error(e);
     }
@@ -353,6 +353,7 @@ const formHandler = (function () {
       document.querySelector("#sdActionMessage_alignment"),
       document.querySelector("#sdBlocker_alignment"),
       document.querySelector("#sdElectronicSign_alignment"),
+      document.querySelector("#sdTollLogo_alignment"),
     ];
     let textElem_bgColorSelects = [
       document.querySelector("#sdCtrlText_backgroundColor"),
@@ -361,6 +362,7 @@ const formHandler = (function () {
       document.querySelector("#sdIcon_borderColor"),
       document.querySelector("#sdIcon_backgroundColor"),
       document.querySelector("#sdBlock_backgroundColor"),
+      document.querySelector("#sdTollLogo_backgroundColor"),
     ];
     let divider_widthMeasurement = document.querySelector(
       "#sdblocker_dividerMeasurement"
@@ -410,6 +412,17 @@ const formHandler = (function () {
 
     for (const icon of IconElement.prototype.icons) {
       lib.appendOption(iconElem_iconsSelect, icon);
+    }
+
+    const tollLogoSelectElmt = document.getElementById("sdTollLogo_logo");
+    if (tollLogoSelectElmt) {
+      for (const logoKey in TollLogoElement.prototype.logos) {
+        const logoDef = TollLogoElement.prototype.logos[logoKey];
+        lib.appendOption(tollLogoSelectElmt, logoKey, {
+          text: logoDef.label,
+          selected: logoKey == TollLogoElement.prototype.defaultLogo,
+        });
+      }
     }
 
     // Populate shield directory
@@ -588,6 +601,10 @@ const formHandler = (function () {
     // icon border -> border color / radius (sdIcon_border)
     toggleTargets(`${block}_border`, [
       `${block}_borderColor`,
+      `${block}_borderRadius`,
+    ]);
+    toggleTargets(`${block}_background`, [
+      `${block}_backgroundColor`,
       `${block}_borderRadius`,
     ]);
   };
@@ -1484,9 +1501,13 @@ const formHandler = (function () {
     advisoryMessageElmt.checked = panel.sign.advisoryMessage;
 
     // Ensure dependent small inputs reflect the corresponding checkbox state
-    ["sdCtrlText", "sdAdvisory", "sdActionMessage", "sdIcon"].forEach((block) =>
-      setDependentVisibility(block)
-    );
+    [
+      "sdCtrlText",
+      "sdAdvisory",
+      "sdActionMessage",
+      "sdIcon",
+      "sdTollLogo",
+    ].forEach((block) => setDependentVisibility(block));
   };
 
   /**

@@ -73,6 +73,29 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   );
 }
 
+.bE-tollLogoElement {
+  display: block;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  height: var(--tollLogoHeight, 3rem);
+  margin: 0 var(--spacing, 0rem);
+}
+
+.bE-tollLogoElement.hasBackground {
+  background-color: var(--tollBgColor, white);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--borderRadius, 4px);
+}
+
+.bE-tollLogoElement img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .dividerElement {
   background-color: white;
   width: var(--dividerWidth);
@@ -88,6 +111,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   gap: 1rem;
   flex-grow: 1;
   flex-basis: 0;
+  min-width: max-content;
 }
 
 .blockElementCenter:empty,
