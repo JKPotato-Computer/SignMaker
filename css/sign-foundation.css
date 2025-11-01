@@ -11,12 +11,32 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .blockElementRow {
+  --blockBleedLeft: 0rem;
+  --blockBleedRight: 0rem;
+  --blockBleedTop: 0rem;
+  --blockBleedBottom: 0rem;
+  --blockPaddingTopExtra: 0rem;
+  --blockPaddingBottomExtra: 0rem;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   margin: var(--marginTop) 0 var(--marginBottom) 0;
   background-color: var(--masterBlockBgColor);
+}
+
+.blockElementRow.fullBleed {
+  width: calc(
+    100% + var(--blockBleedLeft, 0rem) + var(--blockBleedRight, 0rem)
+  );
+  margin-left: calc(-1 * var(--blockBleedLeft, 0rem));
+  margin-right: calc(-1 * var(--blockBleedRight, 0rem));
+  margin-top: calc(var(--marginTop, 0rem) - var(--blockBleedTop, 0rem));
+  margin-bottom: calc(var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem));
+  padding-left: var(--blockBleedLeft, 0rem);
+  padding-right: var(--blockBleedRight, 0rem);
+  padding-top: calc(var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem));
+  padding-bottom: calc(var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem));
 }
 
 .bE-textElement {
@@ -97,9 +117,24 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .dividerElement {
+  --dividerBleedLeft: 0rem;
+  --dividerBleedRight: 0rem;
   background-color: white;
-  width: var(--dividerWidth);
+  width: var(--dividerWidth, 100%);
   height: var(--dividerHeight);
+  position: relative;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.dividerElement.fullBleed {
+  width: calc(
+    var(--dividerWidth, 100%) + var(--dividerBleedLeft, 0rem) +
+      var(--dividerBleedRight, 0rem)
+  );
+  margin-left: calc(-1 * var(--dividerBleedLeft, 0rem));
+  margin-right: calc(-1 * var(--dividerBleedRight, 0rem));
+  flex-grow: 1;
 }
 
 .blockElementLeft,

@@ -30,6 +30,146 @@ const app = (function () {
   };
 
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
+  const applyPanelBorderGradient = (signElmt) => {
+    if (
+      typeof window === "undefined" ||
+      !signElmt ||
+      !signElmt.isConnected
+    ) {
+      return;
+    }
+
+    const computed = window.getComputedStyle(signElmt);
+    const defaultBorderColor =
+      computed.borderTopColor ||
+      computed.borderColor ||
+      (lib.colors && lib.colors.White) ||
+      "rgb(255, 255, 255)";
+    const borderWidth = parseFloat(computed.borderTopWidth) || 0;
+    const fillColor =
+      computed.backgroundColor && computed.backgroundColor !== "rgba(0, 0, 0, 0)"
+        ? computed.backgroundColor
+        : "transparent";
+
+    const clearDynamicBorder = () => {
+      signElmt.style.removeProperty("backgroundImage");
+      signElmt.style.removeProperty("backgroundOrigin");
+      signElmt.style.removeProperty("backgroundClip");
+      signElmt.style.removeProperty("backgroundRepeat");
+      signElmt.style.removeProperty("backgroundPosition");
+      signElmt.style.removeProperty("borderColor");
+    };
+
+    const fullBleedRows = signElmt.querySelectorAll(
+      ".blockElementRow[data-full-bleed-border-color]"
+    );
+
+    if (!fullBleedRows.length) {
+      clearDynamicBorder();
+      return;
+    }
+
+    const signRect = signElmt.getBoundingClientRect();
+    const signHeight = signRect.height;
+    if (!signHeight) {
+      clearDynamicBorder();
+      return;
+    }
+
+    const segments = [];
+    for (const rowEl of fullBleedRows) {
+      const color = rowEl.dataset.fullBleedBorderColor;
+      if (!color) {
+        continue;
+      }
+
+      const rowRect = rowEl.getBoundingClientRect();
+      let start = rowRect.top - signRect.top;
+      let end = rowRect.bottom - signRect.top;
+      if (end <= start) {
+        continue;
+      }
+
+      const edgeThreshold = borderWidth + 0.5;
+      if (start <= edgeThreshold) {
+        start = 0;
+      }
+      if (signHeight - end <= edgeThreshold) {
+        end = signHeight;
+      }
+
+      const startPct = Math.max(
+        0,
+        Math.min(100, (start / signHeight) * 100)
+      );
+      const endPct = Math.max(0, Math.min(100, (end / signHeight) * 100));
+      if (endPct <= startPct) {
+        continue;
+      }
+
+      segments.push({ start: startPct, end: endPct, color });
+    }
+
+    if (!segments.length) {
+      clearDynamicBorder();
+      return;
+    }
+
+    segments.sort((a, b) => a.start - b.start);
+
+    const gradientStops = [];
+    let cursor = 0;
+    const addSegment = (color, start, end) => {
+      const startClamped = Math.max(0, Math.min(100, start));
+      const endClamped = Math.max(0, Math.min(100, end));
+      if (endClamped <= startClamped) {
+        return;
+      }
+      const startLabel = startClamped.toFixed(4);
+      const endLabel = endClamped.toFixed(4);
+      gradientStops.push(`${color} ${startLabel}%`, `${color} ${endLabel}%`);
+    };
+
+    for (const segment of segments) {
+      if (segment.start > cursor) {
+        addSegment(defaultBorderColor, cursor, segment.start);
+      }
+      const segStart = Math.max(cursor, segment.start);
+      addSegment(segment.color, segStart, segment.end);
+      cursor = Math.max(cursor, segment.end);
+    }
+
+    if (cursor < 100) {
+      addSegment(defaultBorderColor, cursor, 100);
+    }
+
+    const gradient = `linear-gradient(to bottom, ${gradientStops.join(", ")})`;
+    signElmt.style.borderColor = "transparent";
+    signElmt.style.backgroundImage = `linear-gradient(${fillColor}, ${fillColor}), ${gradient}`;
+    signElmt.style.backgroundOrigin = "padding-box, border-box";
+    signElmt.style.backgroundClip = "padding-box, border-box";
+    signElmt.style.backgroundRepeat = "no-repeat, no-repeat";
+    signElmt.style.backgroundPosition = "0 0, 0 0";
+  };
+
+  const schedulePanelBorderGradientUpdate = (panelContainerElmt) => {
+    if (typeof window === "undefined" || !panelContainerElmt) {
+      return;
+    }
+
+    const update = () => {
+      const signs = panelContainerElmt.querySelectorAll(".sign");
+      for (const signElmt of signs) {
+        applyPanelBorderGradient(signElmt);
+      }
+    };
+
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(update);
+    } else {
+      update();
+    }
+  };
 
   // Initialize the application, and populates dropdowns and the default post.
 
@@ -1710,6 +1850,8 @@ const app = (function () {
       if (exitWidth > width) {
         signCont.style.width = firstExitTab.clientWidth + "px";
       }
+
+      schedulePanelBorderGradientUpdate(panelElmt);
     }
   };
 

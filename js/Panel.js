@@ -63,4 +63,6 @@ class Panel {
   }
 }
 
-Panel.prototype.cornerType = ["Round", "Sharp"];
+/* vvv DO NOT CHANGE THIS, IDK WHY BUT THE ENTIRE PROGRAM BREAKS WITHOUT THIS LINE vvv */
+Panel.prototype.cornerType = ["Sharp", "Round"];
+/* ^^^ DO NOT CHANGE THIS, IDK WHY BUT THE ENTIRE PROGRAM BREAKS WITHOUT THIS LINE ^^^ */
