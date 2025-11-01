@@ -6,10 +6,252 @@
 const formHandler = (function () {
   let exposed;
   let post;
+  let blockDragState = null;
+  const STORAGE_KEYS = {
+    postPosition: "signMaker.postPosition",
+    showPost: "signMaker.showPost",
+    fhwaFont: "signMaker.fhwaFont",
+    controlTextFont: "signMaker.controlTextFont",
+    legacyFhwaFont: "signMaker.defaultFont",
+  };
+  let localStorageAvailable;
+  let localStorageWarningLogged = false;
+
+  const logStorageWarning = (message, error) => {
+    if (!localStorageWarningLogged) {
+      console.warn(message, error);
+      localStorageWarningLogged = true;
+    }
+  };
+
+  const hasLocalStorage = () => {
+    if (localStorageAvailable !== undefined) {
+      return localStorageAvailable;
+    }
+    try {
+      localStorageAvailable =
+        typeof window !== "undefined" &&
+        typeof window.localStorage !== "undefined";
+    } catch (error) {
+      localStorageAvailable = false;
+    }
+    return localStorageAvailable;
+  };
+
+  const getStoredItem = (key) => {
+    if (!hasLocalStorage()) {
+      return null;
+    }
+    try {
+      return window.localStorage.getItem(key);
+    } catch (error) {
+      logStorageWarning("Unable to read from localStorage", error);
+      localStorageAvailable = false;
+      return null;
+    }
+  };
+
+  const setStoredItem = (key, value) => {
+    if (!hasLocalStorage()) {
+      return;
+    }
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (error) {
+      logStorageWarning("Unable to write to localStorage", error);
+      localStorageAvailable = false;
+    }
+  };
+
+  const applyStoredPreferences = () => {
+    const storedPostPosition = getStoredItem(STORAGE_KEYS.postPosition);
+    if (
+      storedPostPosition &&
+      Post.prototype.polePositions.includes(storedPostPosition)
+    ) {
+      post.polePosition = storedPostPosition;
+    }
+
+    const storedShowPost = getStoredItem(STORAGE_KEYS.showPost);
+    if (storedShowPost !== null) {
+      post.showPost = storedShowPost === "true";
+    }
+
+    let fhwaPreference = getStoredItem(STORAGE_KEYS.fhwaFont);
+    if (fhwaPreference === null) {
+      fhwaPreference = getStoredItem(STORAGE_KEYS.legacyFhwaFont);
+      if (fhwaPreference !== null) {
+        setStoredItem(STORAGE_KEYS.fhwaFont, fhwaPreference);
+      }
+    }
+
+    if (fhwaPreference !== null) {
+      post.fontType = fhwaPreference === "true";
+    }
+
+    const storedControlFont = getStoredItem(STORAGE_KEYS.controlTextFont);
+    const availableFonts =
+      TextElement && TextElement.prototype
+        ? TextElement.prototype.fontFamily
+        : null;
+    if (
+      storedControlFont &&
+      Array.isArray(availableFonts) &&
+      availableFonts.includes(storedControlFont)
+    ) {
+      if (
+        typeof ControlTextElement !== "undefined" &&
+        typeof ControlTextElement.setDefaultFont === "function"
+      ) {
+        ControlTextElement.setDefaultFont(storedControlFont);
+      } else if (typeof ControlTextElement !== "undefined") {
+        ControlTextElement.defaultFont = storedControlFont;
+      }
+    }
+  };
+
+  const toggleBlockWiggle = (isActive) => {
+    const blocks = document.querySelectorAll(".textEditorBlock");
+    for (const block of blocks) {
+      block.classList.toggle("blockWiggle", isActive);
+    }
+  };
+
+  const clearBlockDragIndicators = () => {
+    document
+      .querySelectorAll(".textEditorBlock.dropBefore, .textEditorBlock.dropAfter")
+      .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
+    document
+      .querySelectorAll(".sMControlRow.dropActive")
+      .forEach((el) => el.classList.remove("dropActive"));
+  };
+
+  const endBlockDrag = () => {
+    toggleBlockWiggle(false);
+    clearBlockDragIndicators();
+    blockDragState = null;
+    document
+      .querySelectorAll(".textEditorBlock.dragging")
+      .forEach((el) => el.classList.remove("dragging"));
+    document
+      .querySelectorAll(".textEditorBlock")
+      .forEach((el) => delete el.dataset.dragging);
+  };
+
+  const getDropIndexForRow = (rowEl, clientX) => {
+    const blocks = Array.from(rowEl.querySelectorAll(".textEditorBlock"));
+    if (!blocks.length) {
+      return 0;
+    }
+
+    let dropIndex = blocks.length;
+    let indicatorTarget = null;
+    let before = false;
+
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const rect = block.getBoundingClientRect();
+      if (clientX < rect.left + rect.width / 2) {
+        dropIndex = i;
+        indicatorTarget = block;
+        before = true;
+        break;
+      }
+    }
+
+    if (!indicatorTarget) {
+      indicatorTarget = blocks[blocks.length - 1];
+      before = false;
+    }
+
+    blocks.forEach((block) => {
+      block.classList.remove("dropBefore", "dropAfter");
+    });
+
+    indicatorTarget.classList.add(before ? "dropBefore" : "dropAfter");
+    return dropIndex;
+  };
+
+  const handleBlockDragStart = (event) => {
+    const target = event.currentTarget;
+    const rowIndex = Number(target.dataset.row);
+    const blockIndex = Number(target.dataset.block);
+    blockDragState = { rowIndex, blockIndex };
+    target.dataset.dragging = "true";
+    target.classList.add("dragging");
+    toggleBlockWiggle(true);
+    clearBlockDragIndicators();
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.setData("text/plain", "");
+    }
+  };
+
+  const handleBlockDragEnd = () => {
+    if (blockDragState) {
+      endBlockDrag();
+    }
+  };
+
+  const handleRowDragEnter = (event) => {
+    if (!blockDragState) {
+      return;
+    }
+    clearBlockDragIndicators();
+    const rowEl = event.currentTarget;
+    rowEl.classList.add("dropActive");
+  };
+
+  const handleRowDragOver = (event) => {
+    if (!blockDragState) {
+      return;
+    }
+    const rowEl = event.currentTarget;
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+    rowEl.classList.add("dropActive");
+    getDropIndexForRow(rowEl, event.clientX);
+  };
+
+  const handleRowDrop = (event) => {
+    if (!blockDragState) {
+      return;
+    }
+    const rowEl = event.currentTarget;
+    const rowIndex = Number(rowEl.dataset.dataRow);
+    event.preventDefault();
+    const dropIndex = getDropIndexForRow(rowEl, event.clientX);
+    exposed.moveControlElem(
+      blockDragState.rowIndex,
+      blockDragState.blockIndex,
+      rowIndex,
+      dropIndex
+    );
+    endBlockDrag();
+  };
+
+  const handleRowDragLeave = (event) => {
+    if (!blockDragState) {
+      return;
+    }
+    const rowEl = event.currentTarget;
+    const related = event.relatedTarget;
+    if (related && rowEl.contains(related)) {
+      return;
+    }
+    rowEl.classList.remove("dropActive");
+    rowEl
+      .querySelectorAll(".textEditorBlock.dropBefore, .textEditorBlock.dropAfter")
+      .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
+  };
 
   const initialize = async (appExposed) => {
     exposed = appExposed;
     post = exposed.getPost();
+    applyStoredPreferences();
     await initUI();
 
     try {
@@ -264,7 +506,7 @@ const formHandler = (function () {
     const postPositionSelectElmt = document.getElementById("postPosition");
     for (const polePosition of Post.prototype.polePositions) {
       lib.appendOption(postPositionSelectElmt, polePosition, {
-        selected: polePosition == "Left",
+        selected: polePosition == post.polePosition,
       });
     }
 
@@ -416,6 +658,47 @@ const formHandler = (function () {
       }
     }
 
+    const controlTextFontSelect =
+      document.querySelector("#sdCtrlText_fontFamily");
+    if (controlTextFontSelect) {
+      let defaultControlFont = null;
+      if (
+        typeof ControlTextElement !== "undefined" &&
+        typeof ControlTextElement.getDefaultFont === "function"
+      ) {
+        defaultControlFont = ControlTextElement.getDefaultFont();
+      } else if (typeof ControlTextElement !== "undefined") {
+        defaultControlFont = ControlTextElement.defaultFont;
+      }
+      if (defaultControlFont) {
+        controlTextFontSelect.value = defaultControlFont;
+      }
+
+      controlTextFontSelect.addEventListener("change", () => {
+        const selectedFont = controlTextFontSelect.value;
+        const availableFonts =
+          TextElement && TextElement.prototype
+            ? TextElement.prototype.fontFamily
+            : null;
+        if (
+          !selectedFont ||
+          !Array.isArray(availableFonts) ||
+          !availableFonts.includes(selectedFont)
+        ) {
+          return;
+        }
+        if (
+          typeof ControlTextElement !== "undefined" &&
+          typeof ControlTextElement.setDefaultFont === "function"
+        ) {
+          ControlTextElement.setDefaultFont(selectedFont);
+        } else if (typeof ControlTextElement !== "undefined") {
+          ControlTextElement.defaultFont = selectedFont;
+        }
+        setStoredItem(STORAGE_KEYS.controlTextFont, selectedFont);
+      });
+    }
+
     for (const elem of textElem_alignmentSelects) {
       for (const alignment of TextElement.prototype.alignment) {
         lib.appendOption(elem, alignment);
@@ -456,6 +739,81 @@ const formHandler = (function () {
 
     for (const icon of IconElement.prototype.icons) {
       lib.appendOption(iconElem_iconsSelect, icon);
+    }
+
+    const arrowElemSelect = document.querySelector("#sdArrow_arrow");
+    const arrowSizeInput = document.querySelector("#sdArrow_size");
+    if (arrowElemSelect && typeof ArrowElement !== "undefined") {
+      const arrowKeys =
+        ArrowElement.prototype.arrowKeys ||
+        Object.keys(ArrowElement.prototype.arrows || {});
+      for (const arrowKey of arrowKeys) {
+        const arrowDefinition =
+          ArrowElement.prototype.arrows[arrowKey] || {};
+        lib.appendOption(arrowElemSelect, arrowKey, {
+          text: arrowDefinition.label || arrowKey,
+          selected: arrowKey === ArrowElement.prototype.defaultArrow,
+        });
+      }
+    }
+
+    if (
+      arrowElemSelect &&
+      arrowSizeInput &&
+      typeof ArrowElement !== "undefined"
+    ) {
+      arrowElemSelect.addEventListener("change", () => {
+        const arrowDefinition =
+          ArrowElement.prototype.arrows[arrowElemSelect.value] || null;
+        const defaultSize =
+          arrowDefinition &&
+          typeof arrowDefinition.defaultSize === "number" &&
+          !isNaN(arrowDefinition.defaultSize)
+            ? arrowDefinition.defaultSize
+            : ArrowElement.prototype.defaultSize;
+        arrowSizeInput.value = defaultSize;
+        readForm();
+      });
+    }
+
+    const arrowRotationSlider = document.getElementById("sdArrow_rotation");
+    const arrowRotationVal = document.getElementById("sdArrow_rotationVal");
+    if (arrowRotationSlider && arrowRotationVal) {
+      arrowRotationSlider.addEventListener("input", () => {
+        arrowRotationVal.textContent = arrowRotationSlider.value;
+      });
+    }
+
+    const arrowRotationButtons = document.querySelectorAll(
+      ".sdArrow_rotationPreset"
+    );
+    for (const button of arrowRotationButtons) {
+      button.addEventListener("click", () => {
+        if (!arrowRotationSlider || !arrowRotationVal) {
+          return;
+        }
+        const degrees = parseFloat(button.dataset.degrees || "0") || 0;
+        arrowRotationSlider.value = degrees.toString();
+        arrowRotationVal.textContent = degrees.toString();
+        arrowRotationButtons.forEach((presetButton) => {
+          presetButton.classList.toggle("activated", presetButton === button);
+        });
+        readForm();
+      });
+    }
+
+    const arrowFlipInput = document.getElementById("sdArrow_flip");
+    const arrowFlipButton = document.getElementById("sdArrow_flipButton");
+    if (arrowFlipButton && arrowFlipInput) {
+      arrowFlipButton.addEventListener("click", () => {
+        const newValue = arrowFlipInput.value === "true" ? "false"
+          : "true";
+        arrowFlipInput.value = newValue;
+        const isFlipped = newValue === "true";
+        arrowFlipButton.classList.toggle("activated", isFlipped);
+        arrowFlipButton.setAttribute("aria-pressed", isFlipped ? "true" : "false");
+        readForm();
+      });
     }
 
     const tollLogoSelectElmt = document.getElementById("sdTollLogo_logo");
@@ -675,6 +1033,9 @@ const formHandler = (function () {
     post.fontType = form["fontChange"].checked;
     post.showPost = form["showPost"].checked;
     post.secondExitOnly = form["secondExitOnly"].checked;
+    setStoredItem(STORAGE_KEYS.postPosition, post.polePosition);
+    setStoredItem(STORAGE_KEYS.showPost, String(!!post.showPost));
+    setStoredItem(STORAGE_KEYS.fhwaFont, String(!!post.fontType));
 
     // Panel
     currentPanel.color = form["panelColor"].value;
@@ -825,6 +1186,15 @@ const formHandler = (function () {
           currentBlockElem[propertyName] = element.value;
         }
       }
+    }
+
+    if (blockElemType === "sdArrow") {
+      currentBlockElem.flip =
+        currentBlockElem.flip === true ||
+        currentBlockElem.flip === "true" ||
+        currentBlockElem.flip === 1 ||
+        currentBlockElem.flip === "1" ||
+        currentBlockElem.flip === "on";
     }
 
     subPanel.blockElements.blockProperties[
@@ -1003,6 +1373,26 @@ const formHandler = (function () {
     const panelList = document.getElementById("panelList");
     const subPanelList = document.getElementById("subPanelList");
     const exitTabList = document.getElementById("exitTabList");
+
+    const postPositionSelectElmt = document.getElementById("postPosition");
+    if (postPositionSelectElmt && post.polePosition) {
+      postPositionSelectElmt.value = post.polePosition;
+    }
+
+    const showPostCheckbox = document.getElementById("showPost");
+    if (showPostCheckbox) {
+      showPostCheckbox.checked = !!post.showPost;
+    }
+
+    const fontChangeCheckbox = document.getElementById("fontChange");
+    if (fontChangeCheckbox) {
+      fontChangeCheckbox.checked = !!post.fontType;
+    }
+
+    const secondExitOnlyCheckbox = document.getElementById("secondExitOnly");
+    if (secondExitOnlyCheckbox) {
+      secondExitOnlyCheckbox.checked = !!post.secondExitOnly;
+    }
 
     while (panelList.firstChild) {
       panelList.removeChild(panelList.lastChild);
@@ -1289,12 +1679,21 @@ const formHandler = (function () {
           row == exposed.vars.currentlySelectedRowIndex
             ? " selected"
             : "");
+        textEditorBlock.dataset.row = row.toString();
+        textEditorBlock.dataset.block = item.toString();
+        textEditorBlock.draggable = true;
         textEditorBlock.textContent =
           Control.prototype.blockElements[blockElement.constructor.name];
         sMControlRow.appendChild(textEditorBlock);
+        textEditorBlock.addEventListener("dragstart", handleBlockDragStart);
+        textEditorBlock.addEventListener("dragend", handleBlockDragEnd);
         textEditorBlock.addEventListener(
           "click",
-          () => {
+          (event) => {
+            if (textEditorBlock.dataset.dragging === "true") {
+              event.preventDefault();
+              return;
+            }
             exposed.setSelectedControlElem(item);
           },
           { once: true }
@@ -1302,6 +1701,10 @@ const formHandler = (function () {
       }
 
       sMSPTextList.appendChild(sMControlRow);
+      sMControlRow.addEventListener("dragenter", handleRowDragEnter);
+      sMControlRow.addEventListener("dragover", handleRowDragOver);
+      sMControlRow.addEventListener("dragleave", handleRowDragLeave);
+      sMControlRow.addEventListener("drop", handleRowDrop);
       sMControlRow.addEventListener(
         "click",
         () => {
@@ -1334,6 +1737,39 @@ const formHandler = (function () {
         Control.prototype.blockToClassElems.getElem(currentBlockElem)
       ];
 
+    if (blockElemType === "sdArrow") {
+      const normalizePadding = (value, fallback = 0) => {
+        const parsed = parseFloat(
+          value !== null && value !== undefined ? value : fallback
+        );
+        return isNaN(parsed) ? fallback : parsed;
+      };
+
+      const fallbackPadding =
+        currentBlockElem.padding !== undefined &&
+        currentBlockElem.padding !== null
+          ? currentBlockElem.padding
+          : 0;
+
+      currentBlockElem.paddingHorizontal = normalizePadding(
+        currentBlockElem.paddingHorizontal,
+        fallbackPadding
+      );
+      currentBlockElem.paddingVertical = normalizePadding(
+        currentBlockElem.paddingVertical,
+        fallbackPadding
+      );
+
+      delete currentBlockElem.padding;
+
+      currentBlockElem.flip =
+        currentBlockElem.flip === true ||
+        currentBlockElem.flip === "true" ||
+        currentBlockElem.flip === 1 ||
+        currentBlockElem.flip === "1" ||
+        currentBlockElem.flip === "on";
+    }
+
     for (const propertyName in currentBlockElem) {
       const elementId = `${blockElemType}_${propertyName}`;
       const element = document.getElementById(elementId);
@@ -1357,11 +1793,46 @@ const formHandler = (function () {
             readForm,
             { once: true }
           );
+          if (
+            element.type === "range" &&
+            displayElement &&
+            !element.dataset.syncDisplay
+          ) {
+            element.addEventListener("input", () => {
+              displayElement.textContent = element.value;
+            });
+            element.dataset.syncDisplay = "true";
+          }
         }
       }
 
       if (displayElement) {
         displayElement.textContent = currentBlockElem[propertyName];
+      }
+    }
+
+    if (blockElemType === "sdArrow") {
+      const arrowRotationButtons = document.querySelectorAll(
+        ".sdArrow_rotationPreset"
+      );
+      const currentRotation = parseFloat(currentBlockElem.rotation) || 0;
+      arrowRotationButtons.forEach((button) => {
+        const degrees = parseFloat(button.dataset.degrees || "0") || 0;
+        button.classList.toggle(
+          "activated",
+          Math.abs(((currentRotation % 360) + 360) % 360 - degrees) < 0.5
+        );
+      });
+
+      const arrowFlipInput = document.getElementById("sdArrow_flip");
+      const arrowFlipButton = document.getElementById("sdArrow_flipButton");
+      if (arrowFlipInput && arrowFlipButton) {
+        arrowFlipInput.value = currentBlockElem.flip ? "true" : "false";
+        arrowFlipButton.classList.toggle("activated", currentBlockElem.flip);
+        arrowFlipButton.setAttribute(
+          "aria-pressed",
+          currentBlockElem.flip ? "true" : "false"
+        );
       }
     }
 

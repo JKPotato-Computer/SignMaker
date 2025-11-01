@@ -247,6 +247,8 @@
   --purple: rgb(102, 0, 153);
   --orange: rgb(255, 89, 4);
   --red: rgb(255, 0, 0);
+  --fluorescent-pink: rgb(255, 51, 204);
+  --fluorescent-yellow-green: rgb(153, 255, 0);
 }
 
 :root[data-theme="light"] {

@@ -116,6 +116,31 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   object-fit: contain;
 }
 
+.bE-arrowElement {
+  --arrowRotation: 0deg;
+  --arrowSize: 1.75rem;
+  --arrowPaddingVertical: 0rem;
+  --arrowPaddingHorizontal: 0rem;
+  --arrowFlip: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: var(--arrowPaddingVertical) var(--arrowPaddingHorizontal);
+}
+
+.bE-arrowElement img {
+  display: block;
+  width: var(--arrowSize);
+  height: auto;
+  transform: scaleX(var(--arrowFlip)) rotate(var(--arrowRotation));
+  transform-origin: center;
+}
+
+.blockElementRow[data-light-background="true"] .bE-arrowElement img {
+  filter: brightness(0);
+}
+
 .dividerElement {
   --dividerBleedLeft: 0rem;
   --dividerBleedRight: 0rem;
