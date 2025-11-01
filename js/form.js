@@ -21,6 +21,41 @@ const formHandler = (function () {
 
   const initUI = async () => {
     const sMConfigBar = document.querySelector("#sMConfigBar");
+    const htmlElement = document.documentElement;
+    const nightModeButton = document.querySelector("#nightMode");
+    const prefersDarkScheme =
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-color-scheme: dark)")
+        : null;
+    let userThemeOverride = false;
+
+    const getSystemTheme = () =>
+      prefersDarkScheme && prefersDarkScheme.matches ? "dark" : "light";
+
+    const applyTheme = (theme) => {
+      if (!theme) {
+        return;
+      }
+      htmlElement.dataset.theme = theme;
+    };
+
+    const syncThemeWithSystem = () => {
+      const systemTheme = getSystemTheme();
+      if (!userThemeOverride) {
+        applyTheme(systemTheme);
+      } else if (htmlElement.dataset.theme === systemTheme) {
+        userThemeOverride = false;
+      }
+    };
+
+    syncThemeWithSystem();
+    if (prefersDarkScheme) {
+      if (typeof prefersDarkScheme.addEventListener === "function") {
+        prefersDarkScheme.addEventListener("change", syncThemeWithSystem);
+      } else if (typeof prefersDarkScheme.addListener === "function") {
+        prefersDarkScheme.addListener(syncThemeWithSystem);
+      }
+    }
 
     function reDisplay() {
       for (const holder of document.querySelectorAll(".sMModal")) {
@@ -181,12 +216,14 @@ const formHandler = (function () {
       });
     }
 
-    document.querySelector("#nightMode").addEventListener("click", () => {
-      document.querySelector("html").dataset.theme =
-        document.querySelector("html").dataset.theme == "dark"
-          ? "light"
-          : "dark";
-    });
+    if (nightModeButton) {
+      nightModeButton.addEventListener("click", () => {
+        const nextTheme =
+          htmlElement.dataset.theme === "dark" ? "light" : "dark";
+        applyTheme(nextTheme);
+        userThemeOverride = nextTheme !== getSystemTheme();
+      });
+    }
 
     document
       .querySelector("#smSPShieldAdvanced")
@@ -365,7 +402,10 @@ const formHandler = (function () {
       document.querySelector("#sdTollLogo_backgroundColor"),
     ];
     let divider_widthMeasurement = document.querySelector(
-      "#sdblocker_dividerMeasurement"
+      "#sdBlocker_dividerMeasurement"
+    );
+    let divider_colorSelect = document.querySelector(
+      "#sdBlocker_dividerColor"
     );
     let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
     let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
@@ -404,6 +444,10 @@ const formHandler = (function () {
 
     for (const measurement of DividerElement.prototype.dividerMeasurement) {
       lib.appendOption(divider_widthMeasurement, measurement);
+    }
+
+    for (const { value, label } of DividerElement.prototype.dividerColors) {
+      lib.appendOption(divider_colorSelect, value, { text: label });
     }
 
     for (const shieldType in Shield.prototype.types) {
@@ -794,6 +838,11 @@ const formHandler = (function () {
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor"
     ).value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].backgroundFullWidth = document.querySelector(
+      "#sdBlock_backgroundFullWidth"
+    ).checked;
     subPanel.blockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].width = document.querySelector("#sdBlock_width").value;
@@ -1350,6 +1399,17 @@ const formHandler = (function () {
     document
       .querySelector("#sdBlock_backgroundColor")
       .addEventListener("blur", readForm, { once: true });
+
+    const blockBackgroundFullWidthEl = document.querySelector(
+      "#sdBlock_backgroundFullWidth"
+    );
+    blockBackgroundFullWidthEl.checked =
+      !!sign.blockElements.blockProperties[
+        exposed.vars.currentlySelectedRowIndex
+      ].backgroundFullWidth;
+    blockBackgroundFullWidthEl.addEventListener("change", readForm, {
+      once: true,
+    });
 
     document.querySelector("#sdBlock_width").value =
       sign.blockElements.blockProperties[

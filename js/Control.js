@@ -312,12 +312,16 @@ class DividerElement {
     dividerHeight = 0.2,
     alignment = "Center",
     visible = true,
+    dividerColor = "White",
+    fullBleed = false,
   } = {}) {
     this.dividerWidth = dividerWidth;
     this.dividerMeasurement = dividerMeasurement;
     this.dividerHeight = dividerHeight;
     this.alignment = alignment;
     this.visible = visible;
+    this.dividerColor = dividerColor;
+    this.fullBleed = fullBleed;
   }
 
   createElement(panel) {
@@ -329,12 +333,56 @@ class DividerElement {
       this.dividerWidth + this.dividerMeasurement
     );
     newDivider.style.setProperty("--dividerHeight", this.dividerHeight + "rem");
+    newDivider.style.marginTop = "0";
+    newDivider.style.marginBottom = "0";
+
+    if (this.dividerColor && this.dividerColor !== "Default") {
+      const resolvedColor =
+        lib.colors[this.dividerColor] || this.dividerColor || "";
+      if (resolvedColor) {
+        newDivider.style.backgroundColor = resolvedColor;
+      }
+    }
+
+    if (this.fullBleed) {
+      newDivider.classList.add("fullBleed");
+      const paddingString = panel?.sign?.padding || "";
+      const paddingValues = paddingString.trim().split(/\s+/).filter(Boolean);
+
+      let top = "0rem",
+        right = "0rem",
+        bottom = "0rem",
+        left = "0rem";
+
+      if (paddingValues.length === 1) {
+        top = right = bottom = left = paddingValues[0];
+      } else if (paddingValues.length === 2) {
+        top = bottom = paddingValues[0];
+        right = left = paddingValues[1];
+      } else if (paddingValues.length === 3) {
+        [top, right, bottom] = paddingValues;
+        left = right;
+      } else if (paddingValues.length >= 4) {
+        [top, right, bottom, left] = paddingValues;
+      }
+
+      newDivider.style.setProperty("--dividerBleedLeft", left || "0rem");
+      newDivider.style.setProperty("--dividerBleedRight", right || "0rem");
+    } else {
+      newDivider.classList.remove("fullBleed");
+      newDivider.style.setProperty("--dividerBleedLeft", "0rem");
+      newDivider.style.setProperty("--dividerBleedRight", "0rem");
+    }
 
     return newDivider;
   }
 }
 
 DividerElement.prototype.dividerMeasurement = ["%", "rem"];
+DividerElement.prototype.dividerColors = [
+  { value: "White", label: "White" },
+  { value: "Black", label: "Black" },
+];
 
 class IconElement {
   constructor({
@@ -466,6 +514,7 @@ class Block {
     topPadding = 0,
     bottomPadding = 0,
     backgroundColor = "Inherit",
+    backgroundFullWidth = true,
     width = 0,
     stretchLeft = true,
     stretchCenter = true,
@@ -474,6 +523,7 @@ class Block {
     this.topPadding = topPadding;
     this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
+    this.backgroundFullWidth = backgroundFullWidth;
     this.width = width;
     this.stretchLeft = stretchLeft;
     this.stretchCenter = stretchCenter;
@@ -547,35 +597,120 @@ class Control {
     const flexBox = document.createElement("div");
     flexBox.className = "blockElementMaster";
 
-    for (let i = 0; i < this.rows.length; i++) {
+    const parsePadding = (paddingString = "") => {
+      const defaultPadding = {
+        top: "0rem",
+        right: "0rem",
+        bottom: "0rem",
+        left: "0rem",
+      };
+
+      if (!paddingString || typeof paddingString !== "string") {
+        return defaultPadding;
+      }
+
+      const values = paddingString.trim().split(/\s+/).filter(Boolean);
+      if (values.length === 0) {
+        return defaultPadding;
+      }
+
+      if (values.length === 1) {
+        return {
+          top: values[0],
+          right: values[0],
+          bottom: values[0],
+          left: values[0],
+        };
+      }
+
+      if (values.length === 2) {
+        return {
+          top: values[0],
+          right: values[1],
+          bottom: values[0],
+          left: values[1],
+        };
+      }
+
+      if (values.length === 3) {
+        return {
+          top: values[0],
+          right: values[1],
+          bottom: values[2],
+          left: values[1],
+        };
+      }
+
+      return {
+        top: values[0],
+        right: values[1],
+        bottom: values[2],
+        left: values[3],
+      };
+    };
+
+    const signPadding = parsePadding(panel?.sign?.padding);
+
+    const totalRows = this.rows.length;
+    for (let i = 0; i < totalRows; i++) {
       const row = this.rows[i];
       const properties = this.blockProperties[i];
+      const topPadding = parseFloat(properties.topPadding) || 0;
+      const bottomPadding = parseFloat(properties.bottomPadding) || 0;
+      const topSpacing = topPadding + "rem";
+      const bottomSpacing = bottomPadding + "rem";
+      const bleedTop = i === 0 ? signPadding.top : "0rem";
+      const bleedBottom = i === totalRows - 1 ? signPadding.bottom : "0rem";
 
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
-      flexRow.style.setProperty("--marginTop", properties.topPadding + "rem");
-      flexRow.style.setProperty(
-        "--marginBottom",
-        properties.bottomPadding + "rem"
-      );
-      flexRow.style.setProperty(
-        "--masterBlockBgColor",
+      flexRow.style.setProperty("--marginTop", topSpacing);
+      flexRow.style.setProperty("--marginBottom", bottomSpacing);
+      flexRow.style.setProperty("--blockPaddingTopExtra", "0rem");
+      flexRow.style.setProperty("--blockPaddingBottomExtra", "0rem");
+      const resolvedBackgroundColor =
         properties.backgroundColor == "Inherit"
           ? ""
           : (
               lib.colors[properties.backgroundColor] ||
               properties.backgroundColor
-            ).toLowerCase()
-      );
-      flexRow.style.width =
-        properties.width == 0 ? "" : properties.width + "rem";
+            ).toLowerCase();
+      flexRow.style.setProperty("--masterBlockBgColor", resolvedBackgroundColor);
 
-      if (
+      const usesLightBleedBackground =
         properties.backgroundColor == "Orange" ||
         properties.backgroundColor == "White" ||
-        properties.backgroundColor == "Yellow"
-      ) {
+        properties.backgroundColor == "Yellow";
+
+      if (properties.backgroundFullWidth) {
+        flexRow.classList.add("fullBleed");
+        flexRow.style.setProperty("--blockBleedLeft", signPadding.left);
+        flexRow.style.setProperty("--blockBleedRight", signPadding.right);
+        flexRow.style.setProperty("--blockBleedTop", bleedTop);
+        flexRow.style.setProperty("--blockBleedBottom", bleedBottom);
+        flexRow.style.width = "";
+        flexRow.style.setProperty("--marginTop", "0rem");
+        flexRow.style.setProperty("--marginBottom", "0rem");
+        flexRow.style.setProperty("--blockPaddingTopExtra", topSpacing);
+        flexRow.style.setProperty("--blockPaddingBottomExtra", bottomSpacing);
+      } else {
+        flexRow.classList.remove("fullBleed");
+        flexRow.style.setProperty("--blockBleedLeft", "0rem");
+        flexRow.style.setProperty("--blockBleedRight", "0rem");
+        flexRow.style.setProperty("--blockBleedTop", "0rem");
+        flexRow.style.setProperty("--blockBleedBottom", "0rem");
+        flexRow.style.setProperty("--marginTop", topSpacing);
+        flexRow.style.setProperty("--marginBottom", bottomSpacing);
+        flexRow.style.width =
+          properties.width == 0 ? "" : properties.width + "rem";
+      }
+
+      if (usesLightBleedBackground) {
         flexRow.style.color = "black";
+        if (properties.backgroundFullWidth) {
+          flexRow.dataset.fullBleedBorderColor =
+            (lib.colors && lib.colors.Black) || "rgb(0, 0, 0)";
+        }
       }
 
       const leftAlignment = document.createElement("div");
@@ -586,6 +721,7 @@ class Control {
       rightAlignment.className = "blockElementRight";
 
       let lastKnownAlignment = centerAlignment;
+      let dividerBorderColor = null;
       for (let i = 0; i < row.length; i++) {
         let elem = row[i];
         switch (elem.alignment) {
@@ -601,6 +737,19 @@ class Control {
           default:
         }
 
+        if (
+          elem instanceof DividerElement &&
+          elem.fullBleed === true &&
+          dividerBorderColor === null
+        ) {
+          if (elem.dividerColor && elem.dividerColor !== "Default") {
+            dividerBorderColor =
+              lib.colors[elem.dividerColor] || elem.dividerColor;
+          } else {
+            dividerBorderColor = lib.colors.White || "white";
+          }
+        }
+
         lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
       }
 
@@ -614,6 +763,10 @@ class Control {
         properties.stretchRight && rightAlignment.children.length > 0
           ? "1"
           : "0";
+
+      if (dividerBorderColor) {
+        flexRow.dataset.fullBleedBorderColor = dividerBorderColor.toLowerCase();
+      }
 
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);

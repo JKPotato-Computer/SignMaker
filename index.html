@@ -9,6 +9,19 @@
       content="The ULTIMATE Sign Maker for highways, expressways, and everything!"
     />
     <title>Highway Sign Maker</title>
+    <script>
+      (function () {
+        if (
+          typeof window !== "undefined" &&
+          typeof window.matchMedia === "function" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+          document.documentElement.dataset.theme = "dark";
+        } else {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
     <link rel="icon" type="image/x-icon" href="img/other-symbols/icon.png" />
     <!-- CSS Links -->
     <link href="css/page.css" rel="stylesheet" type="text/css" />
@@ -1067,6 +1080,11 @@
                       data-toolTip="Unit (%/rem)"
                       class="sdTextEditorSmall"
                     ></select>
+                    <label for="sdBlocker_dividerColor">Color:</label>
+                    <select
+                      id="sdBlocker_dividerColor"
+                      class="sdTextEditorSmall"
+                    ></select>
                     <label for="sdBlocker_dividerHeight"
                       >Divider Height (rem):
                     </label>
@@ -1082,6 +1100,8 @@
                     <br />
                     <label for="sdBlocker_alignment">Alignment: </label>
                     <select id="sdBlocker_alignment"></select>
+                    <label for="sdBlocker_fullBleed">Full Width:</label>
+                    <input type="checkbox" id="sdBlocker_fullBleed" />
                     <label for="sdBlocker_visible">Visibility:</label>
                     <input type="checkbox" id="sdBlocker_visible" />
                   </div>
@@ -1502,6 +1522,8 @@
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
                   <select id="sdBlock_backgroundColor"></select>
+                  <label for="sdBlock_backgroundFullWidth">BG Full Width:</label>
+                  <input type="checkbox" id="sdBlock_backgroundFullWidth" />
                   <br />
                   <label
                     for="sdBlock_width"
