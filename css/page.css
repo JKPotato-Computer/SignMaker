@@ -236,6 +236,24 @@
   src: local("Arial Bold");
 }
 
+@font-face {
+  font-family: "DIN Engschrift";
+  src: url("../fonts/DINEngschriftStd.woff2") format("woff2"),
+    url("../fonts/DINEngschriftStd.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DIN Mittelschrift";
+  src: url("../fonts/DINMittelschriftStd.woff2") format("woff2"),
+    url("../fonts/DINMittelschriftStd.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --green: rgb(0, 95, 77);
   --blue: rgb(0, 67, 123);

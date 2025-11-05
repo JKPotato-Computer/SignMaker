@@ -177,6 +177,8 @@ TextElement.prototype.fontFamily = [
   "Arial",
   "Arial Bold",
   "Transport",
+  "DIN Engschrift",
+  "DIN Mittelschrift",
 ];
 
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
