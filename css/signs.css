@@ -124,18 +124,22 @@
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
+.panel.fluorescent.pink .sign,
 .panel.green .guideArrows,
 .panel.blue .guideArrows,
 .panel.brown .guideArrows,
-.panel.black .guideArrows {
+.panel.black .guideArrows,
+.panel.fluorescent.pink .guideArrows {
   color: var(--white);
   border-color: var(--white);
 }
 
 .panel.white .sign,
 .panel.yellow .sign,
+.panel.fluorescent.yellow-green .sign,
 .panel.white .guideArrows,
 .panel.yellow .guideArrows,
+.panel.fluorescent.yellow-green .guideArrows,
 .panel.orange .sign,
 .panel.orange .guideArrows {
   color: var(--black);
@@ -202,13 +206,29 @@
   color: var(--black);
 }
 
+.panel.fluorescent.pink .sign,
+.panel.fluorescent.pink .signContainer,
+.panel.fluorescent.pink .exitTabContainer,
+.panel.fluorescent.pink .guideArrows {
+  background-color: var(--fluorescent-pink);
+}
+
+.panel.fluorescent.yellow-green .sign,
+.panel.fluorescent.yellow-green .signContainer,
+.panel.fluorescent.yellow-green .exitTabContainer,
+.panel.fluorescent.yellow-green .guideArrows {
+  background-color: var(--fluorescent-yellow-green);
+}
+
 .panel.white .dividerElement,
 .panel.orange .dividerElement,
-.panel.yellow .dividerElement {
+.panel.yellow .dividerElement,
+.panel.fluorescent.yellow-green .dividerElement {
   background-color: black;
 }
 
-.panel.orange .arrow {
+.panel.orange .arrow,
+.panel.fluorescent.yellow-green .arrow {
   filter: invert(100%);
   -webkit-filter: invert(100%);
 }
@@ -263,6 +283,21 @@
   color: var(--white);
 }
 
+.exitTab.fluorescent.pink,
+.exitTabHolder.fluorescent.pink {
+  background-color: var(--fluorescent-pink);
+  border-color: var(--white);
+  color: var(--white);
+}
+
+.exitTab.fluorescent.yellow-green,
+.exitTabHolder.fluorescent.yellow-green {
+  background-color: var(--fluorescent-yellow-green);
+  border-color: var(--black);
+  color: var(--black);
+  padding: 1px;
+}
+
 .exitTabHolder {
   flex-grow: 1;
 }
@@ -285,7 +320,7 @@
 
 .exitTab.squareCorners {
   border-radius: 0.25rem 0.25rem 0 0;
-  padding: 0 1.30rem;
+  padding: 0 1.3rem;
 }
 
 .exitTab.squareCorners.out {

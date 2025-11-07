@@ -119,7 +119,11 @@ class BannerGroup {
     position = "left",
     gap = .5,
     direction = "vertical",
-  } = {}) {}
+  } = {}) {
+    this.position = position;
+    this.gap = gap;
+    this.direction = direction;
+  }
 }
 
 class ShieldBlock {

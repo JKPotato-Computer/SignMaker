@@ -453,6 +453,64 @@ const app = (function () {
     redraw();
   };
 
+  const moveControlElem = (
+    fromRowIndex,
+    fromBlockIndex,
+    toRowIndex,
+    toBlockIndex
+  ) => {
+    const blockElements = getCurrentSubPanel().blockElements;
+    const sourceRow = blockElements.rows[fromRowIndex];
+    if (!sourceRow || !sourceRow.length) {
+      return;
+    }
+
+    const movingWithinRow = fromRowIndex === toRowIndex;
+    const rowLengthBeforeRemoval = sourceRow.length;
+
+    const normalizedFrom = clamp(
+      fromBlockIndex,
+      0,
+      Math.max(0, rowLengthBeforeRemoval - 1)
+    );
+    const [movedElem] = sourceRow.splice(normalizedFrom, 1);
+    if (!movedElem) {
+      return;
+    }
+
+    let destinationRowIndex = toRowIndex;
+    if (!movingWithinRow && sourceRow.length === 0) {
+      blockElements.rows.splice(fromRowIndex, 1);
+      blockElements.blockProperties.splice(fromRowIndex, 1);
+      if (fromRowIndex < toRowIndex) {
+        destinationRowIndex = Math.max(0, toRowIndex - 1);
+      }
+    }
+
+    const targetRow = blockElements.rows[destinationRowIndex];
+    if (!targetRow) {
+      return;
+    }
+
+    let normalizedTo;
+    if (movingWithinRow) {
+      const maxIndex = rowLengthBeforeRemoval;
+      normalizedTo = clamp(toBlockIndex, 0, maxIndex);
+      if (normalizedTo > normalizedFrom) {
+        normalizedTo--;
+      }
+    } else {
+      normalizedTo = clamp(toBlockIndex, 0, targetRow.length);
+    }
+
+    targetRow.splice(normalizedTo, 0, movedElem);
+
+    currentlySelectedRowIndex = destinationRowIndex;
+    currentlySelectedBlockIndex = normalizedTo;
+    formHandler.updateForm();
+    redraw();
+  };
+
   const setSelectedControlElem = (block) => {
     currentlySelectedBlockIndex = clamp(
       block,
@@ -1866,6 +1924,7 @@ const app = (function () {
     redraw,
     setSelectedRow,
     setSelectedControlElem,
+    moveControlElem,
     changeEditingPanel,
     changeEditingSubPanel,
     deleteShield,

@@ -133,7 +133,8 @@ class TextElement {
     if (
       this.backgroundColor == "Orange" ||
       this.backgroundColor == "White" ||
-      this.backgroundColor == "Yellow"
+      this.backgroundColor == "Yellow" ||
+      this.backgroundColor == "Fluorescent Yellow-Green"
     ) {
       newText.style.color = "black";
     } else if (this.backgroundColor != "Inherit") {
@@ -186,8 +187,28 @@ TextElement.prototype.backgroundColor = ["Inherit"].concat(
 );
 
 class ControlTextElement extends TextElement {
-  constructor({ spacing = 0, smallCapitals = false } = {}) {
-    super();
+  constructor(options = {}) {
+    const { spacing = 0, smallCapitals = false } = options;
+    const resolvedOptions = { ...options };
+    const availableFonts =
+      TextElement && TextElement.prototype
+        ? TextElement.prototype.fontFamily
+        : null;
+    const providedFont = resolvedOptions.fontFamily;
+    if (
+      !providedFont ||
+      !Array.isArray(availableFonts) ||
+      !availableFonts.includes(providedFont)
+    ) {
+      const defaultFont =
+        typeof ControlTextElement.getDefaultFont === "function"
+          ? ControlTextElement.getDefaultFont()
+          : ControlTextElement.defaultFont;
+      if (defaultFont) {
+        resolvedOptions.fontFamily = defaultFont;
+      }
+    }
+    super(resolvedOptions);
     this.spacing = spacing;
     this.smallCapitals = smallCapitals;
   }
@@ -200,6 +221,46 @@ class ControlTextElement extends TextElement {
     return newText;
   }
 }
+
+ControlTextElement.defaultFont = Array.isArray(
+  TextElement && TextElement.prototype ? TextElement.prototype.fontFamily : null
+)
+  ? TextElement.prototype.fontFamily.includes("Clearview 5WR")
+    ? "Clearview 5WR"
+    : TextElement.prototype.fontFamily[0]
+  : "Clearview 5WR";
+
+ControlTextElement.getDefaultFont = function () {
+  const availableFonts =
+    TextElement && TextElement.prototype
+      ? TextElement.prototype.fontFamily
+      : null;
+  const fallback = Array.isArray(availableFonts) ? availableFonts[0] : null;
+  const currentDefault = ControlTextElement.defaultFont || fallback;
+  if (
+    currentDefault &&
+    Array.isArray(availableFonts) &&
+    availableFonts.includes(currentDefault)
+  ) {
+    return currentDefault;
+  }
+  return fallback || "Clearview 5WR";
+};
+
+ControlTextElement.setDefaultFont = function (font) {
+  const availableFonts =
+    TextElement && TextElement.prototype
+      ? TextElement.prototype.fontFamily
+      : null;
+  if (!font || !Array.isArray(availableFonts) || !availableFonts.length) {
+    return false;
+  }
+  if (!availableFonts.includes(font)) {
+    return false;
+  }
+  ControlTextElement.defaultFont = font;
+  return true;
+};
 
 class ActionMessageElement extends TextElement {
   constructor({ fontSize = 70, useNumeralFormatting = true } = {}) {
@@ -406,16 +467,148 @@ class IconElement {
 
 IconElement.prototype.icons = ["Airplane"];
 
+class ArrowElement {
+  constructor({
+    arrow = ArrowElement.prototype.defaultArrow,
+    rotation = 0,
+    size = null,
+    padding = null,
+    paddingHorizontal = null,
+    paddingVertical = null,
+    flip = false,
+  } = {}) {
+    const resolveArrowKey = ArrowElement.prototype.arrows[arrow]
+      ? arrow
+      : ArrowElement.prototype.defaultArrow;
+    this.arrow = resolveArrowKey;
+    this.rotation = rotation;
+    this.flip =
+      flip === true ||
+      flip === "true" ||
+      flip === 1 ||
+      flip === "1" ||
+      flip === "on";
+
+    const arrowDefinition = ArrowElement.prototype.arrows[this.arrow] || {};
+    const defaultSize =
+      typeof arrowDefinition.defaultSize === "number"
+        ? arrowDefinition.defaultSize
+        : ArrowElement.prototype.defaultSize;
+
+    const normalizeNumber = (value, fallback = 0) => {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? fallback : parsed;
+    };
+
+    if (size === null || size === undefined || size === "") {
+      this.size = defaultSize;
+    } else {
+      this.size = normalizeNumber(size, defaultSize);
+    }
+
+    const fallbackPadding =
+      padding !== null && padding !== undefined ? padding : 0;
+    this.paddingHorizontal = normalizeNumber(
+      paddingHorizontal !== null && paddingHorizontal !== undefined
+        ? paddingHorizontal
+        : fallbackPadding,
+      0
+    );
+    this.paddingVertical = normalizeNumber(
+      paddingVertical !== null && paddingVertical !== undefined
+        ? paddingVertical
+        : fallbackPadding,
+      0
+    );
+  }
+
+  createElement() {
+    const container = document.createElement("div");
+    container.className = "bE-arrowElement";
+
+    const arrowDefinition =
+      ArrowElement.prototype.arrows[this.arrow] ||
+      ArrowElement.prototype.arrows[ArrowElement.prototype.defaultArrow];
+    const img = document.createElement("img");
+    img.src = arrowDefinition.src;
+    img.alt = arrowDefinition.label;
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.draggable = false;
+    container.appendChild(img);
+
+    const parsedRotation = parseFloat(this.rotation);
+    if (!isNaN(parsedRotation)) {
+      container.style.setProperty("--arrowRotation", parsedRotation + "deg");
+    }
+
+    const parsedSize = parseFloat(this.size);
+    if (!isNaN(parsedSize)) {
+      container.style.setProperty(
+        "--arrowSize",
+        Math.max(parsedSize, 0) + "rem"
+      );
+    }
+
+    const horizontalPadding = parseFloat(
+      this.paddingHorizontal !== undefined
+        ? this.paddingHorizontal
+        : this.padding
+    );
+    const verticalPadding = parseFloat(
+      this.paddingVertical !== undefined ? this.paddingVertical : this.padding
+    );
+
+    container.style.setProperty(
+      "--arrowPaddingHorizontal",
+      Math.max(isNaN(horizontalPadding) ? 0 : horizontalPadding, 0) + "rem"
+    );
+    container.style.setProperty(
+      "--arrowPaddingVertical",
+      Math.max(isNaN(verticalPadding) ? 0 : verticalPadding, 0) + "rem"
+    );
+
+    container.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
+
+    return container;
+  }
+}
+
+ArrowElement.prototype.arrows = {
+  TYPE_A: { label: "Type A", src: "img/arrowBlocks/TYPE_A.svg" },
+  TYPE_A_EXTENDED: {
+    label: "Type A Extended",
+    src: "img/arrowBlocks/TYPE_A_EXTENDED.svg",
+  },
+  TYPE_B: { label: "Type B", src: "img/arrowBlocks/TYPE_B.svg" },
+  TYPE_C_45: { label: "Type C 45", src: "img/arrowBlocks/TYPE_C_45.svg" },
+  TYPE_C_90: { label: "Type C 90", src: "img/arrowBlocks/TYPE_C_90.svg" },
+  TYPE_D: { label: "Type D", src: "img/arrowBlocks/TYPE_D.svg" },
+  DOWN: { label: "Down", src: "img/arrowBlocks/DOWN.svg", defaultSize: 2.75 },
+  DOWN_CA: {
+    label: "Down (CA)",
+    src: "img/arrowBlocks/DOWN_CA.svg",
+    defaultSize: 2.75,
+  },
+  UK: { label: "UK", src: "img/arrowBlocks/UK.svg" },
+};
+ArrowElement.prototype.defaultArrow = "TYPE_A";
+ArrowElement.prototype.defaultSize = 1.75;
+ArrowElement.prototype.arrowKeys = Object.keys(ArrowElement.prototype.arrows);
+
 class TollLogoElement {
   constructor({
     logo = TollLogoElement.prototype.defaultLogo,
     logoHeight = 3,
     spacing = 0,
+    horizontalPadding = 0.2,
+    verticalPadding = 0.05,
     background = false,
     backgroundColor = "White",
     alignment = "Center",
     squareIcon = false,
     borderRadius = 8,
+    hasOnlyBlock = false,
   } = {}) {
     this.logo = TollLogoElement.prototype.logos[logo]
       ? logo
@@ -426,6 +619,9 @@ class TollLogoElement {
     this.squareIcon = squareIcon;
     this.borderRadius = borderRadius;
     this.backgroundColor = backgroundColor;
+    this.horizontalPadding = horizontalPadding;
+    this.verticalPadding = verticalPadding;
+    this.hasOnlyBlock = hasOnlyBlock;
     const validAlignments = Array.isArray(TextElement.prototype.alignment)
       ? TextElement.prototype.alignment
       : [];
@@ -444,14 +640,12 @@ class TollLogoElement {
       lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase()
     );
     container.style.setProperty("--borderRadius", this.borderRadius + "px");
-
-    const parsedHeight = parseFloat(this.logoHeight);
-    const height = isNaN(parsedHeight) ? 3 : Math.max(parsedHeight, 0.5);
-    container.style.setProperty("--tollLogoHeight", height + "rem");
-    container.style.height = height + "rem";
-    container.style.alignSelf = "center";
-    container.style.flexShrink = "0";
-    container.style.flexBasis = "auto";
+    container.style.setProperty(
+      "--horizPadding",
+      this.horizontalPadding + "rem"
+    );
+    container.style.setProperty("--vertPadding", this.verticalPadding + "rem");
+    container.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
 
     if (this.background) {
       container.classList.add("hasBackground");
@@ -477,6 +671,23 @@ class TollLogoElement {
       container.textContent = "Toll logo unavailable";
     }
 
+    if (this.hasOnlyBlock) {
+      const onlyBlock = document.createElement("div");
+      onlyBlock.className = "bE-tollOnlyBlock";
+      onlyBlock.textContent = "ONLY";
+      container.appendChild(onlyBlock);
+      container.classList.add("hasOnlyBlock");
+
+      if (
+        this.backgroundColor.toLowerCase() == "white" ||
+        this.backgroundColor.toLowerCase() == "yellow" ||
+        this.backgroundColor.toLowerCase() == "fluorescent yellow-green" ||
+        this.backgroundColor.toLowerCase() == "orange"
+      ) {
+        container.classList.add("inverseColor");
+      }
+    }
+
     return container;
   }
 }
@@ -486,7 +697,12 @@ TollLogoElement.prototype.logos = {
   EZPass: { label: "E-ZPass", src: "img/tolls/EZPass.png" },
   TollTag: { label: "TollTag", src: "img/tolls/NTTA.svg" },
   TxTag: { label: "TxTag", src: "img/tolls/TXTAG.svg" },
-  EZTAG: { label: "EZ TAG", src: "img/tolls/EZTAG.svg" },
+  EZTAG: { label: "EZ TAG Square", src: "img/tolls/EZTAG.svg" },
+  EZTAG2: { label: "EZ TAG Wide", src: "img/tolls/EZTAG-Sign-Wide.svg" },
+  EZTAG3: {
+    label: "EZ TAG FHWA Wide",
+    src: "img/tolls/EZTAG-Sign-Wide-Alt.svg",
+  },
   FasTrak: { label: "FasTrak", src: "img/tolls/FASTrak.png" },
   FreedomPass: { label: "Freedom Pass", src: "img/tolls/FREEDOMPASS.svg" },
   PeachPass: { label: "Peach Pass", src: "img/tolls/PEACHPASS.svg" },
@@ -675,12 +891,16 @@ class Control {
               lib.colors[properties.backgroundColor] ||
               properties.backgroundColor
             ).toLowerCase();
-      flexRow.style.setProperty("--masterBlockBgColor", resolvedBackgroundColor);
+      flexRow.style.setProperty(
+        "--masterBlockBgColor",
+        resolvedBackgroundColor
+      );
 
       const usesLightBleedBackground =
         properties.backgroundColor == "Orange" ||
         properties.backgroundColor == "White" ||
-        properties.backgroundColor == "Yellow";
+        properties.backgroundColor == "Yellow" ||
+        properties.backgroundColor == "Fluorescent Yellow-Green";
 
       if (properties.backgroundFullWidth) {
         flexRow.classList.add("fullBleed");
@@ -768,6 +988,10 @@ class Control {
         flexRow.dataset.fullBleedBorderColor = dividerBorderColor.toLowerCase();
       }
 
+      flexRow.dataset.lightBackground = usesLightBleedBackground
+        ? "true"
+        : "false";
+
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);
       flexRow.appendChild(rightAlignment);
@@ -784,6 +1008,7 @@ Control.prototype.blockToClassElems = {
   ShieldElement: ShieldElement,
   AdvisoryMessageElement: AdvisoryMessageElement,
   IconElement: IconElement,
+  ArrowElement: ArrowElement,
   TollLogoElement: TollLogoElement,
   ActionMessageElement: ActionMessageElement,
   ElectronicSignElement: ElectronicSignElement,
@@ -803,6 +1028,7 @@ Control.prototype.blockElements = {
   ShieldElement: "Shield",
   AdvisoryMessageElement: "Advisory Message",
   IconElement: "Icon",
+  ArrowElement: "Arrow",
   TollLogoElement: "Toll Logo",
   ActionMessageElement: "Action Message",
   ElectronicSignElement: "Electronic Sign",
@@ -814,6 +1040,7 @@ Control.prototype.blockInternalElements = {
   ShieldElement: "sdShield",
   AdvisoryMessageElement: "sdAdvisory",
   IconElement: "sdIcon",
+  ArrowElement: "sdArrow",
   TollLogoElement: "sdTollLogo",
   ActionMessageElement: "sdActionMessage",
   ElectronicSignElement: "sdElectronicSign",
