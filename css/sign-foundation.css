@@ -32,11 +32,17 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   margin-left: calc(-1 * var(--blockBleedLeft, 0rem));
   margin-right: calc(-1 * var(--blockBleedRight, 0rem));
   margin-top: calc(var(--marginTop, 0rem) - var(--blockBleedTop, 0rem));
-  margin-bottom: calc(var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem));
+  margin-bottom: calc(
+    var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem)
+  );
   padding-left: var(--blockBleedLeft, 0rem);
   padding-right: var(--blockBleedRight, 0rem);
-  padding-top: calc(var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem));
-  padding-bottom: calc(var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem));
+  padding-top: calc(
+    var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem)
+  );
+  padding-bottom: calc(
+    var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem)
+  );
 }
 
 .bE-textElement {
@@ -95,25 +101,55 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 
 .bE-tollLogoElement {
   display: block;
-  justify-content: center;
-  align-items: center;
-  flex: 0 0 auto;
-  height: var(--tollLogoHeight, 3rem);
+  height: vmax-content;
   margin: 0 var(--spacing, 0rem);
 }
 
 .bE-tollLogoElement.hasBackground {
   background-color: var(--tollBgColor, white);
-  padding: 0.2rem 0.5rem;
+  padding: var(--vertPadding) var(--horizPadding);
   border-radius: var(--borderRadius, 4px);
 }
 
+.bE-tollLogoElement.hasBackground.hasOnlyBlock {
+  border: 3px solid white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--tollLogoHeight) / 6);
+  padding: calc(var(--vertPadding) * 0.5) calc(var(--horizPadding));
+}
+
+.bE-tollLogoElement.hasBackground.hasOnlyBlock.inverseColor,
+.bE-tollLogoElement.hasBackground.hasOnlyBlock.inverseColor img {
+  border-color: black;
+}
+
+.bE-tollLogoElement.hasBackground.hasOnlyBlock.inverseColor .bE-tollOnlyBlock {
+  background: black;
+  color: white;
+}
+
+.bE-tollOnlyBlock {
+  background-color: white;
+  color: black;
+  font-family: "Series E";
+  padding: calc(var(--tollLogoHeight) * 0.15) 0.5rem
+    calc(var(--tollLogoHeight) * 0.075);
+  line-height: calc(var(--tollLogoHeight) * 0.55);
+  font-size: calc(var(--tollLogoHeight) * 0.8);
+  border-radius: calc(var(--borderRadius) / 2);
+}
+
+.bE-tollLogoElement.hasBackground.hasOnlyBlock img {
+  border: 3px solid white;
+  border-radius: var(--borderRadius, 4px);
+  padding: calc(var(--tollLogoHeight) / 10) calc(var(--tollLogoHeight) / 4);
+}
+
 .bE-tollLogoElement img {
-  display: block;
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
+  height: var(--tollLogoHeight);
 }
 
 .bE-arrowElement {

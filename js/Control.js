@@ -223,9 +223,7 @@ class ControlTextElement extends TextElement {
 }
 
 ControlTextElement.defaultFont = Array.isArray(
-  TextElement && TextElement.prototype
-    ? TextElement.prototype.fontFamily
-    : null
+  TextElement && TextElement.prototype ? TextElement.prototype.fontFamily : null
 )
   ? TextElement.prototype.fontFamily.includes("Clearview 5WR")
     ? "Clearview 5WR"
@@ -546,7 +544,10 @@ class ArrowElement {
 
     const parsedSize = parseFloat(this.size);
     if (!isNaN(parsedSize)) {
-      container.style.setProperty("--arrowSize", Math.max(parsedSize, 0) + "rem");
+      container.style.setProperty(
+        "--arrowSize",
+        Math.max(parsedSize, 0) + "rem"
+      );
     }
 
     const horizontalPadding = parseFloat(
@@ -600,11 +601,14 @@ class TollLogoElement {
     logo = TollLogoElement.prototype.defaultLogo,
     logoHeight = 3,
     spacing = 0,
+    horizontalPadding = 0.2,
+    verticalPadding = 0.05,
     background = false,
     backgroundColor = "White",
     alignment = "Center",
     squareIcon = false,
     borderRadius = 8,
+    hasOnlyBlock = false,
   } = {}) {
     this.logo = TollLogoElement.prototype.logos[logo]
       ? logo
@@ -615,6 +619,9 @@ class TollLogoElement {
     this.squareIcon = squareIcon;
     this.borderRadius = borderRadius;
     this.backgroundColor = backgroundColor;
+    this.horizontalPadding = horizontalPadding;
+    this.verticalPadding = verticalPadding;
+    this.hasOnlyBlock = hasOnlyBlock;
     const validAlignments = Array.isArray(TextElement.prototype.alignment)
       ? TextElement.prototype.alignment
       : [];
@@ -633,14 +640,12 @@ class TollLogoElement {
       lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase()
     );
     container.style.setProperty("--borderRadius", this.borderRadius + "px");
-
-    const parsedHeight = parseFloat(this.logoHeight);
-    const height = isNaN(parsedHeight) ? 3 : Math.max(parsedHeight, 0.5);
-    container.style.setProperty("--tollLogoHeight", height + "rem");
-    container.style.height = height + "rem";
-    container.style.alignSelf = "center";
-    container.style.flexShrink = "0";
-    container.style.flexBasis = "auto";
+    container.style.setProperty(
+      "--horizPadding",
+      this.horizontalPadding + "rem"
+    );
+    container.style.setProperty("--vertPadding", this.verticalPadding + "rem");
+    container.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
 
     if (this.background) {
       container.classList.add("hasBackground");
@@ -666,6 +671,23 @@ class TollLogoElement {
       container.textContent = "Toll logo unavailable";
     }
 
+    if (this.hasOnlyBlock) {
+      const onlyBlock = document.createElement("div");
+      onlyBlock.className = "bE-tollOnlyBlock";
+      onlyBlock.textContent = "ONLY";
+      container.appendChild(onlyBlock);
+      container.classList.add("hasOnlyBlock");
+
+      if (
+        this.backgroundColor.toLowerCase() == "white" ||
+        this.backgroundColor.toLowerCase() == "yellow" ||
+        this.backgroundColor.toLowerCase() == "fluorescent yellow-green" ||
+        this.backgroundColor.toLowerCase() == "orange"
+      ) {
+        container.classList.add("inverseColor");
+      }
+    }
+
     return container;
   }
 }
@@ -675,7 +697,12 @@ TollLogoElement.prototype.logos = {
   EZPass: { label: "E-ZPass", src: "img/tolls/EZPass.png" },
   TollTag: { label: "TollTag", src: "img/tolls/NTTA.svg" },
   TxTag: { label: "TxTag", src: "img/tolls/TXTAG.svg" },
-  EZTAG: { label: "EZ TAG", src: "img/tolls/EZTAG.svg" },
+  EZTAG: { label: "EZ TAG Square", src: "img/tolls/EZTAG.svg" },
+  EZTAG2: { label: "EZ TAG Wide", src: "img/tolls/EZTAG-Sign-Wide.svg" },
+  EZTAG3: {
+    label: "EZ TAG FHWA Wide",
+    src: "img/tolls/EZTAG-Sign-Wide-Alt.svg",
+  },
   FasTrak: { label: "FasTrak", src: "img/tolls/FASTrak.png" },
   FreedomPass: { label: "Freedom Pass", src: "img/tolls/FREEDOMPASS.svg" },
   PeachPass: { label: "Peach Pass", src: "img/tolls/PEACHPASS.svg" },
@@ -864,7 +891,10 @@ class Control {
               lib.colors[properties.backgroundColor] ||
               properties.backgroundColor
             ).toLowerCase();
-      flexRow.style.setProperty("--masterBlockBgColor", resolvedBackgroundColor);
+      flexRow.style.setProperty(
+        "--masterBlockBgColor",
+        resolvedBackgroundColor
+      );
 
       const usesLightBleedBackground =
         properties.backgroundColor == "Orange" ||
@@ -958,7 +988,9 @@ class Control {
         flexRow.dataset.fullBleedBorderColor = dividerBorderColor.toLowerCase();
       }
 
-      flexRow.dataset.lightBackground = usesLightBleedBackground ? "true" : "false";
+      flexRow.dataset.lightBackground = usesLightBleedBackground
+        ? "true"
+        : "false";
 
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);

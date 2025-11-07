@@ -119,7 +119,9 @@ const formHandler = (function () {
 
   const clearBlockDragIndicators = () => {
     document
-      .querySelectorAll(".textEditorBlock.dropBefore, .textEditorBlock.dropAfter")
+      .querySelectorAll(
+        ".textEditorBlock.dropBefore, .textEditorBlock.dropAfter"
+      )
       .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
     document
       .querySelectorAll(".sMControlRow.dropActive")
@@ -244,7 +246,9 @@ const formHandler = (function () {
     }
     rowEl.classList.remove("dropActive");
     rowEl
-      .querySelectorAll(".textEditorBlock.dropBefore, .textEditorBlock.dropAfter")
+      .querySelectorAll(
+        ".textEditorBlock.dropBefore, .textEditorBlock.dropAfter"
+      )
       .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
   };
 
@@ -646,9 +650,7 @@ const formHandler = (function () {
     let divider_widthMeasurement = document.querySelector(
       "#sdBlocker_dividerMeasurement"
     );
-    let divider_colorSelect = document.querySelector(
-      "#sdBlocker_dividerColor"
-    );
+    let divider_colorSelect = document.querySelector("#sdBlocker_dividerColor");
     let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
     let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
 
@@ -658,8 +660,9 @@ const formHandler = (function () {
       }
     }
 
-    const controlTextFontSelect =
-      document.querySelector("#sdCtrlText_fontFamily");
+    const controlTextFontSelect = document.querySelector(
+      "#sdCtrlText_fontFamily"
+    );
     if (controlTextFontSelect) {
       let defaultControlFont = null;
       if (
@@ -748,8 +751,7 @@ const formHandler = (function () {
         ArrowElement.prototype.arrowKeys ||
         Object.keys(ArrowElement.prototype.arrows || {});
       for (const arrowKey of arrowKeys) {
-        const arrowDefinition =
-          ArrowElement.prototype.arrows[arrowKey] || {};
+        const arrowDefinition = ArrowElement.prototype.arrows[arrowKey] || {};
         lib.appendOption(arrowElemSelect, arrowKey, {
           text: arrowDefinition.label || arrowKey,
           selected: arrowKey === ArrowElement.prototype.defaultArrow,
@@ -780,7 +782,7 @@ const formHandler = (function () {
     const arrowRotationVal = document.getElementById("sdArrow_rotationVal");
     if (arrowRotationSlider && arrowRotationVal) {
       arrowRotationSlider.addEventListener("input", () => {
-        arrowRotationVal.textContent = arrowRotationSlider.value;
+        arrowRotationVal.value = arrowRotationSlider.value;
       });
     }
 
@@ -794,7 +796,7 @@ const formHandler = (function () {
         }
         const degrees = parseFloat(button.dataset.degrees || "0") || 0;
         arrowRotationSlider.value = degrees.toString();
-        arrowRotationVal.textContent = degrees.toString();
+        arrowRotationVal.value = degrees.toString();
         arrowRotationButtons.forEach((presetButton) => {
           presetButton.classList.toggle("activated", presetButton === button);
         });
@@ -806,15 +808,40 @@ const formHandler = (function () {
     const arrowFlipButton = document.getElementById("sdArrow_flipButton");
     if (arrowFlipButton && arrowFlipInput) {
       arrowFlipButton.addEventListener("click", () => {
-        const newValue = arrowFlipInput.value === "true" ? "false"
-          : "true";
+        const newValue = arrowFlipInput.value === "true" ? "false" : "true";
         arrowFlipInput.value = newValue;
         const isFlipped = newValue === "true";
         arrowFlipButton.classList.toggle("activated", isFlipped);
-        arrowFlipButton.setAttribute("aria-pressed", isFlipped ? "true" : "false");
+        arrowFlipButton.setAttribute(
+          "aria-pressed",
+          isFlipped ? "true" : "false"
+        );
+        arrowFlipButton.textContent = isFlipped ? "Unflip" : "Flip";
         readForm();
       });
     }
+
+    document.querySelectorAll(".smallVal").forEach((valEl) => {
+      const onChange = (e) => {
+        const id = valEl.id || "";
+        if (id.endsWith("Val")) {
+          const controlId = id.slice(0, -3);
+          const control = document.getElementById(controlId);
+          if (control) {
+            if (
+              control.type === "range" ||
+              control.type === "number" ||
+              control.tagName === "INPUT" ||
+              control.tagName === "SELECT"
+            ) {
+              control.value = valEl.value;
+            }
+          }
+        }
+        readForm();
+      };
+      valEl.addEventListener("change", onChange);
+    });
 
     const tollLogoSelectElmt = document.getElementById("sdTollLogo_logo");
     if (tollLogoSelectElmt) {
@@ -986,6 +1013,12 @@ const formHandler = (function () {
         if (!target) continue;
         if (chk.checked) target.classList.remove("hidden");
         else target.classList.add("hidden");
+
+        const labels = document.querySelectorAll(`label[for="${tid}"]`);
+        labels.forEach((label) => {
+          if (chk.checked) label.classList.remove("hidden");
+          else label.classList.add("hidden");
+        });
       }
     };
 
@@ -1008,6 +1041,9 @@ const formHandler = (function () {
     toggleTargets(`${block}_background`, [
       `${block}_backgroundColor`,
       `${block}_borderRadius`,
+      `${block}_horizontalPadding`,
+      `${block}_verticalPadding`,
+      `${block}_hasOnlyBlock`,
     ]);
   };
 
@@ -1799,7 +1835,7 @@ const formHandler = (function () {
             !element.dataset.syncDisplay
           ) {
             element.addEventListener("input", () => {
-              displayElement.textContent = element.value;
+              displayElement.value = element.value;
             });
             element.dataset.syncDisplay = "true";
           }
@@ -1807,7 +1843,15 @@ const formHandler = (function () {
       }
 
       if (displayElement) {
-        displayElement.textContent = currentBlockElem[propertyName];
+        // If the display element is an input (we replaced many spans with number inputs), set value.
+        if (
+          displayElement.tagName === "INPUT" &&
+          displayElement.type === "number"
+        ) {
+          displayElement.value = currentBlockElem[propertyName];
+        } else {
+          displayElement.textContent = currentBlockElem[propertyName];
+        }
       }
     }
 
@@ -1820,7 +1864,7 @@ const formHandler = (function () {
         const degrees = parseFloat(button.dataset.degrees || "0") || 0;
         button.classList.toggle(
           "activated",
-          Math.abs(((currentRotation % 360) + 360) % 360 - degrees) < 0.5
+          Math.abs((((currentRotation % 360) + 360) % 360) - degrees) < 0.5
         );
       });
 
@@ -1852,15 +1896,31 @@ const formHandler = (function () {
       .querySelector("#sdBlock_bottomPadding")
       .addEventListener("change", readForm, { once: true });
 
-    document.querySelector("#sdBlock_topPaddingVal").textContent =
-      sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
-      ].topPadding;
-
-    document.querySelector("#sdBlock_bottomPaddingVal").textContent =
-      sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
-      ].bottomPadding;
+    const topPadValEl = document.querySelector("#sdBlock_topPaddingVal");
+    const bottomPadValEl = document.querySelector("#sdBlock_bottomPaddingVal");
+    const topPadValue =
+      sign.blockElements.blockProperties[exposed.vars.currentlySelectedRowIndex]
+        .topPadding;
+    const bottomPadValue =
+      sign.blockElements.blockProperties[exposed.vars.currentlySelectedRowIndex]
+        .bottomPadding;
+    if (topPadValEl) {
+      if (topPadValEl.tagName === "INPUT" && topPadValEl.type === "number") {
+        topPadValEl.value = topPadValue;
+      } else {
+        topPadValEl.textContent = topPadValue;
+      }
+    }
+    if (bottomPadValEl) {
+      if (
+        bottomPadValEl.tagName === "INPUT" &&
+        bottomPadValEl.type === "number"
+      ) {
+        bottomPadValEl.value = bottomPadValue;
+      } else {
+        bottomPadValEl.textContent = bottomPadValue;
+      }
+    }
 
     document.querySelector("#sdBlock_backgroundColor").value =
       sign.blockElements.blockProperties[

@@ -1013,7 +1013,7 @@
                       step="1"
                       id="sdCtrlText_lineHeight"
                     />
-                    <span id="sdCtrlText_lineHeightVal">100</span>
+                    <input id="sdCtrlText_lineHeightVal" class="smallVal" type="number" value="100" />
                     <br />
                     <label for="sdCtrlText_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -1173,7 +1173,7 @@
                       step="1"
                       id="sdAdvisory_lineHeight"
                     />
-                    <span id="sdAdvisory_lineHeightVal">100</span>
+                    <input id="sdAdvisory_lineHeightVal" class="smallVal" type="number" value="100"  />
                     <br />
                     <label for="sdAdvisory_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -1234,7 +1234,7 @@
                       step=".1"
                       id="sdAdvisory_horizPadding"
                     />
-                    <span id="sdAdvisory_horizPaddingVal">.3</span>
+                    <input id="sdAdvisory_horizPaddingVal" class="smallVal" type="number" value=".3" step="0.1"  />
 
                     <label for="sdAdvisory_vertPadding"
                       >Vertical Padding (rem):
@@ -1247,7 +1247,7 @@
                       step=".1"
                       id="sdAdvisory_vertPadding"
                     />
-                    <span id="sdAdvisory_vertPaddingVal">.3</span>
+                    <input id="sdAdvisory_vertPaddingVal" class="smallVal" type="number" value=".3" step="0.1"  />
                   </div>
 
                   <div data-property="sdIcon" class="hidden">
@@ -1302,14 +1302,14 @@
                     <select id="sdArrow_arrow"></select>
                     <label for="sdArrow_rotation">Rotation (deg):</label>
                     <input
-                      type="number"
+                      type="range"
                       id="sdArrow_rotation"
                       min="0"
                       max="360"
                       step="1"
                       value="0"
                     />
-                    <span id="sdArrow_rotationVal">0</span>
+                    <input id="sdArrow_rotationVal" class="smallVal" type="number" value="0"  />
                     <div class="sdArrow_rotationButtons">
                       <button type="button" class="sdArrow_rotationPreset" data-degrees="0">
                         0°
@@ -1344,7 +1344,7 @@
                       class="sdTextEditorSmall"
                       min="0"
                       max="20"
-                      step="0.1"
+                      step="0.01"
                       value="1.75"
                     />
                     <label for="sdArrow_paddingHorizontal">Horizontal Padding (rem):</label>
@@ -1409,9 +1409,17 @@
                     <label for="sdTollLogo_background">Background:</label>
                     <input type="checkbox" id="sdTollLogo_background" />
                     <select id="sdTollLogo_backgroundColor" class="hidden" data-toolTip="Toll Logo Background Color"></select>
-                    <input type="number" id="sdTollLogo_borderRadius" class="hidden" min="0" max="100" step="1" value="8" data-toolTip="Toll Logo Border Radius (px)">
                     <label for="sdTollLogo_squareIcon">Square Icon:</label>
                     <input type="checkbox" id="sdTollLogo_squareIcon" />
+                    <br />
+                    <label for="sdTollLogo_hasOnlyBlock" class="hidden">Show Only Block</label>
+                    <input type="checkbox" id="sdTollLogo_hasOnlyBlock" class="hidden"/>
+                    <label for="sdTollLogo_borderRadius" class="hidden">Toll Logo Border Radius (px)</label> 
+                    <input type="number" id="sdTollLogo_borderRadius" class="hidden" min="0" max="100" step="1" value="8">
+                    <label for="sdTollLogo_horizontalPadding" class="hidden">Horizontal Background Padding (rem)</label>
+                    <input type="number" id="sdTollLogo_horizontalPadding" class="hidden" value=".2" step=".01" />
+                    <label for="sdTollLogo_verticalPadding" class="hidden">Vertical Background Padding (rem)</label>
+                    <input type="number" id="sdTollLogo_verticalPadding" class="hidden" value=".05" step=".01" />
                   </div>
 
                   <div data-property="sdActionMessage" class="hidden">
@@ -1453,7 +1461,7 @@
                       step="1"
                       id="sdActionMessage_lineHeight"
                     />
-                    <span id="sdActionMessage_lineHeightVal">100</span>
+                    <input id="sdActionMessage_lineHeightVal" class="smallVal" type="number" value="100"  />
                     <br />
                     <label for="sdActionMessage_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -1542,7 +1550,7 @@
                       step="1"
                       id="sdElectronicSign_lineHeight"
                     />
-                    <span id="sdElectronicSign_lineHeightVal">100</span>
+                    <input id="sdElectronicSign_lineHeightVal" class="smallVal" type="number" value="100" step="1"  />
                     <br />
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
@@ -1557,7 +1565,7 @@
                       step=".1"
                       id="sdElectronicSign_padding"
                     />
-                    <span id="sdElectronicSign_paddingVal">.5</span>
+                    <input id="sdElectronicSign_paddingVal" class="smallVal" type="number" value=".5" step="0.1"  />
                     <br />
                     <label
                       for="sdElectronicSign_setWidth"
@@ -1588,7 +1596,7 @@
                     step=".01"
                     id="sdBlock_topPadding"
                   />
-                  <span id="sdBlock_topPaddingVal">0</span>
+                  <input id="sdBlock_topPaddingVal" class="smallVal" type="number" value="0" step=".01"  />
                   <label for="sdBlock_bottomPadding"
                     >Bottom Margin (rem):
                   </label>
@@ -1600,7 +1608,7 @@
                     step=".01"
                     id="sdBlock_bottomPadding"
                   />
-                  <span id="sdBlock_bottomPaddingVal">0</span>
+                  <input id="sdBlock_bottomPaddingVal" class="smallVal" type="number" value="0" step=".01"  />
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
                   <select id="sdBlock_backgroundColor"></select>

@@ -419,6 +419,16 @@ div.options a {
   background-color: rgb(200, 200, 200);
 }
 
+:root[data-theme="dark"] .active,
+:root[data-theme="dark"] .exitTabSelect.active {
+  background-color: rgb(0, 0, 255);
+}
+
+:root[data-theme="dark"] .scrollMenu button:not(.active),
+:root[data-theme="dark"] .scrolMenu button:not(.active) {
+  background-color: rgb(0, 0, 175);
+}
+
 input,
 select,
 textarea {
@@ -469,6 +479,11 @@ input,
 select {
   background-color: rgb(var(--inputColor));
   color: var(--textColor);
+}
+
+:root[data-theme="dark"] .listNavOptions input,
+:root[data-theme="dark"] .listNavOptions button {
+  background-color: rgb(40, 40, 255);
 }
 
 button,
@@ -569,10 +584,19 @@ input[type="button"]:disabled {
   flex-wrap: wrap;
   gap: 0.25rem;
   margin-top: 0.25rem;
+  justify-content: center;
+}
+
+.sdArrow_rotationButtons > * {
+  font-size: 20px;
+  width: 10%;
 }
 
 #sdArrow_flipButton {
+  font-size: 24px;
   margin-top: 0.5rem;
+  width: 10rem;
+  justify-self: center;
 }
 
 .sMControlRow:hover {
@@ -711,8 +735,12 @@ textarea {
   display: none;
 }
 
-.activated {
+:root[data-theme="light"] .activated {
   background-color: rgb(200, 200, 200);
+}
+
+:root[data-theme="dark"] .activated {
+  background-color: rgb(100, 100, 100);
 }
 
 .close {
@@ -1279,4 +1307,9 @@ dialog {
 
 #selectedBackRoudness {
   background-color: rgb(0, 0, 0, 0.05);
+}
+
+.smallVal {
+  width: 3rem;
+  display: inline-block;
 }
