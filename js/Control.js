@@ -164,8 +164,8 @@ TextElement.prototype.fontFamily = [
   "Clearview 3W",
   "Clearview 4B",
   "Clearview 4W",
-  "Clearivew 5B",
-  "Clearivew 5W",
+  "Clearview 5B",
+  "Clearview 5W",
   "Clearview 5WR",
   "Clearview 6B",
   "Series A",
@@ -178,6 +178,8 @@ TextElement.prototype.fontFamily = [
   "Arial",
   "Arial Bold",
   "Transport",
+  "DIN Engschrift",
+  "DIN Mittelschrift",
 ];
 
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
