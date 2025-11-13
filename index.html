@@ -55,6 +55,14 @@
     <script src="js/main.js" type="text/javascript"></script>
   </head>
   <body onload="app.init();">
+    <a
+      class="mutcd-link"
+      href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      MUTCD
+    </a>
     <main>
       <div id="postContainer">
         <div class="post"></div>
@@ -151,7 +159,7 @@
             <button id="presetShields" class="selected">Presets</button>
             <button id="customShields">Custom</button>
           </nav>
-          <input type="search" id="presetShieldSearch" placeholder="🔎 Search for presets" />
+          <input type="search" id="presetShieldSearch" placeholder="Search for presets" />
           <div id="presetShieldList"></div>
           <div id="uploadShield">
             <div id="shieldUploadField">
@@ -229,13 +237,34 @@
               <div>
                 <label
                   for="postPosition"
-                  data-toolTip="Controls the type of post that will display on the screen."
-                  >Post Position:
+                  data-toolTip="Controls the kind of post or gantry that will display on the screen."
+                  >Post Kind:
                 </label>
                 <select
                   id="postPosition"
                   onchange="formHandler.readForm();"
                 ></select>
+                <br />
+                <label
+                  for="postColor"
+                  data-toolTip="Sets the color of the posts and supports."
+                  >Post Color:
+                </label>
+                <select
+                  id="postColor"
+                  onchange="formHandler.readForm();"
+                ></select>
+                <br />
+                <div class="postThicknessControl">
+                  <label for="postThicknessValue">Post Thickness (rem):</label>
+                  <input
+                    type="number"
+                    id="postThicknessValue"
+                    min="0"
+                    step="0.25"
+                    value="1"
+                  />
+                </div>
                 <br />
                 <label for="showPost" id="showPostLabel"> Hide Post: </label>
                 <input
@@ -276,6 +305,18 @@
                   id="panelCorner"
                   onchange="formHandler.readForm();"
                 ></select>
+                <br />
+                <label for="panelBorderRadius">Sign Border Radius (rem): </label>
+                <input
+                  type="number"
+                  id="panelBorderRadius"
+                  name="panelBorderRadius"
+                  value=".75"
+                  min="0"
+                  max="5"
+                  step=".05"
+                  onblur="formHandler.readForm();"
+                />
               </div>
             </div>
             <div id="sMPanelPadding" class="tabHidden">
@@ -284,8 +325,8 @@
                 <input
                   type="number"
                   id="paddingTop"
-                  value=".5"
-                  placeholder=".5"
+                  value=".3"
+                  placeholder=".3"
                   step=".01"
                   min="0"
                   max="20"
@@ -307,8 +348,8 @@
                 <input
                   type="number"
                   id="paddingBottom"
-                  value=".5"
-                  placeholder=".5"
+                  value=".3"
+                  placeholder=".3"
                   step=".01"
                   min="0"
                   max="20"
@@ -347,13 +388,18 @@
             </div>
             <nav class="listNav">
               <div class="scrollMenu" id="exitTabList">
-                <select id="tab_edit1" class="active">
-                  <option value="-1">Exit Tab</option>
-                </select>
+                <div class="exitTabGroup">
+                  <button type="button" id="tab_edit1" class="exitTabButton active">
+                    Exit Tab 1
+                  </button>
+                </div>
               </div>
               <div class="listNavOptions">
-                <button onclick="app.newNestExitTab();">++</button>
-                <button onclick="app.deleteNestExitTab();">--</button>
+                <label class="listNavLabel" id="exitTabControlsLabel">Exit Tab Controls</label>
+                <button id="addNestedExitTab" onclick="app.newNestExitTab();">
+                  Nest Exit Tab
+                </button>
+                <button onclick="app.deleteNestExitTab();">Remove Nest Exit Tab</button>
                 <button onclick="app.newExitTab();">+</button>
                 <button onclick="app.removeExitTab();">-</button>
                 <button onclick="app.duplicateExitTab();">
@@ -376,7 +422,6 @@
             <div data-tab="sMExitTabSetting" class="sMModalTab selected">
               Settings
             </div>
-            <div data-tab="sMExitTabStyles" class="sMModalTab">Styles</div>
           </nav>
           <div class="sMModalContent">
             <div id="sMExitTabSetting">
@@ -390,6 +435,10 @@
                   onchange="formHandler.readForm();"
                 />
                 <select
+                  id="exitVariant"
+                  onchange="formHandler.readForm();"
+                ></select>
+                <select
                   id="exitTabPosition"
                   onchange="formHandler.readForm();"
                 ></select>
@@ -401,14 +450,10 @@
                   id="exitColor"
                   onchange="formHandler.readForm();"
                 ></select>
-                <select
-                  id="exitVariant"
-                  onchange="formHandler.readForm();"
-                ></select>
               </div>
               <div>
                 <legend>Extra Settings</legend>
-                <label for="exitFont" id="exitFontLabel">FHWA Font:</label>
+                <label for="exitFont" id="exitFontLabel">FHWA Style:</label>
                 <input
                   type="checkbox"
                   name="exitFont"
@@ -462,7 +507,7 @@
                 <input
                   type="range"
                   id="borderThickness"
-                  min="0.01"
+                  min="0"
                   max="0.2"
                   step="0.01"
                   value="0.2"
@@ -542,65 +587,59 @@
                   >16</label
                 >
               </div>
-            </div>
-            <div id="sMExitTabStyles" class="tabHidden">
-              <div>
-                <legend>Toll Settings</legend>
-                <div id="tollSettings" style="display: block">
+              <div id="exitTollLogoOptions" class="hidden">
+                <legend>Toll Logo Options</legend>
+                <label for="exitTollLogoSelect">Toll Logo:</label>
+                <select
+                  id="exitTollLogoSelect"
+                  name="exitTollLogoSelect"
+                  onchange="formHandler.readForm();"
+                ></select>
+                <label for="exitTollLogoOnly" class="checkboxLabel">
                   <input
-                    type="radio"
-                    name="tollOption"
-                    id="ezPass"
-                    class="radioOption"
-                    value="EZPass"
+                    type="checkbox"
+                    id="exitTollLogoOnly"
+                    name="exitTollLogoOnly"
+                    checked=""
                     onchange="formHandler.readForm();"
                   />
-                  <label for="ezPass" style="text-align: left">E-ZPASS</label>
+                  Logo Only
+                </label>
+                <label for="exitTollLogoSquare" class="checkboxLabel">
                   <input
-                    type="radio"
-                    name="tollOption"
-                    id="FASTrak"
-                    class="radioOption"
-                    value="FASTrak"
+                    type="checkbox"
+                    id="exitTollLogoSquare"
+                    name="exitTollLogoSquare"
                     onchange="formHandler.readForm();"
                   />
-                  <label for="FASTrak" style="text-align: left">FASTrak</label>
-                  <input
-                    type="radio"
-                    name="tollOption"
-                    id="SUNPass"
-                    class="radioOption"
-                    value="SUNPass"
-                    onchange="formHandler.readForm();"
-                  />
-                  <label for="SUNPass" style="text-align: left">SunPass</label>
-                  <input
-                    type="radio"
-                    name="tollOption"
-                    id="custom"
-                    class="radioOption"
-                    value="custom"
-                    onchange="formHandler.readForm();"
-                  />
-                  <label for="custom" style="text-align: left"
-                    >Custom Tag <br />
-                    <input
-                      type="text"
-                      id="customTag"
-                      name="customTag"
-                      placeholder="Tag"
-                      onchange="formHandler.readForm();"
-                    />
-                  </label>
-                </div>
+                  Square Icon
+                </label>
+                <label for="exitTollLogoSize">
+                  Logo Size (rem):
+                </label>
+                <input
+                  type="range"
+                  id="exitTollLogoSize"
+                  name="exitTollLogoSize"
+                  min="1"
+                  max="6"
+                  step="0.1"
+                  value="3"
+                  oninput="document.getElementById('exitTollLogoSizeValue').textContent = this.value;"
+                  onchange="formHandler.readForm();"
+                />
+                <label
+                  for="exitTollLogoSize"
+                  id="exitTollLogoSizeValue"
+                  style="
+                    text-align: left;
+                    margin: 0;
+                    font-size: 1.25rem;
+                    width: auto;
+                  "
+                  >3</label
+                >
               </div>
-              <fieldset style="display: none">
-                <legend>Icon Settings</legend>
-                <div id="iconSettings">
-                  <label for="iconSelect">Select icon:</label>
-                  <select id="iconSelect"></select>
-                </div>
-              </fieldset>
             </div>
           </div>
         </div>
@@ -651,7 +690,7 @@
               Block Elements
             </div>
             <div data-tab="sMSPShield" class="sMModalTab">Shields</div>
-            <div data-tab="sMSPExtra" class="sMModalTab">Extra Settings</div>
+            <div data-tab="sMSPExtra" class="sMModalTab">Extra Settings (depreciate soon)</div>
           </nav>
           <div class="sMModalContent">
             <div id="sMSPShield" class="tabHidden">
@@ -1296,6 +1335,25 @@
                       placeholder="4"
                     />
                   </div>
+                  <div data-property="sdBeacon" class="hidden">
+                    <label for="sdBeacon_size">Size (rem): </label>
+                    <input
+                      type="number"
+                      id="sdBeacon_size"
+                      placeholder="2"
+                      min="0.5"
+                      step="0.25"
+                      value="2"
+                    />
+                    <label for="sdBeacon_color">Color: </label>
+                    <select id="sdBeacon_color"></select>
+                    <label for="sdBeacon_backplate">Backplate:</label>
+                    <input type="checkbox" id="sdBeacon_backplate" />
+                    <label for="sdBeacon_flashOpposite">Flash Opposite:</label>
+                    <input type="checkbox" id="sdBeacon_flashOpposite" />
+                    <label for="sdBeacon_alignment">Alignment: </label>
+                    <select id="sdBeacon_alignment"></select>
+                  </div>
 
                   <div data-property="sdArrow" class="hidden">
                     <label for="sdArrow_arrow">Arrow:</label>
@@ -1804,6 +1862,16 @@
                   onchange="formHandler.readForm();"
                 ></select>
                 <br />
+                <label for="useCanadianDownArrows"
+                  >Use Canadian Down Arrow</label
+                >
+                <input
+                  type="checkbox"
+                  id="useCanadianDownArrows"
+                  name="useCanadianDownArrows"
+                  onchange="formHandler.readForm();"
+                />
+                <br />
                 <label
                   id="exitOnlyDirectionLabel"
                   for="exitOnlyDirection"
@@ -1825,22 +1893,64 @@
                   type="checkbox"
                   id="showExitOnly"
                   name="showExitOnly"
-                  value="undefined"
                   onchange="formHandler.readForm();"
                   class="invisible"
                 />
                 <label
-                  id="exitOnlyLabelTextLabel"
-                  for="exitOnlyLabel"
+                  id="hideExitArrowLabel"
+                  for="hideExitArrow"
                   class="invisible"
-                  >Label Text:</label
+                  >Hide Arrow</label
                 >
-                <select
-                  id="exitOnlyLabel"
-                  name="exitOnlyLabel"
+                <input
+                  type="checkbox"
+                  id="hideExitArrow"
+                  name="hideExitArrow"
                   onchange="formHandler.readForm();"
                   class="invisible"
-                ></select>
+                />
+                <label
+                  id="exitOnlyBorderModeLabel"
+                  for="exitOnlyBorderMode"
+                  class="invisible"
+                  >Exit Only Border:</label
+                >
+                <select
+                  id="exitOnlyBorderMode"
+                  class="invisible"
+                  onchange="formHandler.readForm();"
+                >
+                  <option value="edge">Full Black Border</option>
+                  <option value="white-edge">Partial Black Border</option>
+                </select>
+                <label
+                  id="exitOnlyLeftTextLabel"
+                  for="exitOnlyLeftText"
+                  class="invisible"
+                  >Left Text:</label
+                >
+                <input
+                  type="text"
+                  id="exitOnlyLeftText"
+                  name="exitOnlyLeftText"
+                  placeholder="EXIT"
+                  class="invisible"
+                  oninput="formHandler.readForm();"
+                />
+                <label
+                  id="exitOnlyRightTextLabel"
+                  for="exitOnlyRightText"
+                  class="invisible"
+                  >Right Text:</label
+                >
+                <input
+                  type="text"
+                  id="exitOnlyRightText"
+                  name="exitOnlyRightText"
+                  placeholder="ONLY"
+                  class="invisible"
+                  oninput="formHandler.readForm();"
+                />
                 <br />
                 <label
                   id="exitOnlyPaddingLabel"
@@ -1877,6 +1987,17 @@
                   class="invisible"
                   >0.25</label
                 >
+                <br />
+                <label for="secondExitOnly" id="secondExitOnlyLabel"
+                  >2nd Exit Only Design
+                </label>
+                <input
+                  type="checkbox"
+                  id="secondExitOnly"
+                  name="secondExitOnly"
+                  value="secondExitOnly"
+                  onchange="formHandler.readForm();"
+                />
                 <hr />
                 <label for="otherSymbol">Other Bottom Symbols:</label>
                 <select
@@ -1895,85 +2016,52 @@
             <div id="sMAPL" class="tabHidden"></div>
           </div>
         </div>
-        <div class="sMModal globalConfig" data-current-menu="sMGSettings">
-          <nav class="sMModalBar">
-            <div class="sMModalTitle">
-              <span class="material-symbols-outlined">globe</span> Global
-              Settings
-            </div>
-            <div data-tab="sMGSettings" class="sMModalTab selected">
-              Settings
-            </div>
-          </nav>
-          <div class="sMModalContent">
-            <div id="sMGSettings">
-              <div>
-                <legend>Settings</legend>
-                <label for="fontChange" id="fontChangeLabel">FHWA Font </label>
-                <input
-                  type="checkbox"
-                  id="fontChange"
-                  name="fontChange"
-                  value="fontChange"
-                  onchange="formHandler.readForm();"
-                />
-                <br />
-                <label for="secondExitOnly" id="secondExitOnlyLabel"
-                  >2nd Exit Only Design
-                </label>
-                <input
-                  type="checkbox"
-                  id="secondExitOnly"
-                  name="secondExitOnly"
-                  value="secondExitOnly"
-                  onchange="formHandler.readForm();"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-      <nav id="sMConfigBar" data-current-menu="globalConfig">
+      <nav id="sMConfigBar" data-current-menu="postConfig">
         <button
           id="postConfig"
           class="sMConfigOption"
           data-toolTip="Post Settings"
         >
           <span class="material-symbols-outlined"> signpost </span>
+          <span>Post Settings</span>
         </button>
         <div class="sMConfigOption" data-toolTip="Current Panel">
           <div id="panelSelector" class="hitbox"></div>
           <span id="currentlySelectedPanel">Panel 1</span>
           <span class="material-symbols-outlined"> expand_more </span>
           <div id="panelSelect" class="panelSelector">
-            <h5>Current Panel</h5>
-            <nav id="panelOptions">
-              <button class="shiftButton" onclick="app.shiftLeft();">
-                &lt;&lt;
-              </button>
-              <input
-                type="number"
-                class="num"
-                id="panelNumber"
-                name="PanelNumber"
-                placeholder="1"
-                step="1"
-                onchange="app.changeEditingPanel((Math.floor(this.value)) - 1)"
-                min="1"
-              />
-              <button class="shiftButton" onclick="app.shiftLeft();">
-                &gt;&gt;
-              </button>
-            </nav>
-            <div id="panelList" class="scrollMenu">
-              <button id="edit1" class="active">Panel 1</button>
+            <div class="panelPopoverHeader">
+              <h5>Panels</h5>
+              <span class="panelPopoverHint">Drag to reorder</span>
             </div>
-            <div id="numPanelOptions">
-              <button id="newPanel" class="new">++</button>
-              <button id="deletePanel" class="del">--</button>
-              <button id="duplicatePanel" class="dup">
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
+            <div class="panelActions">
+              <button id="newPanel" class="new">Add Panel</button>
+              <!--<button id="duplicatePanel" class="dup">Duplicate</button>-->
+              <button id="deletePanel" class="del">Remove</button>
+            </div>
+            <div id="panelList" class="panelList"></div>
+            <div class="panelSpacingControl">
+              <label for="panelSpacing">Spacing</label>
+              <div class="panelSpacingInputs">
+                <input
+                  type="range"
+                  id="panelSpacing"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  value="0"
+                />
+                <input
+                  type="number"
+                  class="num"
+                  id="panelSpacingValue"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  value="0"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -1992,10 +2080,6 @@
         <button id="guideArrowConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> explore </span>
           <span>Guide Arrows</span>
-        </button>
-        <button id="globalConfig" class="sMConfigOption">
-          <span class="material-symbols-outlined"> globe </span>
-          <span>Global Config</span>
         </button>
         <button id="export" class="sMConfigOption" data-toolTip="Export">
           <span class="material-symbols-outlined"> download </span>

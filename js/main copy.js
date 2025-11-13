@@ -499,8 +499,6 @@ const app = (function() {
 		// Post
 		post.polePosition = form["postPosition"].value;
         
-        post.fontType = form["fontChange"].checked;
-        
         post.showPost = form["showPost"].checked;
         if (post.firstPanel == false) {
             var current = parseInt(form["panelNo"].value) - 1;

@@ -7,15 +7,34 @@ const formHandler = (function () {
   let exposed;
   let post;
   let blockDragState = null;
+  let panelDragState = null;
+  let exitTabDragState = null;
+  let newRowDropTargetButton = null;
   const STORAGE_KEYS = {
     postPosition: "signMaker.postPosition",
+    postColor: "signMaker.postColor",
     showPost: "signMaker.showPost",
-    fhwaFont: "signMaker.fhwaFont",
+    postThickness: "signMaker.postThickness",
     controlTextFont: "signMaker.controlTextFont",
-    legacyFhwaFont: "signMaker.defaultFont",
   };
   let localStorageAvailable;
   let localStorageWarningLogged = false;
+  const LIMON_TRIGGER_VALUE = "limon";
+  const LIMON_VIDEO_URL = "https://www.youtube.com/watch?v=qA7qUG6uEbY";
+  const getPostThicknessFallback = () =>
+    typeof Post !== "undefined" &&
+    Post.prototype &&
+    typeof Post.prototype.defaultThickness === "number"
+      ? Post.prototype.defaultThickness
+      : 1;
+  const normalizeStoredPostThickness = (value) => {
+    const parsed =
+      typeof value === "string" ? parseFloat(value) : Number(value);
+    if (Number.isFinite(parsed)) {
+      return Math.max(0, parsed);
+    }
+    return getPostThicknessFallback();
+  };
 
   const logStorageWarning = (message, error) => {
     if (!localStorageWarningLogged) {
@@ -63,6 +82,14 @@ const formHandler = (function () {
     }
   };
 
+  const formatPostKindLabel = (value) => {
+    if (typeof value !== "string") {
+      return "";
+    }
+    const spaced = value.replace(/([a-z])([A-Z])/g, "$1 $2");
+    return spaced.replace(/[_-]+/g, " ").trim() || value;
+  };
+
   const applyStoredPreferences = () => {
     const storedPostPosition = getStoredItem(STORAGE_KEYS.postPosition);
     if (
@@ -77,16 +104,22 @@ const formHandler = (function () {
       post.showPost = storedShowPost === "true";
     }
 
-    let fhwaPreference = getStoredItem(STORAGE_KEYS.fhwaFont);
-    if (fhwaPreference === null) {
-      fhwaPreference = getStoredItem(STORAGE_KEYS.legacyFhwaFont);
-      if (fhwaPreference !== null) {
-        setStoredItem(STORAGE_KEYS.fhwaFont, fhwaPreference);
-      }
+    const storedPostColor = getStoredItem(STORAGE_KEYS.postColor);
+    if (
+      storedPostColor &&
+      Array.isArray(Post.prototype.colors) &&
+      Post.prototype.colors.includes(storedPostColor)
+    ) {
+      post.color = storedPostColor;
     }
 
-    if (fhwaPreference !== null) {
-      post.fontType = fhwaPreference === "true";
+    const storedPostThickness = getStoredItem(STORAGE_KEYS.postThickness);
+    if (storedPostThickness !== null && post) {
+      const normalizedThickness =
+        typeof post.normalizeThickness === "function"
+          ? post.normalizeThickness(storedPostThickness)
+          : normalizeStoredPostThickness(storedPostThickness);
+      post.thickness = normalizedThickness;
     }
 
     const storedControlFont = getStoredItem(STORAGE_KEYS.controlTextFont);
@@ -117,6 +150,341 @@ const formHandler = (function () {
     }
   };
 
+  const toggleExitTabWiggle = (isActive) => {
+    const buttons = document.querySelectorAll(".exitTabButton");
+    for (const button of buttons) {
+      button.classList.toggle("blockWiggle", isActive);
+    }
+  };
+
+  const togglePanelListWiggle = (isActive) => {
+    const buttons = document.querySelectorAll(".panelListButton");
+    for (const button of buttons) {
+      button.classList.toggle("panelWiggle", isActive);
+    }
+  };
+
+  const toggleExitTabVariantOptionsVisibility = (variantValue) => {
+    const tollOptionsElmt = document.getElementById("exitTollLogoOptions");
+    if (tollOptionsElmt) {
+      tollOptionsElmt.classList.toggle("hidden", variantValue !== "Toll Logo");
+    }
+  };
+
+  const clearExitTabDropIndicators = () => {
+    document
+      .querySelectorAll(".exitTabButton.dropBefore, .exitTabButton.dropAfter")
+      .forEach((button) => button.classList.remove("dropBefore", "dropAfter"));
+  };
+
+  const endExitTabDrag = () => {
+    toggleExitTabWiggle(false);
+    clearExitTabDropIndicators();
+    exitTabDragState = null;
+    document
+      .querySelectorAll(".exitTabButton.dragging")
+      .forEach((button) => {
+        button.classList.remove("dragging");
+        delete button.dataset.dragging;
+      });
+  };
+
+  const getExitTabDropPosition = (container, clientX) => {
+    const buttons = Array.from(container.querySelectorAll(".exitTabButton"));
+    if (!buttons.length) {
+      return { dropIndex: 0, targetButton: null, placement: null };
+    }
+
+    let dropIndex = Number(
+      buttons[buttons.length - 1].dataset.exitTabIndex || buttons.length - 1
+    );
+    let targetButton = null;
+    let placement = "after";
+    let foundPosition = false;
+
+    for (const button of buttons) {
+      const rect = button.getBoundingClientRect();
+      const midpoint = rect.left + rect.width / 2;
+      if (clientX < midpoint) {
+        dropIndex = Number(button.dataset.exitTabIndex || 0);
+        placement = "before";
+        foundPosition = true;
+        targetButton = button.dataset.dragging === "true" ? null : button;
+        break;
+      }
+    }
+
+    if (!foundPosition) {
+      const lastButton = buttons[buttons.length - 1];
+      dropIndex = Number(lastButton.dataset.exitTabIndex || buttons.length - 1) + 1;
+      if (lastButton.dataset.dragging !== "true") {
+        targetButton = lastButton;
+        placement = "after";
+      } else {
+        placement = null;
+      }
+    } else if (!targetButton) {
+      placement = null;
+    }
+
+    return { dropIndex, targetButton, placement };
+  };
+
+  const handleExitTabDragStart = (event) => {
+    const button = event.currentTarget;
+    const fromIndex = Number(button.dataset.exitTabIndex);
+    if (Number.isNaN(fromIndex)) {
+      return;
+    }
+    exitTabDragState = { fromIndex, dropIndex: fromIndex };
+    button.dataset.dragging = "true";
+    button.classList.add("dragging");
+    toggleExitTabWiggle(true);
+    clearExitTabDropIndicators();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.setData("text/plain", "");
+    }
+  };
+
+  const handleExitTabDragOver = (event) => {
+    if (!exitTabDragState) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    const container = event.currentTarget;
+    const { dropIndex, targetButton, placement } = getExitTabDropPosition(
+      container,
+      event.clientX
+    );
+    exitTabDragState.dropIndex = dropIndex;
+
+    clearExitTabDropIndicators();
+    if (targetButton && placement) {
+      targetButton.classList.add(
+        placement === "before" ? "dropBefore" : "dropAfter"
+      );
+    }
+  };
+
+  const handleExitTabDrop = (event) => {
+    if (!exitTabDragState) {
+      return;
+    }
+    event.preventDefault();
+    const fromIndex = exitTabDragState.fromIndex;
+    const dropIndex =
+      exitTabDragState.dropIndex !== undefined
+        ? exitTabDragState.dropIndex
+        : fromIndex;
+    exposed.moveExitTab(fromIndex, dropIndex);
+    endExitTabDrag();
+  };
+
+  const handleExitTabDragLeave = (event) => {
+    if (!exitTabDragState) {
+      return;
+    }
+    const container = event.currentTarget;
+    const related = event.relatedTarget;
+    if (related && container.contains(related)) {
+      return;
+    }
+    clearExitTabDropIndicators();
+  };
+
+  const handleExitTabDragEnd = () => {
+    if (exitTabDragState) {
+      endExitTabDrag();
+    }
+  };
+
+  const clearPanelDropIndicators = () => {
+    document
+      .querySelectorAll(
+        ".panelListButton.dropBefore, .panelListButton.dropAfter"
+      )
+      .forEach((button) => button.classList.remove("dropBefore", "dropAfter"));
+  };
+
+  const endPanelDrag = () => {
+    clearPanelDropIndicators();
+    document
+      .querySelectorAll(".panelListButton.dragging")
+      .forEach((button) => {
+        button.classList.remove("dragging");
+        delete button.dataset.dragging;
+      });
+    panelDragState = null;
+    togglePanelListWiggle(false);
+  };
+
+  const getPanelDropPosition = (container, clientY) => {
+    const buttons = Array.from(container.querySelectorAll(".panelListButton"));
+    if (!buttons.length) {
+      return { dropIndex: 0, targetButton: null, placement: null };
+    }
+
+    let dropIndex = Number(
+      buttons[buttons.length - 1].dataset.panelIndex || buttons.length - 1
+    );
+    dropIndex += 1;
+    let targetButton = null;
+    let placement = "after";
+    let foundPosition = false;
+
+    for (const button of buttons) {
+      const rect = button.getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+      if (clientY < midpoint) {
+        dropIndex = Number(button.dataset.panelIndex || 0);
+        placement = "before";
+        foundPosition = true;
+        targetButton = button.dataset.dragging === "true" ? null : button;
+        break;
+      }
+    }
+
+    if (!foundPosition) {
+      const lastButton = buttons[buttons.length - 1];
+      if (lastButton.dataset.dragging !== "true") {
+        targetButton = lastButton;
+        placement = "after";
+      } else {
+        placement = null;
+      }
+    } else if (!targetButton) {
+      placement = null;
+    }
+
+    return { dropIndex, targetButton, placement };
+  };
+
+  const handlePanelDragStart = (event) => {
+    const button = event.currentTarget;
+    const fromIndex = Number(button.dataset.panelIndex);
+    if (Number.isNaN(fromIndex)) {
+      return;
+    }
+    panelDragState = { fromIndex, dropIndex: fromIndex };
+    button.dataset.dragging = "true";
+    button.classList.add("dragging");
+    togglePanelListWiggle(true);
+    clearPanelDropIndicators();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.setData("text/plain", "");
+    }
+  };
+
+  const handlePanelDragOver = (event) => {
+    if (!panelDragState) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    const container = event.currentTarget;
+    const { dropIndex, targetButton, placement } = getPanelDropPosition(
+      container,
+      event.clientY
+    );
+    panelDragState.dropIndex = dropIndex;
+
+    clearPanelDropIndicators();
+    if (targetButton && placement) {
+      targetButton.classList.add(
+        placement === "before" ? "dropBefore" : "dropAfter"
+      );
+    }
+  };
+
+  const handlePanelDrop = (event) => {
+    if (!panelDragState) {
+      return;
+    }
+    event.preventDefault();
+    const fromIndex = panelDragState.fromIndex;
+    const dropIndex =
+      panelDragState.dropIndex !== undefined
+        ? panelDragState.dropIndex
+        : fromIndex;
+    if (typeof exposed.movePanel === "function") {
+      exposed.movePanel(fromIndex, dropIndex);
+    }
+    endPanelDrag();
+  };
+
+  const handlePanelDragLeave = (event) => {
+    if (!panelDragState) {
+      return;
+    }
+    const container = event.currentTarget;
+    const related = event.relatedTarget;
+    if (related && container.contains(related)) {
+      return;
+    }
+    clearPanelDropIndicators();
+  };
+
+  const handlePanelDragEnd = () => {
+    if (panelDragState) {
+      endPanelDrag();
+    }
+  };
+
+  const isTextInputElement = (element) => {
+    if (!element || element.disabled || element.readOnly) {
+      return false;
+    }
+    const tagName = element.tagName;
+    if (tagName === "TEXTAREA") {
+      return true;
+    }
+    if (tagName === "INPUT") {
+      const type = (element.type || "").toLowerCase();
+      return (
+        type === "text" ||
+        type === "search" ||
+        type === "email" ||
+        type === "url" ||
+        type === "tel" ||
+        type === "password"
+      );
+    }
+    return false;
+  };
+
+  const checkForLimonEasterEgg = (event) => {
+    const target = event.target;
+    if (!isTextInputElement(target)) {
+      return;
+    }
+    const trimmedValue = (target.value || "").trim().toLowerCase();
+    if (trimmedValue === LIMON_TRIGGER_VALUE) {
+      if (target.dataset.limonTriggered === "true") {
+        return;
+      }
+      target.dataset.limonTriggered = "true";
+      const newWindow = window.open(LIMON_VIDEO_URL, "_blank");
+      if (newWindow) {
+        newWindow.opener = null;
+      }
+    } else if (target.dataset.limonTriggered === "true") {
+      delete target.dataset.limonTriggered;
+    }
+  };
+
   const clearBlockDragIndicators = () => {
     document
       .querySelectorAll(
@@ -128,9 +496,66 @@ const formHandler = (function () {
       .forEach((el) => el.classList.remove("dropActive"));
   };
 
+  const setNewRowDropState = (isActive) => {
+    if (!newRowDropTargetButton) {
+      return;
+    }
+    if (isActive) {
+      newRowDropTargetButton.classList.add("dropActive");
+    } else {
+      newRowDropTargetButton.classList.remove("dropActive");
+    }
+  };
+
+  const handleNewRowDragEnter = (event) => {
+    if (!blockDragState || !newRowDropTargetButton) {
+      return;
+    }
+    event.preventDefault();
+    setNewRowDropState(true);
+  };
+
+  const handleNewRowDragOver = (event) => {
+    if (!blockDragState || !newRowDropTargetButton) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "copy";
+    }
+    setNewRowDropState(true);
+  };
+
+  const handleNewRowDragLeave = (event) => {
+    if (!blockDragState || !newRowDropTargetButton) {
+      return;
+    }
+    const related = event.relatedTarget;
+    if (related && newRowDropTargetButton.contains(related)) {
+      return;
+    }
+    setNewRowDropState(false);
+  };
+
+  const handleNewRowDrop = (event) => {
+    if (!blockDragState || !newRowDropTargetButton) {
+      return;
+    }
+    event.preventDefault();
+    setNewRowDropState(false);
+    if (typeof exposed?.duplicateBlockIntoNewRow === "function") {
+      exposed.duplicateBlockIntoNewRow(
+        blockDragState.rowIndex,
+        blockDragState.blockIndex
+      );
+    }
+    endBlockDrag();
+  };
+
   const endBlockDrag = () => {
     toggleBlockWiggle(false);
     clearBlockDragIndicators();
+    setNewRowDropState(false);
     blockDragState = null;
     document
       .querySelectorAll(".textEditorBlock.dragging")
@@ -251,6 +676,7 @@ const formHandler = (function () {
       )
       .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
   };
+
 
   const initialize = async (appExposed) => {
     exposed = appExposed;
@@ -399,6 +825,109 @@ const formHandler = (function () {
       e.preventDefault();
     };
 
+    const registerPanelButton = (selector, actionName) => {
+      const button = document.querySelector(selector);
+      const action =
+        exposed && actionName && typeof exposed[actionName] === "function"
+          ? exposed[actionName]
+          : null;
+      if (!button || !action) {
+        return;
+      }
+      button.type = "button";
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        action();
+      });
+    };
+
+    registerPanelButton("#newPanel", "newPanel");
+    registerPanelButton("#duplicatePanel", "duplicatePanel");
+    registerPanelButton("#deletePanel", "deletePanel");
+
+    const panelSpacingSlider = document.getElementById("panelSpacing");
+    const panelSpacingValueInput =
+      document.getElementById("panelSpacingValue");
+
+    const syncPanelSpacingInputs = (value) => {
+      if (panelSpacingSlider) {
+        panelSpacingSlider.value = value;
+      }
+      if (panelSpacingValueInput) {
+        panelSpacingValueInput.value = value;
+      }
+    };
+
+    const commitPanelSpacingChange = (value) => {
+      const parsedValue = parseFloat(value);
+      const normalized =
+        Number.isFinite(parsedValue) && parsedValue >= 0
+          ? Math.min(parsedValue, 8)
+          : 0;
+      syncPanelSpacingInputs(normalized);
+      if (exposed && typeof exposed.setPanelSpacing === "function") {
+        exposed.setPanelSpacing(normalized);
+      } else if (post) {
+        post.panelSpacing = normalized;
+        if (exposed && typeof exposed.redraw === "function") {
+          exposed.redraw();
+        }
+      }
+    };
+
+    if (panelSpacingSlider) {
+      panelSpacingSlider.addEventListener("input", () => {
+        if (panelSpacingValueInput) {
+          panelSpacingValueInput.value = panelSpacingSlider.value;
+        }
+      });
+      panelSpacingSlider.addEventListener("change", () => {
+        commitPanelSpacingChange(panelSpacingSlider.value);
+      });
+    }
+
+    if (panelSpacingValueInput) {
+      panelSpacingValueInput.addEventListener("input", () => {
+        if (panelSpacingSlider) {
+          panelSpacingSlider.value = panelSpacingValueInput.value;
+        }
+      });
+      panelSpacingValueInput.addEventListener("change", () => {
+        commitPanelSpacingChange(panelSpacingValueInput.value);
+      });
+    }
+
+    const postThicknessValueInput =
+      document.getElementById("postThicknessValue");
+
+    const commitPostThicknessChange = (value) => {
+      const normalizedThickness =
+        post && typeof post.normalizeThickness === "function"
+          ? post.normalizeThickness(value)
+          : normalizeStoredPostThickness(value);
+      if (post) {
+        post.thickness = normalizedThickness;
+      }
+      if (postThicknessValueInput) {
+        postThicknessValueInput.value = normalizedThickness;
+      }
+      setStoredItem(STORAGE_KEYS.postThickness, normalizedThickness);
+      if (exposed && typeof exposed.redraw === "function") {
+        exposed.redraw();
+      }
+    };
+
+    if (postThicknessValueInput) {
+      postThicknessValueInput.addEventListener("input", () => {
+        commitPostThicknessChange(postThicknessValueInput.value);
+      });
+      postThicknessValueInput.addEventListener("change", () => {
+        commitPostThicknessChange(postThicknessValueInput.value);
+      });
+    }
+
+    document.addEventListener("input", checkForLimonEasterEgg, true);
+
     document.getElementById("export").onclick = function () {
       /*
       document.querySelector("#modalHolder").style.display = "flex";
@@ -429,6 +958,14 @@ const formHandler = (function () {
       localStorage.setItem("closedWelcome", true);
       document.querySelector("#welcomeToSignMaker").close();
     };
+
+    newRowDropTargetButton = document.getElementById("sMSPCreateRow");
+    if (newRowDropTargetButton) {
+      newRowDropTargetButton.addEventListener("dragenter", handleNewRowDragEnter);
+      newRowDropTargetButton.addEventListener("dragover", handleNewRowDragOver);
+      newRowDropTargetButton.addEventListener("dragleave", handleNewRowDragLeave);
+      newRowDropTargetButton.addEventListener("drop", handleNewRowDrop);
+    }
 
     const toolTip = document.createElement("span");
     toolTip.className = "toolTip";
@@ -506,12 +1043,23 @@ const formHandler = (function () {
       document.querySelector("#welcomeToSignMaker").showModal();
     }
 
-    // Populate post position options
+    // Populate post kind options
     const postPositionSelectElmt = document.getElementById("postPosition");
     for (const polePosition of Post.prototype.polePositions) {
+      const displayLabel = formatPostKindLabel(polePosition);
       lib.appendOption(postPositionSelectElmt, polePosition, {
         selected: polePosition == post.polePosition,
+        text: displayLabel,
       });
+    }
+
+    const postColorSelectElmt = document.getElementById("postColor");
+    if (postColorSelectElmt) {
+      for (const colorOption of Post.prototype.colors) {
+        lib.appendOption(postColorSelectElmt, colorOption, {
+          selected: colorOption === post.color,
+        });
+      }
     }
 
     // Populate color options
@@ -557,11 +1105,37 @@ const formHandler = (function () {
     for (const exitVariant of ExitTab.prototype.variants) {
       lib.appendOption(exitVariantSelectElmt, exitVariant);
     }
+    if (exitVariantSelectElmt) {
+      exitVariantSelectElmt.addEventListener("change", (event) => {
+        toggleExitTabVariantOptionsVisibility(event.target.value);
+      });
+      toggleExitTabVariantOptionsVisibility(exitVariantSelectElmt.value);
+    }
+
+    const exitTollLogoSelectElmt =
+      document.getElementById("exitTollLogoSelect");
+    if (
+      exitTollLogoSelectElmt &&
+      typeof TollLogoElement !== "undefined" &&
+      TollLogoElement.prototype &&
+      TollLogoElement.prototype.logos
+    ) {
+      for (const [logoKey, logoDef] of Object.entries(
+        TollLogoElement.prototype.logos
+      )) {
+        lib.appendOption(exitTollLogoSelectElmt, logoKey, {
+          text: logoDef.label,
+          selected: logoKey == TollLogoElement.prototype.defaultLogo,
+        });
+      }
+    }
 
     // Populate the exit icons
     const iconSelectSelectElmt = document.getElementById("iconSelect");
-    for (const icons of ExitTab.prototype.icons) {
-      lib.appendOption(iconSelectSelectElmt, icons.split(":")[0]);
+    if (iconSelectSelectElmt) {
+      for (const icons of ExitTab.prototype.icons) {
+        lib.appendOption(iconSelectSelectElmt, icons.split(":")[0]);
+      }
     }
 
     // Populate the shield position options
@@ -607,11 +1181,6 @@ const formHandler = (function () {
     }
 
     // exit-only labels
-    const exitOnlyLabelElmt = document.getElementById("exitOnlyLabel");
-    for (const label of Sign.prototype.exitOnlyLabels) {
-      lib.appendOption(exitOnlyLabelElmt, label);
-    }
-
     // Populate the arrow directions
     const arrowDirectionElmt = document.getElementById("arrowLocations");
     for (const arrowDirection of Sign.prototype.arrowPositions) {
@@ -637,6 +1206,7 @@ const formHandler = (function () {
       document.querySelector("#sdBlocker_alignment"),
       document.querySelector("#sdElectronicSign_alignment"),
       document.querySelector("#sdTollLogo_alignment"),
+      document.querySelector("#sdBeacon_alignment"),
     ];
     let textElem_bgColorSelects = [
       document.querySelector("#sdCtrlText_backgroundColor"),
@@ -653,10 +1223,21 @@ const formHandler = (function () {
     let divider_colorSelect = document.querySelector("#sdBlocker_dividerColor");
     let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
     let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
+    const beaconColorSelect = document.querySelector("#sdBeacon_color");
 
     for (const elem of textElem_fontFamilySelects) {
       for (const fontFamily of TextElement.prototype.fontFamily) {
         lib.appendOption(elem, fontFamily);
+      }
+    }
+
+    if (
+      beaconColorSelect &&
+      typeof BeaconElement !== "undefined" &&
+      Array.isArray(BeaconElement.prototype.colors)
+    ) {
+      for (const color of BeaconElement.prototype.colors) {
+        lib.appendOption(beaconColorSelect, color);
       }
     }
 
@@ -1066,16 +1647,27 @@ const formHandler = (function () {
 
     // Post
     post.polePosition = form["postPosition"].value;
-    post.fontType = form["fontChange"].checked;
+    const requestedPostColor = form["postColor"] ? form["postColor"].value : null;
+    if (
+      requestedPostColor &&
+      Array.isArray(Post.prototype.colors) &&
+      Post.prototype.colors.includes(requestedPostColor)
+    ) {
+      post.color = requestedPostColor;
+    }
     post.showPost = form["showPost"].checked;
     post.secondExitOnly = form["secondExitOnly"].checked;
     setStoredItem(STORAGE_KEYS.postPosition, post.polePosition);
     setStoredItem(STORAGE_KEYS.showPost, String(!!post.showPost));
-    setStoredItem(STORAGE_KEYS.fhwaFont, String(!!post.fontType));
+    setStoredItem(STORAGE_KEYS.postColor, post.color);
 
     // Panel
     currentPanel.color = form["panelColor"].value;
     currentPanel.corner = form["panelCorner"].value;
+    const panelBorderRadiusInput = parseFloat(form["panelBorderRadius"].value);
+    currentPanel.borderRadius = Number.isFinite(panelBorderRadiusInput)
+      ? Math.max(0, panelBorderRadiusInput)
+      : Panel.prototype.defaultBorderRadius;
 
     // Exit Tab
     exitTab.number = form["exitNumber"].value;
@@ -1084,23 +1676,80 @@ const formHandler = (function () {
     exitTab.color = form["exitColor"].value;
     exitTab.variant = form["exitVariant"].value;
 
-    if (exitTab.variant == "Toll") {
-      for (const tollOption of document.getElementsByName("tollOption")) {
-        if (tollOption.checked == true) {
-          if (tollOption.value != "custom") {
-            exitTab.icon = tollOption.value;
-            exitTab.useTextBasedIcon = false;
-          } else {
-            exitTab.icon = form["customTag"].value;
-            exitTab.useTextBasedIcon = true;
-          }
-          break;
-        }
+    toggleExitTabVariantOptionsVisibility(exitTab.variant);
+
+    const resolveDefaultTollLogoSize = () => {
+      if (
+        typeof ExitTab !== "undefined" &&
+        ExitTab.prototype &&
+        typeof ExitTab.prototype.defaultTollLogoSize === "number"
+      ) {
+        return ExitTab.prototype.defaultTollLogoSize;
       }
+      return 3;
+    };
+    const tollLogoSizeField = form["exitTollLogoSize"];
+    const parsedTollLogoSize =
+      tollLogoSizeField && tollLogoSizeField.value !== ""
+        ? parseFloat(tollLogoSizeField.value)
+        : NaN;
+    const normalizedTollLogoSize =
+      Number.isFinite(parsedTollLogoSize) && parsedTollLogoSize > 0
+        ? parsedTollLogoSize
+        : Number.isFinite(exitTab.tollLogoSize) && exitTab.tollLogoSize > 0
+          ? exitTab.tollLogoSize
+          : resolveDefaultTollLogoSize();
+    exitTab.tollLogoSize = normalizedTollLogoSize;
+    if (tollLogoSizeField) {
+      tollLogoSizeField.value = normalizedTollLogoSize;
+    }
+    const tollLogoSizeValueElmt = document.getElementById(
+      "exitTollLogoSizeValue"
+    );
+    if (tollLogoSizeValueElmt) {
+      tollLogoSizeValueElmt.textContent = normalizedTollLogoSize.toString();
+    }
+
+    if (exitTab.variant == "Toll Logo") {
+      const tollLogoSelectField = form["exitTollLogoSelect"];
+      const tollLogoOptions =
+        typeof TollLogoElement !== "undefined" &&
+        TollLogoElement.prototype &&
+        TollLogoElement.prototype.logos
+          ? TollLogoElement.prototype.logos
+          : null;
+      let selectedLogo =
+        tollLogoSelectField && tollLogoSelectField.value
+          ? tollLogoSelectField.value
+          : null;
+      if (!tollLogoOptions || !tollLogoOptions[selectedLogo]) {
+        selectedLogo =
+          tollLogoOptions && TollLogoElement.prototype.defaultLogo
+            ? TollLogoElement.prototype.defaultLogo
+            : null;
+      }
+      exitTab.icon = selectedLogo;
+      exitTab.useTextBasedIcon = false;
+      const tollLogoOnlyField = form["exitTollLogoOnly"];
+      exitTab.tollLogoOnly =
+        tollLogoOnlyField && typeof tollLogoOnlyField.checked === "boolean"
+          ? tollLogoOnlyField.checked
+          : true;
+      const tollLogoSquareField = form["exitTollLogoSquare"];
+      exitTab.tollLogoSquare =
+        tollLogoSquareField && typeof tollLogoSquareField.checked === "boolean"
+          ? tollLogoSquareField.checked
+          : false;
     } else if (exitTab.variant == "Icon") {
-      exitTab.icon = form["iconSelect"].value;
+      const iconSelectField = form["iconSelect"];
+      exitTab.icon = iconSelectField ? iconSelectField.value : null;
+      exitTab.useTextBasedIcon = false;
     } else {
       exitTab.icon = null;
+      exitTab.useTextBasedIcon = false;
+      exitTab.tollLogoOnly =
+        typeof exitTab.tollLogoOnly === "boolean" ? exitTab.tollLogoOnly : true;
+      exitTab.tollLogoSquare = !!exitTab.tollLogoSquare;
     }
 
     exitTab.FHWAFont = form["exitFont"].checked;
@@ -1108,7 +1757,14 @@ const formHandler = (function () {
     exitTab.fullBorder = form["fullBorder"].checked;
     exitTab.squareCorners = form["squareCorners"].checked;
     exitTab.topOffset = form["topOffset"].checked;
-    exitTab.borderThickness = form["borderThickness"].value;
+    const borderThicknessInput = parseFloat(form["borderThickness"].value);
+    exitTab.borderThickness = Number.isFinite(borderThicknessInput)
+      ? Math.max(0, borderThicknessInput)
+      : (typeof ExitTab !== "undefined" &&
+          ExitTab.prototype &&
+          typeof ExitTab.prototype.defaultBorderThickness === "number"
+          ? ExitTab.prototype.defaultBorderThickness
+          : 0.2);
     exitTab.minHeight = form["minHeight"].value;
     exitTab.fontSize = form["fontSize"].value;
 
@@ -1268,7 +1924,16 @@ const formHandler = (function () {
     ) {
       subPanel.width = parseInt(form["subPanelLength"].value);
     } else if (exposed.vars.currentlySelectedSubPanelIndex != 0) {
-      subPanel.height = form["subPanelHeight"].value + "rem";
+      const subPanelHeightField = form["subPanelHeight"];
+      const rawHeightValue =
+        subPanelHeightField && typeof subPanelHeightField.value === "string"
+          ? subPanelHeightField.value.trim()
+          : "";
+      const hasCustomHeight = !!rawHeightValue;
+      subPanel.customDividerHeight = hasCustomHeight;
+      subPanel.height = SubPanels.normalizeHeight(
+        hasCustomHeight ? rawHeightValue : undefined
+      );
       subPanel.width = parseInt(form["subPanelLength"].value);
     }
 
@@ -1324,9 +1989,40 @@ const formHandler = (function () {
       }
     }
 
+    const useCanadianDownArrowField = form["useCanadianDownArrows"];
+    currentPanel.sign.useCanadianDownArrows = !!(
+      useCanadianDownArrowField && useCanadianDownArrowField.checked
+    );
+
     currentPanel.sign.exitguideArrows = exitOnlyDirection_result;
     currentPanel.sign.showExitOnly = form["showExitOnly"].checked;
-    currentPanel.sign.exitOnlyLabelPreset = form["exitOnlyLabel"].value;
+    currentPanel.sign.hideExitArrow = form["hideExitArrow"]
+      ? form["hideExitArrow"].checked
+      : false;
+    const borderModeField = form["exitOnlyBorderMode"];
+    if (borderModeField) {
+      const selectedMode = borderModeField.value;
+      currentPanel.sign.exitOnlyBorderMode = Sign.prototype.exitOnlyBorderModes.includes(
+        selectedMode
+      )
+        ? selectedMode
+        : Sign.prototype.exitOnlyBorderModes[0];
+    } else {
+      currentPanel.sign.exitOnlyBorderMode = Sign.prototype.exitOnlyBorderModes[0];
+    }
+    currentPanel.sign.exitOnlyLeftText = form["exitOnlyLeftText"]
+      ? form["exitOnlyLeftText"].value || ""
+      : "";
+    currentPanel.sign.exitOnlyRightText = form["exitOnlyRightText"]
+      ? form["exitOnlyRightText"].value || ""
+      : "";
+    currentPanel.sign.exitOnlyLabelPreset = [
+      currentPanel.sign.exitOnlyLeftText,
+      currentPanel.sign.exitOnlyRightText,
+    ]
+      .filter((part) => part && part.trim().length > 0)
+      .join(" ")
+      .trim();
     currentPanel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
 
     currentPanel.sign.otherSymbol = form["otherSymbol"].value;
@@ -1343,12 +2039,24 @@ const formHandler = (function () {
       "exitOnlyDirectionLabel"
     );
     const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
+    const hideExitArrowLabel = document.getElementById("hideExitArrowLabel");
     const exitOnlyDirection = document.getElementById("exitOnlyDirection");
     const showExitOnly = document.getElementById("showExitOnly");
-    const exitOnlyLabelTextLabel = document.getElementById(
-      "exitOnlyLabelTextLabel"
+    const hideExitArrow = document.getElementById("hideExitArrow");
+    const exitOnlyBorderModeLabel = document.getElementById(
+      "exitOnlyBorderModeLabel"
     );
-    const exitOnlyLabelSelect = document.getElementById("exitOnlyLabel");
+    const exitOnlyBorderModeSelect = document.getElementById(
+      "exitOnlyBorderMode"
+    );
+    const exitOnlyLeftTextLabel = document.getElementById(
+      "exitOnlyLeftTextLabel"
+    );
+    const exitOnlyLeftTextInput = document.getElementById("exitOnlyLeftText");
+    const exitOnlyRightTextLabel = document.getElementById(
+      "exitOnlyRightTextLabel"
+    );
+    const exitOnlyRightTextInput = document.getElementById("exitOnlyRightText");
 
     if (
       currentPanel.sign.guideArrow != "Exit Only" &&
@@ -1359,15 +2067,51 @@ const formHandler = (function () {
       showExitOnlyLabel.style.visibility = "hidden";
       exitOnlyDirection.style.visibility = "hidden";
       showExitOnly.style.visibility = "hidden";
-      exitOnlyLabelTextLabel.style.visibility = "hidden";
-      exitOnlyLabelSelect.style.visibility = "hidden";
+      if (hideExitArrowLabel && hideExitArrow) {
+        hideExitArrowLabel.style.visibility = "hidden";
+        hideExitArrow.style.visibility = "hidden";
+      }
+      if (exitOnlyLeftTextLabel && exitOnlyLeftTextInput) {
+        exitOnlyLeftTextLabel.style.visibility = "hidden";
+        exitOnlyLeftTextInput.style.visibility = "hidden";
+      }
+      if (exitOnlyRightTextLabel && exitOnlyRightTextInput) {
+        exitOnlyRightTextLabel.style.visibility = "hidden";
+        exitOnlyRightTextInput.style.visibility = "hidden";
+      }
+      if (exitOnlyBorderModeLabel && exitOnlyBorderModeSelect) {
+        exitOnlyBorderModeLabel.style.visibility = "hidden";
+        exitOnlyBorderModeSelect.style.visibility = "hidden";
+      }
     } else {
       exitOnlyDirectionLabel.style.visibility = "visible";
       showExitOnlyLabel.style.visibility = "visible";
       exitOnlyDirection.style.visibility = "visible";
       showExitOnly.style.visibility = "visible";
-      exitOnlyLabelTextLabel.style.visibility = "visible";
-      exitOnlyLabelSelect.style.visibility = "visible";
+      if (hideExitArrowLabel && hideExitArrow) {
+        hideExitArrowLabel.style.visibility = "visible";
+        hideExitArrow.style.visibility = "visible";
+      }
+      if (exitOnlyLeftTextLabel && exitOnlyLeftTextInput) {
+        exitOnlyLeftTextLabel.style.visibility = "visible";
+        exitOnlyLeftTextInput.style.visibility = "visible";
+      }
+      if (exitOnlyRightTextLabel && exitOnlyRightTextInput) {
+        exitOnlyRightTextLabel.style.visibility = "visible";
+        exitOnlyRightTextInput.style.visibility = "visible";
+      }
+      if (exitOnlyBorderModeLabel && exitOnlyBorderModeSelect) {
+        const shouldShowBorderMode =
+          !post.secondExitOnly &&
+          (currentPanel.sign.guideArrow == "Half Exit Only" ||
+            currentPanel.sign.guideArrow == "Exit Only");
+        exitOnlyBorderModeLabel.style.visibility = shouldShowBorderMode
+          ? "visible"
+          : "hidden";
+        exitOnlyBorderModeSelect.style.visibility = shouldShowBorderMode
+          ? "visible"
+          : "hidden";
+      }
     }
 
     var paddingValues = currentPanel.sign.padding.split("rem");
@@ -1400,29 +2144,75 @@ const formHandler = (function () {
       exposed.vars.currentlySelectedSubPanelIndex != -1
         ? panel.sign.subPanels[exposed.vars.currentlySelectedSubPanelIndex]
         : panel.sign;
+
+    const selectedExitTabIndex = exposed.vars.currentlySelectedExitTabIndex;
+    const selectedNestedExitTabIndex =
+      exposed.vars.currentlySelectedNestedExitTabIndex;
+    const currentExitTab = panel.exitTabs[selectedExitTabIndex];
+
+    const maxNested =
+      typeof ExitTab !== "undefined" && ExitTab.prototype.maxNested != null
+        ? ExitTab.prototype.maxNested
+        : 1;
+
+    if (currentExitTab && currentExitTab.nestedExitTabs.length > maxNested) {
+      currentExitTab.nestedExitTabs.splice(maxNested);
+    }
+
+    if (
+      currentExitTab &&
+      selectedNestedExitTabIndex > -1 &&
+      selectedNestedExitTabIndex >= currentExitTab.nestedExitTabs.length
+    ) {
+      const newNestedIndex =
+        currentExitTab.nestedExitTabs.length > 0
+          ? currentExitTab.nestedExitTabs.length - 1
+          : -1;
+      exposed.changeEditingExitTab(selectedExitTabIndex, newNestedIndex);
+      return;
+    }
+
     const exitTab =
-      exposed.vars.currentlySelectedNestedExitTabIndex != -1
-        ? panel.exitTabs[exposed.vars.currentlySelectedExitTabIndex]
-            .nestedExitTabs[exposed.vars.currentlySelectedNestedExitTabIndex]
-        : panel.exitTabs[exposed.vars.currentlySelectedExitTabIndex];
+      currentExitTab && selectedNestedExitTabIndex > -1
+        ? currentExitTab.nestedExitTabs[selectedNestedExitTabIndex]
+        : currentExitTab;
 
     const panelList = document.getElementById("panelList");
     const subPanelList = document.getElementById("subPanelList");
     const exitTabList = document.getElementById("exitTabList");
+    toggleExitTabWiggle(false);
+    clearExitTabDropIndicators();
+    exitTabDragState = null;
+    endPanelDrag();
+    togglePanelListWiggle(false);
+
+    if (exitTabList && !exitTabList.dataset.exitTabDragAttached) {
+      exitTabList.addEventListener("dragover", handleExitTabDragOver);
+      exitTabList.addEventListener("drop", handleExitTabDrop);
+      exitTabList.addEventListener("dragleave", handleExitTabDragLeave);
+      exitTabList.dataset.exitTabDragAttached = "true";
+    }
+
+    if (panelList && !panelList.dataset.panelDragAttached) {
+      panelList.addEventListener("dragover", handlePanelDragOver);
+      panelList.addEventListener("drop", handlePanelDrop);
+      panelList.addEventListener("dragleave", handlePanelDragLeave);
+      panelList.dataset.panelDragAttached = "true";
+    }
 
     const postPositionSelectElmt = document.getElementById("postPosition");
     if (postPositionSelectElmt && post.polePosition) {
       postPositionSelectElmt.value = post.polePosition;
     }
 
+    const postColorSelectElmt = document.getElementById("postColor");
+    if (postColorSelectElmt && post.color) {
+      postColorSelectElmt.value = post.color;
+    }
+
     const showPostCheckbox = document.getElementById("showPost");
     if (showPostCheckbox) {
       showPostCheckbox.checked = !!post.showPost;
-    }
-
-    const fontChangeCheckbox = document.getElementById("fontChange");
-    if (fontChangeCheckbox) {
-      fontChangeCheckbox.checked = !!post.fontType;
     }
 
     const secondExitOnlyCheckbox = document.getElementById("secondExitOnly");
@@ -1459,16 +2249,55 @@ const formHandler = (function () {
     ) {
       const panelButton = document.createElement("button");
       panelButton.id = "edit" + (panelIndex + 1);
-      panelButton.textContent = "Panel " + (panelIndex + 1);
+      panelButton.type = "button";
       panelButton.className =
-        exposed.vars.currentlySelectedPanelIndex == panelIndex ? "active" : "";
+        "panelListButton" +
+        (exposed.vars.currentlySelectedPanelIndex == panelIndex
+          ? " active"
+          : "");
+      panelButton.dataset.panelIndex = panelIndex.toString();
+      panelButton.draggable = post.panels.length > 1;
+
+      const label = document.createElement("span");
+      label.className = "panelListLabel";
+      label.textContent = "Panel " + (panelIndex + 1);
+      panelButton.appendChild(label);
 
       panelButton.addEventListener("click", function () {
         exposed.changeEditingPanel(panelIndex);
-        panelButton.className = "active";
+        panelButton.classList.add("active");
       });
+      panelButton.addEventListener("dragstart", handlePanelDragStart);
+      panelButton.addEventListener("dragend", handlePanelDragEnd);
 
       panelList.appendChild(panelButton);
+    }
+
+    const panelSpacingSlider = document.getElementById("panelSpacing");
+    const panelSpacingValueInput =
+      document.getElementById("panelSpacingValue");
+    const resolvedPanelSpacing =
+      typeof post.panelSpacing === "number" && post.panelSpacing >= 0
+        ? post.panelSpacing
+        : 0;
+    if (panelSpacingSlider) {
+      panelSpacingSlider.value = resolvedPanelSpacing;
+    }
+    if (panelSpacingValueInput) {
+      panelSpacingValueInput.value = resolvedPanelSpacing;
+    }
+
+    const postThicknessValueInput =
+      document.getElementById("postThicknessValue");
+    const resolvedPostThickness =
+      post && typeof post.normalizeThickness === "function"
+        ? post.normalizeThickness(post.thickness)
+        : normalizeStoredPostThickness(post ? post.thickness : undefined);
+    if (post) {
+      post.thickness = resolvedPostThickness;
+    }
+    if (postThicknessValueInput) {
+      postThicknessValueInput.value = resolvedPostThickness;
     }
 
     for (
@@ -1497,39 +2326,79 @@ const formHandler = (function () {
       exitTabIndex < exitTabLength;
       exitTabIndex++
     ) {
-      const nestedExitTab = panel.exitTabs[exitTabIndex].nestedExitTabs.length;
+      const exitTabGroup = document.createElement("div");
+      exitTabGroup.className = "exitTabGroup";
 
-      const exitTabButton = document.createElement("select");
+      const exitTabButton = document.createElement("button");
+      exitTabButton.type = "button";
       exitTabButton.id = "tab_edit" + (exitTabIndex + 1);
-      exitTabButton.className =
-        "exitTabSelect" +
-        (exposed.vars.currentlySelectedExitTabIndex == exitTabIndex)
-          ? " active"
-          : "";
+      exitTabButton.className = "exitTabButton";
+      exitTabButton.textContent = "Exit Tab " + (exitTabIndex + 1);
 
-      for (let nestIndex = -1; nestIndex < nestedExitTab; nestIndex++) {
-        lib.appendOption(exitTabButton, nestIndex, {
-          selected:
-            exposed.vars.currentlySelectedNestedExitTabIndex == nestIndex,
-          text:
-            nestIndex == -1
-              ? "Exit Tab "
-              : "Nest Exit Tab " + (nestIndex + 1).toString(),
-        });
+      if (
+        exposed.vars.currentlySelectedExitTabIndex === exitTabIndex &&
+        exposed.vars.currentlySelectedNestedExitTabIndex === -1
+      ) {
+        exitTabButton.classList.add("active");
       }
-
-      exitTabButton.addEventListener("change", function () {
-        exposed.changeEditingExitTab(
-          exitTabIndex,
-          parseInt(exitTabButton.value)
-        );
-      });
 
       exitTabButton.addEventListener("click", function () {
         exposed.changeEditingExitTab(exitTabIndex);
       });
 
-      exitTabList.appendChild(exitTabButton);
+      exitTabButton.dataset.exitTabIndex = exitTabIndex.toString();
+      exitTabButton.draggable = panel.exitTabs.length > 1;
+      exitTabButton.addEventListener("dragstart", handleExitTabDragStart);
+      exitTabButton.addEventListener("dragend", handleExitTabDragEnd);
+
+      exitTabGroup.appendChild(exitTabButton);
+
+      const nestedExitTabs =
+        panel.exitTabs[exitTabIndex].nestedExitTabs || [];
+      const allowedNestedLength = Math.min(
+        nestedExitTabs.length,
+        maxNested != null ? maxNested : nestedExitTabs.length
+      );
+
+      for (
+        let nestIndex = 0;
+        nestIndex < allowedNestedLength;
+        nestIndex++
+      ) {
+        const nestedButton = document.createElement("button");
+        nestedButton.type = "button";
+        nestedButton.id =
+          "tab_edit" + (exitTabIndex + 1) + "_nest" + (nestIndex + 1);
+        nestedButton.className = "exitTabNestedButton";
+        nestedButton.textContent = "Nested Exit Tab " + (nestIndex + 1);
+
+        if (
+          exposed.vars.currentlySelectedExitTabIndex === exitTabIndex &&
+          exposed.vars.currentlySelectedNestedExitTabIndex === nestIndex
+        ) {
+          nestedButton.classList.add("active");
+        }
+
+        nestedButton.addEventListener("click", function () {
+          exposed.changeEditingExitTab(exitTabIndex, nestIndex);
+        });
+
+        exitTabGroup.appendChild(nestedButton);
+      }
+
+      exitTabList.appendChild(exitTabGroup);
+    }
+
+    const addNestedButton = document.getElementById("addNestedExitTab");
+    if (addNestedButton) {
+      const selectedExitTab = panel.exitTabs[selectedExitTabIndex];
+      const nestedCount =
+        selectedExitTab && selectedExitTab.nestedExitTabs
+          ? selectedExitTab.nestedExitTabs.length
+          : 0;
+      const limit = maxNested != null ? maxNested : 1;
+      addNestedButton.disabled =
+        !selectedExitTab || nestedCount >= limit;
     }
 
     // Panel Setting Config
@@ -1549,6 +2418,15 @@ const formHandler = (function () {
         option.selected = true;
         break;
       }
+    }
+
+    const panelBorderRadiusElmt = document.getElementById("panelBorderRadius");
+    if (panelBorderRadiusElmt) {
+      const resolvedRadius =
+        typeof panel.borderRadius === "number"
+          ? panel.borderRadius
+          : Panel.prototype.defaultBorderRadius;
+      panelBorderRadiusElmt.value = resolvedRadius;
     }
 
     // Global Panel
@@ -1627,28 +2505,77 @@ const formHandler = (function () {
     }
 
     const exitTabVariantElmt = document.querySelector("#exitVariant");
-    for (const option of exitTabColorElmt.options) {
-      if (option.value == exitTab.color) {
-        option.selected = true;
-        break;
+    if (exitTabVariantElmt) {
+      for (const option of exitTabVariantElmt.options) {
+        if (option.value == exitTab.variant) {
+          option.selected = true;
+          break;
+        }
+      }
+      toggleExitTabVariantOptionsVisibility(exitTab.variant);
+    }
+
+    const tollLogoSizeInput = document.getElementById("exitTollLogoSize");
+    const tollLogoSizeValueElmt = document.getElementById(
+      "exitTollLogoSizeValue"
+    );
+    const resolvedTollLogoSize = (() => {
+      const parsed = parseFloat(exitTab.tollLogoSize);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        return parsed;
+      }
+      if (
+        typeof ExitTab !== "undefined" &&
+        ExitTab.prototype &&
+        typeof ExitTab.prototype.defaultTollLogoSize === "number"
+      ) {
+        return ExitTab.prototype.defaultTollLogoSize;
+      }
+      return 3;
+    })();
+    if (tollLogoSizeInput) {
+      tollLogoSizeInput.value = resolvedTollLogoSize;
+    }
+    if (tollLogoSizeValueElmt) {
+      tollLogoSizeValueElmt.textContent = resolvedTollLogoSize.toString();
+    }
+
+    const tollLogoSelect = document.getElementById("exitTollLogoSelect");
+    if (tollLogoSelect && tollLogoSelect.options.length > 0) {
+      const desiredLogo =
+        exitTab.icon ||
+        (typeof TollLogoElement !== "undefined" &&
+        TollLogoElement.prototype
+          ? TollLogoElement.prototype.defaultLogo
+          : "");
+      for (const option of tollLogoSelect.options) {
+        if (option.value == desiredLogo) {
+          option.selected = true;
+          break;
+        }
       }
     }
 
-    const tollSettingOptions = document.getElementsByName("tollOption");
-    for (const tollSettingOption of tollSettingOptions) {
-      if (tollSettingOption.value == exitTab.icon) {
-        tollSettingOption.selected = true;
-        break;
-      }
+    const tollLogoOnly = document.getElementById("exitTollLogoOnly");
+    if (tollLogoOnly) {
+      tollLogoOnly.checked =
+        exitTab.tollLogoOnly === undefined ? true : exitTab.tollLogoOnly;
+    }
+
+    const tollLogoSquare = document.getElementById("exitTollLogoSquare");
+    if (tollLogoSquare) {
+      tollLogoSquare.checked = !!exitTab.tollLogoSquare;
     }
 
     const iconSetting = document.getElementById("iconSelect");
-    iconSetting.value = exitTab.icon;
+    if (iconSetting) {
+      iconSetting.value = exitTab.icon || "";
 
-    for (const option of iconSetting.options) {
-      if (option.value == exitTab.icon) {
-        option.selected = true;
-        break;
+      for (const option of iconSetting.options) {
+        if (option.value == exitTab.icon) {
+          option.selected = true;
+          break;
+        }
       }
     }
 
@@ -1668,9 +2595,24 @@ const formHandler = (function () {
     topOffset.checked = exitTab.topOffset;
 
     const borderThickness = document.getElementById("borderThickness");
-    borderThickness.value = exitTab.borderThickness;
+    const resolvedBorderThickness = (() => {
+      const parsedValue = parseFloat(exitTab.borderThickness);
+      if (Number.isFinite(parsedValue) && parsedValue >= 0) {
+        return parsedValue;
+      }
+      if (
+        typeof ExitTab !== "undefined" &&
+        ExitTab.prototype &&
+        typeof ExitTab.prototype.defaultBorderThickness === "number"
+      ) {
+        return ExitTab.prototype.defaultBorderThickness;
+      }
+      return 0.2;
+    })();
+    exitTab.borderThickness = resolvedBorderThickness;
+    borderThickness.value = resolvedBorderThickness;
     document.getElementById("borderValue").innerHTML =
-      borderThickness.value.toString();
+      resolvedBorderThickness.toString();
 
     const minHeight = document.getElementById("minHeight");
     minHeight.value = exitTab.minHeight;
@@ -2005,17 +2947,36 @@ const formHandler = (function () {
 
     const guideArrowLanesElmt = document.getElementById("guideArrowLanes");
     guideArrowLanesElmt.value = panel.sign.guideArrowLanes;
+    
+    const useCanadianDownArrowsElmt = document.getElementById(
+      "useCanadianDownArrows"
+    );
+    if (useCanadianDownArrowsElmt) {
+      useCanadianDownArrowsElmt.checked = !!panel.sign.useCanadianDownArrows;
+    }
 
     const exitOnlyDirectionLabel = document.getElementById(
       "exitOnlyDirectionLabel"
     );
     const showExitOnlyLabel = document.getElementById("showExitOnlyLabel");
+    const hideExitArrowLabel = document.getElementById("hideExitArrowLabel");
     const exitOnlyDirection = document.getElementById("exitOnlyDirection");
     const showExitOnly = document.getElementById("showExitOnly");
-    const exitOnlyLabelTextLabel = document.getElementById(
-      "exitOnlyLabelTextLabel"
+    const hideExitArrow = document.getElementById("hideExitArrow");
+    const exitOnlyBorderModeLabel = document.getElementById(
+      "exitOnlyBorderModeLabel"
     );
-    const exitOnlyLabelSelect = document.getElementById("exitOnlyLabel");
+    const exitOnlyBorderModeSelect = document.getElementById(
+      "exitOnlyBorderMode"
+    );
+    const exitOnlyLeftTextLabel = document.getElementById(
+      "exitOnlyLeftTextLabel"
+    );
+    const exitOnlyLeftTextInput = document.getElementById("exitOnlyLeftText");
+    const exitOnlyRightTextLabel = document.getElementById(
+      "exitOnlyRightTextLabel"
+    );
+    const exitOnlyRightTextInput = document.getElementById("exitOnlyRightText");
     const exitOnlyPadding = document.getElementById("exitOnlyPadding");
     const exitOnlyPaddingValue = document.getElementById("paddingValue");
     const exitOnlyPaddingLabel = document.getElementById(
@@ -2035,6 +2996,11 @@ const formHandler = (function () {
     showExitOnlyLabel.className = !panel.sign.guideArrow.includes("Exit Only")
       ? "invisible"
       : "";
+    if (hideExitArrowLabel) {
+      hideExitArrowLabel.className = !panel.sign.guideArrow.includes("Exit Only")
+        ? "invisible"
+        : "";
+    }
     exitOnlyDirection.className = !panel.sign.guideArrow.includes("Exit Only")
       ? "invisible"
       : "";
@@ -2046,32 +3012,71 @@ const formHandler = (function () {
     showExitOnly.className = !panel.sign.guideArrow.includes("Exit Only")
       ? "invisible"
       : "";
-    exitOnlyLabelTextLabel.className = !panel.sign.guideArrow.includes(
-      "Exit Only"
-    )
-      ? "invisible"
-      : "";
-    exitOnlyLabelSelect.className = !panel.sign.guideArrow.includes("Exit Only")
-      ? "invisible"
-      : "";
+    if (hideExitArrow) {
+      hideExitArrow.className = !panel.sign.guideArrow.includes("Exit Only")
+        ? "invisible"
+        : "";
+    }
+    if (exitOnlyLeftTextLabel && exitOnlyLeftTextInput) {
+      exitOnlyLeftTextLabel.className = !panel.sign.guideArrow.includes(
+        "Exit Only"
+      )
+        ? "invisible"
+        : "";
+      exitOnlyLeftTextInput.className = !panel.sign.guideArrow.includes(
+        "Exit Only"
+      )
+        ? "invisible"
+        : "";
+      exitOnlyLeftTextInput.value = panel.sign.exitOnlyLeftText || "";
+    }
+    if (exitOnlyRightTextLabel && exitOnlyRightTextInput) {
+      exitOnlyRightTextLabel.className = !panel.sign.guideArrow.includes(
+        "Exit Only"
+      )
+        ? "invisible"
+        : "";
+      exitOnlyRightTextInput.className = !panel.sign.guideArrow.includes(
+        "Exit Only"
+      )
+        ? "invisible"
+        : "";
+      exitOnlyRightTextInput.value = panel.sign.exitOnlyRightText || "";
+    }
     paddingValue.className =
       !panel.sign.guideArrow.includes("Exit Only") ||
       panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
+    if (exitOnlyBorderModeLabel && exitOnlyBorderModeSelect) {
+      const shouldShowBorderMode =
+        !post.secondExitOnly &&
+        (panel.sign.guideArrow == "Half Exit Only" ||
+          panel.sign.guideArrow == "Exit Only");
+      exitOnlyBorderModeLabel.className = shouldShowBorderMode
+        ? ""
+        : "invisible";
+      exitOnlyBorderModeSelect.className = shouldShowBorderMode
+        ? ""
+        : "invisible";
+      const resolvedBorderMode = Sign.prototype.exitOnlyBorderModes.includes(
+        panel.sign.exitOnlyBorderMode
+      )
+        ? panel.sign.exitOnlyBorderMode
+        : Sign.prototype.exitOnlyBorderModes[0];
+      exitOnlyBorderModeSelect.value = resolvedBorderMode;
+    }
+    showExitOnly.checked = !!panel.sign.showExitOnly;
     showExitOnly.value = panel.sign.showExitOnly;
+    if (hideExitArrow) {
+      hideExitArrow.checked = !!panel.sign.hideExitArrow;
+      hideExitArrow.value = panel.sign.hideExitArrow;
+    }
     exitOnlyPadding.value = panel.sign.exitOnlyPadding;
     exitOnlyPaddingValue.textContent = panel.sign.exitOnlyPadding;
 
     for (const option of exitOnlyDirection.options) {
       if (option.value == panel.sign.exitguideArrows) {
-        option.selected = true;
-        break;
-      }
-    }
-
-    for (const option of exitOnlyLabelSelect.options) {
-      if (option.value == panel.sign.exitOnlyLabelPreset) {
         option.selected = true;
         break;
       }

@@ -295,6 +295,30 @@ body {
   transition: 0.15s ease-in-out background-color;
 }
 
+.mutcd-link {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgb(var(--inputColor));
+  color: var(--textColor);
+  border: 1px solid rgba(var(--baseColor), 0.35);
+  box-shadow: 0 0.25rem 0.45rem rgba(0, 0, 0, 0.15);
+  transition: 0.15s ease-in-out;
+}
+
+.mutcd-link:hover {
+  background-color: var(--selectedColor);
+  transform: translateY(-1px);
+}
+
 main,
 footer {
   z-index: 0;
@@ -376,7 +400,7 @@ h6 {
 }
 
 .warning {
-  background-color: yellow;
+  background-color: var(--yellow);
   padding: 6px;
   font-weight: bold;
   font-family: "Inter";

@@ -6,7 +6,7 @@ class Panel {
    * @param {String} corner - Choice of Sharp or Rounded Corners on the Panel
    * @param {ExitTab} [exitTab=null] - Optional exit tab to include in the panel.
    */
-  constructor(sign, color, exitTabs = [], corner) {
+  constructor(sign, color, exitTabs = [], corner, borderRadius) {
     if (Object.keys(lib.colors).includes(color)) {
       this.color = color;
     } else {
@@ -20,6 +20,12 @@ class Panel {
 
     this.sign = sign;
     this.exitTabs = exitTabs;
+
+    if (typeof borderRadius === "number" && borderRadius >= 0) {
+      this.borderRadius = borderRadius;
+    } else {
+      this.borderRadius = Panel.prototype.defaultBorderRadius;
+    }
   }
 
   newExitTab() {
@@ -29,11 +35,22 @@ class Panel {
   }
 
   deleteExitTab(index, secondaryIndex) {
-    if (this.exitTabs.nestedExitTabs.length > 0) {
-      this.exitTabs.nestedExitTabs.splice(secondaryIndex, 1);
-    } else {
-      this.exitTabs.splice(index, 1);
+    const exitTab = this.exitTabs[index];
+    if (!exitTab) {
+      return;
     }
+
+    if (
+      typeof secondaryIndex === "number" &&
+      secondaryIndex > -1 &&
+      exitTab.nestedExitTabs &&
+      secondaryIndex < exitTab.nestedExitTabs.length
+    ) {
+      exitTab.nestedExitTabs.splice(secondaryIndex, 1);
+      return;
+    }
+
+    this.exitTabs.splice(index, 1);
   }
 
   duplicateExitTab(index) {
@@ -41,7 +58,15 @@ class Panel {
 
     const newNest = [];
 
+    const maxNested =
+      typeof ExitTab !== "undefined" && ExitTab.prototype.maxNested != null
+        ? ExitTab.prototype.maxNested
+        : exisitingTab.nestedExitTabs.length;
+
     for (const nest of exisitingTab.nestedExitTabs) {
+      if (newNest.length >= maxNested) {
+        break;
+      }
       newNest.push(Object.assign(new ExitTab(), nest));
     }
 
@@ -66,3 +91,5 @@ class Panel {
 /* vvv DO NOT CHANGE THIS, IDK WHY BUT THE ENTIRE PROGRAM BREAKS WITHOUT THIS LINE vvv */
 Panel.prototype.cornerType = ["Sharp", "Round"];
 /* ^^^ DO NOT CHANGE THIS, IDK WHY BUT THE ENTIRE PROGRAM BREAKS WITHOUT THIS LINE ^^^ */
+
+Panel.prototype.defaultBorderRadius = 0.75;

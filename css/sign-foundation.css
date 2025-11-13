@@ -2,6 +2,10 @@
 Serves as the most minimum needed to support sign making before adopting MUTCDs
 */
 
+:root {
+  --fhwaBaselineShift: 1px;
+}
+
 .blockElementMaster {
   display: flex;
   flex-direction: column;
@@ -46,6 +50,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .bE-textElement {
+  --fhwaBaselineOffset: 0px;
   font-family: var(--fontFamily), "Series EM";
   font-size: var(--fontSize);
   background-color: var(--blockBgColor);
@@ -55,6 +60,11 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   margin: 0 var(--spacing);
   white-space: pre;
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100) + 0.2));
+}
+
+.bE-textElement > span {
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .bE-advisoryMessage {
@@ -175,6 +185,55 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 
 .blockElementRow[data-light-background="true"] .bE-arrowElement img {
   filter: brightness(0);
+}
+
+.bE-beaconElement {
+  --beaconSize: 2rem;
+  --beaconFlashDuration: 1s;
+  --beaconBackplateThickness: 0.125rem;
+  --beaconBackplateRadius: 0.15rem;
+  width: var(--beaconSize);
+  height: var(--beaconSize);
+  background-color: #000;
+  border-radius: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.5rem;
+}
+
+.bE-beaconElement.hasBackplate {
+  box-shadow: 0 0 0 var(--beaconBackplateThickness, 0.125rem)
+    var(--beaconBackplateColor, #ffd200);
+  border-radius: var(--beaconBackplateRadius, 0.15rem);
+}
+
+.bE-beaconBulb {
+  width: calc(var(--beaconSize) * 0.85);
+  height: calc(var(--beaconSize) * 0.85);
+  border-radius: 50%;
+  background-color: var(--beaconBulbColor, var(--yellow, #ffd200));
+  animation: beaconFlash var(--beaconFlashDuration) steps(1, end) infinite;
+  animation-fill-mode: both;
+  box-shadow: none;
+}
+
+@keyframes beaconFlash {
+  0%,
+  49.9% {
+    opacity: 1;
+    box-shadow: 0 0 calc(var(--beaconSize) * 0.25)
+      var(--beaconBulbColor, var(--yellow, #ffd200));
+  }
+  50%,
+  100% {
+    opacity: 0;
+    box-shadow: none;
+  }
+}
+
+.bE-beaconElement.flashOpposite .bE-beaconBulb {
+  animation-delay: calc(var(--beaconFlashDuration, 1s) / -2);
 }
 
 .dividerElement {

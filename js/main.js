@@ -30,6 +30,27 @@ const app = (function () {
   };
 
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
+  const normalizePostThickness = (value) => {
+    const parsed =
+      typeof value === "string" ? parseFloat(value) : Number(value);
+    if (Number.isFinite(parsed)) {
+      return Math.max(0, parsed);
+    }
+    return typeof Post !== "undefined" &&
+      Post.prototype &&
+      typeof Post.prototype.defaultThickness === "number"
+      ? Post.prototype.defaultThickness
+      : 1;
+  };
+  const FHWA_BASELINE_OFFSET_VAR = "var(--fhwaBaselineShift)";
+  const FHWA_EXIT_TAB_FONT_SCALE = 1.5;
+  const applyHighwayGothicStyling = (element, fontFamily = "Series E") => {
+    if (!element) {
+      return;
+    }
+    element.style.fontFamily = fontFamily;
+    element.style.setProperty("--fhwaBaselineOffset", FHWA_BASELINE_OFFSET_VAR);
+  };
   const applyPanelBorderGradient = (signElmt) => {
     if (
       typeof window === "undefined" ||
@@ -229,11 +250,96 @@ const app = (function () {
     redraw();
   };
 
+  const movePanel = function (fromIndex, toIndex) {
+    if (!post || !Array.isArray(post.panels) || post.panels.length < 2) {
+      return;
+    }
+
+    const normalizedFrom = clamp(
+      typeof fromIndex === "number" ? fromIndex : currentlySelectedPanelIndex,
+      0,
+      post.panels.length - 1
+    );
+    let normalizedTo = clamp(
+      typeof toIndex === "number" ? toIndex : normalizedFrom,
+      0,
+      post.panels.length
+    );
+
+    if (
+      normalizedFrom === normalizedTo ||
+      normalizedFrom + 1 === normalizedTo
+    ) {
+      return;
+    }
+
+    const selectedPanelRef =
+      currentlySelectedPanelIndex >= 0 &&
+      currentlySelectedPanelIndex < post.panels.length
+        ? post.panels[currentlySelectedPanelIndex]
+        : null;
+
+    let resultingIndex = normalizedFrom;
+    if (typeof post.movePanel === "function") {
+      resultingIndex = post.movePanel(normalizedFrom, normalizedTo);
+    } else {
+      const panels = post.panels;
+      const [panel] = panels.splice(normalizedFrom, 1);
+      if (!panel) {
+        return;
+      }
+      if (normalizedTo > normalizedFrom) {
+        normalizedTo--;
+      }
+      panels.splice(normalizedTo, 0, panel);
+      resultingIndex = normalizedTo;
+    }
+
+    if (selectedPanelRef) {
+      const updatedIndex = post.panels.indexOf(selectedPanelRef);
+      if (updatedIndex !== -1) {
+        currentlySelectedPanelIndex = updatedIndex;
+      } else {
+        currentlySelectedPanelIndex = clamp(
+          currentlySelectedPanelIndex,
+          0,
+          post.panels.length - 1
+        );
+      }
+    } else {
+      currentlySelectedPanelIndex = clamp(
+        currentlySelectedPanelIndex,
+        0,
+        post.panels.length - 1
+      );
+    }
+
+    formHandler.updateForm();
+    redraw();
+  };
+
   // Set the current panel based off parameter number, within the correct range (0 < # of panels - 1)
   const changeEditingPanel = function (panelNumber) {
     currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1);
     currentlySelectedSubPanelIndex = 0;
     formHandler.updateForm();
+  };
+
+  const setPanelSpacing = function (value) {
+    if (!post) {
+      return;
+    }
+    const parsedValue = parseFloat(value);
+    const normalized =
+      Number.isFinite(parsedValue) && parsedValue >= 0
+        ? Math.min(parsedValue, 8)
+        : 0;
+    if (post.panelSpacing === normalized) {
+      return;
+    }
+    post.panelSpacing = normalized;
+    formHandler.updateForm();
+    redraw();
   };
 
   const addSubPanel = function () {
@@ -278,42 +384,136 @@ const app = (function () {
     const panel = getCurrentPanel();
     panel.newExitTab();
     currentlySelectedExitTabIndex = panel.exitTabs.length - 1;
+    currentlySelectedNestedExitTabIndex = -1;
     formHandler.updateForm();
     redraw();
   };
 
   // Create a new nested exit tab within the parent exit tab.
   const newNestExitTab = function () {
-    const exitTab = getCurrentPanel().exitTabs[currentlySelectedExitTabIndex];
-    exitTab.nestExitTab();
+    const panel = getCurrentPanel();
+    if (!panel || !panel.exitTabs.length) {
+      return;
+    }
+    const exitTab = panel.exitTabs[currentlySelectedExitTabIndex];
+    if (!exitTab) {
+      return;
+    }
+    const nested = exitTab.nestExitTab();
+    if (!nested) {
+      return;
+    }
     currentlySelectedNestedExitTabIndex = exitTab.nestedExitTabs.length - 1;
     formHandler.updateForm();
     redraw();
   };
 
   // Create a duplicate of the exit tab.
-  const duplicateExitTab = function (exitTabIndex) {
+  const duplicateExitTab = function (exitTabIndex = currentlySelectedExitTabIndex) {
     const panel = getCurrentPanel();
+    if (!panel || !panel.exitTabs.length) {
+      return;
+    }
+    exitTabIndex = clamp(exitTabIndex, 0, panel.exitTabs.length - 1);
     panel.duplicateExitTab(exitTabIndex);
-    currentlySelectedExitTabIndex++;
+    currentlySelectedExitTabIndex = clamp(
+      exitTabIndex + 1,
+      0,
+      panel.exitTabs.length - 1
+    );
+    currentlySelectedNestedExitTabIndex = -1;
     formHandler.updateForm();
     redraw();
   };
 
   // Delete the exit tab.
-  const removeExitTab = function (exitTabIndex) {
+  const removeExitTab = function (exitTabIndex = currentlySelectedExitTabIndex) {
     const panel = getCurrentPanel();
+    if (!panel || !panel.exitTabs.length) {
+      return;
+    }
+
+    exitTabIndex = clamp(exitTabIndex, 0, panel.exitTabs.length - 1);
     panel.deleteExitTab(exitTabIndex);
-    currentlySelectedExitTabIndex--;
+
+    if (!panel.exitTabs.length) {
+      panel.newExitTab();
+      currentlySelectedExitTabIndex = 0;
+    } else {
+      currentlySelectedExitTabIndex = clamp(
+        exitTabIndex,
+        0,
+        panel.exitTabs.length - 1
+      );
+    }
+
+    currentlySelectedNestedExitTabIndex = -1;
     formHandler.updateForm();
     redraw();
   };
 
   // Delete the exit tab within the parent exitTab
-  const deleteNestExitTab = function (nestExitTabIndex) {
+  const deleteNestExitTab = function (
+    nestExitTabIndex = currentlySelectedNestedExitTabIndex
+  ) {
     const exitTab = getCurrentPanel().exitTabs[currentlySelectedExitTabIndex];
+    if (!exitTab || !exitTab.nestedExitTabs.length) {
+      return;
+    }
+
+    nestExitTabIndex = clamp(
+      nestExitTabIndex,
+      0,
+      exitTab.nestedExitTabs.length - 1
+    );
+
     exitTab.deleteNestExitTab(nestExitTabIndex);
-    currentlySelectedNestedExitTabIndex--;
+
+    if (exitTab.nestedExitTabs.length === 0) {
+      currentlySelectedNestedExitTabIndex = -1;
+    } else {
+      currentlySelectedNestedExitTabIndex = Math.min(
+        nestExitTabIndex,
+        exitTab.nestedExitTabs.length - 1
+      );
+    }
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const moveExitTab = function (fromIndex, toIndex) {
+    const panel = getCurrentPanel();
+    if (!panel || !panel.exitTabs || panel.exitTabs.length < 2) {
+      return;
+    }
+
+    const exitTabs = panel.exitTabs;
+    const maxIndex = exitTabs.length - 1;
+    const normalizedFrom = clamp(fromIndex, 0, maxIndex);
+    let normalizedTo = clamp(toIndex, 0, exitTabs.length);
+
+    if (
+      normalizedTo === normalizedFrom ||
+      normalizedTo === normalizedFrom + 1
+    ) {
+      return;
+    }
+
+    const [movedExitTab] = exitTabs.splice(normalizedFrom, 1);
+    if (!movedExitTab) {
+      return;
+    }
+
+    if (normalizedTo > normalizedFrom) {
+      normalizedTo--;
+    }
+
+    normalizedTo = clamp(normalizedTo, 0, exitTabs.length);
+    exitTabs.splice(normalizedTo, 0, movedExitTab);
+
+    currentlySelectedExitTabIndex = normalizedTo;
+    currentlySelectedNestedExitTabIndex = -1;
     formHandler.updateForm();
     redraw();
   };
@@ -511,6 +711,62 @@ const app = (function () {
     redraw();
   };
 
+  const duplicateBlockIntoNewRow = (sourceRowIndex, sourceBlockIndex) => {
+    const blockElements = getCurrentSubPanel().blockElements;
+    if (
+      !blockElements ||
+      !Array.isArray(blockElements.rows) ||
+      !blockElements.rows.length
+    ) {
+      return;
+    }
+
+    const normalizedRow = clamp(
+      sourceRowIndex,
+      0,
+      blockElements.rows.length - 1
+    );
+    const sourceRow = blockElements.rows[normalizedRow];
+    if (!Array.isArray(sourceRow) || !sourceRow.length) {
+      return;
+    }
+
+    const normalizedBlock = clamp(
+      sourceBlockIndex,
+      0,
+      Math.max(0, sourceRow.length - 1)
+    );
+    const sourceBlock = sourceRow[normalizedBlock];
+    if (!sourceBlock) {
+      return;
+    }
+
+    const blockElemType =
+      Control.prototype.blockToClassElems.getElem(sourceBlock);
+    if (!blockElemType) {
+      return;
+    }
+    const Constructor = Control.prototype.blockToClassElems[blockElemType];
+    if (typeof Constructor !== "function") {
+      return;
+    }
+
+    const duplicatedBlock = Object.assign(new Constructor(), sourceBlock);
+    const insertRowIndex = clamp(
+      normalizedRow + 1,
+      0,
+      blockElements.rows.length
+    );
+
+    blockElements.rows.splice(insertRowIndex, 0, [duplicatedBlock]);
+    blockElements.blockProperties.splice(insertRowIndex, 0, new Block());
+
+    currentlySelectedRowIndex = insertRowIndex;
+    currentlySelectedBlockIndex = 0;
+    formHandler.updateForm();
+    redraw();
+  };
+
   const setSelectedControlElem = (block) => {
     currentlySelectedBlockIndex = clamp(
       block,
@@ -661,11 +917,11 @@ const app = (function () {
   };
 
   const resetPadding = function (mode, params) {
-    getCurrentPanel().sign.padding = "0.5rem 0.75rem 0.5rem 0.75rem";
+    getCurrentPanel().sign.padding = "0.3rem 0.75rem 0.3rem 0.75rem";
 
-    document.getElementById("paddingTop").value = 0.5;
+    document.getElementById("paddingTop").value = 0.3;
     document.getElementById("paddingRight").value = 0.75;
-    document.getElementById("paddingBottom").value = 0.5;
+    document.getElementById("paddingBottom").value = 0.3;
     document.getElementById("paddingLeft").value = 0.75;
 
     formHandler.updateForm();
@@ -678,59 +934,81 @@ const app = (function () {
 
   const redraw = function () {
     const postContainerElmt = document.getElementById("postContainer");
-
-    postContainerElmt.className = `polePosition${post.polePosition}`;
+    const panelContainerElmt = document.getElementById("panelContainer");
+    const posts = document.getElementsByClassName("post");
+    const availablePolePositions = Array.isArray(Post.prototype.polePositions)
+      ? Post.prototype.polePositions
+      : [];
+    const fallbackPolePosition = availablePolePositions.includes(post.polePosition)
+      ? post.polePosition
+      : availablePolePositions[0] || "Left";
+    const polePositionClass = `polePosition${fallbackPolePosition}`;
+    const availableColors = Array.isArray(Post.prototype.colors)
+      ? Post.prototype.colors
+      : [];
+    const fallbackColor = availableColors[0] || "Silver";
+    const normalizedPostColor = availableColors.includes(post.color)
+      ? post.color
+      : fallbackColor;
+    const colorClass = normalizedPostColor ? ` postColor${normalizedPostColor}` : "";
+    postContainerElmt.className = `${polePositionClass}${colorClass}`;
+    const normalizedThickness =
+      post && typeof post.normalizeThickness === "function"
+        ? post.normalizeThickness(post.thickness)
+        : normalizePostThickness(post ? post.thickness : undefined);
+    if (post) {
+      post.thickness = normalizedThickness;
+    }
+    postContainerElmt.style.setProperty(
+      "--postThickness",
+      normalizedThickness + "rem"
+    );
 
     // post
 
     if (post.showPost == true) {
-      var item = document.getElementsByClassName("post");
-      for (let i = 0; i < item.length; i++) {
-        item[i].style.visibility = "hidden";
+      for (let i = 0; i < posts.length; i++) {
+        posts[i].style.visibility = "hidden";
       }
-
-      const panelContainer = document.getElementById("panelContainer");
-
-      panelContainer.style.background = "none";
+      panelContainerElmt.style.background = "none";
     } else {
-      var item = document.getElementsByClassName("post");
-      for (let i = 0; i < item.length; i++) {
-        if (post.polePosition.toLowerCase() != "overhead") {
-          if (post.polePosition.toLowerCase() == "left") {
-            item[0].style.visibility = "visible";
-            item[1].style.visibility = "hidden";
-          } else if (post.polePosition.toLowerCase() == "right") {
-            item[0].style.visibility = "hidden";
-            item[1].style.visibility = "visible";
-          } else if (
-            post.polePosition.toLowerCase() == "center" ||
-            post.polePosition.toLowerCase() == "rural"
-          ) {
-            //hide both
-            item[0].style.visibility = "hidden";
-            item[1].style.visibility = "hidden";
-          }
-        } else {
-          item[i].style.visibility = "visible";
+      const polePosition = (fallbackPolePosition || "").toLowerCase();
+      for (let i = 0; i < posts.length; i++) {
+        posts[i].style.visibility = "hidden";
+      }
+      if (polePosition === "overhead") {
+        for (let i = 0; i < posts.length; i++) {
+          posts[i].style.visibility = "visible";
+        }
+      } else if (polePosition === "left") {
+        if (posts[0]) {
+          posts[0].style.visibility = "visible";
+        }
+      } else if (polePosition === "right") {
+        if (posts[1]) {
+          posts[1].style.visibility = "visible";
+        }
+      } else if (polePosition === "rural" || polePosition === "center") {
+        // Posts remain hidden; custom backgrounds render supports.
+      } else {
+        for (let i = 0; i < posts.length; i++) {
+          posts[i].style.visibility = "visible";
         }
       }
-
-      const panelContainer = document.getElementById("panelContainer");
-
-      if (post.polePosition.toLowerCase() == "center") {
-        panelContainer.style.background =
-          "linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 45%,rgba(191,191,191,1) 45%,rgba(240,240,240,1) 49%,rgba(128,128,128,1) 55%,rgba(255,255,255,0) 55%)";
-      } else if (post.polePosition.toLowerCase() == "rural") {
-        panelContainer.style.background =
-          "linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 20%,rgba(191,191,191,1) 20%,rgba(240,240,240,1) 22%,rgba(128,128,128,1) 25%,rgba(255,255,255,0) 25%,rgba(255,255,255,0) 75%,rgba(191,191,191,1) 75%,rgba(240,240,240,1) 77%,rgba(128,128,128,1) 80%,rgba(255,255,255,0) 80%)";
-      } else {
-        panelContainer.style.background =
-          "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 47%, rgba(191,191,191,1) 47%, rgba(240,240,240,1) 49%, rgba(128,128,128,1) 52%, rgba(255,255,255,0) 52%, rgba(255,255,255,0) 64%, rgba(191,191,191,1) 64%, rgba(240,240,240,1) 66%, rgba(128,128,128,1) 69%, rgba(255,255,255,0) 69%";
-      }
+      panelContainerElmt.style.background = "";
     }
 
-    const panelContainerElmt = document.getElementById("panelContainer");
     lib.clearChildren(panelContainerElmt);
+    if (panelContainerElmt) {
+      const spacingValue =
+        typeof post.panelSpacing === "number" && post.panelSpacing > 0
+          ? Math.max(0, post.panelSpacing)
+          : 0;
+      panelContainerElmt.style.setProperty(
+        "--panelSpacing",
+        spacingValue + "rem"
+      );
+    }
 
     var index = -1;
     var firstExitTab = null;
@@ -740,6 +1018,23 @@ const app = (function () {
 
       const panelElmt = document.createElement("div");
       panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
+      const borderRadiusFallback =
+        (typeof Panel !== "undefined" &&
+          Panel.prototype &&
+          typeof Panel.prototype.defaultBorderRadius === "number")
+          ? Panel.prototype.defaultBorderRadius
+          : 0.75;
+      const numericPanelBorderRadius =
+        typeof panel.borderRadius === "number"
+          ? panel.borderRadius
+          : parseFloat(panel.borderRadius);
+      const panelBorderRadius = Number.isFinite(numericPanelBorderRadius)
+        ? Math.max(0, numericPanelBorderRadius)
+        : borderRadiusFallback;
+      panelElmt.style.setProperty(
+        "--signBorderRadius",
+        panelBorderRadius + "rem"
+      );
       panelElmt.id = "panel" + index;
       panelContainerElmt.appendChild(panelElmt);
 
@@ -766,6 +1061,113 @@ const app = (function () {
           if (exitTab.squareCorners) {
             exitTabElmt.className += " squareCorners";
           }
+          const fallbackBorderThickness =
+            typeof ExitTab !== "undefined" &&
+            ExitTab.prototype &&
+            typeof ExitTab.prototype.defaultBorderThickness === "number"
+              ? ExitTab.prototype.defaultBorderThickness
+              : 0.2;
+          const numericBorderThickness =
+            typeof exitTab.borderThickness === "number"
+              ? exitTab.borderThickness
+              : parseFloat(exitTab.borderThickness);
+          const normalizedBorderThickness =
+            Number.isFinite(numericBorderThickness) && numericBorderThickness >= 0
+              ? numericBorderThickness
+              : fallbackBorderThickness;
+          exitTab.borderThickness = normalizedBorderThickness;
+          const isBorderlessTab = normalizedBorderThickness <= 0;
+          const borderThicknessRem = normalizedBorderThickness.toString() + "rem";
+          if (isBorderlessTab) {
+            exitTabElmt.classList.add("borderless");
+          }
+          const usesHighwayGothicFont = !!exitTab.FHWAFont || post.fontType === true;
+          const registerExitTabText = (element) => {
+            if (!element) {
+              return element;
+            }
+            element.classList.add("exitTabText");
+            return element;
+          };
+          const appendStandardExitNumber = (parentElmt) => {
+            if (!parentElmt || !exitTab.number) {
+              return;
+            }
+            const normalizedNumberText = String(exitTab.number).replace(
+              /\\n/g,
+              "\n"
+            );
+            const numberLines = normalizedNumberText.split("\n");
+            const renderExitNumberSegments = (targetElmt, lineText) => {
+              if (!targetElmt) {
+                return;
+              }
+              const safeLineText =
+                typeof lineText === "string" ? lineText : String(lineText || "");
+              const txtArr = safeLineText.toUpperCase().split(/(\d+\S*)/);
+              const divTextElmt = document.createElement("div");
+              registerExitTabText(divTextElmt);
+              if (usesHighwayGothicFont) {
+                divTextElmt.style.setProperty(
+                  "--exitTabAdditionalOffset",
+                  "-0.5px"
+                );
+              }
+              const leadingText = txtArr[0] || "";
+              divTextElmt.appendChild(
+                document.createTextNode(
+                  leadingText.length > 0
+                    ? leadingText
+                    : safeLineText.length === 0
+                      ? "\u00a0"
+                      : ""
+                )
+              );
+              targetElmt.appendChild(divTextElmt);
+
+              if (txtArr.length > 1) {
+                divTextElmt.classList.add("exitFormat");
+                if (leadingText && leadingText.trim().length > 0) {
+                  const spacerElmt = document.createElement("span");
+                  spacerElmt.textContent = " ";
+                  spacerElmt.classList.add("exitTabTextSpacer");
+                  registerExitTabText(spacerElmt);
+                  targetElmt.appendChild(spacerElmt);
+                }
+                const spanNumeralElmt = document.createElement("span");
+                spanNumeralElmt.className = "numeral";
+                registerExitTabText(spanNumeralElmt);
+                spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
+                targetElmt.appendChild(spanNumeralElmt);
+                const trailingText = txtArr.slice(2).join("");
+                if (trailingText) {
+                  const trailingSpanElmt = document.createElement("span");
+                  trailingSpanElmt.textContent = trailingText;
+                  registerExitTabText(trailingSpanElmt);
+                  targetElmt.appendChild(trailingSpanElmt);
+                }
+                if (exitTab.topOffset == false) {
+                  divTextElmt.style.setProperty("--exitTabTextBaseOffset", "0rem");
+                }
+              }
+            };
+
+            if (numberLines.length <= 1) {
+              renderExitNumberSegments(parentElmt, normalizedNumberText);
+              return;
+            }
+
+            const multiLineContainerElmt = document.createElement("div");
+            multiLineContainerElmt.className = "exitTabNumberLinesContainer";
+            parentElmt.appendChild(multiLineContainerElmt);
+
+            numberLines.forEach((lineText) => {
+              const lineWrapperElmt = document.createElement("div");
+              lineWrapperElmt.className = "exitTabNumberLine";
+              multiLineContainerElmt.appendChild(lineWrapperElmt);
+              renderExitNumberSegments(lineWrapperElmt, lineText || "");
+            });
+          };
 
           const exitTabHolderElmt = document.createElement("div");
           exitTabHolderElmt.className = "exitTabHolder";
@@ -781,8 +1183,13 @@ const app = (function () {
             exitTabHolderElmt.className += ` ${panel.color.toLowerCase()}`;
           }
 
-          if (exitTab.FHWAFont) {
-            exitTabElmt.style.fontFamily = "Series E";
+          if (usesHighwayGothicFont) {
+            applyHighwayGothicStyling(exitTabElmt);
+            exitTabElmt.style.setProperty(
+              "--fhwaBaselineOffset",
+              "calc(var(--fhwaBaselineShift) + 1px)"
+            );
+            exitTabElmt.style.setProperty("--exitTabNumeralScale", "0.95");
           }
 
           if (
@@ -794,7 +1201,8 @@ const app = (function () {
               const leftElmt = document.createElement("div");
 
               if (exitTab.showLeft) {
-                leftElmt.className = `yellowElmt`;
+                leftElmt.classList.add("yellowElmt");
+                registerExitTabText(leftElmt);
                 leftElmt.appendChild(document.createTextNode("LEFT"));
                 exitTabElmt.appendChild(leftElmt);
                 exitTabElmt.style.display = "inline-block";
@@ -804,74 +1212,162 @@ const app = (function () {
                 }
               }
 
-              const txtArr = exitTab.number.toUpperCase().split(/(\d+\S*)/);
-              const divTextElmt = document.createElement("div");
-              divTextElmt.appendChild(document.createTextNode(txtArr[0]));
-              exitTabElmt.appendChild(divTextElmt);
-
-              if (txtArr.length > 1) {
-                divTextElmt.className = "exitFormat";
-                const spanNumeralElmt = document.createElement("span");
-                spanNumeralElmt.className = "numeral";
-                spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
-                exitTabElmt.appendChild(spanNumeralElmt);
-                exitTabElmt.appendChild(
-                  document.createTextNode(txtArr.slice(2).join(""))
-                );
-                if (exitTab.topOffset == false) {
-                  divTextElmt.style.top = "0rem";
-                }
+              appendStandardExitNumber(exitTabElmt);
+            } else if (exitTab.variant == "Toll Logo") {
+              exitTabCont.classList.add("tollLogoExitTabContainer");
+              exitTabHolderElmt.classList.add("tollLogoExitHolder");
+              const tollLogoContainerElmt = document.createElement("div");
+              tollLogoContainerElmt.className = "tollLogoLogoWrapper";
+              const tollLogoHolderElmt = document.createElement("div");
+              tollLogoHolderElmt.className = "tollLogoImageHolder";
+              if (exitTab.tollLogoSquare) {
+                tollLogoHolderElmt.classList.add("squareIcon");
               }
-            } else if (exitTab.variant == "Toll") {
-              let tollAuthority = exitTab.icon;
-
-              if (exitTab.useTextBasedIcon) {
-                const tagElement = document.createElement("span");
-                tagElement.textContent = tollAuthority.toUpperCase();
-                tagElement.className = "tagText";
-
-                const onlyElement = document.createElement("span");
-                onlyElement.textContent = "ONLY";
-                onlyElement.className = "tagOnlyText";
-
-                exitTabElmt.appendChild(tagElement);
-                exitTabElmt.appendChild(onlyElement);
+              const defaultTollLogoSize =
+                typeof ExitTab !== "undefined" &&
+                ExitTab.prototype &&
+                typeof ExitTab.prototype.defaultTollLogoSize === "number"
+                  ? ExitTab.prototype.defaultTollLogoSize
+                  : 3;
+              let resolvedTollLogoSize = parseFloat(exitTab.tollLogoSize);
+              if (!Number.isFinite(resolvedTollLogoSize) || resolvedTollLogoSize <= 0) {
+                resolvedTollLogoSize = defaultTollLogoSize;
               }
-            } else if (exittab.variant == "Icon") {
+              exitTabElmt.style.setProperty(
+                "--tollLogoSize",
+                resolvedTollLogoSize.toString() + "rem"
+              );
+              tollLogoHolderElmt.style.setProperty(
+                "--tollLogoSize",
+                resolvedTollLogoSize.toString() + "rem"
+              );
+              const tollLogos =
+                typeof TollLogoElement !== "undefined" &&
+                TollLogoElement.prototype &&
+                TollLogoElement.prototype.logos
+                  ? TollLogoElement.prototype.logos
+                  : null;
+              const tollLogoKey =
+                tollLogos && exitTab.icon && tollLogos[exitTab.icon]
+                  ? exitTab.icon
+                  : tollLogos && TollLogoElement.prototype.defaultLogo
+                    ? TollLogoElement.prototype.defaultLogo
+                    : null;
+              const tollLogoDef =
+                tollLogos && tollLogoKey ? tollLogos[tollLogoKey] : null;
+              if (tollLogoDef) {
+                const tollLogoImgElmt = document.createElement("img");
+                tollLogoImgElmt.src = tollLogoDef.src;
+                tollLogoImgElmt.alt = tollLogoDef.label || "Toll logo";
+                tollLogoImgElmt.className = "tollLogoImage";
+                tollLogoImgElmt.loading = "lazy";
+                tollLogoImgElmt.decoding = "async";
+                tollLogoHolderElmt.appendChild(tollLogoImgElmt);
+              } else if (exitTab.icon) {
+                const fallbackLogoElmt = document.createElement("span");
+                fallbackLogoElmt.textContent = exitTab.icon.toUpperCase();
+                registerExitTabText(fallbackLogoElmt);
+                tollLogoHolderElmt.appendChild(fallbackLogoElmt);
+              }
+              tollLogoContainerElmt.appendChild(tollLogoHolderElmt);
+              exitTabElmt.appendChild(tollLogoContainerElmt);
+              exitTabElmt.classList.add("tollLogoExitTab");
+              if (exitTab.tollLogoOnly) {
+                exitTabElmt.classList.add("logoOnly");
+                exitTabHolderElmt.classList.add("logoOnly");
+                exitTabCont.classList.add("logoOnly");
+              } else {
+                const tollLogoNumberWrapperElmt = document.createElement("div");
+                tollLogoNumberWrapperElmt.className = "tollLogoNumberWrapper";
+                appendStandardExitNumber(tollLogoNumberWrapperElmt);
+                exitTabElmt.appendChild(tollLogoNumberWrapperElmt);
+              }
+            } else if (exitTab.variant == "Icon") {
             } else if (exitTab.variant == "Full Left") {
+              exitTabElmt.classList.add("fullLeft");
+              const bannerElmt = document.createElement("div");
+              bannerElmt.className = "fullLeftBanner";
+              registerExitTabText(bannerElmt);
+              bannerElmt.appendChild(document.createTextNode("LEFT"));
+              exitTabElmt.appendChild(bannerElmt);
+
+              const numberWrapperElmt = document.createElement("div");
+              numberWrapperElmt.className = "fullLeftNumber";
+              exitTabElmt.appendChild(numberWrapperElmt);
+              appendStandardExitNumber(numberWrapperElmt);
             } else if (exitTab.variant == "HOV 1") {
+              exitTabCont.classList.add("hovExitTabContainer");
+              exitTabHolderElmt.classList.add("hovExitTabHolder");
+              exitTabElmt.classList.add("hovExitTab");
+
+              const hovIconColumnElmt = document.createElement("div");
+              hovIconColumnElmt.className = "hovIconColumn";
+              const hovIconImgElmt = document.createElement("img");
+              hovIconImgElmt.className = "hovIcon";
+              hovIconImgElmt.src = "img/icons/HOV.png";
+              hovIconImgElmt.alt = "HOV symbol";
+              hovIconColumnElmt.appendChild(hovIconImgElmt);
+
+              const hovContentColumnElmt = document.createElement("div");
+              hovContentColumnElmt.className = "hovContentColumn";
+
+              const hovTextRowElmt = document.createElement("div");
+              hovTextRowElmt.className = "hovTextRow";
+              const hovTextElmt = document.createElement("span");
+              registerExitTabText(hovTextElmt);
+              const hovExitNumber =
+                typeof exitTab.number === "string"
+                  ? exitTab.number.trim().toUpperCase()
+                  : "";
+              hovTextElmt.textContent = hovExitNumber
+                ? `HOV EXIT ${hovExitNumber}`
+                : "HOV EXIT";
+              hovTextRowElmt.appendChild(hovTextElmt);
+              hovContentColumnElmt.appendChild(hovTextRowElmt);
+
+              const hovBottomBarElmt = document.createElement("div");
+              hovBottomBarElmt.className = "hovBottomBar";
+              hovContentColumnElmt.appendChild(hovBottomBarElmt);
+
+              exitTabElmt.appendChild(hovIconColumnElmt);
+              exitTabElmt.appendChild(hovContentColumnElmt);
             } else if (exitTab.variant == "HOV 2") {
             }
 
             exitTabElmt.style.visibility = "visible";
             exitTabCont.className += " tabVisible";
 
-            if (post.fontType == true) {
-              exitTabElmt.style.fontFamily = "Series E";
-            }
-
             const cornerRadius = exitTab.squareCorners ? "0.25rem" : "0.5rem";
 
             if (exitTab.fullBorder == true) {
-              exitTabElmt.style.borderBottomWidth =
-                exitTab.borderThickness.toString() + "rem";
-              exitTabElmt.style.borderBottomStyle = "solid";
-              exitTabElmt.style.borderRadius = cornerRadius;
+              exitTabElmt.style.borderBottomWidth = borderThicknessRem;
+              exitTabElmt.style.borderBottomStyle = isBorderlessTab ? "" : "solid";
+              exitTabElmt.style.borderRadius = isBorderlessTab ? "0" : cornerRadius;
             } else {
               exitTabElmt.style.borderBottomWidth = "";
               exitTabElmt.style.borderBottomStyle = "";
               exitTabElmt.style.borderRadius = "";
             }
 
-            exitTabElmt.style.borderTopWidth =
-              exitTab.borderThickness.toString() + "rem";
-            exitTabElmt.style.borderLeftWidth =
-              exitTab.borderThickness.toString() + "rem";
-            exitTabElmt.style.borderRightWidth =
-              exitTab.borderThickness.toString() + "rem";
-            exitTabElmt.style.fontSize = exitTab.fontSize.toString() + "px";
+            exitTabElmt.style.borderTopWidth = borderThicknessRem;
+            exitTabElmt.style.borderLeftWidth = borderThicknessRem;
+            exitTabElmt.style.borderRightWidth = borderThicknessRem;
+            let resolvedFontSize = exitTab.fontSize;
+            if (typeof resolvedFontSize === "string") {
+              resolvedFontSize = parseFloat(resolvedFontSize);
+            }
+            if (!Number.isFinite(resolvedFontSize)) {
+              resolvedFontSize = 0;
+            }
+            if (usesHighwayGothicFont) {
+              resolvedFontSize *= FHWA_EXIT_TAB_FONT_SCALE;
+            }
+            exitTabElmt.style.fontSize = resolvedFontSize.toString() + "px";
 
             exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
+            if (exitTab.variant == "Toll Logo" && exitTab.tollLogoOnly) {
+              exitTabElmt.style.minHeight = "0";
+            }
           }
         }
 
@@ -1133,9 +1629,9 @@ const app = (function () {
           // Font change
 
           if (post.fontType == true) {
-            toElmt.style.fontFamily = "Series E";
-            bannerElmt.style.fontFamily = "Series E";
-            bannerElmt2.style.fontFamily = "Series E";
+            applyHighwayGothicStyling(toElmt);
+            applyHighwayGothicStyling(bannerElmt);
+            applyHighwayGothicStyling(bannerElmt2);
           }
         }
       }
@@ -1148,7 +1644,7 @@ const app = (function () {
 
         if (i.actionMessage != "") {
           if (post.fontType == true) {
-            p.style.fontFamily = "Series E";
+            applyHighwayGothicStyling(p);
           } else {
             p.style.fontFamily = "Clearview 5WR";
           }
@@ -1295,7 +1791,7 @@ const app = (function () {
       g_controlTextElmt.className = "controlText";
 
       if (post.fontType) {
-        g_controlTextElmt.style.fontFamily = "Series EM";
+        applyHighwayGothicStyling(g_controlTextElmt, "Series EM");
       }
 
       monitorControlText(panel.sign, g_controlTextElmt);
@@ -1304,7 +1800,7 @@ const app = (function () {
       g_actionMessageElmt.className = `actionMessage`;
 
       if (post.fontType) {
-        g_actionMessage.className = "Series E";
+        applyHighwayGothicStyling(g_actionMessageElmt);
       }
 
       monitorActionMessage(panel.sign, g_actionMessageElmt);
@@ -1380,10 +1876,22 @@ const app = (function () {
         let locked = false;
 
         if (subPanelIndex > 0) {
+          const subPanel = panel.sign.subPanels[subPanelIndex];
           const subDivider = document.createElement("div");
           subDivider.className = "subDivider";
           subDivider.id = "subDivider" + subPanelIndex.toString();
-          subDivider.style.height = panel.sign.subPanels[subPanelIndex].height;
+          const dividerHeight = (subPanel && subPanel.height) || "";
+          if (
+            subPanel &&
+            subPanel.customDividerHeight &&
+            typeof dividerHeight === "string" &&
+            dividerHeight.trim().length
+          ) {
+            subDivider.style.height = dividerHeight;
+          } else {
+            subDivider.style.removeProperty("height");
+          }
+          subDivider.style.alignSelf = "stretch";
           signHolderElmt.appendChild(subDivider);
         }
 
@@ -1476,7 +1984,16 @@ const app = (function () {
             downArrowElmt.style.filter = "invert(1)";
           }
 
-          downArrowElmt.src = "img/arrows/" + key + ".svg";
+          const shouldUseCanadianDownArrow =
+            panel.sign.useCanadianDownArrows && key === "C-1";
+
+          if (shouldUseCanadianDownArrow) {
+            downArrowElmt.src = "img/arrowBlocks/DOWN_CA.svg";
+            downArrowElmt.classList.add("canadianDownArrow");
+          } else {
+            downArrowElmt.src = "img/arrows/" + key + ".svg";
+          }
+
           return downArrowElmt;
         }
       };
@@ -1502,11 +2019,29 @@ const app = (function () {
       }
 
       if (panel.sign.guideArrow.includes("Exit Only")) {
+        const borderWidthValue = "0.2rem";
+        const exitOnlyBorderModes = Sign.prototype.exitOnlyBorderModes;
+        const resolvedExitOnlyBorderMode = exitOnlyBorderModes.includes(
+          panel.sign.exitOnlyBorderMode
+        )
+          ? panel.sign.exitOnlyBorderMode
+          : exitOnlyBorderModes[0];
+        const hideExitOnlyArrows = panel.sign.hideExitArrow === true;
+        arrowContElmt.classList.toggle("hideExitOnlyArrows", hideExitOnlyArrows);
         if (
           !post.secondExitOnly &&
-          panel.sign.guideArrow != "Split Exit Only"
+          panel.sign.guideArrow != "Split Exit Only" &&
+          panel.sign.guideArrow != "Half Exit Only"
         ) {
           guideArrowsElmt.style.padding = panel.sign.exitOnlyPadding + "rem";
+        }
+
+        if (
+          panel.sign.guideArrow == "Exit Only" &&
+          !post.secondExitOnly
+        ) {
+          guideArrowsElmt.style.borderTopWidth =
+            resolvedExitOnlyBorderMode === "edge" ? borderWidthValue : "0";
         }
 
         if (panel.sign.guideArrow == "Half Exit Only") {
@@ -1519,7 +2054,96 @@ const app = (function () {
           guideArrowsElmt.className += post.secondExitOnly
             ? " new2"
             : " default";
+          guideArrowsElmt.classList.remove("halfExitNoBorder");
 
+          if (!post.secondExitOnly) {
+            const borderMode = resolvedExitOnlyBorderMode;
+            const arrowPos = panel.sign.arrowPosition.toLowerCase();
+            const overlap = `-${borderWidthValue}`;
+            const touchesLeftEdge =
+              arrowPos === "left" || arrowPos === "middle";
+            const touchesRightEdge =
+              arrowPos === "right" || arrowPos === "middle";
+
+            secondaryContainer.style.backgroundColor = "var(--yellow)";
+            secondaryContainer.style.color = "var(--black)";
+            secondaryContainer.style.borderStyle = "solid";
+            secondaryContainer.style.borderColor = "var(--black)";
+            secondaryContainer.style.borderTopWidth = "0";
+            secondaryContainer.style.borderRightWidth = "0";
+            secondaryContainer.style.borderBottomWidth = "0";
+            secondaryContainer.style.borderLeftWidth = "0";
+            secondaryContainer.style.marginBottom = "0";
+            secondaryContainer.style.marginLeft = "0";
+            secondaryContainer.style.marginRight = "0";
+
+            if (borderMode !== "none") {
+              const edges = {
+                top: borderMode === "edge",
+                right: borderMode === "edge",
+                bottom: true,
+                left: borderMode === "edge",
+              };
+
+              if (borderMode === "white-edge") {
+                edges.top = false;
+                edges.left = touchesLeftEdge;
+                edges.right = touchesRightEdge;
+              }
+
+              secondaryContainer.style.borderTopWidth = edges.top
+                ? borderWidthValue
+                : "0";
+              secondaryContainer.style.borderRightWidth = edges.right
+                ? borderWidthValue
+                : "0";
+              secondaryContainer.style.borderBottomWidth = edges.bottom
+                ? borderWidthValue
+                : "0";
+              secondaryContainer.style.borderLeftWidth = edges.left
+                ? borderWidthValue
+                : "0";
+
+              if (edges.bottom) {
+                secondaryContainer.style.marginBottom = overlap;
+              }
+              if (edges.left) {
+                secondaryContainer.style.marginLeft = overlap;
+              }
+              if (edges.right) {
+                secondaryContainer.style.marginRight = overlap;
+              }
+            } else {
+              secondaryContainer.style.borderStyle = "none";
+              const sideOverlap = "-0.02rem";
+              if (touchesLeftEdge) {
+                secondaryContainer.style.marginLeft = sideOverlap;
+              }
+              if (touchesRightEdge) {
+                secondaryContainer.style.marginRight = sideOverlap;
+              }
+              secondaryContainer.style.marginBottom = overlap;
+            }
+
+            const leftRadius =
+              touchesLeftEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
+            const rightRadius =
+              touchesRightEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
+            secondaryContainer.style.borderBottomLeftRadius = touchesLeftEdge
+              ? leftRadius
+              : "0";
+            secondaryContainer.style.borderBottomRightRadius = touchesRightEdge
+              ? rightRadius
+              : "0";
+
+            if (borderMode === "none") {
+              secondaryContainer.style.zIndex = "0";
+            } else {
+              secondaryContainer.style.removeProperty("z-index");
+            }
+          }
+
+          guideArrowsElmt.classList.remove("halfExitNoBorder");
           path = secondaryContainer;
 
           const arrow = createArrowElmt(
@@ -1561,12 +2185,7 @@ const app = (function () {
             }
           }
 
-          if (
-            post.secondExitOnly &&
-            panel.sign.guideArrow != "Split Exit Only"
-          ) {
-            path.style.padding = panel.sign.exitOnlyPadding + "rem";
-          }
+          path.style.padding = panel.sign.exitOnlyPadding + "rem";
         } else {
           path = arrowContElmt;
         }
@@ -1599,8 +2218,19 @@ const app = (function () {
             if (panel.sign.guideArrow == "Half Exit Only") {
               path.className += " new2";
               arrowContElmt.className += " new2";
-              arrowContElmt.style.justifyContent = "space-between";
+              const arrowPositionSetting =
+                typeof panel.sign.arrowPosition === "string"
+                  ? panel.sign.arrowPosition.toLowerCase()
+                  : "middle";
+              let justifyContent = "center";
+              if (arrowPositionSetting === "left") {
+                justifyContent = "flex-start";
+              } else if (arrowPositionSetting === "right") {
+                justifyContent = "flex-end";
+              }
+              arrowContElmt.style.justifyContent = justifyContent;
               arrowContElmt.style.gap = "5rem";
+              arrowContElmt.style.width = "100%";
             }
             guideArrowsElmt.style.display = "flex";
           }
@@ -1631,20 +2261,25 @@ const app = (function () {
             );
             path.appendChild(actionMessage);
           } else {
-            const exitOnlyLabelFull =
-              typeof panel.sign.exitOnlyLabelPreset === "string" &&
-              panel.sign.exitOnlyLabelPreset.trim().length > 0
-                ? panel.sign.exitOnlyLabelPreset.trim().toUpperCase()
-                : "EXIT ONLY";
-            const exitOnlyLabelParts = exitOnlyLabelFull.split(/\s+/);
-            const exitOnlyLabelLeft =
-              exitOnlyLabelParts[0] && exitOnlyLabelParts[0].length > 0
-                ? exitOnlyLabelParts[0]
-                : "EXIT";
-            const exitOnlyLabelRight =
-              exitOnlyLabelParts.length > 1
-                ? exitOnlyLabelParts.slice(1).join(" ")
-                : exitOnlyLabelLeft;
+            const resolveExitOnlyText = (text, fallback) =>
+              typeof text === "string" ? text : fallback;
+            const exitOnlyLabelLeft = resolveExitOnlyText(
+              panel.sign.exitOnlyLeftText,
+              "EXIT"
+            ).trim();
+            const exitOnlyLabelRight = resolveExitOnlyText(
+              panel.sign.exitOnlyRightText,
+              "ONLY"
+            ).trim();
+            const exitOnlyLabelFull = [exitOnlyLabelLeft, exitOnlyLabelRight]
+              .filter((text) => text && text.length > 0)
+              .join(" ")
+              .trim();
+            const isSplitExitOnly = panel.sign.guideArrow == "Split Exit Only";
+            const shouldRenderLabel = (text) =>
+              !(panel.sign.showExitOnly == false &&
+                isSplitExitOnly &&
+                (!text || text.length === 0));
             for (
               let arrowIndex = 0, length = panel.sign.guideArrowLanes;
               arrowIndex < length;
@@ -1653,26 +2288,28 @@ const app = (function () {
               // Evens
               if (length % 2 == 0) {
                 if (arrowIndex == Math.floor(length / 2)) {
-                  const textExitOnlySpanElmt = document.createElement("span");
-                  if (panel.sign.showExitOnly == false) {
-                    textExitOnlySpanElmt.appendChild(
-                      document.createTextNode(exitOnlyLabelFull)
-                    );
+                  if (shouldRenderLabel(exitOnlyLabelFull)) {
+                    const textExitOnlySpanElmt = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      textExitOnlySpanElmt.appendChild(
+                        document.createTextNode(exitOnlyLabelFull)
+                      );
 
-                    var bonus = "";
+                      var bonus = "";
 
-                    if (panel.sign.guideArrow == "Split Exit Only") {
-                      bonus = " yellowElmt";
+                      if (panel.sign.guideArrow == "Split Exit Only") {
+                        bonus = " yellowElmt";
+                      }
+
+                      textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
+                    } else {
+                      textExitOnlySpanElmt.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀")
+                      );
+                      textExitOnlySpanElmt.className = "exitOnlyText";
                     }
-
-                    textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
-                  } else {
-                    textExitOnlySpanElmt.appendChild(
-                      document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀")
-                    );
-                    textExitOnlySpanElmt.className = "exitOnlyText";
+                    path.appendChild(textExitOnlySpanElmt);
                   }
-                  path.appendChild(textExitOnlySpanElmt);
 
                   if (panel.sign.guideArrow == "Split Exit Only") {
                     path.appendChild(
@@ -1719,27 +2356,29 @@ const app = (function () {
               } else {
                 // Odds
                 if (arrowIndex == Math.floor(length / 2)) {
-                  const textExitSpanElmt = document.createElement("span");
-                  if (panel.sign.showExitOnly == false) {
-                    textExitSpanElmt.appendChild(
-                      document.createTextNode(exitOnlyLabelLeft)
-                    );
+                  if (shouldRenderLabel(exitOnlyLabelLeft)) {
+                    const textExitSpanElmt = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      textExitSpanElmt.appendChild(
+                        document.createTextNode(exitOnlyLabelLeft)
+                      );
 
-                    var bonus = "";
+                      var bonus = "";
 
-                    if (panel.sign.guideArrow == "Split Exit Only") {
-                      bonus = " yellowElmt";
+                      if (panel.sign.guideArrow == "Split Exit Only") {
+                        bonus = " yellowElmt";
+                      }
+
+                      textExitSpanElmt.className = "exitOnlyText" + bonus;
+                    } else {
+                      textExitSpanElmt.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀")
+                      );
+                      textExitSpanElmt.className = "exitOnlyText";
                     }
 
-                    textExitSpanElmt.className = "exitOnlyText" + bonus;
-                  } else {
-                    textExitSpanElmt.appendChild(
-                      document.createTextNode("⠀⠀⠀⠀")
-                    );
-                    textExitSpanElmt.className = "exitOnlyText";
+                    path.appendChild(textExitSpanElmt);
                   }
-
-                  path.appendChild(textExitSpanElmt);
 
                   if (panel.sign.guideArrow == "Split Exit Only") {
                     path.appendChild(
@@ -1754,26 +2393,28 @@ const app = (function () {
                     );
                   }
 
-                  const textOnlySpanElmt = document.createElement("span");
-                  if (panel.sign.showExitOnly == false) {
-                    textOnlySpanElmt.appendChild(
-                      document.createTextNode(exitOnlyLabelRight)
-                    );
+                  if (shouldRenderLabel(exitOnlyLabelRight)) {
+                    const textOnlySpanElmt = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      textOnlySpanElmt.appendChild(
+                        document.createTextNode(exitOnlyLabelRight)
+                      );
 
-                    var bonus = "";
+                      var bonus = "";
 
-                    if (panel.sign.guideArrow == "Split Exit Only") {
-                      bonus = " yellowElmt";
+                      if (panel.sign.guideArrow == "Split Exit Only") {
+                        bonus = " yellowElmt";
+                      }
+
+                      textOnlySpanElmt.className = "exitOnlyText" + bonus;
+                    } else {
+                      textOnlySpanElmt.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀")
+                      );
+                      textOnlySpanElmt.className = "exitOnlyText";
                     }
-
-                    textOnlySpanElmt.className = "exitOnlyText" + bonus;
-                  } else {
-                    textOnlySpanElmt.appendChild(
-                      document.createTextNode("⠀⠀⠀⠀")
-                    );
-                    textOnlySpanElmt.className = "exitOnlyText";
+                    path.appendChild(textOnlySpanElmt);
                   }
-                  path.appendChild(textOnlySpanElmt);
                 } else if (arrowIndex == Math.ceil(length / 2)) {
                   if (panel.sign.guideArrow == "Split Exit Only") {
                     path.appendChild(
@@ -1825,6 +2466,7 @@ const app = (function () {
             }
           }
         } else {
+          arrowContElmt.classList.remove("hideExitOnlyArrows");
           for (
             let arrowIndex = 0, length = panel.sign.guideArrowLanes;
             arrowIndex < length;
@@ -1926,7 +2568,20 @@ const app = (function () {
     setSelectedControlElem,
     moveControlElem,
     changeEditingPanel,
+    movePanel,
+    newPanel,
+    //duplicatePanel,
+    deletePanel,
     changeEditingSubPanel,
+    changeEditingExitTab,
+    newExitTab,
+    duplicateExitTab,
+    removeExitTab,
+    moveExitTab,
+    newNestExitTab,
+    deleteNestExitTab,
+    setPanelSpacing,
+    duplicateBlockIntoNewRow,
     deleteShield,
     duplicateShield,
     vars: {
@@ -1957,6 +2612,17 @@ const app = (function () {
 
   const setPost = function (newPost) {
     post = newPost;
+    if (!post) {
+      return;
+    }
+    if (typeof post.panelSpacing !== "number" || post.panelSpacing < 0) {
+      post.panelSpacing = 0;
+    }
+    if (typeof post.normalizeThickness === "function") {
+      post.thickness = post.normalizeThickness(post.thickness);
+    } else {
+      post.thickness = normalizePostThickness(post.thickness);
+    }
     currentlySelectedPanelIndex = 0;
     formHandler.updateForm();
     redraw();
@@ -1969,7 +2635,9 @@ const app = (function () {
     deletePanel: deletePanel,
     shiftLeft: shiftLeft,
     shiftRight: shiftRight,
+    movePanel: movePanel,
     changeEditingPanel: changeEditingPanel,
+    setPanelSpacing: setPanelSpacing,
     newShield: newShield,
     clearShields: clearShields,
     newSubPanel: addSubPanel,
@@ -1983,6 +2651,7 @@ const app = (function () {
     newExitTab: newExitTab,
     duplicateExitTab: duplicateExitTab,
     removeExitTab: removeExitTab,
+    moveExitTab: moveExitTab,
     changeEditingExitTab: changeEditingExitTab,
     newNestExitTab: newNestExitTab,
     deleteNestExitTab: deleteNestExitTab,

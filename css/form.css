@@ -128,37 +128,170 @@ label span.toolTip,
 #panelSelect {
   display: none;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 8rem;
-  height: 10rem;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 12rem;
+  min-height: 10rem;
   position: absolute;
   background-color: var(--hotbarColor);
-  top: -10.5rem;
+  top: -12rem;
   left: 0;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  gap: 0.5rem;
   z-index: 2;
+  box-shadow: 0 0.35rem 0.8rem rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  font-family: "Overpass", sans-serif;
 }
 
-#panelOptions,
-#numPanelOptions {
+.panelPopoverHeader {
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem;
+  width: 100%;
 }
 
-#panelOptions {
-  gap: 0.1rem;
+.panelPopoverHeader h5 {
+  margin: 0;
+  font-family: inherit;
 }
 
-#panelNumber {
-  background-color: rgb(var(--baseColor));
-  text-align: center;
-  padding: 0.1rem;
+.panelPopoverHint {
+  font-size: 0.65rem;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 0.8;
+  font-family: inherit;
+}
+
+.panelActions {
+  display: flex;
+  width: 100%;
+  gap: 0.25rem;
+}
+
+.panelActions button {
+  flex: 1 1 auto;
+  padding: 0.25rem 0.35rem;
   border-radius: 0;
-  width: 3rem;
+}
+
+#panelList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  max-height: 8.5rem;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.panelListButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  background: rgba(var(--baseColor), 0.3);
+  border-radius: 0;
+  cursor: grab;
+  position: relative;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.panelListButton.active {
+  border-color: var(--selectedColor);
+  background: rgba(var(--baseColor), 0.6);
+}
+
+.panelListButton.panelWiggle {
+  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+}
+
+.panelListButton.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  animation: none !important;
+}
+
+.panelListButton.dropBefore::before,
+.panelListButton.dropAfter::after {
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  right: 0.35rem;
+  height: 0.15rem;
+  background: var(--selectedColor);
+  border-radius: 0.15rem;
+  pointer-events: none;
+}
+
+.panelListButton.dropBefore::before {
+  top: -0.1rem;
+}
+
+.panelListButton.dropAfter::after {
+  bottom: -0.1rem;
+}
+
+.panelSpacingControl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.panelSpacingControl label {
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 0.85;
+  font-family: inherit;
+}
+
+.panelSpacingInputs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.panelSpacingInputs input[type="range"] {
+  flex: 1 1 auto;
+}
+
+.panelSpacingInputs input[type="number"] {
+  width: 3.5rem;
+  padding: 0.2rem;
+  border-radius: 0;
+}
+
+.postThicknessControl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.postThicknessControl label {
+  font-size: 0.85rem;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 1;
+  width: auto;
+  text-align: left;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+.postThicknessControl input {
+  width: 4.5rem;
+  padding: 0.25rem;
 }
 
 .hitbox {
@@ -279,8 +412,7 @@ div.sMModalTitle {
 div#sMPanelPadding,
 div#sMExitTabSetting,
 div#sMSPSettings,
-div#sMAPL,
-div#sMExitTabStyles {
+div#sMAPL {
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -308,12 +440,20 @@ input[type="number"] {
   align-items: center;
   gap: 0.5rem;
   padding-right: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .listNavOptions button,
 .listNavOptions label {
   width: max-content;
   position: relative;
+}
+
+.listNavOptions .listNavLabel {
+  flex-basis: 100%;
+  text-align: right;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 #exitTabNumber,
@@ -415,7 +555,8 @@ div.options a {
 /* OLD - TO CONFIGURE */
 
 .active,
-.exitTabSelect.active {
+.exitTabButton.active,
+.exitTabNestedButton.active {
   background-color: rgb(200, 200, 200);
 }
 
@@ -568,6 +709,11 @@ input[type="button"]:disabled {
 
 .sMControlRow.dropActive {
   background-color: rgba(var(--baseColor), 0.35);
+}
+
+#sMSPCreateRow.dropActive {
+  outline: 2px dashed var(--selectedColor);
+  background-color: rgba(var(--baseColor), 0.45);
 }
 
 @keyframes textEditorBlockWiggle {
@@ -766,15 +912,63 @@ textarea {
   width: auto;
 }
 
-.exitTabSelect {
-  background: rgb(230, 230, 230);
-  width: auto;
-  border-radius: 0rem;
+.exitTabGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 0 0 auto;
 }
 
-.exitTabSelect:hover {
+.exitTabButton,
+.exitTabNestedButton {
+  background: rgb(230, 230, 230);
+  border-radius: 0;
+  min-width: 6rem;
+  padding: 0.25rem 0.5rem;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.exitTabNestedButton {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  min-width: 5rem;
+}
+
+.exitTabButton:hover,
+.exitTabNestedButton:hover {
   background: rgb(200, 200, 200);
 }
+
+.exitTabButton.blockWiggle {
+  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+}
+
+.exitTabButton.dragging {
+  opacity: 0.6;
+  animation: none;
+  cursor: grabbing;
+}
+
+.exitTabButton.dropBefore::before,
+.exitTabButton.dropAfter::after {
+  content: "";
+  position: absolute;
+  top: -0.25rem;
+  bottom: -0.25rem;
+  width: 0.2rem;
+  background: var(--selectedColor);
+  pointer-events: none;
+}
+
+.exitTabButton.dropBefore::before {
+  left: -0.25rem;
+}
+
+.exitTabButton.dropAfter::after {
+  right: -0.25rem;
+}
+
 
 nav#sMConfigBar.invisible {
   left: 1rem;
@@ -889,6 +1083,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .sdIcon {
   background-color: var(--brown);
   color: white;
+}
+
+.sdBeacon {
+  background-color: var(--black);
+  color: var(--yellow);
 }
 
 .sdActionMessage {
@@ -1296,7 +1495,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   margin-bottom: 0.5rem;
 }
 
-dialog {
+dialog:not([open]) {
   display: none;
 }
 

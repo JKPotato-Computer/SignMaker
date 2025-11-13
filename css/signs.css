@@ -2,13 +2,50 @@
   display: flex;
   flex-direction: row;
   height: 30rem;
+  position: relative;
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  --postThickness: 1rem;
+  --postGradient: linear-gradient(
+    90deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+}
+
+#postContainer.postColorSilver {
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+}
+
+#postContainer.postColorBlack {
+  --post-color-mid: rgb(74, 74, 74);
+  --post-color-light: rgb(120, 120, 120);
+  --post-color-dark: rgb(20, 20, 20);
+}
+
+#postContainer.postColorBrown {
+  --post-color-mid: rgb(124, 86, 52);
+  --post-color-light: rgb(171, 124, 82);
+  --post-color-dark: rgb(86, 55, 28);
+}
+
+#postContainer.postColorRed {
+  --post-color-mid: rgb(193, 38, 38);
+  --post-color-light: rgb(235, 110, 110);
+  --post-color-dark: rgb(120, 16, 16);
 }
 
 #postContainer.polePositionOverhead .post {
   visibility: visible;
 }
 #postContainer.polePositionLeft .post:last-child,
-#postContainer.polePositionRight .post:first-child,
+#postContainer.polePositionRight .post:first-child {
+  visibility: hidden;
+}
 #postContainer.polePositionRural .post,
 #postContainer.polePositionCenter .post {
   visibility: hidden;
@@ -21,56 +58,58 @@
     180deg,
     rgba(255, 255, 255, 0) 0%,
     rgba(255, 255, 255, 0) 47%,
-    rgba(191, 191, 191, 1) 47%,
-    rgba(240, 240, 240, 1) 49%,
-    rgba(128, 128, 128, 1) 52%,
+    var(--post-color-mid) 47%,
+    var(--post-color-light) 49%,
+    var(--post-color-dark) 52%,
     rgba(255, 255, 255, 0) 52%,
     rgba(255, 255, 255, 0) 64%,
-    rgba(191, 191, 191, 1) 64%,
-    rgba(240, 240, 240, 1) 66%,
-    rgba(128, 128, 128, 1) 69%,
+    var(--post-color-mid) 64%,
+    var(--post-color-light) 66%,
+    var(--post-color-dark) 69%,
     rgba(255, 255, 255, 0) 69%
   );
   height: 15rem;
 }
 #postContainer.polePositionRural #panelContainer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 20%,
-    rgba(191, 191, 191, 1) 20%,
-    rgba(240, 240, 240, 1) 22%,
-    rgba(128, 128, 128, 1) 25%,
-    rgba(255, 255, 255, 0) 25%,
-    rgba(255, 255, 255, 0) 75%,
-    rgba(191, 191, 191, 1) 75%,
-    rgba(240, 240, 240, 1) 77%,
-    rgba(128, 128, 128, 1) 80%,
-    rgba(255, 255, 255, 0) 80%
-  );
+  position: relative;
+  background-image: linear-gradient(
+      90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%
+    ),
+    linear-gradient(
+      90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%
+    );
+  background-repeat: no-repeat;
+  background-size:
+    var(--postThickness, 1rem) 24rem,
+    var(--postThickness, 1rem) 24rem;
+  background-position:
+    left 1rem bottom,
+    right 1rem bottom;
   margin-top: 20rem;
 }
 #postContainer.polePositionCenter #panelContainer {
-  background: linear-gradient(
+  position: relative;
+  background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 45%,
-    rgba(191, 191, 191, 1) 45%,
-    rgba(240, 240, 240, 1) 49%,
-    rgba(128, 128, 128, 1) 55%,
-    rgba(255, 255, 255, 0) 55%
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
   );
+  background-repeat: no-repeat;
+  background-size: var(--postThickness, 1rem) 24rem;
+  background-position: center bottom;
   margin-top: 7.5rem;
 }
 
 .post {
-  background: linear-gradient(
-    90deg,
-    rgb(191, 191, 191) 0%,
-    rgb(240, 240, 240) 40%,
-    rgb(128, 128, 128) 100%
-  );
-  width: 1rem;
+  background: var(--postGradient);
+  width: var(--postThickness, 1rem);
   height: 24rem;
 
   align-self: flex-end;
@@ -89,9 +128,11 @@
   width: -moz-max-content;
   width: -webkit-max-content;
   width: intrinsic;
+  gap: var(--panelSpacing, 0rem);
 }
 
 .panel {
+  --signBorderRadius: 0.75rem;
   text-align: center;
   display: block;
   padding: 0rem;
@@ -124,12 +165,12 @@
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
-.panel.fluorescent.pink .sign,
+.panel.red .sign,
 .panel.green .guideArrows,
 .panel.blue .guideArrows,
 .panel.brown .guideArrows,
 .panel.black .guideArrows,
-.panel.fluorescent.pink .guideArrows {
+.panel.red .guideArrows {
   color: var(--white);
   border-color: var(--white);
 }
@@ -137,9 +178,11 @@
 .panel.white .sign,
 .panel.yellow .sign,
 .panel.fluorescent.yellow-green .sign,
+.panel.fluorescent.pink .sign,
 .panel.white .guideArrows,
 .panel.yellow .guideArrows,
 .panel.fluorescent.yellow-green .guideArrows,
+.panel.fluorescent.pink .guideArrows,
 .panel.orange .sign,
 .panel.orange .guideArrows {
   color: var(--black);
@@ -188,6 +231,13 @@
   background-color: var(--black);
 }
 
+.panel.red .sign,
+.panel.red .signContainer,
+.panel.red .exitTabContainer,
+.panel.red .guideArrows {
+  background-color: var(--red);
+}
+
 .panel.purple .sign,
 .panel.purple .signContainer,
 .panel.purple .exitTabContainer,
@@ -223,12 +273,14 @@
 .panel.white .dividerElement,
 .panel.orange .dividerElement,
 .panel.yellow .dividerElement,
-.panel.fluorescent.yellow-green .dividerElement {
+.panel.fluorescent.yellow-green .dividerElement,
+.panel.fluorescent.pink .dividerElement {
   background-color: black;
 }
 
 .panel.orange .arrow,
-.panel.fluorescent.yellow-green .arrow {
+.panel.fluorescent.yellow-green .arrow,
+.panel.fluorescent.pink .arrow {
   filter: invert(100%);
   -webkit-filter: invert(100%);
 }
@@ -276,6 +328,13 @@
   color: var(--white);
 }
 
+.exitTab.red,
+.exitTabHolder.red {
+  background-color: var(--red);
+  border-color: var(--white);
+  color: var(--white);
+}
+
 .exitTab.purple,
 .exitTabHolder.purple {
   background-color: var(--purple);
@@ -286,8 +345,8 @@
 .exitTab.fluorescent.pink,
 .exitTabHolder.fluorescent.pink {
   background-color: var(--fluorescent-pink);
-  border-color: var(--white);
-  color: var(--white);
+  border-color: var(--black);
+  color: var(--black);
 }
 
 .exitTab.fluorescent.yellow-green,
@@ -327,6 +386,10 @@
   border-radius: 0.25rem;
 }
 
+.exitTab.borderless {
+  border-radius: 0;
+}
+
 .exitTab.out {
   width: -moz-max-content;
   width: -webkit-max-content;
@@ -356,8 +419,14 @@
 
 .exitTabContainer.out {
   margin-bottom: 0.25rem;
-  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-  margin-left: 0.75rem; /* curved corners of the panel below */
+  margin-right: var(
+    --signBorderRadius,
+    0.75rem
+  ); /* Margin keeps the edge of the tab from going above the */
+  margin-left: var(
+    --signBorderRadius,
+    0.75rem
+  ); /* curved corners of the panel below */
 }
 
 .exitTabContainer.out.right {
@@ -366,8 +435,14 @@
 
 .exitTabContainer.wide,
 .exitTabContainer.narrow {
-  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-  margin-left: 0.75rem; /* curved corners of the panel below */
+  margin-right: var(
+    --signBorderRadius,
+    0.75rem
+  ); /* Margin keeps the edge of the tab from going above the */
+  margin-left: var(
+    --signBorderRadius,
+    0.75rem
+  ); /* curved corners of the panel below */
 }
 .exitTabContainer.edge.right {
   margin-right: 0rem;
@@ -411,16 +486,20 @@
 }
 .exitTab.full {
   width: 100%;
-  border-radius: 0.75rem 0.75rem 0 0;
+  border-radius: var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem) 0 0;
 }
 .sign.full.tabVisible {
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem);
 }
 .sign.edge.right.tabVisible {
-  border-radius: 0.75rem 0 0.75rem 0.75rem;
+  border-radius: var(--signBorderRadius, 0.75rem) 0
+    var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
 .sign.edge.left.tabVisible {
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
+  border-radius: 0 var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
 
 .panel.round .exitTabContainer,
@@ -429,7 +508,7 @@
 }
 
 .sign {
-  border-radius: 0.75rem;
+  border-radius: var(--signBorderRadius, 0.75rem);
   border-style: solid;
   border-width: 0.2rem;
   display: block;
@@ -475,7 +554,7 @@
 .signContentContainer {
   display: flex;
   width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.75rem;
 }
 .signContentContainer.shieldPositionLeft {
   flex-direction: row;
@@ -500,6 +579,7 @@
 }
 
 .to {
+  --fhwaBaselineOffset: 0px;
   display: none;
   margin: auto 0 auto auto;
   padding-left: 0.25rem;
@@ -507,6 +587,8 @@
   margin-bottom: 1.8rem;
   margin-right: 1.8rem;
   font-size: 1.5rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .bannerShieldContainer {
@@ -528,11 +610,14 @@
 
 .bannerA,
 .bannerB {
+  --fhwaBaselineOffset: 0px;
   border-radius: 0.1rem;
   font-size: var(--fontSize);
   text-transform: uppercase;
   font-family: "Clearview 5WR";
   margin-bottom: auto;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 .bannerA:not(.TOLL, .noIndent):first-letter,
 .bannerB:not(.TOLL, .noIndent):first-letter {
@@ -618,11 +703,18 @@
   white-space: pre-wrap;
 }
 
+.controlText {
+  --fhwaBaselineOffset: 0px;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
+}
+
 .guideArrows {
   border-style: solid;
   border-width: 0.2rem;
   border-top-width: 0;
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem);
 
   display: none;
 }
@@ -653,10 +745,31 @@
 
 .guideArrows.half_exit.only.default {
   padding: 0;
+  position: relative;
+  overflow: visible;
 }
 
 .guideArrows.half_exit.only {
   color: black !important;
+}
+
+.guideArrows.half_exit.only.default.halfExitNoBorder::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.25rem;
+  height: 0.35rem;
+  background: var(--white);
+  border-bottom-left-radius: 0.9rem;
+  border-bottom-right-radius: 0.9rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.guideArrows.half_exit.only.default .arrowContainer {
+  position: relative;
+  z-index: 1;
 }
 
 .halfarrow {
@@ -666,12 +779,15 @@
 }
 
 .specialExitOnly {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   color: var(--black);
   background-color: var(--yellow);
   font-family: "Series EM";
   border-radius: 0.2rem;
   border-width: 0rem;
   padding: 0.1rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .otherSymbols + .actionMessage {
@@ -679,25 +795,281 @@
 }
 
 .exitTab {
+  --fhwaBaselineOffset: 0px;
   display: flex;
   align-items: center;
   font-family: "Clearview 4W";
   font-size: 18px;
 }
 
+.exitTab .exitTabText {
+  position: relative;
+  top: calc(
+    var(--exitTabTextBaseOffset, 0px) + var(--fhwaBaselineOffset) +
+      var(--exitTabAdditionalOffset, 0px)
+  );
+}
+
+.exitTab .numeral {
+  font-size: calc(1.5em * var(--exitTabNumeralScale, 1));
+}
+
+.exitTab .exitTabTextSpacer {
+  display: inline-block;
+  min-width: 0.35rem;
+}
+
+.exitTab .exitTabNumberLinesContainer {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.exitTab .exitTabNumberLine {
+  display: inline-flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
+.exitTabContainer.hovExitTabContainer,
+.panel .exitTabContainer.hovExitTabContainer {
+  background: transparent;
+  border-color: transparent;
+}
+
+.exitTabHolder.hovExitTabHolder {
+  background: transparent;
+  border-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.exitTab.hovExitTab {
+  display: flex;
+  padding: 0;
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--black);
+  gap: 0;
+}
+
+.exitTab.hovExitTab .hovIconColumn {
+  flex: 0 0 auto;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  min-width: 3.25rem;
+  position: relative;
+  box-shadow: inset 0 0 0 0.18rem var(--white);
+  border-right: 0.25rem solid var(--white);
+}
+
+.exitTab.hovExitTab .hovIconColumn .hovIcon {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.exitTab.hovExitTab .hovContentColumn {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.35rem 1.25rem 0.3rem;
+  background: var(--white);
+}
+
+.exitTab.hovExitTab .hovTextRow {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.exitTab.hovExitTab .hovTextRow .exitTabText {
+  position: static;
+  top: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.exitTab.hovExitTab .hovBottomBar {
+  width: 100%;
+  height: 0.7rem;
+  margin-top: 0.3rem;
+  background: var(--green);
+  border-top: 0.2rem solid var(--white);
+}
+
+.exitTabContainer.tollLogoExitTabContainer.logoOnly {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-style: none;
+}
+
+.exitTabHolder.tollLogoExitHolder.logoOnly {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-style: none;
+  flex-grow: 0;
+  width: auto;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exitTab.tollLogoExitTab {
+  --tollLogoSize: 3rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.6rem;
+  gap: 0.35rem;
+}
+
+.exitTab.tollLogoExitTab.logoOnly {
+  padding: 0;
+  border: none;
+  border-width: 0 !important;
+  border-style: none !important;
+  min-height: unset;
+  background: transparent !important;
+  gap: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border-radius: 0;
+  width: auto;
+}
+
+.exitTab.tollLogoExitTab.logoOnly .tollLogoLogoWrapper {
+  width: auto;
+}
+
+.exitTab.tollLogoExitTab.logoOnly .tollLogoImageHolder {
+  margin: 0;
+  width: auto;
+  max-width: none;
+  max-height: var(--tollLogoSize, 3rem);
+}
+
+.exitTab.tollLogoExitTab .tollLogoLogoWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.exitTab.tollLogoExitTab .tollLogoImageHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: calc(var(--tollLogoSize, 3rem) * 2.25);
+  max-height: var(--tollLogoSize, 3rem);
+  min-height: var(--tollLogoSize, 3rem);
+}
+
+.exitTab.tollLogoExitTab .tollLogoImageHolder.squareIcon {
+  aspect-ratio: 1 / 1;
+  width: var(--tollLogoSize, 3rem);
+  height: var(--tollLogoSize, 3rem);
+}
+
+.exitTab.tollLogoExitTab .tollLogoImageHolder.squareIcon .tollLogoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.exitTab.tollLogoExitTab .tollLogoImage {
+  max-width: 100%;
+  width: auto;
+  height: var(--tollLogoSize, 3rem);
+  object-fit: contain;
+}
+
+.exitTab.tollLogoExitTab .tollLogoNumberWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.exitTab.tollLogoExitTab .tollLogoNumberWrapper .exitTabTextSpacer {
+  min-width: 0.3rem;
+}
+
+.exitTab.fullLeft {
+  padding: 0;
+  flex-direction: column;
+  align-items: stretch;
+  border-color: var(--white);
+  border-top-width: 0;
+  border-top-style: none;
+  overflow: visible;
+}
+
+.exitTab.fullLeft .fullLeftBanner {
+  background: var(--yellow);
+  color: var(--black);
+  font-family: "Series E", var(--fontFamily, "Clearview 4W");
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  padding: 0.2rem 0.5rem;
+  border: 0.2rem solid var(--black);
+  border-bottom-width: 0.2rem;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin: -0.2rem -0.2rem 0;
+}
+
+.exitTab.fullLeft .fullLeftNumber {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem 0.4rem;
+  border: 0.2rem solid var(--white);
+  border-top-width: 0;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin: 0 -0.2rem -0.2rem;
+  background: inherit;
+}
+
+.exitTab.fullLeft .fullLeftNumber .exitTabTextSpacer {
+  min-width: 0.35rem;
+}
 .action_message {
+  --fhwaBaselineOffset: 0px;
   display: inline-flex;
   align-items: center;
   font-family: "Clearview 5WR";
-}
-.action_message {
   justify-content: center;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitFormat {
   display: inline;
-  position: relative;
-  top: -0.1rem;
+  --exitTabTextBaseOffset: -0.1rem;
 }
 
 .exitOnlyArrow {
@@ -709,8 +1081,13 @@
 
   padding: 2px;
 }
+.arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
+.arrowContainer.hideExitOnlyArrows .halfarrow {
+  opacity: 0;
+}
 
 .exitOnlyText {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   font-family: "Series E";
   padding: 0px 10px 0 10px;
   padding-top: 0.18rem;
@@ -718,9 +1095,12 @@
   word-spacing: 0.3rem;
   letter-spacing: 0.03rem;
   margin: -1rem 0rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitOnlyText.split {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   background-color: var(--yellow);
   color: var(--black);
   border-radius: 0.1rem;
@@ -731,6 +1111,8 @@
   margin-top: 0.5rem;
   font-family: "Series EM";
   height: 1.15rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitOnlySpace {
@@ -793,7 +1175,10 @@
 }
 
 .actionMessage {
+  --fhwaBaselineOffset: 0px;
   font-size: 1.2rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .numeral {

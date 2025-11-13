@@ -106,6 +106,9 @@ class TextElement {
   createElement(panel) {
     const newText = document.createElement("div");
     newText.className = "bE-textElement";
+    const usesHighwayGothic =
+      typeof this.fontFamily === "string" &&
+      this.fontFamily.toLowerCase().includes("series");
 
     // Set custom CSS properties here based off the this. properties
     newText.style.setProperty("--fontFamily", '"' + this.fontFamily + '"');
@@ -129,6 +132,12 @@ class TextElement {
       this.bannerFirstLetterSize
     );
     newText.style.setProperty("--lineHeight", this.lineHeight);
+    if (usesHighwayGothic) {
+      newText.style.setProperty(
+        "--fhwaBaselineOffset",
+        "var(--fhwaBaselineShift)"
+      );
+    }
 
     if (
       this.backgroundColor == "Orange" ||
@@ -467,6 +476,103 @@ class IconElement {
 
 IconElement.prototype.icons = ["Airplane"];
 
+class BeaconElement {
+  constructor({
+    size = 2,
+    alignment = "Center",
+    flashDuration = 1,
+    color = "Yellow",
+    backplate = false,
+    flashOpposite = false,
+  } = {}) {
+    const parsedSize = parseFloat(size);
+    this.size = Number.isFinite(parsedSize) ? Math.max(parsedSize, 0.5) : 2;
+    const parsedDuration = parseFloat(flashDuration);
+    this.flashDuration =
+      Number.isFinite(parsedDuration) && parsedDuration > 0
+        ? parsedDuration
+        : 1;
+    const validAlignments = Array.isArray(TextElement.prototype.alignment)
+      ? TextElement.prototype.alignment
+      : [];
+    this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
+    const availableColors = Array.isArray(BeaconElement.prototype.colors)
+      ? BeaconElement.prototype.colors
+      : [];
+    this.color = availableColors.includes(color)
+      ? color
+      : availableColors[0] || "Yellow";
+    this.backplate =
+      backplate === true ||
+      backplate === "true" ||
+      backplate === 1 ||
+      backplate === "1";
+    this.flashOpposite =
+      flashOpposite === true ||
+      flashOpposite === "true" ||
+      flashOpposite === 1 ||
+      flashOpposite === "1";
+  }
+
+  createElement() {
+    const parsedSize = parseFloat(this.size);
+    const beaconSize = Number.isFinite(parsedSize) ? parsedSize : 2;
+    const parsedDuration = parseFloat(this.flashDuration);
+    const flashDuration =
+      Number.isFinite(parsedDuration) && parsedDuration > 0
+        ? parsedDuration
+        : 1;
+
+    const container = document.createElement("div");
+    container.className = "bE-beaconElement";
+    container.style.setProperty("--beaconSize", Math.max(beaconSize, 0.5) + "rem");
+    container.style.setProperty("--beaconFlashDuration", flashDuration + "s");
+    const resolvedColor =
+      (lib?.colors && lib.colors[this.color]) || this.color || "Yellow";
+    container.style.setProperty(
+      "--beaconBulbColor",
+      typeof resolvedColor === "string" ? resolvedColor : "Yellow"
+    );
+    container.style.setProperty(
+      "--beaconBackplateThickness",
+      BeaconElement.prototype.backplateThicknessRem + "rem"
+    );
+    container.style.setProperty(
+      "--beaconBackplateRadius",
+      BeaconElement.prototype.backplateCornerRadiusRem + "rem"
+    );
+    const backplateColorReference = BeaconElement.prototype.backplateColor;
+    const resolvedBackplateColor =
+      (lib?.colors && lib.colors[backplateColorReference]) ||
+      BeaconElement.prototype.backplateFallbackColor ||
+      backplateColorReference;
+    container.style.setProperty(
+      "--beaconBackplateColor",
+      resolvedBackplateColor
+    );
+    if (this.backplate) {
+      container.classList.add("hasBackplate");
+    }
+    if (this.flashOpposite) {
+      container.classList.add("flashOpposite");
+    }
+
+    const bulb = document.createElement("div");
+    bulb.className = "bE-beaconBulb";
+    container.appendChild(bulb);
+
+    return container;
+  }
+}
+
+BeaconElement.prototype.colors = ["Yellow", "Red", "Purple"];
+BeaconElement.prototype.halfInchInRem = 0.5 / 12;
+BeaconElement.prototype.backplateThicknessRem =
+  BeaconElement.prototype.halfInchInRem * 3;
+BeaconElement.prototype.backplateCornerRadiusRem = 0.15;
+BeaconElement.prototype.backplateColor = "Yellow";
+BeaconElement.prototype.backplateFallbackColor = "#ffd200";
+
 class ArrowElement {
   constructor({
     arrow = ArrowElement.prototype.defaultArrow,
@@ -582,6 +688,7 @@ ArrowElement.prototype.arrows = {
   },
   TYPE_B: { label: "Type B", src: "img/arrowBlocks/TYPE_B.svg" },
   TYPE_C_45: { label: "Type C 45", src: "img/arrowBlocks/TYPE_C_45.svg" },
+  TYPE_C_45_ALT: { label: "Type C 45 (alt)", src: "img/arrowBlocks/TYPE_C_45_ALT.svg" },
   TYPE_C_90: { label: "Type C 90", src: "img/arrowBlocks/TYPE_C_90.svg" },
   TYPE_D: { label: "Type D", src: "img/arrowBlocks/TYPE_D.svg" },
   DOWN: { label: "Down", src: "img/arrowBlocks/DOWN.svg", defaultSize: 2.75 },
@@ -706,6 +813,7 @@ TollLogoElement.prototype.logos = {
   FasTrak: { label: "FasTrak", src: "img/tolls/FASTrak.png" },
   FreedomPass: { label: "Freedom Pass", src: "img/tolls/FREEDOMPASS.svg" },
   PeachPass: { label: "Peach Pass", src: "img/tolls/PEACHPASS.svg" },
+  PeachPassAlt: { label: "Peach Pass (alt)", src: "img/tolls/PEACHPASS_ALT.png" },
   NCQuickPass: { label: "NC Quick Pass", src: "img/tolls/NCQUICKPASS.svg" },
   EPASS: { label: "E-PASS", src: "img/tolls/EPASS.svg" },
   SunPassOld: { label: "SunPass (old)", src: "img/tolls/SUNPASS-1.svg" },
@@ -716,6 +824,7 @@ TollLogoElement.prototype.logos = {
   PikePassOld: { label: "Pikepass (old)", src: "img/tolls/PIKEPASS-OLD.svg" },
   PikePassNew: { label: "Pikepass (new)", src: "img/tolls/PIKEPASS-NEW.svg" },
   PlatePay: { label: "PlatePay", src: "img/tolls/PLATEPAY.svg" },
+  PayByMail: { label: "Pay By Mail", src: "img/tolls/PAY_BY_MAIL.png" },
   IPASS: { label: "I-Pass", src: "img/tolls/I-Pass.svg" },
   GeauxPass: { label: "GeauxPass", src: "img/tolls/GEAUXPASS.svg" },
   GoodToGo: { label: "Good To Go!", src: "img/tolls/GOODTOGO.svg" },
@@ -900,7 +1009,8 @@ class Control {
         properties.backgroundColor == "Orange" ||
         properties.backgroundColor == "White" ||
         properties.backgroundColor == "Yellow" ||
-        properties.backgroundColor == "Fluorescent Yellow-Green";
+        properties.backgroundColor == "Fluorescent Yellow-Green" ||
+        properties.backgroundColor == "Fluorescent Pink";
 
       if (properties.backgroundFullWidth) {
         flexRow.classList.add("fullBleed");
@@ -1008,6 +1118,7 @@ Control.prototype.blockToClassElems = {
   ShieldElement: ShieldElement,
   AdvisoryMessageElement: AdvisoryMessageElement,
   IconElement: IconElement,
+  BeaconElement: BeaconElement,
   ArrowElement: ArrowElement,
   TollLogoElement: TollLogoElement,
   ActionMessageElement: ActionMessageElement,
@@ -1024,13 +1135,14 @@ Control.prototype.blockToClassElems = {
 
 Control.prototype.blockElements = {
   ControlTextElement: "Control Text",
-  DividerElement: "Divider",
-  ShieldElement: "Shield",
-  AdvisoryMessageElement: "Advisory Message",
-  IconElement: "Icon",
-  ArrowElement: "Arrow",
-  TollLogoElement: "Toll Logo",
   ActionMessageElement: "Action Message",
+  AdvisoryMessageElement: "Advisory Message",
+  ShieldElement: "Shield",
+  ArrowElement: "Arrow",
+  DividerElement: "Divider",
+  IconElement: "Icon",
+  BeaconElement: "Flashing Beacon",
+  TollLogoElement: "Toll Logo",
   ElectronicSignElement: "Electronic Sign",
 };
 
@@ -1040,6 +1152,7 @@ Control.prototype.blockInternalElements = {
   ShieldElement: "sdShield",
   AdvisoryMessageElement: "sdAdvisory",
   IconElement: "sdIcon",
+  BeaconElement: "sdBeacon",
   ArrowElement: "sdArrow",
   TollLogoElement: "sdTollLogo",
   ActionMessageElement: "sdActionMessage",

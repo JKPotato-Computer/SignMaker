@@ -1,13 +1,14 @@
 class SubPanels {
     
-    constructor({
-        shields = [],
-        width = 1,
-        height = "2",
+	constructor({
+		shields = [],
+		width = 1,
+		height = SubPanels.defaultHeight,
 		shieldDistance = 0.8,
 		blockElements,
+		customDividerHeight = false,
 		} = {}
-    ) {
+	) {
         this.controlText = controlText;
         this.actionMessage = actionMessage;
         
@@ -19,15 +20,50 @@ class SubPanels {
 		}
         
         this.shields = shields;
-        if ((parseInt(width) < 1) || (parseInt(width) == undefined)) {
-            this.width = 1;
-        } else {
-            this.width = parseInt(width);
-        }
+		if ((parseInt(width) < 1) || (parseInt(width) == undefined)) {
+			this.width = 1;
+		} else {
+			this.width = parseInt(width);
+		}
 		
-		this.height = height;
-		this.shieldDistance = shieldDistance
-    }
-    
-    
-}
+		Object.defineProperty(this, "height", {
+			get() {
+				return this._height;
+			},
+			set(value) {
+				const normalized = SubPanels.normalizeHeight(value);
+				Object.defineProperty(this, "_height", {
+					value: normalized,
+					enumerable: false,
+					writable: true,
+					configurable: true,
+				});
+			},
+			enumerable: true,
+			configurable: true,
+		});
+
+			this.height = height;
+			this.shieldDistance = shieldDistance;
+			this.customDividerHeight = !!customDividerHeight;
+	    }
+	}
+
+SubPanels.defaultHeight = "100%";
+SubPanels.normalizeHeight = function (value) {
+	const defaultHeight = SubPanels.defaultHeight;
+	if (typeof value === "number") {
+		return `${value}rem`;
+	}
+	if (typeof value === "string") {
+		const trimmed = value.trim();
+		if (!trimmed) {
+			return defaultHeight;
+		}
+		if (/^-?\d*\.?\d+$/.test(trimmed)) {
+			return `${trimmed}rem`;
+		}
+		return trimmed;
+	}
+	return defaultHeight;
+};

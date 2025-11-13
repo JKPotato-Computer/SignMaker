@@ -23,9 +23,14 @@ class Sign {
 			arrows = [],
 			guideArrow,
 			guideArrowLanes = 1,
+			useCanadianDownArrows = false,
 			exitguideArrows = "Down Arrow",
             exitOnlyPadding = 0,
+			exitOnlyBorderMode,
+			exitOnlyLeftText = "EXIT",
+			exitOnlyRightText = "ONLY",
 			exitOnlyLabelPreset = "EXIT ONLY",
+			hideExitArrow = false,
 			
 			// other
 			otherSymbol,
@@ -52,7 +57,7 @@ class Sign {
 			advisoryText = "",
 			
 			// panel
-			padding = "0.5rem 0.75rem 0.5rem 0.75rem",
+			padding = "0.3rem 0.75rem 0.3rem 0.75rem",
 			arrowPosition = "Middle"
 		} = {}
 	) {
@@ -78,6 +83,7 @@ class Sign {
 		} else {
 			this.guideArrowLanes = 0;
 		}
+		this.useCanadianDownArrows = !!useCanadianDownArrows;
 		this.oSNum = oSNum;
 		this.actionMessage = actionMessage;
         this.subPanels = subPanels;
@@ -92,11 +98,52 @@ class Sign {
 		this.arrows = arrows;
 		this.exitguideArrows = exitguideArrows;
 		this.exitOnlyPadding = exitOnlyPadding;
-		if (typeof exitOnlyLabelPreset === "string" && exitOnlyLabelPreset.trim().length > 0) {
-			this.exitOnlyLabelPreset = exitOnlyLabelPreset.trim();
+		const exitOnlyBorderModes = Sign.prototype.exitOnlyBorderModes;
+		if (exitOnlyBorderModes.includes(exitOnlyBorderMode)) {
+			this.exitOnlyBorderMode = exitOnlyBorderMode;
 		} else {
-			this.exitOnlyLabelPreset = "EXIT ONLY";
+			const defaultBorderMode =
+				this.guideArrow === "Half Exit Only" ? "edge" : "white-edge";
+			this.exitOnlyBorderMode = exitOnlyBorderModes.includes(
+				defaultBorderMode
+			)
+				? defaultBorderMode
+				: exitOnlyBorderModes[0];
 		}
+		let resolvedLeft =
+			typeof exitOnlyLeftText === "string" ? exitOnlyLeftText : undefined;
+		let resolvedRight =
+			typeof exitOnlyRightText === "string" ? exitOnlyRightText : undefined;
+		if (
+			(typeof resolvedLeft === "undefined" || typeof resolvedRight === "undefined") &&
+			typeof exitOnlyLabelPreset === "string" &&
+			exitOnlyLabelPreset.trim().length > 0
+		) {
+			const parts = exitOnlyLabelPreset.trim().split(/\s+/);
+			const presetLeft = parts.length ? parts[0] : "EXIT";
+			const presetRight =
+				parts.length > 1 ? parts.slice(1).join(" ") : presetLeft;
+			if (typeof resolvedLeft === "undefined") {
+				resolvedLeft = presetLeft;
+			}
+			if (typeof resolvedRight === "undefined") {
+				resolvedRight = presetRight;
+			}
+		}
+		if (typeof resolvedLeft !== "string") {
+			resolvedLeft = "EXIT";
+		}
+		if (typeof resolvedRight !== "string") {
+			resolvedRight = "ONLY";
+		}
+		this.exitOnlyLeftText = resolvedLeft;
+		this.exitOnlyRightText = resolvedRight;
+		const combinedLabel = [resolvedLeft, resolvedRight]
+			.filter((part) => typeof part === "string" && part.trim().length > 0)
+			.join(" ")
+			.trim();
+		this.exitOnlyLabelPreset = combinedLabel || "EXIT ONLY";
+		this.hideExitArrow = !!hideExitArrow;
 		
 		if (this.globalPositioning.includes(globalPositioning)) {
 			this.globalPositioning = globalPositioning;
@@ -193,7 +240,8 @@ class Sign {
 			actionMessage : existingSubPanel.actionMessage,
 			shields : existingSubPanel.shields,
 			width : existingSubPanel.width,
-			height : existingSubPanel.height
+			height : existingSubPanel.height,
+			customDividerHeight : existingSubPanel.customDividerHeight
 		})
 		this.subPanels.push(new_SubPanel);
 	}
@@ -232,16 +280,9 @@ Sign.prototype.exitguideArrows = [
 
 ];
 
-Sign.prototype.exitOnlyLabels = [
-	"EXIT ONLY",
-	"LEFT EXIT",
-	"LEFT ONLY",
-	"RIGHT EXIT",
-	"RIGHT ONLY",
-	"RAMP ONLY",
-	"EXPRESS ONLY",
-	"EXPRESS LANE",
-	"EXPRESS LANES"
+Sign.prototype.exitOnlyBorderModes = [
+	"edge",
+	"white-edge"
 ];
 
 Sign.prototype.arrowPositions = [
@@ -256,6 +297,7 @@ Sign.prototype.otherSymbols = [
 	"Quebec-Left"
 ]
 
+// this needs to be deprecreated in favor of block elements (add vertical dividers maybe?)
 Sign.prototype.globalPositioning = [
 	"Top",
 	"Bottom",
