@@ -40,9 +40,9 @@ class Post {
 	 */
 	newPanel() {
 		const newSign = new Sign();
-        newSign.newSubPanel();
-		
-		
+		newSign.newSubPanel();
+
+
 		const newPanel = new Panel(newSign, undefined);
 		const exitTab = new ExitTab();
 		newPanel.exitTabs.push(exitTab);
@@ -60,7 +60,7 @@ class Post {
 		for (const subPanel of existingPanel.sign.subPanels) {
 			newSubPanels.push(Object.assign(new SubPanels(), subPanel));
 		}
-		
+
 		const newExitTabs = [];
 		const cloneExitTab = (tab) => {
 			const clonedTab = Object.assign(new ExitTab(), tab);
@@ -76,13 +76,13 @@ class Post {
 		for (const exitTab of existingPanel.exitTabs) {
 			newExitTabs.push(cloneExitTab(exitTab));
 		}
-		
+
 		const newSign = new Sign({
-			shieldPosition : existingPanel.sign.shieldPosition,
-			subPanels : newSubPanels,
-			sheildBacks : existingPanel.sign.sheildBacks,
-			guideArrow : existingPanel.sign.guideArrow,
-			guideArrowLanes : existingPanel.sign.guideArrowLanes,
+			shieldPosition: existingPanel.sign.shieldPosition,
+			subPanels: newSubPanels,
+			sheildBacks: existingPanel.sign.sheildBacks,
+			guideArrow: existingPanel.sign.guideArrow,
+			guideArrowLanes: existingPanel.sign.guideArrowLanes,
 			useCanadianDownArrows: existingPanel.sign.useCanadianDownArrows,
 		});
 		const newPanel = Object.assign(new Panel(), existingPanel);

@@ -75,6 +75,12 @@ class Shield {
     imageType = "",
     imageData = "",
   } = {}) {
+    const defaultBannerFont = ShieldElement.prototype.defaultBannerFontFamily;
+    this.indentFirstLetter = true;
+    this.indentFirstLetter2 = true;
+    this.smallCaps = true;
+    this.smallCaps2 = true;
+    this.bannerFontFamily = defaultBannerFont;
     this.shieldType = shieldType;
     this.shieldName = shieldName;
     this.shieldValue = shieldValue;
@@ -95,7 +101,7 @@ class Banner {
     backgroundColor = "None",
     padding = .01,
     borderRadius = 4,
-    fontFamily = "Clearview 5WR",
+    fontFamily = "Series E",
     margins = {
       left: 0,
       right: 0,
@@ -127,11 +133,11 @@ class BannerGroup {
 }
 
 class ShieldBlock {
-  constructor({} = {}) {}
+  constructor({ } = {}) { }
 }
 
 class ShieldContainer {
-  constructor({} = {}) {}
+  constructor({ } = {}) { }
 }
 
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
@@ -494,19 +500,19 @@ Shield.prototype.shieldDirectory = {
 
 Shield.prototype.bannerTypes = [
   "None",
-  "Arterial",
   "North",
   "East",
   "South",
   "West",
+  "Arterial",
   "Jct",
   "Begin",
   "End",
   "Spur",
   "Alt",
   "Truck",
-  "Trunk",
   "Business",
+  "Bus",
   "Byp",
   "Loop",
   "Express",
@@ -518,5 +524,10 @@ Shield.prototype.bannerTypes = [
   "City",
   "Conn",
   "To",
+  "Turnpike",
+  "Nord",
+  "Est",
+  "Sud",
+  "Ouest",
 ];
 Shield.prototype.bannerPositions = ["Above", "Right", "Left"];

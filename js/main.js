@@ -13,6 +13,8 @@ const app = (function () {
     panel: -1,
   };
 
+  let currentlySelectedAPLArrowIndex = 0;
+
   const getCurrentPanel = () => {
     return post.panels[currentlySelectedPanelIndex];
   };
@@ -36,9 +38,7 @@ const app = (function () {
     if (Number.isFinite(parsed)) {
       return Math.max(0, parsed);
     }
-    return typeof Post !== "undefined" &&
-      Post.prototype &&
-      typeof Post.prototype.defaultThickness === "number"
+    return typeof Post.prototype.defaultThickness === "number"
       ? Post.prototype.defaultThickness
       : 1;
   };
@@ -52,11 +52,7 @@ const app = (function () {
     element.style.setProperty("--fhwaBaselineOffset", FHWA_BASELINE_OFFSET_VAR);
   };
   const applyPanelBorderGradient = (signElmt) => {
-    if (
-      typeof window === "undefined" ||
-      !signElmt ||
-      !signElmt.isConnected
-    ) {
+    if (!signElmt || !signElmt.isConnected) {
       return;
     }
 
@@ -174,7 +170,7 @@ const app = (function () {
   };
 
   const schedulePanelBorderGradientUpdate = (panelContainerElmt) => {
-    if (typeof window === "undefined" || !panelContainerElmt) {
+    if (!panelContainerElmt) {
       return;
     }
 
@@ -222,9 +218,9 @@ const app = (function () {
   };
 
   /*
-		Delete the current panel, set the current editing panel to the panel before, update the form and redraw.
-		If no panel is found, create a new one.
-	*/
+    Delete the current panel, set the current editing panel to the panel before, update the form and redraw.
+    If no panel is found, create a new one.
+  */
   const deletePanel = function () {
     post.deletePanel(currentlySelectedPanelIndex);
     if (currentlySelectedPanelIndex > 0) {
@@ -275,25 +271,11 @@ const app = (function () {
 
     const selectedPanelRef =
       currentlySelectedPanelIndex >= 0 &&
-      currentlySelectedPanelIndex < post.panels.length
+        currentlySelectedPanelIndex < post.panels.length
         ? post.panels[currentlySelectedPanelIndex]
         : null;
 
-    let resultingIndex = normalizedFrom;
-    if (typeof post.movePanel === "function") {
-      resultingIndex = post.movePanel(normalizedFrom, normalizedTo);
-    } else {
-      const panels = post.panels;
-      const [panel] = panels.splice(normalizedFrom, 1);
-      if (!panel) {
-        return;
-      }
-      if (normalizedTo > normalizedFrom) {
-        normalizedTo--;
-      }
-      panels.splice(normalizedTo, 0, panel);
-      resultingIndex = normalizedTo;
-    }
+    const resultingIndex = post.movePanel(normalizedFrom, normalizedTo);
 
     if (selectedPanelRef) {
       const updatedIndex = post.panels.indexOf(selectedPanelRef);
@@ -318,11 +300,174 @@ const app = (function () {
     redraw();
   };
 
+  // --- Rendered Panel Drag and Drop ---
+  let renderedPanelDragState = null;
+
+  const toggleRenderedPanelWiggle = (isActive) => {
+    const panels = document.querySelectorAll("#panelContainer > .panel");
+    for (const panel of panels) {
+      panel.classList.toggle("panelWiggle", isActive);
+      if (isActive) {
+        panel.style.setProperty("--wiggle-delay", `${Math.random() * 0.12}s`);
+      } else {
+        panel.style.removeProperty("--wiggle-delay");
+      }
+    }
+  };
+
+  const clearRenderedPanelDropIndicators = () => {
+    document
+      .querySelectorAll(".panel.dropBefore, .panel.dropAfter")
+      .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
+  };
+
+  const endRenderedPanelDrag = () => {
+    toggleRenderedPanelWiggle(false);
+    clearRenderedPanelDropIndicators();
+    document
+      .querySelectorAll(".panel.dragging")
+      .forEach((el) => {
+        el.classList.remove("dragging");
+        delete el.dataset.dragging;
+      });
+    renderedPanelDragState = null;
+  };
+
+  const getRenderedPanelDropPosition = (container, clientX) => {
+    const panels = Array.from(container.querySelectorAll(".panel"));
+    if (!panels.length) {
+      return { dropIndex: 0, targetPanel: null, placement: null };
+    }
+
+    let dropIndex = panels.length;
+    let targetPanel = null;
+    let placement = "after";
+    let foundPosition = false;
+
+    for (let i = 0; i < panels.length; i++) {
+      const panel = panels[i];
+      const rect = panel.getBoundingClientRect();
+      const midpoint = rect.left + rect.width / 2;
+      if (clientX < midpoint) {
+        dropIndex = i;
+        placement = "before";
+        foundPosition = true;
+        targetPanel = panel.dataset.dragging === "true" ? null : panel;
+        break;
+      }
+    }
+
+    if (!foundPosition) {
+      const lastPanel = panels[panels.length - 1];
+      if (lastPanel.dataset.dragging !== "true") {
+        targetPanel = lastPanel;
+        placement = "after";
+      } else {
+        placement = null;
+      }
+    } else if (!targetPanel) {
+      placement = null;
+    }
+
+    return { dropIndex, targetPanel, placement };
+  };
+
+  const handleRenderedPanelDragStart = (event) => {
+    const panel = event.currentTarget;
+    const fromIndex = Number(panel.dataset.panelIndex);
+    if (Number.isNaN(fromIndex)) {
+      return;
+    }
+    renderedPanelDragState = { fromIndex, dropIndex: fromIndex };
+    panel.dataset.dragging = "true";
+    panel.classList.add("dragging");
+    toggleRenderedPanelWiggle(true);
+    clearRenderedPanelDropIndicators();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.setData("text/plain", "");
+    }
+  };
+
+  const handleRenderedPanelDragOver = (event) => {
+    if (!renderedPanelDragState) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    const container = document.getElementById("panelContainer");
+    if (!container) {
+      return;
+    }
+    const { dropIndex, targetPanel, placement } = getRenderedPanelDropPosition(
+      container,
+      event.clientX
+    );
+    renderedPanelDragState.dropIndex = dropIndex;
+
+    clearRenderedPanelDropIndicators();
+    if (targetPanel && placement) {
+      targetPanel.classList.add(
+        placement === "before" ? "dropBefore" : "dropAfter"
+      );
+    }
+  };
+
+  const handleRenderedPanelDrop = (event) => {
+    if (!renderedPanelDragState) {
+      return;
+    }
+    event.preventDefault();
+    const fromIndex = renderedPanelDragState.fromIndex;
+    const dropIndex =
+      renderedPanelDragState.dropIndex !== undefined
+        ? renderedPanelDragState.dropIndex
+        : fromIndex;
+    movePanel(fromIndex, dropIndex);
+    endRenderedPanelDrag();
+  };
+
+  const handleRenderedPanelDragLeave = (event) => {
+    if (!renderedPanelDragState) {
+      return;
+    }
+    const container = document.getElementById("panelContainer");
+    const related = event.relatedTarget;
+    if (related && container && container.contains(related)) {
+      return;
+    }
+    clearRenderedPanelDropIndicators();
+  };
+
+  const handleRenderedPanelDragEnd = () => {
+    if (renderedPanelDragState) {
+      endRenderedPanelDrag();
+    }
+  };
+
   // Set the current panel based off parameter number, within the correct range (0 < # of panels - 1)
+
   const changeEditingPanel = function (panelNumber) {
     currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1);
     currentlySelectedSubPanelIndex = 0;
+    // Reset row and block indices to prevent accessing non-existent elements
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
     formHandler.updateForm();
+
+    // Flash the selected panel
+    const panelElmt = document.getElementById("panel" + currentlySelectedPanelIndex);
+    if (panelElmt) {
+      const signElmt = panelElmt.querySelector(".sign");
+      if (signElmt) {
+        flashElement(signElmt);
+      }
+    }
   };
 
   const setPanelSpacing = function (value) {
@@ -376,7 +521,40 @@ const app = (function () {
       -1,
       getCurrentPanel().sign.subPanels.length - 1
     );
+    // Reset row and block indices to prevent accessing non-existent elements
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
     formHandler.updateForm();
+
+    // Flash the selected subpanel
+    const subPanelElmt = document.getElementById("S_subPanel" + currentlySelectedSubPanelIndex);
+    if (subPanelElmt) {
+      flashElement(subPanelElmt);
+    }
+  };
+
+  const flashElement = (targetElmt) => {
+    if (!targetElmt) return;
+    if (post && post.disableFlash) return;
+
+    const postContainer = document.getElementById("postContainer");
+    if (!postContainer) return;
+
+    const rect = targetElmt.getBoundingClientRect();
+    const containerRect = postContainer.getBoundingClientRect();
+
+    const overlay = document.createElement("div");
+    overlay.className = "flash-selection";
+    overlay.style.top = (rect.top - containerRect.top) + "px";
+    overlay.style.left = (rect.left - containerRect.left) + "px";
+    overlay.style.width = rect.width + "px";
+    overlay.style.height = rect.height + "px";
+
+    postContainer.appendChild(overlay);
+
+    setTimeout(() => {
+      overlay.remove();
+    }, 500);
   };
 
   // Create a new exit tab, update the form, and redraw.
@@ -528,11 +706,11 @@ const app = (function () {
     currentlySelectedNestedExitTabIndex =
       nestedExitTabNumber != null
         ? clamp(
-            nestedExitTabNumber,
-            -1,
-            getCurrentPanel().exitTabs[currentlySelectedExitTabIndex]
-              .nestedExitTabs.length - 1
-          )
+          nestedExitTabNumber,
+          -1,
+          getCurrentPanel().exitTabs[currentlySelectedExitTabIndex]
+            .nestedExitTabs.length - 1
+        )
         : -1;
     formHandler.updateForm();
   };
@@ -587,10 +765,15 @@ const app = (function () {
   };
 
   // Revised Control Panel
-  const newRow = (selectedBlock) => {
+  const newRow = (selectedBlock, evt) => {
     const blockElems = getCurrentSubPanel().blockElements;
+    const insertAbove = evt && evt.shiftKey;
     currentlySelectedBlockIndex = 0;
-    blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
+    if (insertAbove) {
+      blockElems.addRow(currentlySelectedRowIndex, selectedBlock);
+    } else {
+      blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
+    }
     formHandler.updateForm();
     redraw();
   };
@@ -613,6 +796,41 @@ const app = (function () {
 
     formHandler.updateForm();
     redraw();
+  };
+
+  const moveRow = (fromIndex, toIndex) => {
+    const blockElements = getCurrentSubPanel().blockElements;
+    const rows = blockElements.rows;
+    const blockProps = blockElements.blockProperties;
+    const rowCount = rows.length;
+
+    if (rowCount < 2) {
+      return fromIndex;
+    }
+
+    const clampIdx = (val, max) => Math.max(0, Math.min(val, max));
+    const normalizedFrom = clampIdx(fromIndex, rowCount - 1);
+    let normalizedTo = clampIdx(toIndex, rowCount);
+
+    if (normalizedFrom === normalizedTo || normalizedFrom + 1 === normalizedTo) {
+      return normalizedFrom;
+    }
+
+    const [movedRow] = rows.splice(normalizedFrom, 1);
+    const [movedProps] = blockProps.splice(normalizedFrom, 1);
+
+    if (normalizedTo > normalizedFrom) {
+      normalizedTo--;
+    }
+
+    rows.splice(normalizedTo, 0, movedRow);
+    blockProps.splice(normalizedTo, 0, movedProps);
+
+    currentlySelectedRowIndex = normalizedTo;
+    currentlySelectedBlockIndex = 0;
+    formHandler.updateForm();
+    redraw();
+    return normalizedTo;
   };
 
   const setSelectedRow = (row) => {
@@ -774,11 +992,246 @@ const app = (function () {
       getCurrentBlockRows().length - 1
     );
     formHandler.updateForm();
+
+    // Flash the selected block element on the sign
+    const subPanelContainer = document.querySelector(
+      `.blockElementMaster[data-subpanel="${currentlySelectedSubPanelIndex}"]`
+    );
+    if (subPanelContainer) {
+      const signBlockElmt = subPanelContainer.querySelector(
+        `[data-sign-row="${currentlySelectedRowIndex}"][data-sign-block="${currentlySelectedBlockIndex}"]`
+      );
+      if (signBlockElmt) {
+        flashElement(signBlockElmt);
+      }
+    }
+  };
+
+  const duplicateControlElem = () => {
+    const subPanel = getCurrentSubPanel();
+    if (!subPanel || !subPanel.blockElements) {
+      return;
+    }
+    const blockElements = subPanel.blockElements;
+    const rows = blockElements.rows || [];
+    const row = rows[currentlySelectedRowIndex];
+    if (!Array.isArray(row) || !row.length) {
+      return;
+    }
+    const sourceBlock = row[currentlySelectedBlockIndex];
+    if (!sourceBlock) {
+      return;
+    }
+    const blockElemType =
+      Control.prototype.blockToClassElems.getElem(sourceBlock);
+    const Constructor = blockElemType
+      ? Control.prototype.blockToClassElems[blockElemType]
+      : null;
+    if (typeof Constructor !== "function") {
+      return;
+    }
+    const duplicatedBlock = Object.assign(new Constructor(), sourceBlock);
+    const insertIndex = clamp(
+      currentlySelectedBlockIndex + 1,
+      0,
+      row.length
+    );
+    row.splice(insertIndex, 0, duplicatedBlock);
+    currentlySelectedBlockIndex = insertIndex;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  // APL Arrow Management Functions
+  const addAPLArrow = function (type = "APL_UP") {
+    const sign = getCurrentPanel().sign;
+    sign.newAPLArrow(type);
+    currentlySelectedAPLArrowIndex = sign.aplArrows.length - 1;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const removeAPLArrow = function () {
+    const sign = getCurrentPanel().sign;
+    if (sign.aplArrows.length === 0) {
+      return;
+    }
+    sign.deleteAPLArrow(currentlySelectedAPLArrowIndex);
+    if (currentlySelectedAPLArrowIndex >= sign.aplArrows.length) {
+      currentlySelectedAPLArrowIndex = Math.max(0, sign.aplArrows.length - 1);
+    }
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const selectAPLArrow = function (index) {
+    const sign = getCurrentPanel().sign;
+    currentlySelectedAPLArrowIndex = clamp(index, 0, Math.max(0, sign.aplArrows.length - 1));
+    formHandler.updateForm();
+  };
+
+  const updateAPLArrowType = function (type) {
+    const sign = getCurrentPanel().sign;
+    if (sign.aplArrows.length > 0 && currentlySelectedAPLArrowIndex < sign.aplArrows.length) {
+      sign.updateAPLArrowType(currentlySelectedAPLArrowIndex, type);
+      formHandler.updateForm();
+      redraw();
+    }
+  };
+
+  const toggleAPLArrowFlip = function (index) {
+    const sign = getCurrentPanel().sign;
+    const targetIndex = typeof index === 'number' ? index : currentlySelectedAPLArrowIndex;
+    if (sign.aplArrows.length > 0 && targetIndex >= 0 && targetIndex < sign.aplArrows.length) {
+      sign.toggleAPLArrowFlip(targetIndex);
+      formHandler.updateForm();
+      redraw();
+    }
+  };
+
+  const addAPLDivider = function (arrowIndex) {
+    const sign = getCurrentPanel().sign;
+    if (arrowIndex >= 0 && arrowIndex < sign.aplArrows.length) {
+      const arrow = sign.aplArrows[arrowIndex];
+      if (arrow.dividerAfter) {
+        // Toggle off - remove divider
+        sign.setAPLDivider(arrowIndex, false);
+        // Remove the associated subpanel if there are more than 1
+        if (sign.subPanels.length > 1) {
+          sign.deleteSubPanel(sign.subPanels.length - 2);
+          currentlySelectedSubPanelIndex = Math.max(0, currentlySelectedSubPanelIndex - 1);
+        }
+      } else {
+        // Toggle on - add divider and create subpanel
+        if (confirm("This will add a new subpanel. Continue?")) {
+          sign.setAPLDivider(arrowIndex, true);
+          sign.newSubPanel();
+          currentlySelectedSubPanelIndex++;
+        }
+      }
+      formHandler.updateForm();
+      redraw();
+    }
+  };
+
+  const buildMileageTemplate = () => {
+    const destinations = ["A", "B", "C"];
+    const rows = destinations.map((label) => [
+      new ControlTextElement({ textContent: `Destination ${label}` }),
+      new DividerElement({ visible: false, dividerWidth: 3, dividerMeasurement: "rem" }),
+      new ControlTextElement({ textContent: "X" }),
+    ]);
+    const blockProperties = rows.map(() => new Block());
+    return { rows, blockProperties };
+  };
+
+  const buildSimpleExitTemplate = () => {
+    const actionMessage = new ActionMessageElement();
+    actionMessage.textContent = "Distance";
+    actionMessage.fontFamily = "Series EM";
+
+    const rows = [
+      [new ShieldElement({ shieldBase: "I", routeNumber: "X" })],
+      [new ControlTextElement({ textContent: "Destination" })],
+      [actionMessage],
+    ];
+    const blockProperties = [new Block(), new Block(), new Block()];
+    return { rows, blockProperties };
+  };
+
+  const buildTolledExitTemplate = () => {
+    const rows = [
+      [
+        new TollLogoElement({ logo: "MUTCD", logoHeight: 2 }),
+        new ControlTextElement({
+          textContent: "OR",
+          fontSize: 50,
+          fontFamily: "Series E",
+          textColor: "Black",
+        }),
+        new ControlTextElement({
+          textContent: "PAY BY\\nPLATE",
+          fontSize: 50,
+          fontFamily: "Series E",
+          textColor: "Black",
+        }),
+      ],
+      [
+        new DividerElement({
+          dividerWidth: 100,
+          dividerMeasurement: "%",
+          dividerColor: "Black",
+          fullBleed: true,
+        }),
+      ],
+      [new ControlTextElement({ textContent: "Destination" })],
+    ];
+    const blockProperties = [
+      new Block({ backgroundColor: "White", bottomPadding: 0.25 }),
+      new Block(),
+      new Block(),
+    ];
+    return { rows, blockProperties };
+  };
+
+  const buildControlCitiesAdvanceJunctionTemplate = () => {
+    const actionMessage = new ActionMessageElement();
+    actionMessage.textContent = "Distance";
+    actionMessage.fontFamily = "Series EM";
+
+    const rows = [
+      [
+        new ShieldElement({
+          shieldBase: "I",
+          routeNumber: "X",
+          bannerType: "Jct",
+          bannerPosition: "Left",
+        }),
+      ],
+      [new ControlTextElement({ textContent: "Destination A\\nDestination B" })],
+      [actionMessage],
+    ];
+    const blockProperties = [new Block(), new Block(), new Block()];
+    return { rows, blockProperties };
+  };
+
+  const applyTemplate = (templateName) => {
+    const confirmationMessage =
+      "Are you sure you want to apply this template? THIS WILL OVERRIDE YOUR CURRENT SUBPANEL!";
+    if (!window.confirm(confirmationMessage)) {
+      return;
+    }
+    const subPanel = getCurrentSubPanel();
+    if (!subPanel) {
+      return;
+    }
+    let templateData = null;
+    switch (templateName) {
+      case "mileage-sign":
+        templateData = buildMileageTemplate();
+        break;
+      case "simple-exit":
+        templateData = buildSimpleExitTemplate();
+        break;
+      case "tolled-exit":
+        templateData = buildTolledExitTemplate();
+        break;
+      case "control-cities-advance-junction":
+        templateData = buildControlCitiesAdvanceJunctionTemplate();
+        break;
+      default:
+        return;
+    }
+    subPanel.blockElements = new Control(templateData);
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    formHandler.updateForm();
+    redraw();
   };
 
   /**
-		Download the sign from options
-	*/
+    Download the sign from options
+  */
 
   function getFile() {
     var screenshotTarget;
@@ -936,29 +1389,20 @@ const app = (function () {
     const postContainerElmt = document.getElementById("postContainer");
     const panelContainerElmt = document.getElementById("panelContainer");
     const posts = document.getElementsByClassName("post");
-    const availablePolePositions = Array.isArray(Post.prototype.polePositions)
-      ? Post.prototype.polePositions
-      : [];
+    const availablePolePositions = Post.prototype.polePositions;
     const fallbackPolePosition = availablePolePositions.includes(post.polePosition)
       ? post.polePosition
       : availablePolePositions[0] || "Left";
     const polePositionClass = `polePosition${fallbackPolePosition}`;
-    const availableColors = Array.isArray(Post.prototype.colors)
-      ? Post.prototype.colors
-      : [];
+    const availableColors = Post.prototype.colors;
     const fallbackColor = availableColors[0] || "Silver";
     const normalizedPostColor = availableColors.includes(post.color)
       ? post.color
       : fallbackColor;
     const colorClass = normalizedPostColor ? ` postColor${normalizedPostColor}` : "";
     postContainerElmt.className = `${polePositionClass}${colorClass}`;
-    const normalizedThickness =
-      post && typeof post.normalizeThickness === "function"
-        ? post.normalizeThickness(post.thickness)
-        : normalizePostThickness(post ? post.thickness : undefined);
-    if (post) {
-      post.thickness = normalizedThickness;
-    }
+    const normalizedThickness = post.normalizeThickness(post.thickness);
+    post.thickness = normalizedThickness;
     postContainerElmt.style.setProperty(
       "--postThickness",
       normalizedThickness + "rem"
@@ -1000,10 +1444,18 @@ const app = (function () {
 
     lib.clearChildren(panelContainerElmt);
     if (panelContainerElmt) {
+      // Attach drag handlers to panelContainer once
+      if (!panelContainerElmt.dataset.panelDragAttached) {
+        panelContainerElmt.addEventListener("dragover", handleRenderedPanelDragOver);
+        panelContainerElmt.addEventListener("drop", handleRenderedPanelDrop);
+        panelContainerElmt.addEventListener("dragleave", handleRenderedPanelDragLeave);
+        panelContainerElmt.dataset.panelDragAttached = "true";
+      }
       const spacingValue =
         typeof post.panelSpacing === "number" && post.panelSpacing > 0
           ? Math.max(0, post.panelSpacing)
           : 0;
+
       panelContainerElmt.style.setProperty(
         "--panelSpacing",
         spacingValue + "rem"
@@ -1019,9 +1471,7 @@ const app = (function () {
       const panelElmt = document.createElement("div");
       panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
       const borderRadiusFallback =
-        (typeof Panel !== "undefined" &&
-          Panel.prototype &&
-          typeof Panel.prototype.defaultBorderRadius === "number")
+        typeof Panel.prototype.defaultBorderRadius === "number"
           ? Panel.prototype.defaultBorderRadius
           : 0.75;
       const numericPanelBorderRadius =
@@ -1036,7 +1486,15 @@ const app = (function () {
         panelBorderRadius + "rem"
       );
       panelElmt.id = "panel" + index;
+      panelElmt.dataset.panelIndex = index.toString();
+      panelElmt.draggable = post.panels.length > 1;
+      panelElmt.addEventListener("dragstart", handleRenderedPanelDragStart);
+      panelElmt.addEventListener("dragend", handleRenderedPanelDragEnd);
+      panelElmt.addEventListener("click", () => {
+        changeEditingPanel(index);
+      });
       panelContainerElmt.appendChild(panelElmt);
+
 
       for (
         let exitTabIndex = panel.exitTabs.length - 1;
@@ -1062,8 +1520,6 @@ const app = (function () {
             exitTabElmt.className += " squareCorners";
           }
           const fallbackBorderThickness =
-            typeof ExitTab !== "undefined" &&
-            ExitTab.prototype &&
             typeof ExitTab.prototype.defaultBorderThickness === "number"
               ? ExitTab.prototype.defaultBorderThickness
               : 0.2;
@@ -1142,6 +1598,7 @@ const app = (function () {
                 const trailingText = txtArr.slice(2).join("");
                 if (trailingText) {
                   const trailingSpanElmt = document.createElement("span");
+                  trailingSpanElmt.className = "numeral exitTabTrailing";
                   trailingSpanElmt.textContent = trailingText;
                   registerExitTabText(trailingSpanElmt);
                   targetElmt.appendChild(trailingSpanElmt);
@@ -1224,8 +1681,6 @@ const app = (function () {
                 tollLogoHolderElmt.classList.add("squareIcon");
               }
               const defaultTollLogoSize =
-                typeof ExitTab !== "undefined" &&
-                ExitTab.prototype &&
                 typeof ExitTab.prototype.defaultTollLogoSize === "number"
                   ? ExitTab.prototype.defaultTollLogoSize
                   : 3;
@@ -1241,20 +1696,12 @@ const app = (function () {
                 "--tollLogoSize",
                 resolvedTollLogoSize.toString() + "rem"
               );
-              const tollLogos =
-                typeof TollLogoElement !== "undefined" &&
-                TollLogoElement.prototype &&
-                TollLogoElement.prototype.logos
-                  ? TollLogoElement.prototype.logos
-                  : null;
+              const tollLogos = TollLogoElement.prototype.logos;
               const tollLogoKey =
                 tollLogos && exitTab.icon && tollLogos[exitTab.icon]
                   ? exitTab.icon
-                  : tollLogos && TollLogoElement.prototype.defaultLogo
-                    ? TollLogoElement.prototype.defaultLogo
-                    : null;
-              const tollLogoDef =
-                tollLogos && tollLogoKey ? tollLogos[tollLogoKey] : null;
+                  : TollLogoElement.prototype.defaultLogo;
+              const tollLogoDef = tollLogos && tollLogos[tollLogoKey];
               if (tollLogoDef) {
                 const tollLogoImgElmt = document.createElement("img");
                 tollLogoImgElmt.src = tollLogoDef.src;
@@ -1380,9 +1827,9 @@ const app = (function () {
 
       function createShield(i, p) {
         /*
-					i: index (table parent)
-					p: parent (object)
-				*/
+          i: index (table parent)
+          p: parent (object)
+        */
 
         var position;
 
@@ -1411,11 +1858,9 @@ const app = (function () {
           p.appendChild(toElmt);
 
           const bannerShieldContainerElmt = document.createElement("div");
-          bannerShieldContainerElmt.className = `bannerShieldContainer ${
-            shield.type
-          } ${shield.specialBannerType.toLowerCase()} bannerPosition${
-            shield.bannerPosition
-          }`;
+          bannerShieldContainerElmt.className = `bannerShieldContainer ${shield.type
+            } ${shield.specialBannerType.toLowerCase()} bannerPosition${shield.bannerPosition
+            }`;
 
           switch (shield.routeNumber.length) {
             case 1:
@@ -1479,7 +1924,10 @@ const app = (function () {
 
           const bannerElmt2 = document.createElement("p");
           bannerElmt2.className =
-            "bannerB" + (!shield.indentFirstLetter ? " noIndent" : "");
+            "bannerB" +
+            (!(shield.indentFirstLetter2 ?? shield.indentFirstLetter)
+              ? " noIndent"
+              : "");
           bannerElmt2.style = "--fontSize:" + shield.fontSize;
           bannerContainerElmt2.appendChild(bannerElmt2);
 
@@ -1638,9 +2086,9 @@ const app = (function () {
 
       function monitorActionMessage(i, p) {
         /*
-					i: Array
-					p: Parent (element)
-				*/
+          i: Array
+          p: Parent (element)
+        */
 
         if (i.actionMessage != "") {
           if (post.fontType == true) {
@@ -1780,9 +2228,8 @@ const app = (function () {
       signElmt.appendChild(g_bottom);
 
       const g_shieldsContainerElmt = document.createElement("div");
-      g_shieldsContainerElmt.className = `shieldsContainer ${
-        panel.sign.shieldBacks ? "shieldBacks" : ""
-      }`;
+      g_shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""
+        }`;
 
       createShield(panel.sign.shields, g_shieldsContainerElmt);
 
@@ -1860,12 +2307,34 @@ const app = (function () {
       arrowContElmt.className = `arrowContainer`;
       guideArrowsElmt.appendChild(arrowContElmt);
 
+      // APL Arrows Container
+      const aplArrowsElmt = document.createElement("div");
+      aplArrowsElmt.className = "aplArrows";
+      signCont.appendChild(aplArrowsElmt);
+
       const sideLeftArrowElmt = document.createElement("img");
       sideLeftArrowElmt.className = "sideLeftArrow";
       sideLeftArrowElmt.src = "img/arrows/A-4.svg";
       signHolderElmt.appendChild(sideLeftArrowElmt);
 
       // subpanels
+
+      // Calculate APL arrow groups before the loop
+      const aplArrows = panel.sign.aplArrows || [];
+      let arrowGroups = [];
+      if (aplArrows.length > 0) {
+        let currentGroup = [];
+        for (let ai = 0; ai < aplArrows.length; ai++) {
+          currentGroup.push({ arrow: aplArrows[ai], index: ai });
+          if (aplArrows[ai].dividerAfter && ai < aplArrows.length - 1) {
+            arrowGroups.push(currentGroup);
+            currentGroup = [];
+          }
+        }
+        if (currentGroup.length > 0) {
+          arrowGroups.push(currentGroup);
+        }
+      }
 
       for (
         let subPanelIndex = 0;
@@ -1880,6 +2349,33 @@ const app = (function () {
           const subDivider = document.createElement("div");
           subDivider.className = "subDivider";
           subDivider.id = "subDivider" + subPanelIndex.toString();
+
+          // Check for grouped divider arrow
+          if (arrowGroups.length > 0 && subPanelIndex - 1 < arrowGroups.length) {
+            const prevGroup = arrowGroups[subPanelIndex - 1];
+            if (prevGroup.length > 0) {
+              const lastArrowOfPrevGroup = prevGroup[prevGroup.length - 1].arrow;
+              if (lastArrowOfPrevGroup.groupedWithDivider) {
+                const arrowDef = ArrowElement.prototype.arrows[lastArrowOfPrevGroup.type];
+                if (arrowDef) {
+                  const divArrowImg = document.createElement("img");
+                  divArrowImg.className = "aplDividerArrow";
+                  divArrowImg.dataset.type = lastArrowOfPrevGroup.type;
+                  divArrowImg.src = arrowDef.src;
+                  divArrowImg.alt = arrowDef.label;
+
+                  // Flip divider arrow if the arrow is flipped
+                  if (lastArrowOfPrevGroup.flip) {
+                    divArrowImg.style.transform = "scaleX(-1)";
+                  }
+
+                  subDivider.appendChild(divArrowImg);
+                  subDivider.classList.add("hasArrow");
+                }
+              }
+            }
+          }
+
           const dividerHeight = (subPanel && subPanel.height) || "";
           if (
             subPanel &&
@@ -1904,12 +2400,11 @@ const app = (function () {
         signContentContainerElmt.className = `signContentContainer shieldPosition${panel.sign.shieldPosition}`;
         signContentContainerElmt.id =
           "signContentContainer" + subPanelIndex.toString();
-        signHolderElmt.appendChild(signContentContainerElmt);
+        new_subPanel.appendChild(signContentContainerElmt);
 
         const shieldsContainerElmt = document.createElement("div");
-        shieldsContainerElmt.className = `shieldsContainer ${
-          panel.sign.shieldBacks ? "shieldBacks" : ""
-        }`;
+        shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""
+          }`;
         shieldsContainerElmt.id = "shieldsContainer" + subPanelIndex.toString();
         signContentContainerElmt.appendChild(shieldsContainerElmt);
 
@@ -1930,6 +2425,7 @@ const app = (function () {
           panel,
           subPanel
         );
+        blockElement.dataset.subpanel = subPanelIndex;
         signContentContainerElmt.appendChild(blockElement);
 
         // Shields
@@ -1937,6 +2433,71 @@ const app = (function () {
 
         // sign
         signContentContainerElmt.style.padding = panel.sign.padding;
+
+        // APL Arrows for this subpanel - always create container if APL arrows exist on sign
+        if (panel.sign.aplArrows && panel.sign.aplArrows.length > 0) {
+          const subPanelArrowContainer = document.createElement("div");
+          subPanelArrowContainer.className = "aplArrows subpanelAplArrows";
+          subPanelArrowContainer.style.display = "flex";
+          // subPanelArrowContainer.style.justifyContent = "center"; // Moved to CSS
+          subPanelArrowContainer.style.gap = "0";
+
+          // Only add arrows if this subpanel has an arrow group
+          if (arrowGroups.length > 0 && subPanelIndex < arrowGroups.length) {
+            const arrowGroup = arrowGroups[subPanelIndex];
+            for (let gi = 0; gi < arrowGroup.length; gi++) {
+              const arrowData = arrowGroup[gi];
+              const arrow = arrowData.arrow;
+
+              const arrowDef = ArrowElement.prototype.arrows[arrow.type];
+              if (arrowDef) {
+                const arrowImg = document.createElement("img");
+                arrowImg.className = "aplArrow";
+                arrowImg.dataset.type = arrow.type;
+                arrowImg.src = arrowDef.src;
+                arrowImg.alt = arrowDef.label;
+
+                // If this arrow is grouped with divider, make it invisible but keep space
+                if (arrow.groupedWithDivider) {
+                  arrowImg.style.visibility = "hidden";
+                }
+
+                if (arrow.flip) {
+                  arrowImg.style.transform = "scaleX(-1)";
+                }
+
+                if (arrow.exitOnly) {
+                  const container = document.createElement("div");
+                  container.className = "aplExitOnlyContainer";
+                  container.dataset.arrowType = arrow.type;
+                  if (arrow.flip) {
+                    container.dataset.flipped = "true";
+                  }
+
+                  const exitSpan = document.createElement("span");
+                  exitSpan.className = "aplExitOnlyLabel aplExitOnlyExit";
+                  exitSpan.textContent = "EXIT";
+
+                  const onlySpan = document.createElement("span");
+                  onlySpan.className = "aplExitOnlyLabel aplExitOnlyOnly";
+                  onlySpan.textContent = "ONLY";
+
+                  container.appendChild(exitSpan);
+                  arrowImg.style.margin = "0"; // Remove margins from arrow
+                  container.appendChild(arrowImg);
+                  container.appendChild(onlySpan);
+
+                  subPanelArrowContainer.appendChild(container);
+                } else {
+                  subPanelArrowContainer.appendChild(arrowImg);
+                }
+              }
+            }
+          }
+
+          new_subPanel.appendChild(subPanelArrowContainer);
+        }
+
         /*
         monitorControlText(subPanel, controlTextElmt);
 
@@ -2242,11 +2803,11 @@ const app = (function () {
 
           /*
 
-						if (panel.sign.advisoryMessage) {
-							actionMessageElmt.style.fontFamily = "Series E";
-						}
-					
-					*/
+            if (panel.sign.advisoryMessage) {
+              actionMessageElmt.style.fontFamily = "Series E";
+            }
+        	
+          */
 
           // Interlase arrows and the words EXIT and ONLY, ensuring
           //   EXIT ONLY is centered between all the arrows.
@@ -2288,47 +2849,118 @@ const app = (function () {
               // Evens
               if (length % 2 == 0) {
                 if (arrowIndex == Math.floor(length / 2)) {
-                  if (shouldRenderLabel(exitOnlyLabelFull)) {
-                    const textExitOnlySpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textExitOnlySpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelFull)
-                      );
-
-                      var bonus = "";
-
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
-
-                      textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textExitOnlySpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀")
-                      );
-                      textExitOnlySpanElmt.className = "exitOnlyText";
-                    }
-                    path.appendChild(textExitOnlySpanElmt);
-                  }
-
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly"
-                      )
-                    );
+                  if (length == 2 && panel.sign.guideArrow == "Exit Only") {
                   } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1])
-                    );
+                    if (shouldRenderLabel(exitOnlyLabelFull)) {
+                      const textExitOnlySpanElmt = document.createElement("span");
+                      if (panel.sign.showExitOnly == false) {
+                        textExitOnlySpanElmt.appendChild(
+                          document.createTextNode(exitOnlyLabelFull)
+                        );
+
+                        var bonus = "";
+
+                        if (panel.sign.guideArrow == "Split Exit Only") {
+                          bonus = " yellowElmt";
+                        }
+
+                        textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
+                      } else {
+                        textExitOnlySpanElmt.appendChild(
+                          document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀")
+                        );
+                        textExitOnlySpanElmt.className = "exitOnlyText";
+                      }
+                      path.appendChild(textExitOnlySpanElmt);
+                    }
+
+                    if (panel.sign.guideArrow == "Split Exit Only") {
+                      path.appendChild(
+                        createArrowElmt(
+                          panel.sign.exitguideArrows.split(":")[1],
+                          "MainArrows!ExitOnly"
+                        )
+                      );
+                    } else {
+                      path.appendChild(
+                        createArrowElmt(panel.sign.exitguideArrows.split(":")[1])
+                      );
+                    }
+
+                    if (arrowIndex + 1 < length && length != 2) {
+                      const space = document.createElement("span");
+                      space.className = "exitOnlySpace";
+                      path.appendChild(space);
+                    }
+                  }
+                } else if (
+                  length == 2 &&
+                  panel.sign.guideArrow == "Exit Only"
+                ) {
+                  // Special handling for 2 arrows Exit Only
+                  const arrowPos = (
+                    panel.sign.arrowPosition || "Middle"
+                  ).toLowerCase();
+
+                  let arrowEl1 = createArrowElmt(
+                    panel.sign.exitguideArrows.split(":")[1]
+                  );
+                  let arrowEl2 = createArrowElmt(
+                    panel.sign.exitguideArrows.split(":")[1]
+                  );
+
+                  let leftTextEl = null;
+                  if (shouldRenderLabel(exitOnlyLabelLeft)) {
+                    leftTextEl = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      leftTextEl.appendChild(
+                        document.createTextNode(exitOnlyLabelLeft)
+                      );
+                      leftTextEl.className = "exitOnlyText";
+                    } else {
+                      leftTextEl.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀")
+                      );
+                      leftTextEl.className = "exitOnlyText";
+                    }
                   }
 
-                  if (arrowIndex + 1 < length && length != 2) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
+                  let rightTextEl = null;
+                  if (shouldRenderLabel(exitOnlyLabelRight)) {
+                    rightTextEl = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      rightTextEl.appendChild(
+                        document.createTextNode(exitOnlyLabelRight)
+                      );
+                      rightTextEl.className = "exitOnlyText";
+                    } else {
+                      rightTextEl.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀")
+                      );
+                      rightTextEl.className = "exitOnlyText";
+                    }
                   }
+
+                  if (arrowPos === "left") {
+                    // (arrow) EXIT (arrow) ONLY
+                    if (arrowEl1) path.appendChild(arrowEl1);
+                    if (leftTextEl) path.appendChild(leftTextEl);
+                    if (arrowEl2) path.appendChild(arrowEl2);
+                    if (rightTextEl) path.appendChild(rightTextEl);
+                  } else if (arrowPos === "right") {
+                    // EXIT (arrow) ONLY (arrow)
+                    if (leftTextEl) path.appendChild(leftTextEl);
+                    if (arrowEl1) path.appendChild(arrowEl1);
+                    if (rightTextEl) path.appendChild(rightTextEl);
+                    if (arrowEl2) path.appendChild(arrowEl2);
+                  } else {
+
+                    if (arrowEl1) path.appendChild(arrowEl1);
+                    if (leftTextEl) path.appendChild(leftTextEl);
+                    if (rightTextEl) path.appendChild(rightTextEl);
+                    if (arrowEl2) path.appendChild(arrowEl2);
+                  }
+
                 } else {
                   if (panel.sign.guideArrow == "Split Exit Only") {
                     path.appendChild(
@@ -2356,10 +2988,11 @@ const app = (function () {
               } else {
                 // Odds
                 if (arrowIndex == Math.floor(length / 2)) {
+                  let leftTextEl = null;
                   if (shouldRenderLabel(exitOnlyLabelLeft)) {
-                    const textExitSpanElmt = document.createElement("span");
+                    leftTextEl = document.createElement("span");
                     if (panel.sign.showExitOnly == false) {
-                      textExitSpanElmt.appendChild(
+                      leftTextEl.appendChild(
                         document.createTextNode(exitOnlyLabelLeft)
                       );
 
@@ -2369,34 +3002,32 @@ const app = (function () {
                         bonus = " yellowElmt";
                       }
 
-                      textExitSpanElmt.className = "exitOnlyText" + bonus;
+                      leftTextEl.className = "exitOnlyText" + bonus;
                     } else {
-                      textExitSpanElmt.appendChild(
+                      leftTextEl.appendChild(
                         document.createTextNode("⠀⠀⠀⠀")
                       );
-                      textExitSpanElmt.className = "exitOnlyText";
+                      leftTextEl.className = "exitOnlyText";
                     }
-
-                    path.appendChild(textExitSpanElmt);
                   }
 
+                  let arrowEl = null;
                   if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly"
-                      )
+                    arrowEl = createArrowElmt(
+                      panel.sign.exitguideArrows.split(":")[1],
+                      "MainArrows!ExitOnly"
                     );
                   } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1])
+                    arrowEl = createArrowElmt(
+                      panel.sign.exitguideArrows.split(":")[1]
                     );
                   }
 
+                  let rightTextEl = null;
                   if (shouldRenderLabel(exitOnlyLabelRight)) {
-                    const textOnlySpanElmt = document.createElement("span");
+                    rightTextEl = document.createElement("span");
                     if (panel.sign.showExitOnly == false) {
-                      textOnlySpanElmt.appendChild(
+                      rightTextEl.appendChild(
                         document.createTextNode(exitOnlyLabelRight)
                       );
 
@@ -2406,14 +3037,33 @@ const app = (function () {
                         bonus = " yellowElmt";
                       }
 
-                      textOnlySpanElmt.className = "exitOnlyText" + bonus;
+                      rightTextEl.className = "exitOnlyText" + bonus;
                     } else {
-                      textOnlySpanElmt.appendChild(
+                      rightTextEl.appendChild(
                         document.createTextNode("⠀⠀⠀⠀")
                       );
-                      textOnlySpanElmt.className = "exitOnlyText";
+                      rightTextEl.className = "exitOnlyText";
                     }
-                    path.appendChild(textOnlySpanElmt);
+                  }
+
+                  const isExitOnlySingle =
+                    panel.sign.guideArrow == "Exit Only" && length == 1;
+                  const arrowPos = isExitOnlySingle
+                    ? (panel.sign.arrowPosition || "Middle").toLowerCase()
+                    : "middle";
+
+                  if (arrowPos === "left") {
+                    if (arrowEl) path.appendChild(arrowEl);
+                    if (leftTextEl) path.appendChild(leftTextEl);
+                    if (rightTextEl) path.appendChild(rightTextEl);
+                  } else if (arrowPos === "right") {
+                    if (leftTextEl) path.appendChild(leftTextEl);
+                    if (rightTextEl) path.appendChild(rightTextEl);
+                    if (arrowEl) path.appendChild(arrowEl);
+                  } else {
+                    if (leftTextEl) path.appendChild(leftTextEl);
+                    if (arrowEl) path.appendChild(arrowEl);
+                    if (rightTextEl) path.appendChild(rightTextEl);
                   }
                 } else if (arrowIndex == Math.ceil(length / 2)) {
                   if (panel.sign.guideArrow == "Split Exit Only") {
@@ -2544,6 +3194,15 @@ const app = (function () {
         default:
       }
 
+      // APL Arrows Rendering
+      // aplArrows is already defined above
+      if (aplArrows.length > 0) {
+        // Extend sign bottom for APL arrows (like guide arrows)
+        signElmt.style.borderBottomWidth = "0";
+        signElmt.style.width = "100%";
+        // APL arrows are now rendered inside subpanels
+      }
+
       var width = signCont.clientWidth;
       var exitWidth = firstExitTab.clientWidth;
 
@@ -2567,6 +3226,7 @@ const app = (function () {
     setSelectedRow,
     setSelectedControlElem,
     moveControlElem,
+    moveRow,
     changeEditingPanel,
     movePanel,
     newPanel,
@@ -2584,6 +3244,20 @@ const app = (function () {
     duplicateBlockIntoNewRow,
     deleteShield,
     duplicateShield,
+    addAPLArrow,
+    removeAPLArrow,
+    selectAPLArrow,
+    updateAPLArrowType,
+    toggleAPLArrowFlip,
+    addAPLDivider,
+    setAPLGroupedWithDivider: (index, grouped) => {
+      getCurrentPanel().sign.setAPLGroupedWithDivider(index, grouped);
+      redraw();
+    },
+    setAPLExitOnly: (index, isExitOnly) => {
+      getCurrentPanel().sign.setAPLExitOnly(index, isExitOnly);
+      redraw();
+    },
     vars: {
       get currentlySelectedPanelIndex() {
         return currentlySelectedPanelIndex;
@@ -2603,6 +3277,9 @@ const app = (function () {
       get currentlySelectedBlockIndex() {
         return currentlySelectedBlockIndex;
       },
+      get currentlySelectedAPLArrowIndex() {
+        return currentlySelectedAPLArrowIndex;
+      },
     },
   };
 
@@ -2618,11 +3295,7 @@ const app = (function () {
     if (typeof post.panelSpacing !== "number" || post.panelSpacing < 0) {
       post.panelSpacing = 0;
     }
-    if (typeof post.normalizeThickness === "function") {
-      post.thickness = post.normalizeThickness(post.thickness);
-    } else {
-      post.thickness = normalizePostThickness(post.thickness);
-    }
+    post.thickness = post.normalizeThickness(post.thickness);
     currentlySelectedPanelIndex = 0;
     formHandler.updateForm();
     redraw();
@@ -2648,6 +3321,8 @@ const app = (function () {
     updatePreview: updatePreview,
     updateFileType: updateFileType,
     resetPadding: resetPadding,
+    duplicateControlElem: duplicateControlElem,
+    applyTemplate: applyTemplate,
     newExitTab: newExitTab,
     duplicateExitTab: duplicateExitTab,
     removeExitTab: removeExitTab,

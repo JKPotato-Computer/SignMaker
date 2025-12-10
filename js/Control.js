@@ -121,8 +121,8 @@ class TextElement {
       this.backgroundColor == "Inherit"
         ? ""
         : (
-            lib.colors[this.backgroundColor] || this.backgroundColor
-          ).toLowerCase()
+          lib.colors[this.backgroundColor] || this.backgroundColor
+        ).toLowerCase()
     );
     newText.style.setProperty("--alignment", this.alignment);
     newText.style.setProperty("--numeralSize", this.numeralFormattingSize);
@@ -197,7 +197,11 @@ TextElement.prototype.backgroundColor = ["Inherit"].concat(
 
 class ControlTextElement extends TextElement {
   constructor(options = {}) {
-    const { spacing = 0, smallCapitals = false } = options;
+    const {
+      spacing = 0,
+      smallCapitals = false,
+      textColor = ControlTextElement.defaultTextColor,
+    } = options;
     const resolvedOptions = { ...options };
     const availableFonts =
       TextElement && TextElement.prototype
@@ -220,6 +224,10 @@ class ControlTextElement extends TextElement {
     super(resolvedOptions);
     this.spacing = spacing;
     this.smallCapitals = smallCapitals;
+    this.textColor =
+      typeof textColor === "string" && textColor.trim().length
+        ? textColor
+        : ControlTextElement.defaultTextColor;
   }
 
   createElement(panel) {
@@ -227,48 +235,58 @@ class ControlTextElement extends TextElement {
     newText.style.setProperty("--spacing", this.spacing + "rem");
     newText.style.fontVariant = this.smallCapitals ? "small-caps" : "normal";
     newText.classList.add("bE-controlTextElement");
+
+    const shouldOverrideTextColor =
+      typeof this.textColor === "string" &&
+      this.textColor.trim().length > 0 &&
+      this.textColor !== ControlTextElement.defaultTextColor;
+    if (shouldOverrideTextColor) {
+      const resolvedTextColor =
+        (lib?.colors && lib.colors[this.textColor]) || this.textColor;
+      if (typeof resolvedTextColor === "string") {
+        newText.style.color = resolvedTextColor.toLowerCase();
+      } else if (resolvedTextColor) {
+        newText.style.color = resolvedTextColor;
+      }
+    }
+
     return newText;
   }
 }
 
-ControlTextElement.defaultFont = Array.isArray(
-  TextElement && TextElement.prototype ? TextElement.prototype.fontFamily : null
+ControlTextElement.defaultFont = TextElement.prototype.fontFamily.includes(
+  "Clearview 5WR"
 )
-  ? TextElement.prototype.fontFamily.includes("Clearview 5WR")
-    ? "Clearview 5WR"
-    : TextElement.prototype.fontFamily[0]
-  : "Clearview 5WR";
+  ? "Clearview 5WR"
+  : TextElement.prototype.fontFamily[0];
 
 ControlTextElement.getDefaultFont = function () {
-  const availableFonts =
-    TextElement && TextElement.prototype
-      ? TextElement.prototype.fontFamily
-      : null;
-  const fallback = Array.isArray(availableFonts) ? availableFonts[0] : null;
-  const currentDefault = ControlTextElement.defaultFont || fallback;
-  if (
-    currentDefault &&
-    Array.isArray(availableFonts) &&
-    availableFonts.includes(currentDefault)
-  ) {
-    return currentDefault;
-  }
-  return fallback || "Clearview 5WR";
+  const availableFonts = TextElement.prototype.fontFamily;
+  const currentDefault = ControlTextElement.defaultFont || availableFonts[0];
+  return availableFonts.includes(currentDefault)
+    ? currentDefault
+    : availableFonts[0];
 };
 
 ControlTextElement.setDefaultFont = function (font) {
-  const availableFonts =
-    TextElement && TextElement.prototype
-      ? TextElement.prototype.fontFamily
-      : null;
-  if (!font || !Array.isArray(availableFonts) || !availableFonts.length) {
-    return false;
-  }
-  if (!availableFonts.includes(font)) {
+  const availableFonts = TextElement.prototype.fontFamily;
+  if (!font || !availableFonts.includes(font)) {
     return false;
   }
   ControlTextElement.defaultFont = font;
   return true;
+};
+
+ControlTextElement.defaultTextColor = "Match BG";
+ControlTextElement.getTextColorOptions = function () {
+  const palette = Object.keys(lib.colors);
+  const options = [ControlTextElement.defaultTextColor];
+  for (const color of palette) {
+    if (!options.includes(color)) {
+      options.push(color);
+    }
+  }
+  return options;
 };
 
 class ActionMessageElement extends TextElement {
@@ -358,7 +376,10 @@ class ElectronicSignElement extends TextElement {
   }
 }
 ElectronicSignElement.prototype.fontFamily =
-  TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
+  TextElement.prototype.fontFamily.concat([
+    "Electronic Highway Sign",
+    "Modern VMS",
+  ]);
 ElectronicSignElement.prototype.textColors = [
   "Orange",
   "White",
@@ -366,20 +387,696 @@ ElectronicSignElement.prototype.textColors = [
   "Red",
 ];
 
+// TEMP: Block-specific shield support will be replaced when the main shield
 class ShieldElement extends Shield {
-  constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {
+  constructor({
+    shieldBase,
+    shieldType,
+    routeNumber = "1",
+    type,
+    specialBannerType,
+    to = false,
+    bannerType = ShieldElement.prototype.defaultBannerType,
+    bannerType2 = ShieldElement.prototype.defaultBannerType,
+    bannerPosition = ShieldElement.prototype.defaultBannerPosition,
+    bannerPosition2 = ShieldElement.prototype.defaultBannerPosition,
+    indentFirstLetter = true,
+    indentFirstLetter2 = undefined,
+    smallCaps = true,
+    smallCaps2 = undefined,
+    fontSize = ShieldElement.prototype.defaultBannerFontSize,
+    bannerFontFamily = ShieldElement.prototype.defaultBannerFontFamily,
+    countyText = "",
+    shieldSize,
+    scaleBannersWithShield = ShieldElement.prototype.defaultScaleBannersWithShield,
+    size,
+  } = {}) {
     super();
-    this.type = shieldBase;
-    this.specialBannerType = shieldType;
-    this.routeNumber = routeNumber;
+    const resolvedBase =
+      shieldBase || type || ShieldElement.prototype.defaultShieldBase;
+    const resolvedVariant =
+      shieldType || specialBannerType || ShieldElement.prototype.defaultVariant;
+
+    this.shieldBase = resolvedBase;
+    this.shieldType = resolvedVariant;
+    this.routeNumber =
+      `${routeNumber ?? ""}`.trim() ||
+      ShieldElement.prototype.defaultRouteNumber;
+
+    this.to = !!to;
+    this.indentFirstLetter = indentFirstLetter !== false;
+    const normalizedIndentSecond =
+      indentFirstLetter2 !== undefined ? indentFirstLetter2 : indentFirstLetter;
+    this.indentFirstLetter2 = normalizedIndentSecond !== false;
+    this.smallCaps = smallCaps !== false;
+    const normalizedSmallCapsSecond =
+      smallCaps2 !== undefined ? smallCaps2 : smallCaps;
+    this.smallCaps2 = normalizedSmallCapsSecond !== false;
+    this.bannerType = ShieldElement.prototype.normalizeBannerType(bannerType);
+    this.bannerType2 = ShieldElement.prototype.normalizeBannerType(bannerType2);
+    this.bannerPosition = ShieldElement.prototype.normalizeBannerPosition(
+      bannerPosition
+    );
+    this.bannerPosition2 = ShieldElement.prototype.normalizeBannerPosition(
+      bannerPosition2 || bannerPosition
+    );
+    this.fontSize = ShieldElement.prototype.normalizeFontSize(fontSize);
+    this.bannerFontFamily =
+      ShieldElement.prototype.normalizeBannerFontFamily(bannerFontFamily);
+    this.countyText = typeof countyText === "string" ? countyText : "";
+    this.shieldSize = ShieldElement.prototype.normalizeShieldSize(
+      shieldSize !== undefined ? shieldSize : size
+    );
+    this.scaleBannersWithShield = scaleBannersWithShield !== false;
+
+    // Legacy properties used by older save data and helpers
+    this.type = resolvedBase;
+    this.specialBannerType = "None";
+  }
+
+  createElement() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "bE-shieldElement";
+
+    if (this.to) {
+      const toEl = document.createElement("p");
+      toEl.className = "to";
+      toEl.textContent = "TO";
+      toEl.style.display = "inline";
+      wrapper.appendChild(toEl);
+    }
+
+    const config = ShieldElement.prototype.getBlockShieldConfig(
+      this.shieldBase
+    );
+    const normalizedRoute = `${this.routeNumber ?? ""}`.trim();
+    const routeText = normalizedRoute;
+    const variant = ShieldElement.prototype.resolveBlockVariant(
+      this.shieldType,
+      routeText,
+      config
+    );
+    const variantKey = ShieldElement.prototype.formatVariantKey(variant);
+    const shieldPath = ShieldElement.prototype.getShieldAssetPath(
+      config,
+      variantKey
+    );
+    const normalizedShieldSize = ShieldElement.prototype.normalizeShieldSize(
+      this.shieldSize
+    );
+    const shieldScale =
+      ShieldElement.prototype.getShieldScale(normalizedShieldSize);
+    const bannerScale = this.scaleBannersWithShield ? shieldScale : 1;
+    const fontSizeCss = ShieldElement.prototype.getFontSizeCss(this.fontSize);
+    const bannerFontFamily =
+      ShieldElement.prototype.normalizeBannerFontFamily(this.bannerFontFamily);
+    wrapper.style.setProperty("--shieldScale", shieldScale.toString());
+    wrapper.style.setProperty(
+      "--shieldSize",
+      normalizedShieldSize + "rem"
+    );
+    wrapper.style.setProperty("--bannerScale", bannerScale.toString());
+
+    const shieldContainer = document.createElement("div");
+    const containerClass = config.className || config.value;
+    shieldContainer.className = `bannerShieldContainer ${containerClass}`;
+    const containerSizeClass = ShieldElement.prototype.getContainerSizeClass(
+      routeText
+    );
+    if (containerSizeClass) {
+      shieldContainer.classList.add(containerSizeClass);
+    }
+
+    const hasBannerA = ShieldElement.prototype.hasBannerValue(this.bannerType);
+    const hasBannerB = ShieldElement.prototype.hasBannerValue(this.bannerType2);
+    const normalizedBannerPosition =
+      ShieldElement.prototype.normalizeBannerPosition(this.bannerPosition);
+    const normalizedBannerPosition2 =
+      ShieldElement.prototype.normalizeBannerPosition(this.bannerPosition2);
+    const shouldStackSamePosition =
+      hasBannerA &&
+      hasBannerB &&
+      normalizedBannerPosition === normalizedBannerPosition2;
+
+    if (shouldStackSamePosition) {
+      const stackedBannerSlot =
+        ShieldElement.prototype.createStackedBannerSlot(
+          normalizedBannerPosition,
+          [
+            {
+              bannerClass: "bannerA",
+              bannerValue: this.bannerType,
+              containerClass: "bannerContainer",
+              indentFirstLetter: this.indentFirstLetter,
+              smallCaps: this.smallCaps,
+            },
+            {
+              bannerClass: "bannerB",
+              bannerValue: this.bannerType2,
+              containerClass: "bannerContainer2",
+              indentFirstLetter: this.indentFirstLetter2,
+              smallCaps: this.smallCaps2,
+            },
+          ],
+          fontSizeCss,
+          fontSizeCss,
+          this.indentFirstLetter,
+          bannerFontFamily,
+          this.smallCaps
+        );
+      shieldContainer.appendChild(stackedBannerSlot);
+    } else if (hasBannerA) {
+      const bannerContainerElmt = ShieldElement.prototype.createBannerContainer(
+        "bannerContainer",
+        "bannerA",
+        this.bannerType,
+        fontSizeCss,
+        this.indentFirstLetter,
+        bannerFontFamily,
+        false,
+        normalizedBannerPosition,
+        this.smallCaps
+      );
+      shieldContainer.appendChild(bannerContainerElmt);
+    }
+
+    const shieldEl = document.createElement("div");
+    shieldEl.className = "shield";
+
+    const img = document.createElement("img");
+    img.className = "shieldImg";
+    const imageSizeClass = ShieldElement.prototype.getImageSizeClass(routeText);
+    if (imageSizeClass) {
+      img.classList.add(imageSizeClass);
+    }
+    img.src = shieldPath;
+    img.alt = `${config.label} shield`;
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.draggable = false;
+    shieldEl.appendChild(img);
+
+    const routeEl = document.createElement("p");
+    routeEl.className = "routeNumber";
+    routeEl.textContent = routeText;
+
+    if (ShieldElement.prototype.isCountyShield(config)) {
+      const countyLabel = document.createElement("p");
+      countyLabel.className = "countyLabel";
+      countyLabel.textContent = (this.countyText || "").trim().toUpperCase();
+      if (countyLabel.textContent.length > 0) {
+        shieldEl.appendChild(countyLabel);
+      }
+    }
+
+    shieldEl.appendChild(routeEl);
+
+    shieldContainer.appendChild(shieldEl);
+
+    if (!shouldStackSamePosition && hasBannerB) {
+      const bannerContainerElmt2 = ShieldElement.prototype.createBannerContainer(
+        "bannerContainer2",
+        "bannerB",
+        this.bannerType2,
+        fontSizeCss,
+        this.indentFirstLetter2,
+        bannerFontFamily,
+        true,
+        normalizedBannerPosition2,
+        this.smallCaps2
+      );
+      shieldContainer.appendChild(bannerContainerElmt2);
+    }
+
+    if (!hasBannerA && !hasBannerB) {
+      shieldContainer.classList.add("noBanners");
+    }
+
+    wrapper.appendChild(shieldContainer);
+
+    return wrapper;
   }
 }
+
+ShieldElement.prototype.defaultShieldBase = "I";
+ShieldElement.prototype.defaultVariant = "Auto";
+ShieldElement.prototype.defaultRouteNumber = "1";
+ShieldElement.prototype.defaultBannerType = "None";
+ShieldElement.prototype.defaultBannerPosition = "Above";
+ShieldElement.prototype.defaultBannerFontSize = 1.4;
+ShieldElement.prototype.defaultBannerFontFamily = "Series E";
+ShieldElement.prototype.defaultCountyText = "";
+ShieldElement.prototype.defaultShieldSize = 3;
+ShieldElement.prototype.defaultScaleBannersWithShield = true;
+
+ShieldElement.prototype.normalizeShieldCode = function (code) {
+  if (typeof code !== "string") {
+    return "";
+  }
+  return code.replace(/\s+/g, "").replace(/2nd$/i, "2");
+};
+
+ShieldElement.prototype.formatVariantKey = function (variant) {
+  if (typeof variant !== "string") {
+    return "";
+  }
+  return variant.replace(/\s+/g, "");
+};
+
+ShieldElement.prototype.getShieldClassNames = function (code) {
+  const normalized = ShieldElement.prototype.normalizeShieldCode(code);
+  if (!normalized) {
+    return "";
+  }
+
+  if (normalized.includes("-")) {
+    const [base, ...rest] = normalized.split("-");
+    const modifier = rest.join("-").toLowerCase();
+    return modifier ? `${base} ${modifier}` : base;
+  }
+
+  const prefixedModifiers = [
+    "FL",
+    "GA",
+    "NE",
+    "NB",
+    "NS",
+    "TX",
+  ];
+  const matchedPrefix = prefixedModifiers.find(
+    (prefix) => normalized.startsWith(prefix) && normalized.length > prefix.length
+  );
+
+  if (matchedPrefix && !/\d/.test(normalized.slice(matchedPrefix.length))) {
+    const modifier = normalized.slice(matchedPrefix.length).toLowerCase();
+    return modifier ? `${matchedPrefix} ${modifier}` : matchedPrefix;
+  }
+
+  return normalized;
+};
+
+ShieldElement.prototype.buildBlockShieldList = function () {
+  const shields = [];
+  const directory = Shield.prototype.shieldDirectory;
+
+  const traverse = (node, pathParts = []) => {
+    if (!node || typeof node !== "object") {
+      return;
+    }
+    for (const [key, value] of Object.entries(node)) {
+      if (!value || typeof value !== "object") {
+        continue;
+      }
+      if (value.type === "category") {
+        traverse(value, pathParts.concat(key));
+      } else if (value.type === "shield") {
+        const normalizedCode = ShieldElement.prototype.normalizeShieldCode(key);
+        const variants = Array.isArray(value.variants) ? value.variants.slice() : [];
+        shields.push({
+          value: normalizedCode,
+          label: value.name || normalizedCode,
+          variants,
+          assetFolder: ["img/shields"].concat(pathParts).join("/"),
+          className: ShieldElement.prototype.getShieldClassNames(normalizedCode),
+          assetName: normalizedCode,
+          categories: pathParts.slice(),
+        });
+      }
+    }
+  };
+
+  traverse(directory);
+
+  const ensureShield = (value, label, variants, assetFolder, categories = []) => {
+    const normalizedValue = ShieldElement.prototype.normalizeShieldCode(value);
+    if (
+      shields.some(
+        (shield) =>
+          ShieldElement.prototype.normalizeShieldCode(shield.value) ===
+          normalizedValue
+      )
+    ) {
+      return;
+    }
+    shields.push({
+      value: normalizedValue,
+      label: label || normalizedValue,
+      variants: variants || [],
+      assetFolder,
+      className: ShieldElement.prototype.getShieldClassNames(normalizedValue),
+      assetName: normalizedValue,
+      categories,
+    });
+  };
+
+  ensureShield(
+    "cir",
+    "Circle",
+    ["2 Digit", "3 Digit"],
+    "img/shields/United States",
+    ["United States"]
+  );
+  ensureShield(
+    "elp",
+    "Ellipse",
+    ["2 Digit", "3 Digit"],
+    "img/shields/United States",
+    ["United States"]
+  );
+  ensureShield(
+    "rec",
+    "Rectangle",
+    ["2 Digit", "3 Digit"],
+    "img/shields/United States",
+    ["United States"]
+  );
+  ensureShield(
+    "rec2",
+    "Rectangle (Alt)",
+    ["2 Digit", "3 Digit"],
+    "img/shields/United States",
+    ["United States"]
+  );
+
+  return shields;
+};
+
+ShieldElement.prototype.buildBlockShieldVariants = function (shields) {
+  const variants = new Set(["Auto"]);
+  (shields || []).forEach((shield) => {
+    (shield.variants || []).forEach((variant) => variants.add(variant));
+  });
+  return Array.from(variants).map((variant) => ({
+    value: variant,
+    label: variant,
+  }));
+};
+
+(() => {
+  const shields = ShieldElement.prototype.buildBlockShieldList();
+  ShieldElement.prototype.blockShieldBases = shields;
+  ShieldElement.prototype.blockShieldVariants =
+    ShieldElement.prototype.buildBlockShieldVariants(shields);
+  if (shields.length && shields[0].value) {
+    ShieldElement.prototype.defaultShieldBase = shields[0].value;
+  }
+})();
+ShieldElement.prototype.blockBannerPositions = [
+  "Above",
+  "Below",
+  "Left",
+  "Right",
+];
+
+ShieldElement.prototype.getBannerPositionOptions = function () {
+  return ShieldElement.prototype.blockBannerPositions;
+};
+
+ShieldElement.prototype.getBannerFontOptions = function () {
+  return TextElement.prototype.fontFamily;
+};
+
+ShieldElement.prototype.normalizeBannerType = function (value) {
+  const options = Shield.prototype.bannerTypes || [];
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  if (!trimmed) {
+    return ShieldElement.prototype.defaultBannerType;
+  }
+  if (!options.length || options.includes(trimmed)) {
+    return trimmed;
+  }
+  return trimmed;
+};
+
+ShieldElement.prototype.normalizeBannerPosition = function (value) {
+  const options = ShieldElement.prototype.getBannerPositionOptions();
+  if (typeof value === "string" && options.includes(value)) {
+    return value;
+  }
+  return ShieldElement.prototype.defaultBannerPosition;
+};
+
+ShieldElement.prototype.normalizeBannerFontFamily = function (value) {
+  const options = ShieldElement.prototype.getBannerFontOptions();
+  if (typeof value === "string" && options.includes(value)) {
+    return value;
+  }
+  return (
+    ShieldElement.prototype.defaultBannerFontFamily ||
+    (options.length ? options[0] : "")
+  );
+};
+
+ShieldElement.prototype.normalizeFontSize = function (value) {
+  const parsed = parseFloat(
+    typeof value === "string" ? value.replace(/rem$/i, "") : value
+  );
+  if (Number.isFinite(parsed)) {
+    return Math.max(parsed, 0.1);
+  }
+  return ShieldElement.prototype.defaultBannerFontSize;
+};
+
+ShieldElement.prototype.getFontSizeCss = function (value) {
+  const normalized = ShieldElement.prototype.normalizeFontSize(value);
+  return normalized + "rem";
+};
+
+ShieldElement.prototype.normalizeShieldSize = function (value) {
+  if (typeof value === "string") {
+    value = value.replace(/rem$/i, "");
+  }
+  const parsed = parseFloat(value);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+  return ShieldElement.prototype.defaultShieldSize;
+};
+
+ShieldElement.prototype.getShieldScale = function (size) {
+  const base =
+    ShieldElement.prototype.defaultShieldSize && ShieldElement.prototype.defaultShieldSize > 0
+      ? ShieldElement.prototype.defaultShieldSize
+      : 3;
+  const normalizedSize = ShieldElement.prototype.normalizeShieldSize(size);
+  return normalizedSize / base;
+};
+
+ShieldElement.prototype.normalizeScaleBannersWithShield = function (value) {
+  if (
+    value === false ||
+    value === 0 ||
+    value === "0" ||
+    (typeof value === "string" && value.toLowerCase() === "false")
+  ) {
+    return false;
+  }
+  return true;
+};
+
+ShieldElement.prototype.hasBannerValue = function (value) {
+  return typeof value === "string" && value !== "None" && value.trim().length > 0;
+};
+
+ShieldElement.prototype.createBannerElement = function (
+  bannerClass,
+  bannerValue,
+  fontSizeCss,
+  indentFirstLetter,
+  bannerFontFamily,
+  smallCaps = true
+) {
+  const bannerEl = document.createElement("p");
+  const shouldIndent = indentFirstLetter !== false;
+  bannerEl.className =
+    bannerClass + (shouldIndent ? "" : " noIndent") + (smallCaps ? "" : " noSmallCaps");
+  bannerEl.style.setProperty("--fontSize", fontSizeCss);
+  const normalizedFont =
+    ShieldElement.prototype.normalizeBannerFontFamily(bannerFontFamily);
+  if (normalizedFont) {
+    bannerEl.style.setProperty("--bannerFontFamily", `"${normalizedFont}"`);
+    bannerEl.style.fontFamily = `"${normalizedFont}"`;
+  }
+  if (bannerValue === "Toll") {
+    bannerEl.classList.add("TOLL");
+  }
+  bannerEl.textContent =
+    bannerValue && bannerValue !== "None" ? bannerValue : " ";
+  return bannerEl;
+};
+
+ShieldElement.prototype.createStackedBannerSlot = function (
+  position,
+  banners,
+  fontSizeCss,
+  indentFirstLetter,
+  bannerFontFamily,
+  smallCaps = true
+) {
+  const normalizedPosition = ShieldElement.prototype.normalizeBannerPosition(
+    position
+  );
+  const container = document.createElement("div");
+  container.className = "stackedBannerSlot bannerSlot";
+  container.classList.add(
+    `bannerSlot-${normalizedPosition.toLowerCase()}`
+  );
+
+  banners.forEach(
+    ({ bannerClass, bannerValue, containerClass, indentFirstLetter: bannerSpecificIndent, smallCaps: bannerSpecificSmallCaps }) => {
+      if (containerClass) {
+        container.classList.add(containerClass);
+      }
+      const bannerIndent =
+        typeof bannerSpecificIndent === "boolean"
+          ? bannerSpecificIndent
+          : indentFirstLetter;
+      const bannerSmallCaps =
+        typeof bannerSpecificSmallCaps === "boolean"
+          ? bannerSpecificSmallCaps
+          : smallCaps;
+      const bannerEl = ShieldElement.prototype.createBannerElement(
+        bannerClass,
+        bannerValue,
+        fontSizeCss,
+        bannerIndent,
+        bannerFontFamily,
+        bannerSmallCaps
+      );
+      container.appendChild(bannerEl);
+    });
+
+  return container;
+};
+
+ShieldElement.prototype.createBannerContainer = function (
+  containerClass,
+  bannerClass,
+  bannerValue,
+  fontSizeCss,
+  indentFirstLetter,
+  bannerFontFamily,
+  isSecond,
+  position,
+  smallCaps = true
+) {
+  const container = document.createElement("div");
+  container.className = containerClass;
+  container.classList.add("bannerSlot");
+  const normalizedPosition = ShieldElement.prototype.normalizeBannerPosition(
+    position
+  );
+  container.classList.add(
+    `bannerSlot-${normalizedPosition.toLowerCase()}`
+  );
+  const bannerEl = ShieldElement.prototype.createBannerElement(
+    bannerClass,
+    bannerValue,
+    fontSizeCss,
+    indentFirstLetter,
+    bannerFontFamily,
+    smallCaps
+  );
+  container.appendChild(bannerEl);
+  return container;
+};
+
+ShieldElement.prototype.getBlockShieldConfig = function (base) {
+  const options = ShieldElement.prototype.blockShieldBases;
+  const normalizedBase = ShieldElement.prototype.normalizeShieldCode(base);
+  return (
+    options.find(
+      (option) =>
+        ShieldElement.prototype.normalizeShieldCode(option.value) === normalizedBase
+    ) || options[0]
+  );
+};
+
+ShieldElement.prototype.resolveBlockVariant = function (
+  desiredVariant,
+  routeNumber,
+  config
+) {
+  const allowed = config?.variants || [];
+  if (!allowed.length) {
+    return "";
+  }
+  const normalized = (desiredVariant || "").trim();
+  if (normalized && normalized.toLowerCase() !== "auto") {
+    if (allowed.includes(normalized)) {
+      return normalized;
+    }
+    return allowed[0] || normalized;
+  }
+  const fallback = allowed[0] || ShieldElement.prototype.defaultVariant;
+  const inferred = ShieldElement.prototype.getVariantFromRoute(routeNumber, config);
+  return allowed.includes(inferred) ? inferred : fallback;
+};
+
+ShieldElement.prototype.getVariantFromRoute = function (routeNumber, config) {
+  const digitsOnly = (routeNumber || "").replace(/[^0-9]/g, "");
+  const supportsFourDigit =
+    Array.isArray(config?.variants) && config.variants.includes("4 Digit");
+  if (supportsFourDigit && digitsOnly.length >= 4) {
+    return "4 Digit";
+  }
+  return digitsOnly.length >= 3 ? "3 Digit" : "2 Digit";
+};
+
+ShieldElement.prototype.getContainerSizeClass = function (routeNumber) {
+  const length = (routeNumber || "").trim().length;
+  if (length === 0) {
+    return "";
+  }
+  if (length <= 1) {
+    return "one";
+  }
+  if (length === 2) {
+    return "two";
+  }
+  if (length === 3) {
+    return "three";
+  }
+  return "four";
+};
+
+ShieldElement.prototype.getImageSizeClass = function (routeNumber) {
+  const length = (routeNumber || "").trim().length;
+  if (length === 0) {
+    return "";
+  }
+  if (length <= 1) {
+    return "one";
+  }
+  if (length === 2) {
+    return "two";
+  }
+  if (length === 3) {
+    return "three";
+  }
+  return "four";
+};
+
+ShieldElement.prototype.getShieldAssetPath = function (config, variantKey) {
+  const assetFolder = config?.assetFolder || "img/shields";
+  const assetName = config?.assetName || config?.value || "I";
+  const suffix = variantKey ? `-${variantKey}` : "";
+  return `${assetFolder}/${assetName}${suffix}.svg`;
+};
+
+ShieldElement.prototype.isCountyShield = function (config) {
+  const normalized = ShieldElement.prototype.normalizeShieldCode(
+    config?.value || config?.assetName || ""
+  );
+  return normalized === "C";
+};
 
 class DividerElement {
   constructor({
     dividerWidth = 100,
     dividerMeasurement = "%",
     dividerHeight = 0.2,
+    orientation = DividerElement.prototype.defaultOrientation,
     alignment = "Center",
     visible = true,
     dividerColor = "White",
@@ -388,6 +1085,8 @@ class DividerElement {
     this.dividerWidth = dividerWidth;
     this.dividerMeasurement = dividerMeasurement;
     this.dividerHeight = dividerHeight;
+    this.orientation =
+      DividerElement.prototype.normalizeOrientation(orientation);
     this.alignment = alignment;
     this.visible = visible;
     this.dividerColor = dividerColor;
@@ -396,13 +1095,19 @@ class DividerElement {
 
   createElement(panel) {
     const newDivider = document.createElement("div");
-    newDivider.className = "dividerElement";
+    const isVertical =
+      this.orientation === DividerElement.prototype.verticalOrientation;
+    newDivider.className = "dividerElement" + (isVertical ? " vertical" : "");
     newDivider.style.visibility = this.visible ? "visible" : "hidden";
+    const lengthValue = this.dividerWidth + this.dividerMeasurement;
+    const thicknessValue = this.dividerHeight + "rem";
     newDivider.style.setProperty(
       "--dividerWidth",
-      this.dividerWidth + this.dividerMeasurement
+      lengthValue
     );
-    newDivider.style.setProperty("--dividerHeight", this.dividerHeight + "rem");
+    newDivider.style.setProperty("--dividerHeight", thicknessValue);
+    newDivider.style.setProperty("--dividerLength", lengthValue);
+    newDivider.style.setProperty("--dividerThickness", thicknessValue);
     newDivider.style.marginTop = "0";
     newDivider.style.marginBottom = "0";
 
@@ -436,12 +1141,28 @@ class DividerElement {
         [top, right, bottom, left] = paddingValues;
       }
 
-      newDivider.style.setProperty("--dividerBleedLeft", left || "0rem");
-      newDivider.style.setProperty("--dividerBleedRight", right || "0rem");
+      newDivider.style.setProperty(
+        "--dividerBleedLeft",
+        !isVertical ? left || "0rem" : "0rem"
+      );
+      newDivider.style.setProperty(
+        "--dividerBleedRight",
+        !isVertical ? right || "0rem" : "0rem"
+      );
+      newDivider.style.setProperty(
+        "--dividerBleedTop",
+        isVertical ? top || "0rem" : "0rem"
+      );
+      newDivider.style.setProperty(
+        "--dividerBleedBottom",
+        isVertical ? bottom || "0rem" : "0rem"
+      );
     } else {
       newDivider.classList.remove("fullBleed");
       newDivider.style.setProperty("--dividerBleedLeft", "0rem");
       newDivider.style.setProperty("--dividerBleedRight", "0rem");
+      newDivider.style.setProperty("--dividerBleedTop", "0rem");
+      newDivider.style.setProperty("--dividerBleedBottom", "0rem");
     }
 
     return newDivider;
@@ -449,32 +1170,205 @@ class DividerElement {
 }
 
 DividerElement.prototype.dividerMeasurement = ["%", "rem"];
-DividerElement.prototype.dividerColors = [
-  { value: "White", label: "White" },
-  { value: "Black", label: "Black" },
-];
+DividerElement.prototype.orientations = ["Horizontal", "Vertical"];
+DividerElement.prototype.defaultOrientation = "Horizontal";
+DividerElement.prototype.normalizeOrientation = function (value) {
+  const options = DividerElement.prototype.orientations || [];
+  return options.includes(value)
+    ? value
+    : DividerElement.prototype.defaultOrientation;
+};
+DividerElement.prototype.dividerColors = [{ value: "Default", label: "Default" }].concat(
+  Object.keys(lib.colors || {}).map((colorName) => ({
+    value: colorName,
+    label: colorName,
+  }))
+);
 
 class IconElement {
   constructor({
     icon = "Airplane",
-    iconSize = 100,
+    iconSize = 3,
     backgroundColor = "Inherit",
     border = false,
     borderRadius = 4,
     borderColor = "White",
-    spacing = 4,
+    spacing = 0,
+    alignment = "Center",
   } = {}) {
-    this.icon = icon;
+    this.icon = IconElement.prototype.icons[icon]
+      ? icon
+      : IconElement.prototype.defaultIcon;
     this.iconSize = iconSize;
     this.backgroundColor = backgroundColor;
     this.border = border;
     this.borderRadius = borderRadius;
     this.borderColor = borderColor;
     this.spacing = spacing;
+    const validAlignments = Array.isArray(TextElement.prototype.alignment)
+      ? TextElement.prototype.alignment
+      : [];
+    this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
+  }
+
+  createElement() {
+    const container = document.createElement("div");
+    container.className = "bE-iconElement";
+
+    const parsedSpacing = parseFloat(this.spacing);
+    const spacing = isNaN(parsedSpacing) ? 0 : parsedSpacing;
+    container.style.setProperty("--spacing", spacing + "rem");
+
+    const resolvedBgColor = lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase();
+    container.style.setProperty("--iconBgColor", resolvedBgColor);
+
+    container.style.setProperty("--borderRadius", this.borderRadius + "px");
+
+    const resolvedBorderColor = lib.colors[this.borderColor] || this.borderColor.toLowerCase();
+    container.style.setProperty("--iconBorderColor", resolvedBorderColor);
+
+    const parsedSize = parseFloat(this.iconSize);
+    const size = isNaN(parsedSize) ? 3 : parsedSize;
+    container.style.setProperty("--iconSize", size + "rem");
+
+    if (this.border) {
+      container.classList.add("hasBorder");
+    }
+
+    if (this.backgroundColor !== "Inherit") {
+      container.classList.add("hasBackground");
+    }
+
+    const iconDefinition =
+      IconElement.prototype.icons[this.icon] ||
+      IconElement.prototype.icons[IconElement.prototype.defaultIcon];
+
+    if (iconDefinition) {
+      const img = document.createElement("img");
+      img.src = iconDefinition.src;
+      img.alt = iconDefinition.label;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      container.appendChild(img);
+    } else {
+      container.textContent = "Icon unavailable";
+    }
+
+    return container;
   }
 }
 
-IconElement.prototype.icons = ["Airplane"];
+IconElement.prototype.defaultIcon = "AIRPORT";
+IconElement.prototype.icons = {
+  "511": { label: "511", src: "img/icons/511.svg" },
+  "AIRPORT": { label: "Airport", src: "img/icons/AIRPORT.svg" },
+  "ALLTERRAIN_TRAIL": { label: "All-Terrain Trail", src: "img/icons/ALLTERRAIN_TRAIL.svg" },
+  "ALTERNATIVE_FUEL_COMPRESSED_NATURAL_GAS": { label: "Alternative Fuel (Compressed Natural Gas)", src: "img/icons/ALTERNATIVE_FUEL_COMPRESSED_NATURAL_GAS.svg" },
+  "ALTERNATIVE_FUEL_ETHANOL": { label: "Alternative Fuel (Ethanol)", src: "img/icons/ALTERNATIVE_FUEL_ETHANOL.svg" },
+  "ARCHERY": { label: "Archery", src: "img/icons/ARCHERY.svg" },
+  "BASEBALL": { label: "Baseball", src: "img/icons/BASEBALL.svg" },
+  "BEACH": { label: "Beach", src: "img/icons/BEACH.svg" },
+  "BEAR_VIEWING_AREA": { label: "Bear Viewing Area", src: "img/icons/BEAR_VIEWING_AREA.svg" },
+  "BIKE": { label: "Bike", src: "img/icons/BIKE.svg" },
+  "BIOFUEL": { label: "Biofuel", src: "img/icons/BIOFUEL.svg" },
+  "BOAT_RAMP": { label: "Boat Ramp", src: "img/icons/BOAT_RAMP.svg" },
+  "BUS_STATION": { label: "Bus Station", src: "img/icons/BUS_STATION.svg" },
+  "BUS_STOP": { label: "Bus Stop", src: "img/icons/BUS_STOP.svg" },
+  "CAMPFIRES": { label: "Campfires", src: "img/icons/CAMPFIRES.svg" },
+  "CAMPING": { label: "Camping", src: "img/icons/CAMPING.svg" },
+  "CANOEING": { label: "Canoeing", src: "img/icons/CANOEING.svg" },
+  "CHAIR_LIFTSKI_LIFT": { label: "Chair Lift/Ski Lift", src: "img/icons/CHAIR_LIFTSKI_LIFT.svg" },
+  "CLIMBING": { label: "Climbing", src: "img/icons/CLIMBING.svg" },
+  "CROSS_COUNTRY_SKIING": { label: "Cross Country Skiing", src: "img/icons/CROSS_COUNTRY_SKIING.svg" },
+  "DEER_VIEWING_AREA": { label: "Deer Viewing Area", src: "img/icons/DEER_VIEWING_AREA.svg" },
+  "DIESEL_FUEL": { label: "Diesel Fuel", src: "img/icons/DIESEL_FUEL.svg" },
+  "DOG_SLEDDING": { label: "Dog Sledding", src: "img/icons/DOG_SLEDDING.svg" },
+  "DONT_WALK": { label: "Don't Walk", src: "img/icons/DONT_WALK.svg" },
+  "ELECTRICAL_HOOKUP": { label: "Electrical Hookup", src: "img/icons/ELECTRICAL_HOOKUP.svg" },
+  "ELECTRIC_VEHICLE_CHARGING": { label: "EV Charging", src: "img/icons/ELECTRIC_VEHICLE_CHARGING.svg" },
+  "EMERGENCY_MEDICAL_SERVICES": { label: "EMS", src: "img/icons/EMERGENCY_MEDICAL_SERVICES.svg" },
+  "EXIT_INSERT": { label: "Exit Insert", src: "img/icons/EXIT_INSERT.png" },
+  "FIRE_EXTINGUISHER": { label: "Fire Extinguisher", src: "img/icons/FIRE_EXTINGUISHER.svg" },
+  "FIRST_AID": { label: "First Aid", src: "img/icons/FIRST_AID.svg" },
+  "FISHING_AREA": { label: "Fishing Area", src: "img/icons/FISHING_AREA.svg" },
+  "FOOD": { label: "Food", src: "img/icons/FOOD.svg" },
+  "GAS": { label: "Gas", src: "img/icons/GAS.svg" },
+  "GOLFING": { label: "Golfing", src: "img/icons/GOLFING.svg" },
+  "HAND_LAUNCHSMALL_BOAT_LAUNCH": { label: "Hand Launch/Small Boat Launch", src: "img/icons/HAND_LAUNCHSMALL_BOAT_LAUNCH.svg" },
+  "HIKING_TRAIL": { label: "Hiking Trail", src: "img/icons/HIKING_TRAIL.svg" },
+  "HM": { label: "HM", src: "img/icons/HM.png" },
+  "HORSE_TRAIL": { label: "Horse Trail", src: "img/icons/HORSE_TRAIL.svg" },
+  "HOSPITAL": { label: "Hospital", src: "img/icons/HOSPITAL.svg" },
+  "HOV": { label: "HOV", src: "img/icons/HOV.png" },
+  "HYDROGEN_FUEL": { label: "Hydrogen Fuel", src: "img/icons/HYDROGEN_FUEL.svg" },
+  "INLINE_SKATING": { label: "Inline Skating", src: "img/icons/INLINE_SKATING.svg" },
+  "INTERNATIONAL_SYMBOL_OF_ACCESSIBILITY": { label: "Accessibility", src: "img/icons/INTERNATIONAL_SYMBOL_OF_ACCESSIBILITY.svg" },
+  "JET_SKIPERSONAL_WATERCRAFT": { label: "Jet Ski", src: "img/icons/JET_SKIPERSONAL_WATERCRAFT.svg" },
+  "LAUNDROMAT": { label: "Laundromat", src: "img/icons/LAUNDROMAT.svg" },
+  "LIBRARY": { label: "Library", src: "img/icons/LIBRARY.svg" },
+  "LIGHTHOUSE": { label: "Lighthouse", src: "img/icons/LIGHTHOUSE.svg" },
+  "LIGHT_RAIL_TRANSIT_STATION": { label: "Light Rail Station", src: "img/icons/LIGHT_RAIL_TRANSIT_STATION.svg" },
+  "LIQUEFIED_NATURAL_GAS": { label: "Liquefied Natural Gas", src: "img/icons/LIQUEFIED_NATURAL_GAS.svg" },
+  "LIQUEFIED_PETROLEUM_GAS": { label: "Liquefied Petroleum Gas", src: "img/icons/LIQUEFIED_PETROLEUM_GAS.svg" },
+  "LITTER_CONTAINER": { label: "Litter Container", src: "img/icons/LITTER_CONTAINER.svg" },
+  "LODGING": { label: "Lodging", src: "img/icons/LODGING.svg" },
+  "LOOKOUT_TOWER": { label: "Lookout Tower", src: "img/icons/LOOKOUT_TOWER.svg" },
+  "MARINA": { label: "Marina", src: "img/icons/MARINA.svg" },
+  "MENS_RESTROOM": { label: "Men's Restroom", src: "img/icons/MENS_RESTROOM.svg" },
+  "MOTORBOATING": { label: "Motorboating", src: "img/icons/MOTORBOATING.svg" },
+  "NATURE_STUDY_AREA": { label: "Nature Study Area", src: "img/icons/NATURE_STUDY_AREA.svg" },
+  "NO-HM": { label: "No HM", src: "img/icons/NO-HM.png" },
+  "PARKING": { label: "Parking", src: "img/icons/PARKING.svg" },
+  "PASSENGERS_ONLY_FERRY_TERMINAL": { label: "Passengers Only Ferry Terminal", src: "img/icons/PASSENGERS_ONLY_FERRY_TERMINAL.svg" },
+  "PEDESTRIAN": { label: "Pedestrian", src: "img/icons/PEDESTRIAN.svg" },
+  "PHARMACY": { label: "Pharmacy", src: "img/icons/PHARMACY.svg" },
+  "PICKUP_TRUCKS": { label: "Pickup Trucks", src: "img/icons/PICKUP_TRUCKS.svg" },
+  "PICNIC_SHELTER": { label: "Picnic Shelter", src: "img/icons/PICNIC_SHELTER.svg" },
+  "PICNIC_SITE": { label: "Picnic Site", src: "img/icons/PICNIC_SITE.svg" },
+  "POLICE": { label: "Police", src: "img/icons/POLICE.svg" },
+  "POST_OFFICE": { label: "Post Office", src: "img/icons/POST_OFFICE.svg" },
+  "RECREATIONAL_VEHICLE_SITE": { label: "RV Site", src: "img/icons/RECREATIONAL_VEHICLE_SITE.svg" },
+  "RECYCLING": { label: "Recycling", src: "img/icons/RECYCLING.svg" },
+  "RESTROOMS": { label: "Restrooms", src: "img/icons/RESTROOMS.svg" },
+  "RV_SANITARY_STATION": { label: "RV Sanitary Station", src: "img/icons/RV_SANITARY_STATION.svg" },
+  "SCHOOL_BUS": { label: "School Bus", src: "img/icons/SCHOOL_BUS.svg" },
+  "SCHOOL_CROSSING": { label: "School Crossing", src: "img/icons/SCHOOL_CROSSING.svg" },
+  "SCUBA_DIVING": { label: "Scuba Diving", src: "img/icons/SCUBA_DIVING.svg" },
+  "SEAL_VIEWING": { label: "Seal Viewing", src: "img/icons/SEAL_VIEWING.svg" },
+  "SEA_PLANE": { label: "Sea Plane", src: "img/icons/SEA_PLANE.svg" },
+  "SHOWERS": { label: "Showers", src: "img/icons/SHOWERS.svg" },
+  "SKATEBOARDING": { label: "Skateboarding", src: "img/icons/SKATEBOARDING.svg" },
+  "SLEDDING": { label: "Sledding", src: "img/icons/SLEDDING.svg" },
+  "SLEEPING_SHELTER": { label: "Sleeping Shelter", src: "img/icons/SLEEPING_SHELTER.svg" },
+  "SMOKING": { label: "Smoking", src: "img/icons/SMOKING.svg" },
+  "SNOWSHOEING": { label: "Snowshoeing", src: "img/icons/SNOWSHOEING.svg" },
+  "SNOW_TUBING": { label: "Snow Tubing", src: "img/icons/SNOW_TUBING.svg" },
+  "SPELUNKINGCAVES": { label: "Spelunking/Caves", src: "img/icons/SPELUNKINGCAVES.svg" },
+  "STOP": { label: "Stop", src: "img/icons/STOP.svg" },
+  "SWIMMING": { label: "Swimming", src: "img/icons/SWIMMING.svg" },
+  "TECHNICAL_ROCK_CLIMBING": { label: "Technical Rock Climbing", src: "img/icons/TECHNICAL_ROCK_CLIMBING.svg" },
+  "TELECOMMUNICATIONS_DEVICE_FOR_THE_DEAF": { label: "Telecommunications Device for the Deaf", src: "img/icons/TELECOMMUNICATIONS_DEVICE_FOR_THE_DEAF.svg" },
+  "TELEPHONE": { label: "Telephone", src: "img/icons/TELEPHONE.svg" },
+  "TENNIS": { label: "Tennis", src: "img/icons/TENNIS.svg" },
+  "TOURIST_INFORMATION": { label: "Tourist Information", src: "img/icons/TOURIST_INFORMATION.svg" },
+  "TRAILER_SITE": { label: "Trailer Site", src: "img/icons/TRAILER_SITE.svg" },
+  "TRAIN_STATION": { label: "Train Station", src: "img/icons/TRAIN_STATION.svg" },
+  "TRAMWAY": { label: "Tramway", src: "img/icons/TRAMWAY.svg" },
+  "TRASH_DUMPSTER": { label: "Trash Dumpster", src: "img/icons/TRASH_DUMPSTER.svg" },
+  "TRUCK_EXTERNAL_POWER": { label: "Truck External Power", src: "img/icons/TRUCK_EXTERNAL_POWER.svg" },
+  "TRUCK_PARKING": { label: "Truck Parking", src: "img/icons/TRUCK_PARKING.svg" },
+  "TUNNEL": { label: "Tunnel", src: "img/icons/TUNNEL.svg" },
+  "VEHICLE_FERRY_STATION": { label: "Vehicle Ferry", src: "img/icons/VEHICLE_FERRY_STATION.svg" },
+  "VIEWING_AREA": { label: "Viewing Area", src: "img/icons/VIEWING_AREA.svg" },
+  "WATERSKIING": { label: "Waterskiing", src: "img/icons/WATERSKIING.svg" },
+  "WHALE_VIEWING": { label: "Whale Viewing", src: "img/icons/WHALE_VIEWING.svg" },
+  "WILDLIFE_VIEWING": { label: "Wildlife Viewing", src: "img/icons/WILDLIFE_VIEWING.svg" },
+  "WINTER_RECREATIONAL_AREA": { label: "Winter Rec Area", src: "img/icons/WINTER_RECREATIONAL_AREA.svg" },
+  "WIRELESS_INTERNET": { label: "WiFi", src: "img/icons/WIRELESS_INTERNET.svg" },
+  "WOMENS_RESTROOM": { label: "Women's Restroom", src: "img/icons/WOMENS_RESTROOM.svg" },
+  "YIELD": { label: "Yield", src: "img/icons/YIELD.svg" }
+};
 
 class BeaconElement {
   constructor({
@@ -698,6 +1592,10 @@ ArrowElement.prototype.arrows = {
     defaultSize: 2.75,
   },
   UK: { label: "UK", src: "img/arrowBlocks/UK.svg" },
+  APL_UP: { label: "APL Up", src: "img/arrowBlocks/APL_UP.svg" },
+  APL_UP_TURN: { label: "APL Up Turn", src: "img/arrowBlocks/APL_UP_TURN.svg" },
+  APL_TURN: { label: "APL Turn", src: "img/arrowBlocks/APL_TURN.svg" },
+  APL_DUAL_TURN: { label: "APL Dual Turn", src: "img/arrowBlocks/APL_DUAL_TURN.svg" },
 };
 ArrowElement.prototype.defaultArrow = "TYPE_A";
 ArrowElement.prototype.defaultSize = 1.75;
@@ -839,6 +1737,7 @@ class Block {
     topPadding = 0,
     bottomPadding = 0,
     backgroundColor = "Inherit",
+    borderColor = "Match BG",
     backgroundFullWidth = true,
     width = 0,
     stretchLeft = true,
@@ -848,6 +1747,7 @@ class Block {
     this.topPadding = topPadding;
     this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
+    this.borderColor = borderColor;
     this.backgroundFullWidth = backgroundFullWidth;
     this.width = width;
     this.stretchLeft = stretchLeft;
@@ -855,6 +1755,7 @@ class Block {
     this.stretchRight = stretchRight;
   }
 }
+Block.defaultBorderColor = "Match BG";
 
 class Control {
   constructor({ rows = [], blockProperties = [] } = {}) {
@@ -921,6 +1822,21 @@ class Control {
   createElement(panel, subPanel) {
     const flexBox = document.createElement("div");
     flexBox.className = "blockElementMaster";
+    const resolveColorValue = (colorValue) => {
+      if (typeof colorValue !== "string") {
+        return "";
+      }
+      const trimmed = colorValue.trim();
+      if (!trimmed) {
+        return "";
+      }
+      const paletteValue =
+        (lib && lib.colors && lib.colors[trimmed]) || trimmed;
+      if (typeof paletteValue === "string") {
+        return paletteValue.toLowerCase();
+      }
+      return paletteValue || "";
+    };
 
     const parsePadding = (paddingString = "") => {
       const defaultPadding = {
@@ -997,9 +1913,9 @@ class Control {
         properties.backgroundColor == "Inherit"
           ? ""
           : (
-              lib.colors[properties.backgroundColor] ||
-              properties.backgroundColor
-            ).toLowerCase();
+            lib.colors[properties.backgroundColor] ||
+            properties.backgroundColor
+          ).toLowerCase();
       flexRow.style.setProperty(
         "--masterBlockBgColor",
         resolvedBackgroundColor
@@ -1012,6 +1928,7 @@ class Control {
         properties.backgroundColor == "Fluorescent Yellow-Green" ||
         properties.backgroundColor == "Fluorescent Pink";
 
+      let appliedFullBleedBorderColor = "";
       if (properties.backgroundFullWidth) {
         flexRow.classList.add("fullBleed");
         flexRow.style.setProperty("--blockBleedLeft", signPadding.left);
@@ -1023,6 +1940,23 @@ class Control {
         flexRow.style.setProperty("--marginBottom", "0rem");
         flexRow.style.setProperty("--blockPaddingTopExtra", topSpacing);
         flexRow.style.setProperty("--blockPaddingBottomExtra", bottomSpacing);
+        const chosenBorderColor =
+          typeof properties.borderColor === "string" &&
+            properties.borderColor.trim().length
+            ? properties.borderColor
+            : Block.defaultBorderColor;
+        const resolvedBorderColor =
+          chosenBorderColor === Block.defaultBorderColor
+            ? usesLightBleedBackground
+              ? (lib.colors && lib.colors.Black) || "black"
+              : (lib.colors && lib.colors.White) || "white"
+            : resolveColorValue(chosenBorderColor);
+        if (resolvedBorderColor) {
+          flexRow.dataset.fullBleedBorderColor = resolvedBorderColor;
+          appliedFullBleedBorderColor = resolvedBorderColor;
+        } else {
+          delete flexRow.dataset.fullBleedBorderColor;
+        }
       } else {
         flexRow.classList.remove("fullBleed");
         flexRow.style.setProperty("--blockBleedLeft", "0rem");
@@ -1033,13 +1967,16 @@ class Control {
         flexRow.style.setProperty("--marginBottom", bottomSpacing);
         flexRow.style.width =
           properties.width == 0 ? "" : properties.width + "rem";
+        delete flexRow.dataset.fullBleedBorderColor;
       }
 
       if (usesLightBleedBackground) {
         flexRow.style.color = "black";
-        if (properties.backgroundFullWidth) {
-          flexRow.dataset.fullBleedBorderColor =
+        if (properties.backgroundFullWidth && !appliedFullBleedBorderColor) {
+          const fallbackBorderColor =
             (lib.colors && lib.colors.Black) || "rgb(0, 0, 0)";
+          flexRow.dataset.fullBleedBorderColor = fallbackBorderColor;
+          appliedFullBleedBorderColor = fallbackBorderColor;
         }
       }
 
@@ -1052,8 +1989,8 @@ class Control {
 
       let lastKnownAlignment = centerAlignment;
       let dividerBorderColor = null;
-      for (let i = 0; i < row.length; i++) {
-        let elem = row[i];
+      for (let blockIdx = 0; blockIdx < row.length; blockIdx++) {
+        let elem = row[blockIdx];
         switch (elem.alignment) {
           case "Left":
             lastKnownAlignment = leftAlignment;
@@ -1080,7 +2017,10 @@ class Control {
           }
         }
 
-        lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
+        const blockElmt = elem.createElement(panel, subPanel);
+        blockElmt.dataset.signRow = i;
+        blockElmt.dataset.signBlock = blockIdx;
+        lastKnownAlignment.appendChild(blockElmt);
       }
 
       leftAlignment.style.flexGrow =
@@ -1095,7 +2035,12 @@ class Control {
           : "0";
 
       if (dividerBorderColor) {
-        flexRow.dataset.fullBleedBorderColor = dividerBorderColor.toLowerCase();
+        const normalizedDividerColor =
+          typeof dividerBorderColor === "string"
+            ? dividerBorderColor.toLowerCase()
+            : dividerBorderColor;
+        flexRow.dataset.fullBleedBorderColor = normalizedDividerColor;
+        appliedFullBleedBorderColor = normalizedDividerColor;
       }
 
       flexRow.dataset.lightBackground = usesLightBleedBackground

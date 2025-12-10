@@ -1,4 +1,4 @@
-.sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
+.sMConfigOption>span:not(.material-symbols-outlined, .toolTip) {
   font-size: 1rem;
   top: 2px;
   position: relative;
@@ -35,15 +35,56 @@ nav#sMConfigBar {
   gap: 0.25rem;
   transition: 0.25s ease-in-out;
   cursor: pointer;
-  position: relative; /* for tooltips / mini menus */
+  position: relative;
   font-family: "Overpass";
   color: var(--textColor);
   line-height: 0;
 }
 
+.sMConfigOption .configIcon,
+.sMModalTitle .configIcon {
+  height: 1.25rem;
+  width: 1.25rem;
+  object-fit: contain;
+}
+
+:root:not([data-theme="dark"]) .templateIcon {
+  filter: invert(1);
+}
+
 .sMConfigOption.selected {
   background: var(--selectedColor);
   transition: 0s;
+}
+
+@media (max-width: 768px) {
+  nav#sMConfigBar {
+    left: 0;
+    right: 0;
+    width: auto;
+    transform: none;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 0.25rem;
+    padding: 0.4rem 0.5rem;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  nav#sMConfigBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  nav#sMConfigBar .sMConfigOption {
+    flex: 0 0 auto;
+    padding: 0.35rem;
+    gap: 0.15rem;
+  }
+
+  nav#sMConfigBar .sMConfigOption>span:not(.material-symbols-outlined) {
+    display: none;
+  }
 }
 
 .sMModal {
@@ -92,7 +133,7 @@ span.toolTip {
   max-width: 200px;
 }
 
-label > .toolTip {
+label>.toolTip {
   font-family: "Inter";
 }
 
@@ -115,6 +156,7 @@ label span.toolTip,
     display: none;
     opacity: 0;
   }
+
   to {
     display: block;
     opacity: 1;
@@ -211,6 +253,7 @@ label span.toolTip,
 
 .panelListButton.panelWiggle {
   animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+  animation-delay: var(--wiggle-delay, 0s);
 }
 
 .panelListButton.dragging {
@@ -301,7 +344,7 @@ label span.toolTip,
   z-index: 2;
 }
 
-.listNav > .scrollMenu {
+.listNav>.scrollMenu {
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -312,29 +355,13 @@ label span.toolTip,
   margin-left: -8px;
 }
 
-/* Minimalistic scrollbar for WebKit browsers */
-.scrollMenu::-webkit-scrollbar {
-  height: 6px; /* Adjust thickness as needed */
-}
-
-.scrollMenu::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3); /* Adjust color and opacity */
-  border-radius: 3px; /* Make it rectangular with slightly rounded corners */
-}
-
-.scrollMenu::-webkit-scrollbar-track {
-  background-color: transparent; /* Make the track invisible or a subtle color */
-}
-
-/* Minimalistic scrollbar for Firefox */
-/* Note: Firefox styling options are more limited */
 .scrollMenu {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.3) transparent; /* thumb track */
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
 }
 
-.sMModalContent > div:not(#sMSPSettings),
-#sMSPSettings > div {
+.sMModalContent>div:not(#sMSPSettings),
+#sMSPSettings>div {
   width: max-content;
   flex-grow: 1;
   height: 100%;
@@ -390,6 +417,7 @@ div.sMModalTitle {
   gap: 0.25rem;
   margin-right: 0.5rem;
 }
+
 div.sMModalTab {
   padding: 0rem 0.5rem;
   font-size: 15px;
@@ -500,6 +528,8 @@ dialog {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 80vw;
+  max-width: 800px;
 }
 
 #welcomeToSignMaker {
@@ -548,7 +578,7 @@ div.options a {
   background-color: rgb(var(--baseColor), 0.4);
 }
 
-.SMSPNewElementHolder > span {
+.SMSPNewElementHolder>span {
   font-size: 0.7rem;
 }
 
@@ -567,19 +597,18 @@ div.options a {
 
 :root[data-theme="dark"] .scrollMenu button:not(.active),
 :root[data-theme="dark"] .scrolMenu button:not(.active) {
-  background-color: rgb(0, 0, 175);
+  background-color: var(--black);
 }
 
 input,
 select,
 textarea {
-  width: 6rem;
+  width: rem;
   margin: 0.25rem;
   padding: 0.25rem;
   border: none;
   font-family: "Inter";
   font-weight: 600;
-  transition: 0.15s ease-in-out;
 }
 
 label {
@@ -600,8 +629,7 @@ label:hover {
 }
 
 select {
-  background: rgb(240, 240, 240) url(../img/other-symbols/select.svg) no-repeat
-    right;
+  background: rgb(240, 240, 240) url(../img/other-symbols/select.svg) no-repeat right;
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
@@ -647,11 +675,9 @@ input[type="button"] {
 }
 
 button:not(.textEditorBlock, .sMControlRow .sMConfigOption):enabled:hover,
-input[type="button"]:not(
-    .textEditorblock,
-    .sMControlRow,
-    .sMConfigOption
-  ):enabled:hover {
+input[type="button"]:not(.textEditorblock,
+  .sMControlRow,
+  .sMConfigOption):enabled:hover {
   background-color: var(--selectedColor);
 }
 
@@ -666,7 +692,7 @@ input[type="button"]:disabled {
   align-items: center;
   justify-content: center;
   padding: 0.3rem 0.65rem;
-  border-radius: 0.4rem;
+  border-radius: 999rem;
   cursor: grab;
   user-select: none;
   transform-origin: center;
@@ -679,6 +705,7 @@ input[type="button"]:disabled {
 
 .textEditorBlock.blockWiggle {
   animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+  animation-delay: var(--wiggle-delay, 0s);
 }
 
 .textEditorBlock.dragging {
@@ -720,6 +747,7 @@ input[type="button"]:disabled {
   from {
     transform: rotate(-2deg) scale(1.02);
   }
+
   to {
     transform: rotate(2deg) scale(1.02);
   }
@@ -733,7 +761,7 @@ input[type="button"]:disabled {
   justify-content: center;
 }
 
-.sdArrow_rotationButtons > * {
+.sdArrow_rotationButtons>* {
   font-size: 20px;
   width: 10%;
 }
@@ -767,6 +795,7 @@ textarea {
   width: -webkit-max-content;
   width: intrinsic;
 }
+
 .shields div:nth-child(odd) {
   background-color: rgba(var(--baseColor), 0.33);
 }
@@ -779,6 +808,7 @@ textarea {
 .shields select:first-of-type {
   width: auto;
 }
+
 .shields label {
   margin: 0;
 }
@@ -811,11 +841,9 @@ textarea {
 
 #currentPanel {
   width: auto;
-  background: linear-gradient(
-    to bottom,
-    rgba(var(--baseColor), 0.2),
-    rgba(var(--baseColor), 0.4)
-  );
+  background: linear-gradient(to bottom,
+      rgba(var(--baseColor), 0.2),
+      rgba(var(--baseColor), 0.4));
   border-radius: 0rem 0rem 1rem 2rem;
   padding: 0.4rem;
   display: table;
@@ -942,6 +970,7 @@ textarea {
 
 .exitTabButton.blockWiggle {
   animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+  animation-delay: var(--wiggle-delay, 0s);
 }
 
 .exitTabButton.dragging {
@@ -975,7 +1004,7 @@ nav#sMConfigBar.invisible {
   transform: none;
 }
 
-nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
+nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
   display: none;
 }
 
@@ -1009,10 +1038,10 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   gap: 1rem;
 }
 
-#sMSPCreate > span,
-#sMSPElement > span,
-#smSPShieldHeader > span,
-#smSPShieldList > span {
+#sMSPCreate>span,
+#sMSPElement>span,
+#smSPShieldHeader>span,
+#smSPShieldList>span {
   font-size: 16px;
 }
 
@@ -1046,13 +1075,45 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.5);
 }
 
+.sMControlRow.rowWiggle {
+  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+  animation-delay: var(--wiggle-delay, 0s);
+}
+
+.sMControlRow.dragging {
+  opacity: 0.5;
+  animation: none;
+  cursor: grabbing;
+}
+
+.sMControlRow.dropBefore::before,
+.sMControlRow.dropAfter::after {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  height: 0.2rem;
+  border-radius: 0.2rem;
+  background: var(--selectedColor);
+  pointer-events: none;
+}
+
+.sMControlRow.dropBefore::before {
+  top: -0.15rem;
+}
+
+.sMControlRow.dropAfter::after {
+  bottom: -0.15rem;
+}
+
 .smControlRow * {
   font-size: 16px;
   padding: 4px 8px;
 }
 
 .smControlRow *.selected {
-  text-decoration: underline;
+  text-decoration: none;
+  box-shadow: inset 0 0 0 100vmax rgba(0, 0, 0, 0.4);
 }
 
 .sdCtrlText {
@@ -1093,6 +1154,14 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .sdActionMessage {
   background-color: var(--green);
   color: white;
+}
+
+.sdShieldBannerGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin: 0.35rem 0;
 }
 
 .sdElectronicSign {
@@ -1194,7 +1263,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 }
 
 .smSPShieldRow.selected .dragIndicator,
-.smSPShieldGroup.selected > .dragIndicator {
+.smSPShieldGroup.selected>.dragIndicator {
   display: block;
 }
 
@@ -1212,12 +1281,12 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   padding: 1rem;
 }
 
-#smSPShieldImgConfig > div {
+#smSPShieldImgConfig>div {
   background-color: rgb(var(--baseColor), 0.125);
   height: stretch;
 }
 
-#smSPShieldImgConfig > div:nth-child(1) {
+#smSPShieldImgConfig>div:nth-child(1) {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1226,7 +1295,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   padding: 0.5rem;
 }
 
-#smSPShieldImgConfig > div:nth-child(2) {
+#smSPShieldImgConfig>div:nth-child(2) {
   padding: 0.5rem;
 }
 
@@ -1253,11 +1322,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   height: 80%;
 }
 
-#shieldImgSelector > div {
+#shieldImgSelector>div {
   padding: 1rem;
 }
 
-#shieldImgSelector > div {
+#shieldImgSelector>div {
   background: canvas;
 }
 
@@ -1268,7 +1337,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   gap: 0.5rem;
 }
 
-.shieldLibrary > header {
+.shieldLibrary>header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -1285,7 +1354,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(255, 0, 0, 0.6);
 }
 
-.shieldLibrary > nav {
+.shieldLibrary>nav {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -1293,12 +1362,12 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   gap: 0.5rem;
 }
 
-.shieldLibrary > nav button {
+.shieldLibrary>nav button {
   font-size: 24px;
   padding: 0.5rem 2rem;
 }
 
-.shieldLibrary > nav button.selected {
+.shieldLibrary>nav button.selected {
   background-color: rgb(0, 0, 255, 0.7);
   color: white;
 }
@@ -1312,11 +1381,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   display: none;
 }
 
-.shieldLibrary > nav button.selected:hover {
+.shieldLibrary>nav button.selected:hover {
   background-color: rgb(0, 0, 255, 1) !important;
 }
 
-.shieldLibrary > nav button:not(.selected):hover {
+.shieldLibrary>nav button:not(.selected):hover {
   background-color: rgb(0, 0, 255, 0.125) !important;
 }
 
@@ -1417,7 +1486,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   font-weight: 600;
 }
 
-.shieldPreview > footer {
+.shieldPreview>footer {
   margin-top: auto;
 }
 
@@ -1444,7 +1513,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   transition: all 0.3s ease;
 }
 
-#shieldUploadField > span.material-symbols-outlined {
+#shieldUploadField>span.material-symbols-outlined {
   font-size: 64px;
 }
 
@@ -1500,7 +1569,7 @@ dialog:not([open]) {
 }
 
 .shieldCategory:not(.open) .shieldCategoryType,
-.shieldCategory:not(.open) > .shieldCategory {
+.shieldCategory:not(.open)>.shieldCategory {
   display: none;
 }
 
@@ -1511,4 +1580,163 @@ dialog:not([open]) {
 .smallVal {
   width: 3rem;
   display: inline-block;
+}
+
+
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 1rem;
+  background: rgba(var(--baseColor), 0.1);
+}
+
+.iconGridItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+.iconGridItem:hover {
+  background-color: var(--selectedColor);
+}
+
+.iconGridItem img {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+}
+
+.iconGridItem span {
+  display: none;
+}
+
+#iconSearch {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+#arrowGrid .iconGridItem img {
+  filter: invert(1);
+}
+
+/* APL Divider Controls */
+.aplDividerRadioGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.aplDividerRadioLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  width: auto;
+}
+
+.aplDividerButton {
+  min-width: 2.5rem;
+  min-height: 1.9rem;
+  margin: 2px;
+  font-size: 1rem;
+}
+
+.aplArrowListItem {
+  margin: 4px 0;
+  padding: 6px;
+  gap: 10px;
+}
+
+.aplArrowListItem button {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+:root[data-theme="dark"] .aplDividerButton,
+:root[data-theme="dark"] .aplDividerButton.active,
+:root[data-theme="dark"] .aplArrowListItem button,
+:root[data-theme="dark"] #aplArrowFlip {
+  background-color: rgb(var(--inputColor));
+}
+
+#aplArrowFlip,
+#aplArrowFlipButton {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.aplArrowControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.aplArrowControls label {
+  width: auto;
+}
+
+.aplArrowControls select,
+.aplArrowControls button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.aplDividerIcon {
+  width: 20px;
+  height: 20px;
+}
+
+:root[data-theme="dark"] .aplDividerIcon {
+  filter: invert(1);
+}
+
+/* Dark mode for dialog modals */
+:root[data-theme="dark"] dialog {
+  background-color: rgb(30, 30, 30);
+  color: white;
+}
+
+:root[data-theme="dark"] div.options {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme="dark"] .iconGrid {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="dark"] .iconGridItem {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="dark"] .iconGridItem:hover {
+  background-color: var(--selectedColor);
+}
+
+:root[data-theme="dark"] #iconSearch,
+:root[data-theme="dark"] #arrowSearch,
+:root[data-theme="dark"] #tollLogoSearch {
+  background-color: rgb(50, 50, 50);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme="dark"] #iconGrid .iconGridItem img {
+  filter: invert(1);
 }

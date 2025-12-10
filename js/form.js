@@ -1,6 +1,6 @@
 /* 
-	// form.js - JK_Potato/Computer
-	Responsible for changes within the website form (editor)
+  // form.js - JK_Potato/Computer
+  Responsible for changes within the website form (editor)
 */
 
 const formHandler = (function () {
@@ -9,6 +9,7 @@ const formHandler = (function () {
   let blockDragState = null;
   let panelDragState = null;
   let exitTabDragState = null;
+  let rowDragState = null;
   let newRowDropTargetButton = null;
   const STORAGE_KEYS = {
     postPosition: "signMaker.postPosition",
@@ -16,14 +17,13 @@ const formHandler = (function () {
     showPost: "signMaker.showPost",
     postThickness: "signMaker.postThickness",
     controlTextFont: "signMaker.controlTextFont",
+    bannerFontFamily: "signMaker.bannerFontFamily",
   };
   let localStorageAvailable;
   let localStorageWarningLogged = false;
   const LIMON_TRIGGER_VALUE = "limon";
   const LIMON_VIDEO_URL = "https://www.youtube.com/watch?v=qA7qUG6uEbY";
   const getPostThicknessFallback = () =>
-    typeof Post !== "undefined" &&
-    Post.prototype &&
     typeof Post.prototype.defaultThickness === "number"
       ? Post.prototype.defaultThickness
       : 1;
@@ -44,17 +44,8 @@ const formHandler = (function () {
   };
 
   const hasLocalStorage = () => {
-    if (localStorageAvailable !== undefined) {
-      return localStorageAvailable;
-    }
-    try {
-      localStorageAvailable =
-        typeof window !== "undefined" &&
-        typeof window.localStorage !== "undefined";
-    } catch (error) {
-      localStorageAvailable = false;
-    }
-    return localStorageAvailable;
+    localStorageAvailable = true;
+    return true;
   };
 
   const getStoredItem = (key) => {
@@ -123,23 +114,23 @@ const formHandler = (function () {
     }
 
     const storedControlFont = getStoredItem(STORAGE_KEYS.controlTextFont);
-    const availableFonts =
-      TextElement && TextElement.prototype
-        ? TextElement.prototype.fontFamily
-        : null;
+    const availableFonts = TextElement.prototype.fontFamily;
     if (
       storedControlFont &&
       Array.isArray(availableFonts) &&
       availableFonts.includes(storedControlFont)
     ) {
-      if (
-        typeof ControlTextElement !== "undefined" &&
-        typeof ControlTextElement.setDefaultFont === "function"
-      ) {
-        ControlTextElement.setDefaultFont(storedControlFont);
-      } else if (typeof ControlTextElement !== "undefined") {
-        ControlTextElement.defaultFont = storedControlFont;
-      }
+      ControlTextElement.setDefaultFont(storedControlFont);
+    }
+
+    const storedBannerFont = getStoredItem(STORAGE_KEYS.bannerFontFamily);
+    const bannerFonts = ShieldElement.prototype.getBannerFontOptions();
+    if (
+      storedBannerFont &&
+      Array.isArray(bannerFonts) &&
+      bannerFonts.includes(storedBannerFont)
+    ) {
+      ShieldElement.prototype.defaultBannerFontFamily = storedBannerFont;
     }
   };
 
@@ -147,6 +138,11 @@ const formHandler = (function () {
     const blocks = document.querySelectorAll(".textEditorBlock");
     for (const block of blocks) {
       block.classList.toggle("blockWiggle", isActive);
+      if (isActive) {
+        block.style.setProperty("--wiggle-delay", `${Math.random() * 0.12}s`);
+      } else {
+        block.style.removeProperty("--wiggle-delay");
+      }
     }
   };
 
@@ -154,6 +150,11 @@ const formHandler = (function () {
     const buttons = document.querySelectorAll(".exitTabButton");
     for (const button of buttons) {
       button.classList.toggle("blockWiggle", isActive);
+      if (isActive) {
+        button.style.setProperty("--wiggle-delay", `${Math.random() * 0.12}s`);
+      } else {
+        button.style.removeProperty("--wiggle-delay");
+      }
     }
   };
 
@@ -161,6 +162,11 @@ const formHandler = (function () {
     const buttons = document.querySelectorAll(".panelListButton");
     for (const button of buttons) {
       button.classList.toggle("panelWiggle", isActive);
+      if (isActive) {
+        button.style.setProperty("--wiggle-delay", `${Math.random() * 0.12}s`);
+      } else {
+        button.style.removeProperty("--wiggle-delay");
+      }
     }
   };
 
@@ -443,6 +449,154 @@ const formHandler = (function () {
     }
   };
 
+  // --- Row Drag and Drop ---
+  const toggleRowWiggle = (isActive) => {
+    const rows = document.querySelectorAll(".sMControlRow");
+    for (const row of rows) {
+      row.classList.toggle("rowWiggle", isActive);
+      if (isActive) {
+        row.style.setProperty("--wiggle-delay", `${Math.random() * 0.12}s`);
+      } else {
+        row.style.removeProperty("--wiggle-delay");
+      }
+    }
+  };
+
+  const clearRowDropIndicators = () => {
+    document
+      .querySelectorAll(".sMControlRow.dropBefore, .sMControlRow.dropAfter")
+      .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
+  };
+
+  const endRowDrag = () => {
+    toggleRowWiggle(false);
+    clearRowDropIndicators();
+    rowDragState = null;
+    document
+      .querySelectorAll(".sMControlRow.dragging")
+      .forEach((el) => {
+        el.classList.remove("dragging");
+        delete el.dataset.dragging;
+      });
+  };
+
+  const getRowDropPosition = (container, clientY) => {
+    const rows = Array.from(container.querySelectorAll(".sMControlRow"));
+    if (!rows.length) {
+      return { dropIndex: 0, targetRow: null, placement: null };
+    }
+
+    let dropIndex = rows.length;
+    let targetRow = null;
+    let placement = "after";
+    let foundPosition = false;
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const rect = row.getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+      if (clientY < midpoint) {
+        dropIndex = Number(row.dataset.dataRow || i);
+        placement = "before";
+        foundPosition = true;
+        targetRow = row.dataset.dragging === "true" ? null : row;
+        break;
+      }
+    }
+
+    if (!foundPosition) {
+      const lastRow = rows[rows.length - 1];
+      dropIndex = Number(lastRow.dataset.dataRow || rows.length - 1) + 1;
+      if (lastRow.dataset.dragging !== "true") {
+        targetRow = lastRow;
+        placement = "after";
+      } else {
+        placement = null;
+      }
+    } else if (!targetRow) {
+      placement = null;
+    }
+
+    return { dropIndex, targetRow, placement };
+  };
+
+  const handleRowDragStart = (event) => {
+    const row = event.currentTarget;
+    const fromIndex = Number(row.dataset.dataRow);
+    if (Number.isNaN(fromIndex)) {
+      return;
+    }
+    rowDragState = { fromIndex, dropIndex: fromIndex };
+    row.dataset.dragging = "true";
+    row.classList.add("dragging");
+    toggleRowWiggle(true);
+    clearRowDropIndicators();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.setData("text/plain", "");
+    }
+  };
+
+  const handleRowListDragOver = (event) => {
+    if (!rowDragState) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    const container = event.currentTarget;
+    const { dropIndex, targetRow, placement } = getRowDropPosition(
+      container,
+      event.clientY
+    );
+    rowDragState.dropIndex = dropIndex;
+
+    clearRowDropIndicators();
+    if (targetRow && placement) {
+      targetRow.classList.add(
+        placement === "before" ? "dropBefore" : "dropAfter"
+      );
+    }
+  };
+
+  const handleRowListDrop = (event) => {
+    if (!rowDragState) {
+      return;
+    }
+    event.preventDefault();
+    const fromIndex = rowDragState.fromIndex;
+    const dropIndex =
+      rowDragState.dropIndex !== undefined
+        ? rowDragState.dropIndex
+        : fromIndex;
+    if (typeof exposed.moveRow === "function") {
+      exposed.moveRow(fromIndex, dropIndex);
+    }
+    endRowDrag();
+  };
+
+  const handleRowListDragLeave = (event) => {
+    if (!rowDragState) {
+      return;
+    }
+    const container = event.currentTarget;
+    const related = event.relatedTarget;
+    if (related && container.contains(related)) {
+      return;
+    }
+    clearRowDropIndicators();
+  };
+
+  const handleRowDragEnd = () => {
+    if (rowDragState) {
+      endRowDrag();
+    }
+  };
+
   const isTextInputElement = (element) => {
     if (!element || element.disabled || element.readOnly) {
       return false;
@@ -600,6 +754,7 @@ const formHandler = (function () {
   };
 
   const handleBlockDragStart = (event) => {
+    event.stopPropagation();
     const target = event.currentTarget;
     const rowIndex = Number(target.dataset.row);
     const blockIndex = Number(target.dataset.block);
@@ -1114,12 +1269,7 @@ const formHandler = (function () {
 
     const exitTollLogoSelectElmt =
       document.getElementById("exitTollLogoSelect");
-    if (
-      exitTollLogoSelectElmt &&
-      typeof TollLogoElement !== "undefined" &&
-      TollLogoElement.prototype &&
-      TollLogoElement.prototype.logos
-    ) {
+    if (exitTollLogoSelectElmt) {
       for (const [logoKey, logoDef] of Object.entries(
         TollLogoElement.prototype.logos
       )) {
@@ -1193,6 +1343,47 @@ const formHandler = (function () {
       lib.appendOption(otherSymbolSelectElement, otherSymbol);
     }
 
+    // APL Arrow Per Lane event listeners
+    const addAPLArrowBtn = document.getElementById("addAPLArrow");
+    const removeAPLArrowBtn = document.getElementById("removeAPLArrow");
+    const aplArrowTypeSelect = document.getElementById("aplArrowType");
+
+    if (addAPLArrowBtn) {
+      addAPLArrowBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (exposed && typeof exposed.addAPLArrow === "function") {
+          const type = aplArrowTypeSelect ? aplArrowTypeSelect.value : "APL_UP";
+          exposed.addAPLArrow(type);
+        }
+      });
+    }
+
+    if (removeAPLArrowBtn) {
+      removeAPLArrowBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (exposed && typeof exposed.removeAPLArrow === "function") {
+          exposed.removeAPLArrow();
+        }
+      });
+    }
+
+    if (aplArrowTypeSelect) {
+      aplArrowTypeSelect.addEventListener("change", () => {
+        if (exposed && typeof exposed.updateAPLArrowType === "function") {
+          exposed.updateAPLArrowType(aplArrowTypeSelect.value);
+        }
+      });
+    }
+
+    const aplArrowFlipButton = document.getElementById("aplArrowFlipButton");
+    if (aplArrowFlipButton) {
+      aplArrowFlipButton.addEventListener("click", () => {
+        if (exposed && typeof exposed.toggleAPLArrowFlip === "function") {
+          exposed.toggleAPLArrowFlip();
+        }
+      });
+    }
+
     // Control Signs Revision
     let textElem_fontFamilySelects = [
       document.querySelector("#sdCtrlText_fontFamily"),
@@ -1207,6 +1398,7 @@ const formHandler = (function () {
       document.querySelector("#sdElectronicSign_alignment"),
       document.querySelector("#sdTollLogo_alignment"),
       document.querySelector("#sdBeacon_alignment"),
+      document.querySelector("#sdIcon_alignment"),
     ];
     let textElem_bgColorSelects = [
       document.querySelector("#sdCtrlText_backgroundColor"),
@@ -1220,10 +1412,19 @@ const formHandler = (function () {
     let divider_widthMeasurement = document.querySelector(
       "#sdBlocker_dividerMeasurement"
     );
+    let divider_orientationSelect = document.querySelector(
+      "#sdBlocker_orientation"
+    );
     let divider_colorSelect = document.querySelector("#sdBlocker_dividerColor");
     let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
     let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
     const beaconColorSelect = document.querySelector("#sdBeacon_color");
+    const controlTextColorSelect = document.querySelector(
+      "#sdCtrlText_textColor"
+    );
+    const blockBorderColorSelect = document.querySelector(
+      "#sdBlock_borderColor"
+    );
 
     for (const elem of textElem_fontFamilySelects) {
       for (const fontFamily of TextElement.prototype.fontFamily) {
@@ -1231,14 +1432,41 @@ const formHandler = (function () {
       }
     }
 
-    if (
-      beaconColorSelect &&
-      typeof BeaconElement !== "undefined" &&
-      Array.isArray(BeaconElement.prototype.colors)
-    ) {
+    if (beaconColorSelect) {
       for (const color of BeaconElement.prototype.colors) {
         lib.appendOption(beaconColorSelect, color);
       }
+    }
+
+    if (controlTextColorSelect) {
+      const textColorOptions = ControlTextElement.getTextColorOptions();
+      for (const optionValue of textColorOptions) {
+        if (optionValue) {
+          lib.appendOption(controlTextColorSelect, optionValue);
+        }
+      }
+      const defaultTextColor =
+        ControlTextElement.defaultTextColor ||
+        (textColorOptions.length ? textColorOptions[0] : "");
+      if (defaultTextColor) {
+        controlTextColorSelect.value = defaultTextColor;
+      }
+    }
+
+    if (blockBorderColorSelect) {
+      const defaultBorderColor = Block.defaultBorderColor || "Match BG";
+      const borderColorOptions = [defaultBorderColor].concat(
+        Object.keys(lib.colors || {})
+      );
+      const seenBorderColors = new Set();
+      for (const optionValue of borderColorOptions) {
+        if (!optionValue || seenBorderColors.has(optionValue)) {
+          continue;
+        }
+        lib.appendOption(blockBorderColorSelect, optionValue);
+        seenBorderColors.add(optionValue);
+      }
+      blockBorderColorSelect.value = defaultBorderColor;
     }
 
     const controlTextFontSelect = document.querySelector(
@@ -1246,39 +1474,18 @@ const formHandler = (function () {
     );
     if (controlTextFontSelect) {
       let defaultControlFont = null;
-      if (
-        typeof ControlTextElement !== "undefined" &&
-        typeof ControlTextElement.getDefaultFont === "function"
-      ) {
-        defaultControlFont = ControlTextElement.getDefaultFont();
-      } else if (typeof ControlTextElement !== "undefined") {
-        defaultControlFont = ControlTextElement.defaultFont;
-      }
+      defaultControlFont = ControlTextElement.getDefaultFont();
       if (defaultControlFont) {
         controlTextFontSelect.value = defaultControlFont;
       }
 
       controlTextFontSelect.addEventListener("change", () => {
         const selectedFont = controlTextFontSelect.value;
-        const availableFonts =
-          TextElement && TextElement.prototype
-            ? TextElement.prototype.fontFamily
-            : null;
-        if (
-          !selectedFont ||
-          !Array.isArray(availableFonts) ||
-          !availableFonts.includes(selectedFont)
-        ) {
+        const availableFonts = TextElement.prototype.fontFamily;
+        if (!selectedFont || !availableFonts.includes(selectedFont)) {
           return;
         }
-        if (
-          typeof ControlTextElement !== "undefined" &&
-          typeof ControlTextElement.setDefaultFont === "function"
-        ) {
-          ControlTextElement.setDefaultFont(selectedFont);
-        } else if (typeof ControlTextElement !== "undefined") {
-          ControlTextElement.defaultFont = selectedFont;
-        }
+        ControlTextElement.setDefaultFont(selectedFont);
         setStoredItem(STORAGE_KEYS.controlTextFont, selectedFont);
       });
     }
@@ -1313,21 +1520,167 @@ const formHandler = (function () {
       lib.appendOption(divider_widthMeasurement, measurement);
     }
 
+    for (const orientation of DividerElement.prototype.orientations || []) {
+      lib.appendOption(divider_orientationSelect, orientation);
+    }
+
     for (const { value, label } of DividerElement.prototype.dividerColors) {
       lib.appendOption(divider_colorSelect, value, { text: label });
     }
 
-    for (const shieldType in Shield.prototype.types) {
-      lib.appendOption(shield_shieldBase, shieldType);
+    if (shield_shieldBase && ShieldElement.prototype.blockShieldBases) {
+      const shields = ShieldElement.prototype.blockShieldBases || [];
+      const currentValue =
+        shield_shieldBase.value || ShieldElement.prototype.defaultShieldBase;
+      shield_shieldBase.innerHTML = "";
+
+      const groupMap = new Map();
+      for (const shield of shields) {
+        const categories = Array.isArray(shield.categories)
+          ? shield.categories
+          : [];
+        const groupLabel = categories.length ? categories.join(" / ") : "Other";
+        if (!groupMap.has(groupLabel)) {
+          groupMap.set(groupLabel, []);
+        }
+        groupMap.get(groupLabel).push(shield);
+      }
+
+      let firstOptionValue = "";
+      const sortedGroups = Array.from(groupMap.entries()).sort((a, b) =>
+        a[0].localeCompare(b[0])
+      );
+
+      for (const [groupLabel, groupShields] of sortedGroups) {
+        const optgroup = document.createElement("optgroup");
+        optgroup.label = groupLabel;
+
+        groupShields
+          .slice()
+          .sort((a, b) =>
+            (a.label || a.value).localeCompare(b.label || b.value)
+          )
+          .forEach(({ value, label }) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = label || value;
+            if (!firstOptionValue) {
+              firstOptionValue = value;
+            }
+            if (currentValue && value === currentValue) {
+              option.selected = true;
+            }
+            optgroup.appendChild(option);
+          });
+
+        shield_shieldBase.appendChild(optgroup);
+      }
+
+      if (!shield_shieldBase.value && firstOptionValue) {
+        shield_shieldBase.value = firstOptionValue;
+      }
     }
 
-    for (const icon of IconElement.prototype.icons) {
-      lib.appendOption(iconElem_iconsSelect, icon);
+    const shieldVariantSelect = document.querySelector("#sdShield_shieldType");
+    if (shieldVariantSelect && ShieldElement.prototype.blockShieldVariants) {
+      const populateVariantOptions = (baseValue, currentValue) => {
+        shieldVariantSelect.innerHTML = "";
+        const config = ShieldElement.prototype.getBlockShieldConfig(baseValue);
+        const variants =
+          (config && Array.isArray(config.variants) && config.variants.length
+            ? config.variants
+            : []) || [];
+        const optionsToUse = variants.length
+          ? variants
+          : (ShieldElement.prototype.blockShieldVariants || []).map(
+            (variant) => variant.value || variant
+          );
+        for (const variant of optionsToUse) {
+          lib.appendOption(shieldVariantSelect, variant, { text: variant });
+        }
+        if (currentValue && optionsToUse.includes(currentValue)) {
+          shieldVariantSelect.value = currentValue;
+        }
+      };
+
+      populateVariantOptions(
+        shield_shieldBase?.value || ShieldElement.prototype.defaultShieldBase,
+        shieldVariantSelect.value
+      );
+
+      if (shield_shieldBase) {
+        shield_shieldBase.addEventListener("change", () => {
+          populateVariantOptions(shield_shieldBase.value, null);
+        });
+      }
     }
+
+    const blockShieldBannerSelects = [
+      document.querySelector("#sdShield_bannerType"),
+      document.querySelector("#sdShield_bannerType2"),
+    ];
+    for (const select of blockShieldBannerSelects) {
+      if (!select) {
+        continue;
+      }
+      for (const bannerType of Shield.prototype.bannerTypes) {
+        lib.appendOption(select, bannerType);
+      }
+    }
+
+    const blockBannerPositionSelects = [
+      document.querySelector("#sdShield_bannerPosition"),
+      document.querySelector("#sdShield_bannerPosition2"),
+    ];
+    const bannerPositionOptions = ShieldElement.prototype.blockBannerPositions;
+    for (const select of blockBannerPositionSelects) {
+      if (!select || !bannerPositionOptions.length) {
+        continue;
+      }
+      for (const bannerPosition of bannerPositionOptions) {
+        lib.appendOption(select, bannerPosition);
+      }
+    }
+
+    const blockBannerFontSelect = document.querySelector(
+      "#sdShield_bannerFontFamily"
+    );
+    if (blockBannerFontSelect) {
+      const bannerFontOptions = ShieldElement.prototype.getBannerFontOptions();
+      if (
+        (!bannerFontOptions || !bannerFontOptions.length) &&
+        ShieldElement.prototype.defaultBannerFontFamily
+      ) {
+        lib.appendOption(
+          blockBannerFontSelect,
+          ShieldElement.prototype.defaultBannerFontFamily
+        );
+      } else {
+        for (const font of bannerFontOptions) {
+          lib.appendOption(blockBannerFontSelect, font);
+        }
+      }
+      const defaultBannerFont =
+        ShieldElement.prototype.defaultBannerFontFamily ||
+        (bannerFontOptions.length ? bannerFontOptions[0] : "");
+      if (defaultBannerFont) {
+        blockBannerFontSelect.value = defaultBannerFont;
+      }
+      blockBannerFontSelect.addEventListener("change", () => {
+        const selectedFont = blockBannerFontSelect.value;
+        if (selectedFont) {
+          ShieldElement.prototype.defaultBannerFontFamily = selectedFont;
+          setStoredItem(STORAGE_KEYS.bannerFontFamily, selectedFont);
+        }
+        readForm();
+      });
+    }
+
+
 
     const arrowElemSelect = document.querySelector("#sdArrow_arrow");
     const arrowSizeInput = document.querySelector("#sdArrow_size");
-    if (arrowElemSelect && typeof ArrowElement !== "undefined") {
+    if (arrowElemSelect) {
       const arrowKeys =
         ArrowElement.prototype.arrowKeys ||
         Object.keys(ArrowElement.prototype.arrows || {});
@@ -1340,18 +1693,14 @@ const formHandler = (function () {
       }
     }
 
-    if (
-      arrowElemSelect &&
-      arrowSizeInput &&
-      typeof ArrowElement !== "undefined"
-    ) {
+    if (arrowElemSelect && arrowSizeInput) {
       arrowElemSelect.addEventListener("change", () => {
         const arrowDefinition =
           ArrowElement.prototype.arrows[arrowElemSelect.value] || null;
         const defaultSize =
           arrowDefinition &&
-          typeof arrowDefinition.defaultSize === "number" &&
-          !isNaN(arrowDefinition.defaultSize)
+            typeof arrowDefinition.defaultSize === "number" &&
+            !isNaN(arrowDefinition.defaultSize)
             ? arrowDefinition.defaultSize
             : ArrowElement.prototype.defaultSize;
         arrowSizeInput.value = defaultSize;
@@ -1431,6 +1780,17 @@ const formHandler = (function () {
         lib.appendOption(tollLogoSelectElmt, logoKey, {
           text: logoDef.label,
           selected: logoKey == TollLogoElement.prototype.defaultLogo,
+        });
+      }
+    }
+
+    const iconSelectElmt = document.getElementById("sdIcon_icon");
+    if (iconSelectElmt) {
+      for (const iconKey in IconElement.prototype.icons) {
+        const iconDef = IconElement.prototype.icons[iconKey];
+        lib.appendOption(iconSelectElmt, iconKey, {
+          text: iconDef.label,
+          selected: iconKey == IconElement.prototype.defaultIcon,
         });
       }
     }
@@ -1636,13 +1996,13 @@ const formHandler = (function () {
     const subPanel =
       exposed.vars.currentlySelectedSubPanelIndex != -1
         ? currentPanel.sign.subPanels[
-            exposed.vars.currentlySelectedSubPanelIndex
-          ]
+        exposed.vars.currentlySelectedSubPanelIndex
+        ]
         : currentPanel.sign;
     const exitTab =
       exposed.vars.currentlySelectedNestedExitTabIndex != -1
         ? currentPanel.exitTabs[exposed.vars.currentlySelectedExitTabIndex]
-            .nestedExitTabs[exposed.vars.currentlySelectedNestedExitTabIndex]
+          .nestedExitTabs[exposed.vars.currentlySelectedNestedExitTabIndex]
         : currentPanel.exitTabs[exposed.vars.currentlySelectedExitTabIndex];
 
     // Post
@@ -1669,6 +2029,8 @@ const formHandler = (function () {
       ? Math.max(0, panelBorderRadiusInput)
       : Panel.prototype.defaultBorderRadius;
 
+    post.disableFlash = form["disableFlash"].checked;
+
     // Exit Tab
     exitTab.number = form["exitNumber"].value;
     exitTab.width = form["exitTabWidth"].value;
@@ -1678,16 +2040,10 @@ const formHandler = (function () {
 
     toggleExitTabVariantOptionsVisibility(exitTab.variant);
 
-    const resolveDefaultTollLogoSize = () => {
-      if (
-        typeof ExitTab !== "undefined" &&
-        ExitTab.prototype &&
-        typeof ExitTab.prototype.defaultTollLogoSize === "number"
-      ) {
-        return ExitTab.prototype.defaultTollLogoSize;
-      }
-      return 3;
-    };
+    const resolveDefaultTollLogoSize = () =>
+      typeof ExitTab.prototype.defaultTollLogoSize === "number"
+        ? ExitTab.prototype.defaultTollLogoSize
+        : 3;
     const tollLogoSizeField = form["exitTollLogoSize"];
     const parsedTollLogoSize =
       tollLogoSizeField && tollLogoSizeField.value !== ""
@@ -1712,12 +2068,7 @@ const formHandler = (function () {
 
     if (exitTab.variant == "Toll Logo") {
       const tollLogoSelectField = form["exitTollLogoSelect"];
-      const tollLogoOptions =
-        typeof TollLogoElement !== "undefined" &&
-        TollLogoElement.prototype &&
-        TollLogoElement.prototype.logos
-          ? TollLogoElement.prototype.logos
-          : null;
+      const tollLogoOptions = TollLogoElement.prototype.logos;
       let selectedLogo =
         tollLogoSelectField && tollLogoSelectField.value
           ? tollLogoSelectField.value
@@ -1760,11 +2111,7 @@ const formHandler = (function () {
     const borderThicknessInput = parseFloat(form["borderThickness"].value);
     exitTab.borderThickness = Number.isFinite(borderThicknessInput)
       ? Math.max(0, borderThicknessInput)
-      : (typeof ExitTab !== "undefined" &&
-          ExitTab.prototype &&
-          typeof ExitTab.prototype.defaultBorderThickness === "number"
-          ? ExitTab.prototype.defaultBorderThickness
-          : 0.2);
+      : ExitTab.prototype.defaultBorderThickness;
     exitTab.minHeight = form["minHeight"].value;
     exitTab.fontSize = form["fontSize"].value;
 
@@ -1799,18 +2146,41 @@ const formHandler = (function () {
       shield.bannerType = document.getElementById(
         `shield${shieldIndex}_bannerType`
       ).value;
+      const customBannerInput = document.getElementById(
+        `shield${shieldIndex}_bannerCustomText`
+      );
+      const customBannerText =
+        customBannerInput && customBannerInput.value
+          ? customBannerInput.value.trim()
+          : "";
+      shield.bannerType = customBannerText || shield.bannerType;
       shield.bannerPosition = document.getElementById(
         `shield${shieldIndex}_bannerPosition`
       ).value;
       shield.bannerType2 = document.getElementById(
         `shield${shieldIndex}_bannerType2`
       ).value;
+      const customBannerInput2 = document.getElementById(
+        `shield${shieldIndex}_bannerCustomText2`
+      );
+      const customBannerText2 =
+        customBannerInput2 && customBannerInput2.value
+          ? customBannerInput2.value.trim()
+          : "";
+      shield.bannerType2 = customBannerText2 || shield.bannerType2;
       shield.specialBannerType =
         document.getElementById(`shield${shieldIndex}_specialBannerType`)
           .value || "None";
       shield.indentFirstLetter = document.getElementById(
         `shield${shieldIndex}_indentFirstLetter`
       ).checked;
+      const indentSecondElmt = document.getElementById(
+        `shield${shieldIndex}_indentFirstLetter2`
+      );
+      shield.indentFirstLetter2 =
+        indentSecondElmt && typeof indentSecondElmt.checked === "boolean"
+          ? indentSecondElmt.checked
+          : shield.indentFirstLetter;
       shield.fontSize =
         String(document.getElementById(`shield${shieldIndex}_fontSize`).value) +
         "rem";
@@ -1859,13 +2229,33 @@ const formHandler = (function () {
     const currentBlockElem = exposed.getCurrentBlockElem();
     const blockElemType =
       Control.prototype.blockInternalElements[
-        Control.prototype.blockToClassElems.getElem(currentBlockElem)
+      Control.prototype.blockToClassElems.getElem(currentBlockElem)
       ];
     for (const propertyName in currentBlockElem) {
       const elementId = `${blockElemType}_${propertyName}`;
       const element = document.getElementById(elementId);
 
       if (element) {
+        const handleCustomBanner =
+          blockElemType === "sdShield" &&
+          (propertyName === "bannerType" || propertyName === "bannerType2");
+        if (handleCustomBanner) {
+          const customInputId =
+            propertyName === "bannerType"
+              ? "sdShield_bannerCustomText"
+              : "sdShield_bannerCustomText2";
+          const customInput = document.getElementById(customInputId);
+          const customValue =
+            customInput && typeof customInput.value === "string"
+              ? customInput.value.trim()
+              : "";
+          if (customValue) {
+            currentBlockElem[propertyName] = customValue;
+          } else if (element.tagName === "SELECT") {
+            currentBlockElem[propertyName] = element.value;
+          }
+          continue;
+        }
         if (element.type === "checkbox") {
           currentBlockElem[propertyName] = element.checked;
         } else if (element.type === "radio") {
@@ -1878,6 +2268,17 @@ const formHandler = (function () {
           currentBlockElem[propertyName] = element.value;
         }
       }
+    }
+
+    if (blockElemType === "sdShield") {
+      currentBlockElem.shieldSize =
+        ShieldElement.prototype.normalizeShieldSize(
+          currentBlockElem.shieldSize
+        );
+      currentBlockElem.scaleBannersWithShield =
+        ShieldElement.prototype.normalizeScaleBannersWithShield(
+          currentBlockElem.scaleBannersWithShield
+        );
     }
 
     if (blockElemType === "sdArrow") {
@@ -1900,6 +2301,9 @@ const formHandler = (function () {
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor"
     ).value;
+    subPanel.blockElements.blockProperties[
+      exposed.vars.currentlySelectedRowIndex
+    ].borderColor = document.querySelector("#sdBlock_borderColor").value;
     subPanel.blockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].backgroundFullWidth = document.querySelector(
@@ -1979,6 +2383,22 @@ const formHandler = (function () {
 
         if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
           lib.appendOption(form["arrowLocations"], "Middle");
+        }
+      }
+    } else if (
+      currentPanel.sign.guideArrow == "Exit Only" &&
+      (currentPanel.sign.guideArrowLanes == 1 ||
+        currentPanel.sign.guideArrowLanes == 2)
+    ) {
+      currentPanel.sign.arrowPosition = form["arrowLocations"].value;
+
+      for (const arrowPosition of Sign.prototype.arrowPositions) {
+        if (
+          !form["arrowLocations"].querySelector(
+            `option[value="${arrowPosition}"]`
+          )
+        ) {
+          lib.appendOption(form["arrowLocations"], arrowPosition);
         }
       }
     } else {
@@ -2139,6 +2559,197 @@ const formHandler = (function () {
    * Update the fields in the form to the values of the currently selected panel.
    */
   const updateForm = function () {
+    // Icon Modal Logic
+    const iconChooseBtn = document.getElementById("sdIcon_chooseBtn");
+    const iconModal = document.getElementById("iconSelectorModal");
+    const closeIconModalBtn = document.getElementById("closeIconSelector");
+    const iconSearch = document.getElementById("iconSearch");
+    const iconGrid = document.getElementById("iconGrid");
+    const iconInput = document.getElementById("sdIcon_icon");
+    const iconLabel = document.getElementById("sdIcon_selectedLabel");
+
+    if (iconChooseBtn && iconModal && !iconChooseBtn.hasAttribute("data-initialized")) {
+      iconChooseBtn.setAttribute("data-initialized", "true");
+
+      const populateGrid = (filter = "") => {
+        lib.clearChildren(iconGrid);
+        const filterText = filter.toLowerCase();
+
+        for (const iconKey in IconElement.prototype.icons) {
+          const iconDef = IconElement.prototype.icons[iconKey];
+          if (iconDef.label.toLowerCase().includes(filterText)) {
+            const item = document.createElement("div");
+            item.className = "iconGridItem";
+
+            const img = document.createElement("img");
+            img.src = iconDef.src;
+            img.loading = "lazy";
+            img.title = iconDef.label; // Tooltip for accessibility
+
+            item.appendChild(img);
+
+            item.onclick = () => {
+              iconInput.value = iconKey;
+              iconLabel.textContent = "Current: " + iconDef.label;
+              readForm(); // Trigger update
+              iconModal.close();
+            };
+
+            iconGrid.appendChild(item);
+          }
+        }
+      };
+
+      iconChooseBtn.onclick = () => {
+        populateGrid();
+        iconSearch.value = "";
+        iconModal.showModal();
+      };
+
+      closeIconModalBtn.onclick = () => {
+        iconModal.close();
+      };
+
+      iconSearch.oninput = (e) => {
+        populateGrid(e.target.value);
+      };
+    }
+
+    // Update label on form update
+    if (iconInput && iconLabel) {
+      const currentIconKey = iconInput.value || IconElement.prototype.defaultIcon;
+      const currentIconDef = IconElement.prototype.icons[currentIconKey];
+      if (currentIconDef) {
+        iconLabel.textContent = "Current: " + currentIconDef.label;
+      }
+    }
+
+    const tollLogoChooseBtn = document.getElementById("sdTollLogo_chooseBtn");
+    const tollLogoModal = document.getElementById("tollLogoSelectorModal");
+    const closeTollLogoModalBtn = document.getElementById("closeTollLogoSelector");
+    const tollLogoSearch = document.getElementById("tollLogoSearch");
+    const tollLogoGrid = document.getElementById("tollLogoGrid");
+    const tollLogoInput = document.getElementById("sdTollLogo_logo");
+    const tollLogoLabel = document.getElementById("sdTollLogo_selectedLabel");
+
+    if (tollLogoChooseBtn && tollLogoModal && !tollLogoChooseBtn.hasAttribute("data-initialized")) {
+      tollLogoChooseBtn.setAttribute("data-initialized", "true");
+
+      const populateTollGrid = (filter = "") => {
+        lib.clearChildren(tollLogoGrid);
+        const filterText = filter.toLowerCase();
+
+        for (const logoKey in TollLogoElement.prototype.logos) {
+          const logoDef = TollLogoElement.prototype.logos[logoKey];
+          if (logoDef.label.toLowerCase().includes(filterText)) {
+            const item = document.createElement("div");
+            item.className = "iconGridItem";
+
+            const img = document.createElement("img");
+            img.src = logoDef.src;
+            img.loading = "lazy";
+
+            item.appendChild(img);
+
+            item.onclick = () => {
+              tollLogoInput.value = logoKey;
+              tollLogoLabel.textContent = "Current: " + logoDef.label;
+              readForm(); // Trigger update
+              tollLogoModal.close();
+            };
+
+            tollLogoGrid.appendChild(item);
+          }
+        }
+      };
+
+      tollLogoChooseBtn.onclick = () => {
+        populateTollGrid();
+        tollLogoSearch.value = "";
+        tollLogoModal.showModal();
+      };
+
+      closeTollLogoModalBtn.onclick = () => {
+        tollLogoModal.close();
+      };
+
+      tollLogoSearch.oninput = (e) => {
+        populateTollGrid(e.target.value);
+      };
+    }
+
+    if (tollLogoInput && tollLogoLabel) {
+      const currentLogoKey = tollLogoInput.value || TollLogoElement.prototype.defaultLogo;
+      const currentLogoDef = TollLogoElement.prototype.logos[currentLogoKey];
+      if (currentLogoDef) {
+        tollLogoLabel.textContent = "Current: " + currentLogoDef.label;
+      }
+    }
+
+    const arrowChooseBtn = document.getElementById("sdArrow_chooseBtn");
+    const arrowModal = document.getElementById("arrowSelectorModal");
+    const closeArrowModalBtn = document.getElementById("closeArrowSelector");
+    const arrowSearch = document.getElementById("arrowSearch");
+    const arrowGrid = document.getElementById("arrowGrid");
+    const arrowInput = document.getElementById("sdArrow_arrow");
+    const arrowLabel = document.getElementById("sdArrow_selectedLabel");
+
+    if (arrowChooseBtn && arrowModal && !arrowChooseBtn.hasAttribute("data-initialized")) {
+      arrowChooseBtn.setAttribute("data-initialized", "true");
+
+      const populateArrowGrid = (filter = "") => {
+        lib.clearChildren(arrowGrid);
+        const filterText = filter.toLowerCase();
+
+        for (const arrowKey in ArrowElement.prototype.arrows) {
+          const arrowDef = ArrowElement.prototype.arrows[arrowKey];
+          if (arrowDef.label.toLowerCase().includes(filterText)) {
+            const item = document.createElement("div");
+            item.className = "iconGridItem";
+
+            const img = document.createElement("img");
+            img.src = arrowDef.src;
+            img.loading = "lazy";
+            img.title = arrowDef.label;
+
+            item.appendChild(img);
+
+            item.onclick = () => {
+              arrowInput.value = arrowKey;
+              arrowLabel.textContent = "Current: " + arrowDef.label;
+              readForm(); // Trigger update
+              arrowModal.close();
+            };
+
+            arrowGrid.appendChild(item);
+          }
+        }
+      };
+
+      arrowChooseBtn.onclick = () => {
+        populateArrowGrid();
+        arrowSearch.value = "";
+        arrowModal.showModal();
+      };
+
+      closeArrowModalBtn.onclick = () => {
+        arrowModal.close();
+      };
+
+      arrowSearch.oninput = (e) => {
+        populateArrowGrid(e.target.value);
+      };
+    }
+
+    // Update label on form update for Arrow
+    if (arrowInput && arrowLabel) {
+      const currentArrowKey = arrowInput.value || ArrowElement.prototype.defaultArrow;
+      const currentArrowDef = ArrowElement.prototype.arrows[currentArrowKey];
+      if (currentArrowDef) {
+        arrowLabel.textContent = "Current: " + currentArrowDef.label;
+      }
+    }
+
     const panel = exposed.getCurrentPanel();
     const sign =
       exposed.vars.currentlySelectedSubPanelIndex != -1
@@ -2151,9 +2762,7 @@ const formHandler = (function () {
     const currentExitTab = panel.exitTabs[selectedExitTabIndex];
 
     const maxNested =
-      typeof ExitTab !== "undefined" && ExitTab.prototype.maxNested != null
-        ? ExitTab.prototype.maxNested
-        : 1;
+      ExitTab.prototype.maxNested != null ? ExitTab.prototype.maxNested : 1;
 
     if (currentExitTab && currentExitTab.nestedExitTabs.length > maxNested) {
       currentExitTab.nestedExitTabs.splice(maxNested);
@@ -2401,6 +3010,226 @@ const formHandler = (function () {
         !selectedExitTab || nestedCount >= limit;
     }
 
+    // APL Arrow List Update
+    const aplArrowList = document.getElementById("aplArrowList");
+    const aplArrowTypeSelect = document.getElementById("aplArrowType");
+    const selectedAPLIndex = exposed.vars.currentlySelectedAPLArrowIndex;
+
+    if (aplArrowList) {
+      lib.clearChildren(aplArrowList);
+
+      // Add hint text
+      const hintText = document.createElement("p");
+      hintText.textContent = "To adjust spacing of each APL section, use the spacing section in the subpanel tab.";
+      aplArrowList.appendChild(hintText);
+
+      const aplArrows = panel.sign.aplArrows || [];
+
+      for (let i = 0; i < aplArrows.length; i++) {
+        const arrow = aplArrows[i];
+
+        // Create container for arrow button and divider button
+        const arrowContainer = document.createElement("div");
+        arrowContainer.className = "aplArrowListItem";
+        arrowContainer.style.display = "flex";
+        arrowContainer.style.alignItems = "center";
+        arrowContainer.style.gap = "4px";
+
+        const arrowButton = document.createElement("button");
+        arrowButton.type = "button";
+        arrowButton.className = "scrollMenuItem" + (i === selectedAPLIndex ? " active" : "");
+        arrowButton.dataset.aplIndex = i.toString();
+        arrowButton.style.flex = "1";
+
+        const arrowDef = ArrowElement.prototype.arrows[arrow.type];
+        let label = arrowDef ? arrowDef.label : arrow.type;
+        // Remove "APL " prefix if present
+        if (label.startsWith("APL ")) {
+          label = label.substring(4);
+        }
+        arrowButton.textContent = "Arrow " + (i + 1) + ": " + label;
+
+        arrowButton.addEventListener("click", function () {
+          if (exposed && typeof exposed.selectAPLArrow === "function") {
+            exposed.selectAPLArrow(i);
+          }
+        });
+
+        arrowContainer.appendChild(arrowButton);
+
+        // Add divider button (available on all arrows if at least 2 arrows)
+        if (aplArrows.length >= 2) {
+          const dividerContainer = document.createElement("div");
+          dividerContainer.style.display = "flex";
+          dividerContainer.style.flexDirection = "row";
+          dividerContainer.style.alignItems = "center";
+          dividerContainer.style.gap = "4px";
+          dividerContainer.style.marginLeft = "4px";
+
+          const dividerButton = document.createElement("button");
+          dividerButton.type = "button";
+          dividerButton.className = "aplDividerButton" + (arrow.dividerAfter ? " active" : "");
+          dividerButton.title = arrow.dividerAfter ? "Remove Divider" : "Add Divider";
+          dividerButton.style.minWidth = "28px";
+          dividerButton.style.padding = "4px";
+          dividerButton.style.display = "flex";
+          dividerButton.style.alignItems = "center";
+          dividerButton.style.justifyContent = "center";
+
+          if (arrow.dividerAfter) {
+            const closeIcon = document.createElement("img");
+            closeIcon.src = "img/other-symbols/ui/close.svg";
+            closeIcon.alt = "Remove Divider";
+            closeIcon.className = "aplDividerIcon";
+            closeIcon.style.width = "20px";
+            closeIcon.style.height = "20px";
+            dividerButton.appendChild(closeIcon);
+          } else {
+            const dividerIcon = document.createElement("img");
+            dividerIcon.src = "img/other-symbols/ui/divider_add.svg";
+            dividerIcon.alt = "Add Divider";
+            dividerIcon.className = "aplDividerIcon";
+            dividerIcon.style.width = "20px";
+            dividerIcon.style.height = "20px";
+            dividerButton.appendChild(dividerIcon);
+          }
+
+          dividerButton.addEventListener("click", function (e) {
+            e.stopPropagation();
+            if (exposed && typeof exposed.addAPLDivider === "function") {
+              exposed.addAPLDivider(i);
+            }
+          });
+
+          dividerContainer.appendChild(dividerButton);
+
+          if (arrow.dividerAfter) {
+            // Radio buttons for divider options (when divider is active)
+            const radioGroup = document.createElement("div");
+            radioGroup.className = "aplDividerRadioGroup";
+            radioGroup.style.display = "flex";
+            radioGroup.style.flexDirection = "row";
+            radioGroup.style.gap = "8px";
+            radioGroup.style.fontSize = "0.75rem";
+            radioGroup.style.marginLeft = "8px";
+            radioGroup.style.flexWrap = "wrap";
+
+            const radioName = "aplDividerOption_" + i;
+
+            // Option 1: Normal (default)
+            const normalLabel = document.createElement("label");
+            normalLabel.className = "aplDividerRadioLabel";
+            const normalRadio = document.createElement("input");
+            normalRadio.type = "radio";
+            normalRadio.name = radioName;
+            normalRadio.value = "normal";
+            normalRadio.checked = !arrow.groupedWithDivider && !arrow.exitOnly;
+            normalRadio.addEventListener("change", function (e) {
+              e.stopPropagation();
+              if (exposed) {
+                if (typeof exposed.setAPLGroupedWithDivider === "function") {
+                  exposed.setAPLGroupedWithDivider(i, false);
+                }
+                if (typeof exposed.setAPLExitOnly === "function") {
+                  exposed.setAPLExitOnly(i, false);
+                }
+                if (typeof exposed.selectAPLArrow === "function") {
+                  exposed.selectAPLArrow(i);
+                }
+              }
+            });
+            normalLabel.appendChild(normalRadio);
+            normalLabel.appendChild(document.createTextNode("Normal"));
+            radioGroup.appendChild(normalLabel);
+
+            // Option 2: Group with Last Arrow
+            const groupLabel = document.createElement("label");
+            groupLabel.className = "aplDividerRadioLabel";
+            const groupRadio = document.createElement("input");
+            groupRadio.type = "radio";
+            groupRadio.name = radioName;
+            groupRadio.value = "group";
+            groupRadio.checked = arrow.groupedWithDivider === true;
+            groupRadio.addEventListener("change", function (e) {
+              e.stopPropagation();
+              if (exposed && typeof exposed.setAPLGroupedWithDivider === "function") {
+                exposed.setAPLGroupedWithDivider(i, true);
+              }
+              if (exposed && typeof exposed.selectAPLArrow === "function") {
+                exposed.selectAPLArrow(i);
+              }
+            });
+            groupLabel.appendChild(groupRadio);
+            groupLabel.appendChild(document.createTextNode("Group"));
+            radioGroup.appendChild(groupLabel);
+
+            // Option 3: Exit Only
+            const exitOnlyLabel = document.createElement("label");
+            exitOnlyLabel.className = "aplDividerRadioLabel";
+            const exitOnlyRadio = document.createElement("input");
+            exitOnlyRadio.type = "radio";
+            exitOnlyRadio.name = radioName;
+            exitOnlyRadio.value = "exitOnly";
+            exitOnlyRadio.checked = arrow.exitOnly === true;
+            exitOnlyRadio.addEventListener("change", function (e) {
+              e.stopPropagation();
+              if (exposed && typeof exposed.setAPLExitOnly === "function") {
+                exposed.setAPLExitOnly(i, true);
+              }
+              if (exposed && typeof exposed.selectAPLArrow === "function") {
+                exposed.selectAPLArrow(i);
+              }
+            });
+            exitOnlyLabel.appendChild(exitOnlyRadio);
+            exitOnlyLabel.appendChild(document.createTextNode("Exit Only"));
+            radioGroup.appendChild(exitOnlyLabel);
+
+            dividerContainer.appendChild(radioGroup);
+          } else {
+            // Checkbox for Exit Only (when no divider)
+            const exitOnlyCheckLabel = document.createElement("label");
+            exitOnlyCheckLabel.className = "aplDividerRadioLabel";
+            exitOnlyCheckLabel.style.marginLeft = "8px";
+
+            const exitOnlyCheckbox = document.createElement("input");
+            exitOnlyCheckbox.type = "checkbox";
+            exitOnlyCheckbox.checked = arrow.exitOnly === true;
+            exitOnlyCheckbox.addEventListener("change", function (e) {
+              e.stopPropagation();
+              if (exposed && typeof exposed.setAPLExitOnly === "function") {
+                exposed.setAPLExitOnly(i, this.checked);
+              }
+              if (exposed && typeof exposed.selectAPLArrow === "function") {
+                exposed.selectAPLArrow(i);
+              }
+            });
+
+            exitOnlyCheckLabel.appendChild(exitOnlyCheckbox);
+            exitOnlyCheckLabel.appendChild(document.createTextNode("Exit Only"));
+            dividerContainer.appendChild(exitOnlyCheckLabel);
+          }
+
+          arrowContainer.appendChild(dividerContainer);
+        }
+
+        aplArrowList.appendChild(arrowContainer);
+      }
+
+      // Update the type selector to match the selected arrow
+      if (aplArrowTypeSelect && aplArrows.length > 0 && selectedAPLIndex < aplArrows.length) {
+        aplArrowTypeSelect.value = aplArrows[selectedAPLIndex].type;
+      }
+
+      // Update the flip button state
+      const aplArrowFlipButton = document.getElementById("aplArrowFlipButton");
+      if (aplArrowFlipButton && aplArrows.length > 0 && selectedAPLIndex < aplArrows.length) {
+        const isFlipped = aplArrows[selectedAPLIndex].flip === true;
+        aplArrowFlipButton.classList.toggle("activated", isFlipped);
+        aplArrowFlipButton.setAttribute("aria-pressed", isFlipped ? "true" : "false");
+        aplArrowFlipButton.textContent = isFlipped ? "Unflip" : "Flip";
+      }
+    }
+
     // Panel Setting Config
 
     // Panel Config
@@ -2439,17 +3268,17 @@ const formHandler = (function () {
     const g_actionMessage = document.getElementById("g_actionMessage");
 
     g_actionMessage.className =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 ? "invisible" : "";
+      exposed.vars.currentlySelectedSubPanelIndex != -1 ? "invisible" : "";
     outActionMessage.className =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 ? "invisible" : "";
+      exposed.vars.currentlySelectedSubPanelIndex != -1 ? "invisible" : "";
     outActionMessageLabel.className =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 ? "invisible" : "";
+      exposed.vars.currentlySelectedSubPanelIndex != -1 ? "invisible" : "";
     g_actionMessage.className =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 ? "invisible" : "";
+      exposed.vars.currentlySelectedSubPanelIndex != -1 ? "invisible" : "";
     globalPositioning.className =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 ? "invisible" : "";
+      exposed.vars.currentlySelectedSubPanelIndex != -1 ? "invisible" : "";
     globalPositionLabel.className =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 ? "invisible" : "";
+      exposed.vars.currentlySelectedSubPanelIndex != -1 ? "invisible" : "";
 
     outActionMessage.checked = panel.sign.advisoryMessage;
 
@@ -2460,18 +3289,18 @@ const formHandler = (function () {
     const subPanelLengthLabel = document.getElementById("subPanelLengthLabel");
 
     subPanelHeight.style.display =
-      exposed.varscurrentlySelectedSubPanelIndex > 0 ? "initial" : "none";
+      exposed.vars.currentlySelectedSubPanelIndex > 0 ? "initial" : "none";
     subPanelHeightLabel.style.display =
-      exposed.varscurrentlySelectedSubPanelIndex > 0 ? "inline-block" : "none";
+      exposed.vars.currentlySelectedSubPanelIndex > 0 ? "inline-block" : "none";
 
     subPanelLength.style.display =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 &&
-      panel.sign.subPanels.length > 1
+      exposed.vars.currentlySelectedSubPanelIndex != -1 &&
+        panel.sign.subPanels.length > 1
         ? "initial"
         : "none";
     subPanelLengthLabel.style.display =
-      exposed.varscurrentlySelectedSubPanelIndex != -1 &&
-      panel.sign.subPanels.length > 1
+      exposed.vars.currentlySelectedSubPanelIndex != -1 &&
+        panel.sign.subPanels.length > 1
         ? "inline-block"
         : "none";
 
@@ -2524,14 +3353,9 @@ const formHandler = (function () {
       if (Number.isFinite(parsed) && parsed > 0) {
         return parsed;
       }
-      if (
-        typeof ExitTab !== "undefined" &&
-        ExitTab.prototype &&
-        typeof ExitTab.prototype.defaultTollLogoSize === "number"
-      ) {
-        return ExitTab.prototype.defaultTollLogoSize;
-      }
-      return 3;
+      return typeof ExitTab.prototype.defaultTollLogoSize === "number"
+        ? ExitTab.prototype.defaultTollLogoSize
+        : 3;
     })();
     if (tollLogoSizeInput) {
       tollLogoSizeInput.value = resolvedTollLogoSize;
@@ -2543,11 +3367,7 @@ const formHandler = (function () {
     const tollLogoSelect = document.getElementById("exitTollLogoSelect");
     if (tollLogoSelect && tollLogoSelect.options.length > 0) {
       const desiredLogo =
-        exitTab.icon ||
-        (typeof TollLogoElement !== "undefined" &&
-        TollLogoElement.prototype
-          ? TollLogoElement.prototype.defaultLogo
-          : "");
+        exitTab.icon || TollLogoElement.prototype.defaultLogo || "";
       for (const option of tollLogoSelect.options) {
         if (option.value == desiredLogo) {
           option.selected = true;
@@ -2600,14 +3420,7 @@ const formHandler = (function () {
       if (Number.isFinite(parsedValue) && parsedValue >= 0) {
         return parsedValue;
       }
-      if (
-        typeof ExitTab !== "undefined" &&
-        ExitTab.prototype &&
-        typeof ExitTab.prototype.defaultBorderThickness === "number"
-      ) {
-        return ExitTab.prototype.defaultBorderThickness;
-      }
-      return 0.2;
+      return ExitTab.prototype.defaultBorderThickness;
     })();
     exitTab.borderThickness = resolvedBorderThickness;
     borderThickness.value = resolvedBorderThickness;
@@ -2651,10 +3464,10 @@ const formHandler = (function () {
         textEditorBlock.className =
           "textEditorBlock " +
           Control.prototype.blockInternalElements[
-            blockElement.constructor.name
+          blockElement.constructor.name
           ] +
           (item == exposed.vars.currentlySelectedBlockIndex &&
-          row == exposed.vars.currentlySelectedRowIndex
+            row == exposed.vars.currentlySelectedRowIndex
             ? " selected"
             : "");
         textEditorBlock.dataset.row = row.toString();
@@ -2672,6 +3485,7 @@ const formHandler = (function () {
               event.preventDefault();
               return;
             }
+            exposed.setSelectedRow(row);
             exposed.setSelectedControlElem(item);
           },
           { once: true }
@@ -2679,6 +3493,10 @@ const formHandler = (function () {
       }
 
       sMSPTextList.appendChild(sMControlRow);
+      sMControlRow.draggable = true;
+      sMControlRow.style.position = "relative";
+      sMControlRow.addEventListener("dragstart", handleRowDragStart);
+      sMControlRow.addEventListener("dragend", handleRowDragEnd);
       sMControlRow.addEventListener("dragenter", handleRowDragEnter);
       sMControlRow.addEventListener("dragover", handleRowDragOver);
       sMControlRow.addEventListener("dragleave", handleRowDragLeave);
@@ -2692,15 +3510,20 @@ const formHandler = (function () {
       );
     }
 
+    // Attach row list container drag events for row reordering
+    sMSPTextList.addEventListener("dragover", handleRowListDragOver);
+    sMSPTextList.addEventListener("drop", handleRowListDrop);
+    sMSPTextList.addEventListener("dragleave", handleRowListDragLeave);
+
     for (const divConfig of document.querySelectorAll(
       "#smSPProperties > div"
     )) {
       if (
         divConfig.dataset.property ==
         Control.prototype.blockInternalElements[
-          Control.prototype.blockToClassElems.getElem(
-            exposed.getCurrentBlockElem()
-          )
+        Control.prototype.blockToClassElems.getElem(
+          exposed.getCurrentBlockElem()
+        )
         ]
       ) {
         divConfig.classList.remove("hidden");
@@ -2712,7 +3535,7 @@ const formHandler = (function () {
     const currentBlockElem = exposed.getCurrentBlockElem();
     const blockElemType =
       Control.prototype.blockInternalElements[
-        Control.prototype.blockToClassElems.getElem(currentBlockElem)
+      Control.prototype.blockToClassElems.getElem(currentBlockElem)
       ];
 
     if (blockElemType === "sdArrow") {
@@ -2725,7 +3548,7 @@ const formHandler = (function () {
 
       const fallbackPadding =
         currentBlockElem.padding !== undefined &&
-        currentBlockElem.padding !== null
+          currentBlockElem.padding !== null
           ? currentBlockElem.padding
           : 0;
 
@@ -2748,11 +3571,72 @@ const formHandler = (function () {
         currentBlockElem.flip === "on";
     }
 
+    if (blockElemType === "sdShield") {
+      currentBlockElem.bannerFontFamily =
+        ShieldElement.prototype.normalizeBannerFontFamily(
+          currentBlockElem.bannerFontFamily
+        );
+      currentBlockElem.scaleBannersWithShield =
+        ShieldElement.prototype.normalizeScaleBannersWithShield(
+          currentBlockElem.scaleBannersWithShield
+        );
+      if (currentBlockElem.indentFirstLetter === undefined) {
+        currentBlockElem.indentFirstLetter = true;
+      }
+      if (currentBlockElem.indentFirstLetter2 === undefined) {
+        currentBlockElem.indentFirstLetter2 =
+          currentBlockElem.indentFirstLetter;
+      }
+      currentBlockElem.shieldSize =
+        ShieldElement.prototype.normalizeShieldSize(
+          currentBlockElem.shieldSize
+        );
+      if (currentBlockElem.smallCaps === undefined) {
+        currentBlockElem.smallCaps = true;
+      }
+      if (currentBlockElem.smallCaps2 === undefined) {
+        currentBlockElem.smallCaps2 = currentBlockElem.smallCaps;
+      }
+    }
+
+    if (blockElemType === "sdBlocker") {
+      currentBlockElem.orientation =
+        DividerElement.prototype.normalizeOrientation(
+          currentBlockElem.orientation
+        );
+    }
+
     for (const propertyName in currentBlockElem) {
       const elementId = `${blockElemType}_${propertyName}`;
       const element = document.getElementById(elementId);
       const displayElement = document.getElementById(elementId + "Val");
       if (element) {
+        const handleCustomBanner =
+          blockElemType === "sdShield" &&
+          (propertyName === "bannerType" || propertyName === "bannerType2");
+        if (handleCustomBanner) {
+          const customInputId =
+            propertyName === "bannerType"
+              ? "sdShield_bannerCustomText"
+              : "sdShield_bannerCustomText2";
+          const customInput = document.getElementById(customInputId);
+          const bannerOptions = Shield.prototype.bannerTypes || [];
+          const isPreset = bannerOptions.includes(currentBlockElem[propertyName]);
+          if (element.tagName === "SELECT") {
+            element.value = isPreset
+              ? currentBlockElem[propertyName]
+              : ShieldElement.prototype.defaultBannerType;
+            element.addEventListener("change", readForm, { once: true });
+          }
+          if (customInput) {
+            customInput.value = isPreset ? "" : currentBlockElem[propertyName];
+            customInput.addEventListener("blur", readForm, { once: true });
+          }
+          if (displayElement) {
+            displayElement.textContent = currentBlockElem[propertyName];
+          }
+          continue;
+        }
         if (element.type === "checkbox") {
           element.checked = currentBlockElem[propertyName];
           element.addEventListener("change", readForm, { once: true });
@@ -2873,6 +3757,17 @@ const formHandler = (function () {
       .querySelector("#sdBlock_backgroundColor")
       .addEventListener("blur", readForm, { once: true });
 
+    const blockBorderColorEl = document.querySelector("#sdBlock_borderColor");
+    if (blockBorderColorEl) {
+      const storedBorderColor =
+        sign.blockElements.blockProperties[
+          exposed.vars.currentlySelectedRowIndex
+        ].borderColor;
+      blockBorderColorEl.value =
+        storedBorderColor || Block.defaultBorderColor || "Match BG";
+      blockBorderColorEl.addEventListener("blur", readForm, { once: true });
+    }
+
     const blockBackgroundFullWidthEl = document.querySelector(
       "#sdBlock_backgroundFullWidth"
     );
@@ -2921,7 +3816,7 @@ const formHandler = (function () {
     // Old Control Text
     const controlTextElmt = document.getElementById("controlText");
     controlTextElmt.value = sign.controlText;
-
+ 
     const actionMessageElmt = document.getElementById("actionMessage");
     actionMessageElmt.value = sign.actionMessage;
     */
@@ -2947,7 +3842,7 @@ const formHandler = (function () {
 
     const guideArrowLanesElmt = document.getElementById("guideArrowLanes");
     guideArrowLanesElmt.value = panel.sign.guideArrowLanes;
-    
+
     const useCanadianDownArrowsElmt = document.getElementById(
       "useCanadianDownArrows"
     );
@@ -2990,7 +3885,7 @@ const formHandler = (function () {
       : "";
     exitOnlyPaddingLabel.className =
       !panel.sign.guideArrow.includes("Exit Only") ||
-      panel.sign.guideArrow == "Split Exit Only"
+        panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
     showExitOnlyLabel.className = !panel.sign.guideArrow.includes("Exit Only")
@@ -3006,7 +3901,7 @@ const formHandler = (function () {
       : "";
     exitOnlyPadding.className =
       !panel.sign.guideArrow.includes("Exit Only") ||
-      panel.sign.guideArrow == "Split Exit Only"
+        panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
     showExitOnly.className = !panel.sign.guideArrow.includes("Exit Only")
@@ -3045,7 +3940,7 @@ const formHandler = (function () {
     }
     paddingValue.className =
       !panel.sign.guideArrow.includes("Exit Only") ||
-      panel.sign.guideArrow == "Split Exit Only"
+        panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
     if (exitOnlyBorderModeLabel && exitOnlyBorderModeSelect) {
@@ -3211,7 +4106,10 @@ const formHandler = (function () {
       const indentElmt = document.createElement("input");
       indentElmt.type = "checkbox";
       indentElmt.id = `shield${shieldIndex}_indentFirstLetter`;
-      indentElmt.checked = shields[shieldIndex].indentFirstLetter;
+      indentElmt.checked =
+        shields[shieldIndex].indentFirstLetter !== undefined
+          ? shields[shieldIndex].indentFirstLetter
+          : true;
       indentElmt.onchange = readForm;
       rowContainerElmt.appendChild(indentElmt);
 
@@ -3224,6 +4122,25 @@ const formHandler = (function () {
         document.createTextNode("Enlarge First Letter")
       );
       rowContainerElmt.appendChild(indentLabelElmt);
+      const indentElmt2 = document.createElement("input");
+      indentElmt2.type = "checkbox";
+      indentElmt2.id = `shield${shieldIndex}_indentFirstLetter2`;
+      indentElmt2.checked =
+        shields[shieldIndex].indentFirstLetter2 !== undefined
+          ? shields[shieldIndex].indentFirstLetter2
+          : shields[shieldIndex].indentFirstLetter;
+      indentElmt2.onchange = readForm;
+      rowContainerElmt.appendChild(indentElmt2);
+
+      const indentLabelElmt2 = document.createElement("label");
+      indentLabelElmt2.setAttribute(
+        "for",
+        `shield${shieldIndex}_indentFirstLetter2`
+      );
+      indentLabelElmt2.appendChild(
+        document.createTextNode("Enlarge First Letter (2nd Banner)")
+      );
+      rowContainerElmt.appendChild(indentLabelElmt2);
 
       const fontSizeLabelElmt = document.createElement("label");
       fontSizeLabelElmt.setAttribute("for", `shield${shieldIndex}_fontSize`);
@@ -3260,6 +4177,17 @@ const formHandler = (function () {
       bannerTypeSelectElmt.id = `shield${shieldIndex}_bannerType`;
       bannerTypeSelectElmt.addEventListener("change", readForm);
       rowContainerElmt.appendChild(bannerTypeSelectElmt);
+      const bannerCustomInputElmt = document.createElement("input");
+      bannerCustomInputElmt.type = "text";
+      bannerCustomInputElmt.placeholder = "Custom text";
+      bannerCustomInputElmt.id = `shield${shieldIndex}_bannerCustomText`;
+      const isCustomBanner =
+        !Shield.prototype.bannerTypes.includes(shields[shieldIndex].bannerType);
+      bannerCustomInputElmt.value = isCustomBanner
+        ? shields[shieldIndex].bannerType
+        : "";
+      bannerCustomInputElmt.addEventListener("blur", readForm);
+      rowContainerElmt.appendChild(bannerCustomInputElmt);
 
       // Populate banner position options
       const bannerPositionSelectElmt = document.createElement("select");
@@ -3283,6 +4211,17 @@ const formHandler = (function () {
       bannerType2SelectElmt.id = `shield${shieldIndex}_bannerType2`;
       bannerType2SelectElmt.addEventListener("change", readForm);
       rowContainerElmt.appendChild(bannerType2SelectElmt);
+      const bannerCustomInputElmt2 = document.createElement("input");
+      bannerCustomInputElmt2.type = "text";
+      bannerCustomInputElmt2.placeholder = "Custom text";
+      bannerCustomInputElmt2.id = `shield${shieldIndex}_bannerCustomText2`;
+      const isCustomBanner2 =
+        !Shield.prototype.bannerTypes.includes(shields[shieldIndex].bannerType2);
+      bannerCustomInputElmt2.value = isCustomBanner2
+        ? shields[shieldIndex].bannerType2
+        : "";
+      bannerCustomInputElmt2.addEventListener("blur", readForm);
+      rowContainerElmt.appendChild(bannerCustomInputElmt2);
 
       // Populate banner position options
 

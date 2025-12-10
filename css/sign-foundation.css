@@ -30,23 +30,15 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .blockElementRow.fullBleed {
-  width: calc(
-    100% + var(--blockBleedLeft, 0rem) + var(--blockBleedRight, 0rem)
-  );
+  width: calc(100% + var(--blockBleedLeft, 0rem) + var(--blockBleedRight, 0rem));
   margin-left: calc(-1 * var(--blockBleedLeft, 0rem));
   margin-right: calc(-1 * var(--blockBleedRight, 0rem));
   margin-top: calc(var(--marginTop, 0rem) - var(--blockBleedTop, 0rem));
-  margin-bottom: calc(
-    var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem)
-  );
+  margin-bottom: calc(var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem));
   padding-left: var(--blockBleedLeft, 0rem);
   padding-right: var(--blockBleedRight, 0rem);
-  padding-top: calc(
-    var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem)
-  );
-  padding-bottom: calc(
-    var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem)
-  );
+  padding-top: calc(var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem));
+  padding-bottom: calc(var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem));
 }
 
 .bE-textElement {
@@ -62,14 +54,13 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100) + 0.2));
 }
 
-.bE-textElement > span {
+.bE-textElement>span {
   position: relative;
   top: var(--fhwaBaselineOffset);
 }
 
 .bE-advisoryMessage {
-  padding: calc(var(--fontSize) * var(--vertPadding))
-    calc(var(--fontSize) * var(--horizPadding));
+  padding: calc(var(--fontSize) * var(--vertPadding)) calc(var(--fontSize) * var(--horizPadding));
   border-radius: var(--borderRadius);
   display: flex;
   justify-content: center;
@@ -103,10 +94,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .bE-banner:first-letter {
-  font-size: calc(
-    var(--fontSize) * (var(--bannerSize) / 100) *
-      (var(--bannerFirstLetterSize) / 100)
-  );
+  font-size: calc(var(--fontSize) * (var(--bannerSize) / 100) * (var(--bannerFirstLetterSize) / 100));
 }
 
 .bE-tollLogoElement {
@@ -145,8 +133,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   background-color: white;
   color: black;
   font-family: "Series E";
-  padding: calc(var(--tollLogoHeight) * 0.15) 0.5rem
-    calc(var(--tollLogoHeight) * 0.075);
+  padding: calc(var(--tollLogoHeight) * 0.15) 0.5rem calc(var(--tollLogoHeight) * 0.075);
   line-height: calc(var(--tollLogoHeight) * 0.55);
   font-size: calc(var(--tollLogoHeight) * 0.8);
   border-radius: calc(var(--borderRadius) / 2);
@@ -156,6 +143,10 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   border: 3px solid white;
   border-radius: var(--borderRadius, 4px);
   padding: calc(var(--tollLogoHeight) / 10) calc(var(--tollLogoHeight) / 4);
+}
+
+.bE-shieldElement {
+  /* moved shield layout rules to css/shields.css */
 }
 
 .bE-tollLogoElement img {
@@ -203,8 +194,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .bE-beaconElement.hasBackplate {
-  box-shadow: 0 0 0 var(--beaconBackplateThickness, 0.125rem)
-    var(--beaconBackplateColor, #ffd200);
+  box-shadow: 0 0 0 var(--beaconBackplateThickness, 0.125rem) var(--beaconBackplateColor, #ffd200);
   border-radius: var(--beaconBackplateRadius, 0.15rem);
 }
 
@@ -219,12 +209,13 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 @keyframes beaconFlash {
+
   0%,
   49.9% {
     opacity: 1;
-    box-shadow: 0 0 calc(var(--beaconSize) * 0.25)
-      var(--beaconBulbColor, var(--yellow, #ffd200));
+    box-shadow: 0 0 calc(var(--beaconSize) * 0.25) var(--beaconBulbColor, var(--yellow, #ffd200));
   }
+
   50%,
   100% {
     opacity: 0;
@@ -237,24 +228,37 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .dividerElement {
+  --dividerLength: var(--dividerWidth, 100%);
+  --dividerThickness: var(--dividerHeight, 0.2rem);
   --dividerBleedLeft: 0rem;
   --dividerBleedRight: 0rem;
+  --dividerBleedTop: 0rem;
+  --dividerBleedBottom: 0rem;
   background-color: white;
-  width: var(--dividerWidth, 100%);
-  height: var(--dividerHeight);
+  width: var(--dividerLength, 100%);
+  height: var(--dividerThickness, 0.2rem);
   position: relative;
   z-index: 3;
   pointer-events: none;
 }
 
-.dividerElement.fullBleed {
-  width: calc(
-    var(--dividerWidth, 100%) + var(--dividerBleedLeft, 0rem) +
-      var(--dividerBleedRight, 0rem)
-  );
+.dividerElement.vertical {
+  width: var(--dividerThickness, 0.2rem);
+  height: var(--dividerLength, 100%);
+  align-self: stretch;
+}
+
+.dividerElement.fullBleed:not(.vertical) {
+  width: calc(var(--dividerLength, 100%) + var(--dividerBleedLeft, 0rem) + var(--dividerBleedRight, 0rem));
   margin-left: calc(-1 * var(--dividerBleedLeft, 0rem));
   margin-right: calc(-1 * var(--dividerBleedRight, 0rem));
   flex-grow: 1;
+}
+
+.dividerElement.vertical.fullBleed {
+  height: calc(var(--dividerLength, 100%) + var(--dividerBleedTop, 0rem) + var(--dividerBleedBottom, 0rem));
+  margin-top: calc(-1 * var(--dividerBleedTop, 0rem));
+  margin-bottom: calc(-1 * var(--dividerBleedBottom, 0rem));
 }
 
 .blockElementLeft,
@@ -285,4 +289,29 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 
 .blockElementRight {
   justify-content: right;
+}
+
+.bE-iconElement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 var(--spacing, 0rem);
+  aspect-ratio: 1 / 1;
+  width: 3.5rem;
+}
+
+.bE-iconElement img {
+  height: var(--iconSize, 3rem);
+  width: auto;
+  display: block;
+}
+
+.bE-iconElement.hasBackground {
+  background-color: var(--iconBgColor, inherit);
+  padding: 0.2rem;
+  border-radius: var(--borderRadius, 4px);
+}
+
+.bE-iconElement.hasBorder {
+  border: 0.15rem solid var(--iconBorderColor, white);
 }

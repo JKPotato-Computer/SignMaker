@@ -7,31 +7,31 @@ class Arrow {
 		* @param {string} [opt.rightText] - For EXIT ONLY, right text
 		* @param {boolean} [opt.individual] - For EXIT ONLY, if possible, combine with next arrow
 	*/
-	
+
 	constructor({
-		
+
 		// Arrow Information
-		
+
 		arrowType = "",
 		leftText = "",
 		rightText = "",
 		individual = true,
-		
+
 		// Arrow location
-		
+
 		parentIndex = 0,
 		arrowIndex = 0
-		
+
 	} = {}
 	) {
 		this.arrowType = arrowType;
 		this.lefttext = leftText;
 		this.rightText = rightText;
 		this.individual = individual;
-		
+
 		this.parentIndex = parentIndex;
 		this.arrowIndex = arrowIndex;
-		
+
 	}
 }
 

@@ -202,20 +202,19 @@
 }
 
 @font-face {
-  font-family: "Icons";
-  src: url("../fonts/Roadgeek2005Icons.woff2") format("woff2"),
-    url("../fonts/Roadgeek2005Icons.woff") format("woff"),
-    url("../fonts/Roadgeek2005Icons.ttf") format("truetype");
+  font-family: "Electronic Highway Sign";
+  src: url("../fonts/ElectronicHighwaySign.woff2") format("woff2"),
+    url("../fonts/ElectronicHighwaySign.woff") format("woff"),
+    url("../fonts/ElectronicHighwaySign.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Electronic Highway Sign";
-  src: url("../fonts/ElectronicHighwaySign.woff2") format("woff2"),
-    url("../fonts/ElectronicHighwaySign.woff") format("woff"),
-    url("../fonts/ElectronicHighwaySign.ttf") format("truetype");
+  font-family: "Modern VMS";
+  src: url("../fonts/VCR_OSD_MONO.woff") format("woff"),
+    url("../fonts/VCR_OSD_MONO.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -257,8 +256,8 @@
   --textColor: rgb(0, 0, 0);
   --selectedColor: rgb(255, 255, 255);
   --hoverColor: rgb(255, 255, 255, 0.5);
-  --baseColor: 255,255,255;
-  --inputColor: 240,240,240;
+  --baseColor: 255, 255, 255;
+  --inputColor: 240, 240, 240;
 }
 
 :root[data-theme="dark"] {
@@ -267,8 +266,8 @@
   --textColor: rgb(247 249 251);
   --selectedColor: rgb(255, 255, 255, 0.25);
   --hoverColor: rgb(24 39 78);
-  --baseColor: 0,0,0;
-  --inputColor: 15,15,15;
+  --baseColor: 0, 0, 0;
+  --inputColor: 15, 15, 15;
 }
 
 * {
@@ -333,7 +332,7 @@ main {
   justify-content: center;
 }
 
-body > footer {
+body>footer {
   border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;
   padding: 0.5rem;
   display: flex;
@@ -342,7 +341,7 @@ body > footer {
   align-items: center;
 }
 
-body > footer div:nth-child(1) {
+body>footer div:nth-child(1) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -352,7 +351,7 @@ body > footer div:nth-child(1) {
   padding: 0.5rem 1rem;
 }
 
-body > footer a {
+body>footer a {
   background-color: rgba(255, 255, 255, 0.25);
   border-radius: 0.1rem;
 
@@ -366,11 +365,11 @@ body > footer a {
   transition: 0.2s;
 }
 
-body > footer p {
+body>footer p {
   font-size: 16px;
 }
 
-body > footer a:hover {
+body>footer a:hover {
   background-color: rgba(255, 255, 255, 0.5);
   scale: 1.1;
 }

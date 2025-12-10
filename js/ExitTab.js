@@ -5,7 +5,7 @@ class ExitTab {
 	 * @param {string} [position=null] - Position to display the exit tab relative to the sign.
 	 * @param {string} [width=null] - Width of the exit tab (narrow or wide).
 	 */
-	constructor ({
+	constructor({
 		number = null,
 		position = null,
 		width = null,
@@ -25,8 +25,8 @@ class ExitTab {
 		tollLogoOnly = true,
 		tollLogoSquare = false,
 		tollLogoSize = null
-		} = {}
-	)  {
+	} = {}
+	) {
 		this.number = number;
 		if (this.positions.includes(position)) {
 			this.position = position;
@@ -38,18 +38,18 @@ class ExitTab {
 		} else {
 			this.width = this.widths[0];
 		}
-        if (this.colors.includes(color)) {
-            this.color = color;
-        } else {
-            this.color = this.colors[0];
-        }
-		
+		if (this.colors.includes(color)) {
+			this.color = color;
+		} else {
+			this.color = this.colors[0];
+		}
+
 		if (this.variants.includes(variant)) {
 			this.variant = variant;
 		} else {
 			this.variant = this.variants[0];
 		}
-		
+
 		this.fullBorder = fullBorder;
 		this.squareCorners = squareCorners;
 		const parsedBorderThickness =
@@ -92,7 +92,7 @@ class ExitTab {
 			);
 		}
 	}
-	
+
 	nestExitTab() {
 		if (this.nestedExitTabs.length >= ExitTab.prototype.maxNested) {
 			return null;
@@ -101,11 +101,11 @@ class ExitTab {
 		this.nestedExitTabs.push(exitTab);
 		return exitTab;
 	}
-	
+
 	deleteNestExitTab(index) {
 		this.nestedExitTabs.splice(index, 1);
 	}
-	
+
 	duplicateNestExitTab(index) {
 		if (this.nestedExitTabs.length >= ExitTab.prototype.maxNested) {
 			return null;
@@ -115,29 +115,29 @@ class ExitTab {
 			return null;
 		}
 		const exitTab = new ExitTab({
-			number : exisitingTab.number,
-			position : exisitingTab.position,
-			width : exisitingTab.width,
-			color : exisitingTab.color,
-			variant : exisitingTab.variant,
-			icon : exisitingTab.icon,
-			squareCorners : exisitingTab.squareCorners,
-			fullBorder : exisitingTab.fullBorder,
-			borderThickness : exisitingTab.borderThickness,
-			minHeight : exisitingTab.minHeight,
-			tollLogoOnly : exisitingTab.tollLogoOnly,
-			tollLogoSquare : exisitingTab.tollLogoSquare,
-			tollLogoSize : exisitingTab.tollLogoSize
+			number: exisitingTab.number,
+			position: exisitingTab.position,
+			width: exisitingTab.width,
+			color: exisitingTab.color,
+			variant: exisitingTab.variant,
+			icon: exisitingTab.icon,
+			squareCorners: exisitingTab.squareCorners,
+			fullBorder: exisitingTab.fullBorder,
+			borderThickness: exisitingTab.borderThickness,
+			minHeight: exisitingTab.minHeight,
+			tollLogoOnly: exisitingTab.tollLogoOnly,
+			tollLogoSquare: exisitingTab.tollLogoSquare,
+			tollLogoSize: exisitingTab.tollLogoSize
 		});
-		
+
 		this.nestedExitTabs.push(exitTab);
 		return exitTab;
 	}
 }
 
 ExitTab.prototype.positions = ["Left", "Center", "Right"];
-ExitTab.prototype.variants = ["Default", "Toll Logo", "Icon", "Full Left", "HOV 1", "HOV 2"];
-ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge","Out"];
+ExitTab.prototype.variants = ["Default", "Toll Logo", "Icon", "Full Left", "Stacked", "HOV 1", "HOV 2"];
+ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge", "Out", "Side"];
 ExitTab.prototype.defaultBorderThickness = 0.2;
 ExitTab.prototype.defaultTollLogoSize = 3;
 ExitTab.prototype.colors = (() => {

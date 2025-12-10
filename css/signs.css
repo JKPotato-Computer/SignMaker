@@ -7,12 +7,10 @@
   --post-color-light: rgb(240, 240, 240);
   --post-color-dark: rgb(128, 128, 128);
   --postThickness: 1rem;
-  --postGradient: linear-gradient(
-    90deg,
-    var(--post-color-mid) 0%,
-    var(--post-color-light) 40%,
-    var(--post-color-dark) 100%
-  );
+  --postGradient: linear-gradient(90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%);
 }
 
 #postContainer.postColorSilver {
@@ -42,10 +40,12 @@
 #postContainer.polePositionOverhead .post {
   visibility: visible;
 }
+
 #postContainer.polePositionLeft .post:last-child,
 #postContainer.polePositionRight .post:first-child {
   visibility: hidden;
 }
+
 #postContainer.polePositionRural .post,
 #postContainer.polePositionCenter .post {
   visibility: hidden;
@@ -54,36 +54,31 @@
 #postContainer.polePositionLeft #panelContainer,
 #postContainer.polePositionRight #panelContainer,
 #postContainer.polePositionOverhead #panelContainer {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 47%,
-    var(--post-color-mid) 47%,
-    var(--post-color-light) 49%,
-    var(--post-color-dark) 52%,
-    rgba(255, 255, 255, 0) 52%,
-    rgba(255, 255, 255, 0) 64%,
-    var(--post-color-mid) 64%,
-    var(--post-color-light) 66%,
-    var(--post-color-dark) 69%,
-    rgba(255, 255, 255, 0) 69%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0) 47%,
+      var(--post-color-mid) 47%,
+      var(--post-color-light) 49%,
+      var(--post-color-dark) 52%,
+      rgba(255, 255, 255, 0) 52%,
+      rgba(255, 255, 255, 0) 64%,
+      var(--post-color-mid) 64%,
+      var(--post-color-light) 66%,
+      var(--post-color-dark) 69%,
+      rgba(255, 255, 255, 0) 69%);
   height: 15rem;
 }
+
 #postContainer.polePositionRural #panelContainer {
   position: relative;
-  background-image: linear-gradient(
-      90deg,
+  background-image: linear-gradient(90deg,
       var(--post-color-mid) 0%,
       var(--post-color-light) 40%,
-      var(--post-color-dark) 100%
-    ),
-    linear-gradient(
-      90deg,
+      var(--post-color-dark) 100%),
+    linear-gradient(90deg,
       var(--post-color-mid) 0%,
       var(--post-color-light) 40%,
-      var(--post-color-dark) 100%
-    );
+      var(--post-color-dark) 100%);
   background-repeat: no-repeat;
   background-size:
     var(--postThickness, 1rem) 24rem,
@@ -93,14 +88,13 @@
     right 1rem bottom;
   margin-top: 20rem;
 }
+
 #postContainer.polePositionCenter #panelContainer {
   position: relative;
-  background-image: linear-gradient(
-    90deg,
-    var(--post-color-mid) 0%,
-    var(--post-color-light) 40%,
-    var(--post-color-dark) 100%
-  );
+  background-image: linear-gradient(90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%);
   background-repeat: no-repeat;
   background-size: var(--postThickness, 1rem) 24rem;
   background-position: center bottom;
@@ -114,9 +108,11 @@
 
   align-self: flex-end;
 }
+
 .post:first-child {
   margin-left: auto;
 }
+
 .post:last-child {
   margin-right: auto;
 }
@@ -142,6 +138,7 @@
 .panel:first-child {
   padding-left: 1rem;
 }
+
 .panel:last-child {
   padding-right: 1rem;
 }
@@ -149,9 +146,11 @@
 #postContainer.polePositionRural .panel {
   margin-top: -10rem;
 }
+
 #postContainer.polePositionCenter .panel {
   margin-top: -22.5rem;
 }
+
 #postContainer.polePositionRural .panel:not(:first-child),
 #postContainer.polePositionCenter .panel:not(:first-child) {
   display: none;
@@ -161,7 +160,42 @@
   background-color: var(--orange);
 }
 
+/* Panel drag-and-drop on rendered sign */
+.panel.panelWiggle {
+  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+  animation-delay: var(--wiggle-delay, 0s);
+  cursor: grab;
+}
+
+.panel.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  animation: none;
+}
+
+.panel.dropBefore::before,
+.panel.dropAfter::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  width: 0.3rem;
+  border-radius: 0.2rem;
+  background: var(--selectedColor, rgb(100, 150, 255));
+  pointer-events: none;
+  z-index: 10;
+}
+
+.panel.dropBefore::before {
+  left: 0.25rem;
+}
+
+.panel.dropAfter::after {
+  right: 0.25rem;
+}
+
 .panel.green .sign,
+
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
@@ -342,6 +376,13 @@
   color: var(--white);
 }
 
+.exitTab.orange,
+.exitTabHolder.orange {
+  background-color: var(--orange);
+  border-color: var(--black);
+  color: var(--black);
+}
+
 .exitTab.fluorescent.pink,
 .exitTabHolder.fluorescent.pink {
   background-color: var(--fluorescent-pink);
@@ -371,7 +412,8 @@
   border-left-style: solid;
   border-left-width: 0.2rem;
   font-size: 1rem;
-  visibility: hidden; /* hides exitTab by default when loading page */
+  visibility: hidden;
+  /* hides exitTab by default when loading page */
   float: none;
   min-height: 2.25rem;
   padding: 0 0.5rem;
@@ -419,14 +461,12 @@
 
 .exitTabContainer.out {
   margin-bottom: 0.25rem;
-  margin-right: var(
-    --signBorderRadius,
-    0.75rem
-  ); /* Margin keeps the edge of the tab from going above the */
-  margin-left: var(
-    --signBorderRadius,
-    0.75rem
-  ); /* curved corners of the panel below */
+  margin-right: var(--signBorderRadius,
+      0.75rem);
+  /* Margin keeps the edge of the tab from going above the */
+  margin-left: var(--signBorderRadius,
+      0.75rem);
+  /* curved corners of the panel below */
 }
 
 .exitTabContainer.out.right {
@@ -435,25 +475,27 @@
 
 .exitTabContainer.wide,
 .exitTabContainer.narrow {
-  margin-right: var(
-    --signBorderRadius,
-    0.75rem
-  ); /* Margin keeps the edge of the tab from going above the */
-  margin-left: var(
-    --signBorderRadius,
-    0.75rem
-  ); /* curved corners of the panel below */
+  margin-right: var(--signBorderRadius,
+      0.75rem);
+  /* Margin keeps the edge of the tab from going above the */
+  margin-left: var(--signBorderRadius,
+      0.75rem);
+  /* curved corners of the panel below */
 }
+
 .exitTabContainer.edge.right {
   margin-right: 0rem;
 }
+
 .exitTabContainer.edge.left {
   margin-left: 0rem;
 }
+
 .narrow.center,
 .edge.center {
   margin: auto;
 }
+
 .exitTabContainer,
 .signContainer {
   z-index: 2;
@@ -464,42 +506,47 @@
 .exitTabContainer.edge {
   width: max-content;
 }
+
 .exitTabContainer.narrow.left,
 .exitTabContainer.edge.left {
   margin-right: auto;
 }
+
 .exitTabContainer.narrow.right,
 .exitTabContainer.edge.right {
   margin-left: auto;
 }
+
 .exitTab.wide.left,
 .exitTab.full.left {
   justify-content: flex-start;
 }
+
 .exitTab.wide.center,
 .exitTab.full.center {
   justify-content: center;
 }
+
 .exitTab.wide.right,
 .exitTab.full.right {
   justify-content: flex-end;
 }
+
 .exitTab.full {
   width: 100%;
-  border-radius: var(--signBorderRadius, 0.75rem)
-    var(--signBorderRadius, 0.75rem) 0 0;
+  border-radius: var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem) 0 0;
 }
+
 .sign.full.tabVisible {
-  border-radius: 0 0 var(--signBorderRadius, 0.75rem)
-    var(--signBorderRadius, 0.75rem);
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
+
 .sign.edge.right.tabVisible {
-  border-radius: var(--signBorderRadius, 0.75rem) 0
-    var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
+  border-radius: var(--signBorderRadius, 0.75rem) 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
+
 .sign.edge.left.tabVisible {
-  border-radius: 0 var(--signBorderRadius, 0.75rem)
-    var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
+  border-radius: 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
 
 .panel.round .exitTabContainer,
@@ -515,12 +562,15 @@
   clear: both;
   visibility: visible;
   overflow: hidden;
+  width: 100%;
 }
 
 .signHolder {
   display: flex;
   clear: both;
   flex-direction: row;
+  width: 100%;
+  justify-content: center;
 }
 
 .panel.round .exitTabContainer,
@@ -531,9 +581,11 @@
 .panel .exitTabContainer {
   visibility: hidden;
 }
+
 .panel .tabVisible {
   visibility: visible;
 }
+
 .sideLeftArrow,
 .sideRightArrow {
   margin-top: auto;
@@ -555,15 +607,19 @@
   display: flex;
   width: 100%;
   padding: 0.3rem 0.75rem 0.3rem 0.75rem;
+  justify-content: center;
 }
+
 .signContentContainer.shieldPositionLeft {
   flex-direction: row;
   align-items: center;
 }
+
 .signContentContainer.shieldPositionAbove {
   flex-direction: column;
   justify-content: center;
 }
+
 .signContentContainer.shieldPositionRight {
   flex-direction: row-reverse;
   align-items: center;
@@ -578,74 +634,19 @@
   gap: 1rem;
 }
 
-.to {
-  --fhwaBaselineOffset: 0px;
-  display: none;
-  margin: auto 0 auto auto;
-  padding-left: 0.25rem;
-  font-family: "Clearview 5WR";
-  margin-bottom: 1.8rem;
-  margin-right: 1.8rem;
-  font-size: 1.5rem;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-
-.bannerShieldContainer {
-  display: flex;
-  flex-direction: column;
-  /* margin-right: auto; */
-  /* margin-left: auto; */
-  padding: 0.1rem;
-}
-.bannerShieldContainer.bannerPositionLeft {
-  flex-direction: row;
-}
-.bannerShieldContainer.bannerPositionAbove {
-  flex-direction: column;
-}
-.bannerShieldContainer.bannerPositionRight {
-  flex-direction: row-reverse;
-}
-
-.bannerA,
-.bannerB {
-  --fhwaBaselineOffset: 0px;
-  border-radius: 0.1rem;
-  font-size: var(--fontSize);
-  text-transform: uppercase;
-  font-family: "Clearview 5WR";
-  margin-bottom: auto;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-.bannerA:not(.TOLL, .noIndent):first-letter,
-.bannerB:not(.TOLL, .noIndent):first-letter {
-  font-size: calc(var(--fontSize) + 0.3rem);
-  /* margin-right: -0.1rem; */
-}
-
-.shield {
-  margin: 0.15rem;
-  position: relative;
-}
-
-.shieldImg {
-  /* width:max-content; */
-  height: 3rem;
-}
-
 .markerImg {
   height: 1.5rem;
   top: 0.25rem;
   position: relative;
   z-index: 0;
 }
+
 .left .markerImg {
   transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
   -moz-transform: scaleX(-1);
 }
+
 .otherSymbols {
   display: inline-flex;
   flex-direction: column;
@@ -655,6 +656,7 @@
   position: relative;
   margin-bottom: 0.5rem;
 }
+
 .oSNum {
   /* Add .left and .right */
   font-family: "Series EM";
@@ -667,17 +669,21 @@
   left: -0.3rem;
   color: black;
 }
+
 .left .oSNum {
   left: 0.3rem;
 }
+
 .oSNum.short {
   letter-spacing: 0.1rem;
 }
+
 .oSNum.five {
   font-family: "Series C";
   top: 0.29rem;
   font-size: 1.2em;
 }
+
 .routeNumber {
   font-size: 1.5rem;
 
@@ -692,9 +698,11 @@
   margin-bottom: 0.5rem;
   padding: 0 1rem;
 }
+
 .streetName:last-child {
   margin-bottom: 0;
 }
+
 .streetName,
 .controlText {
   font-family: "Clearview 5WR";
@@ -713,11 +721,11 @@
   border-style: solid;
   border-width: 0.2rem;
   border-top-width: 0;
-  border-radius: 0 0 var(--signBorderRadius, 0.75rem)
-    var(--signBorderRadius, 0.75rem);
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 
   display: none;
 }
+
 .guideArrows.exit_only {
   background-color: var(--yellow) !important;
   border-color: var(--black) !important;
@@ -790,7 +798,7 @@
   top: var(--fhwaBaselineOffset);
 }
 
-.otherSymbols + .actionMessage {
+.otherSymbols+.actionMessage {
   padding-right: 0.2rem;
 }
 
@@ -804,10 +812,7 @@
 
 .exitTab .exitTabText {
   position: relative;
-  top: calc(
-    var(--exitTabTextBaseOffset, 0px) + var(--fhwaBaselineOffset) +
-      var(--exitTabAdditionalOffset, 0px)
-  );
+  top: calc(var(--exitTabTextBaseOffset, 0px) + var(--fhwaBaselineOffset) + var(--exitTabAdditionalOffset, 0px));
 }
 
 .exitTab .numeral {
@@ -1057,6 +1062,7 @@
 .exitTab.fullLeft .fullLeftNumber .exitTabTextSpacer {
   min-width: 0.35rem;
 }
+
 .action_message {
   --fhwaBaselineOffset: 0px;
   display: inline-flex;
@@ -1081,6 +1087,7 @@
 
   padding: 2px;
 }
+
 .arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
 .arrowContainer.hideExitOnlyArrows .halfarrow {
   opacity: 0;
@@ -1124,8 +1131,10 @@
 }
 
 .arrow {
-  font-size: 4rem; /* Makes arrows large and visble */
-  line-height: 0; /* Makes space text (arrow) takes up minimal */
+  font-size: 4rem;
+  /* Makes arrows large and visble */
+  line-height: 0;
+  /* Makes space text (arrow) takes up minimal */
   display: inline-block;
   margin: 0.5rem 5rem;
   padding: 0 0.1rem 0 0.05rem;
@@ -1142,6 +1151,7 @@
 .arrow:first-child {
   margin-left: 1rem;
 }
+
 .arrow:last-child {
   margin-right: 1rem;
 }
@@ -1163,7 +1173,7 @@
   margin-top: -0.25rem;
 }
 
-.actionMessage + .arrow {
+.actionMessage+.arrow {
   margin-left: 0.5rem;
 }
 
@@ -1186,6 +1196,7 @@
   word-spacing: -0.4rem;
   line-height: 0;
 }
+
 .fraction {
   font-size: 1.5rem;
 }
@@ -1194,6 +1205,7 @@
 .fraction:first-child {
   padding-right: 0.5rem;
 }
+
 .numeral:last-child,
 .fraction:last-child {
   padding-left: 0.5rem;
@@ -1232,18 +1244,92 @@
   margin: 0.4rem 0rem;
 }
 
-.exitOnlyText.yellowElmt,
+.exitOnlyText.yellowElmt {
+  margin-top: 0;
+}
+
 .TOLL {
   margin-top: 0;
 }
 
 .subPanelDisplay {
   height: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Center subpanel content vertically, except for APL subpanels */
+.subPanelDisplay:not(:has(.subpanelAplArrows)) .signContentContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* When APL arrows are present, make subpanels stretch equally */
+.subPanelDisplay:has(.subpanelAplArrows) {
+  flex: 1;
+}
+
+/* Make content area grow to push APL arrows to consistent bottom position */
+.subPanelDisplay:has(.subpanelAplArrows) .signContentContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .subDivider {
-  width: 8px;
+  width: 0.2rem;
   background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  /* Align arrow to bottom */
+}
+
+/* When APL arrows are present, shorten the divider to stop above arrows */
+.signHolder:has(.subpanelAplArrows) .subDivider {
+  margin-bottom: 6.2rem;
+  /* 6rem min-height + 0.2rem border */
+}
+
+/* If the divider has an arrow, remove the margin so it extends down */
+.signHolder:has(.subpanelAplArrows) .subDivider.hasArrow {
+  margin-bottom: 0;
+  background-color: transparent;
+  /* Transparent background so we can simulate the line */
+  position: relative;
+}
+
+/* Simulate the white line stopping above the arrow */
+.subDivider.hasArrow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 6.2rem;
+  /* Stop where the line would normally stop */
+  width: 0.2rem;
+  background-color: var(--white);
+}
+
+.aplDividerArrow {
+  height: 4.75rem;
+  /* Default size (UP) */
+  width: auto;
+  margin-bottom: 0.7rem;
+  /* Align with other arrows */
+  z-index: 10;
+}
+
+.aplDividerArrow[data-type="APL_TURN"] {
+  height: 3.5rem;
+}
+
+.aplDividerArrow[data-type="APL_DUAL_TURN"] {
+  height: 4.5rem;
 }
 
 .arrowContainer.new {
@@ -1291,4 +1377,240 @@ img.exitOnlyArrow:last-child {
 
 .signContainer:has(.guideArrows.exit_only) {
   /* background: linear-gradient(180deg, var(--green), var(--yellow)); */
+}
+
+/* APL Arrows */
+.aplContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.aplArrowWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.aplExitBox {
+  background-color: var(--yellow);
+  color: black;
+  font-family: "Series E";
+  padding: 0.2rem;
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.aplDivider {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 0.4rem;
+  background-color: white;
+  z-index: 10;
+  transform: translateX(50%);
+}
+
+
+.aplArrows {
+  border-style: solid;
+  border-width: 0.2rem;
+  border-top-width: 0;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
+  display: none;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0.5rem 1rem;
+}
+
+.aplArrow {
+  height: 4.75rem;
+  width: auto;
+  margin-left: 3.6rem;
+  margin-right: 3.6rem;
+}
+
+.aplArrow:first-child {
+  margin-left: 1rem;
+}
+
+.aplArrow:last-child {
+  margin-right: 1rem;
+}
+
+.aplArrow[data-type="APL_TURN"] {
+  height: 3.5rem;
+}
+
+.aplArrow[data-type="APL_DUAL_TURN"] {
+  height: 4.5rem;
+}
+
+.panel.green .aplArrows {
+  background-color: var(--green);
+  border-color: var(--white);
+}
+
+.panel.white .aplArrows {
+  background-color: var(--white);
+  border-color: var(--black);
+}
+
+.panel.yellow .aplArrows {
+  background-color: var(--yellow);
+  border-color: var(--black);
+}
+
+.panel.orange .aplArrows {
+  background-color: var(--orange);
+  border-color: var(--black);
+}
+
+/* not adding colors other than green, white, yellow, orange bc no apl uses those colors */
+.panel.yellow .aplArrow,
+.panel.white .aplArrow,
+.panel.orange .aplArrow {
+  filter: invert(1);
+}
+
+/* APL arrows inside subpanels - extends past parent to cover side borders */
+.subpanelAplArrows {
+  padding: 0.5rem 1rem;
+  margin-left: -0.2rem;
+  margin-right: -0.2rem;
+  border: 0.2rem solid var(--white);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  position: relative;
+  /*z-index: 5;*/
+  align-items: flex-end;
+  min-height: 6rem;
+  /* Matches largest arrow height (4.75rem) + padding */
+}
+
+/* Only first subpanel gets left border and bottom-left radius */
+.subPanelDisplay:first-of-type .subpanelAplArrows {
+  border-left: 0.2rem solid var(--white);
+  border-bottom-left-radius: var(--signBorderRadius, 0.75rem);
+  justify-content: flex-start;
+  /* Left align arrows */
+  padding-left: 0;
+  /* Remove left padding as requested */
+}
+
+/* Only last subpanel gets right border and bottom-right radius */
+.subPanelDisplay:last-of-type .subpanelAplArrows {
+  border-right: 0.2rem solid var(--white);
+  border-bottom-right-radius: var(--signBorderRadius, 0.75rem);
+  justify-content: flex-end;
+  /* Right align arrows */
+  padding-right: 0;
+  /* Remove right padding for symmetry */
+}
+
+/* When a divider follows the last subpanel, remove the right border/radius from that subpanel */
+.subPanelDisplay:has(+ .subDivider:last-child) .subpanelAplArrows {
+  border-right: none;
+  border-bottom-right-radius: 0;
+}
+
+/* Add a pseudo-element to extend the bottom border after the last divider */
+.signHolder:has(.subpanelAplArrows) .subDivider:last-child {
+  border-bottom: 0.2rem solid var(--white);
+  border-right: 0.2rem solid var(--white);
+  border-bottom-right-radius: var(--signBorderRadius, 0.75rem);
+}
+
+.panel.white .subpanelAplArrows,
+.panel.yellow .subpanelAplArrows,
+.panel.orange .subpanelAplArrows {
+  border-color: var(--black);
+}
+
+.panel.white .subPanelDisplay:first-of-type .subpanelAplArrows,
+.panel.yellow .subPanelDisplay:first-of-type .subpanelAplArrows,
+.panel.orange .subPanelDisplay:first-of-type .subpanelAplArrows {
+  border-left-color: var(--black);
+}
+
+.panel.white .subPanelDisplay:last-of-type .subpanelAplArrows,
+.panel.yellow .subPanelDisplay:last-of-type .subpanelAplArrows,
+.panel.orange .subPanelDisplay:last-of-type .subpanelAplArrows {
+  border-right-color: var(--black);
+}
+
+/* APL Exit Only Styling */
+.aplExitOnlyContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  gap: 0.25rem;
+}
+
+.aplExitOnlyLabel {
+  background-color: var(--yellow);
+  color: var(--black);
+  font-family: "Series E", sans-serif;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.1rem 1rem;
+  border-radius: 0.1rem
+}
+
+/* APL Exit Only - TURN arrow */
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"] .aplExitOnlyExit {
+  margin-right: 0.15rem
+}
+
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"] .aplExitOnlyOnly {
+  /* Shift ONLY to the left (closer to arrow) */
+  margin-left: -2rem;
+}
+
+/* APL Exit Only - TURN arrow flipped */
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"][data-flipped="true"] .aplExitOnlyExit {
+  /* Shift EXIT to the right (closer to arrow) */
+  margin-right: -2rem;
+}
+
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"][data-flipped="true"] .aplExitOnlyOnly {
+  /* Reset ONLY shift for flipped TURN */
+  margin-left: 0.15rem;
+}
+
+@keyframes flashSelection {
+  0% {
+    outline: 0.5rem solid yellow;
+  }
+
+  15% {
+    outline: 1.125rem solid yellow;
+  }
+
+  25% {
+    outline: 0.5rem solid yellow;
+  }
+
+  100% {
+    outline: 0.5rem solid rgba(255, 255, 0, 0);
+  }
+}
+
+.flash-selection {
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+  background: transparent;
+  animation: flashSelection 0.5s ease-in forwards;
 }

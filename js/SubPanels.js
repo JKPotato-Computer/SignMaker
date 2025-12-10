@@ -1,5 +1,5 @@
 class SubPanels {
-    
+
 	constructor({
 		shields = [],
 		width = 1,
@@ -7,25 +7,25 @@ class SubPanels {
 		shieldDistance = 0.8,
 		blockElements,
 		customDividerHeight = false,
-		} = {}
+	} = {}
 	) {
-        this.controlText = controlText;
-        this.actionMessage = actionMessage;
-        
+		this.controlText = controlText;
+		this.actionMessage = actionMessage;
+
 		if (blockElements) {
 			this.blockElements = blockElements;
 		} else {
 			this.blockElements = new Control();
-			this.blockElements.addElement(ControlTextElement,{},0,0);
+			this.blockElements.addElement(ControlTextElement, {}, 0, 0);
 		}
-        
-        this.shields = shields;
+
+		this.shields = shields;
 		if ((parseInt(width) < 1) || (parseInt(width) == undefined)) {
 			this.width = 1;
 		} else {
 			this.width = parseInt(width);
 		}
-		
+
 		Object.defineProperty(this, "height", {
 			get() {
 				return this._height;
@@ -43,11 +43,11 @@ class SubPanels {
 			configurable: true,
 		});
 
-			this.height = height;
-			this.shieldDistance = shieldDistance;
-			this.customDividerHeight = !!customDividerHeight;
-	    }
+		this.height = height;
+		this.shieldDistance = shieldDistance;
+		this.customDividerHeight = !!customDividerHeight;
 	}
+}
 
 SubPanels.defaultHeight = "100%";
 SubPanels.normalizeHeight = function (value) {
