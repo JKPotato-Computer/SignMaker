@@ -82,6 +82,8 @@ class Panel {
       borderThickness: exisitingTab.borderThickness,
       minHeight: exisitingTab.minHeight,
       nestedExitTabs: newNest,
+      verticalArrangement: exisitingTab.verticalArrangement,
+      caStyle: exisitingTab.caStyle,
     });
 
     this.exitTabs.push(exitTab);

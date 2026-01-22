@@ -160,42 +160,7 @@
   background-color: var(--orange);
 }
 
-/* Panel drag-and-drop on rendered sign */
-.panel.panelWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-  animation-delay: var(--wiggle-delay, 0s);
-  cursor: grab;
-}
-
-.panel.dragging {
-  opacity: 0.5;
-  cursor: grabbing;
-  animation: none;
-}
-
-.panel.dropBefore::before,
-.panel.dropAfter::after {
-  content: "";
-  position: absolute;
-  top: 10%;
-  bottom: 10%;
-  width: 0.3rem;
-  border-radius: 0.2rem;
-  background: var(--selectedColor, rgb(100, 150, 255));
-  pointer-events: none;
-  z-index: 10;
-}
-
-.panel.dropBefore::before {
-  left: 0.25rem;
-}
-
-.panel.dropAfter::after {
-  right: 0.25rem;
-}
-
 .panel.green .sign,
-
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
@@ -499,7 +464,6 @@
 .exitTabContainer,
 .signContainer {
   z-index: 2;
-  gap: var(--nestedTabSpacing, 0);
 }
 
 .signContainer,
@@ -837,52 +801,6 @@
   justify-content: center;
   align-items: baseline;
   gap: 0.15rem;
-}
-
-.exitTab .exitTabVerticalContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.4rem;
-  padding: 0;
-}
-
-.exitTab .exitTabVerticalText {
-  line-height: 1.3;
-  margin-bottom: 0;
-}
-
-.exitTab .exitTabVerticalNumber {
-  line-height: 1.3;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  margin-top: 0;
-}
-
-.exitTab.verticalArrangement {
-  padding: 0 0.75rem 0.2rem 0.75rem;
-  align-items: flex-start;
-}
-
-.exitTabContainer.caStyle {
-  width: auto;
-  margin: 0;
-  padding: 0 0.5rem;
-  order: -1;
-}
-
-.exitTabContainer.caStyle .exitTab {
-  border-radius: 0.25rem;
-  min-height: auto;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.9rem;
-  border: 0.15rem solid;
-}
-
-.signContentContainer:has(.exitTabContainer.caStyle) {
-  align-items: flex-start;
 }
 
 .exitTabContainer.hovExitTabContainer,
@@ -1306,14 +1224,6 @@
   flex: 1;
 }
 
-/* Center subpanel content vertically, except for APL subpanels */
-.subPanelDisplay:not(:has(.subpanelAplArrows)) .signContentContainer {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
 /* When APL arrows are present, make subpanels stretch equally */
 .subPanelDisplay:has(.subpanelAplArrows) {
   flex: 1;
@@ -1634,30 +1544,4 @@ img.exitOnlyArrow:last-child {
 .aplExitOnlyContainer[data-arrow-type="APL_TURN"][data-flipped="true"] .aplExitOnlyOnly {
   /* Reset ONLY shift for flipped TURN */
   margin-left: 0.15rem;
-}
-
-@keyframes flashSelection {
-  0% {
-    outline: 0.5rem solid yellow;
-  }
-
-  15% {
-    outline: 1.125rem solid yellow;
-  }
-
-  25% {
-    outline: 0.5rem solid yellow;
-  }
-
-  100% {
-    outline: 0.5rem solid rgba(255, 255, 0, 0);
-  }
-}
-
-.flash-selection {
-  position: absolute;
-  pointer-events: none;
-  z-index: 50;
-  background: transparent;
-  animation: flashSelection 0.5s ease-in forwards;
 }

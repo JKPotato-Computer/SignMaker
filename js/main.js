@@ -1390,15 +1390,14 @@ const app = (function () {
     const panelContainerElmt = document.getElementById("panelContainer");
     const posts = document.getElementsByClassName("post");
     const availablePolePositions = Post.prototype.polePositions;
-    const fallbackPolePosition = availablePolePositions.includes(post.polePosition)
+    const polePosition = availablePolePositions.includes(post.polePosition)
       ? post.polePosition
-      : availablePolePositions[0] || "Left";
-    const polePositionClass = `polePosition${fallbackPolePosition}`;
+      : availablePolePositions[0];
+    const polePositionClass = `polePosition${polePosition}`;
     const availableColors = Post.prototype.colors;
-    const fallbackColor = availableColors[0] || "Silver";
     const normalizedPostColor = availableColors.includes(post.color)
       ? post.color
-      : fallbackColor;
+      : availableColors[0];
     const colorClass = normalizedPostColor ? ` postColor${normalizedPostColor}` : "";
     postContainerElmt.className = `${polePositionClass}${colorClass}`;
     const normalizedThickness = post.normalizeThickness(post.thickness);
@@ -1416,7 +1415,7 @@ const app = (function () {
       }
       panelContainerElmt.style.background = "none";
     } else {
-      const polePosition = (fallbackPolePosition || "").toLowerCase();
+      const polePosition = (post.polePosition || "").toLowerCase();
       for (let i = 0; i < posts.length; i++) {
         posts[i].style.visibility = "hidden";
       }
@@ -1470,17 +1469,13 @@ const app = (function () {
 
       const panelElmt = document.createElement("div");
       panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
-      const borderRadiusFallback =
-        typeof Panel.prototype.defaultBorderRadius === "number"
-          ? Panel.prototype.defaultBorderRadius
-          : 0.75;
       const numericPanelBorderRadius =
         typeof panel.borderRadius === "number"
           ? panel.borderRadius
           : parseFloat(panel.borderRadius);
       const panelBorderRadius = Number.isFinite(numericPanelBorderRadius)
         ? Math.max(0, numericPanelBorderRadius)
-        : borderRadiusFallback;
+        : Panel.prototype.defaultBorderRadius;
       panelElmt.style.setProperty(
         "--signBorderRadius",
         panelBorderRadius + "rem"
@@ -1495,6 +1490,8 @@ const app = (function () {
       });
       panelContainerElmt.appendChild(panelElmt);
 
+      // Store CA style exit tabs to append inside sign later
+      const caStyleExitTabs = [];
 
       for (
         let exitTabIndex = panel.exitTabs.length - 1;
@@ -1505,7 +1502,20 @@ const app = (function () {
 
         const exitTabCont = document.createElement("div");
         exitTabCont.className = `exitTabContainer ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
-        panelElmt.appendChild(exitTabCont);
+        
+        // If CA style, don't append to panel yet - store for later insertion inside sign
+        if (exitTab.caStyle && exitTab.variant == "Default") {
+          caStyleExitTabs.push({exitTabCont, exitTabIndex});
+        } else {
+          panelElmt.appendChild(exitTabCont);
+        }
+
+        // Apply nested tab spacing CSS variable
+        const nestedTabSpacingValue =
+          typeof exitTab.nestedTabSpacing === "number" && exitTab.nestedTabSpacing > 0
+            ? exitTab.nestedTabSpacing
+            : 0;
+        exitTabCont.style.setProperty("--nestedTabSpacing", nestedTabSpacingValue + "rem");
 
         var nestedExitTabs = exitTab.nestedExitTabs.length;
 
@@ -1519,10 +1529,6 @@ const app = (function () {
           if (exitTab.squareCorners) {
             exitTabElmt.className += " squareCorners";
           }
-          const fallbackBorderThickness =
-            typeof ExitTab.prototype.defaultBorderThickness === "number"
-              ? ExitTab.prototype.defaultBorderThickness
-              : 0.2;
           const numericBorderThickness =
             typeof exitTab.borderThickness === "number"
               ? exitTab.borderThickness
@@ -1530,7 +1536,7 @@ const app = (function () {
           const normalizedBorderThickness =
             Number.isFinite(numericBorderThickness) && numericBorderThickness >= 0
               ? numericBorderThickness
-              : fallbackBorderThickness;
+              : ExitTab.prototype.defaultBorderThickness;
           exitTab.borderThickness = normalizedBorderThickness;
           const isBorderlessTab = normalizedBorderThickness <= 0;
           const borderThicknessRem = normalizedBorderThickness.toString() + "rem";
@@ -1561,6 +1567,64 @@ const app = (function () {
               const safeLineText =
                 typeof lineText === "string" ? lineText : String(lineText || "");
               const txtArr = safeLineText.toUpperCase().split(/(\d+\S*)/);
+              
+              // Handle vertical arrangement
+              if (exitTab.verticalArrangement && txtArr.length > 1) {
+                // #region agent log
+                fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1564',message:'Vertical arrangement active',data:{verticalArrangement:exitTab.verticalArrangement,leadingText:txtArr[0],number:txtArr[1],minHeight:exitTab.minHeight},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B'})}).catch(()=>{});
+                // #endregion
+                const verticalContainer = document.createElement("div");
+                verticalContainer.className = "exitTabVerticalContainer";
+                registerExitTabText(verticalContainer);
+                
+                const leadingText = txtArr[0] || "";
+                if (leadingText && leadingText.trim().length > 0) {
+                  const topTextElmt = document.createElement("div");
+                  topTextElmt.className = "exitTabVerticalText";
+                  registerExitTabText(topTextElmt);
+                  if (usesHighwayGothicFont) {
+                    topTextElmt.style.setProperty(
+                      "--exitTabAdditionalOffset",
+                      "-0.5px"
+                    );
+                  }
+                  topTextElmt.appendChild(document.createTextNode(leadingText));
+                  if (exitTab.topOffset == false) {
+                    topTextElmt.style.setProperty("--exitTabTextBaseOffset", "0rem");
+                  }
+                  verticalContainer.appendChild(topTextElmt);
+                }
+                
+                const bottomNumberElmt = document.createElement("div");
+                bottomNumberElmt.className = "exitTabVerticalNumber";
+                registerExitTabText(bottomNumberElmt);
+                const spanNumeralElmt = document.createElement("span");
+                spanNumeralElmt.className = "numeral";
+                registerExitTabText(spanNumeralElmt);
+                spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
+                bottomNumberElmt.appendChild(spanNumeralElmt);
+                const trailingText = txtArr.slice(2).join("");
+                if (trailingText) {
+                  const trailingSpanElmt = document.createElement("span");
+                  trailingSpanElmt.className = "numeral exitTabTrailing";
+                  trailingSpanElmt.textContent = trailingText;
+                  registerExitTabText(trailingSpanElmt);
+                  bottomNumberElmt.appendChild(trailingSpanElmt);
+                }
+                verticalContainer.appendChild(bottomNumberElmt);
+                targetElmt.appendChild(verticalContainer);
+                // #region agent log
+                setTimeout(() => {
+                  const containerStyle = window.getComputedStyle(verticalContainer);
+                  const topTextStyle = topTextElmt ? window.getComputedStyle(topTextElmt) : null;
+                  const exitTabStyle = exitTabElmt ? window.getComputedStyle(exitTabElmt) : null;
+                  fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1607',message:'Vertical container padding computed',data:{containerPaddingTop:containerStyle.paddingTop,containerPaddingBottom:containerStyle.paddingBottom,containerPadding:containerStyle.padding,topTextMarginTop:topTextStyle?.marginTop,topTextPaddingTop:topTextStyle?.paddingTop,exitTabPaddingTop:exitTabStyle?.paddingTop,exitTabPadding:exitTabStyle?.padding},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'padding-source'})}).catch(()=>{});
+                }, 100);
+                // #endregion
+                return;
+              }
+              
+              // Original horizontal arrangement
               const divTextElmt = document.createElement("div");
               registerExitTabText(divTextElmt);
               if (usesHighwayGothicFont) {
@@ -1640,6 +1704,16 @@ const app = (function () {
             exitTabHolderElmt.className += ` ${panel.color.toLowerCase()}`;
           }
 
+          if (exitTab.verticalArrangement && exitTab.variant == "Default") {
+            exitTabElmt.classList.add("verticalArrangement");
+            // #region agent log
+            setTimeout(() => {
+              const computedStyle = window.getComputedStyle(exitTabElmt);
+              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1692',message:'Vertical arrangement class added - computed padding',data:{verticalArrangement:exitTab.verticalArrangement,computedPaddingTop:computedStyle.paddingTop,computedPaddingRight:computedStyle.paddingRight,computedPaddingBottom:computedStyle.paddingBottom,computedPaddingLeft:computedStyle.paddingLeft,inlinePadding:exitTabElmt.style.padding},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'padding-source'})}).catch(()=>{});
+            }, 100);
+            // #endregion
+          }
+
           if (usesHighwayGothicFont) {
             applyHighwayGothicStyling(exitTabElmt);
             exitTabElmt.style.setProperty(
@@ -1711,10 +1785,10 @@ const app = (function () {
                 tollLogoImgElmt.decoding = "async";
                 tollLogoHolderElmt.appendChild(tollLogoImgElmt);
               } else if (exitTab.icon) {
-                const fallbackLogoElmt = document.createElement("span");
-                fallbackLogoElmt.textContent = exitTab.icon.toUpperCase();
-                registerExitTabText(fallbackLogoElmt);
-                tollLogoHolderElmt.appendChild(fallbackLogoElmt);
+                const logoTextElmt = document.createElement("span");
+                logoTextElmt.textContent = exitTab.icon.toUpperCase();
+                registerExitTabText(logoTextElmt);
+                tollLogoHolderElmt.appendChild(logoTextElmt);
               }
               tollLogoContainerElmt.appendChild(tollLogoHolderElmt);
               exitTabElmt.appendChild(tollLogoContainerElmt);
@@ -1811,7 +1885,22 @@ const app = (function () {
             }
             exitTabElmt.style.fontSize = resolvedFontSize.toString() + "px";
 
-            exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
+            // #region agent log
+            fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1859',message:'Setting exit tab minHeight',data:{verticalArrangement:exitTab.verticalArrangement,minHeight:exitTab.minHeight,variant:exitTab.variant,resolvedFontSize:resolvedFontSize},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F,G,H'})}).catch(()=>{});
+            // #endregion
+            // Increase minHeight when vertical arrangement is enabled to accommodate stacked content
+            // Large numerals (1.5em scale) need extra space, so increase minHeight more
+            if (exitTab.verticalArrangement && exitTab.variant == "Default") {
+              const baseMinHeight = parseFloat(exitTab.minHeight) || 2.25;
+              // Account for numeral scaling (1.5em) and vertical spacing
+              const calculatedMinHeight = Math.max(baseMinHeight * 1.5, 3.75);
+              exitTabElmt.style.minHeight = calculatedMinHeight.toString() + "rem";
+              // #region agent log
+              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1868',message:'Vertical arrangement minHeight calculated',data:{baseMinHeight:baseMinHeight,calculatedMinHeight:calculatedMinHeight},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'G,H'})}).catch(()=>{});
+              // #endregion
+            } else {
+              exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
+            }
             if (exitTab.variant == "Toll Logo" && exitTab.tollLogoOnly) {
               exitTabElmt.style.minHeight = "0";
             }
@@ -2402,6 +2491,14 @@ const app = (function () {
           "signContentContainer" + subPanelIndex.toString();
         new_subPanel.appendChild(signContentContainerElmt);
 
+        // Insert CA style exit tabs at the beginning of the first subpanel
+        if (subPanelIndex === 0 && caStyleExitTabs.length > 0) {
+          caStyleExitTabs.forEach(({exitTabCont}) => {
+            exitTabCont.classList.add("caStyle");
+            signContentContainerElmt.appendChild(exitTabCont);
+          });
+        }
+
         const shieldsContainerElmt = document.createElement("div");
         shieldsContainerElmt.className = `shieldsContainer ${panel.sign.shieldBacks ? "shieldBacks" : ""
           }`;
@@ -2822,16 +2919,8 @@ const app = (function () {
             );
             path.appendChild(actionMessage);
           } else {
-            const resolveExitOnlyText = (text, fallback) =>
-              typeof text === "string" ? text : fallback;
-            const exitOnlyLabelLeft = resolveExitOnlyText(
-              panel.sign.exitOnlyLeftText,
-              "EXIT"
-            ).trim();
-            const exitOnlyLabelRight = resolveExitOnlyText(
-              panel.sign.exitOnlyRightText,
-              "ONLY"
-            ).trim();
+            const exitOnlyLabelLeft = (typeof panel.sign.exitOnlyLeftText === "string" ? panel.sign.exitOnlyLeftText : "EXIT").trim();
+            const exitOnlyLabelRight = (typeof panel.sign.exitOnlyRightText === "string" ? panel.sign.exitOnlyRightText : "ONLY").trim();
             const exitOnlyLabelFull = [exitOnlyLabelLeft, exitOnlyLabelRight]
               .filter((text) => text && text.length > 0)
               .join(" ")
@@ -3301,6 +3390,390 @@ const app = (function () {
     redraw();
   };
 
+  // Template management functions
+  let templateDB = null;
+
+  const initTemplateDB = async function () {
+    if (!templateDB) {
+      templateDB = new IndexDB();
+      await templateDB.dbInitialized;
+    }
+    return templateDB;
+  };
+
+  const saveTemplate = async function (templateName) {
+    if (!templateName || templateName.trim() === "") {
+      alert("Please enter a template name");
+      return;
+    }
+
+    try {
+      const db = await initTemplateDB();
+      
+      // Add element type information to Control elements before serialization
+      const addElementTypes = (obj, visited = new WeakSet()) => {
+        if (!obj || typeof obj !== "object" || visited.has(obj)) {
+          return;
+        }
+        
+        visited.add(obj);
+        
+        if (Array.isArray(obj)) {
+          obj.forEach(item => addElementTypes(item, visited));
+          return;
+        }
+        
+        // Check if this is a Control element
+        if (Control.prototype.blockToClassElems) {
+          try {
+            const elemType = Control.prototype.blockToClassElems.getElem?.(obj);
+            if (elemType) {
+              obj._elementType = elemType;
+            }
+          } catch (e) {
+            // Not an element instance, continue
+          }
+        }
+        
+        // Recursively process all properties
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key) && key !== "_elementType") {
+            addElementTypes(obj[key], visited);
+          }
+        }
+      };
+      
+      // Add element types to the post (modifies in place, but that's OK for serialization)
+      addElementTypes(post);
+      
+      // Serialize the entire post with element type information
+      const postData = JSON.stringify(post, null, 2);
+      
+      // Clean up the _elementType properties we added (optional, but cleaner)
+      const removeElementTypes = (obj, visited = new WeakSet()) => {
+        if (!obj || typeof obj !== "object" || visited.has(obj)) {
+          return;
+        }
+        visited.add(obj);
+        if (Array.isArray(obj)) {
+          obj.forEach(item => removeElementTypes(item, visited));
+          return;
+        }
+        if (obj._elementType) {
+          delete obj._elementType;
+        }
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            removeElementTypes(obj[key], visited);
+          }
+        }
+      };
+      removeElementTypes(post);
+      
+      const templateData = {
+        name: templateName.trim(),
+        data: postData,
+        dateCreated: new Date().toISOString(),
+      };
+
+      await db.saveTemplate(templateData);
+      
+      // Clear the input field
+      const templateNameInput = document.getElementById("templateNameInput");
+      if (templateNameInput) {
+        templateNameInput.value = "";
+      }
+      
+      await refreshTemplatesList();
+    } catch (error) {
+      console.error("Error saving template:", error);
+      alert("Failed to save template: " + error.message);
+    }
+  };
+
+  const loadTemplate = async function (templateId) {
+    if (!templateId) {
+      return;
+    }
+
+    const confirmationMessage =
+      "Are you sure you want to load this template? THIS WILL REPLACE YOUR CURRENT SIGN!";
+    if (!window.confirm(confirmationMessage)) {
+      return;
+    }
+
+    try {
+      const db = await initTemplateDB();
+      const template = await db.getTemplate(templateId);
+      
+      if (!template) {
+        alert("Template not found");
+        return;
+      }
+
+      // Deserialize and restore the post
+      const postData = JSON.parse(template.data);
+      
+      // Helper function to reconstruct Control blockElements
+      const reconstructControl = (controlData) => {
+        if (!controlData) {
+          return new Control();
+        }
+        
+        const control = new Control();
+        const rows = [];
+        const blockProperties = [];
+        
+        if (Array.isArray(controlData.rows)) {
+          for (const rowData of controlData.rows) {
+            const row = [];
+            if (Array.isArray(rowData)) {
+              for (const elemData of rowData) {
+                // Use stored element type or try to infer
+                let elemType = elemData._elementType;
+                
+                if (!elemType && Control.prototype.blockToClassElems) {
+                  // Try to infer from properties
+                  if (elemData.icon !== undefined) {
+                    elemType = "IconElement";
+                  } else if (elemData.arrow !== undefined) {
+                    elemType = "ArrowElement";
+                  } else if (elemData.logo !== undefined || elemData.tollLogo !== undefined) {
+                    elemType = "TollLogoElement";
+                  } else if (elemData.shieldBase !== undefined || elemData.type !== undefined) {
+                    elemType = "ShieldElement";
+                  } else if (elemData.dividerWidth !== undefined) {
+                    elemType = "DividerElement";
+                  } else if (elemData.beacon !== undefined || elemData.size !== undefined && elemData.color !== undefined && !elemData.textContent) {
+                    elemType = "BeaconElement";
+                  } else if (elemData.textContent !== undefined) {
+                    // Distinguish between ControlText, Advisory, ActionMessage, ElectronicSign
+                    if (elemData.glow !== undefined) {
+                      elemType = "ElectronicSignElement";
+                    } else if (elemData.borderRadius !== undefined && elemData.horizPadding !== undefined) {
+                      elemType = "AdvisoryMessageElement";
+                    } else if (elemData.spacing !== undefined) {
+                      elemType = "ControlTextElement";
+                    } else {
+                      elemType = "ActionMessageElement";
+                    }
+                  }
+                }
+                
+                if (elemType && Control.prototype.blockToClassElems && Control.prototype.blockToClassElems[elemType]) {
+                  const ElemClass = Control.prototype.blockToClassElems[elemType];
+                  const elem = new ElemClass(elemData);
+                  Object.assign(elem, elemData);
+                  delete elem._elementType; // Remove the helper property
+                  row.push(elem);
+                } else {
+                  console.warn("Could not reconstruct element:", elemData);
+                }
+              }
+            }
+            rows.push(row);
+            
+            // Reconstruct Block
+            const blockIndex = rows.length - 1;
+            const blockData = controlData.blockProperties?.[blockIndex];
+            if (blockData) {
+              const block = new Block(blockData);
+              Object.assign(block, blockData);
+              blockProperties.push(block);
+            } else {
+              blockProperties.push(new Block());
+            }
+          }
+        }
+        
+        control.rows = rows;
+        control.blockProperties = blockProperties;
+        return control;
+      };
+      
+      // Create a new Post instance and copy properties
+      const newPost = new Post(
+        postData.polePosition || Post.prototype.polePositions[0],
+        postData.lanesWide || 1,
+        postData.color || Post.prototype.colors[0]
+      );
+      
+      // Copy additional post properties
+      if (typeof postData.panelSpacing === "number") {
+        newPost.panelSpacing = postData.panelSpacing;
+      }
+      if (typeof postData.thickness === "number") {
+        newPost.thickness = postData.thickness;
+      }
+      if (typeof postData.showPost === "boolean") {
+        newPost.showPost = postData.showPost;
+      }
+      if (typeof postData.disableFlash === "boolean") {
+        newPost.disableFlash = postData.disableFlash;
+      }
+      if (typeof postData.secondExitOnly === "boolean") {
+        newPost.secondExitOnly = postData.secondExitOnly;
+      }
+      
+      // Restore panels
+      if (Array.isArray(postData.panels)) {
+        newPost.panels = [];
+        for (const panelData of postData.panels) {
+          // Restore subpanels first (needed for Sign constructor)
+          const subPanels = [];
+          if (Array.isArray(panelData.sign?.subPanels)) {
+            for (const subPanelData of panelData.sign.subPanels) {
+              // Reconstruct blockElements
+              const blockElements = reconstructControl(subPanelData.blockElements);
+              
+              const subPanel = new SubPanels({
+                ...subPanelData,
+                blockElements: blockElements
+              });
+              Object.assign(subPanel, subPanelData);
+              subPanel.blockElements = blockElements; // Ensure it's set
+              subPanels.push(subPanel);
+            }
+          }
+          
+          // Create sign with subpanels
+          const signData = panelData.sign || {};
+          const sign = new Sign({
+            ...signData,
+            subPanels: subPanels
+          });
+          
+          // Restore shields
+          if (Array.isArray(signData.shields)) {
+            sign.shields = signData.shields.map((shieldData) => {
+              const shield = new Shield(shieldData);
+              Object.assign(shield, shieldData);
+              return shield;
+            });
+          }
+          
+          // Copy other sign properties
+          Object.assign(sign, signData);
+          sign.subPanels = subPanels; // Ensure subpanels are set
+          
+          // Create panel
+          const panel = new Panel(
+            sign,
+            panelData.color,
+            [],
+            panelData.corner,
+            panelData.borderRadius
+          );
+          
+          // Restore exit tabs
+          if (Array.isArray(panelData.exitTabs)) {
+            panel.exitTabs = panelData.exitTabs.map((exitTabData) => {
+              const exitTab = new ExitTab(exitTabData);
+              Object.assign(exitTab, exitTabData);
+              
+              // Restore nested exit tabs
+              if (Array.isArray(exitTabData.nestedExitTabs)) {
+                exitTab.nestedExitTabs = exitTabData.nestedExitTabs.map((nestedData) => {
+                  const nested = new ExitTab(nestedData);
+                  Object.assign(nested, nestedData);
+                  return nested;
+                });
+              }
+              
+              return exitTab;
+            });
+          }
+          
+          // Copy other panel properties
+          Object.assign(panel, panelData);
+          panel.sign = sign; // Ensure sign is set
+          newPost.panels.push(panel);
+        }
+      }
+      
+      setPost(newPost);
+    } catch (error) {
+      console.error("Error loading template:", error);
+      alert("Failed to load template: " + error.message);
+    }
+  };
+
+  const deleteTemplate = async function (templateId) {
+    if (!templateId) {
+      return;
+    }
+
+    try {
+      const db = await initTemplateDB();
+      await db.deleteTemplate(templateId);
+      await refreshTemplatesList();
+    } catch (error) {
+      console.error("Error deleting template:", error);
+      alert("Failed to delete template: " + error.message);
+    }
+  };
+
+  const refreshTemplatesList = async function () {
+    try {
+      const db = await initTemplateDB();
+      const templates = await db.getAllTemplates();
+      
+      const templatesList = document.getElementById("savedTemplatesList");
+      if (!templatesList) {
+        return;
+      }
+
+      // Clear existing list
+      templatesList.innerHTML = "";
+
+      if (templates.length === 0) {
+        templatesList.innerHTML = "<p style='padding: 1rem; color: #666;'>No saved templates</p>";
+        return;
+      }
+
+      // Sort templates by date (newest first)
+      templates.sort((a, b) => {
+        const dateA = new Date(a.dateModified || a.dateCreated);
+        const dateB = new Date(b.dateModified || b.dateCreated);
+        return dateB - dateA;
+      });
+
+      // Create template items
+      templates.forEach((template) => {
+        const templateItem = document.createElement("div");
+        templateItem.className = "templateItem";
+        templateItem.innerHTML = `
+          <div class="templateItemInfo">
+            <span class="templateItemName">${escapeHtml(template.name)}</span>
+            <span class="templateItemDate">${formatDate(template.dateModified || template.dateCreated)}</span>
+          </div>
+          <div class="templateItemActions">
+            <button class="templateLoadBtn" onclick="app.loadTemplate('${template.id}')" title="Load Template">
+              <span class="material-symbols-outlined">upload</span>
+            </button>
+            <button class="templateDeleteBtn" onclick="app.deleteTemplate('${template.id}')" title="Delete Template">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        `;
+        templatesList.appendChild(templateItem);
+      });
+    } catch (error) {
+      console.error("Error refreshing templates list:", error);
+    }
+  };
+
+  const escapeHtml = function (text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
+  const formatDate = function (dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return {
     init: init,
     newPanel: newPanel,
@@ -3339,6 +3812,11 @@ const app = (function () {
     delRow: delRow,
     newControlElem: newControlElem,
     delControlElem: delControlElem,
+
+    saveTemplate: saveTemplate,
+    loadTemplate: loadTemplate,
+    deleteTemplate: deleteTemplate,
+    refreshTemplatesList: refreshTemplatesList,
 
     exposeToFormHandler,
   };

@@ -388,6 +388,7 @@ ElectronicSignElement.prototype.textColors = [
 ];
 
 // TEMP: Block-specific shield support will be replaced when the main shield
+// system is integrated. Please treat this class as a stop-gap.
 class ShieldElement extends Shield {
   constructor({
     shieldBase,
@@ -1172,6 +1173,7 @@ class DividerElement {
 DividerElement.prototype.dividerMeasurement = ["%", "rem"];
 DividerElement.prototype.orientations = ["Horizontal", "Vertical"];
 DividerElement.prototype.defaultOrientation = "Horizontal";
+DividerElement.prototype.verticalOrientation = "Vertical";
 DividerElement.prototype.normalizeOrientation = function (value) {
   const options = DividerElement.prototype.orientations || [];
   return options.includes(value)

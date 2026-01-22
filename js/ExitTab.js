@@ -13,18 +13,21 @@ class ExitTab {
 		variant = "Default",
 		icon = null,
 		useTextBasedIcon = false,
-		fullBorder = false,
-		squareCorners = false,
-		topOffset = true,
+		fullBorder = ExitTab.prototype.defaultFullBorder,
+		squareCorners = ExitTab.prototype.defaultSquareCorners,
+		topOffset = ExitTab.prototype.defaultTopOffset,
 		showLeft = false,
 		borderThickness = 0.2,
 		minHeight = 2.25,
 		nestedExitTabs = [],
-		FHWAFont = false,
+		nestedTabSpacing = 0,
+		FHWAFont = ExitTab.prototype.defaultFHWAFont,
 		fontSize = 18,
 		tollLogoOnly = true,
 		tollLogoSquare = false,
-		tollLogoSize = null
+		tollLogoSize = null,
+		verticalArrangement = ExitTab.prototype.defaultVerticalArrangement,
+		caStyle = ExitTab.prototype.defaultCAStyle
 	} = {}
 	) {
 		this.number = number;
@@ -66,10 +69,19 @@ class ExitTab {
 		this.topOffset = topOffset;
 		this.minHeight = minHeight;
 		this.nestedExitTabs = nestedExitTabs;
+		const parsedNestedTabSpacing =
+			typeof nestedTabSpacing === "number"
+				? nestedTabSpacing
+				: parseFloat(nestedTabSpacing);
+		this.nestedTabSpacing = Number.isFinite(parsedNestedTabSpacing)
+			? Math.max(0, parsedNestedTabSpacing)
+			: 0;
 		this.FHWAFont = FHWAFont;
 		this.icon = icon;
 		this.showLeft = showLeft;
 		this.fontSize = fontSize;
+		this.verticalArrangement = verticalArrangement;
+		this.caStyle = caStyle;
 		const defaultTollLogoSize =
 			typeof ExitTab.prototype.defaultTollLogoSize === "number"
 				? ExitTab.prototype.defaultTollLogoSize
@@ -127,7 +139,9 @@ class ExitTab {
 			minHeight: exisitingTab.minHeight,
 			tollLogoOnly: exisitingTab.tollLogoOnly,
 			tollLogoSquare: exisitingTab.tollLogoSquare,
-			tollLogoSize: exisitingTab.tollLogoSize
+			tollLogoSize: exisitingTab.tollLogoSize,
+			verticalArrangement: exisitingTab.verticalArrangement,
+			caStyle: exisitingTab.caStyle
 		});
 
 		this.nestedExitTabs.push(exitTab);
@@ -140,6 +154,12 @@ ExitTab.prototype.variants = ["Default", "Toll Logo", "Icon", "Full Left", "Stac
 ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge", "Out", "Side"];
 ExitTab.prototype.defaultBorderThickness = 0.2;
 ExitTab.prototype.defaultTollLogoSize = 3;
+ExitTab.prototype.defaultFullBorder = false;
+ExitTab.prototype.defaultSquareCorners = false;
+ExitTab.prototype.defaultTopOffset = true;
+ExitTab.prototype.defaultFHWAFont = false;
+ExitTab.prototype.defaultVerticalArrangement = false;
+ExitTab.prototype.defaultCAStyle = false;
 ExitTab.prototype.colors = (() => {
 	const colors = ["Panel Color"];
 	if (typeof lib !== "undefined" && lib?.colors) {

@@ -496,6 +496,19 @@ Shield.prototype.shieldDirectory = {
       },
     },
   },
+  DuskSMP: {
+    type: "category",
+    DUSKSMP: {
+      type: "shield",
+      name: "DuskSMP",
+      variants: [],
+    },
+    DUSKSMP_TOLL: {
+      type: "shield",
+      name: "DuskSMP Toll",
+      variants: [],
+    },
+  },
 };
 
 Shield.prototype.bannerTypes = [

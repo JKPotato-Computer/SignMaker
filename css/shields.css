@@ -970,3 +970,35 @@
 .bannerShieldContainer.WY.three .routeNumber {
 	font-family: "Series C";
 }
+
+.bannerShieldContainer.DUSKSMP.one .routeNumber,
+.bannerShieldContainer.DUSKSMP.two .routeNumber,
+.bannerShieldContainer.DUSKSMP.three .routeNumber {
+	color: var(--black);
+	font-family: "Series D";
+	top: calc(0.6rem * var(--shieldScale, 1));
+	font-size: calc(2rem * var(--shieldScale, 1));
+}
+
+.bannerShieldContainer.DUSKSMP.four .routeNumber {
+	color: var(--black);
+	font-family: "Series C";
+	top: calc(0.6rem * var(--shieldScale, 1));
+	font-size: calc(2rem * var(--shieldScale, 1));
+}
+
+.bannerShieldContainer.DUSKSMP_TOLL.one .routeNumber,
+.bannerShieldContainer.DUSKSMP_TOLL.two .routeNumber,
+.bannerShieldContainer.DUSKSMP_TOLL.three .routeNumber {
+	color: var(--black);
+	font-family: "Series D";
+	top: calc(0.9rem * var(--shieldScale, 1));
+	font-size: calc(1.2rem * var(--shieldScale, 1));
+}
+
+.bannerShieldContainer.DUSKSMP_TOLL.four .routeNumber {
+	color: var(--black);
+	font-family: "Series C";
+	top: calc(0.9rem * var(--shieldScale, 1));
+	font-size: calc(1.2rem * var(--shieldScale, 1));
+}

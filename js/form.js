@@ -18,6 +18,10 @@ const formHandler = (function () {
     postThickness: "signMaker.postThickness",
     controlTextFont: "signMaker.controlTextFont",
     bannerFontFamily: "signMaker.bannerFontFamily",
+    exitTabFHWAFont: "signMaker.exitTabFHWAFont",
+    exitTabFullBorder: "signMaker.exitTabFullBorder",
+    exitTabSquareCorners: "signMaker.exitTabSquareCorners",
+    exitTabTopOffset: "signMaker.exitTabTopOffset",
   };
   let localStorageAvailable;
   let localStorageWarningLogged = false;
@@ -131,6 +135,26 @@ const formHandler = (function () {
       bannerFonts.includes(storedBannerFont)
     ) {
       ShieldElement.prototype.defaultBannerFontFamily = storedBannerFont;
+    }
+
+    const storedExitFHWA = getStoredItem(STORAGE_KEYS.exitTabFHWAFont);
+    if (storedExitFHWA !== null) {
+      ExitTab.prototype.defaultFHWAFont = storedExitFHWA === "true";
+    }
+
+    const storedExitFullBorder = getStoredItem(STORAGE_KEYS.exitTabFullBorder);
+    if (storedExitFullBorder !== null) {
+      ExitTab.prototype.defaultFullBorder = storedExitFullBorder === "true";
+    }
+
+    const storedExitSquareCorners = getStoredItem(STORAGE_KEYS.exitTabSquareCorners);
+    if (storedExitSquareCorners !== null) {
+      ExitTab.prototype.defaultSquareCorners = storedExitSquareCorners === "true";
+    }
+
+    const storedExitTopOffset = getStoredItem(STORAGE_KEYS.exitTabTopOffset);
+    if (storedExitTopOffset !== null) {
+      ExitTab.prototype.defaultTopOffset = storedExitTopOffset === "true";
     }
   };
 
@@ -962,6 +986,11 @@ const formHandler = (function () {
           } else {
             btn.className = "sMModalTab";
           }
+        }
+
+        // Refresh templates list when Saved tab is opened
+        if (button.dataset.tab === "sMTemplatesSaved" && typeof app !== "undefined" && typeof app.refreshTemplatesList === "function") {
+          app.refreshTemplatesList();
         }
       };
     }
@@ -2108,12 +2137,28 @@ const formHandler = (function () {
     exitTab.fullBorder = form["fullBorder"].checked;
     exitTab.squareCorners = form["squareCorners"].checked;
     exitTab.topOffset = form["topOffset"].checked;
+    exitTab.verticalArrangement = form["verticalArrangement"].checked;
+    exitTab.caStyle = form["caStyle"].checked;
+
+    setStoredItem(STORAGE_KEYS.exitTabFHWAFont, String(!!exitTab.FHWAFont));
+    setStoredItem(STORAGE_KEYS.exitTabFullBorder, String(!!exitTab.fullBorder));
+    setStoredItem(STORAGE_KEYS.exitTabSquareCorners, String(!!exitTab.squareCorners));
+    setStoredItem(STORAGE_KEYS.exitTabTopOffset, String(!!exitTab.topOffset));
     const borderThicknessInput = parseFloat(form["borderThickness"].value);
     exitTab.borderThickness = Number.isFinite(borderThicknessInput)
       ? Math.max(0, borderThicknessInput)
       : ExitTab.prototype.defaultBorderThickness;
     exitTab.minHeight = form["minHeight"].value;
     exitTab.fontSize = form["fontSize"].value;
+
+    // Nested Tab Spacing (always applies to parent exit tab, not nested tabs)
+    const parentExitTab = currentPanel.exitTabs[exposed.vars.currentlySelectedExitTabIndex];
+    const nestedTabSpacingInput = parseFloat(form["nestedTabSpacing"]?.value);
+    if (parentExitTab) {
+      parentExitTab.nestedTabSpacing = Number.isFinite(nestedTabSpacingInput)
+        ? Math.max(0, nestedTabSpacingInput)
+        : 0;
+    }
 
     // Misc Shields
     currentPanel.sign.shieldBacks = form["shieldBacks"].checked;
@@ -2648,6 +2693,7 @@ const formHandler = (function () {
             const img = document.createElement("img");
             img.src = logoDef.src;
             img.loading = "lazy";
+            img.title = logoDef.label; // Tooltip for accessibility
 
             item.appendChild(img);
 
@@ -2678,6 +2724,7 @@ const formHandler = (function () {
       };
     }
 
+    // Update label on form update for Toll Logo
     if (tollLogoInput && tollLogoLabel) {
       const currentLogoKey = tollLogoInput.value || TollLogoElement.prototype.defaultLogo;
       const currentLogoDef = TollLogoElement.prototype.logos[currentLogoKey];
@@ -3020,6 +3067,10 @@ const formHandler = (function () {
 
       // Add hint text
       const hintText = document.createElement("p");
+      hintText.style.fontSize = "0.8rem";
+      hintText.style.color = "#888";
+      hintText.style.marginBottom = "8px";
+      hintText.style.fontStyle = "italic";
       hintText.textContent = "To adjust spacing of each APL section, use the spacing section in the subpanel tab.";
       aplArrowList.appendChild(hintText);
 
@@ -3414,6 +3465,12 @@ const formHandler = (function () {
     const topOffset = document.getElementById("topOffset");
     topOffset.checked = exitTab.topOffset;
 
+    const verticalArrangement = document.getElementById("verticalArrangement");
+    verticalArrangement.checked = exitTab.verticalArrangement;
+
+    const caStyle = document.getElementById("caStyle");
+    caStyle.checked = exitTab.caStyle;
+
     const borderThickness = document.getElementById("borderThickness");
     const resolvedBorderThickness = (() => {
       const parsedValue = parseFloat(exitTab.borderThickness);
@@ -3430,6 +3487,14 @@ const formHandler = (function () {
     const minHeight = document.getElementById("minHeight");
     minHeight.value = exitTab.minHeight;
     document.getElementById("minValue").innerHTML = minHeight.value.toString();
+
+    // Nested Tab Spacing (from parent exit tab)
+    const nestedTabSpacingInput = document.getElementById("nestedTabSpacing");
+    if (nestedTabSpacingInput) {
+      const parentExitTab = panel.exitTabs[selectedExitTabIndex];
+      const resolvedSpacing = parentExitTab?.nestedTabSpacing ?? 0;
+      nestedTabSpacingInput.value = resolvedSpacing;
+    }
 
     // Shields
     updateShieldSubform();

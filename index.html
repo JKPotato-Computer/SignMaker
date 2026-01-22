@@ -344,6 +344,12 @@
               <label for="topOffset">Top Offset:</label>
               <input type="checkbox" id="topOffset" value="topOffset" name="topOffset"
                 onchange="formHandler.readForm();" checked="" />
+              <label for="verticalArrangement">Vertical Arrangement:</label>
+              <input type="checkbox" id="verticalArrangement" value="verticalArrangement" name="verticalArrangement"
+                onchange="formHandler.readForm();" />
+              <label for="caStyle">CA Style:</label>
+              <input type="checkbox" id="caStyle" value="caStyle" name="caStyle"
+                onchange="formHandler.readForm();" />
               <br />
               <label for="borderThickness">Border Thickness (rem):
                 <input type="button" class="resetBtn clear" id="borderReset" value="Reset" />
@@ -382,6 +388,11 @@
                     font-size: 2rem;
                     width: auto;
                   ">16</label>
+              <br />
+              <label for="nestedTabSpacing">Nested Tab Spacing (rem):
+              </label>
+              <input type="number" id="nestedTabSpacing" name="nestedTabSpacing" min="0" max="10" step="0.1" value="0"
+                onchange="formHandler.readForm();" />
             </div>
             <div id="exitTollLogoOptions" class="hidden">
               <legend>Toll Logo Options</legend>
@@ -1160,28 +1171,54 @@
           </div>
         </div>
       </div>
-      <div class="sMModal templates">
+      <div class="sMModal templates" data-current-menu="sMTemplatesPreset">
         <nav class="sMModalBar">
           <div class="sMModalTitle">
             <img src="img/other-symbols/ui/template.svg" alt="" class="configIcon templateIcon" />
             Templates
           </div>
+          <div data-tab="sMTemplatesPreset" class="sMModalTab selected">
+            Presets
+          </div>
+          <div data-tab="sMTemplatesSaved" class="sMModalTab" id="sMTemplatesSavedTab">Saved</div>
         </nav>
         <div class="sMModalContent">
-          <p>Select a template to apply to the current subpanel.</p>
-          <button id="templateSimpleExit" onclick="app.applyTemplate('simple-exit');">
-            Simple Exit
-          </button>
-          <button id="templateMileage" onclick="app.applyTemplate('mileage-sign');">
-            Mileage Sign
-          </button>
-          <button id="templateTolledExit" onclick="app.applyTemplate('tolled-exit');">
-            Tolled Exit
-          </button>
-          <button id="templateControlCitiesAdvanceJunction"
-            onclick="app.applyTemplate('control-cities-advance-junction');">
-            Control Cities Advance Junction
-          </button>
+          <div id="sMTemplatesPreset">
+            <p>Select a template to apply to the current subpanel.</p>
+            <button id="templateSimpleExit" onclick="app.applyTemplate('simple-exit');">
+              Simple Exit
+            </button>
+            <button id="templateMileage" onclick="app.applyTemplate('mileage-sign');">
+              Mileage Sign
+            </button>
+            <button id="templateTolledExit" onclick="app.applyTemplate('tolled-exit');">
+              Tolled Exit
+            </button>
+            <button id="templateControlCitiesAdvanceJunction"
+              onclick="app.applyTemplate('control-cities-advance-junction');">
+              Control Cities Advance Junction
+            </button>
+          </div>
+          <div id="sMTemplatesSaved" class="tabHidden">
+            <div class="templateSaveSection">
+              <h4>Save Current Sign as Template</h4>
+              <div class="templateSaveInput">
+                <input type="text" id="templateNameInput" placeholder="Enter template name..." 
+                  onkeypress="if(event.key === 'Enter') app.saveTemplate(this.value);" />
+                <button id="saveTemplateBtn" onclick="app.saveTemplate(document.getElementById('templateNameInput').value);">
+                  <span class="material-symbols-outlined">save</span>
+                  Save Template
+                </button>
+              </div>
+            </div>
+            <hr />
+            <div class="templateListSection">
+              <h4>Saved Templates</h4>
+              <div id="savedTemplatesList">
+                <p style="padding: 1rem; color: #666;">Loading templates...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
