@@ -292,7 +292,7 @@ Shield.prototype.shieldDirectory = {
     KS: { type: "shield", name: "Kansas", variants: ["2 Digit", "3 Digit"] },
     KY: { type: "shield", name: "Kentucky", variants: ["2 Digit", "3 Digit"] },
     LA: { type: "shield", name: "Louisiana", variants: ["2 Digit", "3 Digit"] },
-    ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit"] },
+    ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit", "Turnpike"] },
     MD: { type: "shield", name: "Maryland", variants: ["2 Digit", "3 Digit"] },
     MA: {
       type: "shield",
@@ -343,19 +343,19 @@ Shield.prototype.shieldDirectory = {
     NH: {
       type: "shield",
       name: "New Hampshire",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Blue", "Spaulding", "Everett"],
     },
     NJ: {
       type: "shield",
       name: "New Jersey",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "NJTP", "GSP"],
     },
     NM: {
       type: "shield",
       name: "New Mexico",
       variants: ["2 Digit", "3 Digit"],
     },
-    NY: { type: "shield", name: "New York", variants: ["2 Digit", "3 Digit"] },
+    NY: { type: "shield", name: "New York", variants: ["2 Digit", "3 Digit", "Thruway"] },
     NC: {
       type: "shield",
       name: "North Carolina",
