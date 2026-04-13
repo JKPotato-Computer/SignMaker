@@ -297,7 +297,7 @@ Shield.prototype.shieldDirectory = {
     MA: {
       type: "shield",
       name: "Massachusetts",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Turnpike"],
     },
     MI: { type: "shield", name: "Michigan", variants: ["2 Digit", "3 Digit"] },
     Minnesota: {
