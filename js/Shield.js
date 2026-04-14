@@ -291,7 +291,7 @@ Shield.prototype.shieldDirectory = {
     IA: { type: "shield", name: "Iowa", variants: ["2 Digit", "3 Digit"] },
     KS: { type: "shield", name: "Kansas", variants: ["2 Digit", "3 Digit"] },
     KY: { type: "shield", name: "Kentucky", variants: ["2 Digit", "3 Digit", "AA"] },
-    KYPKWY: {type: "shield", name: "Kentucky Parkway", variants: ["Audubon", "Bluegrass", "Cumberland", "Hal Rogers", "Mountain", "Western KY"]}
+    KYPKWY: {type: "shield", name: "Kentucky Parkway", variants: ["Audubon", "Bluegrass", "Cumberland", "Hal Rogers", "Mountain", "Western KY"] },
     LA: { type: "shield", name: "Louisiana", variants: ["2 Digit", "3 Digit"] },
     ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit", "Turnpike"] },
     MD: { type: "shield", name: "Maryland", variants: ["2 Digit", "3 Digit"] },
