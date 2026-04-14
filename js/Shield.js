@@ -228,7 +228,7 @@ Shield.prototype.shieldDirectory = {
     CT: {
       type: "shield",
       name: "Connecticut",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Merritt"],
     },
     DE: { type: "shield", name: "Delaware", variants: ["2 Digit", "3 Digit"] },
     DC: {
