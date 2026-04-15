@@ -463,13 +463,23 @@ Shield.prototype.shieldDirectory = {
       name: "Prince Edward Island",
       variants: ["2 Digit", "3 Digit"],
     },
+    AB: {
+      type: "shield",
+      name: "Alberta",
+      variants: ["2 Digit"],
+    },
+      AB2: {
+      type: "shield",
+      name: "Alberta (alt)",
+      variants: ["3 Digit"],
+    },
     NS: {
       type: "shield",
       name: "Nova Scotia",
       variants: ["2 Digit", "3 Digit"],
     },
     QC: { type: "shield", name: "Quebec", variants: ["2 Digit", "3 Digit"] },
-    "QC 2nd": {
+    QC2: {
       type: "shield",
       name: "Quebec (alt)",
       variants: ["2 Digit", "3 Digit"],
