@@ -228,7 +228,7 @@ Shield.prototype.shieldDirectory = {
     CT: {
       type: "shield",
       name: "Connecticut",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Merritt"],
     },
     DE: { type: "shield", name: "Delaware", variants: ["2 Digit", "3 Digit"] },
     DC: {
@@ -290,7 +290,8 @@ Shield.prototype.shieldDirectory = {
     IN: { type: "shield", name: "Indiana", variants: ["2 Digit", "3 Digit"] },
     IA: { type: "shield", name: "Iowa", variants: ["2 Digit", "3 Digit"] },
     KS: { type: "shield", name: "Kansas", variants: ["2 Digit", "3 Digit"] },
-    KY: { type: "shield", name: "Kentucky", variants: ["2 Digit", "3 Digit"] },
+    KY: { type: "shield", name: "Kentucky", variants: ["2 Digit", "3 Digit", "AA"] },
+    KYPKWY: {type: "shield", name: "Kentucky Parkway", variants: ["Audubon", "Bluegrass", "Cumberland", "Hal Rogers", "Mountain", "Western KY"] },
     LA: { type: "shield", name: "Louisiana", variants: ["2 Digit", "3 Digit"] },
     ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit", "Turnpike"] },
     MD: { type: "shield", name: "Maryland", variants: ["2 Digit", "3 Digit"] },
