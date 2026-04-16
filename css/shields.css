@@ -689,8 +689,8 @@
 .bannerShieldContainer.NY .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
-	top: 0.15em;
-	font-size: 1.5em;
+	top: 0.05em;
+	font-size: 2em;
 }
 
 .bannerShieldContainer.NC .routeNumber {
@@ -1003,4 +1003,22 @@
 	font-family: "Series C";
 	top: calc(0.9rem * var(--shieldScale, 1));
 	font-size: calc(1.2rem * var(--shieldScale, 1));
+}
+.bannerShieldContainer.AB .routeNumber {
+	color: var(--black);
+	top: 0.5em;
+	font-size: 1.4em;
+}
+.bannerShieldContainer.AB.one .routeNumber {
+	font-family: "Series E";
+}
+.bannerShieldContainer.AB.two .routeNumber,
+.bannerShieldContainer.AB.three .routeNumber {
+	font-family: "Series C";
+}
+.bannerShieldContainer.AB2 .routeNumber {
+		color: var(--black);
+	top: 0.65em;
+	font-size: 1.4em;
+	font-family: "Series C";
 }
