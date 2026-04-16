@@ -940,6 +940,21 @@ const formHandler = (function () {
           button.className = "sMConfigOption";
         }
       }
+
+      // Shift panels right by half the open modal's width so they aren't blocked
+      const mainElmt = document.querySelector("main");
+      if (mainElmt) {
+        const currentMenu = sMConfigBar.dataset.currentMenu;
+        const openModal = currentMenu
+          ? document.querySelector(".sMModal." + currentMenu)
+          : null;
+        if (openModal) {
+          const modalWidth = openModal.offsetWidth;
+          mainElmt.style.transform = "translateX(" + (modalWidth / 2) + "px)";
+        } else {
+          mainElmt.style.transform = "";
+        }
+      }
     }
 
     for (const button of document.querySelectorAll(".sMConfigOption")) {
@@ -1482,6 +1497,32 @@ const formHandler = (function () {
       }
     }
 
+    const advisoryTextColorSelect = document.querySelector(
+      "#sdAdvisory_textColor"
+    );
+    if (advisoryTextColorSelect) {
+      const advisoryTextColorOptions = AdvisoryMessageElement.getTextColorOptions();
+      for (const optionValue of advisoryTextColorOptions) {
+        if (optionValue) {
+          lib.appendOption(advisoryTextColorSelect, optionValue);
+        }
+      }
+      advisoryTextColorSelect.value = AdvisoryMessageElement.defaultTextColor;
+    }
+
+    const actionMessageTextColorSelect = document.querySelector(
+      "#sdActionMessage_textColor"
+    );
+    if (actionMessageTextColorSelect) {
+      const actionTextColorOptions = ActionMessageElement.getTextColorOptions();
+      for (const optionValue of actionTextColorOptions) {
+        if (optionValue) {
+          lib.appendOption(actionMessageTextColorSelect, optionValue);
+        }
+      }
+      actionMessageTextColorSelect.value = ActionMessageElement.defaultTextColor;
+    }
+
     if (blockBorderColorSelect) {
       const defaultBorderColor = Block.defaultBorderColor || "Match BG";
       const borderColorOptions = [defaultBorderColor].concat(
@@ -1522,6 +1563,18 @@ const formHandler = (function () {
     for (const elem of textElem_alignmentSelects) {
       for (const alignment of TextElement.prototype.alignment) {
         lib.appendOption(elem, alignment);
+      }
+    }
+
+    let textElem_justificationSelects = [
+      document.querySelector("#sdCtrlText_justification"),
+      document.querySelector("#sdAdvisory_justification"),
+      document.querySelector("#sdActionMessage_justification"),
+      document.querySelector("#sdElectronicSign_justification"),
+    ];
+    for (const elem of textElem_justificationSelects) {
+      for (const justification of TextElement.prototype.justification) {
+        lib.appendOption(elem, justification);
       }
     }
 
@@ -2489,6 +2542,8 @@ const formHandler = (function () {
       .join(" ")
       .trim();
     currentPanel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
+    const halfExitGapInput = parseFloat(document.getElementById("halfExitGap")?.value);
+    currentPanel.sign.halfExitGap = Number.isFinite(halfExitGapInput) ? halfExitGapInput : 5;
 
     currentPanel.sign.otherSymbol = form["otherSymbol"].value;
     currentPanel.sign.oSNum = form["oSNum"].value;
@@ -2604,6 +2659,13 @@ const formHandler = (function () {
    * Update the fields in the form to the values of the currently selected panel.
    */
   const updateForm = function () {
+    if (exposed && typeof exposed.getPost === "function") {
+      post = exposed.getPost();
+    }
+    if (!post || !Array.isArray(post.panels) || post.panels.length === 0) {
+      return;
+    }
+
     // Icon Modal Logic
     const iconChooseBtn = document.getElementById("sdIcon_chooseBtn");
     const iconModal = document.getElementById("iconSelectorModal");
@@ -2927,6 +2989,17 @@ const formHandler = (function () {
       panelButton.addEventListener("dragend", handlePanelDragEnd);
 
       panelList.appendChild(panelButton);
+    }
+
+    const currentlySelectedPanelLabel = document.getElementById(
+      "currentlySelectedPanel"
+    );
+    if (currentlySelectedPanelLabel) {
+      const selectedPanelNumber = Math.max(
+        1,
+        Math.min(post.panels.length, exposed.vars.currentlySelectedPanelIndex + 1)
+      );
+      currentlySelectedPanelLabel.textContent = "Panel " + selectedPanelNumber;
     }
 
     const panelSpacingSlider = document.getElementById("panelSpacing");
@@ -3279,6 +3352,187 @@ const formHandler = (function () {
         aplArrowFlipButton.setAttribute("aria-pressed", isFlipped ? "true" : "false");
         aplArrowFlipButton.textContent = isFlipped ? "Unflip" : "Flip";
       }
+
+      // Per-arrow settings controls
+      const aplArrowSettingsContainer = document.getElementById("aplArrowSettings");
+      if (aplArrowSettingsContainer) {
+        lib.clearChildren(aplArrowSettingsContainer);
+
+        if (aplArrows.length > 0 && selectedAPLIndex < aplArrows.length) {
+          const arrow = aplArrows[selectedAPLIndex];
+          const idx = selectedAPLIndex;
+
+          // Arrow Margin Left
+          const marginLeftLabel = document.createElement("label");
+          marginLeftLabel.textContent = "Arrow Margin Left (rem):";
+          marginLeftLabel.style.fontSize = "0.8rem";
+          const marginLeftInput = document.createElement("input");
+          marginLeftInput.type = "number";
+          marginLeftInput.step = "0.1";
+          marginLeftInput.min = "0";
+          marginLeftInput.placeholder = "3.6";
+          marginLeftInput.style.width = "5rem";
+          if (arrow.arrowMarginLeft != null) {
+            marginLeftInput.value = arrow.arrowMarginLeft;
+          }
+          marginLeftInput.addEventListener("change", function () {
+            const val = this.value === "" ? null : parseFloat(this.value);
+            if (exposed) exposed.setAPLArrowMarginLeft(idx, val);
+          });
+          aplArrowSettingsContainer.appendChild(marginLeftLabel);
+          aplArrowSettingsContainer.appendChild(marginLeftInput);
+
+          // Arrow Margin Right
+          const marginRightLabel = document.createElement("label");
+          marginRightLabel.textContent = "Arrow Margin Right (rem):";
+          marginRightLabel.style.fontSize = "0.8rem";
+          const marginRightInput = document.createElement("input");
+          marginRightInput.type = "number";
+          marginRightInput.step = "0.1";
+          marginRightInput.min = "0";
+          marginRightInput.placeholder = "3.6";
+          marginRightInput.style.width = "5rem";
+          if (arrow.arrowMarginRight != null) {
+            marginRightInput.value = arrow.arrowMarginRight;
+          }
+          marginRightInput.addEventListener("change", function () {
+            const val = this.value === "" ? null : parseFloat(this.value);
+            if (exposed) exposed.setAPLArrowMarginRight(idx, val);
+          });
+          aplArrowSettingsContainer.appendChild(marginRightLabel);
+          aplArrowSettingsContainer.appendChild(marginRightInput);
+
+          // Exit Only settings (only when exitOnly is enabled)
+          if (arrow.exitOnly) {
+            const exitOnlyHeader = document.createElement("p");
+            exitOnlyHeader.textContent = "Exit Only Settings";
+            exitOnlyHeader.style.fontWeight = "bold";
+            exitOnlyHeader.style.fontSize = "0.85rem";
+            exitOnlyHeader.style.marginTop = "8px";
+            exitOnlyHeader.style.marginBottom = "4px";
+            aplArrowSettingsContainer.appendChild(exitOnlyHeader);
+
+            // Background Color
+            const bgLabel = document.createElement("label");
+            bgLabel.textContent = "Background Color:";
+            bgLabel.style.fontSize = "0.8rem";
+            const bgSelect = document.createElement("select");
+            bgSelect.style.width = "5rem";
+            const yellowOpt = document.createElement("option");
+            yellowOpt.value = "yellow";
+            yellowOpt.textContent = "Yellow";
+            const whiteOpt = document.createElement("option");
+            whiteOpt.value = "white";
+            whiteOpt.textContent = "White";
+            bgSelect.appendChild(yellowOpt);
+            bgSelect.appendChild(whiteOpt);
+            bgSelect.value = arrow.exitOnlyBgColor || "yellow";
+            bgSelect.addEventListener("change", function () {
+              if (exposed) exposed.setAPLExitOnlyBgColor(idx, this.value);
+            });
+            aplArrowSettingsContainer.appendChild(bgLabel);
+            aplArrowSettingsContainer.appendChild(bgSelect);
+
+            // Horizontal Padding
+            const padLabel = document.createElement("label");
+            padLabel.textContent = "Horizontal Padding (rem):";
+            padLabel.style.fontSize = "0.8rem";
+            const padInput = document.createElement("input");
+            padInput.type = "number";
+            padInput.step = "0.1";
+            padInput.min = "0";
+            padInput.placeholder = "1";
+            padInput.style.width = "5rem";
+            if (arrow.exitOnlyPadding != null) {
+              padInput.value = arrow.exitOnlyPadding;
+            }
+            padInput.addEventListener("change", function () {
+              const val = this.value === "" ? null : parseFloat(this.value);
+              if (exposed) exposed.setAPLExitOnlyPadding(idx, val);
+            });
+            aplArrowSettingsContainer.appendChild(padLabel);
+            aplArrowSettingsContainer.appendChild(padInput);
+
+            // Border Radius
+            const radLabel = document.createElement("label");
+            radLabel.textContent = "Border Radius (rem):";
+            radLabel.style.fontSize = "0.8rem";
+            const radInput = document.createElement("input");
+            radInput.type = "number";
+            radInput.step = "0.1";
+            radInput.min = "0";
+            radInput.placeholder = "0.1";
+            radInput.style.width = "5rem";
+            if (arrow.exitOnlyBorderRadius != null) {
+              radInput.value = arrow.exitOnlyBorderRadius;
+            }
+            radInput.addEventListener("change", function () {
+              const val = this.value === "" ? null : parseFloat(this.value);
+              if (exposed) exposed.setAPLExitOnlyBorderRadius(idx, val);
+            });
+            aplArrowSettingsContainer.appendChild(radLabel);
+            aplArrowSettingsContainer.appendChild(radInput);
+
+            // Left Label Text + Hide
+            const leftLabel = document.createElement("label");
+            leftLabel.textContent = "Left Label Text:";
+            leftLabel.style.fontSize = "0.8rem";
+            const leftInput = document.createElement("input");
+            leftInput.type = "text";
+            leftInput.placeholder = "EXIT";
+            leftInput.style.width = "5rem";
+            leftInput.value = arrow.exitOnlyTextLeft != null ? arrow.exitOnlyTextLeft : "EXIT";
+            leftInput.addEventListener("change", function () {
+              if (exposed) exposed.setAPLExitOnlyTextLeft(idx, this.value);
+            });
+            const hideLeftLabel = document.createElement("label");
+            hideLeftLabel.style.fontSize = "0.8rem";
+            hideLeftLabel.style.display = "inline-flex";
+            hideLeftLabel.style.alignItems = "center";
+            hideLeftLabel.style.gap = "4px";
+            const hideLeftCheck = document.createElement("input");
+            hideLeftCheck.type = "checkbox";
+            hideLeftCheck.checked = arrow.exitOnlyHideLeft === true;
+            hideLeftCheck.addEventListener("change", function () {
+              if (exposed) exposed.setAPLExitOnlyHideLeft(idx, this.checked);
+            });
+            hideLeftLabel.appendChild(hideLeftCheck);
+            hideLeftLabel.appendChild(document.createTextNode("Hide"));
+            aplArrowSettingsContainer.appendChild(leftLabel);
+            aplArrowSettingsContainer.appendChild(leftInput);
+            aplArrowSettingsContainer.appendChild(hideLeftLabel);
+
+            // Right Label Text + Hide
+            const rightLabel = document.createElement("label");
+            rightLabel.textContent = "Right Label Text:";
+            rightLabel.style.fontSize = "0.8rem";
+            const rightInput = document.createElement("input");
+            rightInput.type = "text";
+            rightInput.placeholder = "ONLY";
+            rightInput.style.width = "5rem";
+            rightInput.value = arrow.exitOnlyTextRight != null ? arrow.exitOnlyTextRight : "ONLY";
+            rightInput.addEventListener("change", function () {
+              if (exposed) exposed.setAPLExitOnlyTextRight(idx, this.value);
+            });
+            const hideRightLabel = document.createElement("label");
+            hideRightLabel.style.fontSize = "0.8rem";
+            hideRightLabel.style.display = "inline-flex";
+            hideRightLabel.style.alignItems = "center";
+            hideRightLabel.style.gap = "4px";
+            const hideRightCheck = document.createElement("input");
+            hideRightCheck.type = "checkbox";
+            hideRightCheck.checked = arrow.exitOnlyHideRight === true;
+            hideRightCheck.addEventListener("change", function () {
+              if (exposed) exposed.setAPLExitOnlyHideRight(idx, this.checked);
+            });
+            hideRightLabel.appendChild(hideRightCheck);
+            hideRightLabel.appendChild(document.createTextNode("Hide"));
+            aplArrowSettingsContainer.appendChild(rightLabel);
+            aplArrowSettingsContainer.appendChild(rightInput);
+            aplArrowSettingsContainer.appendChild(hideRightLabel);
+          }
+        }
+      }
     }
 
     // Panel Setting Config
@@ -3308,6 +3562,20 @@ const formHandler = (function () {
           : Panel.prototype.defaultBorderRadius;
       panelBorderRadiusElmt.value = resolvedRadius;
     }
+
+    const signPadding =
+      typeof panel.sign.padding === "string"
+        ? panel.sign.padding
+        : "0.3rem 0.75rem 0.3rem 0.75rem";
+    const paddingParts = signPadding.split("rem");
+    const paddingTopElmt = document.getElementById("paddingTop");
+    const paddingRightElmt = document.getElementById("paddingRight");
+    const paddingBottomElmt = document.getElementById("paddingBottom");
+    const paddingLeftElmt = document.getElementById("paddingLeft");
+    if (paddingTopElmt) paddingTopElmt.value = parseFloat(paddingParts[0]);
+    if (paddingRightElmt) paddingRightElmt.value = parseFloat(paddingParts[1]);
+    if (paddingBottomElmt) paddingBottomElmt.value = parseFloat(paddingParts[2]);
+    if (paddingLeftElmt) paddingLeftElmt.value = parseFloat(paddingParts[3]);
 
     // Global Panel
     const outActionMessage = document.getElementById("outActionMessage");
@@ -3502,6 +3770,80 @@ const formHandler = (function () {
     // Control Text Revision
     const sMSPTextList = document.querySelector("#sMSPTextList");
     sMSPTextList.innerHTML = "";
+
+    // START Add Header/Footer Buttons
+    const addHeaderFooterContainer = document.createElement("div");
+    addHeaderFooterContainer.style.width = "100%";
+    addHeaderFooterContainer.style.display = "flex";
+    addHeaderFooterContainer.style.justifyContent = "center";
+    addHeaderFooterContainer.style.gap = "10px";
+    addHeaderFooterContainer.style.paddingBottom = "10px";
+
+    const createButton = (text, onClick) => {
+      const btn = document.createElement("button");
+      btn.textContent = text;
+      btn.type = "button";
+      btn.style.padding = "0.4rem 0.8rem";
+      btn.onclick = onClick;
+      return btn;
+    };
+
+    const addHeaderButton = createButton("Add Header", () => {
+      const blockElems = sign.blockElements;
+
+      // Add Header text at the top
+      blockElems.addRow(0, "ControlTextElement");
+      if (blockElems.rows[0] && blockElems.rows[0][0]) {
+        blockElems.rows[0][0].textContent = "Header";
+        // Set element background just in case, though row background is usually preferred for full strips
+        blockElems.rows[0][0].backgroundColor = "Yellow";
+      }
+      if (blockElems.blockProperties[0]) {
+        blockElems.blockProperties[0].bottomPadding = 0.2;
+        blockElems.blockProperties[0].backgroundColor = "Yellow";
+      }
+
+      // Add Divider below the Header
+      blockElems.addRow(1, "DividerElement");
+      if (blockElems.rows[1] && blockElems.rows[1][0]) {
+        blockElems.rows[1][0].dividerColor = "Black";
+        blockElems.rows[1][0].fullBleed = true;
+      }
+
+      if (typeof updateForm === "function") updateForm();
+      if (exposed && typeof exposed.redraw === "function") exposed.redraw();
+    });
+
+    const addFooterButton = createButton("Add Footer", () => {
+      const blockElems = sign.blockElements;
+      const lastIndex = blockElems.rows.length;
+
+      // Add Divider at the bottom
+      blockElems.addRow(lastIndex, "DividerElement");
+      if (blockElems.rows[lastIndex] && blockElems.rows[lastIndex][0]) {
+        blockElems.rows[lastIndex][0].dividerColor = "Black";
+        blockElems.rows[lastIndex][0].fullBleed = true;
+      }
+
+      // Add Footer text below the divider
+      blockElems.addRow(lastIndex + 1, "ControlTextElement");
+      if (blockElems.rows[lastIndex + 1] && blockElems.rows[lastIndex + 1][0]) {
+        blockElems.rows[lastIndex + 1][0].textContent = "Footer";
+        blockElems.rows[lastIndex + 1][0].backgroundColor = "Yellow";
+      }
+      if (blockElems.blockProperties[lastIndex + 1]) {
+        blockElems.blockProperties[lastIndex + 1].topPadding = 0.2;
+        blockElems.blockProperties[lastIndex + 1].backgroundColor = "Yellow";
+      }
+
+      if (typeof updateForm === "function") updateForm();
+      if (exposed && typeof exposed.redraw === "function") exposed.redraw();
+    });
+
+    addHeaderFooterContainer.appendChild(addHeaderButton);
+    addHeaderFooterContainer.appendChild(addFooterButton);
+    sMSPTextList.appendChild(addHeaderFooterContainer);
+    // END Add Header/Footer Buttons
     document.querySelector("#SMSPSelectLabel").textContent =
       "Selected: Row " + (exposed.vars.currentlySelectedRowIndex + 1);
     document.querySelector("#SMSPElementLabel").textContent =
@@ -3942,6 +4284,9 @@ const formHandler = (function () {
     const exitOnlyPaddingLabel = document.getElementById(
       "exitOnlyPaddingLabel"
     );
+    const halfExitGapElmt = document.getElementById("halfExitGap");
+    const halfExitGapValueElmt = document.getElementById("halfExitGapValue");
+    const halfExitGapLabelElmt = document.getElementById("halfExitGapLabel");
 
     exitOnlyDirectionLabel.className = !panel.sign.guideArrow.includes(
       "Exit Only"
@@ -3969,6 +4314,10 @@ const formHandler = (function () {
         panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
+    const isHalfExitOnly = panel.sign.guideArrow === "Half Exit Only";
+    if (halfExitGapElmt) halfExitGapElmt.className = isHalfExitOnly ? "" : "invisible";
+    if (halfExitGapValueElmt) halfExitGapValueElmt.className = isHalfExitOnly ? "" : "invisible";
+    if (halfExitGapLabelElmt) halfExitGapLabelElmt.className = isHalfExitOnly ? "" : "invisible";
     showExitOnly.className = !panel.sign.guideArrow.includes("Exit Only")
       ? "invisible"
       : "";
@@ -4034,6 +4383,9 @@ const formHandler = (function () {
     }
     exitOnlyPadding.value = panel.sign.exitOnlyPadding;
     exitOnlyPaddingValue.textContent = panel.sign.exitOnlyPadding;
+    const resolvedGap = typeof panel.sign.halfExitGap === "number" ? panel.sign.halfExitGap : 5;
+    if (halfExitGapElmt) halfExitGapElmt.value = resolvedGap;
+    if (halfExitGapValueElmt) halfExitGapValueElmt.textContent = resolvedGap;
 
     for (const option of exitOnlyDirection.options) {
       if (option.value == panel.sign.exitguideArrows) {

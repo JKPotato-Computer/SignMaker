@@ -22,11 +22,17 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   --blockPaddingTopExtra: 0rem;
   --blockPaddingBottomExtra: 0rem;
   display: flex;
+  position: relative;
   justify-content: center;
   align-items: center;
   width: 100%;
   margin: var(--marginTop) 0 var(--marginBottom) 0;
   background-color: var(--masterBlockBgColor);
+}
+
+.blockElementRow.hasVerticalDivider {
+  align-items: stretch;
+  z-index: 1;
 }
 
 .blockElementRow.fullBleed {
@@ -43,6 +49,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 
 .bE-textElement {
   --fhwaBaselineOffset: 0px;
+  --justification: center;
   font-family: var(--fontFamily), "Series EM";
   font-size: var(--fontSize);
   background-color: var(--blockBgColor);
@@ -51,6 +58,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   align-items: center;
   margin: 0 var(--spacing);
   white-space: pre;
+  text-align: var(--justification);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100) + 0.2));
 }
 
@@ -234,16 +242,23 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   --dividerBleedRight: 0rem;
   --dividerBleedTop: 0rem;
   --dividerBleedBottom: 0rem;
+  --dividerRowBleedTop: 0rem;
+  --dividerRowBleedBottom: 0rem;
+  --dividerLaneBleedTop: 0px;
+  --dividerLaneBleedBottom: 0px;
   background-color: white;
   width: var(--dividerLength, 100%);
   height: var(--dividerThickness, 0.2rem);
+  display: block;
   position: relative;
   z-index: 3;
   pointer-events: none;
+  flex-shrink: 0;
 }
 
 .dividerElement.vertical {
   width: var(--dividerThickness, 0.2rem);
+  min-width: var(--dividerThickness, 0.2rem);
   height: var(--dividerLength, 100%);
   align-self: stretch;
 }
@@ -256,9 +271,17 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 }
 
 .dividerElement.vertical.fullBleed {
-  height: calc(var(--dividerLength, 100%) + var(--dividerBleedTop, 0rem) + var(--dividerBleedBottom, 0rem));
-  margin-top: calc(-1 * var(--dividerBleedTop, 0rem));
-  margin-bottom: calc(-1 * var(--dividerBleedBottom, 0rem));
+  overflow: visible;
+}
+
+.dividerElement.vertical.fullBleed::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * (var(--dividerBleedTop, 0rem) + var(--dividerRowBleedTop, 0rem) + var(--dividerLaneBleedTop, 0px)));
+  bottom: calc(-1 * (var(--dividerBleedBottom, 0rem) + var(--dividerRowBleedBottom, 0rem) + var(--dividerLaneBleedBottom, 0px)));
+  left: 0;
+  right: 0;
+  background-color: inherit;
 }
 
 .blockElementLeft,
@@ -277,6 +300,12 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 .blockElementLeft:empty,
 .blockElementRight:empty {
   flex-grow: 0;
+}
+
+.blockElementRow.hasVerticalDivider .blockElementLeft,
+.blockElementRow.hasVerticalDivider .blockElementCenter,
+.blockElementRow.hasVerticalDivider .blockElementRight {
+  align-self: stretch;
 }
 
 .blockElementLeft {

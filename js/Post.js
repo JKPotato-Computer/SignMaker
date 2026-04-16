@@ -56,39 +56,12 @@ class Post {
 	 */
 	duplicatePanel(panelIndex) {
 		const existingPanel = this.panels[panelIndex];
-		const newSubPanels = [];
-		for (const subPanel of existingPanel.sign.subPanels) {
-			newSubPanels.push(Object.assign(new SubPanels(), subPanel));
+		if (!existingPanel) {
+			return;
 		}
 
-		const newExitTabs = [];
-		const cloneExitTab = (tab) => {
-			const clonedTab = Object.assign(new ExitTab(), tab);
-			if (Array.isArray(tab?.nestedExitTabs)) {
-				clonedTab.nestedExitTabs = tab.nestedExitTabs.map((nested) =>
-					cloneExitTab(nested)
-				);
-			} else {
-				clonedTab.nestedExitTabs = [];
-			}
-			return clonedTab;
-		};
-		for (const exitTab of existingPanel.exitTabs) {
-			newExitTabs.push(cloneExitTab(exitTab));
-		}
-
-		const newSign = new Sign({
-			shieldPosition: existingPanel.sign.shieldPosition,
-			subPanels: newSubPanels,
-			sheildBacks: existingPanel.sign.sheildBacks,
-			guideArrow: existingPanel.sign.guideArrow,
-			guideArrowLanes: existingPanel.sign.guideArrowLanes,
-			useCanadianDownArrows: existingPanel.sign.useCanadianDownArrows,
-		});
-		const newPanel = Object.assign(new Panel(), existingPanel);
-		newPanel.sign = newSign;
-		newPanel.exitTabs = newExitTabs;
-		this.panels.splice(++panelIndex, 0, newPanel);
+		const newPanel = Post.clonePanel(existingPanel);
+		this.panels.splice(panelIndex + 1, 0, newPanel);
 	}
 
 	/**
@@ -176,6 +149,191 @@ class Post {
 		return Math.max(0, parsed);
 	}
 }
+
+Post.cloneData = function (value) {
+	if (Array.isArray(value)) {
+		return value.map((item) => Post.cloneData(item));
+	}
+
+	if (value && typeof value === "object") {
+		const clone = {};
+		for (const [key, entry] of Object.entries(value)) {
+			clone[key] = Post.cloneData(entry);
+		}
+		return clone;
+	}
+
+	return value;
+};
+
+Post.cloneShield = function (shieldData) {
+	const safeData =
+		shieldData && typeof shieldData === "object"
+			? Post.cloneData(shieldData)
+			: {};
+	const shield = new Shield(safeData);
+	return Object.assign(shield, safeData);
+};
+
+Post.cloneArrow = function (arrowData) {
+	const safeData =
+		arrowData && typeof arrowData === "object"
+			? Post.cloneData(arrowData)
+			: {};
+
+	if (typeof Arrow === "function") {
+		const arrow = new Arrow(safeData);
+		return Object.assign(arrow, safeData);
+	}
+
+	return safeData;
+};
+
+Post.cloneExitTab = function (exitTabData) {
+	const safeData =
+		exitTabData && typeof exitTabData === "object"
+			? Post.cloneData(exitTabData)
+			: {};
+	const nestedExitTabs = Array.isArray(exitTabData?.nestedExitTabs)
+		? exitTabData.nestedExitTabs.map((nestedTab) => Post.cloneExitTab(nestedTab))
+		: [];
+	const exitTab = new ExitTab({
+		...safeData,
+		nestedExitTabs,
+	});
+	Object.assign(exitTab, safeData);
+	exitTab.nestedExitTabs = nestedExitTabs;
+	return exitTab;
+};
+
+Post.cloneBlock = function (blockData) {
+	const safeData =
+		blockData && typeof blockData === "object"
+			? Post.cloneData(blockData)
+			: {};
+
+	if (typeof Block === "function") {
+		const block = new Block(safeData);
+		return Object.assign(block, safeData);
+	}
+
+	return safeData;
+};
+
+Post.cloneControlElement = function (elementData) {
+	const safeData =
+		elementData && typeof elementData === "object"
+			? Post.cloneData(elementData)
+			: {};
+	const registry = Control?.prototype?.blockToClassElems;
+	const elementType =
+		registry && typeof registry.getElem === "function"
+			? registry.getElem(elementData)
+			: null;
+
+	if (elementType && typeof registry[elementType] === "function") {
+		const ElementClass = registry[elementType];
+		const element = new ElementClass(safeData);
+		return Object.assign(element, safeData);
+	}
+
+	return safeData;
+};
+
+Post.cloneControl = function (controlData) {
+	const rowSource = Array.isArray(controlData?.rows) ? controlData.rows : [];
+	const blockSource = Array.isArray(controlData?.blockProperties)
+		? controlData.blockProperties
+		: [];
+	const rows = rowSource.map((row) =>
+		Array.isArray(row)
+			? row.map((element) => Post.cloneControlElement(element))
+			: []
+	);
+	const blockProperties = rows.map((_, index) => {
+		const blockData = blockSource[index];
+		return blockData ? Post.cloneBlock(blockData) : new Block();
+	});
+
+	return new Control({
+		rows,
+		blockProperties,
+	});
+};
+
+Post.cloneSubPanel = function (subPanelData) {
+	const safeData =
+		subPanelData && typeof subPanelData === "object"
+			? Post.cloneData(subPanelData)
+			: {};
+	const shields = Array.isArray(subPanelData?.shields)
+		? subPanelData.shields.map((shield) => Post.cloneShield(shield))
+		: [];
+	const blockElements = Post.cloneControl(subPanelData?.blockElements);
+	const subPanel = new SubPanels({
+		...safeData,
+		shields,
+		blockElements,
+	});
+	Object.assign(subPanel, safeData);
+	subPanel.shields = shields;
+	subPanel.blockElements = blockElements;
+	return subPanel;
+};
+
+Post.cloneSign = function (signData) {
+	const safeData =
+		signData && typeof signData === "object"
+			? Post.cloneData(signData)
+			: {};
+	const subPanels = Array.isArray(signData?.subPanels)
+		? signData.subPanels.map((subPanel) => Post.cloneSubPanel(subPanel))
+		: [];
+	const shields = Array.isArray(signData?.shields)
+		? signData.shields.map((shield) => Post.cloneShield(shield))
+		: [];
+	const arrows = Array.isArray(signData?.arrows)
+		? signData.arrows.map((arrow) => Post.cloneArrow(arrow))
+		: [];
+	const aplArrows = Array.isArray(signData?.aplArrows)
+		? Post.cloneData(signData.aplArrows)
+		: [];
+	const sign = new Sign({
+		...safeData,
+		subPanels,
+		shields,
+		arrows,
+		aplArrows,
+	});
+	Object.assign(sign, safeData);
+	sign.subPanels = subPanels;
+	sign.shields = shields;
+	sign.arrows = arrows;
+	sign.aplArrows = aplArrows;
+	return sign;
+};
+
+Post.clonePanel = function (panelData) {
+	const safeData =
+		panelData && typeof panelData === "object"
+			? Post.cloneData(panelData)
+			: {};
+	const sign = Post.cloneSign(panelData?.sign);
+	const exitTabs = Array.isArray(panelData?.exitTabs)
+		? panelData.exitTabs.map((exitTab) => Post.cloneExitTab(exitTab))
+		: [];
+	const panel = new Panel(
+		sign,
+		safeData.color,
+		exitTabs,
+		safeData.corner,
+		safeData.borderRadius
+	);
+	Object.assign(panel, safeData);
+	panel.sign = sign;
+	panel.exitTabs = exitTabs;
+	return panel;
+};
 
 Post.prototype.polePositions = [
 	"Left",

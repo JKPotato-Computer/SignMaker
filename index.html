@@ -672,6 +672,8 @@
                   <input type="checkbox" id="sdCtrlText_smallCapitals" />
                   <label for="sdCtrlText_alignment">Alignment: </label>
                   <select id="sdCtrlText_alignment"></select>
+                  <label for="sdCtrlText_justification">Justification: </label>
+                  <select id="sdCtrlText_justification"></select>
                   <br />
                   <label for="sdCtrlText_lineHeight">Line Height (%): </label>
                   <input type="range" min="0" max="300" value="100" step="1" id="sdCtrlText_lineHeight" />
@@ -691,9 +693,9 @@
 
                 <div data-property="sdBlocker" class="hidden">
                   <label for="sdBlocker_dividerWidth">Divider Width: </label>
-                  <input type="number" id="sdBlocker_dividerWidth" placeholder="100" min="0" max="100" value="100"
-                    step="1" />
-                  <select id="sdBlocker_dividerMeasurement" data-toolTip="Unit (%/rem)"
+                  <input type="number" id="sdBlocker_dividerWidth" placeholder="1" min="0" max="100" value="1"
+                    step=".1" />
+                  <select id="sdBlocker_dividerMeasurement" data-toolTip="Unit (rem/%)"
                     class="sdTextEditorSmall"></select>
                   <label for="sdBlocker_dividerColor">Color:</label>
                   <select id="sdBlocker_dividerColor" class="sdTextEditorSmall"></select>
@@ -706,7 +708,7 @@
                   <select id="sdBlocker_orientation" class="sdTextEditorSmall"></select>
                   <label for="sdBlocker_alignment">Alignment: </label>
                   <select id="sdBlocker_alignment"></select>
-                  <label for="sdBlocker_fullBleed">Full Bleed:</label>
+                  <label for="sdBlocker_fullBleed">Full Width/Height:</label>
                   <input type="checkbox" id="sdBlocker_fullBleed" />
                   <label for="sdBlocker_visible">Visibility:</label>
                   <input type="checkbox" id="sdBlocker_visible" />
@@ -769,11 +771,15 @@
                   <br />
                   <label for="sdAdvisory_backgroundColor">BG:</label>
                   <select id="sdAdvisory_backgroundColor"></select>
+                  <label for="sdAdvisory_textColor">Text:</label>
+                  <select id="sdAdvisory_textColor"></select>
                   <label for="sdAdvisory_fontFamily">Font:</label>
                   <select id="sdAdvisory_fontFamily"></select>
                   <br />
                   <label for="sdAdvisory_alignment">Alignment: </label>
                   <select id="sdAdvisory_alignment"></select>
+                  <label for="sdAdvisory_justification">Justification: </label>
+                  <select id="sdAdvisory_justification"></select>
                   <label for="sdAdvisory_fontSize">Font Size (%):</label>
                   <input type="number" id="sdAdvisory_fontSize" placeholder="100" max="150" min="50" step="1"
                     value="100" />
@@ -935,11 +941,15 @@
                   <br />
                   <label for="sdActionMessage_backgroundColor">BG:</label>
                   <select id="sdActionMessage_backgroundColor"></select>
+                  <label for="sdActionMessage_textColor">Text:</label>
+                  <select id="sdActionMessage_textColor"></select>
                   <label for="sdActionMessage_fontFamily">Font:</label>
                   <select id="sdActionMessage_fontFamily"></select>
                   <br />
                   <label for="sdActionMessage_alignment">Alignment: </label>
                   <select id="sdActionMessage_alignment"></select>
+                  <label for="sdActionMessage_justification">Justification: </label>
+                  <select id="sdActionMessage_justification"></select>
                   <label for="sdActionMessage_fontSize">Font Size (%):</label>
                   <input type="number" id="sdActionMessage_fontSize" placeholder="100" max="150" min="50" step="1"
                     value="100" />
@@ -993,6 +1003,8 @@
                     value="0" />
                   <label for="sdElectronicSign_alignment">Alignment: </label>
                   <select id="sdElectronicSign_alignment"></select>
+                  <label for="sdElectronicSign_justification">Justification: </label>
+                  <select id="sdElectronicSign_justification"></select>
                 </div>
               </div>
               <div id="smSPBlockProperties">
@@ -1135,6 +1147,19 @@
                     width: auto;
                   " class="invisible">0.25</label>
               <br />
+              <label id="halfExitGapLabel" for="halfExitGap" class="invisible">Gap (rem):
+                <input type="button" class="resetBtn clear" id="halfExitGapReset" value="Reset" />
+              </label>
+              <input id="halfExitGap" type="range" min="0" max="15" step="0.5" value="5"
+                oninput="document.querySelector('#halfExitGapValue').textContent = this.value;"
+                onchange="formHandler.readForm();" class="invisible" />
+              <label for="halfExitGap" id="halfExitGapValue" style="
+                    text-align: left;
+                    margin: 0;
+                    font-size: 2rem;
+                    width: auto;
+                  " class="invisible">5</label>
+              <br />
               <label for="secondExitOnly" id="secondExitOnlyLabel">2nd Exit Only Design
               </label>
               <input type="checkbox" id="secondExitOnly" name="secondExitOnly" value="secondExitOnly"
@@ -1166,6 +1191,9 @@
                 <button type="button" id="aplArrowFlipButton" aria-pressed="false">
                   Flip
                 </button>
+              </div>
+              <div id="aplArrowSettings" class="aplArrowControls" style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+                <!-- Per-arrow settings dynamically populated here -->
               </div>
             </div>
           </div>
@@ -1263,7 +1291,7 @@
           </div>
           <div class="panelActions">
             <button id="newPanel" class="new">Add Panel</button>
-            <!--<button id="duplicatePanel" class="dup">Duplicate</button>-->
+            <button id="duplicatePanel" class="dup">Duplicate</button>
             <button id="deletePanel" class="del">Remove</button>
           </div>
           <div id="panelList" class="panelList"></div>

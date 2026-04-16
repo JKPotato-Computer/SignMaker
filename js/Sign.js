@@ -59,7 +59,8 @@ class Sign {
 
 		// panel
 		padding = "0.3rem 0.75rem 0.3rem 0.75rem",
-		arrowPosition = "Middle"
+		arrowPosition = "Middle",
+		halfExitGap = 5
 	} = {}
 	) {
 		if (this.shieldPositions.includes(shieldPosition)) {
@@ -91,6 +92,7 @@ class Sign {
 		this.advisoryMessage = advisoryMessage;
 		this.padding = padding;
 		this.arrowPosition = arrowPosition;
+		this.halfExitGap = halfExitGap;
 		this.shields = shields;
 		this.controlText = controlText;
 		this.shieldDistance = shieldDistance;
@@ -165,7 +167,22 @@ class Sign {
 	}
 
 	newAPLArrow(type = "APL_UP") {
-		this.aplArrows.push({ type: type, flip: false, dividerAfter: false, groupedWithDivider: false, exitOnly: false });
+		this.aplArrows.push({
+			type: type,
+			flip: false,
+			dividerAfter: false,
+			groupedWithDivider: false,
+			exitOnly: false,
+			arrowMarginLeft: null,
+			arrowMarginRight: null,
+			exitOnlyBgColor: "yellow",
+			exitOnlyPadding: null,
+			exitOnlyBorderRadius: null,
+			exitOnlyTextLeft: "EXIT",
+			exitOnlyTextRight: "ONLY",
+			exitOnlyHideLeft: false,
+			exitOnlyHideRight: false
+		});
 	}
 
 	deleteAPLArrow(index) {
@@ -211,6 +228,60 @@ class Sign {
 			if (isExitOnly) {
 				this.aplArrows[index].groupedWithDivider = false; // Mutually exclusive
 			}
+		}
+	}
+
+	setAPLArrowMarginLeft(index, margin) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].arrowMarginLeft = margin;
+		}
+	}
+
+	setAPLArrowMarginRight(index, margin) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].arrowMarginRight = margin;
+		}
+	}
+
+	setAPLExitOnlyBgColor(index, color) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyBgColor = color;
+		}
+	}
+
+	setAPLExitOnlyPadding(index, padding) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyPadding = padding;
+		}
+	}
+
+	setAPLExitOnlyBorderRadius(index, radius) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyBorderRadius = radius;
+		}
+	}
+
+	setAPLExitOnlyTextLeft(index, text) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyTextLeft = text;
+		}
+	}
+
+	setAPLExitOnlyTextRight(index, text) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyTextRight = text;
+		}
+	}
+
+	setAPLExitOnlyHideLeft(index, hidden) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyHideLeft = hidden;
+		}
+	}
+
+	setAPLExitOnlyHideRight(index, hidden) {
+		if (index >= 0 && index < this.aplArrows.length) {
+			this.aplArrows[index].exitOnlyHideRight = hidden;
 		}
 	}
 
@@ -292,15 +363,20 @@ class Sign {
 
 	duplicateSubPanel(subPanelIndex) {
 		const existingSubPanel = this.subPanels[subPanelIndex];
-		const new_SubPanel = new SubPanels({
-			controlText: existingSubPanel.controlText,
-			actionMessage: existingSubPanel.actionMessage,
-			shields: existingSubPanel.shields,
-			width: existingSubPanel.width,
-			height: existingSubPanel.height,
-			customDividerHeight: existingSubPanel.customDividerHeight
-		})
-		this.subPanels.push(new_SubPanel);
+		if (!existingSubPanel) {
+			return;
+		}
+
+		const newSubPanel =
+			typeof Post !== "undefined" && typeof Post.cloneSubPanel === "function"
+				? Post.cloneSubPanel(existingSubPanel)
+				: new SubPanels({
+					shields: existingSubPanel.shields,
+					width: existingSubPanel.width,
+					height: existingSubPanel.height,
+					customDividerHeight: existingSubPanel.customDividerHeight
+				});
+		this.subPanels.splice(subPanelIndex + 1, 0, newSubPanel);
 	}
 
 }

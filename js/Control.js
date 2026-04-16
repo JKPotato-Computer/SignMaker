@@ -33,6 +33,7 @@ class TextElement {
     useNumeralFormatting = false,
     numeralFormattingSize = 150,
     alignment = "Center",
+    justification = "Center",
     lineHeight = 100,
   } = {}) {
     this.textContent = textContent;
@@ -45,6 +46,7 @@ class TextElement {
     this.numeralFormattingSize = numeralFormattingSize;
     this.bannerFirstLetterSize = bannerFirstLetterSize;
     this.alignment = alignment;
+    this.justification = justification;
     this.lineHeight = lineHeight;
   }
 
@@ -125,6 +127,7 @@ class TextElement {
         ).toLowerCase()
     );
     newText.style.setProperty("--alignment", this.alignment);
+    newText.style.setProperty("--justification", (this.justification || "Center").toLowerCase());
     newText.style.setProperty("--numeralSize", this.numeralFormattingSize);
     newText.style.setProperty("--bannerSize", this.bannerFormattingSize);
     newText.style.setProperty(
@@ -190,6 +193,8 @@ TextElement.prototype.fontFamily = [
 ];
 
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
+
+TextElement.prototype.justification = ["Left", "Center", "Right"];
 
 TextElement.prototype.backgroundColor = ["Inherit"].concat(
   Object.keys(lib.colors)
@@ -290,12 +295,48 @@ ControlTextElement.getTextColorOptions = function () {
 };
 
 class ActionMessageElement extends TextElement {
-  constructor({ fontSize = 70, useNumeralFormatting = true } = {}) {
+  constructor({ fontSize = 70, useNumeralFormatting = true, textColor = ActionMessageElement.defaultTextColor } = {}) {
     super();
     this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
+    this.textColor =
+      typeof textColor === "string" && textColor.trim().length
+        ? textColor
+        : ActionMessageElement.defaultTextColor;
+  }
+
+  createElement(panel) {
+    const newText = super.createElement(panel);
+
+    const shouldOverrideTextColor =
+      typeof this.textColor === "string" &&
+      this.textColor.trim().length > 0 &&
+      this.textColor !== ActionMessageElement.defaultTextColor;
+    if (shouldOverrideTextColor) {
+      const resolvedTextColor =
+        (lib?.colors && lib.colors[this.textColor]) || this.textColor;
+      if (typeof resolvedTextColor === "string") {
+        newText.style.color = resolvedTextColor.toLowerCase();
+      } else if (resolvedTextColor) {
+        newText.style.color = resolvedTextColor;
+      }
+    }
+
+    return newText;
   }
 }
+
+ActionMessageElement.defaultTextColor = "Match BG";
+ActionMessageElement.getTextColorOptions = function () {
+  const palette = Object.keys(lib.colors);
+  const options = [ActionMessageElement.defaultTextColor];
+  for (const color of palette) {
+    if (!options.includes(color)) {
+      options.push(color);
+    }
+  }
+  return options;
+};
 
 class AdvisoryMessageElement extends TextElement {
   constructor({
@@ -305,6 +346,7 @@ class AdvisoryMessageElement extends TextElement {
     useNumeralFormatting = true,
     horizPadding = 0.3,
     vertPadding = 0.3,
+    textColor = AdvisoryMessageElement.defaultTextColor,
   } = {}) {
     super();
     this.backgroundColor = backgroundColor;
@@ -313,6 +355,10 @@ class AdvisoryMessageElement extends TextElement {
     this.useNumeralFormatting = useNumeralFormatting;
     this.horizPadding = horizPadding;
     this.vertPadding = vertPadding;
+    this.textColor =
+      typeof textColor === "string" && textColor.trim().length
+        ? textColor
+        : AdvisoryMessageElement.defaultTextColor;
   }
 
   createElement(panel) {
@@ -326,9 +372,35 @@ class AdvisoryMessageElement extends TextElement {
       newText.classList.add("hgFix");
     }
 
+    const shouldOverrideTextColor =
+      typeof this.textColor === "string" &&
+      this.textColor.trim().length > 0 &&
+      this.textColor !== AdvisoryMessageElement.defaultTextColor;
+    if (shouldOverrideTextColor) {
+      const resolvedTextColor =
+        (lib?.colors && lib.colors[this.textColor]) || this.textColor;
+      if (typeof resolvedTextColor === "string") {
+        newText.style.color = resolvedTextColor.toLowerCase();
+      } else if (resolvedTextColor) {
+        newText.style.color = resolvedTextColor;
+      }
+    }
+
     return newText;
   }
 }
+
+AdvisoryMessageElement.defaultTextColor = "Match BG";
+AdvisoryMessageElement.getTextColorOptions = function () {
+  const palette = Object.keys(lib.colors);
+  const options = [AdvisoryMessageElement.defaultTextColor];
+  for (const color of palette) {
+    if (!options.includes(color)) {
+      options.push(color);
+    }
+  }
+  return options;
+};
 
 class ElectronicSignElement extends TextElement {
   constructor({
@@ -1074,8 +1146,8 @@ ShieldElement.prototype.isCountyShield = function (config) {
 
 class DividerElement {
   constructor({
-    dividerWidth = 100,
-    dividerMeasurement = "%",
+    dividerWidth = 1,
+    dividerMeasurement = "rem",
     dividerHeight = 0.2,
     orientation = DividerElement.prototype.defaultOrientation,
     alignment = "Center",
@@ -1170,7 +1242,7 @@ class DividerElement {
   }
 }
 
-DividerElement.prototype.dividerMeasurement = ["%", "rem"];
+DividerElement.prototype.dividerMeasurement = ["rem", "%"];
 DividerElement.prototype.orientations = ["Horizontal", "Vertical"];
 DividerElement.prototype.defaultOrientation = "Horizontal";
 DividerElement.prototype.verticalOrientation = "Vertical";
@@ -1369,7 +1441,9 @@ IconElement.prototype.icons = {
   "WINTER_RECREATIONAL_AREA": { label: "Winter Rec Area", src: "img/icons/WINTER_RECREATIONAL_AREA.svg" },
   "WIRELESS_INTERNET": { label: "WiFi", src: "img/icons/WIRELESS_INTERNET.svg" },
   "WOMENS_RESTROOM": { label: "Women's Restroom", src: "img/icons/WOMENS_RESTROOM.svg" },
-  "YIELD": { label: "Yield", src: "img/icons/YIELD.svg" }
+  "YIELD": { label: "Yield", src: "img/icons/YIELD.svg" },
+
+  "ORANGE_COUNTY": { label: "Orange County", src: "img/icons/orange_county.svg"},
 };
 
 class BeaconElement {
@@ -1730,6 +1804,10 @@ TollLogoElement.prototype.logos = {
   GoodToGo: { label: "Good To Go!", src: "img/tolls/GOODTOGO.svg" },
   ExpressToll: { label: "ExpressToll", src: "img/tolls/EXPRESSTOLL.svg" },
   DPASS: { label: "D-PASS", src: "img/tolls/DPASS.svg" },
+  CATag: { label: "CATag", src: "img/tolls/CATag.png" },
+  CAToll: { label: "CAToll", src: "img/tolls/CAToll.png" },
+  Telepass: { label: "Telepass", src: "img/tolls/Telepass.png" },
+  FASTag: { label: "FASTag", src: "img/tolls/FASTag.png" },
   MUTCD: { label: "MUTCD", src: "img/tolls/MUTCD.svg" },
 };
 TollLogoElement.prototype.alignment = TextElement.prototype.alignment;
@@ -1902,11 +1980,20 @@ class Control {
       const bottomPadding = parseFloat(properties.bottomPadding) || 0;
       const topSpacing = topPadding + "rem";
       const bottomSpacing = bottomPadding + "rem";
+      const rowBleedTop = topSpacing;
+      const rowBleedBottom = bottomSpacing;
       const bleedTop = i === 0 ? signPadding.top : "0rem";
       const bleedBottom = i === totalRows - 1 ? signPadding.bottom : "0rem";
-
+      const hasVerticalDivider = row.some(
+        (elem) =>
+          elem instanceof DividerElement &&
+          elem.orientation === DividerElement.prototype.verticalOrientation
+      );
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
+      if (hasVerticalDivider) {
+        flexRow.classList.add("hasVerticalDivider");
+      }
       flexRow.style.setProperty("--marginTop", topSpacing);
       flexRow.style.setProperty("--marginBottom", bottomSpacing);
       flexRow.style.setProperty("--blockPaddingTopExtra", "0rem");
@@ -2020,6 +2107,22 @@ class Control {
         }
 
         const blockElmt = elem.createElement(panel, subPanel);
+        if (
+          elem instanceof DividerElement &&
+          elem.fullBleed === true &&
+          elem.orientation === DividerElement.prototype.verticalOrientation
+        ) {
+          blockElmt.style.setProperty(
+            "--dividerBleedTop",
+            i === 0 ? bleedTop : "0rem"
+          );
+          blockElmt.style.setProperty(
+            "--dividerBleedBottom",
+            i === totalRows - 1 ? bleedBottom : "0rem"
+          );
+          blockElmt.style.setProperty("--dividerRowBleedTop", rowBleedTop);
+          blockElmt.style.setProperty("--dividerRowBleedBottom", rowBleedBottom);
+        }
         blockElmt.dataset.signRow = i;
         blockElmt.dataset.signBlock = blockIdx;
         lastKnownAlignment.appendChild(blockElmt);

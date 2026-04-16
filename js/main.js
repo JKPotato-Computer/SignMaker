@@ -169,6 +169,44 @@ const app = (function () {
     signElmt.style.backgroundPosition = "0 0, 0 0";
   };
 
+  const applyVerticalDividerLaneBleed = (signElmt) => {
+    if (!signElmt || !signElmt.isConnected) {
+      return;
+    }
+
+    const verticalDividers = signElmt.querySelectorAll(
+      ".dividerElement.vertical.fullBleed"
+    );
+    if (!verticalDividers.length) {
+      return;
+    }
+
+    for (const dividerEl of verticalDividers) {
+      dividerEl.style.setProperty("--dividerLaneBleedTop", "0px");
+      dividerEl.style.setProperty("--dividerLaneBleedBottom", "0px");
+
+      const laneEl = dividerEl.parentElement;
+      if (!laneEl) {
+        continue;
+      }
+
+      const laneRect = laneEl.getBoundingClientRect();
+      const dividerRect = dividerEl.getBoundingClientRect();
+      if (!laneRect.height || !dividerRect.height) {
+        continue;
+      }
+
+      const laneBleedTop = Math.max(0, dividerRect.top - laneRect.top);
+      const laneBleedBottom = Math.max(0, laneRect.bottom - dividerRect.bottom);
+
+      dividerEl.style.setProperty("--dividerLaneBleedTop", `${laneBleedTop}px`);
+      dividerEl.style.setProperty(
+        "--dividerLaneBleedBottom",
+        `${laneBleedBottom}px`
+      );
+    }
+  };
+
   const schedulePanelBorderGradientUpdate = (panelContainerElmt) => {
     if (!panelContainerElmt) {
       return;
@@ -177,6 +215,7 @@ const app = (function () {
     const update = () => {
       const signs = panelContainerElmt.querySelectorAll(".sign");
       for (const signElmt of signs) {
+        applyVerticalDividerLaneBleed(signElmt);
         applyPanelBorderGradient(signElmt);
       }
     };
@@ -211,8 +250,21 @@ const app = (function () {
 
   // Clone the panel, set the current editing panel to that panel, update the form and redraw.
   const duplicatePanel = function () {
+    if (
+      !post ||
+      !Array.isArray(post.panels) ||
+      currentlySelectedPanelIndex < 0 ||
+      currentlySelectedPanelIndex >= post.panels.length
+    ) {
+      return;
+    }
+
     post.duplicatePanel(currentlySelectedPanelIndex);
-    currentlySelectedPanelIndex++;
+    currentlySelectedPanelIndex = clamp(
+      currentlySelectedPanelIndex + 1,
+      0,
+      post.panels.length - 1
+    );
     formHandler.updateForm();
     redraw();
   };
@@ -1485,8 +1537,9 @@ const app = (function () {
       panelElmt.draggable = post.panels.length > 1;
       panelElmt.addEventListener("dragstart", handleRenderedPanelDragStart);
       panelElmt.addEventListener("dragend", handleRenderedPanelDragEnd);
+      const panelClickIndex = index;
       panelElmt.addEventListener("click", () => {
-        changeEditingPanel(index);
+        changeEditingPanel(panelClickIndex);
       });
       panelContainerElmt.appendChild(panelElmt);
 
@@ -1502,10 +1555,10 @@ const app = (function () {
 
         const exitTabCont = document.createElement("div");
         exitTabCont.className = `exitTabContainer ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
-        
+
         // If CA style, don't append to panel yet - store for later insertion inside sign
         if (exitTab.caStyle && exitTab.variant == "Default") {
-          caStyleExitTabs.push({exitTabCont, exitTabIndex});
+          caStyleExitTabs.push({ exitTabCont, exitTabIndex });
         } else {
           panelElmt.appendChild(exitTabCont);
         }
@@ -1567,16 +1620,16 @@ const app = (function () {
               const safeLineText =
                 typeof lineText === "string" ? lineText : String(lineText || "");
               const txtArr = safeLineText.toUpperCase().split(/(\d+\S*)/);
-              
+
               // Handle vertical arrangement
               if (exitTab.verticalArrangement && txtArr.length > 1) {
                 // #region agent log
-                fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1564',message:'Vertical arrangement active',data:{verticalArrangement:exitTab.verticalArrangement,leadingText:txtArr[0],number:txtArr[1],minHeight:exitTab.minHeight},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1564', message: 'Vertical arrangement active', data: { verticalArrangement: exitTab.verticalArrangement, leadingText: txtArr[0], number: txtArr[1], minHeight: exitTab.minHeight }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A,B' }) }).catch(() => { });
                 // #endregion
                 const verticalContainer = document.createElement("div");
                 verticalContainer.className = "exitTabVerticalContainer";
                 registerExitTabText(verticalContainer);
-                
+
                 const leadingText = txtArr[0] || "";
                 if (leadingText && leadingText.trim().length > 0) {
                   const topTextElmt = document.createElement("div");
@@ -1594,7 +1647,7 @@ const app = (function () {
                   }
                   verticalContainer.appendChild(topTextElmt);
                 }
-                
+
                 const bottomNumberElmt = document.createElement("div");
                 bottomNumberElmt.className = "exitTabVerticalNumber";
                 registerExitTabText(bottomNumberElmt);
@@ -1618,12 +1671,12 @@ const app = (function () {
                   const containerStyle = window.getComputedStyle(verticalContainer);
                   const topTextStyle = topTextElmt ? window.getComputedStyle(topTextElmt) : null;
                   const exitTabStyle = exitTabElmt ? window.getComputedStyle(exitTabElmt) : null;
-                  fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1607',message:'Vertical container padding computed',data:{containerPaddingTop:containerStyle.paddingTop,containerPaddingBottom:containerStyle.paddingBottom,containerPadding:containerStyle.padding,topTextMarginTop:topTextStyle?.marginTop,topTextPaddingTop:topTextStyle?.paddingTop,exitTabPaddingTop:exitTabStyle?.paddingTop,exitTabPadding:exitTabStyle?.padding},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'padding-source'})}).catch(()=>{});
+                  fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1607', message: 'Vertical container padding computed', data: { containerPaddingTop: containerStyle.paddingTop, containerPaddingBottom: containerStyle.paddingBottom, containerPadding: containerStyle.padding, topTextMarginTop: topTextStyle?.marginTop, topTextPaddingTop: topTextStyle?.paddingTop, exitTabPaddingTop: exitTabStyle?.paddingTop, exitTabPadding: exitTabStyle?.padding }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run3', hypothesisId: 'padding-source' }) }).catch(() => { });
                 }, 100);
                 // #endregion
                 return;
               }
-              
+
               // Original horizontal arrangement
               const divTextElmt = document.createElement("div");
               registerExitTabText(divTextElmt);
@@ -1709,7 +1762,7 @@ const app = (function () {
             // #region agent log
             setTimeout(() => {
               const computedStyle = window.getComputedStyle(exitTabElmt);
-              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1692',message:'Vertical arrangement class added - computed padding',data:{verticalArrangement:exitTab.verticalArrangement,computedPaddingTop:computedStyle.paddingTop,computedPaddingRight:computedStyle.paddingRight,computedPaddingBottom:computedStyle.paddingBottom,computedPaddingLeft:computedStyle.paddingLeft,inlinePadding:exitTabElmt.style.padding},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'padding-source'})}).catch(()=>{});
+              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1692', message: 'Vertical arrangement class added - computed padding', data: { verticalArrangement: exitTab.verticalArrangement, computedPaddingTop: computedStyle.paddingTop, computedPaddingRight: computedStyle.paddingRight, computedPaddingBottom: computedStyle.paddingBottom, computedPaddingLeft: computedStyle.paddingLeft, inlinePadding: exitTabElmt.style.padding }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run3', hypothesisId: 'padding-source' }) }).catch(() => { });
             }, 100);
             // #endregion
           }
@@ -1886,7 +1939,7 @@ const app = (function () {
             exitTabElmt.style.fontSize = resolvedFontSize.toString() + "px";
 
             // #region agent log
-            fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1859',message:'Setting exit tab minHeight',data:{verticalArrangement:exitTab.verticalArrangement,minHeight:exitTab.minHeight,variant:exitTab.variant,resolvedFontSize:resolvedFontSize},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F,G,H'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1859', message: 'Setting exit tab minHeight', data: { verticalArrangement: exitTab.verticalArrangement, minHeight: exitTab.minHeight, variant: exitTab.variant, resolvedFontSize: resolvedFontSize }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'F,G,H' }) }).catch(() => { });
             // #endregion
             // Increase minHeight when vertical arrangement is enabled to accommodate stacked content
             // Large numerals (1.5em scale) need extra space, so increase minHeight more
@@ -1896,7 +1949,7 @@ const app = (function () {
               const calculatedMinHeight = Math.max(baseMinHeight * 1.5, 3.75);
               exitTabElmt.style.minHeight = calculatedMinHeight.toString() + "rem";
               // #region agent log
-              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:1868',message:'Vertical arrangement minHeight calculated',data:{baseMinHeight:baseMinHeight,calculatedMinHeight:calculatedMinHeight},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'G,H'})}).catch(()=>{});
+              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1868', message: 'Vertical arrangement minHeight calculated', data: { baseMinHeight: baseMinHeight, calculatedMinHeight: calculatedMinHeight }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'G,H' }) }).catch(() => { });
               // #endregion
             } else {
               exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
@@ -2493,7 +2546,7 @@ const app = (function () {
 
         // Insert CA style exit tabs at the beginning of the first subpanel
         if (subPanelIndex === 0 && caStyleExitTabs.length > 0) {
-          caStyleExitTabs.forEach(({exitTabCont}) => {
+          caStyleExitTabs.forEach(({ exitTabCont }) => {
             exitTabCont.classList.add("caStyle");
             signContentContainerElmt.appendChild(exitTabCont);
           });
@@ -2571,13 +2624,51 @@ const app = (function () {
                     container.dataset.flipped = "true";
                   }
 
+                  // Apply arrow margins to container (arrow margin is zeroed inside container)
+                  if (arrow.arrowMarginLeft != null) {
+                    container.style.marginLeft = arrow.arrowMarginLeft + "rem";
+                  }
+                  if (arrow.arrowMarginRight != null) {
+                    container.style.marginRight = arrow.arrowMarginRight + "rem";
+                  }
+
                   const exitSpan = document.createElement("span");
                   exitSpan.className = "aplExitOnlyLabel aplExitOnlyExit";
-                  exitSpan.textContent = "EXIT";
+                  exitSpan.textContent = arrow.exitOnlyTextLeft != null ? arrow.exitOnlyTextLeft : "EXIT";
 
                   const onlySpan = document.createElement("span");
                   onlySpan.className = "aplExitOnlyLabel aplExitOnlyOnly";
-                  onlySpan.textContent = "ONLY";
+                  onlySpan.textContent = arrow.exitOnlyTextRight != null ? arrow.exitOnlyTextRight : "ONLY";
+
+                  // Background color
+                  if (arrow.exitOnlyBgColor === "white") {
+                    exitSpan.style.backgroundColor = "var(--white)";
+                    onlySpan.style.backgroundColor = "var(--white)";
+                  }
+
+                  // Horizontal padding
+                  if (arrow.exitOnlyPadding != null) {
+                    const pad = arrow.exitOnlyPadding + "rem";
+                    exitSpan.style.paddingLeft = pad;
+                    exitSpan.style.paddingRight = pad;
+                    onlySpan.style.paddingLeft = pad;
+                    onlySpan.style.paddingRight = pad;
+                  }
+
+                  // Border radius
+                  if (arrow.exitOnlyBorderRadius != null) {
+                    const rad = arrow.exitOnlyBorderRadius + "rem";
+                    exitSpan.style.borderRadius = rad;
+                    onlySpan.style.borderRadius = rad;
+                  }
+
+                  // Hide labels
+                  if (arrow.exitOnlyHideLeft) {
+                    exitSpan.style.display = "none";
+                  }
+                  if (arrow.exitOnlyHideRight) {
+                    onlySpan.style.display = "none";
+                  }
 
                   container.appendChild(exitSpan);
                   arrowImg.style.margin = "0"; // Remove margins from arrow
@@ -2586,6 +2677,13 @@ const app = (function () {
 
                   subPanelArrowContainer.appendChild(container);
                 } else {
+                  // Apply per-arrow margins
+                  if (arrow.arrowMarginLeft != null) {
+                    arrowImg.style.marginLeft = arrow.arrowMarginLeft + "rem";
+                  }
+                  if (arrow.arrowMarginRight != null) {
+                    arrowImg.style.marginRight = arrow.arrowMarginRight + "rem";
+                  }
                   subPanelArrowContainer.appendChild(arrowImg);
                 }
               }
@@ -2887,7 +2985,7 @@ const app = (function () {
                 justifyContent = "flex-end";
               }
               arrowContElmt.style.justifyContent = justifyContent;
-              arrowContElmt.style.gap = "5rem";
+              arrowContElmt.style.gap = (typeof panel.sign.halfExitGap === "number" ? panel.sign.halfExitGap : 5) + "rem";
               arrowContElmt.style.width = "100%";
             }
             guideArrowsElmt.style.display = "flex";
@@ -3319,7 +3417,7 @@ const app = (function () {
     changeEditingPanel,
     movePanel,
     newPanel,
-    //duplicatePanel,
+    duplicatePanel,
     deletePanel,
     changeEditingSubPanel,
     changeEditingExitTab,
@@ -3345,6 +3443,42 @@ const app = (function () {
     },
     setAPLExitOnly: (index, isExitOnly) => {
       getCurrentPanel().sign.setAPLExitOnly(index, isExitOnly);
+      redraw();
+    },
+    setAPLArrowMarginLeft: (index, margin) => {
+      getCurrentPanel().sign.setAPLArrowMarginLeft(index, margin);
+      redraw();
+    },
+    setAPLArrowMarginRight: (index, margin) => {
+      getCurrentPanel().sign.setAPLArrowMarginRight(index, margin);
+      redraw();
+    },
+    setAPLExitOnlyBgColor: (index, color) => {
+      getCurrentPanel().sign.setAPLExitOnlyBgColor(index, color);
+      redraw();
+    },
+    setAPLExitOnlyPadding: (index, padding) => {
+      getCurrentPanel().sign.setAPLExitOnlyPadding(index, padding);
+      redraw();
+    },
+    setAPLExitOnlyBorderRadius: (index, radius) => {
+      getCurrentPanel().sign.setAPLExitOnlyBorderRadius(index, radius);
+      redraw();
+    },
+    setAPLExitOnlyTextLeft: (index, text) => {
+      getCurrentPanel().sign.setAPLExitOnlyTextLeft(index, text);
+      redraw();
+    },
+    setAPLExitOnlyTextRight: (index, text) => {
+      getCurrentPanel().sign.setAPLExitOnlyTextRight(index, text);
+      redraw();
+    },
+    setAPLExitOnlyHideLeft: (index, hidden) => {
+      getCurrentPanel().sign.setAPLExitOnlyHideLeft(index, hidden);
+      redraw();
+    },
+    setAPLExitOnlyHideRight: (index, hidden) => {
+      getCurrentPanel().sign.setAPLExitOnlyHideRight(index, hidden);
       redraw();
     },
     vars: {
@@ -3408,21 +3542,26 @@ const app = (function () {
     }
 
     try {
+      // Sync form values (padding, border radius, etc.) to the model before saving
+      if (formHandler && typeof formHandler.readForm === "function") {
+        formHandler.readForm();
+      }
+
       const db = await initTemplateDB();
-      
+
       // Add element type information to Control elements before serialization
       const addElementTypes = (obj, visited = new WeakSet()) => {
         if (!obj || typeof obj !== "object" || visited.has(obj)) {
           return;
         }
-        
+
         visited.add(obj);
-        
+
         if (Array.isArray(obj)) {
           obj.forEach(item => addElementTypes(item, visited));
           return;
         }
-        
+
         // Check if this is a Control element
         if (Control.prototype.blockToClassElems) {
           try {
@@ -3434,7 +3573,7 @@ const app = (function () {
             // Not an element instance, continue
           }
         }
-        
+
         // Recursively process all properties
         for (const key in obj) {
           if (obj.hasOwnProperty(key) && key !== "_elementType") {
@@ -3442,13 +3581,13 @@ const app = (function () {
           }
         }
       };
-      
+
       // Add element types to the post (modifies in place, but that's OK for serialization)
       addElementTypes(post);
-      
+
       // Serialize the entire post with element type information
       const postData = JSON.stringify(post, null, 2);
-      
+
       // Clean up the _elementType properties we added (optional, but cleaner)
       const removeElementTypes = (obj, visited = new WeakSet()) => {
         if (!obj || typeof obj !== "object" || visited.has(obj)) {
@@ -3469,7 +3608,7 @@ const app = (function () {
         }
       };
       removeElementTypes(post);
-      
+
       const templateData = {
         name: templateName.trim(),
         data: postData,
@@ -3477,13 +3616,13 @@ const app = (function () {
       };
 
       await db.saveTemplate(templateData);
-      
+
       // Clear the input field
       const templateNameInput = document.getElementById("templateNameInput");
       if (templateNameInput) {
         templateNameInput.value = "";
       }
-      
+
       await refreshTemplatesList();
     } catch (error) {
       console.error("Error saving template:", error);
@@ -3505,7 +3644,7 @@ const app = (function () {
     try {
       const db = await initTemplateDB();
       const template = await db.getTemplate(templateId);
-      
+
       if (!template) {
         alert("Template not found");
         return;
@@ -3513,17 +3652,17 @@ const app = (function () {
 
       // Deserialize and restore the post
       const postData = JSON.parse(template.data);
-      
+
       // Helper function to reconstruct Control blockElements
       const reconstructControl = (controlData) => {
         if (!controlData) {
           return new Control();
         }
-        
+
         const control = new Control();
         const rows = [];
         const blockProperties = [];
-        
+
         if (Array.isArray(controlData.rows)) {
           for (const rowData of controlData.rows) {
             const row = [];
@@ -3531,7 +3670,7 @@ const app = (function () {
               for (const elemData of rowData) {
                 // Use stored element type or try to infer
                 let elemType = elemData._elementType;
-                
+
                 if (!elemType && Control.prototype.blockToClassElems) {
                   // Try to infer from properties
                   if (elemData.icon !== undefined) {
@@ -3559,7 +3698,7 @@ const app = (function () {
                     }
                   }
                 }
-                
+
                 if (elemType && Control.prototype.blockToClassElems && Control.prototype.blockToClassElems[elemType]) {
                   const ElemClass = Control.prototype.blockToClassElems[elemType];
                   const elem = new ElemClass(elemData);
@@ -3572,7 +3711,7 @@ const app = (function () {
               }
             }
             rows.push(row);
-            
+
             // Reconstruct Block
             const blockIndex = rows.length - 1;
             const blockData = controlData.blockProperties?.[blockIndex];
@@ -3585,19 +3724,19 @@ const app = (function () {
             }
           }
         }
-        
+
         control.rows = rows;
         control.blockProperties = blockProperties;
         return control;
       };
-      
+
       // Create a new Post instance and copy properties
       const newPost = new Post(
         postData.polePosition || Post.prototype.polePositions[0],
         postData.lanesWide || 1,
         postData.color || Post.prototype.colors[0]
       );
-      
+
       // Copy additional post properties
       if (typeof postData.panelSpacing === "number") {
         newPost.panelSpacing = postData.panelSpacing;
@@ -3614,7 +3753,7 @@ const app = (function () {
       if (typeof postData.secondExitOnly === "boolean") {
         newPost.secondExitOnly = postData.secondExitOnly;
       }
-      
+
       // Restore panels
       if (Array.isArray(postData.panels)) {
         newPost.panels = [];
@@ -3625,7 +3764,7 @@ const app = (function () {
             for (const subPanelData of panelData.sign.subPanels) {
               // Reconstruct blockElements
               const blockElements = reconstructControl(subPanelData.blockElements);
-              
+
               const subPanel = new SubPanels({
                 ...subPanelData,
                 blockElements: blockElements
@@ -3635,14 +3774,14 @@ const app = (function () {
               subPanels.push(subPanel);
             }
           }
-          
+
           // Create sign with subpanels
           const signData = panelData.sign || {};
           const sign = new Sign({
             ...signData,
             subPanels: subPanels
           });
-          
+
           // Restore shields
           if (Array.isArray(signData.shields)) {
             sign.shields = signData.shields.map((shieldData) => {
@@ -3651,11 +3790,11 @@ const app = (function () {
               return shield;
             });
           }
-          
+
           // Copy other sign properties
           Object.assign(sign, signData);
           sign.subPanels = subPanels; // Ensure subpanels are set
-          
+
           // Create panel
           const panel = new Panel(
             sign,
@@ -3664,13 +3803,13 @@ const app = (function () {
             panelData.corner,
             panelData.borderRadius
           );
-          
+
           // Restore exit tabs
           if (Array.isArray(panelData.exitTabs)) {
             panel.exitTabs = panelData.exitTabs.map((exitTabData) => {
               const exitTab = new ExitTab(exitTabData);
               Object.assign(exitTab, exitTabData);
-              
+
               // Restore nested exit tabs
               if (Array.isArray(exitTabData.nestedExitTabs)) {
                 exitTab.nestedExitTabs = exitTabData.nestedExitTabs.map((nestedData) => {
@@ -3679,18 +3818,18 @@ const app = (function () {
                   return nested;
                 });
               }
-              
+
               return exitTab;
             });
           }
-          
+
           // Copy other panel properties
           Object.assign(panel, panelData);
           panel.sign = sign; // Ensure sign is set
           newPost.panels.push(panel);
         }
       }
-      
+
       setPost(newPost);
     } catch (error) {
       console.error("Error loading template:", error);
@@ -3717,7 +3856,7 @@ const app = (function () {
     try {
       const db = await initTemplateDB();
       const templates = await db.getAllTemplates();
-      
+
       const templatesList = document.getElementById("savedTemplatesList");
       if (!templatesList) {
         return;
