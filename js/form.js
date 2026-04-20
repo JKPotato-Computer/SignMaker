@@ -2377,6 +2377,18 @@ const formHandler = (function () {
         ShieldElement.prototype.normalizeScaleBannersWithShield(
           currentBlockElem.scaleBannersWithShield
         );
+      const disableSmallCapsElmt = document.getElementById(
+        "sdShield_disableSmallCaps"
+      );
+      const disableSmallCapsElmt2 = document.getElementById(
+        "sdShield_disableSmallCaps2"
+      );
+      if (disableSmallCapsElmt) {
+        currentBlockElem.smallCaps = !disableSmallCapsElmt.checked;
+      }
+      if (disableSmallCapsElmt2) {
+        currentBlockElem.smallCaps2 = !disableSmallCapsElmt2.checked;
+      }
     }
 
     if (blockElemType === "sdArrow") {
@@ -3979,6 +3991,30 @@ const formHandler = (function () {
     }
 
     if (blockElemType === "sdShield") {
+      const normalizeDisableSmallCapsValue = (value) =>
+        value === true ||
+        value === "true" ||
+        value === 1 ||
+        value === "1" ||
+        value === "on";
+
+      if (
+        currentBlockElem.disableSmallCaps !== undefined &&
+        currentBlockElem.smallCaps === undefined
+      ) {
+        currentBlockElem.smallCaps = !normalizeDisableSmallCapsValue(
+          currentBlockElem.disableSmallCaps
+        );
+      }
+      if (
+        currentBlockElem.disableSmallCaps2 !== undefined &&
+        currentBlockElem.smallCaps2 === undefined
+      ) {
+        currentBlockElem.smallCaps2 = !normalizeDisableSmallCapsValue(
+          currentBlockElem.disableSmallCaps2
+        );
+      }
+
       currentBlockElem.bannerFontFamily =
         ShieldElement.prototype.normalizeBannerFontFamily(
           currentBlockElem.bannerFontFamily
@@ -4004,6 +4040,8 @@ const formHandler = (function () {
       if (currentBlockElem.smallCaps2 === undefined) {
         currentBlockElem.smallCaps2 = currentBlockElem.smallCaps;
       }
+      delete currentBlockElem.disableSmallCaps;
+      delete currentBlockElem.disableSmallCaps2;
     }
 
     if (blockElemType === "sdBlocker") {
@@ -4085,6 +4123,27 @@ const formHandler = (function () {
         } else {
           displayElement.textContent = currentBlockElem[propertyName];
         }
+      }
+    }
+
+    if (blockElemType === "sdShield") {
+      const disableSmallCapsElmt = document.getElementById(
+        "sdShield_disableSmallCaps"
+      );
+      const disableSmallCapsElmt2 = document.getElementById(
+        "sdShield_disableSmallCaps2"
+      );
+      if (disableSmallCapsElmt) {
+        disableSmallCapsElmt.checked = currentBlockElem.smallCaps === false;
+        disableSmallCapsElmt.addEventListener("change", readForm, {
+          once: true,
+        });
+      }
+      if (disableSmallCapsElmt2) {
+        disableSmallCapsElmt2.checked = currentBlockElem.smallCaps2 === false;
+        disableSmallCapsElmt2.addEventListener("change", readForm, {
+          once: true,
+        });
       }
     }
 

@@ -241,7 +241,7 @@ Shield.prototype.shieldDirectory = {
       FL: {
         type: "shield",
         name: "Florida",
-        variants: ["2 Digit", "3 Digit", "No Outline"],
+        variants: ["2 Digit Overhead", "3 Digit Overhead"],
       },
       FLTURNPIKE: { type: "shield", name: "Florida's Turnpike", variants: [] },
       FLToll: {
@@ -340,7 +340,7 @@ Shield.prototype.shieldDirectory = {
         variants: ["2 Digit"],
       },
     },
-    NV: { type: "shield", name: "Nevada", variants: ["2 Digit", "3 Digit"] },
+    NV: { type: "shield", name: "Nevada", variants: ["2 Digit", "3 Digit", "CC 215"] },
     NH: {
       type: "shield",
       name: "New Hampshire",

@@ -358,15 +358,16 @@
 .bannerShieldContainer.FL.two .routeNumber,
 .bannerShieldContainer.FL.three .routeNumber {
 	font-family: "Series D";
-	font-size: 2em;
+	font-size: 2.2em;
 	top: 0.2em;
 }
 
 
 
+
 .bannerShieldContainer.FL.four .routeNumber {
 	font-family: "Series C";
-	font-size: 2em;
+	font-size: 2.2em;
 	top: 0.2em;
 }
 
@@ -601,6 +602,8 @@
 .bannerShieldContainer.NE.spur.one .routeNumber .bannerShieldContainer.NE.spur.two .routeNumber {
 	top: -0.1em;
 }
+
+
 
 .bannerShieldContainer.NL .routeNumber {
 	font-size: 1.8em;

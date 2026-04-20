@@ -14,6 +14,9 @@ const app = (function () {
   };
 
   let currentlySelectedAPLArrowIndex = 0;
+  const SESSION_STORAGE_KEY = "signMaker.session";
+  const SESSION_STORAGE_VERSION = 1;
+  let isSessionPersisting = false;
 
   const getCurrentPanel = () => {
     return post.panels[currentlySelectedPanelIndex];
@@ -227,17 +230,101 @@ const app = (function () {
     }
   };
 
+  const getSelectionState = () => ({
+    currentlySelectedPanelIndex,
+    currentlySelectedSubPanelIndex,
+    currentlySelectedExitTabIndex,
+    currentlySelectedNestedExitTabIndex,
+    currentlySelectedRowIndex,
+    currentlySelectedBlockIndex,
+    currentlySelectedAPLArrowIndex,
+  });
+
+  const persistSessionState = ({ syncForm = false } = {}) => {
+    if (
+      isSessionPersisting ||
+      !post ||
+      !Array.isArray(post.panels) ||
+      post.panels.length === 0
+    ) {
+      return;
+    }
+
+    if (syncForm && formHandler && typeof formHandler.readForm === "function") {
+      isSessionPersisting = true;
+      try {
+        formHandler.readForm();
+      } catch (error) {
+        console.warn("Unable to sync form before saving session", error);
+      } finally {
+        isSessionPersisting = false;
+      }
+    }
+
+    try {
+      const sessionData = {
+        version: SESSION_STORAGE_VERSION,
+        savedAt: new Date().toISOString(),
+        post: JSON.parse(serializePostWithElementTypes()),
+        selection: getSelectionState(),
+        fileInfo: { ...fileInfo },
+      };
+      window.localStorage.setItem(
+        SESSION_STORAGE_KEY,
+        JSON.stringify(sessionData)
+      );
+    } catch (error) {
+      console.warn("Unable to save SignMaker session", error);
+    }
+  };
+
+  const restoreSavedSession = () => {
+    try {
+      const storedSession = window.localStorage.getItem(SESSION_STORAGE_KEY);
+      if (!storedSession) {
+        return false;
+      }
+
+      const sessionData = JSON.parse(storedSession);
+      const postData = sessionData && (sessionData.post || sessionData);
+      if (!postData || !Array.isArray(postData.panels) || !postData.panels.length) {
+        return false;
+      }
+
+      if (sessionData.fileInfo && typeof sessionData.fileInfo === "object") {
+        fileInfo = { ...fileInfo, ...sessionData.fileInfo };
+      }
+
+      setPost(reconstructPostFromData(postData), sessionData.selection);
+      return true;
+    } catch (error) {
+      console.warn("Unable to restore SignMaker session", error);
+      try {
+        window.localStorage.removeItem(SESSION_STORAGE_KEY);
+      } catch (storageError) {
+        console.warn("Unable to clear invalid SignMaker session", storageError);
+      }
+      return false;
+    }
+  };
+
   // Initialize the application, and populates dropdowns and the default post.
 
   const init = async function () {
     post = new Post(Post.prototype.polePositions[0]);
-    formHandler.init(exposeToFormHandler);
+    await formHandler.init(exposeToFormHandler);
 
     // Initialize CustomShields after formHandler and wait for it
     window.customShields = new CustomShields();
     await window.customShields.initialized;
 
-    newPanel();
+    window.addEventListener("beforeunload", () => {
+      persistSessionState({ syncForm: true });
+    });
+
+    if (!restoreSavedSession()) {
+      newPanel();
+    }
   };
 
   // Create a new panel, set the current editing panel to that panel, update the form, and redraw.
@@ -520,6 +607,7 @@ const app = (function () {
         flashElement(signElmt);
       }
     }
+    persistSessionState();
   };
 
   const setPanelSpacing = function (value) {
@@ -579,10 +667,16 @@ const app = (function () {
     formHandler.updateForm();
 
     // Flash the selected subpanel
-    const subPanelElmt = document.getElementById("S_subPanel" + currentlySelectedSubPanelIndex);
+    const panelElmt = document.getElementById(
+      "panel" + currentlySelectedPanelIndex
+    );
+    const subPanelElmt = panelElmt
+      ? panelElmt.querySelector("#S_subPanel" + currentlySelectedSubPanelIndex)
+      : null;
     if (subPanelElmt) {
       flashElement(subPanelElmt);
     }
+    persistSessionState();
   };
 
   const flashElement = (targetElmt) => {
@@ -765,6 +859,7 @@ const app = (function () {
         )
         : -1;
     formHandler.updateForm();
+    persistSessionState();
   };
 
   // Add a new shield to the current panel's sign, update the shield subform, and redraw the sign.
@@ -892,6 +987,7 @@ const app = (function () {
       getCurrentSubPanel().blockElements.rows.length - 1
     );
     formHandler.updateForm();
+    persistSessionState();
   };
 
   const newControlElem = (selectedElem) => {
@@ -1046,9 +1142,14 @@ const app = (function () {
     formHandler.updateForm();
 
     // Flash the selected block element on the sign
-    const subPanelContainer = document.querySelector(
-      `.blockElementMaster[data-subpanel="${currentlySelectedSubPanelIndex}"]`
+    const panelElmt = document.getElementById(
+      "panel" + currentlySelectedPanelIndex
     );
+    const subPanelContainer = panelElmt
+      ? panelElmt.querySelector(
+          `.blockElementMaster[data-subpanel="${currentlySelectedSubPanelIndex}"]`
+        )
+      : null;
     if (subPanelContainer) {
       const signBlockElmt = subPanelContainer.querySelector(
         `[data-sign-row="${currentlySelectedRowIndex}"][data-sign-block="${currentlySelectedBlockIndex}"]`
@@ -1057,6 +1158,7 @@ const app = (function () {
         flashElement(signBlockElmt);
       }
     }
+    persistSessionState();
   };
 
   const duplicateControlElem = () => {
@@ -1120,6 +1222,7 @@ const app = (function () {
     const sign = getCurrentPanel().sign;
     currentlySelectedAPLArrowIndex = clamp(index, 0, Math.max(0, sign.aplArrows.length - 1));
     formHandler.updateForm();
+    persistSessionState();
   };
 
   const updateAPLArrowType = function (type) {
@@ -1398,6 +1501,7 @@ const app = (function () {
       panelNumberSelector.style.display = "block";
       document.getElementById("downloadContents").style.verticalAlign = "";
     }
+    persistSessionState();
 
     while (downloadPreview.firstChild) {
       downloadPreview.removeChild(downloadPreview.lastChild);
@@ -1419,6 +1523,7 @@ const app = (function () {
       document.getElementById("PNG").className = "";
       document.getElementById("SVG").className = "activated";
     }
+    persistSessionState();
   };
 
   const resetPadding = function (mode, params) {
@@ -3399,6 +3504,7 @@ const app = (function () {
 
       schedulePanelBorderGradientUpdate(panelElmt);
     }
+    persistSessionState();
   };
 
   // Expose necessary variables and functions to formHandler
@@ -3506,11 +3612,381 @@ const app = (function () {
     },
   };
 
+  const normalizeIndex = (value, fallback = 0) => {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.trunc(number) : fallback;
+  };
+
+  const normalizeEditorSelection = () => {
+    if (!post || !Array.isArray(post.panels) || post.panels.length === 0) {
+      currentlySelectedPanelIndex = -1;
+      currentlySelectedSubPanelIndex = 0;
+      currentlySelectedExitTabIndex = 0;
+      currentlySelectedNestedExitTabIndex = -1;
+      currentlySelectedRowIndex = 0;
+      currentlySelectedBlockIndex = 0;
+      currentlySelectedAPLArrowIndex = 0;
+      return;
+    }
+
+    currentlySelectedPanelIndex = clamp(
+      normalizeIndex(currentlySelectedPanelIndex),
+      0,
+      post.panels.length - 1
+    );
+
+    const panel = post.panels[currentlySelectedPanelIndex];
+    const subPanels = Array.isArray(panel?.sign?.subPanels)
+      ? panel.sign.subPanels
+      : [];
+    currentlySelectedSubPanelIndex =
+      currentlySelectedSubPanelIndex === -1
+        ? -1
+        : clamp(
+            normalizeIndex(currentlySelectedSubPanelIndex),
+            0,
+            Math.max(0, subPanels.length - 1)
+          );
+
+    const exitTabs = Array.isArray(panel?.exitTabs) ? panel.exitTabs : [];
+    currentlySelectedExitTabIndex = exitTabs.length
+      ? clamp(
+          normalizeIndex(currentlySelectedExitTabIndex),
+          0,
+          exitTabs.length - 1
+        )
+      : 0;
+
+    const nestedExitTabs = Array.isArray(
+      exitTabs[currentlySelectedExitTabIndex]?.nestedExitTabs
+    )
+      ? exitTabs[currentlySelectedExitTabIndex].nestedExitTabs
+      : [];
+    currentlySelectedNestedExitTabIndex =
+      currentlySelectedNestedExitTabIndex === -1
+        ? -1
+        : clamp(
+            normalizeIndex(currentlySelectedNestedExitTabIndex),
+            0,
+            Math.max(0, nestedExitTabs.length - 1)
+          );
+
+    const selectedSubPanel =
+      currentlySelectedSubPanelIndex === -1
+        ? null
+        : subPanels[currentlySelectedSubPanelIndex];
+    const rows = Array.isArray(selectedSubPanel?.blockElements?.rows)
+      ? selectedSubPanel.blockElements.rows
+      : [];
+    currentlySelectedRowIndex = rows.length
+      ? clamp(normalizeIndex(currentlySelectedRowIndex), 0, rows.length - 1)
+      : 0;
+
+    const row = Array.isArray(rows[currentlySelectedRowIndex])
+      ? rows[currentlySelectedRowIndex]
+      : [];
+    currentlySelectedBlockIndex = row.length
+      ? clamp(normalizeIndex(currentlySelectedBlockIndex), 0, row.length - 1)
+      : 0;
+
+    const aplArrows = Array.isArray(panel?.sign?.aplArrows)
+      ? panel.sign.aplArrows
+      : [];
+    currentlySelectedAPLArrowIndex = aplArrows.length
+      ? clamp(
+          normalizeIndex(currentlySelectedAPLArrowIndex),
+          0,
+          aplArrows.length - 1
+        )
+      : 0;
+  };
+
+  const applySelectionState = (selection) => {
+    if (selection && typeof selection === "object") {
+      currentlySelectedPanelIndex = normalizeIndex(
+        selection.currentlySelectedPanelIndex,
+        currentlySelectedPanelIndex
+      );
+      currentlySelectedSubPanelIndex = normalizeIndex(
+        selection.currentlySelectedSubPanelIndex,
+        currentlySelectedSubPanelIndex
+      );
+      currentlySelectedExitTabIndex = normalizeIndex(
+        selection.currentlySelectedExitTabIndex,
+        currentlySelectedExitTabIndex
+      );
+      currentlySelectedNestedExitTabIndex = normalizeIndex(
+        selection.currentlySelectedNestedExitTabIndex,
+        currentlySelectedNestedExitTabIndex
+      );
+      currentlySelectedRowIndex = normalizeIndex(
+        selection.currentlySelectedRowIndex,
+        currentlySelectedRowIndex
+      );
+      currentlySelectedBlockIndex = normalizeIndex(
+        selection.currentlySelectedBlockIndex,
+        currentlySelectedBlockIndex
+      );
+      currentlySelectedAPLArrowIndex = normalizeIndex(
+        selection.currentlySelectedAPLArrowIndex,
+        currentlySelectedAPLArrowIndex
+      );
+    }
+
+    normalizeEditorSelection();
+  };
+
+  const addElementTypes = (obj, visited = new WeakSet()) => {
+    if (!obj || typeof obj !== "object" || visited.has(obj)) {
+      return;
+    }
+
+    visited.add(obj);
+
+    if (Array.isArray(obj)) {
+      obj.forEach((item) => addElementTypes(item, visited));
+      return;
+    }
+
+    if (Control.prototype.blockToClassElems) {
+      try {
+        const elemType = Control.prototype.blockToClassElems.getElem?.(obj);
+        if (elemType) {
+          obj._elementType = elemType;
+        }
+      } catch (error) {
+        // Not a Control element instance.
+      }
+    }
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && key !== "_elementType") {
+        addElementTypes(obj[key], visited);
+      }
+    }
+  };
+
+  const removeElementTypes = (obj, visited = new WeakSet()) => {
+    if (!obj || typeof obj !== "object" || visited.has(obj)) {
+      return;
+    }
+
+    visited.add(obj);
+
+    if (Array.isArray(obj)) {
+      obj.forEach((item) => removeElementTypes(item, visited));
+      return;
+    }
+
+    if (obj._elementType) {
+      delete obj._elementType;
+    }
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        removeElementTypes(obj[key], visited);
+      }
+    }
+  };
+
+  const serializePostWithElementTypes = (space) => {
+    addElementTypes(post);
+    try {
+      return JSON.stringify(post, null, space);
+    } finally {
+      removeElementTypes(post);
+    }
+  };
+
+  const inferControlElementType = (elemData) => {
+    if (!elemData || typeof elemData !== "object") {
+      return null;
+    }
+
+    if (elemData._elementType) {
+      return elemData._elementType;
+    }
+
+    if (!Control.prototype.blockToClassElems) {
+      return null;
+    }
+
+    if (elemData.icon !== undefined) {
+      return "IconElement";
+    }
+    if (elemData.arrow !== undefined) {
+      return "ArrowElement";
+    }
+    if (elemData.logo !== undefined || elemData.tollLogo !== undefined) {
+      return "TollLogoElement";
+    }
+    if (elemData.shieldBase !== undefined || elemData.type !== undefined) {
+      return "ShieldElement";
+    }
+    if (elemData.dividerWidth !== undefined) {
+      return "DividerElement";
+    }
+    if (
+      elemData.beacon !== undefined ||
+      (elemData.size !== undefined &&
+        elemData.color !== undefined &&
+        !elemData.textContent)
+    ) {
+      return "BeaconElement";
+    }
+    if (elemData.textContent !== undefined) {
+      if (elemData.glow !== undefined) {
+        return "ElectronicSignElement";
+      }
+      if (
+        elemData.borderRadius !== undefined &&
+        elemData.horizPadding !== undefined
+      ) {
+        return "AdvisoryMessageElement";
+      }
+      if (elemData.spacing !== undefined) {
+        return "ControlTextElement";
+      }
+      return "ActionMessageElement";
+    }
+
+    return null;
+  };
+
+  const reconstructControl = (controlData) => {
+    if (!controlData) {
+      return new Control();
+    }
+
+    const control = new Control();
+    const rows = [];
+    const blockProperties = [];
+
+    if (Array.isArray(controlData.rows)) {
+      for (const rowData of controlData.rows) {
+        const row = [];
+        if (Array.isArray(rowData)) {
+          for (const elemData of rowData) {
+            const elemType = inferControlElementType(elemData);
+
+            if (
+              elemType &&
+              Control.prototype.blockToClassElems &&
+              Control.prototype.blockToClassElems[elemType]
+            ) {
+              const ElemClass = Control.prototype.blockToClassElems[elemType];
+              const elem = new ElemClass(elemData);
+              Object.assign(elem, elemData);
+              delete elem._elementType;
+              row.push(elem);
+            } else {
+              console.warn("Could not reconstruct element:", elemData);
+            }
+          }
+        }
+        rows.push(row);
+
+        const blockIndex = rows.length - 1;
+        const blockData = controlData.blockProperties?.[blockIndex];
+        if (blockData) {
+          const block = new Block(blockData);
+          Object.assign(block, blockData);
+          blockProperties.push(block);
+        } else {
+          blockProperties.push(new Block());
+        }
+      }
+    }
+
+    control.rows = rows;
+    control.blockProperties = blockProperties;
+    return control;
+  };
+
+  const reconstructPostFromData = (postData) => {
+    const newPost = new Post(
+      postData.polePosition || Post.prototype.polePositions[0],
+      postData.lanesWide || 1,
+      postData.color || Post.prototype.colors[0]
+    );
+
+    Object.assign(newPost, postData);
+
+    if (Array.isArray(postData.panels)) {
+      newPost.panels = [];
+      for (const panelData of postData.panels) {
+        const subPanels = [];
+        if (Array.isArray(panelData.sign?.subPanels)) {
+          for (const subPanelData of panelData.sign.subPanels) {
+            const blockElements = reconstructControl(subPanelData.blockElements);
+            const subPanel = new SubPanels({
+              ...subPanelData,
+              blockElements,
+            });
+            Object.assign(subPanel, subPanelData);
+            subPanel.blockElements = blockElements;
+            subPanels.push(subPanel);
+          }
+        }
+
+        const signData = panelData.sign || {};
+        const sign = new Sign({
+          ...signData,
+          subPanels,
+        });
+
+        if (Array.isArray(signData.shields)) {
+          sign.shields = signData.shields.map((shieldData) => {
+            const shield = new Shield(shieldData);
+            Object.assign(shield, shieldData);
+            return shield;
+          });
+        }
+
+        Object.assign(sign, signData);
+        sign.subPanels = subPanels;
+
+        const panel = new Panel(
+          sign,
+          panelData.color,
+          [],
+          panelData.corner,
+          panelData.borderRadius
+        );
+
+        if (Array.isArray(panelData.exitTabs)) {
+          panel.exitTabs = panelData.exitTabs.map((exitTabData) => {
+            const exitTab = new ExitTab(exitTabData);
+            Object.assign(exitTab, exitTabData);
+
+            if (Array.isArray(exitTabData.nestedExitTabs)) {
+              exitTab.nestedExitTabs = exitTabData.nestedExitTabs.map(
+                (nestedData) => {
+                  const nested = new ExitTab(nestedData);
+                  Object.assign(nested, nestedData);
+                  return nested;
+                }
+              );
+            }
+
+            return exitTab;
+          });
+        }
+
+        Object.assign(panel, panelData);
+        panel.sign = sign;
+        newPost.panels.push(panel);
+      }
+    }
+
+    return newPost;
+  };
+
   const getPost = function () {
     return post;
   };
 
-  const setPost = function (newPost) {
+  const setPost = function (newPost, selection) {
     post = newPost;
     if (!post) {
       return;
@@ -3519,7 +3995,12 @@ const app = (function () {
       post.panelSpacing = 0;
     }
     post.thickness = post.normalizeThickness(post.thickness);
-    currentlySelectedPanelIndex = 0;
+    if (selection) {
+      applySelectionState(selection);
+    } else {
+      currentlySelectedPanelIndex = 0;
+      normalizeEditorSelection();
+    }
     formHandler.updateForm();
     redraw();
   };
@@ -3548,66 +4029,7 @@ const app = (function () {
       }
 
       const db = await initTemplateDB();
-
-      // Add element type information to Control elements before serialization
-      const addElementTypes = (obj, visited = new WeakSet()) => {
-        if (!obj || typeof obj !== "object" || visited.has(obj)) {
-          return;
-        }
-
-        visited.add(obj);
-
-        if (Array.isArray(obj)) {
-          obj.forEach(item => addElementTypes(item, visited));
-          return;
-        }
-
-        // Check if this is a Control element
-        if (Control.prototype.blockToClassElems) {
-          try {
-            const elemType = Control.prototype.blockToClassElems.getElem?.(obj);
-            if (elemType) {
-              obj._elementType = elemType;
-            }
-          } catch (e) {
-            // Not an element instance, continue
-          }
-        }
-
-        // Recursively process all properties
-        for (const key in obj) {
-          if (obj.hasOwnProperty(key) && key !== "_elementType") {
-            addElementTypes(obj[key], visited);
-          }
-        }
-      };
-
-      // Add element types to the post (modifies in place, but that's OK for serialization)
-      addElementTypes(post);
-
-      // Serialize the entire post with element type information
-      const postData = JSON.stringify(post, null, 2);
-
-      // Clean up the _elementType properties we added (optional, but cleaner)
-      const removeElementTypes = (obj, visited = new WeakSet()) => {
-        if (!obj || typeof obj !== "object" || visited.has(obj)) {
-          return;
-        }
-        visited.add(obj);
-        if (Array.isArray(obj)) {
-          obj.forEach(item => removeElementTypes(item, visited));
-          return;
-        }
-        if (obj._elementType) {
-          delete obj._elementType;
-        }
-        for (const key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            removeElementTypes(obj[key], visited);
-          }
-        }
-      };
-      removeElementTypes(post);
+      const postData = serializePostWithElementTypes(2);
 
       const templateData = {
         name: templateName.trim(),
@@ -3650,187 +4072,8 @@ const app = (function () {
         return;
       }
 
-      // Deserialize and restore the post
       const postData = JSON.parse(template.data);
-
-      // Helper function to reconstruct Control blockElements
-      const reconstructControl = (controlData) => {
-        if (!controlData) {
-          return new Control();
-        }
-
-        const control = new Control();
-        const rows = [];
-        const blockProperties = [];
-
-        if (Array.isArray(controlData.rows)) {
-          for (const rowData of controlData.rows) {
-            const row = [];
-            if (Array.isArray(rowData)) {
-              for (const elemData of rowData) {
-                // Use stored element type or try to infer
-                let elemType = elemData._elementType;
-
-                if (!elemType && Control.prototype.blockToClassElems) {
-                  // Try to infer from properties
-                  if (elemData.icon !== undefined) {
-                    elemType = "IconElement";
-                  } else if (elemData.arrow !== undefined) {
-                    elemType = "ArrowElement";
-                  } else if (elemData.logo !== undefined || elemData.tollLogo !== undefined) {
-                    elemType = "TollLogoElement";
-                  } else if (elemData.shieldBase !== undefined || elemData.type !== undefined) {
-                    elemType = "ShieldElement";
-                  } else if (elemData.dividerWidth !== undefined) {
-                    elemType = "DividerElement";
-                  } else if (elemData.beacon !== undefined || elemData.size !== undefined && elemData.color !== undefined && !elemData.textContent) {
-                    elemType = "BeaconElement";
-                  } else if (elemData.textContent !== undefined) {
-                    // Distinguish between ControlText, Advisory, ActionMessage, ElectronicSign
-                    if (elemData.glow !== undefined) {
-                      elemType = "ElectronicSignElement";
-                    } else if (elemData.borderRadius !== undefined && elemData.horizPadding !== undefined) {
-                      elemType = "AdvisoryMessageElement";
-                    } else if (elemData.spacing !== undefined) {
-                      elemType = "ControlTextElement";
-                    } else {
-                      elemType = "ActionMessageElement";
-                    }
-                  }
-                }
-
-                if (elemType && Control.prototype.blockToClassElems && Control.prototype.blockToClassElems[elemType]) {
-                  const ElemClass = Control.prototype.blockToClassElems[elemType];
-                  const elem = new ElemClass(elemData);
-                  Object.assign(elem, elemData);
-                  delete elem._elementType; // Remove the helper property
-                  row.push(elem);
-                } else {
-                  console.warn("Could not reconstruct element:", elemData);
-                }
-              }
-            }
-            rows.push(row);
-
-            // Reconstruct Block
-            const blockIndex = rows.length - 1;
-            const blockData = controlData.blockProperties?.[blockIndex];
-            if (blockData) {
-              const block = new Block(blockData);
-              Object.assign(block, blockData);
-              blockProperties.push(block);
-            } else {
-              blockProperties.push(new Block());
-            }
-          }
-        }
-
-        control.rows = rows;
-        control.blockProperties = blockProperties;
-        return control;
-      };
-
-      // Create a new Post instance and copy properties
-      const newPost = new Post(
-        postData.polePosition || Post.prototype.polePositions[0],
-        postData.lanesWide || 1,
-        postData.color || Post.prototype.colors[0]
-      );
-
-      // Copy additional post properties
-      if (typeof postData.panelSpacing === "number") {
-        newPost.panelSpacing = postData.panelSpacing;
-      }
-      if (typeof postData.thickness === "number") {
-        newPost.thickness = postData.thickness;
-      }
-      if (typeof postData.showPost === "boolean") {
-        newPost.showPost = postData.showPost;
-      }
-      if (typeof postData.disableFlash === "boolean") {
-        newPost.disableFlash = postData.disableFlash;
-      }
-      if (typeof postData.secondExitOnly === "boolean") {
-        newPost.secondExitOnly = postData.secondExitOnly;
-      }
-
-      // Restore panels
-      if (Array.isArray(postData.panels)) {
-        newPost.panels = [];
-        for (const panelData of postData.panels) {
-          // Restore subpanels first (needed for Sign constructor)
-          const subPanels = [];
-          if (Array.isArray(panelData.sign?.subPanels)) {
-            for (const subPanelData of panelData.sign.subPanels) {
-              // Reconstruct blockElements
-              const blockElements = reconstructControl(subPanelData.blockElements);
-
-              const subPanel = new SubPanels({
-                ...subPanelData,
-                blockElements: blockElements
-              });
-              Object.assign(subPanel, subPanelData);
-              subPanel.blockElements = blockElements; // Ensure it's set
-              subPanels.push(subPanel);
-            }
-          }
-
-          // Create sign with subpanels
-          const signData = panelData.sign || {};
-          const sign = new Sign({
-            ...signData,
-            subPanels: subPanels
-          });
-
-          // Restore shields
-          if (Array.isArray(signData.shields)) {
-            sign.shields = signData.shields.map((shieldData) => {
-              const shield = new Shield(shieldData);
-              Object.assign(shield, shieldData);
-              return shield;
-            });
-          }
-
-          // Copy other sign properties
-          Object.assign(sign, signData);
-          sign.subPanels = subPanels; // Ensure subpanels are set
-
-          // Create panel
-          const panel = new Panel(
-            sign,
-            panelData.color,
-            [],
-            panelData.corner,
-            panelData.borderRadius
-          );
-
-          // Restore exit tabs
-          if (Array.isArray(panelData.exitTabs)) {
-            panel.exitTabs = panelData.exitTabs.map((exitTabData) => {
-              const exitTab = new ExitTab(exitTabData);
-              Object.assign(exitTab, exitTabData);
-
-              // Restore nested exit tabs
-              if (Array.isArray(exitTabData.nestedExitTabs)) {
-                exitTab.nestedExitTabs = exitTabData.nestedExitTabs.map((nestedData) => {
-                  const nested = new ExitTab(nestedData);
-                  Object.assign(nested, nestedData);
-                  return nested;
-                });
-              }
-
-              return exitTab;
-            });
-          }
-
-          // Copy other panel properties
-          Object.assign(panel, panelData);
-          panel.sign = sign; // Ensure sign is set
-          newPost.panels.push(panel);
-        }
-      }
-
-      setPost(newPost);
+      setPost(reconstructPostFromData(postData));
     } catch (error) {
       console.error("Error loading template:", error);
       alert("Failed to load template: " + error.message);
