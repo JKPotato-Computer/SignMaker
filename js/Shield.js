@@ -368,13 +368,13 @@ Shield.prototype.shieldDirectory = {
       name: "North Dakota",
       variants: ["2 Digit", "3 Digit"],
     },
-    OH: { type: "shield", name: "Ohio", variants: ["2 Digit", "3 Digit"] },
+    OH: { type: "shield", name: "Ohio", variants: ["2 Digit", "3 Digit", "Turnpike"] },
     OK: { type: "shield", name: "Oklahoma", variants: ["2 Digit", "3 Digit"] },
     OR: { type: "shield", name: "Oregon", variants: ["2 Digit", "3 Digit"] },
     PA: {
       type: "shield",
       name: "Pennsylvania",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Turnpike"],
     },
     RI: {
       type: "shield",
