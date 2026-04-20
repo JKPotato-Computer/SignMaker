@@ -403,12 +403,12 @@ Shield.prototype.shieldDirectory = {
       TXLOOP: {
         type: "shield",
         name: "Texas Loop",
-        variants: ["2 Digit", "3 Digit"],
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
       },
       TXSPUR: {
         type: "shield",
         name: "Texas Spur",
-        variants: ["2 Digit", "3 Digit"],
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
       },
       TXTOLL: {
         type: "shield",
@@ -420,7 +420,7 @@ Shield.prototype.shieldDirectory = {
         name: "Texas Express",
         variants: ["2 Digit", "3 Digit"],
       },
-      TXFM: { type: "shield", name: "Texas FM", variants: ["4 Digit"] },
+      TXFM: { type: "shield", name: "Texas FM", variants: ["2 Digit", "3 Digit", "4 Digit"] },
       TXPARK: { type: "shield", name: "Texas Park", variants: ["2 Digit"] },
       TXRM: { type: "shield", name: "Texas RM", variants: ["2 Digit"] },
       TXBELTWAY: {
