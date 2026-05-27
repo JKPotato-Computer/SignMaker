@@ -221,6 +221,23 @@ label span.toolTip,
   border-radius: 0;
 }
 
+.panelOrientationControl {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 0.9;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.panelOrientationControl input {
+  margin: 0;
+}
+
 #panelList {
   display: flex;
   flex-direction: column;
@@ -693,12 +710,32 @@ input[type="button"]:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
   padding: 0.3rem 0.65rem;
   border-radius: 999rem;
   cursor: grab;
   user-select: none;
   transform-origin: center;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.blockSelectionCheckbox {
+  margin: 0 0.15rem 0 0.35rem;
+}
+
+.groupExpandButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  border-radius: 999rem;
+  cursor: pointer;
+}
+
+.textEditorBlock .groupExpandButton {
+  font-size: 1.1rem;
 }
 
 .textEditorBlock:active {
@@ -1171,6 +1208,36 @@ nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
   color: var(--orange);
 }
 
+.sdGroupedBlock {
+  background-color: var(--purple);
+  color: white;
+}
+
+.panel.groupPreviewPanel .signContainer {
+  outline: 0.5rem solid var(--purple);
+  outline-offset: 0;
+}
+
+#sMSPGroupNav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.25rem;
+}
+
+#sMSPGroupNav.hidden {
+  display: none;
+}
+
+#sMSPExitGroup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0;
+}
+
 #smSPProperties,
 #smSPBlockProperties,
 #smSPShieldProperties {
@@ -1629,7 +1696,7 @@ dialog:not([open]) {
   font-size: 1rem;
 }
 
-#arrowGrid .iconGridItem img {
+:root:not([data-theme="dark"]) #arrowGrid .iconGridItem img {
   filter: invert(1);
 }
 
@@ -1807,8 +1874,4 @@ dialog:not([open]) {
   background-color: rgb(50, 50, 50);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-:root[data-theme="dark"] #iconGrid .iconGridItem img {
-  filter: invert(1);
 }

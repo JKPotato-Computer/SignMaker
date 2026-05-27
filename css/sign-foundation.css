@@ -206,6 +206,16 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   border-radius: var(--beaconBackplateRadius, 0.15rem);
 }
 
+.bE-groupedBlockElement {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bE-groupedBlockElementContent {
+  width: auto;
+}
+
 .bE-beaconBulb {
   width: calc(var(--beaconSize) * 0.85);
   height: calc(var(--beaconSize) * 0.85);

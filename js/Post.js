@@ -33,6 +33,9 @@ class Post {
 
 		this.panels = [];
 		this.panelSpacing = 0;
+		this.panelOrientation = this.normalizePanelOrientation(
+			Post.prototype.defaultPanelOrientation
+		);
 	}
 
 	/**
@@ -148,7 +151,24 @@ class Post {
 		}
 		return Math.max(0, parsed);
 	}
+
+	normalizePanelOrientation(value) {
+		const options = Array.isArray(Post.prototype.panelOrientations)
+			? Post.prototype.panelOrientations
+			: ["Horizontal", "Vertical"];
+		const fallback = Post.prototype.defaultPanelOrientation || options[0];
+		if (typeof value !== "string") {
+			return fallback;
+		}
+		const normalized = options.find(
+			(option) => option.toLowerCase() === value.toLowerCase()
+		);
+		return normalized || fallback;
+	}
 }
+
+Post.prototype.panelOrientations = ["Horizontal", "Vertical"];
+Post.prototype.defaultPanelOrientation = "Horizontal";
 
 Post.cloneData = function (value) {
 	if (Array.isArray(value)) {
@@ -233,8 +253,18 @@ Post.cloneControlElement = function (elementData) {
 
 	if (elementType && typeof registry[elementType] === "function") {
 		const ElementClass = registry[elementType];
-		const element = new ElementClass(safeData);
-		return Object.assign(element, safeData);
+		const element =
+			elementType === "GroupedBlockElement"
+				? new ElementClass({
+					...safeData,
+					blockElements: Post.cloneControl(elementData?.blockElements),
+				})
+				: new ElementClass(safeData);
+		Object.assign(element, safeData);
+		if (elementType === "GroupedBlockElement") {
+			element.blockElements = Post.cloneControl(elementData?.blockElements);
+		}
+		return element;
 	}
 
 	return safeData;

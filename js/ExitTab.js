@@ -15,6 +15,7 @@ class ExitTab {
 		useTextBasedIcon = false,
 		fullBorder = ExitTab.prototype.defaultFullBorder,
 		squareCorners = ExitTab.prototype.defaultSquareCorners,
+		attached = ExitTab.prototype.defaultAttached,
 		topOffset = ExitTab.prototype.defaultTopOffset,
 		showLeft = false,
 		borderThickness = 0.2,
@@ -55,6 +56,7 @@ class ExitTab {
 
 		this.fullBorder = fullBorder;
 		this.squareCorners = squareCorners;
+		this.attached = !!attached;
 		const parsedBorderThickness =
 			typeof borderThickness === "number"
 				? borderThickness
@@ -135,6 +137,7 @@ class ExitTab {
 			icon: exisitingTab.icon,
 			squareCorners: exisitingTab.squareCorners,
 			fullBorder: exisitingTab.fullBorder,
+			attached: exisitingTab.attached,
 			borderThickness: exisitingTab.borderThickness,
 			minHeight: exisitingTab.minHeight,
 			tollLogoOnly: exisitingTab.tollLogoOnly,
@@ -156,6 +159,7 @@ ExitTab.prototype.defaultBorderThickness = 0.2;
 ExitTab.prototype.defaultTollLogoSize = 3;
 ExitTab.prototype.defaultFullBorder = false;
 ExitTab.prototype.defaultSquareCorners = false;
+ExitTab.prototype.defaultAttached = false;
 ExitTab.prototype.defaultTopOffset = true;
 ExitTab.prototype.defaultFHWAFont = false;
 ExitTab.prototype.defaultVerticalArrangement = false;

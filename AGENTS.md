@@ -1,0 +1,1 @@
+1. Use minimal UI and use UI in the style of this current repo. Do not make custom UI elements and only use the minimal UI elements in here.

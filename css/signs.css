@@ -127,8 +127,17 @@
   gap: var(--panelSpacing, 0rem);
 }
 
+#postContainer #panelContainer[data-panel-orientation="vertical"] {
+  flex-direction: column;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel .exitTabContainer:not(.tabVisible) {
+  display: none;
+}
+
 .panel {
   --signBorderRadius: 0.75rem;
+  --signBorderWidth: 0.2rem;
   text-align: center;
   display: block;
   padding: 0rem;
@@ -192,6 +201,24 @@
 
 .panel.dropAfter::after {
   right: 0.25rem;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel.dropBefore::before,
+#panelContainer[data-panel-orientation="vertical"] .panel.dropAfter::after {
+  left: 10%;
+  right: 10%;
+  width: auto;
+  height: 0.3rem;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel.dropBefore::before {
+  top: 0.25rem;
+  bottom: auto;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel.dropAfter::after {
+  top: auto;
+  bottom: 0.25rem;
 }
 
 .panel.green .sign,
@@ -502,6 +529,17 @@
   gap: var(--nestedTabSpacing, 0);
 }
 
+.exitTabContainer.attached {
+  align-items: flex-start;
+  margin-bottom: calc(-1 * var(--signBorderWidth, 0.2rem));
+  position: relative;
+  z-index: 3;
+}
+
+.exitTabHolder.attached {
+  padding-bottom: var(--signBorderWidth, 0.2rem);
+}
+
 .signContainer,
 .exitTabContainer.narrow,
 .exitTabContainer.edge {
@@ -558,7 +596,7 @@
 .sign {
   border-radius: var(--signBorderRadius, 0.75rem);
   border-style: solid;
-  border-width: 0.2rem;
+  border-width: var(--signBorderWidth, 0.2rem);
   display: block;
   clear: both;
   visibility: visible;
@@ -1114,7 +1152,7 @@
   --fhwaBaselineOffset: 0px;
   display: inline-flex;
   align-items: center;
-  font-family: "Clearview 5WR";
+  font-family: "Series E";
   justify-content: center;
   position: relative;
   top: var(--fhwaBaselineOffset);

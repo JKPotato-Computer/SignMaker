@@ -260,9 +260,9 @@ class ControlTextElement extends TextElement {
 }
 
 ControlTextElement.defaultFont = TextElement.prototype.fontFamily.includes(
-  "Clearview 5WR"
+  "Series E"
 )
-  ? "Clearview 5WR"
+  ? "Series E"
   : TextElement.prototype.fontFamily[0];
 
 ControlTextElement.getDefaultFont = function () {
@@ -295,8 +295,21 @@ ControlTextElement.getTextColorOptions = function () {
 };
 
 class ActionMessageElement extends TextElement {
-  constructor({ fontSize = 70, useNumeralFormatting = true, textColor = ActionMessageElement.defaultTextColor } = {}) {
-    super();
+  constructor(options = {}) {
+    const {
+      fontFamily = "Series E",
+      fontSize = 70,
+      useNumeralFormatting = true,
+      textColor = ActionMessageElement.defaultTextColor,
+    } = options;
+
+    super({
+      ...options,
+      fontFamily,
+      fontSize,
+      useNumeralFormatting,
+    });
+
     this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
     this.textColor =
@@ -1442,8 +1455,10 @@ IconElement.prototype.icons = {
   "WIRELESS_INTERNET": { label: "WiFi", src: "img/icons/WIRELESS_INTERNET.svg" },
   "WOMENS_RESTROOM": { label: "Women's Restroom", src: "img/icons/WOMENS_RESTROOM.svg" },
   "YIELD": { label: "Yield", src: "img/icons/YIELD.svg" },
+  "CONE": { label: "Cone", src: "img/icons/Cone.png" },
+  "SEATBELT": { label: "Seatbelt", src: "img/icons/Seatbelt.png" },
 
-  "ORANGE_COUNTY": { label: "Orange County", src: "img/icons/orange_county.svg"},
+  "ORANGE_COUNTY": { label: "Orange", src: "img/icons/orange_county.svg"},
 };
 
 class BeaconElement {
@@ -1882,16 +1897,14 @@ class Control {
   duplicateRow(row) {
     let newRows = [];
     for (const e of this.rows[row]) {
-      const blockElemType = Control.prototype.blockToClassElems.getElem(e);
-      newRows.push(
-        Object.assign(
-          new Control.prototype.blockToClassElems[blockElemType](),
-          e
-        )
-      );
+      newRows.push(this.cloneElement(e));
     }
     this.rows.splice(row + 1, 0, newRows);
-    this.blockProperties.splice(row + 1, 0, new Block());
+    this.blockProperties.splice(
+      row + 1,
+      0,
+      this.cloneBlockProperties(this.blockProperties[row])
+    );
   }
 
   deleteRow(row) {
@@ -2162,6 +2175,107 @@ class Control {
   }
 }
 
+class GroupedBlockElement {
+  constructor({
+    label = GroupedBlockElement.defaultLabel,
+    alignment = "Center",
+    blockElements,
+  } = {}) {
+    this.label =
+      typeof label === "string" && label.trim().length
+        ? label
+        : GroupedBlockElement.defaultLabel;
+    this.alignment = TextElement.prototype.alignment.includes(alignment)
+      ? alignment
+      : "Center";
+
+    if (blockElements instanceof Control) {
+      this.blockElements = blockElements;
+    } else if (blockElements && Array.isArray(blockElements.rows)) {
+      this.blockElements = new Control(blockElements);
+    } else {
+      this.blockElements = new Control({
+        rows: [[new ControlTextElement({ textContent: "Grouped Block" })]],
+        blockProperties: [new Block()],
+      });
+    }
+  }
+
+  createElement(panel, subPanel) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "bE-groupedBlockElement";
+    wrapper.dataset.groupLabel = this.label;
+
+    const nestedPanel =
+      panel && panel.sign
+        ? {
+          ...panel,
+          sign: {
+            ...panel.sign,
+            padding: "0rem 0rem 0rem 0rem",
+          },
+        }
+        : panel;
+    const nestedBlockElements = this.blockElements.createElement(
+      nestedPanel,
+      subPanel
+    );
+    nestedBlockElements.classList.add("bE-groupedBlockElementContent");
+    wrapper.appendChild(nestedBlockElements);
+    return wrapper;
+  }
+}
+
+GroupedBlockElement.defaultLabel = "Group";
+GroupedBlockElement.prototype.alignment = TextElement.prototype.alignment;
+
+Control.prototype.cloneBlockProperties = function (properties) {
+  const clonedProperties = new Block(properties || {});
+  if (properties && typeof properties === "object") {
+    Object.assign(clonedProperties, properties);
+  }
+  return clonedProperties;
+};
+
+Control.prototype.cloneElement = function (element) {
+  if (!element || typeof element !== "object") {
+    return element;
+  }
+
+  const blockElemType = Control.prototype.blockToClassElems.getElem(element);
+  const Constructor = blockElemType
+    ? Control.prototype.blockToClassElems[blockElemType]
+    : null;
+  if (typeof Constructor !== "function") {
+    return Object.assign({}, element);
+  }
+
+  const clonedElement = Object.assign(new Constructor(element), element);
+  delete clonedElement._elementType;
+
+  if (blockElemType === "GroupedBlockElement") {
+    clonedElement.blockElements =
+      element.blockElements && typeof element.blockElements.clone === "function"
+        ? element.blockElements.clone()
+        : new Control(element.blockElements || {});
+  }
+
+  return clonedElement;
+};
+
+Control.prototype.clone = function () {
+  const rows = Array.isArray(this.rows)
+    ? this.rows.map((row) =>
+      Array.isArray(row) ? row.map((elem) => this.cloneElement(elem)) : []
+    )
+    : [];
+  const blockProperties = rows.map((row, index) =>
+    this.cloneBlockProperties(this.blockProperties[index])
+  );
+
+  return new Control({ rows, blockProperties });
+};
+
 Control.prototype.blockToClassElems = {
   ControlTextElement: ControlTextElement,
   DividerElement: DividerElement,
@@ -2173,6 +2287,7 @@ Control.prototype.blockToClassElems = {
   TollLogoElement: TollLogoElement,
   ActionMessageElement: ActionMessageElement,
   ElectronicSignElement: ElectronicSignElement,
+  GroupedBlockElement: GroupedBlockElement,
   getElem: (elemObj) => {
     for (const key in Control.prototype.blockToClassElems) {
       if (elemObj instanceof Control.prototype.blockToClassElems[key]) {
@@ -2194,6 +2309,7 @@ Control.prototype.blockElements = {
   BeaconElement: "Flashing Beacon",
   TollLogoElement: "Toll Logo",
   ElectronicSignElement: "Electronic Sign",
+  GroupedBlockElement: "Grouped Block",
 };
 
 Control.prototype.blockInternalElements = {
@@ -2207,4 +2323,5 @@ Control.prototype.blockInternalElements = {
   TollLogoElement: "sdTollLogo",
   ActionMessageElement: "sdActionMessage",
   ElectronicSignElement: "sdElectronicSign",
+  GroupedBlockElement: "sdGroupedBlock",
 };

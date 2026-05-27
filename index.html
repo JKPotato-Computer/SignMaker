@@ -341,6 +341,9 @@
               <label for="squareCorners">Square Corners:</label>
               <input type="checkbox" id="squareCorners" value="squareCorners" name="squareCorners"
                 onchange="formHandler.readForm();" />
+              <label for="exitTabAttached">Attached:</label>
+              <input type="checkbox" id="exitTabAttached" value="exitTabAttached" name="exitTabAttached"
+                onchange="formHandler.readForm();" />
               <label for="topOffset">Top Offset:</label>
               <input type="checkbox" id="topOffset" value="topOffset" name="topOffset"
                 onchange="formHandler.readForm();" checked="" />
@@ -592,8 +595,20 @@
           </div>
           <div id="sMSPBlocks" class="">
             <div id="sMSPTextEditor">
+              <div id="sMSPGroupNav" class="hidden">
+                <button type="button" id="sMSPExitGroup" onclick="app.exitGroupElement();">
+                  <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <span id="sMSPGroupLabel">Editing Group</span>
+              </div>
               <div id="sMSPCreate">
                 <span id="SMSPSelectLabel">Selected: Row 1</span>
+                <label for="sMSPBlockSelectionMode" class="noLabelAlignment">Selection Mode:</label>
+                <input type="checkbox" id="sMSPBlockSelectionMode" />
+                <button type="button" id="sMSPGroupSelectedBlocks" class="hidden" disabled>
+                  <span class="material-symbols-outlined">folder_copy</span>
+                  Group
+                </button>
                 <button id="sMSPCreateRow"
                   onclick="app.newRow(document.querySelector('#sMSPElementSelect').value, event);">
                   <span class="material-symbols-outlined">add</span> New
@@ -641,6 +656,10 @@
                   <button id="sMSPDuplicateSelectedBlock" onclick="app.duplicateControlElem();">
                     <span class="material-symbols-outlined">content_copy</span>
                     Duplicate
+                  </button>
+                  <button id="sMSPUngroupSelectedBlock" onclick="app.ungroupSelectedBlockElement();" disabled>
+                    <span class="material-symbols-outlined">folder_open</span>
+                    Ungroup
                   </button>
                   <button id="sMSPDeleteSelectedBlock" onclick="app.delControlElem();">
                     <span class="material-symbols-outlined" disabled>delete</span>
@@ -1006,6 +1025,13 @@
                   <label for="sdElectronicSign_justification">Justification: </label>
                   <select id="sdElectronicSign_justification"></select>
                 </div>
+                <div data-property="sdGroupedBlock" class="hidden">
+                  <label for="sdGroupedBlock_label">Name:</label>
+                  <input type="text" id="sdGroupedBlock_label" class="sdTextEditorWide" placeholder="Group"
+                    value="Group" />
+                  <label for="sdGroupedBlock_alignment">Alignment:</label>
+                  <select id="sdGroupedBlock_alignment"></select>
+                </div>
               </div>
               <div id="smSPBlockProperties">
                 <h4>Block Properties</h4>
@@ -1294,6 +1320,10 @@
             <button id="duplicatePanel" class="dup">Duplicate</button>
             <button id="deletePanel" class="del">Remove</button>
           </div>
+          <label class="panelOrientationControl" for="panelOrientationVertical">
+            <input type="checkbox" id="panelOrientationVertical" name="panelOrientationVertical" />
+            <span>Vertical panels</span>
+          </label>
           <div id="panelList" class="panelList"></div>
           <div class="panelSpacingControl">
             <label for="panelSpacing">Spacing</label>

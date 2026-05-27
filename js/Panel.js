@@ -79,6 +79,7 @@ class Panel {
       icon: exisitingTab.icon,
       squareCorners: exisitingTab.squareCorners,
       fullBorder: exisitingTab.fullBorder,
+      attached: exisitingTab.attached,
       borderThickness: exisitingTab.borderThickness,
       minHeight: exisitingTab.minHeight,
       nestedExitTabs: newNest,

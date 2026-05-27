@@ -11,6 +11,9 @@ const formHandler = (function () {
   let exitTabDragState = null;
   let rowDragState = null;
   let newRowDropTargetButton = null;
+  let blockSelectionMode = false;
+  let selectedBlockKeys = new Set();
+  let blockSelectionContextKey = "";
   const STORAGE_KEYS = {
     postPosition: "signMaker.postPosition",
     postColor: "signMaker.postColor",
@@ -21,6 +24,7 @@ const formHandler = (function () {
     exitTabFHWAFont: "signMaker.exitTabFHWAFont",
     exitTabFullBorder: "signMaker.exitTabFullBorder",
     exitTabSquareCorners: "signMaker.exitTabSquareCorners",
+    exitTabAttached: "signMaker.exitTabAttached",
     exitTabTopOffset: "signMaker.exitTabTopOffset",
   };
   let localStorageAvailable;
@@ -152,6 +156,11 @@ const formHandler = (function () {
       ExitTab.prototype.defaultSquareCorners = storedExitSquareCorners === "true";
     }
 
+    const storedExitAttached = getStoredItem(STORAGE_KEYS.exitTabAttached);
+    if (storedExitAttached !== null) {
+      ExitTab.prototype.defaultAttached = storedExitAttached === "true";
+    }
+
     const storedExitTopOffset = getStoredItem(STORAGE_KEYS.exitTabTopOffset);
     if (storedExitTopOffset !== null) {
       ExitTab.prototype.defaultTopOffset = storedExitTopOffset === "true";
@@ -199,6 +208,53 @@ const formHandler = (function () {
     if (tollOptionsElmt) {
       tollOptionsElmt.classList.toggle("hidden", variantValue !== "Toll Logo");
     }
+  };
+
+  const getBlockSelectionKey = (rowIndex, blockIndex) =>
+    `${rowIndex}:${blockIndex}`;
+
+  const getSelectedBlockRefs = () =>
+    Array.from(selectedBlockKeys)
+      .map((key) => {
+        const [rowIndex, blockIndex] = key.split(":").map(Number);
+        return { rowIndex, blockIndex };
+      })
+      .filter(
+        ({ rowIndex, blockIndex }) =>
+          Number.isInteger(rowIndex) && Number.isInteger(blockIndex)
+      );
+
+  const pruneSelectedBlockKeys = (blockElements) => {
+    if (!blockElements || !Array.isArray(blockElements.rows)) {
+      selectedBlockKeys.clear();
+      return;
+    }
+
+    for (const key of Array.from(selectedBlockKeys)) {
+      const [rowIndex, blockIndex] = key.split(":").map(Number);
+      const row = blockElements.rows[rowIndex];
+      if (!Array.isArray(row) || blockIndex < 0 || blockIndex >= row.length) {
+        selectedBlockKeys.delete(key);
+      }
+    }
+  };
+
+  const syncGroupSelectionControls = () => {
+    const selectionCheckbox = document.getElementById("sMSPBlockSelectionMode");
+    if (selectionCheckbox) {
+      selectionCheckbox.checked = blockSelectionMode;
+    }
+
+    const groupButton = document.getElementById("sMSPGroupSelectedBlocks");
+    if (groupButton) {
+      groupButton.classList.toggle("hidden", !blockSelectionMode);
+      groupButton.disabled = !blockSelectionMode || selectedBlockKeys.size < 2;
+    }
+  };
+
+  const clearBlockSelection = () => {
+    selectedBlockKeys.clear();
+    syncGroupSelectionControls();
   };
 
   const clearExitTabDropIndicators = () => {
@@ -1044,9 +1100,39 @@ const formHandler = (function () {
     registerPanelButton("#duplicatePanel", "duplicatePanel");
     registerPanelButton("#deletePanel", "deletePanel");
 
+    const panelOrientationCheckbox = document.getElementById(
+      "panelOrientationVertical"
+    );
     const panelSpacingSlider = document.getElementById("panelSpacing");
     const panelSpacingValueInput =
       document.getElementById("panelSpacingValue");
+
+    const normalizePanelOrientation = (value) => {
+      if (post && typeof post.normalizePanelOrientation === "function") {
+        return post.normalizePanelOrientation(value);
+      }
+      return value === "Vertical" ? "Vertical" : "Horizontal";
+    };
+
+    const syncPanelOrientationInput = (orientation) => {
+      if (panelOrientationCheckbox) {
+        panelOrientationCheckbox.checked =
+          normalizePanelOrientation(orientation) === "Vertical";
+      }
+    };
+
+    const commitPanelOrientationChange = (isVertical) => {
+      const orientation = isVertical ? "Vertical" : "Horizontal";
+      syncPanelOrientationInput(orientation);
+      if (exposed && typeof exposed.setPanelOrientation === "function") {
+        exposed.setPanelOrientation(orientation);
+      } else if (post) {
+        post.panelOrientation = orientation;
+        if (exposed && typeof exposed.redraw === "function") {
+          exposed.redraw();
+        }
+      }
+    };
 
     const syncPanelSpacingInputs = (value) => {
       if (panelSpacingSlider) {
@@ -1073,6 +1159,12 @@ const formHandler = (function () {
         }
       }
     };
+
+    if (panelOrientationCheckbox) {
+      panelOrientationCheckbox.addEventListener("change", () => {
+        commitPanelOrientationChange(panelOrientationCheckbox.checked);
+      });
+    }
 
     if (panelSpacingSlider) {
       panelSpacingSlider.addEventListener("input", () => {
@@ -1164,6 +1256,37 @@ const formHandler = (function () {
       newRowDropTargetButton.addEventListener("dragover", handleNewRowDragOver);
       newRowDropTargetButton.addEventListener("dragleave", handleNewRowDragLeave);
       newRowDropTargetButton.addEventListener("drop", handleNewRowDrop);
+    }
+
+    const blockSelectionModeInput = document.getElementById(
+      "sMSPBlockSelectionMode"
+    );
+    if (blockSelectionModeInput) {
+      blockSelectionModeInput.addEventListener("change", () => {
+        blockSelectionMode = blockSelectionModeInput.checked;
+        if (!blockSelectionMode) {
+          clearBlockSelection();
+        }
+        updateForm();
+      });
+    }
+
+    const groupSelectedBlocksButton = document.getElementById(
+      "sMSPGroupSelectedBlocks"
+    );
+    if (groupSelectedBlocksButton) {
+      groupSelectedBlocksButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        const didGroup =
+          exposed &&
+          typeof exposed.groupSelectedBlockElements === "function" &&
+          exposed.groupSelectedBlockElements(getSelectedBlockRefs());
+        if (didGroup) {
+          blockSelectionMode = false;
+          clearBlockSelection();
+          updateForm();
+        }
+      });
     }
 
     const toolTip = document.createElement("span");
@@ -1443,6 +1566,7 @@ const formHandler = (function () {
       document.querySelector("#sdTollLogo_alignment"),
       document.querySelector("#sdBeacon_alignment"),
       document.querySelector("#sdIcon_alignment"),
+      document.querySelector("#sdGroupedBlock_alignment"),
     ];
     let textElem_bgColorSelects = [
       document.querySelector("#sdCtrlText_backgroundColor"),
@@ -2099,6 +2223,9 @@ const formHandler = (function () {
     }
     post.showPost = form["showPost"].checked;
     post.secondExitOnly = form["secondExitOnly"].checked;
+    post.panelOrientation = form["panelOrientationVertical"]?.checked
+      ? "Vertical"
+      : "Horizontal";
     setStoredItem(STORAGE_KEYS.postPosition, post.polePosition);
     setStoredItem(STORAGE_KEYS.showPost, String(!!post.showPost));
     setStoredItem(STORAGE_KEYS.postColor, post.color);
@@ -2189,6 +2316,7 @@ const formHandler = (function () {
     exitTab.showLeft = form["showLeft"].checked;
     exitTab.fullBorder = form["fullBorder"].checked;
     exitTab.squareCorners = form["squareCorners"].checked;
+    exitTab.attached = form["exitTabAttached"].checked;
     exitTab.topOffset = form["topOffset"].checked;
     exitTab.verticalArrangement = form["verticalArrangement"].checked;
     exitTab.caStyle = form["caStyle"].checked;
@@ -2196,6 +2324,7 @@ const formHandler = (function () {
     setStoredItem(STORAGE_KEYS.exitTabFHWAFont, String(!!exitTab.FHWAFont));
     setStoredItem(STORAGE_KEYS.exitTabFullBorder, String(!!exitTab.fullBorder));
     setStoredItem(STORAGE_KEYS.exitTabSquareCorners, String(!!exitTab.squareCorners));
+    setStoredItem(STORAGE_KEYS.exitTabAttached, String(!!exitTab.attached));
     setStoredItem(STORAGE_KEYS.exitTabTopOffset, String(!!exitTab.topOffset));
     const borderThicknessInput = parseFloat(form["borderThickness"].value);
     exitTab.borderThickness = Number.isFinite(borderThicknessInput)
@@ -2325,6 +2454,10 @@ const formHandler = (function () {
 
     // Control Text Revision
     const currentBlockElem = exposed.getCurrentBlockElem();
+    const activeBlockElements =
+      exposed && typeof exposed.getActiveBlockElements === "function"
+        ? exposed.getActiveBlockElements()
+        : subPanel.blockElements;
     const blockElemType =
       Control.prototype.blockInternalElements[
       Control.prototype.blockToClassElems.getElem(currentBlockElem)
@@ -2400,35 +2533,35 @@ const formHandler = (function () {
         currentBlockElem.flip === "on";
     }
 
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].topPadding = document.querySelector("#sdBlock_topPadding").value;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].bottomPadding = document.querySelector("#sdBlock_bottomPadding").value;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor"
     ).value;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].borderColor = document.querySelector("#sdBlock_borderColor").value;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].backgroundFullWidth = document.querySelector(
       "#sdBlock_backgroundFullWidth"
     ).checked;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].width = document.querySelector("#sdBlock_width").value;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].stretchLeft = document.querySelector("#sdBlock_stretchLeft").checked;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].stretchCenter = document.querySelector("#sdBlock_stretchCenter").checked;
-    subPanel.blockElements.blockProperties[
+    activeBlockElements.blockProperties[
       exposed.vars.currentlySelectedRowIndex
     ].stretchRight = document.querySelector("#sdBlock_stretchRight").checked;
 
@@ -3026,6 +3159,21 @@ const formHandler = (function () {
     }
     if (panelSpacingValueInput) {
       panelSpacingValueInput.value = resolvedPanelSpacing;
+    }
+    const panelOrientationCheckbox = document.getElementById(
+      "panelOrientationVertical"
+    );
+    const resolvedPanelOrientation =
+      post && typeof post.normalizePanelOrientation === "function"
+        ? post.normalizePanelOrientation(post.panelOrientation)
+        : post?.panelOrientation === "Vertical"
+          ? "Vertical"
+          : "Horizontal";
+    if (post) {
+      post.panelOrientation = resolvedPanelOrientation;
+    }
+    if (panelOrientationCheckbox) {
+      panelOrientationCheckbox.checked = resolvedPanelOrientation === "Vertical";
     }
 
     const postThicknessValueInput =
@@ -3742,6 +3890,9 @@ const formHandler = (function () {
     const squareCorners = document.getElementById("squareCorners");
     squareCorners.checked = exitTab.squareCorners;
 
+    const exitTabAttached = document.getElementById("exitTabAttached");
+    exitTabAttached.checked = !!exitTab.attached;
+
     const topOffset = document.getElementById("topOffset");
     topOffset.checked = exitTab.topOffset;
 
@@ -3782,6 +3933,40 @@ const formHandler = (function () {
     // Control Text Revision
     const sMSPTextList = document.querySelector("#sMSPTextList");
     sMSPTextList.innerHTML = "";
+    const activeBlockElements =
+      exposed && typeof exposed.getActiveBlockElements === "function"
+        ? exposed.getActiveBlockElements()
+        : sign.blockElements;
+    pruneSelectedBlockKeys(activeBlockElements);
+    syncGroupSelectionControls();
+
+    const groupPath =
+      exposed && typeof exposed.getGroupEditingPath === "function"
+        ? exposed.getGroupEditingPath()
+        : [];
+    const groupPathKey = groupPath
+      .map((segment) => `${segment.rowIndex}:${segment.blockIndex}`)
+      .join("/");
+    if (groupPathKey !== blockSelectionContextKey) {
+      blockSelectionContextKey = groupPathKey;
+      selectedBlockKeys.clear();
+      syncGroupSelectionControls();
+    }
+    const isEditingGroup = groupPath.length > 0;
+    const groupNav = document.getElementById("sMSPGroupNav");
+    const groupLabel = document.getElementById("sMSPGroupLabel");
+    if (groupNav) {
+      groupNav.classList.toggle("hidden", !isEditingGroup);
+    }
+    if (groupLabel) {
+      const activeGroup =
+        exposed && typeof exposed.getActiveGroupElement === "function"
+          ? exposed.getActiveGroupElement()
+          : null;
+      groupLabel.textContent = activeGroup?.label
+        ? `Editing: ${activeGroup.label}`
+        : "Editing Group";
+    }
 
     // START Add Header/Footer Buttons
     const addHeaderFooterContainer = document.createElement("div");
@@ -3801,7 +3986,7 @@ const formHandler = (function () {
     };
 
     const addHeaderButton = createButton("Add Header", () => {
-      const blockElems = sign.blockElements;
+      const blockElems = activeBlockElements;
 
       // Add Header text at the top
       blockElems.addRow(0, "ControlTextElement");
@@ -3827,7 +4012,7 @@ const formHandler = (function () {
     });
 
     const addFooterButton = createButton("Add Footer", () => {
-      const blockElems = sign.blockElements;
+      const blockElems = activeBlockElements;
       const lastIndex = blockElems.rows.length;
 
       // Add Divider at the bottom
@@ -3861,13 +4046,18 @@ const formHandler = (function () {
     document.querySelector("#SMSPElementLabel").textContent =
       "Selected: Block " + (exposed.vars.currentlySelectedBlockIndex + 1);
     document.querySelector("#sMSPDeleteSelectedRow").disabled =
-      exposed.getCurrentSubPanel().blockElements.rows.length == 1;
-    document.querySelector("#smSPDeleteSelectedBlock").disabled =
-      exposed.getCurrentSubPanel().blockElements.rows.length == 1 &&
+      activeBlockElements.rows.length == 1;
+    document.querySelector("#sMSPDeleteSelectedBlock").disabled =
+      activeBlockElements.rows.length == 1 &&
       exposed.getCurrentBlockRows().length == 1;
+    const selectedBlockElement = exposed.getCurrentBlockElem();
+    const ungroupButton = document.querySelector("#sMSPUngroupSelectedBlock");
+    if (ungroupButton) {
+      ungroupButton.disabled = !(selectedBlockElement instanceof GroupedBlockElement);
+    }
     for (
       let row = 0;
-      row < Object.keys(sign.blockElements.rows).length;
+      row < Object.keys(activeBlockElements.rows).length;
       row++
     ) {
       const sMControlRow = document.createElement("div");
@@ -3876,14 +4066,37 @@ const formHandler = (function () {
         "sMControlRow" +
         (row == exposed.vars.currentlySelectedRowIndex ? " selected" : "");
 
-      for (let item = 0; item < sign.blockElements.rows[row].length; item++) {
-        const blockElement = sign.blockElements.rows[row][item];
+      for (let item = 0; item < activeBlockElements.rows[row].length; item++) {
+        const blockElement = activeBlockElements.rows[row][item];
+        const blockElementType =
+          Control.prototype.blockToClassElems.getElem(blockElement) ||
+          blockElement.constructor.name;
+
+        if (blockSelectionMode) {
+          const selectionCheckbox = document.createElement("input");
+          selectionCheckbox.type = "checkbox";
+          selectionCheckbox.className = "blockSelectionCheckbox";
+          const selectionKey = getBlockSelectionKey(row, item);
+          selectionCheckbox.checked = selectedBlockKeys.has(selectionKey);
+          selectionCheckbox.addEventListener("click", (event) => {
+            event.stopPropagation();
+          });
+          selectionCheckbox.addEventListener("change", () => {
+            if (selectionCheckbox.checked) {
+              selectedBlockKeys.add(selectionKey);
+            } else {
+              selectedBlockKeys.delete(selectionKey);
+            }
+            syncGroupSelectionControls();
+          });
+          sMControlRow.appendChild(selectionCheckbox);
+        }
 
         const textEditorBlock = document.createElement("button");
         textEditorBlock.className =
           "textEditorBlock " +
           Control.prototype.blockInternalElements[
-          blockElement.constructor.name
+          blockElementType
           ] +
           (item == exposed.vars.currentlySelectedBlockIndex &&
             row == exposed.vars.currentlySelectedRowIndex
@@ -3892,8 +4105,19 @@ const formHandler = (function () {
         textEditorBlock.dataset.row = row.toString();
         textEditorBlock.dataset.block = item.toString();
         textEditorBlock.draggable = true;
-        textEditorBlock.textContent =
-          Control.prototype.blockElements[blockElement.constructor.name];
+        if (blockElementType === "GroupedBlockElement") {
+          const label = document.createElement("span");
+          label.textContent = blockElement.label || "Grouped Block";
+          textEditorBlock.appendChild(label);
+          const chevron = document.createElement("span");
+          chevron.className =
+            "groupExpandButton material-symbols-outlined";
+          chevron.textContent = "chevron_right";
+          textEditorBlock.appendChild(chevron);
+        } else {
+          textEditorBlock.textContent =
+            Control.prototype.blockElements[blockElementType];
+        }
         sMControlRow.appendChild(textEditorBlock);
         textEditorBlock.addEventListener("dragstart", handleBlockDragStart);
         textEditorBlock.addEventListener("dragend", handleBlockDragEnd);
@@ -3902,6 +4126,16 @@ const formHandler = (function () {
           (event) => {
             if (textEditorBlock.dataset.dragging === "true") {
               event.preventDefault();
+              return;
+            }
+            if (
+              blockElement instanceof GroupedBlockElement &&
+              event.target.closest(".groupExpandButton")
+            ) {
+              event.preventDefault();
+              if (exposed && typeof exposed.enterGroupElement === "function") {
+                exposed.enterGroupElement(row, item);
+              }
               return;
             }
             exposed.setSelectedRow(row);
@@ -4173,7 +4407,7 @@ const formHandler = (function () {
     }
 
     document.querySelector("#sdBlock_topPadding").value =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].topPadding;
     document
@@ -4181,7 +4415,7 @@ const formHandler = (function () {
       .addEventListener("change", readForm, { once: true });
 
     document.querySelector("#sdBlock_bottomPadding").value =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].bottomPadding;
     document
@@ -4191,10 +4425,10 @@ const formHandler = (function () {
     const topPadValEl = document.querySelector("#sdBlock_topPaddingVal");
     const bottomPadValEl = document.querySelector("#sdBlock_bottomPaddingVal");
     const topPadValue =
-      sign.blockElements.blockProperties[exposed.vars.currentlySelectedRowIndex]
+      activeBlockElements.blockProperties[exposed.vars.currentlySelectedRowIndex]
         .topPadding;
     const bottomPadValue =
-      sign.blockElements.blockProperties[exposed.vars.currentlySelectedRowIndex]
+      activeBlockElements.blockProperties[exposed.vars.currentlySelectedRowIndex]
         .bottomPadding;
     if (topPadValEl) {
       if (topPadValEl.tagName === "INPUT" && topPadValEl.type === "number") {
@@ -4215,7 +4449,7 @@ const formHandler = (function () {
     }
 
     document.querySelector("#sdBlock_backgroundColor").value =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].backgroundColor;
 
@@ -4226,7 +4460,7 @@ const formHandler = (function () {
     const blockBorderColorEl = document.querySelector("#sdBlock_borderColor");
     if (blockBorderColorEl) {
       const storedBorderColor =
-        sign.blockElements.blockProperties[
+        activeBlockElements.blockProperties[
           exposed.vars.currentlySelectedRowIndex
         ].borderColor;
       blockBorderColorEl.value =
@@ -4238,7 +4472,7 @@ const formHandler = (function () {
       "#sdBlock_backgroundFullWidth"
     );
     blockBackgroundFullWidthEl.checked =
-      !!sign.blockElements.blockProperties[
+      !!activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].backgroundFullWidth;
     blockBackgroundFullWidthEl.addEventListener("change", readForm, {
@@ -4246,7 +4480,7 @@ const formHandler = (function () {
     });
 
     document.querySelector("#sdBlock_width").value =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].width;
     document
@@ -4258,7 +4492,7 @@ const formHandler = (function () {
       .addEventListener("change", readForm, { once: true });
 
     document.querySelector("#sdBlock_stretchLeft").checked =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].stretchLeft;
 
@@ -4266,7 +4500,7 @@ const formHandler = (function () {
       .querySelector("#sdBlock_stretchCenter")
       .addEventListener("change", readForm, { once: true });
     document.querySelector("#sdBlock_stretchCenter").checked =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].stretchCenter;
 
@@ -4274,7 +4508,7 @@ const formHandler = (function () {
       .querySelector("#sdBlock_stretchRight")
       .addEventListener("change", readForm, { once: true });
     document.querySelector("#sdBlock_stretchRight").checked =
-      sign.blockElements.blockProperties[
+      activeBlockElements.blockProperties[
         exposed.vars.currentlySelectedRowIndex
       ].stretchRight;
 
