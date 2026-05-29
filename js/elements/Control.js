@@ -196,28 +196,13 @@ TextElement.prototype.backgroundColor = ["Inherit"].concat(
 );
 
 class ControlTextElement extends TextElement {
-  constructor(options = {}) {
-    const { spacing = 0, smallCapitals = false } = options;
-    const resolvedOptions = { ...options };
-    const availableFonts =
-      TextElement && TextElement.prototype
-        ? TextElement.prototype.fontFamily
-        : null;
-    const providedFont = resolvedOptions.fontFamily;
-    if (
-      !providedFont ||
-      !Array.isArray(availableFonts) ||
-      !availableFonts.includes(providedFont)
-    ) {
-      const defaultFont =
-        typeof ControlTextElement.getDefaultFont === "function"
-          ? ControlTextElement.getDefaultFont()
-          : ControlTextElement.defaultFont;
-      if (defaultFont) {
-        resolvedOptions.fontFamily = defaultFont;
-      }
-    }
-    super(resolvedOptions);
+  constructor({
+    spacing = 0,
+    smallCapitals = false,
+    fontFamily = ControlTextElement.defaultFont,
+  } = {}) {
+    super();
+    this.fontFamily = fontFamily;
     this.spacing = spacing;
     this.smallCapitals = smallCapitals;
   }
@@ -231,45 +216,7 @@ class ControlTextElement extends TextElement {
   }
 }
 
-ControlTextElement.defaultFont = Array.isArray(
-  TextElement && TextElement.prototype ? TextElement.prototype.fontFamily : null
-)
-  ? TextElement.prototype.fontFamily.includes("Clearview 5WR")
-    ? "Clearview 5WR"
-    : TextElement.prototype.fontFamily[0]
-  : "Clearview 5WR";
-
-ControlTextElement.getDefaultFont = function () {
-  const availableFonts =
-    TextElement && TextElement.prototype
-      ? TextElement.prototype.fontFamily
-      : null;
-  const fallback = Array.isArray(availableFonts) ? availableFonts[0] : null;
-  const currentDefault = ControlTextElement.defaultFont || fallback;
-  if (
-    currentDefault &&
-    Array.isArray(availableFonts) &&
-    availableFonts.includes(currentDefault)
-  ) {
-    return currentDefault;
-  }
-  return fallback || "Clearview 5WR";
-};
-
-ControlTextElement.setDefaultFont = function (font) {
-  const availableFonts =
-    TextElement && TextElement.prototype
-      ? TextElement.prototype.fontFamily
-      : null;
-  if (!font || !Array.isArray(availableFonts) || !availableFonts.length) {
-    return false;
-  }
-  if (!availableFonts.includes(font)) {
-    return false;
-  }
-  ControlTextElement.defaultFont = font;
-  return true;
-};
+ControlTextElement.defaultFont = "Clearview 5WR";
 
 class ActionMessageElement extends TextElement {
   constructor({ fontSize = 70, useNumeralFormatting = true } = {}) {
@@ -366,14 +313,98 @@ ElectronicSignElement.prototype.textColors = [
   "Red",
 ];
 
-class ShieldElement extends Shield {
-  constructor({ shieldBase = "I-", shieldType = "", routeNumber = 1 } = {}) {
-    super();
-    this.type = shieldBase;
-    this.specialBannerType = shieldType;
-    this.routeNumber = routeNumber;
+class ShieldGroupElement {
+  constructor({
+    shields = [
+      new Shield({ group: 1 }),
+      new Shield({ group: 1, routeNumber: "44", variant: "3Digit" }),
+      new Shield({ group: 0, routeNumber: "69", shieldValue: "US" }),
+      new Shield({
+        group: 0,
+        routeNumber: "45",
+        shieldValue: "TXTOLL",
+        variant: "2Digit",
+      }),
+      new Shield({
+        group: 1,
+        routeNumber: "288",
+        shieldValue: "TX",
+        variant: "3Digit",
+      }),
+      new Shield({
+        group: 1,
+        routeNumber: "1",
+        shieldValue: "TXLOOP",
+        variant: "2Digit",
+      }),
+    ],
+    alignment = "Center",
+    direction = "Horizontal",
+    gap = 0.5,
+  } = {}) {
+    this.shields = shields;
+    this.alignment = alignment;
+    this.direction = direction;
+    this.gap = gap;
+  }
+
+  newShield() {
+    let shield = new Shield();
+    this.shields.push(shield);
+  }
+
+  deleteShield(index) {
+    if (index >= 0 && index < this.shields.length) {
+      this.shields.splice(index, 1);
+    }
+  }
+
+  duplicateShield(index) {
+    if (index >= 0 && index < this.shields.length) {
+      const shieldToDuplicate = this.shields[index];
+      const duplicatedShield = Object.assign(shieldToDuplicate.constructor.prototype, shieldToDuplicate);
+      this.shields.splice(index + 1, 0, duplicatedShield);
+    }
+  }
+
+  createElement() {
+    const shieldGroupElem = document.createElement("div");
+    shieldGroupElem.className = "bE-shieldGroupElement";
+
+    if (this.direction == "Horizontal") {
+      shieldGroupElem.style.flexDirection = "row";
+    } else if (this.direction == "Vertical") {
+      shieldGroupElem.style.flexDirection = "column";
+    }
+    shieldGroupElem.style.gap = this.gap + "rem";
+
+    let lastGroup = null;
+    let lastGroupInd = -1;
+    for (const shield of this.shields) {
+      if (shield.group == 0) {
+        lastGroup = null;
+        lastGroupInd = -1;
+
+        const bannerShieldContainerElmt = shield.createBannerShieldElement();
+        bannerShieldContainerElmt.appendChild(shield.createElement());
+        shieldGroupElem.appendChild(bannerShieldContainerElmt);
+      } else if (shield.group != lastGroupInd) {
+        const [bannerShieldContainerElmt, groupedShieldElement] =
+          shield.createBannerShieldElement(true);
+        lastGroupInd = shield.group;
+        lastGroup = groupedShieldElement;
+
+        lastGroup.appendChild(shield.createElement());
+        shieldGroupElem.appendChild(bannerShieldContainerElmt);
+      } else if (shield.group == lastGroupInd) {
+        lastGroup.appendChild(shield.createElement());
+      }
+    }
+
+    return shieldGroupElem;
   }
 }
+ShieldGroupElement.prototype.direction = ["Horizontal", "Vertical"];
 
 class DividerElement {
   constructor({
@@ -525,7 +556,10 @@ class BeaconElement {
 
     const container = document.createElement("div");
     container.className = "bE-beaconElement";
-    container.style.setProperty("--beaconSize", Math.max(beaconSize, 0.5) + "rem");
+    container.style.setProperty(
+      "--beaconSize",
+      Math.max(beaconSize, 0.5) + "rem"
+    );
     container.style.setProperty("--beaconFlashDuration", flashDuration + "s");
     const resolvedColor =
       (lib?.colors && lib.colors[this.color]) || this.color || "Yellow";
@@ -582,6 +616,7 @@ class ArrowElement {
     paddingHorizontal = null,
     paddingVertical = null,
     flip = false,
+    alignment = "Center",
   } = {}) {
     const resolveArrowKey = ArrowElement.prototype.arrows[arrow]
       ? arrow
@@ -594,6 +629,7 @@ class ArrowElement {
       flip === 1 ||
       flip === "1" ||
       flip === "on";
+    this.alignment = alignment;
 
     const arrowDefinition = ArrowElement.prototype.arrows[this.arrow] || {};
     const defaultSize =
@@ -681,23 +717,30 @@ class ArrowElement {
 }
 
 ArrowElement.prototype.arrows = {
-  TYPE_A: { label: "Type A", src: "img/arrowBlocks/TYPE_A.svg" },
+  TYPE_A: { label: "Type A", src: "assets/arrowBlocks/TYPE_A.svg" },
   TYPE_A_EXTENDED: {
     label: "Type A Extended",
-    src: "img/arrowBlocks/TYPE_A_EXTENDED.svg",
+    src: "assets/arrowBlocks/TYPE_A_EXTENDED.svg",
   },
-  TYPE_B: { label: "Type B", src: "img/arrowBlocks/TYPE_B.svg" },
-  TYPE_C_45: { label: "Type C 45", src: "img/arrowBlocks/TYPE_C_45.svg" },
-  TYPE_C_45_ALT: { label: "Type C 45 (alt)", src: "img/arrowBlocks/TYPE_C_45_ALT.svg" },
-  TYPE_C_90: { label: "Type C 90", src: "img/arrowBlocks/TYPE_C_90.svg" },
-  TYPE_D: { label: "Type D", src: "img/arrowBlocks/TYPE_D.svg" },
-  DOWN: { label: "Down", src: "img/arrowBlocks/DOWN.svg", defaultSize: 2.75 },
-  DOWN_CA: {
-    label: "Down (CA)",
-    src: "img/arrowBlocks/DOWN_CA.svg",
+  TYPE_B: { label: "Type B", src: "assets/arrowBlocks/TYPE_B.svg" },
+  TYPE_C_45: { label: "Type C 45", src: "assets/arrowBlocks/TYPE_C_45.svg" },
+  TYPE_C_45_ALT: {
+    label: "Type C 45 (alt)",
+    src: "assets/arrowBlocks/TYPE_C_45_ALT.svg",
+  },
+  TYPE_C_90: { label: "Type C 90", src: "assets/arrowBlocks/TYPE_C_90.svg" },
+  TYPE_D: { label: "Type D", src: "assets/arrowBlocks/TYPE_D.svg" },
+  DOWN: {
+    label: "Down",
+    src: "assets/arrowBlocks/DOWN.svg",
     defaultSize: 2.75,
   },
-  UK: { label: "UK", src: "img/arrowBlocks/UK.svg" },
+  DOWN_CA: {
+    label: "Down (CA)",
+    src: "assets/arrowBlocks/DOWN_CA.svg",
+    defaultSize: 2.75,
+  },
+  UK: { label: "UK", src: "assets/arrowBlocks/UK.svg" },
 };
 ArrowElement.prototype.defaultArrow = "TYPE_A";
 ArrowElement.prototype.defaultSize = 1.75;
@@ -801,36 +844,45 @@ class TollLogoElement {
 
 TollLogoElement.prototype.defaultLogo = "EZPass";
 TollLogoElement.prototype.logos = {
-  EZPass: { label: "E-ZPass", src: "img/tolls/EZPass.png" },
-  TollTag: { label: "TollTag", src: "img/tolls/NTTA.svg" },
-  TxTag: { label: "TxTag", src: "img/tolls/TXTAG.svg" },
-  EZTAG: { label: "EZ TAG Square", src: "img/tolls/EZTAG.svg" },
-  EZTAG2: { label: "EZ TAG Wide", src: "img/tolls/EZTAG-Sign-Wide.svg" },
+  EZPass: { label: "E-ZPass", src: "assets/tolls/EZPass.png" },
+  TollTag: { label: "TollTag", src: "assets/tolls/NTTA.svg" },
+  TxTag: { label: "TxTag", src: "assets/tolls/TXTAG.svg" },
+  EZTAG: { label: "EZ TAG Square", src: "assets/tolls/EZTAG.svg" },
+  EZTAG2: { label: "EZ TAG Wide", src: "assets/tolls/EZTAG-Sign-Wide.svg" },
   EZTAG3: {
     label: "EZ TAG FHWA Wide",
-    src: "img/tolls/EZTAG-Sign-Wide-Alt.svg",
+    src: "assets/tolls/EZTAG-Sign-Wide-Alt.svg",
   },
-  FasTrak: { label: "FasTrak", src: "img/tolls/FASTrak.png" },
-  FreedomPass: { label: "Freedom Pass", src: "img/tolls/FREEDOMPASS.svg" },
-  PeachPass: { label: "Peach Pass", src: "img/tolls/PEACHPASS.svg" },
-  PeachPassAlt: { label: "Peach Pass (alt)", src: "img/tolls/PEACHPASS_ALT.png" },
-  NCQuickPass: { label: "NC Quick Pass", src: "img/tolls/NCQUICKPASS.svg" },
-  EPASS: { label: "E-PASS", src: "img/tolls/EPASS.svg" },
-  SunPassOld: { label: "SunPass (old)", src: "img/tolls/SUNPASS-1.svg" },
-  SunPassNew: { label: "SunPass (new)", src: "img/tolls/SUNPASS-2.svg" },
-  ZipCash: { label: "ZipCash", src: "img/tolls/ZIPCASH.svg" },
-  LEEWAY: { label: "LeeWay", src: "img/tolls/LEEWAY.svg" },
-  KTAG: { label: "K-TAG", src: "img/tolls/KTAG.svg" },
-  PikePassOld: { label: "Pikepass (old)", src: "img/tolls/PIKEPASS-OLD.svg" },
-  PikePassNew: { label: "Pikepass (new)", src: "img/tolls/PIKEPASS-NEW.svg" },
-  PlatePay: { label: "PlatePay", src: "img/tolls/PLATEPAY.svg" },
-  PayByMail: { label: "Pay By Mail", src: "img/tolls/PAY_BY_MAIL.png" },
-  IPASS: { label: "I-Pass", src: "img/tolls/I-Pass.svg" },
-  GeauxPass: { label: "GeauxPass", src: "img/tolls/GEAUXPASS.svg" },
-  GoodToGo: { label: "Good To Go!", src: "img/tolls/GOODTOGO.svg" },
-  ExpressToll: { label: "ExpressToll", src: "img/tolls/EXPRESSTOLL.svg" },
-  DPASS: { label: "D-PASS", src: "img/tolls/DPASS.svg" },
-  MUTCD: { label: "MUTCD", src: "img/tolls/MUTCD.svg" },
+  FasTrak: { label: "FasTrak", src: "assets/tolls/FASTrak.png" },
+  FreedomPass: { label: "Freedom Pass", src: "assets/tolls/FREEDOMPASS.svg" },
+  PeachPass: { label: "Peach Pass", src: "assets/tolls/PEACHPASS.svg" },
+  PeachPassAlt: {
+    label: "Peach Pass (alt)",
+    src: "assets/tolls/PEACHPASS_ALT.png",
+  },
+  NCQuickPass: { label: "NC Quick Pass", src: "assets/tolls/NCQUICKPASS.svg" },
+  EPASS: { label: "E-PASS", src: "assets/tolls/EPASS.svg" },
+  SunPassOld: { label: "SunPass (old)", src: "assets/tolls/SUNPASS-1.svg" },
+  SunPassNew: { label: "SunPass (new)", src: "assets/tolls/SUNPASS-2.svg" },
+  ZipCash: { label: "ZipCash", src: "assets/tolls/ZIPCASH.svg" },
+  LEEWAY: { label: "LeeWay", src: "assets/tolls/LEEWAY.svg" },
+  KTAG: { label: "K-TAG", src: "assets/tolls/KTAG.svg" },
+  PikePassOld: {
+    label: "Pikepass (old)",
+    src: "assets/tolls/PIKEPASS-OLD.svg",
+  },
+  PikePassNew: {
+    label: "Pikepass (new)",
+    src: "assets/tolls/PIKEPASS-NEW.svg",
+  },
+  PlatePay: { label: "PlatePay", src: "assets/tolls/PLATEPAY.svg" },
+  PayByMail: { label: "Pay By Mail", src: "assets/tolls/PAY_BY_MAIL.png" },
+  IPASS: { label: "I-Pass", src: "assets/tolls/I-Pass.svg" },
+  GeauxPass: { label: "GeauxPass", src: "assets/tolls/GEAUXPASS.svg" },
+  GoodToGo: { label: "Good To Go!", src: "assets/tolls/GOODTOGO.svg" },
+  ExpressToll: { label: "ExpressToll", src: "assets/tolls/EXPRESSTOLL.svg" },
+  DPASS: { label: "D-PASS", src: "assets/tolls/DPASS.svg" },
+  MUTCD: { label: "MUTCD", src: "assets/tolls/MUTCD.svg" },
 };
 TollLogoElement.prototype.alignment = TextElement.prototype.alignment;
 
@@ -1115,7 +1167,7 @@ class Control {
 Control.prototype.blockToClassElems = {
   ControlTextElement: ControlTextElement,
   DividerElement: DividerElement,
-  ShieldElement: ShieldElement,
+  ShieldGroupElement: ShieldGroupElement,
   AdvisoryMessageElement: AdvisoryMessageElement,
   IconElement: IconElement,
   BeaconElement: BeaconElement,
@@ -1137,7 +1189,7 @@ Control.prototype.blockElements = {
   ControlTextElement: "Control Text",
   ActionMessageElement: "Action Message",
   AdvisoryMessageElement: "Advisory Message",
-  ShieldElement: "Shield",
+  ShieldGroupElement: "Shield Group",
   ArrowElement: "Arrow",
   DividerElement: "Divider",
   IconElement: "Icon",
@@ -1149,7 +1201,7 @@ Control.prototype.blockElements = {
 Control.prototype.blockInternalElements = {
   ControlTextElement: "sdCtrlText",
   DividerElement: "sdBlocker",
-  ShieldElement: "sdShield",
+  ShieldGroupElement: "sdShieldGroup",
   AdvisoryMessageElement: "sdAdvisory",
   IconElement: "sdIcon",
   BeaconElement: "sdBeacon",

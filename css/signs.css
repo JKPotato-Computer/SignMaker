@@ -1,7 +1,7 @@
 #postContainer {
   display: flex;
   flex-direction: row;
-  height: 30rem;
+  height: max-content;
   position: relative;
   --post-color-mid: rgb(191, 191, 191);
   --post-color-light: rgb(240, 240, 240);
@@ -46,8 +46,8 @@
 #postContainer.polePositionRight .post:first-child {
   visibility: hidden;
 }
-#postContainer.polePositionRural .post,
-#postContainer.polePositionCenter .post {
+#postContainer.postVariantRural .post,
+#postContainer.postVariantCenter .post {
   visibility: hidden;
 }
 
@@ -56,21 +56,22 @@
 #postContainer.polePositionOverhead #panelContainer {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 47%,
-    var(--post-color-mid) 47%,
-    var(--post-color-light) 49%,
-    var(--post-color-dark) 52%,
-    rgba(255, 255, 255, 0) 52%,
-    rgba(255, 255, 255, 0) 64%,
-    var(--post-color-mid) 64%,
-    var(--post-color-light) 66%,
-    var(--post-color-dark) 69%,
-    rgba(255, 255, 255, 0) 69%
+    var(--post-color-mid) 0,
+    var(--post-color-light) calc(var(--postThickness) / 2),
+    var(--post-color-dark) calc(var(--postThickness)),
+    transparent calc(var(--postThickness)),
+    transparent calc(100% - var(--postThickness)),
+    var(--post-color-mid) calc(100% - var(--postThickness)),
+    var(--post-color-light)
+      calc(100% - var(--postThickness) + calc(var(--postThickness) / 2)),
+    var(--post-color-dark)
+      calc(100% - var(--postThickness) + var(--postThickness))
   );
-  height: 15rem;
+  height: calc(var(--spacingMultiplier) * var(--postThickness));
+  margin-top: var(--postOffset);
 }
-#postContainer.polePositionRural #panelContainer {
+
+#postContainer.postVariantRural #panelContainer {
   position: relative;
   background-image: linear-gradient(
       90deg,
@@ -85,15 +86,17 @@
       var(--post-color-dark) 100%
     );
   background-repeat: no-repeat;
-  background-size:
-    var(--postThickness, 1rem) 24rem,
+  background-size: var(--postThickness, 1rem) 24rem,
     var(--postThickness, 1rem) 24rem;
-  background-position:
-    left 1rem bottom,
-    right 1rem bottom;
+  background-position: left 1rem bottom, right 1rem bottom;
   margin-top: 20rem;
+  height: 10rem;
 }
-#postContainer.polePositionCenter #panelContainer {
+#postContainer.postVariantRural .panel {
+  margin-bottom: -1rem;
+}
+
+#postContainer.postVariantCenter #panelContainer {
   position: relative;
   background-image: linear-gradient(
     90deg,
@@ -104,7 +107,7 @@
   background-repeat: no-repeat;
   background-size: var(--postThickness, 1rem) 24rem;
   background-position: center bottom;
-  margin-top: 7.5rem;
+  height: 30rem;
 }
 
 .post {
@@ -146,14 +149,14 @@
   padding-right: 1rem;
 }
 
-#postContainer.polePositionRural .panel {
+#postContainer.postVariantRural .panel {
   margin-top: -10rem;
 }
-#postContainer.polePositionCenter .panel {
-  margin-top: -22.5rem;
+#postContainer.postVariantCenter .panel {
+  margin-top: -20rem;
 }
-#postContainer.polePositionRural .panel:not(:first-child),
-#postContainer.polePositionCenter .panel:not(:first-child) {
+#postContainer.postVariantRural .panel:not(:first-child),
+#postContainer.postVariantCenter .panel:not(:first-child) {
   display: none;
 }
 
@@ -528,6 +531,10 @@
   visibility: hidden;
 }
 
+.exitTabContainer {
+  display: flex;
+}
+
 .panel .exitTabContainer {
   visibility: hidden;
 }
@@ -578,63 +585,6 @@
   gap: 1rem;
 }
 
-.to {
-  --fhwaBaselineOffset: 0px;
-  display: none;
-  margin: auto 0 auto auto;
-  padding-left: 0.25rem;
-  font-family: "Clearview 5WR";
-  margin-bottom: 1.8rem;
-  margin-right: 1.8rem;
-  font-size: 1.5rem;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-
-.bannerShieldContainer {
-  display: flex;
-  flex-direction: column;
-  /* margin-right: auto; */
-  /* margin-left: auto; */
-  padding: 0.1rem;
-}
-.bannerShieldContainer.bannerPositionLeft {
-  flex-direction: row;
-}
-.bannerShieldContainer.bannerPositionAbove {
-  flex-direction: column;
-}
-.bannerShieldContainer.bannerPositionRight {
-  flex-direction: row-reverse;
-}
-
-.bannerA,
-.bannerB {
-  --fhwaBaselineOffset: 0px;
-  border-radius: 0.1rem;
-  font-size: var(--fontSize);
-  text-transform: uppercase;
-  font-family: "Clearview 5WR";
-  margin-bottom: auto;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-.bannerA:not(.TOLL, .noIndent):first-letter,
-.bannerB:not(.TOLL, .noIndent):first-letter {
-  font-size: calc(var(--fontSize) + 0.3rem);
-  /* margin-right: -0.1rem; */
-}
-
-.shield {
-  margin: 0.15rem;
-  position: relative;
-}
-
-.shieldImg {
-  /* width:max-content; */
-  height: 3rem;
-}
-
 .markerImg {
   height: 1.5rem;
   top: 0.25rem;
@@ -677,13 +627,6 @@
   font-family: "Series C";
   top: 0.29rem;
   font-size: 1.2em;
-}
-.routeNumber {
-  font-size: 1.5rem;
-
-  width: 100%;
-
-  position: absolute;
 }
 
 .streetName {
@@ -816,7 +759,7 @@
 
 .exitTab .exitTabTextSpacer {
   display: inline-block;
-  min-width: 0.35rem;
+  min-width: 0;
 }
 
 .exitTab .exitTabNumberLinesContainer {

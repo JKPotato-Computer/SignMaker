@@ -1,66 +1,3 @@
-/*
-class Shield {
-   * Creates anew a route shield.
-   * @param {string} [type="I-"] - Type of shield.
-   * @param {number} [routeNumber="1"] - Route number to display on shield.
-   * @param {boolean} [to=false] - Whether or not the shield should be signed as "TO".
-   * @param {string} [bannerType] - Directional banner to display.
-   * @param {string} [bannerPosition] - Where to place the directional banner relative to the shield.
-  constructor({
-    type = "I",
-    routeNumber = "1",
-    to = false,
-    indentFirstLetter = true,
-    fontSize = "1.4rem",
-    specialBannerType,
-    bannerType,
-    bannerType2,
-    bannerPosition,
-  } = {}) {
-    if (Object.keys(this.types).includes(type)) {
-      this.type = type;
-    } else {
-      this.type = "I";
-    }
-    this.type = type;
-    this.routeNumber = routeNumber;
-    this.to = to;
-    this.indentFirstLetter = indentFirstLetter;
-    this.fontSize = fontSize;
-
-    if (this.bannerTypes.includes(bannerType)) {
-      this.bannerType = bannerType;
-    } else {
-      this.bannerType = this.bannerTypes[0];
-    }
-    if (this.bannerTypes.includes(bannerType2)) {
-      this.bannerType2 = bannerType2;
-    } else {
-      this.bannerType2 = this.bannerTypes[0];
-    }
-
-    if (this.bannerPositions.includes(bannerPosition)) {
-      this.bannerPosition = bannerPosition;
-    } else {
-      this.bannerPosition = this.bannerPositions[0];
-    }
-
-    let selectedSpecialBannerType =
-      this.specialBannerTypes[type][specialBannerType];
-
-    if (selectedSpecialBannerType == undefined) {
-      this.specialBannerType = this.bannerTypes[0];
-    } else {
-      if (routeNumber.length >= selectedSpecialBannerType) {
-        this.specialBannerType = specialBannerType;
-      } else {
-        this.specialBannerType = this.bannerTypes[0];
-      }
-    }
-  }
-}
-*/
-
 class Shield {
   constructor({
     shieldType = "preset",
@@ -70,79 +7,271 @@ class Shield {
 
     shieldBacks = false,
     shieldBackColor = "Black",
-    shieldBorderRadius = 4,
+    shieldBackRadius = 4,
 
     imageType = "",
     imageData = "",
+
+    banners = { top: [new Banner()] },
+    group = 0,
+
+    designation = "TEXAS",
+    routeNumber = "1",
+
+    scale = 100,
+
+    customShields = {
+      route_scale: 100,
+      route_xOffset: 0,
+      route_yOffset: 0,
+      route_fontFamily: "",
+
+      designation_scale: 100,
+      designation_xOffset: 0,
+      designation_yOffset: 0,
+      designation_fontFamily: "",
+    },
   } = {}) {
+    // Shield Image
     this.shieldType = shieldType;
     this.shieldName = shieldName;
     this.shieldValue = shieldValue;
     this.variant = variant;
     this.shieldBacks = shieldBacks;
     this.shieldBackColor = shieldBackColor;
-    this.shieldBorderRadius = shieldBorderRadius;
+    this.shieldBackRadius = shieldBackRadius;
     this.imageType = imageType;
     this.imageData = imageData;
+    this.designation = designation;
+    this.routeNumber = routeNumber;
+    this.scale = scale;
+
+    // Banner
+    this.banners = banners;
+
+    // Shield Groups
+    this.group = group;
+
+    this.customShields = customShields;
+  }
+
+  createBannerShieldElement(isGrouped) {
+    const bannerShieldContainerElmt = document.createElement("div");
+    bannerShieldContainerElmt.className = "bannerShieldContainer";
+
+    for (const bannerAlignment in this.banners) {
+      const bannerGroup = this.banners[bannerAlignment];
+      const bannerGroupElem = document.createElement("div");
+      bannerGroupElem.className =
+        "bannerGroupElem " + bannerAlignment.toLowerCase();
+
+      for (const banner of bannerGroup) {
+        bannerGroupElem.appendChild(banner.createElement());
+      }
+
+      bannerShieldContainerElmt.appendChild(bannerGroupElem);
+    }
+
+    if (isGrouped) {
+      const shieldGroup = document.createElement("div");
+      shieldGroup.className = "shieldGroupContainer";
+      bannerShieldContainerElmt.appendChild(shieldGroup);
+
+      return [bannerShieldContainerElmt, shieldGroup];
+    }
+
+    return bannerShieldContainerElmt;
+  }
+
+  createElement() {
+    const shieldElmt = document.createElement("div");
+    shieldElmt.className = "shield";
+    shieldElmt.style.setProperty("--shieldScale", this.scale / 100);
+
+    const shieldImgElmt = document.createElement("img");
+    shieldImgElmt.className = "shieldImg";
+
+    const routeNumberElmt = document.createElement("span");
+    routeNumberElmt.className = "routeNumber";
+
+    routeNumberElmt.style.setProperty(
+      "--routeScale",
+      this.customShields.route_scale / 100
+    );
+    routeNumberElmt.style.setProperty(
+      "--routeXOffset",
+      this.customShields.route_xOffset + "%"
+    );
+    routeNumberElmt.style.setProperty(
+      "--routeYOffset",
+      this.customShields.route_yOffset + "%"
+    );
+    if (this.customShields.route_fontFamily != "") {
+      routeNumberElmt.style.fontFamily = this.customShields.route_fontFamily;
+    }
+
+    if (this.designation != "") {
+      const designationElmt = document.createElement("span");
+      designationElmt.className = "designation";
+      designationElmt.style.setProperty(
+        "--designationScale",
+        this.customShields.designation_scale / 100
+      );
+      designationElmt.style.setProperty(
+        "--designationXOffset",
+        this.customShields.designation_xOffset + "%"
+      );
+      designationElmt.style.setProperty(
+        "--designationYOffset",
+        this.customShields.designation_yOffset + "%"
+      );
+      if (this.customShields.designation_fontFamily != "") {
+        designationElmt.style.fontFamily =
+          this.customShields.designation_fontFamily;
+      }
+
+      designationElmt.textContent = this.designation;
+      shieldElmt.appendChild(designationElmt);
+    }
+    routeNumberElmt.textContent = this.routeNumber;
+
+    if (this.shieldType == "preset") {
+      const classMap = {
+        1: "One",
+        2: "Two",
+        3: "Three",
+        4: "Four",
+        " ": "",
+      };
+
+      shieldElmt.classList.add(this.shieldValue);
+      shieldElmt.classList.add(
+        this.variant.replace(/ |\d/g, (matched) => classMap[matched])
+      );
+      shieldImgElmt.src = Shield.prototype.getDirectoryFromShield(
+        this.shieldValue,
+        this.variant
+      );
+    } else {
+      shieldImgElmt.src = this.imageData;
+    }
+
+    if (this.shieldBacks) {
+      shieldImgElmt.classList.add("shieldBacks");
+      shieldImgElmt.style.setProperty(
+        "--sbColor",
+        (lib.colors[this.backgroundColor] || this.backgroundColor).toLowerCase()
+      );
+      shieldImgElmt.style.setProperty(
+        "--sbRadius",
+        this.shieldBackRadius + "px"
+      );
+    }
+
+    shieldElmt.appendChild(routeNumberElmt);
+    shieldElmt.appendChild(shieldImgElmt);
+    return shieldElmt;
+  }
+
+  addBanner(alignment) {
+    if (this.banners[alignment] == undefined) {
+      this.banners[alignment] = [];
+    }
+
+    const newBanner = new Banner();
+    this.banners[alignment].push(newBanner);
+  }
+
+  removeBanner(alignment, bannerIndex) {
+    if (this.banners[alignment] == undefined) {
+      return;
+    }
+
+    this.banners[alignment].splice(bannerIndex, 1);
+
+    if (this.banners[alignment].length == 0) {
+      delete this.banners[alignment];
+    }
   }
 }
 
 class Banner {
   constructor({
-    textContent = "",
-    firstLetterSize = 100,
+    textContent = "North",
+    firstLetterSize = 125,
     fontSize = 1,
-    backgroundColor = "None",
-    padding = .01,
+    backgroundColor = "Panel Color",
+    horizontalPadding = 0,
+    verticalPadding = 0,
+    horziontalMargin = 0,
+    verticalMargin = 0,
+    lineHeight = 100,
     borderRadius = 4,
     fontFamily = "Clearview 5WR",
-    margins = {
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0
-    }
   } = {}) {
     this.textContent = textContent;
     this.firstLetterSize = firstLetterSize;
     this.fontSize = fontSize;
     this.backgroundColor = backgroundColor;
-    this.padding = padding;
+    this.horizontalPadding = horizontalPadding;
+    this.verticalPadding = verticalPadding;
+    this.lineHeight = lineHeight;
     this.borderRadius = borderRadius;
     this.fontFamily = fontFamily;
-    this.margins = margins;
+    this.horziontalMargin = horziontalMargin;
+    this.verticalMargin = verticalMargin;
   }
-}
 
-class BannerGroup {
-  constructor({
-    position = "left",
-    gap = .5,
-    direction = "vertical",
-  } = {}) {
-    this.position = position;
-    this.gap = gap;
-    this.direction = direction;
+  createElement() {
+    const bannerElmt = document.createElement("div");
+    bannerElmt.className = "bannerElmt";
+    bannerElmt.style.setProperty(
+      "--bgColor",
+      this.backgroundColor == "Panel Color"
+        ? "transparent"
+        : (
+            lib.colors[this.backgroundColor] || this.backgroundColor
+          ).toLowerCase()
+    );
+    bannerElmt.style.setProperty("--fontSize", this.fontSize + "rem");
+    bannerElmt.style.setProperty(
+      "--horizontalPadding",
+      this.horizontalPadding + "px"
+    );
+    bannerElmt.style.setProperty(
+      "--verticalPadding",
+      this.verticalPadding + "px"
+    );
+    bannerElmt.style.setProperty("--lineHeight", this.lineHeight + "%");
+    bannerElmt.style.setProperty("--borderRadius", this.borderRadius + "px");
+    bannerElmt.style.setProperty("--fontFamily", '"' + this.fontFamily + '"');
+    bannerElmt.style.setProperty(
+      "--firstLetterSize",
+      this.firstLetterSize / 100
+    );
+    bannerElmt.style.setProperty(
+      "--horizontalMargin",
+      this.horizontalMargin + "px"
+    );
+    bannerElmt.style.setProperty(
+      "--verticalMargin",
+      this.verticalMargin + "px"
+    );
+
+    bannerElmt.textContent = this.textContent;
+    return bannerElmt;
   }
-}
-
-class ShieldBlock {
-  constructor({} = {}) {}
-}
-
-class ShieldContainer {
-  constructor({} = {}) {}
 }
 
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
   variant = variant.replace(/\s/g, "");
 
-  let directory = "img/shields/";
+  let directory = "assets/shields/";
   const search = (dir, str) => {
     for (const category in dir) {
       const cat = dir[category];
       if (cat.type == "category") {
-        const catSearch = search(cat, str, category);
+        const catSearch = search(cat, str);
         if (catSearch != null) {
           return category + "/" + catSearch;
         }
@@ -166,7 +295,7 @@ Shield.prototype.getPropertiesFromName = (name) => {
     for (const category in dir) {
       const cat = dir[category];
       if (cat.type == "category") {
-        const catSearch = search(cat, str, category);
+        const catSearch = search(cat, str);
         if (catSearch != null) {
           return catSearch;
         }

@@ -1,36 +1,30 @@
 class CustomShields {
   constructor() {
-    this.db = new IndexDB();
+    this.db = IndexDBManager.getDatastore("customShields", {
+      keyPath: "fileName",
+    });
     this.uploadField = document.getElementById("shieldUploadField");
     this.fileInput = document.getElementById("uploadCustomShield");
     this.savedShieldsList = document.getElementById("savedCustomShieldsList");
     this.linkUploadInput = document.getElementById("linkUpload");
-
-    // Initialize asynchronously
     this.initialized = this.init();
   }
 
   async init() {
-    // Initialize drag and drop
     this.setupDragAndDrop();
 
-    // Initialize file input click
     this.uploadField.addEventListener("click", () => this.fileInput.click());
-
-    // Initialize file input change
     this.fileInput.addEventListener("change", (e) =>
-      this.handleFileUpload(e.target.files)
+      this.handleFileUpload(e.target.files),
     );
 
-    // Initialize URL input
     this.linkUploadInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         this.handleUrlUpload(e.target.value);
       }
     });
 
-    // Load existing shields
-    this.loadSavedShields();
+    await this.loadSavedShields();
   }
 
   setupDragAndDrop() {
@@ -62,10 +56,24 @@ class CustomShields {
       }
 
       try {
-        await this.db.saveShield(file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        const shield = await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            resolve({
+              fileName: file.name,
+              type: file.type,
+              data: reader.result,
+              dateAdded: new Date().toISOString(),
+            });
+          };
+          reader.onerror = (error) => reject(error);
+        });
+
+        await this.db.put(shield);
         await this.loadSavedShields();
       } catch (error) {
-        console.error("Error uploading file:", error);
         alert("Error uploading file. Please try again.");
       }
     }
@@ -78,7 +86,22 @@ class CustomShields {
       const fileName = url.split("/").pop();
       const file = new File([blob], fileName, { type: blob.type });
 
-      await this.db.saveShield(file);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      const shield = await new Promise((resolve, reject) => {
+        reader.onload = () => {
+          resolve({
+            fileName: file.name,
+            type: file.type,
+            data: reader.result,
+            dateAdded: new Date().toISOString(),
+          });
+        };
+        reader.onerror = (error) => reject(error);
+      });
+
+      await this.db.put(shield);
       await this.loadSavedShields();
       this.linkUploadInput.value = "";
     } catch (error) {
@@ -89,7 +112,7 @@ class CustomShields {
 
   async loadSavedShields(onShieldClick) {
     try {
-      const shields = await this.db.getAllShields();
+      const shields = await this.db.getAll();
       this.savedShieldsList.innerHTML = "";
 
       shields.forEach((shield) => {
@@ -109,7 +132,7 @@ class CustomShields {
           .addEventListener("click", async (e) => {
             e.stopPropagation();
             if (confirm("Are you sure you want to delete this shield?")) {
-              await this.db.deleteShield(shield.fileName);
+              await this.db.delete(shield.fileName);
               await this.loadSavedShields();
             }
           });

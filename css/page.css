@@ -257,8 +257,9 @@
   --textColor: rgb(0, 0, 0);
   --selectedColor: rgb(255, 255, 255);
   --hoverColor: rgb(255, 255, 255, 0.5);
-  --baseColor: 255,255,255;
-  --inputColor: 240,240,240;
+  --baseColor: 255, 255, 255;
+  --baseColorInv: 0, 0, 0;
+  --inputColor: 240, 240, 240;
 }
 
 :root[data-theme="dark"] {
@@ -267,8 +268,9 @@
   --textColor: rgb(247 249 251);
   --selectedColor: rgb(255, 255, 255, 0.25);
   --hoverColor: rgb(24 39 78);
-  --baseColor: 0,0,0;
-  --inputColor: 15,15,15;
+  --baseColor: 0, 0, 0;
+  --baseColorInv: 255, 255, 255;
+  --inputColor: 15, 15, 15;
 }
 
 * {
@@ -297,26 +299,28 @@ body {
 
 .mutcd-link {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: 0.75rem;
+  right: 0.75rem;
   z-index: 1000;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
   font-weight: 600;
   text-decoration: none;
   background-color: rgb(var(--inputColor));
   color: var(--textColor);
   border: 1px solid rgba(var(--baseColor), 0.35);
-  box-shadow: 0 0.25rem 0.45rem rgba(0, 0, 0, 0.15);
   transition: 0.15s ease-in-out;
+  font-size: 16px;
+  opacity: 0.4;
+  gap: 0.25rem;
+  transition: 0.1s ease-in-out opacity;
 }
 
 .mutcd-link:hover {
   background-color: var(--selectedColor);
-  transform: translateY(-1px);
+  opacity: 1;
 }
 
 main,
@@ -324,22 +328,51 @@ footer {
   z-index: 0;
 }
 
-main {
-  width: 100%;
-  height: 100vh;
+main#smRender {
+  width: max-content;
+  height: max-content;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
+  min-height: max(calc(100svh * var(--zoomLevelDec, 1)), 100svh);
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: 0.25s ease-in-out transform, 0.25s ease-in-out left;
+}
+
+main#smRender.wide {
+  left: 0;
+  transform: none;
+}
+
+main#smRender.modalOpen {
+  transform: translateX(50%);
+}
+
+body > footer img {
+  height: 100px;
+  margin: -10px 0 -10px -10px;
 }
 
 body > footer {
-  border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;
+  background-color: rgba(255, 255, 255, 0.1);
   padding: 0.5rem;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+  width: 100%;
+  position: relative;
+  transition: none;
+}
+
+body > footer > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5rem;
 }
 
 body > footer div:nth-child(1) {
@@ -347,32 +380,40 @@ body > footer div:nth-child(1) {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.25);
   width: max-content;
   padding: 0.5rem 1rem;
 }
 
 body > footer a {
-  background-color: rgba(255, 255, 255, 0.25);
+  color: var(--textColor);
+}
+
+body > footer > div:nth-child(2) a {
   border-radius: 0.1rem;
 
-  color: black;
+  background-color: rgb(255, 255, 255, 0.15);
   text-decoration: none;
 
-  display: inline-block;
-  margin: 0.25rem;
-  padding: 0 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  height: 100%;
+  width: 10rem;
 
   transition: 0.2s;
+  font-size: 16px;
+  text-align: right;
+  transition: 0.15s ease-in-out;
+}
+
+body > footer > div:nth-child(2) a:hover {
+  background-color: rgb(255, 255, 255, 0.5);
 }
 
 body > footer p {
   font-size: 16px;
-}
-
-body > footer a:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-  scale: 1.1;
 }
 
 h1,

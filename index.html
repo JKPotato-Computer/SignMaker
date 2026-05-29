@@ -9,20 +9,7 @@
       content="The ULTIMATE Sign Maker for highways, expressways, and everything!"
     />
     <title>Highway Sign Maker</title>
-    <script>
-      (function () {
-        if (
-          typeof window !== "undefined" &&
-          typeof window.matchMedia === "function" &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-        ) {
-          document.documentElement.dataset.theme = "dark";
-        } else {
-          document.documentElement.dataset.theme = "light";
-        }
-      })();
-    </script>
-    <link rel="icon" type="image/x-icon" href="img/other-symbols/icon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/other-symbols/icon.png" />
     <!-- CSS Links -->
     <link href="css/page.css" rel="stylesheet" type="text/css" />
     <link href="css/signs.css" rel="stylesheet" type="text/css" />
@@ -39,31 +26,54 @@
     />
     <!-- Page Links -->
     <script src="https://cdn.jsdelivr.net/gh/peterhry/CircleType@2.3.1/dist/circletype.min.js"></script>
-    <script src="js/HtmlToImage.js" type="text/javascript"></script>
-    <script src="js/lib.js" type="text/javascript"></script>
-    <script src="js/Shield.js" type="text/javascript"></script>
-    <script src="js/Sign.js" type="text/javascript"></script>
-    <script src="js/ExitTab.js" type="text/javascript"></script>
-    <script src="js/Panel.js" type="text/javascript"></script>
-    <script src="js/Post.js" type="text/javascript"></script>
-    <script src="js/Arrows.js" type="text/javascript"></script>
-    <script src="js/Control.js" type="text/javascript"></script>
-    <script src="js/SubPanels.js" type="text/javascript"></script>
-    <script src="js/form.js" type="text/javascript"></script>
-    <script src="js/IndexDB.js" type="text/javascript"></script>
-    <script src="js/CustomShields.js" type="text/javascript"></script>
-    <script src="js/main.js" type="text/javascript"></script>
+    <script src="js/packages/HtmlToImage.js" type="text/javascript"></script>
+    <script src="js/modules/StorageManager.js" type="text/javascript"></script>
+    <script src="js/elements/lib.js" type="text/javascript"></script>
+    <script src="js/elements/Shield.js" type="text/javascript"></script>
+    <script src="js/elements/Sign.js" type="text/javascript"></script>
+    <script src="js/elements/ExitTab.js" type="text/javascript"></script>
+    <script src="js/elements/Panel.js" type="text/javascript"></script>
+    <script src="js/elements/Post.js" type="text/javascript"></script>
+    <script src="js/elements/Arrows.js" type="text/javascript"></script>
+    <script src="js/elements/Control.js" type="text/javascript"></script>
+    <script src="js/elements/SubPanels.js" type="text/javascript"></script>
+    <script src="js/FormHandler.js" type="text/javascript"></script>
+    <script src="js/navigation/FormNavigation.js" text="text/javascript"></script>
+    <script src="js/modules/IndexDBManager.js" type="text/javascript"></script>
+    <script src="js/modules/CustomShields.js" type="text/javascript"></script>
+    <script src="js/modules/ImportExport.js" type="text/javascript"></script>
+    <script src="js/App.js" type="text/javascript"></script>
+    <script>
+      const applyTheme = (theme) => {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem("userTheme", theme);
+      };
+
+      applyTheme(
+        localStorage.getItem("userTheme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light")
+      );
+    </script>
   </head>
-  <body onload="app.init();">
+  <body onload="App.init();">
     <a
       class="mutcd-link"
       href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"
       target="_blank"
       rel="noopener noreferrer"
     >
+      <span class="material-symbols-outlined">open_in_new</span>
       MUTCD
     </a>
-    <main>
+    <div id="zoomControl">
+        <span>Zoom</span>
+        <button id="zoomOut" onclick="formHandler.zoom(-.25);"><span class="material-symbols-outlined">zoom_out</span></span></button>
+        <span id="zoomLevel">100%</span>
+        <button id="zoomIn" onclick="formHandler.zoom(.25);"><span class="material-symbols-outlined">zoom_in</span></button>
+      </div>
+    <main id="smRender">
       <div id="postContainer">
         <div class="post"></div>
         <div id="panelContainer"></div>
@@ -72,7 +82,7 @@
     </main>
     <div id="modalHolder">
       <dialog id="welcomeToSignMaker">
-        <img src="img/other-symbols/Banner.png" />
+        <img src="assets/other-symbols/Banner.png" />
         <h3>
           Welcome to SignMaker! <span class="warning">WORK IN PROGRESS</span>
         </h3>
@@ -104,14 +114,14 @@
             <button
               id="PNG"
               class="activated"
-              onclick="app.updateFileType(`png`)"
+              onclick="App.updateFileType(`png`)"
             >
               PNG
             </button>
-            <button id="SVG" class="" onclick="app.updateFileType(`png`)">
+            <button id="SVG" class="" onclick="App.updateFileType(`png`)">
               SVG
             </button>
-            <button id="JSON" class="" onclick="app.updateFileType(`json`)">
+            <button id="JSON" class="" onclick="App.updateFileType(`json`)">
               JSON
             </button>
           </div>
@@ -122,7 +132,7 @@
             id="entirePost"
             name="entirePost"
             value="entirePost"
-            onchange="app.updatePreview();"
+            onchange="ImportExport.updatePreview();"
             checked=""
           />
           <br />
@@ -132,7 +142,7 @@
               type="number"
               id="selectPanel"
               name="selectPanel"
-              onchange="app.updatePreview();"
+              onchange="ImportExport.updatePreview();"
               min="1"
               step="1"
               value="1"
@@ -141,7 +151,7 @@
           </div>
           <div class="options">
             <button id="cancelDownload">Cancel</button>
-            <button id="download" onclick="app.downloadSign()">Download</button>
+            <button id="download" onclick="ImportExport.downloadSign()">Download</button>
           </div>
         </div>
         <div id="downloadPreview"></div>
@@ -165,7 +175,7 @@
             <div id="shieldUploadField">
               <span class="material-symbols-outlined">attach_file</span>
               <span>Drag and drop a file or click to upload</span>
-              <input type="file" id="uploadCustomShield" style="display: none;"/>
+              <input type="file" id="uploadCustomShield" />
             </div>
             <div class="shieldUploadDisclaimer">Files are only saved <b>on the client side</b> using IndexedDB. <b>No files whatsoever are sent over the server. (and neither is anything really lol)</b></div>
             <label for="linkUpload" class="noLabelAlignment">OR Image URL:</label>
@@ -174,14 +184,14 @@
             <h3>Saved Images</h3>
             <div id="savedCustomShieldsList">
               <div class="customShieldItem">
-                <img src="img/shields/United States/I-2Digit.svg" class="shieldItemImg">
+                <img src="assets/shields/United States/I-2Digit.svg" class="shieldItemImg">
                 <span class="shieldItemName">Custom Shield 1</span>
                 <button class="deleteCustomShieldBtn">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
               <div class="customShieldItem selected">
-                <img src="img/shields/United States/I-2Digit.svg" class="shieldItemImg">
+                <img src="assets/shields/United States/I-2Digit.svg" class="shieldItemImg">
                 <span class="shieldItemName">Custom Shield 2</span>
                 <button class="deleteCustomShieldBtn">
                   <span class="material-symbols-outlined">delete</span>
@@ -191,7 +201,7 @@
           </div>
         </div>
         <div class="shieldPreview">
-          <img class="selectedShieldPreview" src="/img/shields/United States/I-2Digit.svg" />
+          <img class="selectedShieldPreview" src="/assets/shields/United States/I-2Digit.svg" />
           <br />
           <span class="selectedShieldName">Interstate</span>
           <br />
@@ -228,45 +238,58 @@
               <span class="material-symbols-outlined">signpost</span> Post
               Settings
             </div>
-            <div data-tab="sMPostSettings" class="sMModalTab selected">
+            <a tabindex="0" data-tab="sMPostSettings" class="sMModalTab selected">
               Settings
-            </div>
+            </a>
           </nav>
           <div class="sMModalContent">
             <div id="sMPostSettings">
-              <div>
+               <label for="postVariant"
+                data-toolTip="Variant of post/gantry"
+                >Variant:</label>
+                <select id="postVariant" class="sdTextEditorWide" onchange="formHandler.readForm()"></select>
+                <br />
                 <label
                   for="postPosition"
                   data-toolTip="Controls the kind of post or gantry that will display on the screen."
-                  >Post Kind:
+                  id="postPositionLabel"
+                  >Orientation:
                 </label>
                 <select
                   id="postPosition"
                   onchange="formHandler.readForm();"
                 ></select>
-                <br />
                 <label
                   for="postColor"
                   data-toolTip="Sets the color of the posts and supports."
-                  >Post Color:
+                  >Color:
                 </label>
                 <select
                   id="postColor"
                   onchange="formHandler.readForm();"
                 ></select>
                 <br />
-                <div class="postThicknessControl">
-                  <label for="postThicknessValue">Post Thickness (rem):</label>
-                  <input
+                <label for="postThicknessValue">Thickness (rem):</label>
+                <input
                     type="number"
                     id="postThicknessValue"
                     min="0"
-                    step="0.25"
+                    step=".01"
                     value="1"
-                  />
-                </div>
+                    onblur="formHandler.readForm()"
+                />
+                <label for="postCornerRadius" id="postCornerRadiusLabel">Corner Radius (%):</label>
+                <input
+                    type="number"
+                    id="postCornerRadius"
+                    min="0"
+                    max="50"
+                    step="1"
+                    value="30"
+                    onblur="formHandler.readForm()"
+                />
                 <br />
-                <label for="showPost" id="showPostLabel"> Hide Post: </label>
+                <label for="showPost"> Post Visibility:</label>
                 <input
                   type="checkbox"
                   id="showPost"
@@ -274,7 +297,18 @@
                   value="showPost"
                   onchange="formHandler.readForm();"
                 />
-              </div>
+                <label for="offsetPost" data-toolTip="Offset the top of the panel by 1rem" id="offsetPostLabel">Offset Post:</label>
+                <input type="checkbox" id="offsetPost" onchange="formHandler.readForm()"  />
+                <br />
+                <label for="postSpacing" id="postSpacingLabel" >Spacing Multiplier:</label>
+                <input
+                    type="number"
+                    id="postSpacing"
+                    min=".5"
+                    step=".01"
+                    value="1"
+                    onblur="formHandler.readForm()"
+                />
             </div>
           </div>
         </div>
@@ -286,10 +320,10 @@
             <div class="sMModalTitle">
               <span class="material-symbols-outlined">tune</span> Panel Style
             </div>
-            <div data-tab="sMPanelAppearance" class="sMModalTab selected">
+            <a tabindex="0" data-tab="sMPanelAppearance" class="sMModalTab selected">
               Appearance
-            </div>
-            <div data-tab="sMPanelPadding" class="sMModalTab">Padding</div>
+            </a>
+            <a tabindex="0" data-tab="sMPanelPadding" class="sMModalTab">Padding</a>
           </nav>
           <div class="sMModalContent">
             <div id="sMPanelAppearance">
@@ -369,7 +403,7 @@
                 <button
                   id="resetPadding"
                   class="resetClass"
-                  onclick="app.resetPadding();"
+                  onclick="App.resetPadding();"
                 >
                   Reset to Default
                 </button>
@@ -395,14 +429,9 @@
                 </div>
               </div>
               <div class="listNavOptions">
-                <label class="listNavLabel" id="exitTabControlsLabel">Exit Tab Controls</label>
-                <button id="addNestedExitTab" onclick="app.newNestExitTab();">
-                  Nest Exit Tab
-                </button>
-                <button onclick="app.deleteNestExitTab();">Remove Nest Exit Tab</button>
-                <button onclick="app.newExitTab();">+</button>
-                <button onclick="app.removeExitTab();">-</button>
-                <button onclick="app.duplicateExitTab();">
+                <button onclick="App.newExitTab();"><span class="material-symbols-outlined">add</span></button>
+                <button onclick="App.removeExitTab();"><span class="material-symbols-outlined">remove</span></button>
+                <button onclick="App.duplicateExitTab();">
                   <span class="material-symbols-outlined">content_copy</span>
                 </button>
                 <label for="exitTabNumber">No:</label>
@@ -412,16 +441,16 @@
                   name="exitTabNumber"
                   placeholder="1"
                   step="1"
-                  onchange="app.changeEditingExitTab(Math.floor(document.getElementById(parseInt(this.value.toString().split(`:`)[0]),parseInt(this.value.toString().split(`:`)[1]))));"
+                  onchange="App.changeEditingExitTab(Math.floor(document.getElementById(parseInt(this.value.toString().split(`:`)[0]),parseInt(this.value.toString().split(`:`)[1]))));"
                   min="1"
                 />
               </div>
             </nav>
           </nav>
           <nav class="sMModalBar sMModalSubBar">
-            <div data-tab="sMExitTabSetting" class="sMModalTab selected">
+            <a tabindex="0" data-tab="sMExitTabSetting" class="sMModalTab selected">
               Settings
-            </div>
+            </a>
           </nav>
           <div class="sMModalContent">
             <div id="sMExitTabSetting">
@@ -641,6 +670,7 @@
                 >
               </div>
             </div>
+            <button onclick="App.deleteNestExitTab();">Remove Nest Exit Tab</button>
           </div>
         </div>
         <div
@@ -657,19 +687,12 @@
                 class="scrollMenu horizontal-scroll-on-wheel"
                 id="subPanelList"
               >
-                <button
-                  id="global"
-                  onclick="app.changeEditingSubPanel(-1);"
-                  class=""
-                >
-                  Global
-                </button>
                 <button id="sub_edit1" class="active">SubPanel 1</button>
               </div>
               <div class="listNavOptions">
-                <button onclick="app.newSubPanel();">+</button>
-                <button onclick="app.removeSubPanel();">-</button>
-                <button onclick="app.duplicateSubPanel();">
+                <button onclick="App.newSubPanel();">+</button>
+                <button onclick="App.removeSubPanel();">-</button>
+                <button onclick="App.duplicateSubPanel();">
                   <span class="material-symbols-outlined">content_copy</span>
                 </button>
                 <label for="subPanelNumber">No:</label>
@@ -679,18 +702,18 @@
                   name="subPanelNumber"
                   placeholder="1"
                   step="1"
-                  onchange="app.changeEditingSubPanel(Math.floor(document.getElementById(this.value - 1)));"
+                  onchange="App.changeEditingSubPanel(Math.floor(document.getElementById(this.value - 1)));"
                   min="1"
                 />
               </div>
             </nav>
           </nav>
           <nav class="sMModalBar sMModalSubBar">
-            <div data-tab="sMSPBlocks" class="sMModalTab selected">
+            <a tabindex="0" data-tab="sMSPBlocks" class="sMModalTab selected">
               Block Elements
-            </div>
-            <div data-tab="sMSPShield" class="sMModalTab">Shields</div>
-            <div data-tab="sMSPExtra" class="sMModalTab">Extra Settings (depreciate soon)</div>
+            </a>
+            <a tabindex="0" data-tab="sMSPShield" class="sMModalTab">Shields</a>
+            <a tabindex="0" data-tab="sMSPExtra" class="sMModalTab">Extra Settings (depreciate soon)</a>
           </nav>
           <div class="sMModalContent">
             <div id="sMSPShield" class="tabHidden">
@@ -699,36 +722,51 @@
                 <input
                   type="button"
                   value="New Shield"
-                  onclick="app.newShield();"
+                  onclick="App.newShield();"
                 />
                 <input
                   id="clear"
                   type="button"
                   value="Clear all Shields"
-                  onclick="app.clearShields();"
+                  onclick="App.clearShields();"
                 />
                 <br />
                 <br />
-                <!-- Control Cities Revision -->
               </div>
 
               <div id="smSPShieldEditor">
+                <div id="smPShieldGroupSelector">
+                  <div>
+                    <span>Select a shield group from <b>Block Elements</b> to modify:</span>
+                    <button onclick="App.newShieldGroup();"><span class="material-symbols-outlined">add</span>New Shield Group</button>
+                  </div>
+                  <div id="shieldGroupList">
+                    <button class="selected">Shield Group 1 (Row 1)</button>
+                    <button>Shield Group 2 (Row 1)</button>
+                    <button>Shield Group 3 (Row 2)</button>
+                  </div>
+                </div>
                 <div id="smSPShieldHeader">
                   <span id="smSPShieldSelectLabel">Selected: Shield 1</span>
-                  <button id="smSPCreateShield" onclick="app.newShield();">
+                  <button id="smSPCreateShield" onclick="App.newShield();">
                     <span class="material-symbols-outlined">add</span> New
                   </button>
-                  <button id="smSPDuplicateShield" onclick="app.dupRow();">
+                  <button id="smSPDuplicateShield" onclick="App.dupRow();">
                     <span class="material-symbols-outlined">content_copy</span>
                     Duplicate
                   </button>
                   <button
                     id="smSPDeleteShield"
-                    onclick="app.delRow();"
+                    onclick="App.delRow();"
                     disabled
                   >
                     <span class="material-symbols-outlined">delete</span>
                     Selected
+                  </button>
+                  <button
+                    id="smSPGroupShields"
+                  >
+                    Group With Next Shield
                   </button>
                 </div>
 
@@ -748,7 +786,7 @@
                         </button>
                         <span class="smSPShieldBlock"
                           ><img
-                            src="img/shields/AZ-2.svg"
+                            src="assets/shields/AZ-2.svg"
                             class="smSPShieldVisual"
                           />AZ-45</span
                         >
@@ -761,7 +799,7 @@
                         </button>
                         <span class="smSPShieldBlock"
                           ><img
-                            src="img/shields/TX-2-TOLL.svg"
+                            src="assets/shields/TX-2-TOLL.svg"
                             class="smSPShieldVisual"
                           />TX-45 TOLL</span
                         >
@@ -774,7 +812,7 @@
                         </button>
                         <span class="smSPShieldBlock"
                           ><img
-                            src="img/shields/United States/I-2Digit.svg"
+                            src="assets/shields/United States/I-2Digit.svg"
                             class="smSPShieldVisual"
                           />I-35E</span
                         >
@@ -789,7 +827,7 @@
                     </button>
                     <span class="smSPShieldBlock"
                       ><img
-                        src="img/shields/United States/I-2Digit.svg"
+                        src="assets/shields/United States/I-2Digit.svg"
                         class="smSPShieldVisual"
                       />I-35</span
                     >
@@ -797,12 +835,12 @@
                 </div>
 
                 <div id="smSPShieldProperties">
-                  <h4>Image Configuration</h4>
                   <div id="smSPShieldImgConfig">
+                    
                     <div>
                       <div id="smSPShieldImgPreview">
                         <img
-                          src="img/shields/United States/I-2Digit.svg"
+                          src="assets/shields/United States/I-2Digit.svg"
                           class="smSPShieldLargeVisual"
                         />
                       </div>
@@ -825,6 +863,16 @@
                         placeholder=""
                         id="spShield_designation"
                       />
+                      <br />
+                      <label for="spShield_scale">Scale: </label>
+                      <input
+                        type="range"
+                        min="0"
+                        value="1"
+                        step=".01"
+                        id="spShield_scale"
+                      />
+                      <input id="spShield_scaleVal" class="smallVal" type="number" value="1" step=".01"  />
                       <br />
                       <br />
                       <button id="smSPShieldAdvanced">
@@ -922,11 +970,67 @@
                       </div>
                     </div>
                   </div>
+                  <div id="smSPShieldBannerConfig">
+                    <div id="smSP_bannerMaster">
+                      <div class="smSP_bannerElement">
+                        <button class="smSP_deleteBanner">X</button>
+                        <div class="smSP_bannerEditor">
+                          <div>
+                            <input
+                              type="text"
+                              id="smSPBanner_textContent"
+                              placeholder="BANNER"
+                            >
+                            <select id="smSPBanner_bgColor" data-toolTip="Background Color"><option>Panel Color</option></select>
+                            <select id="smSPBanner_fontFamily" data-toolTip="Font Family"><option>Clearview 5WR</option></select>
+                            <select id="smSPBanner_position" data-toolTip="Position"><option>Top</option></select>
+                          </div>
+                          <div>
+                            <div>
+                              <div>
+                                <span>1st Letter Size (%):</span>
+                              <input type="number" id="smSPBanner_firstLetterScale" placeholder="120" value="120" />
+                              </div>
+
+                              <div>
+                                <span>Font Size (rem):</span>
+                                <input type="number" id="smSPBanner_fontSize"  placeholder="1.2" value="1.2" min="0" step="0.01" />
+                              </div>
+                            </div>
+                            <div>
+                              <div>
+                                <span>Line Height (%):</span>
+                                <input type="number" id="smSPBanner_lineHeight" placeholder="100" value="100" />
+                              </div>
+                              <div>
+                                <span>Horiz/Vert Margins (px):</span>
+                                <input type="number" class="halfSizeInput" id="smSPBanner_horizontalMargins" placeholder="0" value="0" min="0" step="1" />
+                                <span>/</span>
+                                <input type="number" class="halfSizeInput" id="smSPBanner_verticalMargins" placeholder="0" value="0" min="0" step="1" />
+                              </div>
+                            </div>
+                            <div>
+                              <div>
+                                <span>Border Radius (px):</span>
+                                <input type="number" id="smSPBanner_borderRadius" placeholder="120" value="120" min="0" step="1" />
+                              </div>
+                              <div>
+                                <span>Horiz/Vert Padding (px):</span>
+                                <input type="number" class="halfSizeInput" id="smSPBanner_horizontalPadding" placeholder="0" value="0" min="0" step="1" />
+                                <span>/</span>
+                                <input type="number" class="halfSizeInput" id="smSPBanner_verticalPadding" placeholder="0" value="0" min="0" step="1" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="smSPShieldBannerController">
+                      <button id="smSPShieldAddBanner">Add Banner</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <label for="sdShield_direction">Shield Direction:</label>
-              <select id="sdShield_direction"></select>
             </div>
             <div id="sMSPBlocks" class="">
               <div id="sMSPTextEditor">
@@ -934,17 +1038,17 @@
                   <span id="SMSPSelectLabel">Selected: Row 1</span>
                   <button
                     id="sMSPCreateRow"
-                    onclick="app.newRow(document.querySelector('#sMSPElementSelect').value);"
+                    onclick="App.newRow(document.querySelector('#sMSPElementSelect').value);"
                   >
                     <span class="material-symbols-outlined">add</span> New
                   </button>
-                  <button id="sMSPDuplicateRow" onclick="app.dupRow();">
+                  <button id="sMSPDuplicateRow" onclick="App.dupRow();">
                     <span class="material-symbols-outlined">content_copy</span>
                     Duplicate
                   </button>
                   <button
                     id="sMSPDeleteSelectedRow"
-                    onclick="app.delRow();"
+                    onclick="App.delRow();"
                     disabled
                   >
                     <span class="material-symbols-outlined">delete</span>
@@ -980,13 +1084,13 @@
                     <select id="sMSPElementSelect" style="width: 30%"></select>
                     <button
                       id="sMSPCreateElement"
-                      onclick="app.newControlElem(document.querySelector('#sMSPElementSelect').value);"
+                      onclick="App.newControlElem(document.querySelector('#sMSPElementSelect').value);"
                     >
                       <span class="material-symbols-outlined">add</span> Add
                     </button>
                     <button
                       id="sMSPDeleteSelectedBlock"
-                      onclick="app.delControlElem();"
+                      onclick="App.delControlElem();"
                     >
                       <span class="material-symbols-outlined" disabled
                         >delete</span
@@ -1145,20 +1249,25 @@
                     <input type="checkbox" id="sdBlocker_visible" />
                   </div>
 
-                  <div data-property="sdShield" class="hidden">
-                    <label for="sdShield_shieldBase">Shield: </label>
+                  <div data-property="sdShieldGroup" class="hidden">
+                    <button id="sdShieldGroup_OpenShieldEditor">Open Shield Editor</button>
+                    <label for="sdShieldGroup_alignment">Alignment: </label>
                     <select
-                      id="sdShield_shieldBase"
-                      data-toolTip="Shield Type"
+                      id="sdShieldGroup_alignment"
                     ></select>
+                    <label for="sdShieldGroup_direction">Shield Direction: </label>
                     <select
-                      id="sdShield_shieldType"
-                      data-toolTip="Shield Variant"
+                      id="sdShieldGroup_direction"
                     ></select>
+                    <br />
+                    <label for="sdShieldGroup_gap">Gap: </label>
                     <input
-                      type="text"
-                      id="sdShield_routeNumber"
-                      data-toolTip="Route Number"
+                      type="number"
+                      id="sdShieldGroup_gap"
+                      placeholder=".5"
+                      min="0"
+                      value=".5"
+                      step=".01"
                     />
                   </div>
 
@@ -1347,10 +1456,12 @@
                     />
                     <label for="sdBeacon_color">Color: </label>
                     <select id="sdBeacon_color"></select>
+                    <br />
                     <label for="sdBeacon_backplate">Backplate:</label>
                     <input type="checkbox" id="sdBeacon_backplate" />
                     <label for="sdBeacon_flashOpposite">Flash Opposite:</label>
                     <input type="checkbox" id="sdBeacon_flashOpposite" />
+                    <br />
                     <label for="sdBeacon_alignment">Alignment: </label>
                     <select id="sdBeacon_alignment"></select>
                   </div>
@@ -1405,6 +1516,9 @@
                       step="0.01"
                       value="1.75"
                     />
+                    <label for="sdArrow_alignment">Alignment: </label>
+                    <select id="sdArrow_alignment"></select>
+                    <br />
                     <label for="sdArrow_paddingHorizontal">Horizontal Padding (rem):</label>
                     <input
                       type="number"
@@ -1645,8 +1759,10 @@
                 </div>
                 <div id="smSPBlockProperties">
                   <h4>Block Properties</h4>
-                  <label for="sdBlock_topPadding">Top Margin (rem): </label>
-                  <input
+                  <div>
+                    <label for="sdBlock_topPadding" class="noLabelAlignment">Top Margin (rem): </label>
+                    <div>
+                      <input
                     type="range"
                     min="0"
                     max="3"
@@ -1654,11 +1770,15 @@
                     step=".01"
                     id="sdBlock_topPadding"
                   />
-                  <input id="sdBlock_topPaddingVal" class="smallVal" type="number" value="0" step=".01"  />
-                  <label for="sdBlock_bottomPadding"
-                    >Bottom Margin (rem):
+                   <input id="sdBlock_topPaddingVal" class="smallVal" type="number" value="0" step=".01"  />
+                    </div>
+                  </div>
+                  <div>
+                  <label for="sdBlock_bottomPadding" class="noLabelAlignment"
+                    >Bottom Margin (rem): 
                   </label>
-                  <input
+                 <div>
+                   <input
                     type="range"
                     min="0"
                     max="3"
@@ -1667,6 +1787,8 @@
                     id="sdBlock_bottomPadding"
                   />
                   <input id="sdBlock_bottomPaddingVal" class="smallVal" type="number" value="0" step=".01"  />
+                 </div>
+                  </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
                   <select id="sdBlock_backgroundColor"></select>
@@ -1774,20 +1896,6 @@
             </div>
             <div id="sMSPExtra" class="tabHidden">
               <div>
-                <legend>Global Positioning</legend>
-                <label
-                  for="globalPosition"
-                  id="globalPositionLabel"
-                  class="invisible"
-                  >Global Position:</label
-                >
-                <select
-                  id="globalPosition"
-                  class="invisible"
-                  onchange="formHandler.readForm();"
-                ></select>
-              </div>
-              <div>
                 <legend>Extra Subpanel Settings</legend>
                 <label
                   for="subPanelHeight"
@@ -1831,10 +1939,10 @@
               <span class="material-symbols-outlined">explore</span> Guide
               Arrows
             </div>
-            <div data-tab="sMStandardArrows" class="sMModalTab selected">
+            <a tabindex="0" data-tab="sMStandardArrows" class="sMModalTab selected">
               Standard Arrows
-            </div>
-            <div data-tab="sMAPL" class="sMModalTab">APL (Arrow Per Lane)</div>
+            </a>
+            <a tabindex="0" data-tab="sMAPL" class="sMModalTab">APL (Arrow Per Lane)</a>
           </nav>
           <div class="sMModalContent">
             <div id="sMStandardArrows">
@@ -2017,28 +2125,24 @@
           </div>
         </div>
       </div>
-      <nav id="sMConfigBar" data-current-menu="postConfig">
+      <nav id="sMConfigBar" data-current-menu="">
         <button
           id="postConfig"
           class="sMConfigOption"
           data-toolTip="Post Settings"
         >
           <span class="material-symbols-outlined"> signpost </span>
-          <span>Post Settings</span>
         </button>
         <div class="sMConfigOption" data-toolTip="Current Panel">
           <div id="panelSelector" class="hitbox"></div>
           <span id="currentlySelectedPanel">Panel 1</span>
           <span class="material-symbols-outlined"> expand_more </span>
           <div id="panelSelect" class="panelSelector">
-            <div class="panelPopoverHeader">
-              <h5>Panels</h5>
-              <span class="panelPopoverHint">Drag to reorder</span>
-            </div>
+            <span class="panelPopoverHint">(Drag to reorder)</span>
             <div class="panelActions">
-              <button id="newPanel" class="new">Add Panel</button>
+              <button class="new" onclick="App.newPanel();">Add Panel</button>
               <!--<button id="duplicatePanel" class="dup">Duplicate</button>-->
-              <button id="deletePanel" class="del">Remove</button>
+              <button class="del" onclick="App.deletePanel();">Remove</button>
             </div>
             <div id="panelList" class="panelList"></div>
             <div class="panelSpacingControl">
@@ -2051,6 +2155,7 @@
                   max="4"
                   step="0.25"
                   value="0"
+                  onchange="formHandler.readForm();"
                 />
                 <input
                   type="number"
@@ -2060,6 +2165,7 @@
                   max="4"
                   step="0.25"
                   value="0"
+                  onblur="formHandler.readForm();"
                 />
               </div>
             </div>
@@ -2084,7 +2190,7 @@
         <button id="export" class="sMConfigOption" data-toolTip="Export">
           <span class="material-symbols-outlined"> download </span>
         </button>
-        <button id="nightMode" class="sMConfigOption" data-toolTip="Dark Mode">
+        <button id="nightMode" class="sMConfigOption" data-toolTip="Night Mode">
           <span class="material-symbols-outlined"> dark_mode </span>
         </button>
         <button id="hideConfig" class="sMConfigOption" data-toolTip="Hide">
@@ -2092,27 +2198,29 @@
         </button>
       </nav>
     </form>
-    <footer>
+    <footer id="signMakerFooter">
       <div>
-        <img src="img/other-symbols/icon.png" height="50" />
+        <img src="assets/other-symbols/icon.png"/>
         <div>
           <h3>Highway Sign Maker (v2.2)</h3>
-          <p>made by JK_Potato/Computer</p>
-          <p>forked from dki-os/SignMaker</p>
+          <p>made by JK_Potato/Computer & the community</p>
+          <p>forked from <a
+          href="https://github.com/dki-os/SignMaker"
+          target="_blank"
+          >dki-os/SignMaker</a
+        ></p>
         </div>
       </div>
       <div>
         <a
-          style="font-size: 1rem"
           href="https://github.com/JKPotato-Computer/SignMaker"
           target="_blank"
-          >GitHub Page</a
+          > <span class="material-symbols-outlined">folder_code</span>GitHub Page</a
         >
-        <a
-          style="font-size: 1rem"
-          href="https://github.com/dki-os/SignMaker"
+         <a
+          href="https://github.com/JKPotato-Computer/SignMaker/wiki"
           target="_blank"
-          >OG GitHub Page</a
+          > <span class="material-symbols-outlined">docs</span>Documentation</a
         >
       </div>
     </footer>

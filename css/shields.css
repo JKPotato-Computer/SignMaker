@@ -1,662 +1,761 @@
-.bannerShieldContainer.I .routeNumber {
-	color: var(--white);
-	top: .16em;
-	font-size: 2em;
-}
-.bannerShieldContainer.I.one .routeNumber,
-.bannerShieldContainer.I.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.I.three .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.I.bus .banner {
-	display: none;
+.shield.I .routeNumber,
+.shield.I-BUS .routeNumber {
+  color: var(--white);
+  top: 0.16em;
+  font-size: 2em;
 }
 
-.bannerShieldContainer.US .routeNumber,
-.bannerShieldContainer.NS.two .routeNumber,
-.bannerShieldContainer.NS.one .routeNumber,
-.bannerShieldContainer.cir .routeNumber,
-.bannerShieldContainer.elp .routeNumber,
-.bannerShieldContainer.rec .routeNumber,
-.bannerShieldContainer.rec2 .routeNumber {
-	color: var(--black);
-    font-size: 2.2em;
-	font-family: "Series D";
-	top: 0em;
+.shield.I.OneDigit .routeNumber,
+.shield.I.TwoDigit .routeNumber,
+.shield.I-BUS.OneDigit .routeNumber,
+.shield.I-BUS.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.I.ThreeDigit .routeNumber,
+.shield.I-BUS.ThreeDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.I-BUS .banner {
+  display: none;
 }
 
-.bannerShieldContainer.C .routeNumber {
-	color: var(--countyYellow);
-	font-size: 1.4em;
-	top: 0.1em;
+.shield.I .designation,
+.shield.I-BUS .designation {
+  top: 2.25em;
+  font-family: "Series D";
+  font-size: .45em;
 }
-.bannerShieldContainer.C.one .routeNumber,
-.bannerShieldContainer.Ctwo .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.C.three .routeNumber {
-	font-family: "Series C";
-	font-size: 1.3em;
+.shield.I:has(.designation) .routeNumber,
+.shield.I-BUS:has(.designation) .routeNumber {
+  top: .525em;
 }
 
-.bannerShieldContainer.AL .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0;
-	font-size: 1.5em;
+.shield.US .routeNumber,
+.shield.NS.TwoDigit .routeNumber,
+.shield.NS.OneDigit .routeNumber,
+.shield.cir .routeNumber,
+.shield.elp .routeNumber,
+.shield.rec .routeNumber,
+.shield.rec2 .routeNumber {
+  color: var(--black);
+  font-size: 2.2em;
+  font-family: "Series D";
+  top: 0em;
 }
 
-.bannerShieldContainer.AK .routeNumber {
-	color: var(--black);
-	top: 0.27em;
+.shield.C .routeNumber {
+  color: var(--countyYellow);
+  font-size: 1.4em;
+  top: 0.1em;
 }
-.bannerShieldContainer.AK.one .routeNumber {
-	font-family: "Series E";
-	text-align: center;
-	left: 0.35em;
+.shield.C.OneDigit .routeNumber,
+.shield.Ctwo .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.AK.two .routeNumber,
-.bannerShieldContainer.AK.three .routeNumber {
-	font-family: "Series C";
-	text-align: right;
-	right: 0.25em;
+.shield.C.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.3em;
 }
 
-.bannerShieldContainer.AZ .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.2em;
-	font-size: 1.5em;
-}
-.bannerShieldContainer.AZ.loop.three .banner {
-	display: none;
+.shield.AL .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0;
+  font-size: 1.5em;
 }
 
-.bannerShieldContainer.AR .routeNumber {
-	color: var(--black);
-	top: 0.15em;
-	right: 0.125em;
-	font-size: 1.5em;
+.shield.AK .routeNumber {
+  color: var(--black);
+  top: 0.27em;
 }
-.bannerShieldContainer.AR.one .routeNumber,
-.bannerShieldContainer.AR.two .routeNumber {
-	font-family: "Series D";
+.shield.AK.OneDigit .routeNumber {
+  font-family: "Series E";
+  text-align: center;
+  left: 0.35em;
 }
-.bannerShieldContainer.AR.three .routeNumber {
-	font-family: "Series C";
-	right: 0.15em;
-}
-
-.bannerShieldContainer.CA .routeNumber {
-	color: var(--white);
-	font-family: "Series D";
-	top: 0.45em;
-	font-size: 1.4em;
+.shield.AK.TwoDigit .routeNumber,
+.shield.AK.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  text-align: right;
+  right: 0.25em;
 }
 
-.bannerShieldContainer.CO .routeNumber {
-	color: var(--black);
-	font-size: 1.3em;
-	top: 0.7em;
+.shield.AZ .routeNumber,
+.shield.AZLOOP .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.2em;
+  font-size: 1.5em;
 }
-.bannerShieldContainer.CO.one .routeNumber,
-.bannerShieldContainer.CO.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.CO.three .routeNumber {
-	font-family: "Series C";
+.shield.AZLOOP.ThreeDigit .banner {
+  display: none;
 }
 
-.bannerShieldContainer.DC .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	font-size: 1em;
-	top: 0.85em;
+.shield.AR .routeNumber {
+  color: var(--black);
+  top: 0.15em;
+  right: 0.125em;
+  font-size: 1.5em;
+}
+.shield.AR.OneDigit .routeNumber,
+.shield.AR.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.AR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  right: 0.15em;
 }
 
-.bannerShieldContainer.FL .routeNumber {
-	color: var(--black);
-	top: 0.3em;
-	right: 0.15em;
-	font-size: 1.5em;
-}
-.bannerShieldContainer.FL.one .routeNumber,
-.bannerShieldContainer.FL.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.FL.three .routeNumber {
-	font-family: "Series C";
-}
-.bannerShieldContainer.FL.toll .banner {
-	display: none;
-}
-.bannerShieldContainer.FL.toll .routeNumber {
-	font-family: "Series C";
-	font-size: 1em;
-	top: 0.85em;
+.shield.CA .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  top: 0.45em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.GA .routeNumber {
-	color: var(--black);
-	top: 0.3em;
+.shield.CO .routeNumber {
+  color: var(--black);
+  font-size: 1.3em;
+  top: 0.7em;
 }
-.bannerShieldContainer.GA.one .routeNumber,
-.bannerShieldContainer.GA.two .routeNumber {
-	font-family: "Series D";
+.shield.CO.OneDigit .routeNumber,
+.shield.CO.TwoDigit .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.GA.three .routeNumber {
-	font-family: "Series C";
-}
-.bannerShieldContainer.GA.alt .banner,
-.bannerShieldContainer.GA.byp .banner,
-.bannerShieldContainer.GA.conn .banner,
-.bannerShieldContainer.GA.loop .banner,
-.bannerShieldContainer.GA.spur .banner {
-	display: none;
+.shield.CO.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }
 
-.bannerShieldContainer.HI .routeNumber {
-	color: var(--black);
-	font-size: 1.35em;
-}
-.bannerShieldContainer.HI.one .routeNumber,
-.bannerShieldContainer.HI.two .routeNumber {
-	font-family: "Series D";
-	top: 0.3em;
-}
-.bannerShieldContainer.HI.three .routeNumber {
-	font-family: "Series C";
-	font-size: 1.15em;
-	top: 0.6em;
+.shield.DC .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1em;
+  top: 0.85em;
 }
 
-.bannerShieldContainer.ID .routeNumber {
-	font-family: "Series C";
-	text-align: right;
-	top: -0.15em;
-	font-size: 1.25em;
+.shield.FL .routeNumber,
+.shield.FLToll .routeNumber,
+.shield.FLTURNPIKE .routeNumber,
+.shield.FLCFXToll .routeNumber {
+  color: var(--black);
+  top: 0.3em;
+  right: 0.15em;
+  font-size: 1.5em;
 }
-.bannerShieldContainer.ID.one .routeNumber,
-.bannerShieldContainer.ID.two .routeNumber {
-	right: 0.3em;
+.shield.FL.OneDigit .routeNumber,
+.shield.FL.TwoDigit .routeNumber,
+.shield.FLToll.OneDigit .routeNumber,
+.shield.FLToll.TwoDigit .routeNumber,
+.shield.FLTURNPIKE.OneDigit .routeNumber,
+.shield.FLTURNPIKE.TwoDigit .routeNumber,
+.shield.FLCFXToll.OneDigit .routeNumber,
+.shield.FLCFXToll.TwoDigit .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.ID.three .routeNumber {
-	font-size: 1.15em;
-	right: 0.2em;
+.shield.FL.ThreeDigit .routeNumber,
+.shield.FLToll.ThreeDigit .routeNumber,
+.shield.FLTURNPIKE.ThreeDigit .routeNumber,
+.shield.FLCFXToll.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+.shield.FLToll .banner {
+  display: none;
+}
+.shield.FLToll .routeNumber {
+  font-family: "Series C";
+  font-size: 1em;
+  top: 0.85em;
+}
+
+.shield.GA .routeNumber,
+.shield.GAALT .routeNumber,
+.shield.GABYP .routeNumber,
+.shield.GACONN .routeNumber,
+.shield.GALOOP .routeNumber,
+.shield.GASPUR .routeNumber {
+  color: var(--black);
+  top: 0.3em;
+}
+.shield.GA.OneDigit .routeNumber,
+.shield.GA.TwoDigit .routeNumber,
+.shield.GAALT.OneDigit .routeNumber,
+.shield.GAALT.TwoDigit .routeNumber,
+.shield.GABYP.OneDigit .routeNumber,
+.shield.GABYP.TwoDigit .routeNumber,
+.shield.GACONN.OneDigit .routeNumber,
+.shield.GACONN.TwoDigit .routeNumber,
+.shield.GALOOP.OneDigit .routeNumber,
+.shield.GALOOP.TwoDigit .routeNumber,
+.shield.GASPUR.OneDigit .routeNumber,
+.shield.GASPUR.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.GA.ThreeDigit .routeNumber,
+.shield.GAALT.ThreeDigit .routeNumber,
+.shield.GABYP.ThreeDigit .routeNumber,
+.shield.GACONN.ThreeDigit .routeNumber,
+.shield.GALOOP.ThreeDigit .routeNumber,
+.shield.GASPUR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+.shield.GAALT .banner,
+.shield.GABYP .banner,
+.shield.GACONN .banner,
+.shield.GALOOP .banner,
+.shield.GASPUR .banner {
+  display: none;
+}
+
+.shield.MN .routeNumber,
+.shield.MNBUS .routeNumber {
+  color: var(--white);
+  font-family: "Series C";
+  font-size: 1.6em;
+  top: 0.25em;
+}
+
+.shield.HI.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.15em;
+  top: 0.6em;
+}
+
+.shield.ID .routeNumber {
+  font-family: "Series C";
+  text-align: right;
+  top: -0.15em;
+  font-size: 1.25em;
+}
+.shield.ID.OneDigit .routeNumber,
+.shield.ID.TwoDigit .routeNumber {
+  right: 0.3em;
+}
+.shield.ID.ThreeDigit .routeNumber {
+  font-size: 1.15em;
+  right: 0.2em;
 }
 .shieldsContainer.shieldBacks .ID .routeNumber {
-	color: var(--white);
+  color: var(--white);
 }
 .shieldsContainer:not(.shieldBacks) .ID .routeNumber {
-	color: var(--black);
+  color: var(--black);
 }
 
-.bannerShieldContainer.IL .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.35em;
-	font-size: 1.4em;
+.shield.IL .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.35em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.IN .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.35em;
-	font-size: 1.4em;
+.shield.IN .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.35em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.KS .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.15em;
-	font-size: 1.45em;
+.shield.KS .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.15em;
+  font-size: 1.45em;
 }
 
-.bannerShieldContainer.LA .routeNumber {
-	color: var(--black);
-	font-family: "Series C";
-	font-size: 1em;
-	top: 0.85em;
+.shield.LA .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 1em;
+  top: 0.85em;
 }
 
-.bannerShieldContainer.MD .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.35em;
-	font-size: 1.5em;
+.shield.MD .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.35em;
+  font-size: 1.5em;
 }
 
-.bannerShieldContainer.MI .routeNumber {
-	color: var(--black);
-	font-size: 1.15em;
-	top: 0.5em;
+.shield.MI .routeNumber {
+  color: var(--black);
+  font-size: 1.15em;
+  top: 0.5em;
 }
-.bannerShieldContainer.MI.one .routeNumber,
-.bannerShieldContainer.MI.two .routeNumber {
-	font-family: "Series D";
+.shield.MI.OneDigit .routeNumber,
+.shield.MI.TwoDigit .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.MI.three .routeNumber {
-	font-family: "Series C";
-}
-
-.bannerShieldContainer.MN .routeNumber {
-	color: var(--white);
-	font-family: "Series C";
-	font-size: 1.6em;
-	top: 0.25em;
-}
-.bannerShieldContainer.MN.bus .banner {
-	display: none;
+.shield.MI.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }
 
-.bannerShieldContainer.MO .routeNumber {
-	color: var(--black);
-	top: 0.15em;
+.shield.MN .routeNumber {
+  color: var(--white);
+  font-family: "Series C";
+  font-size: 1.6em;
+  top: 0.25em;
 }
-.bannerShieldContainer.MO.one .routeNumber,
-.bannerShieldContainer.MO.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.MO.three .routeNumber {
-	font-family: "Series C";
+.shield.MNBUS .banner {
+  display: none;
 }
 
-.bannerShieldContainer.MT .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.3em;
-	font-size: 1.5em;
+.shield.MO .routeNumber {
+  color: var(--black);
+  top: 0.15em;
+}
+.shield.MO.OneDigit .routeNumber,
+.shield.MO.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.MO.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }
 
-.bannerShieldContainer.MT2 .routeNumber {
-	color: var(--black);
-}
-.bannerShieldContainer.MT2.one .routeNumber,
-.bannerShieldContainer.MT2.two .routeNumber {
-	top: 0.2em;
-}
-.bannerShieldContainer.MT2.three .routeNumber {
-	font-size: 1.15em;
-	top: 0.3em;
-}
-.bannerShieldContainer.MT2.one .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.MT2.two .routeNumber,
-.bannerShieldContainer.MT2.three .routeNumber {
-	font-family: "Series C";
-}
-.bannerShieldContainer.NB .routeNumber {
-	color: var(--black);
-	top: 0.43em;
-	font-family: "Helvetica";
-	font-weight: bold;
-}
-.bannerShieldContainer.NB.one .routeNumber,
-.bannerShieldContainer.NB.two .routeNumber {
-	font-size: 1.3em;
-}
-.bannerShieldContainer.NB.three .routeNumber {
-	font-size: 0.9em;
-	top: 0.87em;
-	left: -0.03em;
-}
-.bannerShieldContainer.NB.local.three .banner {
-	display: none;
-}
-.bannerShieldContainer.NE .routeNumber {
-	color: var(--black);
-	top: 0.05em;
-}
-.bannerShieldContainer.NE.one .routeNumber,
-.bannerShieldContainer.NE.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.NE.three .routeNumber {
-	font-family: "Series C";
-}
-.bannerShieldContainer.NE.link.one .banner,
-.bannerShieldContainer.NE.link.two .banner,
-.bannerShieldContainer.NE.spur.one .banner,
-.bannerShieldContainer.NE.spur.two .banner {
-	display: none;
-}
-.bannerShieldContainer.NE.link.one .routeNumber
-.bannerShieldContainer.NE.link.two .routeNumber,
-.bannerShieldContainer.NE.spur.one .routeNumber
-.bannerShieldContainer.NE.spur.two .routeNumber {
-	top: -0.1em;
-}
-.bannerShieldContainer.NL .routeNumber {
-	font-size: 1.8em;
-	color: var(--black);
-	font-family: "Series EM";
-	top: 0.03em;
-}
-.bannerShieldContainer.NL.three .routeNumber {
-	font-size: 1.6em;
-	font-family: "Series D";
-	top: 0.12em;
-}
-.bannerShieldContainer.NS.three .routeNumber {
-	font-size: 1.05em;
-	top: 0.8em;
-	letter-spacing: .05em;
-	left: 0.02em;
-	color: white;
-	font-family: "Series C";
-}
-.bannerShieldContainer.bannerShieldContainer.NS.conn.three .routeNumber {
-	font-size: 1.05em;
-	color: white;
-	top: .51em;
-	letter-spacing: 0.05em;
-	left: .015em;
-	font-family: "Series D";
-}
-.bannerShieldContainer.NS.trunk.two .banner,
-.bannerShieldContainer.NS.conn .banner,
-.bannerShieldContainer.NS.arterial.three .banner {
-	display: none;	
+.shield.MT .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.3em;
+  font-size: 1.5em;
 }
 
-.bannerShieldContainer.NV .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	font-size: 0.9em;
-	top: 0.15em;
+.shield.MT2 .routeNumber {
+  color: var(--black);
+}
+.shield.MT2.OneDigit .routeNumber,
+.shield.MT2.TwoDigit .routeNumber {
+  top: 0.2em;
+}
+.shield.MT2.ThreeDigit .routeNumber {
+  font-size: 1.15em;
+  top: 0.3em;
+}
+.shield.MT2.OneDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.MT2.TwoDigit .routeNumber,
+.shield.MT2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+.shield.NB .routeNumber,
+.shield.NBLOCAL .routeNumber,
+.shield.NBCONN .routeNumber {
+  color: var(--black);
+  top: 0.43em;
+  font-family: "Helvetica";
+  font-weight: bold;
+}
+.shield.NB.OneDigit .routeNumber,
+.shield.NB.TwoDigit .routeNumber,
+.shield.NBLOCAL.OneDigit .routeNumber,
+.shield.NBLOCAL.TwoDigit .routeNumber,
+.shield.NBCONN.OneDigit .routeNumber,
+.shield.NBCONN.TwoDigit .routeNumber {
+  font-size: 1.3em;
+}
+.shield.NB.ThreeDigit .routeNumber,
+.shield.NBLOCAL.ThreeDigit .routeNumber,
+.shield.NBCONN.ThreeDigit .routeNumber {
+  font-size: 0.9em;
+  top: 0.87em;
+  left: -0.03em;
+}
+.shield.NBLOCAL.ThreeDigit .banner,
+.shield.NBCONN.ThreeDigit .banner {
+  display: none;
+}
+.shield.NE .routeNumber,
+.shield.NELINK .routeNumber,
+.shield.NESPUR .routeNumber {
+  color: var(--black);
+  top: 0.05em;
+}
+.shield.NE.OneDigit .routeNumber,
+.shield.NE.TwoDigit .routeNumber,
+.shield.NELINK.OneDigit .routeNumber,
+.shield.NELINK.TwoDigit .routeNumber,
+.shield.NESPUR.OneDigit .routeNumber,
+.shield.NESPUR.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.NE.ThreeDigit .routeNumber,
+.shield.NELINK.ThreeDigit .routeNumber,
+.shield.NESPUR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+.shield.NELINK.OneDigit .banner,
+.shield.NELINK.TwoDigit .banner,
+.shield.NESPUR.OneDigit .banner,
+.shield.NESPUR.TwoDigit .banner {
+  display: none;
+}
+.shield.NELINK.OneDigit .routeNumber .shield.NELINK.TwoDigit .routeNumber,
+.shield.NESPUR.OneDigit .routeNumber .shield.NESPUR.TwoDigit .routeNumber {
+  top: -0.1em;
+}
+.shield.NL .routeNumber {
+  font-size: 1.8em;
+  color: var(--black);
+  font-family: "Series EM";
+  top: 0.03em;
+}
+.shield.NL.ThreeDigit .routeNumber {
+  font-size: 1.6em;
+  font-family: "Series D";
+  top: 0.12em;
+}
+.shield.NS.ThreeDigit .routeNumber {
+  font-size: 1.05em;
+  top: 0.8em;
+  letter-spacing: 0.05em;
+  left: 0.02em;
+  color: white;
+  font-family: "Series C";
+}
+.shield.NS.conn.ThreeDigit .routeNumber {
+  font-size: 1.05em;
+  color: white;
+  top: 0.51em;
+  letter-spacing: 0.05em;
+  left: 0.015em;
+  font-family: "Series D";
+}
+.shield.NS.trunk.TwoDigit .banner,
+.shield.NS.conn .banner,
+.shield.NS.arterial.ThreeDigit .banner {
+  display: none;
 }
 
-.bannerShieldContainer.NH .routeNumber {
-	color: var(--black);
-	top: 0.15em;
-}
-.bannerShieldContainer.NH.one .routeNumber,
-.bannerShieldContainer.NH.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.NH.three .routeNumber {
-	font-family: "Series C";
-	font-size: 1.4em;
-	right: -0.1em;
+.shield.NV .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 0.9em;
+  top: 0.15em;
 }
 
-.bannerShieldContainer.NM .routeNumber {
-	color: var(--black);
+.shield.NH .routeNumber {
+  color: var(--black);
+  top: 0.15em;
 }
-.bannerShieldContainer.NM.one .routeNumber,
-.bannerShieldContainer.NM.two .routeNumber {
-	font-family: "Series D";
+.shield.NH.OneDigit .routeNumber,
+.shield.NH.TwoDigit .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.NM.one .routeNumber {
-	top: 0.15em;
-}
-.bannerShieldContainer.NM.two .routeNumber {
-	font-size: 1.2em;
-	top: 0.35em;
-}
-.bannerShieldContainer.NM.three .routeNumber {
-	font-family: "Series C";
-	font-size: 1em;
-	top: 0.55em;
+.shield.NH.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.4em;
+  right: -0.1em;
 }
 
-.bannerShieldContainer.NY .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.15em;
-	font-size: 1.5em;
+.shield.NM .routeNumber {
+  color: var(--black);
+}
+.shield.NM.OneDigit .routeNumber,
+.shield.NM.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.NM.OneDigit .routeNumber {
+  top: 0.15em;
+}
+.shield.NM.TwoDigit .routeNumber {
+  font-size: 1.2em;
+  top: 0.35em;
+}
+.shield.NM.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1em;
+  top: 0.55em;
 }
 
-.bannerShieldContainer.NC .routeNumber {
-	color: var(--black);
-	font-size: 1.15em;
-	top: 0.4em;
-}
-.bannerShieldContainer.NC.one .routeNumber,
-.bannerShieldContainer.NC.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.NC.three .routeNumber {
-	font-family: "Series C";
+.shield.NY .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.15em;
+  font-size: 1.5em;
 }
 
-.bannerShieldContainer.ND .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.25em;
+.shield.NC .routeNumber {
+  color: var(--black);
+  font-size: 1.15em;
+  top: 0.4em;
+}
+.shield.NC.OneDigit .routeNumber,
+.shield.NC.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.NC.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }
 
-.bannerShieldContainer.OH .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.15em;
+.shield.ND .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.25em;
 }
 
-.bannerShieldContainer.OK .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
-	top: 0.35em;
-	font-size: 1.4em;
+.shield.OH .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.15em;
 }
 
-.bannerShieldContainer.OR .routeNumber {
-	color: var(--black);
-	top: 0.1em;
-	font-size: 1.5em;
-}
-.bannerShieldContainer.OR.one .routeNumber,
-.bannerShieldContainer.OR.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.OR.three .routeNumber {
-	font-family: "Series C";
+.shield.OK .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+  top: 0.35em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.PA .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.2em;
-	font-size: 1.4em;
+.shield.OR .routeNumber {
+  color: var(--black);
+  top: 0.1em;
+  font-size: 1.5em;
 }
-.bannerShieldContainer.PEI .routeNumber {
-	font-size: 1.2em;
-	top: 0.5em;
-	color: var(--black);
-	font-family: "Series C";
+.shield.OR.OneDigit .routeNumber,
+.shield.OR.TwoDigit .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.PEI.three .routeNumber {
-	font-size: 1.1em;
-	top: .6em;
-}
-.bannerShieldContainer.QC .routeNumber {
-	font-size: 1.5rem;
-	color: var(--white);
-	top: 0.4em;
-	font-family: "Series EM";
-}
-.bannerShieldContainer.QC.two .routeNumber {
-	font-family: "Series D";
-	top: 0.42em;
-}
-.bannerShieldContainer.QC2 .routeNumber {
-	font-size: 1.2rem;
-	color: var(--white);
-	top: 0.4em;
-	font-family: "Series D";
-	font-size: 1.3em;
-}
-.bannerShieldContainer.RI .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.35em;
-	font-size: 1.4em;
+.shield.OR.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }
 
-.bannerShieldContainer.SC .routeNumber {
-	color: var(--blue);
-	font-family: "Series D";
-	top: 0.4em;
-	font-size: 1.4em;
+.shield.PA .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.2em;
+  font-size: 1.4em;
+}
+.shield.PEI .routeNumber {
+  font-size: 1.2em;
+  top: 0.5em;
+  color: var(--black);
+  font-family: "Series C";
+}
+.shield.PEI.ThreeDigit .routeNumber {
+  font-size: 1.1em;
+  top: 0.6em;
+}
+.shield.QC .routeNumber {
+  font-size: 1.5rem;
+  color: var(--white);
+  top: 0.4em;
+  font-family: "Series EM";
+}
+.shield.QC.TwoDigit .routeNumber {
+  font-family: "Series D";
+  top: 0.42em;
+}
+.shield.QC2 .routeNumber {
+  font-size: 1.2rem;
+  color: var(--white);
+  top: 0.4em;
+  font-family: "Series D";
+  font-size: 1.3em;
+}
+.shield.RI .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.35em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.SD .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.15em;
-	font-size: 1.35em;
+.shield.SC .routeNumber {
+  color: var(--blue);
+  font-family: "Series D";
+  top: 0.4em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.TN .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0.05em;
-	font-size: 1.4em;
+.shield.SD .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.15em;
+  font-size: 1.35em;
 }
 
-.bannerShieldContainer.TN2 .routeNumber {
-	color: var(--black);
-	top: -0.15em;
-	font-size: 1.35em;
-}
-.bannerShieldContainer.TN2.one .routeNumber,
-.bannerShieldContainer.TN2.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.TN2.three .routeNumber {
-	font-family: "Series C";
+.shield.TN .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0.05em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.TX .routeNumber {
-	color: var(--black);
-	font-size: 2.2em;
-	top: 0.2em;
+.shield.TN2 .routeNumber {
+  color: var(--black);
+  top: -0.15em;
+  font-size: 1.35em;
 }
-.bannerShieldContainer.TX.one .routeNumber,
-.bannerShieldContainer.TX.two .routeNumber {
-	font-family: "Series D";
+.shield.TN2.OneDigit .routeNumber,
+.shield.TN2.TwoDigit .routeNumber {
+  font-family: "Series D";
 }
-.bannerShieldContainer.TX.three .routeNumber {
-	font-family: "Series D";
-}
-
-.bannerShieldContainer.TX.toll.three .routeNumber {
-	font-family: "Series D";
-    left: 0rem;
-    font-size: 1.8em;
-    letter-spacing: 0;
-    top: -0.2rem;
+.shield.TN2.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }
 
-.bannerShieldContainer.TX.toll.four .routeNumber {
-	font-family: "Series C";
-    left: 0rem;
-    font-size: 2em;
-    top: -.45rem;
+.shield.TX .routeNumber,
+.shield.TXLOOP .routeNumber,
+.shield.TXSPUR .routeNumber,
+.shield.TXEXPRESS .routeNumber,
+.shield.TXFM .routeNumber,
+.shield.TXPARK .routeNumber,
+.shield.TXRM .routeNumber,
+.shield.TXBELTWAY .routeNumber {
+  color: var(--black);
+  font-size: 2.2em;
+  top: 0.2em;
+}
+.shield.TX.OneDigit .routeNumber,
+.shield.TX.TwoDigit .routeNumber,
+.shield.TXLOOP.OneDigit .routeNumber,
+.shield.TXLOOP.TwoDigit .routeNumber,
+.shield.TXSPUR.OneDigit .routeNumber,
+.shield.TXSPUR.TwoDigit .routeNumber,
+.shield.TXEXPRESS.OneDigit .routeNumber,
+.shield.TXEXPRESS.TwoDigit .routeNumber,
+.shield.TXFM.OneDigit .routeNumber,
+.shield.TXFM.TwoDigit .routeNumber,
+.shield.TXPARK.OneDigit .routeNumber,
+.shield.TXPARK.TwoDigit .routeNumber,
+.shield.TXRM.OneDigit .routeNumber,
+.shield.TXRM.TwoDigit .routeNumber,
+.shield.TXBELTWAY.OneDigit .routeNumber,
+.shield.TXBELTWAY.TwoDigit .routeNumber {
+  font-family: "Series D";
+  top :.45em;
+}
+.shield.TX.ThreeDigit .routeNumber,
+.shield.TXLOOP.ThreeDigit .routeNumber,
+.shield.TXSPUR.ThreeDigit .routeNumber,
+.shield.TXEXPRESS.ThreeDigit .routeNumber,
+.shield.TXFM.ThreeDigit .routeNumber,
+.shield.TXPARK.ThreeDigit .routeNumber,
+.shield.TXRM.ThreeDigit .routeNumber,
+.shield.TXBELTWAY.ThreeDigit .routeNumber {
+  font-family: "Series D";
+  top: .45em;
 }
 
-.bannerShieldContainer.TX.toll .routeNumber {
-	color: var(--white);
-    top: -0.45rem;
-    font-size: 2.2em;
-    font-family: "Series E";
+.shield.TXTOLL.ThreeDigit .routeNumber {
+  font-family: "Series D";
+  left: 0rem;
+  font-size: 1.8em;
+  letter-spacing: 0;
+  top: -0.2rem;
 }
 
-.bannerShieldContainer.TX.express .routeNumber {
-	color: var(--white);
-	top: 0.1em;
-	font-size: 2rem;
+.shield.TXTOLL .designation {
+  top: .8em;
 }
 
-.bannerShieldContainer.TX.loop .banner,
-.bannerShieldContainer.TX.spur .banner {
-	display: none;
+.shield.TXTOLL:has(.designation) .routeNumber,
+.shield.TXTOLL:has(.designation) .routeNumber {
+  top: -.25em;
+  font-size: 1.75em;
 }
 
-.bannerShieldContainer.UT .routeNumber {
-	color: var(--black);
-}
-.bannerShieldContainer.UT.one .routeNumber,
-.bannerShieldContainer.UT.two .routeNumber {
-	font-family: "Series D";
-	font-size: 1.15em;
-	top: 0.4em;
-}
-.bannerShieldContainer.UT.three .routeNumber {
-	font-family: "Series C";
-	font-size: 1em;
-	top: 0.45em;
+.shield.TXTOLL.FourDigit .routeNumber {
+  font-family: "Series C";
+  left: 0rem;
+  font-size: 2em;
+  top: -0.45rem;
 }
 
-.bannerShieldContainer.VT .routeNumber {
-	color: var(--green);
-	font-family: "Series D";
-	top: 0.4em;
-	font-size: 1.4em;
+.shield.TXTOLL .routeNumber {
+  color: var(--white);
+  top: -0.45rem;
+  font-size: 2.2em;
+  font-family: "Series E";
 }
 
-.bannerShieldContainer.VA .routeNumber {
-	color: var(--black);
-	font-family: "Series D";
-	top: 0em;
-	left: 0.025em;
-	font-size: 1.6em;
+.shield.TXEXPRESS .routeNumber {
+  color: var(--white);
+  top: 0.1em;
+  font-size: 2rem;
 }
 
-.bannerShieldContainer.VA2 .routeNumber {
-	color: var(--black);
-	top: 0.15em;
-	left: 0.025em;
-	font-size: 1.5em;
+.shield.UT .routeNumber {
+  color: var(--black);
 }
-.bannerShieldContainer.VA2.one .routeNumber,
-.bannerShieldContainer.VA2.two .routeNumber {
-	font-family: "Series D";
+.shield.UT.OneDigit .routeNumber,
+.shield.UT.TwoDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.15em;
+  top: 0.4em;
 }
-.bannerShieldContainer.VA2.three .routeNumber {
-	font-family: "Series C";
-}
-
-.bannerShieldContainer.WA .routeNumber {
-	color: var(--black);
-}
-.bannerShieldContainer.WA.one .routeNumber,
-.bannerShieldContainer.WA.two .routeNumber {
-	font-family: "Series D";
-	font-size: 1.35em;
-	top: 0.1em;
-}
-.bannerShieldContainer.WA.three .routeNumber {
-	font-family: "Series C";
-	font-size: 1.15em;
-	top: 0.3em;
+.shield.UT.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1em;
+  top: 0.45em;
 }
 
-.bannerShieldContainer.WI .routeNumber {
-	color: var(--black);
-	top: 0.15em;
-	font-size: 1.5em;
-}
-.bannerShieldContainer.WI.one .routeNumber,
-.bannerShieldContainer.WI.two .routeNumber {
-	font-family: "Series D";
-}
-.bannerShieldContainer.WI.three .routeNumber {
-	font-family: "Series C";
+.shield.VT .routeNumber {
+  color: var(--green);
+  font-family: "Series D";
+  top: 0.4em;
+  font-size: 1.4em;
 }
 
-.bannerShieldContainer.WY .routeNumber {
-	color: var(--black);
-	top: 0.2em;
-	font-size: 1.4em;
+.shield.VA .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  top: 0em;
+  left: 0.025em;
+  font-size: 1.6em;
 }
-.bannerShieldContainer.WY.one .routeNumber,
-.bannerShieldContainer.WY.two .routeNumber {
-	font-family: "Series D";
+
+.shield.VA2 .routeNumber {
+  color: var(--black);
+  top: 0.15em;
+  left: 0.025em;
+  font-size: 1.5em;
 }
-.bannerShieldContainer.WY.three .routeNumber {
-	font-family: "Series C";
+.shield.VA2.OneDigit .routeNumber,
+.shield.VA2.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.VA2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.WA .routeNumber {
+  color: var(--black);
+}
+.shield.WA.OneDigit .routeNumber,
+.shield.WA.TwoDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.35em;
+  top: 0.1em;
+}
+.shield.WA.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.15em;
+  top: 0.3em;
+}
+
+.shield.WI .routeNumber {
+  color: var(--black);
+  top: 0.15em;
+  font-size: 1.5em;
+}
+.shield.WI.OneDigit .routeNumber,
+.shield.WI.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.WI.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.WY .routeNumber {
+  color: var(--black);
+  top: 0.2em;
+  font-size: 1.4em;
+}
+.shield.WY.OneDigit .routeNumber,
+.shield.WY.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+.shield.WY.ThreeDigit .routeNumber {
+  font-family: "Series C";
 }

@@ -19,6 +19,7 @@ nav#sMConfigBar {
   transform: translateX(-50%);
   height: max-content;
   z-index: 1;
+  transition: 0.1s ease-in-out opacity;
 }
 
 :root[data-theme="dark"] .sMConfigOption:not(.selected) {
@@ -39,6 +40,7 @@ nav#sMConfigBar {
   font-family: "Overpass";
   color: var(--textColor);
   line-height: 0;
+  font-size: 1rem;
 }
 
 .sMConfigOption.selected {
@@ -47,17 +49,17 @@ nav#sMConfigBar {
 }
 
 .sMModal {
-  max-width: 80vh;
+  max-width: 100vh;
   background: var(--hotbarColor);
   display: none;
   min-width: 45vh;
   width: max-content;
-  height: max-content;
+  height: 100%;
 }
 
 .sMModalContent {
   padding: 1rem;
-  max-height: 80vh;
+  max-height: 75svh;
   overflow-x: auto;
 }
 
@@ -66,7 +68,8 @@ nav#sMConfigBar {
   inset: 1.5rem;
   position: fixed;
   height: max-content;
-  max-height: 87.5%;
+  max-height: calc(100% - 5rem);
+  z-index: 4;
 }
 
 #export {
@@ -85,8 +88,10 @@ span.toolTip {
   padding: 0.2rem 0.5rem;
   font-size: 13px;
   opacity: 1;
-  transition: 0.25s ease-in-out transform, 0.25s ease-in-out opacity;
-  z-index: 3;
+  transition:
+    0.25s ease-in-out transform,
+    0.25s ease-in-out opacity;
+  z-index: 10;
   font-family: "Inter";
   width: max-content;
   max-width: 200px;
@@ -131,7 +136,7 @@ label span.toolTip,
   justify-content: flex-start;
   align-items: stretch;
   width: 12rem;
-  min-height: 10rem;
+  height: 11rem;
   position: absolute;
   background-color: var(--hotbarColor);
   top: -12rem;
@@ -139,23 +144,8 @@ label span.toolTip,
   padding: 0.5rem;
   gap: 0.5rem;
   z-index: 2;
-  box-shadow: 0 0.35rem 0.8rem rgba(0, 0, 0, 0.2);
   border-radius: 0;
   font-family: "Overpass", sans-serif;
-}
-
-.panelPopoverHeader {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.25rem;
-  width: 100%;
-}
-
-.panelPopoverHeader h5 {
-  margin: 0;
-  font-family: inherit;
 }
 
 .panelPopoverHint {
@@ -164,6 +154,11 @@ label span.toolTip,
   letter-spacing: normal;
   opacity: 0.8;
   font-family: inherit;
+  position: absolute;
+
+  top: -0.8rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .panelActions {
@@ -186,6 +181,7 @@ label span.toolTip,
   max-height: 8.5rem;
   overflow-y: auto;
   padding-right: 0.15rem;
+  height: 100%;
 }
 
 .panelListButton {
@@ -310,27 +306,14 @@ label span.toolTip,
   overflow-x: auto;
   gap: 4px;
   margin-left: -8px;
-}
-
-/* Minimalistic scrollbar for WebKit browsers */
-.scrollMenu::-webkit-scrollbar {
-  height: 6px; /* Adjust thickness as needed */
-}
-
-.scrollMenu::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3); /* Adjust color and opacity */
-  border-radius: 3px; /* Make it rectangular with slightly rounded corners */
-}
-
-.scrollMenu::-webkit-scrollbar-track {
-  background-color: transparent; /* Make the track invisible or a subtle color */
+  height: 2rem;
 }
 
 /* Minimalistic scrollbar for Firefox */
 /* Note: Firefox styling options are more limited */
-.scrollMenu {
+* {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.3) transparent; /* thumb track */
+  scrollbar-color: rgb(255, 255, 255, 0.5) transparent; /* thumb track */
 }
 
 .sMModalContent > div:not(#sMSPSettings),
@@ -390,13 +373,14 @@ div.sMModalTitle {
   gap: 0.25rem;
   margin-right: 0.5rem;
 }
-div.sMModalTab {
+
+a.sMModalTab {
   padding: 0rem 0.5rem;
   font-size: 15px;
   cursor: pointer;
 }
 
-div.sMModalTab.selected {
+a.sMModalTab.selected {
   text-decoration: underline;
 }
 
@@ -562,12 +546,12 @@ div.options a {
 
 :root[data-theme="dark"] .active,
 :root[data-theme="dark"] .exitTabSelect.active {
-  background-color: rgb(0, 0, 255);
+  background-color: rgb(0, 0, 175);
 }
 
-:root[data-theme="dark"] .scrollMenu button:not(.active),
-:root[data-theme="dark"] .scrolMenu button:not(.active) {
-  background-color: rgb(0, 0, 175);
+:root[data-theme="dark"] .scrollMenu button:not(.active, .newNestedButton),
+:root[data-theme="dark"] .scrolMenu button:not(.active, .newNestedButton) {
+  background-color: rgb(0, 0, 255);
 }
 
 input,
@@ -600,8 +584,8 @@ label:hover {
 }
 
 select {
-  background: rgb(240, 240, 240) url(../img/other-symbols/select.svg) no-repeat
-    right;
+  background: rgb(240, 240, 240) url(../assets/other-symbols/select.svg)
+    no-repeat right;
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
@@ -646,7 +630,12 @@ input[type="button"] {
   color: var(--textColor);
 }
 
-button:not(.textEditorBlock, .sMControlRow .sMConfigOption):enabled:hover,
+button:not(
+    .textEditorBlock,
+    .sMControlRow .sMConfigOption,
+    .shieldCategoryHead,
+    .shieldCategortyType
+  ):enabled:hover,
 input[type="button"]:not(
     .textEditorblock,
     .sMControlRow,
@@ -670,7 +659,9 @@ input[type="button"]:disabled {
   cursor: grab;
   user-select: none;
   transform-origin: center;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    transform 0.12s ease,
+    0.12s ease;
 }
 
 .textEditorBlock:active {
@@ -914,30 +905,53 @@ textarea {
 
 .exitTabGroup {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 0.25rem;
   flex: 0 0 auto;
+}
+
+.exitTabGroup:not(:has(.active)) .exitTabNestedButton {
+  display: none;
+}
+
+.exitTabNestedButton.newNestedButton {
+  background: rgb(var(--baseColor));
+  min-width: 1rem;
+  width: 1rem;
 }
 
 .exitTabButton,
 .exitTabNestedButton {
   background: rgb(230, 230, 230);
   border-radius: 0;
-  min-width: 6rem;
+  min-width: 1rem;
+  height: 1rem;
   padding: 0.25rem 0.5rem;
   flex: 0 0 auto;
   position: relative;
 }
 
-.exitTabNestedButton {
-  font-size: 0.75rem;
-  margin-left: 0.5rem;
-  min-width: 5rem;
+.exitTabButton {
+  min-width: 1.5rem;
+  height: 1.5rem;
 }
 
-.exitTabButton:hover,
-.exitTabNestedButton:hover {
+.exitTabNestedButton {
+  font-size: 0.7rem;
+  min-width: 3rem;
+  padding: 0.125rem 0.5rem;
+  height: max-content;
+}
+
+:root[data-theme="light"] .exitTabButton:hover,
+:root[data-theme="light"] .exitTabNestedButton:hover {
   background: rgb(200, 200, 200);
+}
+
+:root[data-theme="dark"] .exitTabButton:hover,
+:root[data-theme="dark"] .exitTabNestedButton:hover {
+  background: rgb(0, 0, 200) !important;
 }
 
 .exitTabButton.blockWiggle {
@@ -969,7 +983,6 @@ textarea {
   right: -0.25rem;
 }
 
-
 nav#sMConfigBar.invisible {
   left: 1rem;
   transform: none;
@@ -993,7 +1006,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 #sMSPCreate,
 #smSPElement,
 #smSPShieldHeader,
-#smSPShieldList {
+#smSPShieldList,
+#smPShieldGroupSelector {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -1002,6 +1016,32 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   padding: 0.5rem;
   background-color: rgb(var(--baseColor), 0.3);
   width: 100%;
+}
+
+#smPShieldGroupSelector {
+  flex-direction: column;
+}
+
+#smPShieldGroupSelector > div:nth-child(1) {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+#smPShieldGroupSelector > div:nth-child(1) > span {
+  font-size: 16px;
+}
+
+#shieldGroupList {
+  display: grid;
+  grid-template-columns: repeat(3, 0fr);
+  justify-content: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+#shieldGroupList > button {
+  padding: 0.5rem;
 }
 
 #smSPElement,
@@ -1065,7 +1105,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   color: black;
 }
 
-.sdShield {
+.sdShieldGroup {
   background-color: var(--blue);
   color: white;
 }
@@ -1073,6 +1113,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .sdAdvisory {
   background-color: var(--yellow);
   border-radius: 8px;
+  color: black;
 }
 
 .sdTollLogo {
@@ -1141,8 +1182,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   cursor: pointer;
 }
 
-.smSPShieldRow:hover,
-.smSPShieldGroup:hover {
+.smSPShieldRow:hover {
   background-color: rgb(200, 200, 200, 0.5);
 }
 
@@ -1224,6 +1264,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
+  flex-grow: 1;
 }
 
 #smSPShieldImgConfig > div:nth-child(2) {
@@ -1361,6 +1402,9 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   color: white;
   margin-left: -1rem;
   cursor: pointer;
+  width: 100%;
+  text-align: initial;
+  font-size: 20px;
 }
 
 .shieldCategory {
@@ -1511,4 +1555,160 @@ dialog:not([open]) {
 .smallVal {
   width: 3rem;
   display: inline-block;
+}
+
+#zoomControl {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  left: 0.75rem;
+  top: 0.75rem;
+  background-color: var(--hotbarColor);
+  padding: 0.25rem 0.25rem;
+  width: max-content;
+  gap: 0.25rem;
+  opacity: 0.4;
+  transition: 0.1s ease-in-out opacity;
+  position: fixed;
+  z-index: 3;
+}
+
+#zoomControl:hover {
+  opacity: 1;
+}
+
+#zoomControl * {
+  width: max-content;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+#zoomControl button {
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 2rem;
+}
+
+#zoomControl > span:nth-child(1) {
+  font-size: 12px;
+  width: 3rem;
+}
+
+div#subPanelList {
+  padding: 0.25rem;
+}
+
+div#smSPBlockProperties > div {
+  width: 49%;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+input#uploadCustomShield {
+  display: none;
+}
+
+button#sdShieldGroup_OpenShieldEditor {
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.smSPShieldBannerController {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.smSPShieldBannerController > button {
+  width: 50%;
+  font-size: 1rem;
+}
+
+#smSP_bannerMaster {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: rgb(255, 255, 255, 0.25);
+}
+
+.smSP_bannerEditor {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.smSP_bannerElement {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(255, 255, 255, 0.5);
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+.smSP_bannerEditor > div:nth-child(1) * {
+  width: 25%;
+}
+
+.smSP_bannerEditor > div:nth-child(1) {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.smSP_bannerEditor > div:nth-child(2) span {
+  width: max-content;
+  display: block;
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.smSP_bannerEditor > div:nth-child(2) {
+  width: 100%;
+}
+
+.smSP_bannerEditor > div:nth-child(2) > div {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.smSP_bannerEditor > div:nth-child(2) > div > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.smSP_deleteBanner {
+  height: stretch;
+  font-size: 1.5rem;
+  background-color: rgb(255, 0, 0, 0.6);
+  color: white;
+  padding: 0.75rem;
+}
+
+.smSP_deleteBanner:hover {
+  background-color: rgb(255, 0, 0, 1) !important;
+}
+
+input.halfSizeInput {
+  width: 3rem;
 }

@@ -6,6 +6,14 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   --fhwaBaselineShift: 1px;
 }
 
+#postContainer {
+  scale: var(--zoomLevel, 100%);
+}
+
+main#smRender.wide #postContainer {
+  left: calc((var(--zoomLevel, 100%) - 100%) / 2);
+}
+
 .blockElementMaster {
   display: flex;
   flex-direction: column;
@@ -285,4 +293,203 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 
 .blockElementRight {
   justify-content: right;
+}
+
+/* Post Variants */
+
+/* Curved Post */
+#postContainer.postVariantCurved .post {
+  width: 10rem;
+  height: 30rem;
+  clip-path: shape(
+    from 0% 100%,
+    vline to var(--cornerRad),
+    curve to 100% 0% with 0% 0%,
+    line to 100% 0%,
+    vline to var(--postThickness),
+    curve to var(--postThickness) var(--cornerRad) with var(--postThickness)
+      var(--postThickness),
+    line to var(--postThickness) 100%,
+    close
+  );
+  background: radial-gradient(
+    circle at top left,
+    var(--post-color-light) 15%,
+    var(--post-color-mid) 30%,
+    var(--post-color-mid)
+  );
+  align-self: initial;
+}
+
+#postContainer.postVariantCurved .post:nth-child(3) {
+  transform: scaleX(-1);
+}
+
+#postContainer.postVariantCurved #panelContainer {
+  background: var(--post-color-mid) !important;
+  height: var(--postThickness) !important;
+}
+
+/* Curved 2 Post */
+#postContainer.postVariantCurved-2 .post {
+  width: 10rem;
+  height: 30rem;
+  clip-path: shape(
+    from 0% 100%,
+    vline to var(--cornerRad),
+    curve to var(--cornerRad2) 0% with 0% 0%,
+    line to 100% 0%,
+    vline to var(--postThickness),
+    line to var(--cornerRad2) var(--postThickness),
+    curve to var(--postThickness) var(--cornerRad) with var(--postThickness)
+      var(--postThickness),
+    vline to
+      calc(
+        calc(var(--spacingMultiplier) * var(--postThickness)) -
+          var(--postThickness)
+      ),
+    hline to 100%,
+    vline to calc(var(--spacingMultiplier) * var(--postThickness)),
+    hline to var(--postThickness),
+    vline to 100%,
+    close
+  );
+  background: radial-gradient(
+    circle at top left,
+    var(--post-color-light) 5%,
+    var(--post-color-mid) 25%,
+    var(--post-color-mid)
+  );
+  align-self: initial;
+}
+
+#postContainer.postVariantCurved-2 .post:nth-child(3) {
+  transform: scaleX(-1);
+}
+
+#postContainer.postVariantCurved-2 #panelContainer {
+  background: linear-gradient(
+    180deg,
+    var(--post-color-mid) 0,
+    var(--post-color-mid) calc(var(--postThickness)),
+    transparent calc(var(--postThickness)),
+    transparent calc(100% - var(--postThickness)),
+    var(--post-color-mid) calc(100% - var(--postThickness))
+  );
+}
+
+.bE-shieldGroupElement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bannerShieldContainer {
+  display: grid;
+  grid-template-areas: ". topBanners ." "leftBanners shield rightBanners" ". bottomBanners .";
+  justify-content: center;
+  align-items: center;
+}
+
+.bannerGroupElem {
+  display: flex;
+  flex-direction: column;
+}
+
+.bannerGroupElem.top {
+  grid-area: topBanners;
+  justify-content: end;
+  align-items: center;
+}
+
+.bannerGroupElem.bottom {
+  grid-area: bottomBanners;
+  justify-content: start;
+  align-items: center;
+}
+
+.bannerGroupElem.left {
+  grid-area: leftBanners;
+  align-items: end;
+  justify-content: center;
+}
+
+.bannerGroupElem.right {
+  grid-area: rightBanners;
+  align-items: start;
+  justify-content: center;
+}
+
+.shield,
+.shieldGroupContainer {
+  grid-area: shield;
+}
+
+.shield {
+  margin: 0.15rem;
+  position: relative;
+}
+
+.shield::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  anchor-name: --routeNumberAnchor;
+  pointer-events: none; /* Keep it non-interactive */
+}
+
+.shieldImg.shieldBacks {
+  background-color: var(--sColor);
+  border-radius: var(--sbRadius);
+}
+
+.shieldImg {
+  height: calc(3rem * var(--shieldScale));
+}
+
+.routeNumber {
+  font-size: 1.5rem;
+  position: absolute;
+  position-anchor: --routeNumberAnchor;
+  position-area: center;
+  line-height: 0;
+  scale: var(--routeScale, 1);
+  transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
+}
+
+.designation {
+  position: absolute;
+  position-anchor: --routeNumberAnchor;
+  position-area: top;
+  font-size: 0.5rem;
+  line-height: 0;
+  font-family: "Series E";
+  transform: translate(
+    var(--designationXOffset, 0%),
+    var(--designationYOffset, 0%)
+  );
+}
+
+.shieldGroupContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.bannerElmt {
+  border-radius: var(--borderRadius);
+  font-size: var(--fontSize);
+  text-transform: uppercase;
+  font-family: var(--fontFamily);
+  margin-bottom: auto;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
+  background-color: var(--bgColor);
+  padding: var(--verticalPadding) var(--horizontalPadding);
+  margin: var(--verticalMargin) var(--horizontalMargin);
+}
+
+.bannerElmt:first-letter {
+  font-size: calc(var(--fontSize) * var(--firstLetterSize)) !important;
 }
