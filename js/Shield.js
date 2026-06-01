@@ -142,6 +142,9 @@ class ShieldContainer {
 
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
   variant = variant.replace(/\s/g, "");
+  if (name === "NV" && variant === "3Digit") {
+    variant = "2Digit";
+  }
 
   let directory = "img/shields/";
   const search = (dir, str) => {
@@ -340,7 +343,15 @@ Shield.prototype.shieldDirectory = {
         variants: ["2 Digit"],
       },
     },
-    NV: { type: "shield", name: "Nevada", variants: ["2 Digit", "3 Digit", "CC215"] },
+    Nevada: {
+      type: "category",
+      NV: {
+        type: "shield",
+        name: "Nevada",
+        variants: ["2 Digit", "CC215"],
+        fixedRouteVariants: ["CC215"],
+      },
+    },
     NH: {
       type: "shield",
       name: "New Hampshire",

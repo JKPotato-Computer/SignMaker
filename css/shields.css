@@ -50,8 +50,8 @@
 	top: -0.4rem;
 }
 
-.bannerA:not(.TOLL, .noIndent):first-letter,
-.bannerB:not(.TOLL, .noIndent):first-letter {
+.bannerA:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter,
+.bannerB:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter {
 	font-size: calc(var(--fontSize) + 0.3rem);
 }
 
@@ -191,8 +191,8 @@
 	font-size: calc(var(--fontSize) * var(--bannerScale, 1));
 }
 
-.bE-shieldElement .bannerA:not(.TOLL, .noIndent):first-letter,
-.bE-shieldElement .bannerB:not(.TOLL, .noIndent):first-letter {
+.bE-shieldElement .bannerA:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter,
+.bE-shieldElement .bannerB:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter {
 	font-size: calc((var(--fontSize) + 0.3rem) * var(--bannerScale, 1));
 }
 
@@ -645,8 +645,26 @@
 .bannerShieldContainer.NV .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
-	font-size: 0.9em;
-	top: 0.15em;
+	font-size: 1.35em;
+	top: 0.05em;
+}
+
+.bannerShieldContainer.NV.three .routeNumber {
+	font-family: "Series D";
+	font-size: 1.25em;
+	top: 0.075em;
+}
+
+.bannerShieldContainer.C .shield,
+.bannerShieldContainer.NV.cc215 .shield,
+.bannerShieldContainer.NV.variant-cc215 .shield {
+	align-items: center;
+	background: var(--yellow);
+	box-sizing: content-box;
+	display: inline-flex;
+	justify-content: center;
+	line-height: 0;
+	padding: calc(0.18rem * var(--shieldScale, 1));
 }
 
 .bannerShieldContainer.NH .routeNumber {

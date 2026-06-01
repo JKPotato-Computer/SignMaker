@@ -8,6 +8,7 @@ const app = (function () {
   let currentlySelectedRowIndex = 0,
     currentlySelectedBlockIndex = 0;
   let currentlyEditingGroupPath = [];
+  let controlElemClipboardRows = [];
 
   let fileInfo = {
     fileType: "png",
@@ -95,6 +96,10 @@ const app = (function () {
   };
 
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
+  const clampFinite = (value, min, max, fallback = min) => {
+    const number = Number(value);
+    return clamp(Number.isFinite(number) ? number : fallback, min, max);
+  };
   const normalizePostThickness = (value) => {
     const parsed =
       typeof value === "string" ? parseFloat(value) : Number(value);
@@ -1013,12 +1018,13 @@ const app = (function () {
   const newRow = (selectedBlock, evt) => {
     const blockElems = getActiveBlockElements();
     const insertAbove = evt && evt.shiftKey;
+    const sourceRowIndex = currentlySelectedRowIndex;
+    const insertRowIndex = insertAbove
+      ? sourceRowIndex
+      : sourceRowIndex + 1;
     currentlySelectedBlockIndex = 0;
-    if (insertAbove) {
-      blockElems.addRow(currentlySelectedRowIndex, selectedBlock);
-    } else {
-      blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
-    }
+    blockElems.addRow(insertRowIndex, selectedBlock, { sourceRowIndex });
+    currentlySelectedRowIndex = insertRowIndex;
     formHandler.updateForm();
     redraw();
   };
@@ -1096,6 +1102,217 @@ const app = (function () {
       currentlySelectedRowIndex,
       ++currentlySelectedBlockIndex
     );
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const normalizeControlElemRefs = (refs, blockElements) => {
+    const rows = blockElements?.rows;
+    const normalizedRefs = [];
+    const seenKeys = new Set();
+
+    if (Array.isArray(rows)) {
+      const sourceRefs = Array.isArray(refs) && refs.length
+        ? refs
+        : [
+          {
+            rowIndex: currentlySelectedRowIndex,
+            blockIndex: currentlySelectedBlockIndex,
+          },
+        ];
+
+      for (const ref of sourceRefs) {
+        const rowIndex = Number(ref?.rowIndex);
+        const blockIndex = Number(ref?.blockIndex);
+        if (!Number.isInteger(rowIndex) || !Number.isInteger(blockIndex)) {
+          continue;
+        }
+
+        const row = rows[rowIndex];
+        if (!Array.isArray(row) || blockIndex < 0 || blockIndex >= row.length) {
+          continue;
+        }
+
+        const key = `${rowIndex}:${blockIndex}`;
+        if (seenKeys.has(key)) {
+          continue;
+        }
+
+        seenKeys.add(key);
+        normalizedRefs.push({ rowIndex, blockIndex });
+      }
+    }
+
+    return normalizedRefs.sort(
+      (left, right) =>
+        left.rowIndex - right.rowIndex || left.blockIndex - right.blockIndex
+    );
+  };
+
+  const cloneControlElemClipboardRows = (blockElements) =>
+    controlElemClipboardRows
+      .map((clipboardRow) => ({
+        blocks: Array.isArray(clipboardRow.blocks)
+          ? clipboardRow.blocks
+            .map((block) => blockElements.cloneElement(block))
+            .filter(Boolean)
+          : [],
+        rowProperty: blockElements.cloneBlockProperties(
+          clipboardRow.rowProperty || new Block()
+        ),
+      }))
+      .filter((clipboardRow) => clipboardRow.blocks.length > 0);
+
+  const copyControlElements = (refs) => {
+    const blockElements = getActiveBlockElements();
+    const rows = blockElements?.rows;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      controlElemClipboardRows = [];
+      return { copied: false, copiedBlockCount: 0 };
+    }
+
+    const normalizedRefs = normalizeControlElemRefs(refs, blockElements);
+    if (!normalizedRefs.length) {
+      controlElemClipboardRows = [];
+      return { copied: false, copiedBlockCount: 0 };
+    }
+
+    const clipboardRows = [];
+    let currentClipboardRow = null;
+
+    for (const ref of normalizedRefs) {
+      if (!currentClipboardRow || currentClipboardRow.rowIndex !== ref.rowIndex) {
+        currentClipboardRow = {
+          rowIndex: ref.rowIndex,
+          blocks: [],
+          rowProperty: blockElements.cloneBlockProperties(
+            blockElements.blockProperties[ref.rowIndex]
+          ),
+        };
+        clipboardRows.push(currentClipboardRow);
+      }
+
+      currentClipboardRow.blocks.push(
+        blockElements.cloneElement(rows[ref.rowIndex][ref.blockIndex])
+      );
+    }
+
+    controlElemClipboardRows = clipboardRows;
+    return {
+      copied: true,
+      copiedBlockCount: normalizedRefs.length,
+      rowCount: clipboardRows.length,
+    };
+  };
+
+  const pasteControlElements = () => {
+    const blockElements = getActiveBlockElements();
+    const rows = blockElements?.rows;
+    if (!Array.isArray(rows)) {
+      return { pasted: false, pastedBlockCount: 0 };
+    }
+
+    const clipboardRows = cloneControlElemClipboardRows(blockElements);
+    if (!clipboardRows.length) {
+      return { pasted: false, pastedBlockCount: 0 };
+    }
+
+    if (rows.length === 0) {
+      rows.push([]);
+      blockElements.blockProperties.push(new Block());
+    }
+
+    const targetRowIndex = clamp(
+      currentlySelectedRowIndex,
+      0,
+      Math.max(0, rows.length - 1)
+    );
+
+    if (clipboardRows.length === 1) {
+      const targetRow = rows[targetRowIndex];
+      const insertIndex = targetRow.length
+        ? clamp(currentlySelectedBlockIndex + 1, 0, targetRow.length)
+        : 0;
+
+      targetRow.splice(insertIndex, 0, ...clipboardRows[0].blocks);
+      currentlySelectedRowIndex = targetRowIndex;
+      currentlySelectedBlockIndex = insertIndex;
+    } else {
+      const insertRowIndex = clamp(targetRowIndex + 1, 0, rows.length);
+      rows.splice(
+        insertRowIndex,
+        0,
+        ...clipboardRows.map((clipboardRow) => clipboardRow.blocks)
+      );
+      blockElements.blockProperties.splice(
+        insertRowIndex,
+        0,
+        ...clipboardRows.map((clipboardRow) => clipboardRow.rowProperty)
+      );
+      currentlySelectedRowIndex = insertRowIndex;
+      currentlySelectedBlockIndex = 0;
+    }
+
+    formHandler.updateForm();
+    redraw();
+    return {
+      pasted: true,
+      pastedBlockCount: clipboardRows.reduce(
+        (total, clipboardRow) => total + clipboardRow.blocks.length,
+        0
+      ),
+      rowCount: clipboardRows.length,
+    };
+  };
+
+  const replaceControlElemTypeAt = (rowIndex, blockIndex, nextElemType) => {
+    if (!Control.prototype.blockToClassElems[nextElemType]) {
+      return;
+    }
+
+    const blockElems = getActiveBlockElements();
+    const rows = blockElems && blockElems.rows;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return;
+    }
+
+    const normalizedRowIndex = clamp(
+      rowIndex,
+      0,
+      Math.max(0, rows.length - 1)
+    );
+    const row = rows[normalizedRowIndex];
+    if (!Array.isArray(row) || row.length === 0) {
+      return;
+    }
+
+    const normalizedBlockIndex = clamp(
+      blockIndex,
+      0,
+      Math.max(0, row.length - 1)
+    );
+    const previousBlock = row[normalizedBlockIndex];
+    if (!previousBlock) {
+      return;
+    }
+
+    const previousElemType =
+      Control.prototype.blockToClassElems.getElem(previousBlock);
+    currentlySelectedRowIndex = normalizedRowIndex;
+    currentlySelectedBlockIndex = normalizedBlockIndex;
+
+    if (previousElemType === nextElemType) {
+      formHandler.updateForm();
+      persistSessionState();
+      return;
+    }
+
+    const Constructor = Control.prototype.blockToClassElems[nextElemType];
+    if (typeof Constructor !== "function") {
+      return;
+    }
+
+    row[normalizedBlockIndex] = new Constructor();
     formHandler.updateForm();
     redraw();
   };
@@ -1226,7 +1443,16 @@ const app = (function () {
     );
 
     blockElements.rows.splice(insertRowIndex, 0, [duplicatedBlock]);
-    blockElements.blockProperties.splice(insertRowIndex, 0, new Block());
+    blockElements.blockProperties.splice(
+      insertRowIndex,
+      0,
+      typeof blockElements.createBlockWithNeighborBackground === "function"
+        ? blockElements.createBlockWithNeighborBackground(
+          insertRowIndex,
+          normalizedRow
+        )
+        : new Block()
+    );
 
     currentlySelectedRowIndex = insertRowIndex;
     currentlySelectedBlockIndex = 0;
@@ -1551,11 +1777,253 @@ const app = (function () {
     return true;
   };
 
-  // APL Arrow Management Functions
-  const addAPLArrow = function (type = "APL_UP") {
+  const APL_ARROW_KINDS = {
+    UP: { type: "APL_UP", flip: false },
+    UP_LEFT: { type: "APL_UP_TURN", flip: true },
+    UP_RIGHT: { type: "APL_UP_TURN", flip: false },
+    DUAL_TURN: { type: "APL_DUAL_TURN", flip: false },
+    LEFT_TURN: { type: "APL_TURN", flip: true },
+    RIGHT_TURN: { type: "APL_TURN", flip: false },
+    UP_CFX: { type: "APL_UP_CFX", flip: false },
+    UP_LEFT_CFX: { type: "APL_UP_TURN_CFX", flip: true },
+    UP_RIGHT_CFX: { type: "APL_UP_TURN_CFX", flip: false },
+    LEFT_TURN_CFX: { type: "APL_TURN_CFX", flip: true },
+    RIGHT_TURN_CFX: { type: "APL_TURN_CFX", flip: false },
+  };
+
+  const getAPLArrowKind = function (arrow) {
+    if (arrow && APL_ARROW_KINDS[arrow.kind]) {
+      return arrow.kind;
+    }
+    if (!arrow || arrow.type === "APL_UP") return "UP";
+    if (arrow.type === "APL_UP_TURN") return arrow.flip ? "UP_LEFT" : "UP_RIGHT";
+    if (arrow.type === "APL_DUAL_TURN") return "DUAL_TURN";
+    if (arrow.type === "APL_TURN") return arrow.flip ? "LEFT_TURN" : "RIGHT_TURN";
+    if (arrow.type === "APL_UP_CFX") return "UP_CFX";
+    if (arrow.type === "APL_UP_TURN_CFX") {
+      return arrow.flip ? "UP_LEFT_CFX" : "UP_RIGHT_CFX";
+    }
+    if (arrow.type === "APL_TURN_CFX") {
+      return arrow.flip ? "LEFT_TURN_CFX" : "RIGHT_TURN_CFX";
+    }
+    return "UP";
+  };
+
+  const normalizeAPLArrowKind = function (kindOrType, arrow) {
+    if (APL_ARROW_KINDS[kindOrType]) {
+      return kindOrType;
+    }
+    if (kindOrType === "APL_UP_TURN") {
+      return arrow && arrow.flip ? "UP_LEFT" : "UP_RIGHT";
+    }
+    if (kindOrType === "APL_TURN") {
+      return arrow && arrow.flip ? "LEFT_TURN" : "RIGHT_TURN";
+    }
+    if (kindOrType === "APL_DUAL_TURN") {
+      return "DUAL_TURN";
+    }
+    if (kindOrType === "APL_UP_CFX") {
+      return "UP_CFX";
+    }
+    if (kindOrType === "APL_UP_TURN_CFX") {
+      return arrow && arrow.flip ? "UP_LEFT_CFX" : "UP_RIGHT_CFX";
+    }
+    if (kindOrType === "APL_TURN_CFX") {
+      return arrow && arrow.flip ? "LEFT_TURN_CFX" : "RIGHT_TURN_CFX";
+    }
+    return "UP";
+  };
+
+  const applyAPLArrowKind = function (arrow, kindOrType) {
+    if (!arrow) {
+      return;
+    }
+    const kind = normalizeAPLArrowKind(kindOrType, arrow);
+    const definition = APL_ARROW_KINDS[kind] || APL_ARROW_KINDS.UP;
+    arrow.kind = kind;
+    arrow.type = definition.type;
+    arrow.flip = definition.flip;
+  };
+
+  const createAPLArrowData = function (kindOrType = "UP") {
     const sign = getCurrentPanel().sign;
-    sign.newAPLArrow(type);
-    currentlySelectedAPLArrowIndex = sign.aplArrows.length - 1;
+    sign.newAPLArrow((APL_ARROW_KINDS[kindOrType] || {}).type || kindOrType || "APL_UP");
+    const arrow = sign.aplArrows.pop();
+    applyAPLArrowKind(arrow, kindOrType);
+    return arrow;
+  };
+
+  const isAPLDividerArrow = function (arrow) {
+    return arrow?.placement === "divider" || arrow?.groupedWithDivider === true;
+  };
+
+  const orderAPLBucketForRendering = function (bucket) {
+    return bucket
+      .filter((arrow) => !isAPLDividerArrow(arrow))
+      .concat(bucket.filter((arrow) => isAPLDividerArrow(arrow)));
+  };
+
+  const getAPLArrowBuckets = function (sign) {
+    const subPanelCount = Math.max(1, sign?.subPanels?.length || 1);
+    const buckets = Array.from({ length: subPanelCount }, () => []);
+    const aplArrows = sign?.aplArrows || [];
+    const hasExplicitPlacement = aplArrows.some((arrow) => {
+      return (
+        arrow &&
+        (arrow.placement === "subpanel" ||
+          arrow.placement === "divider" ||
+          Number.isFinite(Number(arrow.subPanelIndex)) ||
+          Number.isFinite(Number(arrow.dividerAfterSubPanelIndex)))
+      );
+    });
+
+    if (hasExplicitPlacement) {
+      for (const arrow of aplArrows) {
+        if (isAPLDividerArrow(arrow)) {
+          const dividerIndex = clampFinite(
+            arrow.dividerAfterSubPanelIndex,
+            0,
+            Math.max(0, subPanelCount - 2),
+            0
+          );
+          arrow.placement = "divider";
+          arrow.groupedWithDivider = true;
+          arrow.dividerAfterSubPanelIndex = dividerIndex;
+          delete arrow.subPanelIndex;
+          buckets[dividerIndex].push(arrow);
+        } else {
+          const targetSubPanelIndex = clampFinite(
+            arrow.subPanelIndex,
+            0,
+            subPanelCount - 1,
+            0
+          );
+          arrow.placement = "subpanel";
+          arrow.groupedWithDivider = false;
+          arrow.subPanelIndex = targetSubPanelIndex;
+          delete arrow.dividerAfterSubPanelIndex;
+          buckets[targetSubPanelIndex].push(arrow);
+        }
+      }
+
+      return buckets.map(orderAPLBucketForRendering);
+    }
+
+    let bucketIndex = 0;
+
+    for (const arrow of aplArrows) {
+      buckets[Math.min(bucketIndex, subPanelCount - 1)].push(arrow);
+      if (arrow.dividerAfter && bucketIndex < subPanelCount - 1) {
+        bucketIndex++;
+      }
+    }
+
+    return buckets.map(orderAPLBucketForRendering);
+  };
+
+  const rebuildAPLArrowBuckets = function (sign, buckets) {
+    const subPanelCount = Math.max(1, sign?.subPanels?.length || 1);
+    const normalizedBuckets = Array.from(
+      { length: subPanelCount },
+      (_, index) => Array.isArray(buckets[index]) ? buckets[index] : []
+    );
+    const rebuiltArrows = [];
+
+    normalizedBuckets.forEach((bucket, bucketIndex) => {
+      const orderedBucket = orderAPLBucketForRendering(bucket);
+
+      orderedBucket.forEach((arrow, arrowIndex) => {
+        if (isAPLDividerArrow(arrow)) {
+          arrow.placement = "divider";
+          arrow.groupedWithDivider = true;
+          arrow.dividerAfterSubPanelIndex = Math.min(
+            bucketIndex,
+            Math.max(0, subPanelCount - 2)
+          );
+          delete arrow.subPanelIndex;
+        } else {
+          arrow.placement = "subpanel";
+          arrow.groupedWithDivider = false;
+          arrow.subPanelIndex = bucketIndex;
+          delete arrow.dividerAfterSubPanelIndex;
+        }
+
+        arrow.dividerAfter =
+          bucketIndex < subPanelCount - 1 && arrowIndex === orderedBucket.length - 1;
+        rebuiltArrows.push(arrow);
+      });
+    });
+
+    sign.aplArrows = rebuiltArrows;
+  };
+
+  const getAPLSubpanelGroupsForCurrentPanel = function () {
+    const sign = getCurrentPanel().sign;
+    const buckets = getAPLArrowBuckets(sign);
+
+    return buckets.map((bucket, index) => {
+      const arrowIndexes = bucket
+        .map((arrow) => sign.aplArrows.indexOf(arrow))
+        .filter((arrowIndex) => arrowIndex >= 0);
+      return {
+        start: index,
+        end: index,
+        indices: [index],
+        groupIndex: index,
+        label: "Subpanel " + (index + 1),
+        arrowIndexes,
+      };
+    });
+  };
+
+  // APL Arrow Management Functions
+  const addAPLArrow = function (
+    kindOrType = "UP",
+    { placement = "subpanel", subPanelIndex = currentlySelectedSubPanelIndex, dividerAfterSubPanelIndex = 0 } = {}
+  ) {
+    const sign = getCurrentPanel().sign;
+    const arrow = createAPLArrowData(kindOrType || "UP");
+    const shouldPlaceInBucket = arguments.length > 1;
+
+    if (shouldPlaceInBucket) {
+      const buckets = getAPLArrowBuckets(sign);
+      const targetIndex =
+        placement === "divider"
+          ? clampFinite(
+            dividerAfterSubPanelIndex,
+            0,
+            Math.max(0, buckets.length - 2),
+            0
+          )
+          : clampFinite(subPanelIndex, 0, buckets.length - 1, 0);
+
+      arrow.groupedWithDivider = placement === "divider";
+      arrow.exitOnly = placement === "divider" ? false : !!arrow.exitOnly;
+      buckets[targetIndex].push(arrow);
+      rebuildAPLArrowBuckets(sign, buckets);
+      currentlySelectedAPLArrowIndex = sign.aplArrows.indexOf(arrow);
+    } else {
+      sign.aplArrows.push(arrow);
+      currentlySelectedAPLArrowIndex = sign.aplArrows.length - 1;
+    }
+
+    sign.arrowMode = "apl";
+    sign.guideArrow = "None";
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const removeAPLArrowAt = function (index) {
+    const sign = getCurrentPanel().sign;
+    if (index < 0 || index >= sign.aplArrows.length) {
+      return;
+    }
+    sign.aplArrows.splice(index, 1);
+    currentlySelectedAPLArrowIndex = clamp(
+      currentlySelectedAPLArrowIndex,
+      0,
+      Math.max(0, sign.aplArrows.length - 1)
+    );
     formHandler.updateForm();
     redraw();
   };
@@ -1565,12 +2033,7 @@ const app = (function () {
     if (sign.aplArrows.length === 0) {
       return;
     }
-    sign.deleteAPLArrow(currentlySelectedAPLArrowIndex);
-    if (currentlySelectedAPLArrowIndex >= sign.aplArrows.length) {
-      currentlySelectedAPLArrowIndex = Math.max(0, sign.aplArrows.length - 1);
-    }
-    formHandler.updateForm();
-    redraw();
+    removeAPLArrowAt(currentlySelectedAPLArrowIndex);
   };
 
   const selectAPLArrow = function (index) {
@@ -1580,10 +2043,11 @@ const app = (function () {
     persistSessionState();
   };
 
-  const updateAPLArrowType = function (type) {
+  const updateAPLArrowType = function (kindOrType, index = currentlySelectedAPLArrowIndex) {
     const sign = getCurrentPanel().sign;
-    if (sign.aplArrows.length > 0 && currentlySelectedAPLArrowIndex < sign.aplArrows.length) {
-      sign.updateAPLArrowType(currentlySelectedAPLArrowIndex, type);
+    if (sign.aplArrows.length > 0 && index >= 0 && index < sign.aplArrows.length) {
+      applyAPLArrowKind(sign.aplArrows[index], kindOrType);
+      currentlySelectedAPLArrowIndex = index;
       formHandler.updateForm();
       redraw();
     }
@@ -1622,6 +2086,160 @@ const app = (function () {
       formHandler.updateForm();
       redraw();
     }
+  };
+
+  const addAPLDividerArrow = function (dividerAfterSubPanelIndex) {
+    addAPLArrow("UP_RIGHT", {
+      placement: "divider",
+      dividerAfterSubPanelIndex,
+    });
+  };
+
+  const moveAPLArrow = function (
+    fromIndex,
+    { placement = "subpanel", subPanelIndex = 0, dividerAfterSubPanelIndex = 0, beforeIndex = null } = {}
+  ) {
+    const sign = getCurrentPanel().sign;
+    if (fromIndex < 0 || fromIndex >= sign.aplArrows.length) {
+      return;
+    }
+
+    const arrow = sign.aplArrows[fromIndex];
+    const buckets = getAPLArrowBuckets(sign);
+
+    for (const bucket of buckets) {
+      const existingIndex = bucket.indexOf(arrow);
+      if (existingIndex >= 0) {
+        bucket.splice(existingIndex, 1);
+        break;
+      }
+    }
+
+    const targetIndex =
+      placement === "divider"
+        ? clampFinite(
+          dividerAfterSubPanelIndex,
+          0,
+          Math.max(0, buckets.length - 2),
+          0
+        )
+        : clampFinite(subPanelIndex, 0, buckets.length - 1, 0);
+    const targetBucket = buckets[targetIndex];
+    const beforeArrow =
+      typeof beforeIndex === "number" && beforeIndex >= 0
+        ? sign.aplArrows[beforeIndex]
+        : null;
+    const insertIndex = beforeArrow ? targetBucket.indexOf(beforeArrow) : -1;
+
+    arrow.groupedWithDivider = placement === "divider";
+    if (placement === "divider") {
+      arrow.exitOnly = false;
+    }
+
+    if (insertIndex >= 0) {
+      targetBucket.splice(insertIndex, 0, arrow);
+    } else {
+      targetBucket.push(arrow);
+    }
+
+    rebuildAPLArrowBuckets(sign, buckets);
+    currentlySelectedAPLArrowIndex = sign.aplArrows.indexOf(arrow);
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const initializeAPLArrowsForCurrentPanel = function () {
+    const sign = getCurrentPanel().sign;
+    sign.arrowMode = "apl";
+    sign.guideArrow = "None";
+
+    if (sign.aplArrows && sign.aplArrows.length > 0) {
+      formHandler.updateForm();
+      redraw();
+      return;
+    }
+
+    const subPanelCount = Math.max(1, sign.subPanels.length);
+    const buckets = Array.from({ length: subPanelCount }, () => []);
+    const makeArrow = function (kind, groupedWithDivider = false) {
+      const arrow = createAPLArrowData(kind);
+      arrow.groupedWithDivider = groupedWithDivider;
+      arrow.exitOnly = false;
+      return arrow;
+    };
+
+    if (subPanelCount === 1) {
+      buckets[0].push(makeArrow("UP"));
+    } else if (subPanelCount === 2) {
+      buckets[0].push(makeArrow("UP"));
+      buckets[0].push(makeArrow("UP_RIGHT", true));
+      buckets[1].push(makeArrow("RIGHT_TURN"));
+    } else if (subPanelCount === 3) {
+      buckets[0].push(makeArrow("LEFT_TURN"));
+      buckets[0].push(makeArrow("UP_LEFT", true));
+      buckets[1].push(makeArrow("UP"));
+      buckets[1].push(makeArrow("UP_RIGHT", true));
+      buckets[2].push(makeArrow("RIGHT_TURN"));
+    } else {
+      for (let index = 0; index < subPanelCount; index++) {
+        const isFirst = index === 0;
+        const isLast = index === subPanelCount - 1;
+        buckets[index].push(
+          makeArrow(isFirst ? "LEFT_TURN" : isLast ? "RIGHT_TURN" : "UP")
+        );
+
+        if (!isLast) {
+          buckets[index].push(makeArrow(isFirst ? "UP_LEFT" : "UP_RIGHT", true));
+        }
+      }
+    }
+
+    rebuildAPLArrowBuckets(sign, buckets);
+    currentlySelectedAPLArrowIndex = 0;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const addAPLSubPanelLeftAndOpen = function () {
+    const sign = getCurrentPanel().sign;
+    const selectedIndex = clamp(
+      currentlySelectedSubPanelIndex,
+      0,
+      Math.max(0, sign.subPanels.length - 1)
+    );
+    sign.newSubPanel();
+    const newSubPanel = sign.subPanels.pop();
+    sign.subPanels.splice(selectedIndex, 0, newSubPanel);
+    currentlySelectedSubPanelIndex = selectedIndex;
+    resetGroupEditing();
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const addAPLSubPanelRightAndOpen = function () {
+    const sign = getCurrentPanel().sign;
+    const selectedIndex = clamp(
+      currentlySelectedSubPanelIndex,
+      0,
+      Math.max(0, sign.subPanels.length - 1)
+    );
+    sign.newSubPanel();
+    const newSubPanel = sign.subPanels.pop();
+    sign.subPanels.splice(selectedIndex + 1, 0, newSubPanel);
+    currentlySelectedSubPanelIndex = selectedIndex + 1;
+    resetGroupEditing();
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setCurrentPanelArrowMode = function (mode) {
+    const sign = getCurrentPanel().sign;
+    sign.arrowMode = mode === "apl" ? "apl" : "standard";
+    if (sign.arrowMode === "apl") {
+      sign.guideArrow = "None";
+    }
+    formHandler.updateForm();
+    redraw();
   };
 
   const buildMileageTemplate = () => {
@@ -1745,18 +2363,11 @@ const app = (function () {
   */
 
   function getFile() {
-    var screenshotTarget;
-    var postClass;
-
     if (fileInfo.panel == -1) {
-      screenshotTarget = document.querySelector("#postContainer");
-    } else {
-      screenshotTarget = document.getElementById(
-        "panel" + fileInfo.panel.toString()
-      );
+      return document.querySelector("#postContainer");
     }
 
-    return screenshotTarget;
+    return document.getElementById("panel" + fileInfo.panel.toString());
   }
 
   const downloadFile = function (dataURL, ending) {
@@ -1767,50 +2378,1516 @@ const app = (function () {
     a.remove();
   };
 
-  const saveSign = async function (file, isPreview, isSVG) {
-    let newElem = file.cloneNode(true);
-    newElem.style.position = "absolute";
-    newElem.style.top = "0";
-    newElem.style.left = "0";
-    document.body.appendChild(newElem);
-    return new Promise((resolve, reject) => {
-      let svg = htmlToImage.toSvg(newElem);
-      newElem.remove();
-      svg
-        .then(function (dataUrl) {
-          if (isSVG) {
-            if (isPreview) {
-              resolve(dataUrl);
-            }
-            downloadFile(dataUrl, ".svg");
-            return;
-          }
+  const downloadBlob = function (blob, ending) {
+    const url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "downloadedSign" + ending);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
 
-          let tmpCanvas = document.createElement("canvas");
-          let ctx = tmpCanvas.getContext("2d");
+  const waitForImagesInElement = async (root, timeoutMs = 2500) => {
+    if (!root) {
+      return;
+    }
 
-          let tmpImg = new Image();
-          tmpImg.addEventListener("load", onTempImageLoad);
-          tmpImg.src = dataUrl;
+    const images = Array.from(root.querySelectorAll("img"));
+    if (!images.length) {
+      return;
+    }
 
-          tmpCanvas.width = tmpCanvas.height = 512;
-          function onTempImageLoad(e) {
-            tmpCanvas.width = e.target.width;
-            tmpCanvas.height = e.target.height;
+    for (const img of images) {
+      img.loading = "eager";
+      img.decoding = "sync";
+    }
 
-            ctx.drawImage(e.target, 0, 0);
-            if (isPreview) {
-              resolve(tmpCanvas.toDataURL());
-            } else {
-              downloadFile(tmpCanvas.toDataURL(), ".png");
-              resolve(true);
-            }
-          }
-        })
-        .catch(function (error) {
-          console.error("Error Saving!", error);
-        });
+    const imagePromises = images.map((img) => {
+      if (img.complete) {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve) => {
+        const done = () => {
+          img.removeEventListener("load", done);
+          img.removeEventListener("error", done);
+          resolve();
+        };
+        img.addEventListener("load", done, { once: true });
+        img.addEventListener("error", done, { once: true });
+      });
     });
+
+    await Promise.race([
+      Promise.all(imagePromises),
+      new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
+  };
+
+  const waitForNextFrame = () =>
+    new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+
+  const MAX_EXPORT_CANVAS_DIMENSION = 16384;
+  const MAX_EXPORT_CANVAS_PIXELS = 134217728;
+
+  const getExportPixelRatio = (width, height, isPreview) => {
+    if (isPreview) {
+      return 1;
+    }
+
+    const safeWidth = Math.max(width, 1);
+    const safeHeight = Math.max(height, 1);
+    const dimensionRatio =
+      MAX_EXPORT_CANVAS_DIMENSION / Math.max(safeWidth, safeHeight);
+    const areaRatio = Math.sqrt(
+      MAX_EXPORT_CANVAS_PIXELS / Math.max(safeWidth * safeHeight, 1)
+    );
+    const maxRatio = Math.min(dimensionRatio, areaRatio);
+    const requestedRatio = Number.isFinite(post.copyScale) ? post.copyScale : 8;
+    const safeRequestedRatio = requestedRatio <= 0 ? 0.1 : requestedRatio;
+
+    return Math.max(0.1, Math.min(safeRequestedRatio, Math.floor(maxRatio * 100) / 100));
+  };
+
+  const getExportBox = (element) => {
+    const rect = element.getBoundingClientRect();
+    const exportWidth = Number.parseFloat(element.dataset?.exportWidth || "");
+    const exportHeight = Number.parseFloat(element.dataset?.exportHeight || "");
+
+    if (
+      Number.isFinite(exportWidth) &&
+      exportWidth > 0 &&
+      Number.isFinite(exportHeight) &&
+      exportHeight > 0
+    ) {
+      return {
+        width: Math.ceil(exportWidth),
+        height: Math.ceil(exportHeight),
+      };
+    }
+
+    return {
+      width: Math.ceil(
+        Math.max(rect.width, element.scrollWidth, element.offsetWidth, 1)
+      ),
+      height: Math.ceil(
+        Math.max(rect.height, element.scrollHeight, element.offsetHeight, 1)
+      ),
+    };
+  };
+
+  const readBlobAsDataUrl = (blob) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+  const loadImageFromBlob = (blob) =>
+    new Promise((resolve, reject) => {
+      const imageUrl = URL.createObjectURL(blob);
+      const image = new Image();
+      const cleanup = () => URL.revokeObjectURL(imageUrl);
+
+      image.onload = () => {
+        cleanup();
+        resolve(image);
+      };
+      image.onerror = () => {
+        cleanup();
+        reject(new Error("Unable to decode exported PNG"));
+      };
+      image.src = imageUrl;
+    });
+
+  const decodeImageForTrim = async (blob) => {
+    if (typeof createImageBitmap === "function") {
+      try {
+        const imageBitmap = await createImageBitmap(blob);
+        return {
+          image: imageBitmap,
+          cleanup: () => {
+            if (typeof imageBitmap.close === "function") {
+              imageBitmap.close();
+            }
+          },
+        };
+      } catch (error) {
+        // Fall back to Image decoding below.
+      }
+    }
+
+    return {
+      image: await loadImageFromBlob(blob),
+      cleanup: () => {},
+    };
+  };
+
+  const trimTransparentPngBlob = async (blob) => {
+    if (!blob) {
+      return blob;
+    }
+
+    let decodedImage = null;
+
+    try {
+      decodedImage = await decodeImageForTrim(blob);
+      const image = decodedImage.image;
+      const width = image.naturalWidth || image.width;
+      const height = image.naturalHeight || image.height;
+
+      if (!width || !height) {
+        return blob;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+
+      if (!context) {
+        return blob;
+      }
+
+      context.drawImage(image, 0, 0);
+      const pixels = context.getImageData(0, 0, width, height).data;
+      let minX = width;
+      let minY = height;
+      let maxX = -1;
+      let maxY = -1;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const alpha = pixels[(y * width + x) * 4 + 3];
+
+          if (alpha === 0) {
+            continue;
+          }
+
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
+      }
+
+      if (
+        maxX < minX ||
+        maxY < minY ||
+        (minX === 0 && minY === 0 && maxX === width - 1 && maxY === height - 1)
+      ) {
+        return blob;
+      }
+
+      const trimWidth = maxX - minX + 1;
+      const trimHeight = maxY - minY + 1;
+      const trimCanvas = document.createElement("canvas");
+      trimCanvas.width = trimWidth;
+      trimCanvas.height = trimHeight;
+      const trimContext = trimCanvas.getContext("2d");
+
+      if (!trimContext) {
+        return blob;
+      }
+
+      trimContext.drawImage(
+        canvas,
+        minX,
+        minY,
+        trimWidth,
+        trimHeight,
+        0,
+        0,
+        trimWidth,
+        trimHeight
+      );
+
+      return await new Promise((resolve) => {
+        trimCanvas.toBlob((trimmedBlob) => {
+          resolve(trimmedBlob || blob);
+        }, "image/png");
+      });
+    } catch (error) {
+      return blob;
+    } finally {
+      if (decodedImage) {
+        decodedImage.cleanup();
+      }
+    }
+  };
+
+  const inlineFontFaceUrls = async (cssText, baseHref) => {
+    if (!cssText || !cssText.includes("url(")) {
+      return cssText || "";
+    }
+
+    const replacements = [];
+    const urlRegex = /url\((['"]?)([^'")]+)\1\)/g;
+    let match;
+
+    while ((match = urlRegex.exec(cssText)) !== null) {
+      const fullMatch = match[0];
+      const rawUrl = String(match[2] || "").trim();
+
+      if (!rawUrl || rawUrl.startsWith("data:")) {
+        continue;
+      }
+
+      let resolvedUrl = rawUrl;
+
+      try {
+        resolvedUrl = new URL(rawUrl, baseHref || document.baseURI).href;
+        const response = await fetch(resolvedUrl);
+
+        if (!response.ok) {
+          throw new Error("Unable to fetch font " + response.status);
+        }
+
+        const dataUrl = await readBlobAsDataUrl(await response.blob());
+        replacements.push([fullMatch, `url(${dataUrl})`]);
+      } catch (error) {
+        if (resolvedUrl && !String(resolvedUrl).startsWith("file:")) {
+          replacements.push([fullMatch, `url("${resolvedUrl}")`]);
+        }
+      }
+    }
+
+    let inlinedCss = cssText;
+    for (const [from, to] of replacements) {
+      inlinedCss = inlinedCss.split(from).join(to);
+    }
+
+    return inlinedCss;
+  };
+
+  const waitForDocumentFonts = async (timeoutMs = 3000) => {
+    if (!document.fonts || !document.fonts.ready) {
+      return;
+    }
+
+    await Promise.race([
+      document.fonts.ready.catch(() => {}),
+      new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
+  };
+
+  const getBundledExportFontEmbedCSS = () => {
+    const bundledFaces = Array.isArray(window.SIGNMAKER_EXPORT_FONT_FACES)
+      ? window.SIGNMAKER_EXPORT_FONT_FACES
+      : [];
+
+    return bundledFaces
+      .filter((fontFace) => fontFace && fontFace.fontFamily && fontFace.data)
+      .map((fontFace) => {
+        const format = fontFace.format || "woff2";
+        const mimeType =
+          format === "woff"
+            ? "font/woff"
+            : format === "truetype"
+              ? "application/font-truetype"
+              : "font/woff2";
+
+        return [
+          "@font-face {",
+          `  font-family: "${fontFace.fontFamily}";`,
+          `  src: url("data:${mimeType};base64,${fontFace.data}") format("${format}");`,
+          `  font-weight: ${fontFace.fontWeight || "normal"};`,
+          `  font-style: ${fontFace.fontStyle || "normal"};`,
+          "  font-display: block;",
+          "}",
+        ].join("\n");
+      })
+      .join("\n");
+  };
+
+  const getBundledExportFontFamilySet = () => {
+    const bundledFaces = Array.isArray(window.SIGNMAKER_EXPORT_FONT_FACES)
+      ? window.SIGNMAKER_EXPORT_FONT_FACES
+      : [];
+
+    return new Set(
+      bundledFaces
+        .map((fontFace) =>
+          String(fontFace?.fontFamily || "").replace(/^["']|["']$/g, "")
+        )
+        .filter(Boolean)
+    );
+  };
+
+  const quoteExportFontFamily = (fontFamily) =>
+    `"${String(fontFamily || "")
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"')}"`;
+
+  const getExportFontFamilyValue = (fontFamily) => {
+    const quotedFontFamily = quoteExportFontFamily(fontFamily);
+    return fontFamily === "Series EM"
+      ? quotedFontFamily
+      : `${quotedFontFamily}, "Series EM"`;
+  };
+
+  let bundledExportFontStyleElement = null;
+
+  const ensureBundledExportFontsAvailable = async (root) => {
+    const bundledFontCSS = getBundledExportFontEmbedCSS();
+    if (!bundledFontCSS || !document.fonts) {
+      return;
+    }
+
+    if (!bundledExportFontStyleElement) {
+      bundledExportFontStyleElement = document.createElement("style");
+      bundledExportFontStyleElement.id = "signmaker-export-font-bundle";
+      bundledExportFontStyleElement.textContent = bundledFontCSS;
+      document.head.appendChild(bundledExportFontStyleElement);
+    }
+
+    const fontFamilies = new Set();
+    const exportFontElements =
+      root instanceof Element
+        ? [
+            ...(root.matches("[data-export-font-family]") ? [root] : []),
+            ...Array.from(root.querySelectorAll("[data-export-font-family]")),
+          ]
+        : [];
+
+    exportFontElements.forEach((element) => {
+      const fontFamily = element.dataset.exportFontFamily;
+      if (fontFamily) {
+        fontFamilies.add(fontFamily);
+      }
+    });
+
+    const fontLoadPromises = Array.from(fontFamilies).map((fontFamily) =>
+      document.fonts.load(`16px ${quoteExportFontFamily(fontFamily)}`).catch(() => {})
+    );
+
+    await Promise.race([
+      Promise.all(fontLoadPromises),
+      new Promise((resolve) => setTimeout(resolve, 3000)),
+    ]);
+
+    await waitForDocumentFonts();
+  };
+
+  const applyExplicitExportFontFamilies = (root) => {
+    if (!root) {
+      return () => {};
+    }
+
+    const restoreCallbacks = [];
+    const exportFontElements =
+      root instanceof Element
+        ? [
+            ...(root.matches("[data-export-font-family]") ? [root] : []),
+            ...Array.from(root.querySelectorAll("[data-export-font-family]")),
+          ]
+        : [];
+
+    exportFontElements.forEach((element) => {
+      const fontFamily = element.dataset.exportFontFamily;
+      if (!fontFamily) {
+        return;
+      }
+
+      const fontFamilyValue = getExportFontFamilyValue(fontFamily);
+
+      [element, ...Array.from(element.querySelectorAll("*"))].forEach(
+        (fontElement) => {
+          const oldFontFamily = fontElement.style.getPropertyValue("font-family");
+          const oldPriority = fontElement.style.getPropertyPriority("font-family");
+
+          fontElement.style.setProperty(
+            "font-family",
+            fontFamilyValue,
+            "important"
+          );
+          restoreCallbacks.push(() => {
+            if (oldFontFamily) {
+              fontElement.style.setProperty(
+                "font-family",
+                oldFontFamily,
+                oldPriority
+              );
+            } else {
+              fontElement.style.removeProperty("font-family");
+            }
+          });
+        }
+      );
+    });
+
+    return () => {
+      for (const restore of restoreCallbacks.reverse()) {
+        restore();
+      }
+    };
+  };
+
+  let bundledExportAssetLowerMap = null;
+
+  const getBundledExportAssetMap = () =>
+    window.SIGNMAKER_EXPORT_ASSETS &&
+    typeof window.SIGNMAKER_EXPORT_ASSETS === "object"
+      ? window.SIGNMAKER_EXPORT_ASSETS
+      : {};
+
+  const getBundledExportAssetLowerMap = () => {
+    if (bundledExportAssetLowerMap) {
+      return bundledExportAssetLowerMap;
+    }
+
+    bundledExportAssetLowerMap = {};
+    const assetMap = getBundledExportAssetMap();
+    Object.keys(assetMap).forEach((assetPath) => {
+      bundledExportAssetLowerMap[assetPath.toLowerCase()] = assetMap[assetPath];
+    });
+    return bundledExportAssetLowerMap;
+  };
+
+  const normalizeExportAssetPath = (rawUrl) => {
+    if (!rawUrl || String(rawUrl).startsWith("data:")) {
+      return "";
+    }
+
+    const cleanUrl = String(rawUrl).split("#")[0].split("?")[0];
+
+    try {
+      const url = new URL(cleanUrl, document.baseURI);
+      const decodedPath = decodeURIComponent(url.pathname || "");
+      const imgIndex = decodedPath.lastIndexOf("/img/");
+      if (imgIndex >= 0) {
+        return decodedPath.slice(imgIndex + 1);
+      }
+      if (decodedPath.startsWith("/img/")) {
+        return decodedPath.slice(1);
+      }
+    } catch (error) {
+      // Fall through to relative path normalization.
+    }
+
+    const decodedCleanUrl = decodeURIComponent(cleanUrl);
+    const normalized = decodedCleanUrl.replace(/\\/g, "/").replace(/^\.?\//, "");
+    const imgIndex = normalized.lastIndexOf("img/");
+    return imgIndex >= 0 ? normalized.slice(imgIndex) : normalized;
+  };
+
+  const getBundledExportAssetDataUrl = (rawUrl) => {
+    const assetPath = normalizeExportAssetPath(rawUrl);
+    if (!assetPath) {
+      return "";
+    }
+
+    const assetMap = getBundledExportAssetMap();
+    return (
+      assetMap[assetPath] ||
+      getBundledExportAssetLowerMap()[assetPath.toLowerCase()] ||
+      ""
+    );
+  };
+
+  const inlineBundledExportAssets = (root) => {
+    if (!root) {
+      return;
+    }
+
+    root.querySelectorAll("img[src]").forEach((img) => {
+      const dataUrl =
+        getBundledExportAssetDataUrl(img.getAttribute("src")) ||
+        getBundledExportAssetDataUrl(img.src);
+
+      if (!dataUrl) {
+        return;
+      }
+
+      img.removeAttribute("srcset");
+      img.src = dataUrl;
+    });
+
+    root.querySelectorAll("object[data]").forEach((objectElement) => {
+      const dataUrl =
+        getBundledExportAssetDataUrl(objectElement.getAttribute("data")) ||
+        getBundledExportAssetDataUrl(objectElement.data);
+
+      if (dataUrl) {
+        objectElement.data = dataUrl;
+      }
+    });
+
+    root
+      .querySelectorAll("image[href], image[xlink\\:href]")
+      .forEach((imageElement) => {
+        const href =
+          imageElement.getAttribute("href") ||
+          imageElement.getAttribute("xlink:href");
+        const dataUrl = getBundledExportAssetDataUrl(href);
+
+        if (!dataUrl) {
+          return;
+        }
+
+        imageElement.setAttribute("href", dataUrl);
+        imageElement.setAttribute("xlink:href", dataUrl);
+      });
+  };
+
+  let safeExportFontEmbedCSSPromise = null;
+
+  const getSafeExportFontEmbedCSS = async () => {
+    if (safeExportFontEmbedCSSPromise) {
+      return safeExportFontEmbedCSSPromise;
+    }
+
+    safeExportFontEmbedCSSPromise = (async () => {
+      const fontFaceRules = [];
+      const bundledFontFamilies = getBundledExportFontFamilySet();
+
+      for (const sheet of Array.from(document.styleSheets)) {
+        let rules;
+
+        try {
+          rules = Array.from(sheet.cssRules || []);
+        } catch (error) {
+          continue;
+        }
+
+        for (const rule of rules) {
+          if (rule.type === CSSRule.FONT_FACE_RULE) {
+            const fontFamily = String(
+              rule.style.getPropertyValue("font-family") || ""
+            ).replace(/^["']|["']$/g, "");
+
+            if (bundledFontFamilies.has(fontFamily)) {
+              continue;
+            }
+
+            fontFaceRules.push({
+              cssText: rule.cssText,
+              baseHref: sheet.href || document.baseURI,
+            });
+          }
+        }
+      }
+
+      const inlinedRules = await Promise.all(
+        fontFaceRules.map((rule) =>
+          inlineFontFaceUrls(rule.cssText, rule.baseHref)
+        )
+      );
+
+      return [inlinedRules.join("\n"), getBundledExportFontEmbedCSS()]
+        .filter(Boolean)
+        .join("\n");
+    })();
+
+    return safeExportFontEmbedCSSPromise;
+  };
+
+  const materializeExportBannerFirstLetters = (root) => {
+    if (!root) {
+      return () => {};
+    }
+
+    const bannerElements = Array.from(
+      root.querySelectorAll(
+        ".bannerA:not(.TOLL):not(.noIndent), .bannerB:not(.TOLL):not(.noIndent), .bE-banner"
+      )
+    );
+
+    const restoreCallbacks = [];
+
+    for (const bannerEl of bannerElements) {
+      const text = bannerEl.textContent || "";
+
+      if (!text.trim()) {
+        continue;
+      }
+
+      const firstVisibleMatch = text.match(/\S/);
+
+      if (!firstVisibleMatch) {
+        continue;
+      }
+
+      const baseStyle = window.getComputedStyle(bannerEl);
+      const firstLetterStyle = window.getComputedStyle(
+        bannerEl,
+        "::first-letter"
+      );
+
+      const originalHTML = bannerEl.innerHTML;
+      const originalClassName = bannerEl.className;
+
+      const firstIndex = firstVisibleMatch.index;
+      const beforeFirst = text.slice(0, firstIndex);
+      const firstLetter = text.charAt(firstIndex);
+      const afterFirst = text.slice(firstIndex + 1);
+
+      const firstLetterSpan = document.createElement("span");
+      firstLetterSpan.className = "exportBannerFirstLetter";
+      firstLetterSpan.textContent = firstLetter;
+
+      const copiedProperties = [
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "fontStyle",
+        "fontStretch",
+        "letterSpacing",
+        "lineHeight",
+        "color",
+        "textTransform",
+      ];
+
+      for (const property of copiedProperties) {
+        const value = firstLetterStyle[property];
+
+        if (value && value !== baseStyle[property]) {
+          firstLetterSpan.style[property] = value;
+        }
+      }
+
+      bannerEl.classList.add("exportRealFirstLetter");
+      bannerEl.replaceChildren();
+
+      if (beforeFirst) {
+        bannerEl.appendChild(document.createTextNode(beforeFirst));
+      }
+
+      bannerEl.appendChild(firstLetterSpan);
+
+      if (afterFirst) {
+        bannerEl.appendChild(document.createTextNode(afterFirst));
+      }
+
+      restoreCallbacks.push(() => {
+        bannerEl.className = originalClassName;
+        bannerEl.innerHTML = originalHTML;
+      });
+    }
+
+    return () => {
+      for (const restore of restoreCallbacks.reverse()) {
+        restore();
+      }
+    };
+  };
+
+  const isElementVisibleForExport = (node) => {
+    if (!node || !(node instanceof Element)) {
+      return false;
+    }
+
+    const style = window.getComputedStyle(node);
+    if (
+      style.display === "none" ||
+      style.visibility === "hidden" ||
+      style.opacity === "0"
+    ) {
+      return false;
+    }
+
+    const rect = node.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  };
+
+  const EXPORT_SIGN_BOUNDS_SELECTOR = [
+    ".sign",
+    ".exitTabContainer.tabVisible",
+    ".exitTabHolder",
+    ".exitTab",
+    ".guideArrows",
+    ".sideLeftArrow",
+    ".sideRightArrow",
+  ].join(", ");
+
+  const getPreferredExportBoundsElements = (element) => {
+    if (!element || !(element instanceof Element)) {
+      return [];
+    }
+
+    const boundsElements = [];
+
+    if (element.matches(EXPORT_SIGN_BOUNDS_SELECTOR)) {
+      boundsElements.push(element);
+    }
+
+    element.querySelectorAll(EXPORT_SIGN_BOUNDS_SELECTOR).forEach((node) => {
+      boundsElements.push(node);
+    });
+
+    return boundsElements.filter(isElementVisibleForExport);
+  };
+
+  const getElementAndDescendantBounds = (element, { includeSelf = true } = {}) => {
+    const rects = [];
+    const addRect = (node) => {
+      if (!isElementVisibleForExport(node)) {
+        return;
+      }
+
+      const rect = node.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        rects.push(rect);
+      }
+    };
+
+    const preferredBoundsElements = getPreferredExportBoundsElements(element);
+
+    if (preferredBoundsElements.length) {
+      preferredBoundsElements.forEach(addRect);
+    } else if (includeSelf) {
+      addRect(element);
+    }
+
+    if (!preferredBoundsElements.length) {
+      element.querySelectorAll("*").forEach(addRect);
+    }
+
+    if (!rects.length) {
+      const fallbackRect = element.getBoundingClientRect();
+      return {
+        left: fallbackRect.left,
+        top: fallbackRect.top,
+        right: fallbackRect.right,
+        bottom: fallbackRect.bottom,
+        width: Math.max(fallbackRect.width, 1),
+        height: Math.max(fallbackRect.height, 1),
+      };
+    }
+
+    const left = Math.min(...rects.map((rect) => rect.left));
+    const top = Math.min(...rects.map((rect) => rect.top));
+    const right = Math.max(...rects.map((rect) => rect.right));
+    const bottom = Math.max(...rects.map((rect) => rect.bottom));
+
+    return {
+      left,
+      top,
+      right,
+      bottom,
+      width: Math.max(right - left, 1),
+      height: Math.max(bottom - top, 1),
+    };
+  };
+
+  const isPanelExportSourceElement = (child) =>
+    child?.classList && child.classList.contains("panel");
+
+  const getExportCloneSourceElements = (element) => {
+    if (!element) {
+      return [];
+    }
+
+    if (element.id === "panelContainer") {
+      const panels = Array.from(element.children).filter(isPanelExportSourceElement);
+      return panels.length ? panels : [element];
+    }
+
+    if (element.id === "postContainer") {
+      return Array.from(element.children).filter(
+        (child) =>
+          (child.id === "panelContainer" ||
+            (child.classList && child.classList.contains("post"))) &&
+          isElementVisibleForExport(child)
+      );
+    }
+
+    return [element];
+  };
+
+  const getExportLayoutScale = (element) => {
+    if (!element) {
+      return 1;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const layoutWidth = element.offsetWidth || element.scrollWidth || 0;
+    const layoutHeight = element.offsetHeight || element.scrollHeight || 0;
+
+    const scaleX =
+      layoutWidth > 0 && rect.width > 0 ? rect.width / layoutWidth : 1;
+    const scaleY =
+      layoutHeight > 0 && rect.height > 0 ? rect.height / layoutHeight : scaleX;
+
+    const scales = [scaleX, scaleY].filter(
+      (value) => Number.isFinite(value) && value > 0
+    );
+
+    if (!scales.length) {
+      return 1;
+    }
+
+    return Math.max(0.01, Math.min(...scales));
+  };
+
+  const clearExportSelectionClasses = (clone) => {
+    if (!clone || !clone.classList) {
+      return;
+    }
+
+    clone.classList.remove("groupPreviewPanel");
+    clone.querySelectorAll(".groupPreviewPanel").forEach((node) => {
+      node.classList.remove("groupPreviewPanel");
+    });
+  };
+
+  const createStaticExportClone = (element) => {
+    if (!element || !element.isConnected) {
+      return null;
+    }
+
+    const sourceElements = getExportCloneSourceElements(element).filter(
+      isElementVisibleForExport
+    );
+
+    if (!sourceElements.length) {
+      return null;
+    }
+
+    const layoutScale = getExportLayoutScale(element);
+    const normalizeMeasurement = (value) => value / layoutScale;
+
+    const sourceInfos = sourceElements.map((sourceElement) => {
+      const includePanelContainerSelf =
+        sourceElement.id === "panelContainer" && element.id !== "panelContainer";
+
+      return {
+        sourceElement,
+        sourceRect: sourceElement.getBoundingClientRect(),
+        bounds: getElementAndDescendantBounds(sourceElement, {
+          includeSelf:
+            includePanelContainerSelf ||
+            (sourceElement.id !== "panelContainer" &&
+              !isPanelExportSourceElement(sourceElement)),
+        }),
+      };
+    });
+
+    const left = Math.min(...sourceInfos.map((info) => info.bounds.left));
+    const top = Math.min(...sourceInfos.map((info) => info.bounds.top));
+    const right = Math.max(...sourceInfos.map((info) => info.bounds.right));
+    const bottom = Math.max(...sourceInfos.map((info) => info.bounds.bottom));
+    const exportWidth = Math.ceil(normalizeMeasurement(right - left));
+    const exportHeight = Math.ceil(normalizeMeasurement(bottom - top));
+
+    const host = document.createElement("div");
+    host.className = "exportStaticCaptureHost";
+    host.style.position = "fixed";
+    host.style.left = "calc(100vw + 100px)";
+    host.style.top = "0";
+    host.style.width = exportWidth + "px";
+    host.style.height = exportHeight + "px";
+    host.style.overflow = "hidden";
+    host.style.background = "transparent";
+    host.style.pointerEvents = "none";
+    host.style.zIndex = "0";
+    host.style.boxSizing = "border-box";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "exportStaticCaptureWrapper";
+    wrapper.style.position = "relative";
+    wrapper.style.left = "0";
+    wrapper.style.top = "0";
+    wrapper.style.width = exportWidth + "px";
+    wrapper.style.height = exportHeight + "px";
+    wrapper.style.overflow = "hidden";
+    wrapper.style.background = "transparent";
+    wrapper.style.pointerEvents = "none";
+    wrapper.style.boxSizing = "border-box";
+    wrapper.dataset.exportWidth = String(exportWidth);
+    wrapper.dataset.exportHeight = String(exportHeight);
+
+    sourceInfos.forEach(({ sourceElement, sourceRect }) => {
+      const clone = sourceElement.cloneNode(true);
+      const sourceStyle = window.getComputedStyle(sourceElement);
+
+      clearExportSelectionClasses(clone);
+
+      [
+        "background",
+        "background-color",
+        "background-image",
+        "background-position",
+        "background-size",
+        "background-repeat",
+        "background-origin",
+        "background-clip",
+      ].forEach((propertyName) => {
+        const propertyValue = sourceStyle.getPropertyValue(propertyName);
+        if (propertyValue) {
+          clone.style.setProperty(propertyName, propertyValue);
+        }
+      });
+
+      if (sourceElement.id === "panelContainer") {
+        [
+          "display",
+          "flex-direction",
+          "align-items",
+          "justify-content",
+          "gap",
+          "column-gap",
+          "row-gap",
+        ].forEach((propertyName) => {
+          const propertyValue = sourceStyle.getPropertyValue(propertyName);
+          if (propertyValue) {
+            clone.style.setProperty(propertyName, propertyValue);
+          }
+        });
+      }
+
+      if (element.id === "panelContainer" && sourceElement.id === "panelContainer") {
+        clone.style.setProperty("background", "transparent", "important");
+        clone.style.setProperty("background-image", "none", "important");
+      }
+
+      [
+        "--post-color-mid",
+        "--post-color-light",
+        "--post-color-dark",
+        "--postThickness",
+        "--postGradient",
+        "--panelSpacing",
+      ].forEach((propertyName) => {
+        const propertyValue = sourceStyle.getPropertyValue(propertyName);
+        if (propertyValue) {
+          clone.style.setProperty(propertyName, propertyValue);
+        }
+      });
+
+      clone.classList.add("exportStaticCaptureClone");
+      clone.style.position = "absolute";
+      clone.style.left = normalizeMeasurement(sourceRect.left - left) + "px";
+      clone.style.top = normalizeMeasurement(sourceRect.top - top) + "px";
+      clone.style.boxSizing = sourceStyle.boxSizing || "content-box";
+      clone.style.paddingTop = sourceStyle.paddingTop;
+      clone.style.paddingRight = sourceStyle.paddingRight;
+      clone.style.paddingBottom = sourceStyle.paddingBottom;
+      clone.style.paddingLeft = sourceStyle.paddingLeft;
+      clone.style.width = normalizeMeasurement(sourceRect.width) + "px";
+      clone.style.height = normalizeMeasurement(sourceRect.height) + "px";
+      clone.style.minWidth = "0";
+      clone.style.maxWidth = "none";
+      clone.style.minHeight = "0";
+      clone.style.maxHeight = "none";
+      clone.style.margin = "0";
+      clone.style.overflow = "visible";
+      clone.style.transform = "none";
+      clone.style.transition = "none";
+      clone.style.pointerEvents = "none";
+
+      wrapper.appendChild(clone);
+    });
+
+    host.appendChild(wrapper);
+    document.body.appendChild(host);
+
+    return {
+      node: wrapper,
+      cleanup: () => host.remove(),
+    };
+  };
+
+  const withTemporaryExportStyles = async (element, callback) => {
+    const staticClone = createStaticExportClone(element);
+    const exportElement = staticClone ? staticClone.node : element;
+    const oldInline = staticClone
+      ? null
+      : {
+          transform: element.style.transform,
+          transition: element.style.transition,
+          width: element.style.width,
+          minWidth: element.style.minWidth,
+          height: element.style.height,
+          overflow: element.style.overflow,
+          padding: element.style.padding,
+          background: element.style.background,
+        };
+
+    if (!staticClone) {
+      element.classList.add("exportCaptureTarget");
+      element.style.transform = "none";
+      element.style.transition = "none";
+      element.style.overflow = "visible";
+    }
+
+    let restoreExportBannerFirstLetters = () => {};
+    let restoreExplicitExportFontFamilies = () => {};
+
+    try {
+      await ensureBundledExportFontsAvailable(exportElement);
+      await waitForNextFrame();
+      restoreExportBannerFirstLetters =
+        materializeExportBannerFirstLetters(exportElement);
+      restoreExplicitExportFontFamilies =
+        applyExplicitExportFontFamilies(exportElement);
+      inlineBundledExportAssets(exportElement);
+      await waitForNextFrame();
+      await waitForImagesInElement(exportElement);
+      await waitForNextFrame();
+      const box = getExportBox(exportElement);
+      return await callback(box, exportElement);
+    } finally {
+      restoreExplicitExportFontFamilies();
+      restoreExportBannerFirstLetters();
+
+      if (staticClone) {
+        staticClone.cleanup();
+      } else {
+        element.classList.remove("exportCaptureTarget");
+        element.style.transform = oldInline.transform;
+        element.style.transition = oldInline.transition;
+        element.style.width = oldInline.width;
+        element.style.minWidth = oldInline.minWidth;
+        element.style.height = oldInline.height;
+        element.style.overflow = oldInline.overflow;
+        element.style.padding = oldInline.padding;
+        element.style.background = oldInline.background;
+      }
+    }
+  };
+
+  const renderSignExport = async function (file, format, isPreview = false) {
+    if (!file) {
+      throw new Error("No export target found");
+    }
+
+    await waitForDocumentFonts();
+
+    return await withTemporaryExportStyles(
+      file,
+      async ({ width, height }, exportElement) => {
+        const exportOptions = {
+          cacheBust: true,
+          width,
+          height,
+          backgroundColor: "transparent",
+          fontEmbedCSS: await getSafeExportFontEmbedCSS(),
+          style: {
+            transform: "none",
+            transition: "none",
+          },
+        };
+
+        if (format === "svg") {
+          return await htmlToImage.toSvg(exportElement, exportOptions);
+        }
+
+        const pixelRatio = getExportPixelRatio(width, height, isPreview);
+
+        if (format === "blob") {
+          const blob = await htmlToImage.toBlob(exportElement, {
+            ...exportOptions,
+            pixelRatio,
+          });
+          if (!blob) {
+            throw new Error("PNG render failed");
+          }
+          return await trimTransparentPngBlob(blob);
+        }
+
+        return await htmlToImage.toPng(exportElement, {
+          ...exportOptions,
+          pixelRatio,
+        });
+      }
+    );
+  };
+
+  const saveSign = async function (file, isPreview, isSVG) {
+    try {
+      if (isSVG) {
+        const svgDataUrl = await renderSignExport(file, "svg", isPreview);
+
+        if (isPreview) {
+          return svgDataUrl;
+        }
+
+        downloadFile(svgDataUrl, ".svg");
+        return true;
+      }
+
+      const pngDataUrl = await renderSignExport(file, "png", isPreview);
+
+      if (isPreview) {
+        return pngDataUrl;
+      }
+
+      downloadFile(pngDataUrl, ".png");
+      return true;
+    } catch (error) {
+      console.error("Error Saving!", error);
+      throw error;
+    }
+  };
+
+  const getClipboardFile = function () {
+    if (post.copySignsOnly !== false || post.showPost === true) {
+      return document.querySelector("#panelContainer");
+    }
+
+    return document.querySelector("#postContainer");
+  };
+
+  const getPanelClipboardFile = function (panelIndex) {
+    const normalizedPanelIndex = Number.parseInt(panelIndex, 10);
+
+    if (!Number.isInteger(normalizedPanelIndex) || normalizedPanelIndex < 0) {
+      return null;
+    }
+
+    return document.getElementById("panel" + normalizedPanelIndex.toString());
+  };
+
+  const copyExportTargetToClipboard = async function (file) {
+    if (!file) {
+      throw new Error("No export target found");
+    }
+
+    const blobPromise = renderSignExport(file, "blob", false);
+    let renderedBlob = null;
+    const getRenderedBlob = async () => {
+      if (!renderedBlob) {
+        renderedBlob = await blobPromise;
+      }
+      return renderedBlob;
+    };
+    const canWriteImage =
+      navigator.clipboard &&
+      typeof navigator.clipboard.write === "function" &&
+      typeof ClipboardItem !== "undefined";
+
+    if (canWriteImage) {
+      try {
+        let clipboardItem;
+        try {
+          clipboardItem = new ClipboardItem({ "image/png": blobPromise });
+        } catch (itemError) {
+          clipboardItem = new ClipboardItem({
+            "image/png": await getRenderedBlob(),
+          });
+        }
+
+        await navigator.clipboard.write([clipboardItem]);
+        return "copied";
+      } catch (clipboardError) {
+        console.error("Clipboard image write failed", clipboardError);
+        const blob = await getRenderedBlob();
+        downloadBlob(blob, ".png");
+        alert(
+          "This browser blocked image clipboard access, so the PNG was downloaded instead."
+        );
+        return "downloaded";
+      }
+    }
+
+    const blob = await getRenderedBlob();
+    downloadBlob(blob, ".png");
+    alert(
+      "This browser does not support copying images directly, so the PNG was downloaded instead."
+    );
+    return "downloaded";
+  };
+
+  let copySignInProgress = false;
+  let copyButtonRestoreTimer = null;
+  let downloadCopiedSignInProgress = false;
+  let downloadButtonRestoreTimer = null;
+
+  const setCopyButtonState = (state) => {
+    const button = document.getElementById("export");
+    const icon = button?.querySelector(".material-symbols-outlined");
+
+    if (!button || !icon) {
+      return;
+    }
+
+    if (copyButtonRestoreTimer) {
+      clearTimeout(copyButtonRestoreTimer);
+      copyButtonRestoreTimer = null;
+    }
+
+    const restore = () => {
+      button.disabled = false;
+      button.classList.remove("activated");
+      button.dataset.tooltip = "Copy Sign";
+      icon.textContent = "content_copy";
+    };
+
+    if (state === "copying") {
+      button.disabled = true;
+      button.classList.remove("activated");
+      button.dataset.tooltip = "Copying...";
+      icon.textContent = "hourglass_empty";
+      return;
+    }
+
+    if (state === "copied") {
+      button.disabled = false;
+      button.classList.add("activated");
+      button.dataset.tooltip = "Copied";
+      icon.textContent = "check";
+      copyButtonRestoreTimer = setTimeout(restore, 1400);
+      return;
+    }
+
+    if (state === "downloaded") {
+      button.disabled = false;
+      button.classList.add("activated");
+      button.dataset.tooltip = "Downloaded PNG";
+      icon.textContent = "download_done";
+      copyButtonRestoreTimer = setTimeout(restore, 1800);
+      return;
+    }
+
+    if (state === "error") {
+      button.disabled = false;
+      button.classList.remove("activated");
+      button.dataset.tooltip = "Copy Failed";
+      icon.textContent = "error";
+      copyButtonRestoreTimer = setTimeout(restore, 1800);
+      return;
+    }
+
+    restore();
+  };
+
+  const setDownloadButtonState = (state) => {
+    const button = document.getElementById("exportDownload");
+    const icon = button?.querySelector(".material-symbols-outlined");
+
+    if (!button || !icon) {
+      return;
+    }
+
+    if (downloadButtonRestoreTimer) {
+      clearTimeout(downloadButtonRestoreTimer);
+      downloadButtonRestoreTimer = null;
+    }
+
+    const restore = () => {
+      button.disabled = false;
+      button.classList.remove("activated");
+      button.dataset.tooltip = "Download Sign";
+      icon.textContent = "download";
+    };
+
+    if (state === "downloading") {
+      button.disabled = true;
+      button.classList.remove("activated");
+      button.dataset.tooltip = "Downloading...";
+      icon.textContent = "hourglass_empty";
+      return;
+    }
+
+    if (state === "downloaded") {
+      button.disabled = false;
+      button.classList.add("activated");
+      button.dataset.tooltip = "Downloaded PNG";
+      icon.textContent = "download_done";
+      downloadButtonRestoreTimer = setTimeout(restore, 1400);
+      return;
+    }
+
+    if (state === "error") {
+      button.disabled = false;
+      button.classList.remove("activated");
+      button.dataset.tooltip = "Download Failed";
+      icon.textContent = "error";
+      downloadButtonRestoreTimer = setTimeout(restore, 1800);
+      return;
+    }
+
+    restore();
+  };
+
+  const copySignToClipboard = async function () {
+    if (copySignInProgress || downloadCopiedSignInProgress) {
+      return false;
+    }
+
+    copySignInProgress = true;
+    setCopyButtonState("copying");
+
+    try {
+      const file = getClipboardFile();
+      const result = await copyExportTargetToClipboard(file);
+      setCopyButtonState(result);
+      return result === "copied";
+    } catch (error) {
+      console.error("Error Copying Sign!", error);
+      setCopyButtonState("error");
+      alert("Unable to copy the sign: " + error.message);
+      return false;
+    } finally {
+      copySignInProgress = false;
+    }
+  };
+
+  const copyPanelToClipboard = async function (panelIndex) {
+    if (copySignInProgress || downloadCopiedSignInProgress) {
+      return false;
+    }
+
+    const panelNumber = Number.parseInt(panelIndex, 10) + 1;
+    copySignInProgress = true;
+    setCopyButtonState("copying");
+
+    try {
+      const file = getPanelClipboardFile(panelIndex);
+      const result = await copyExportTargetToClipboard(file);
+      setCopyButtonState(result);
+      return result === "copied";
+    } catch (error) {
+      console.error("Error Copying Panel!", error);
+      setCopyButtonState("error");
+      alert("Unable to copy Panel " + panelNumber + ": " + error.message);
+      return false;
+    } finally {
+      copySignInProgress = false;
+    }
+  };
+
+  let copyPanelContextMenuListenersActive = false;
+
+  function getCopyPanelContextMenu() {
+    return document.getElementById("copyPanelContextMenu");
+  }
+
+  function removeCopyPanelContextMenuListeners() {
+    if (!copyPanelContextMenuListenersActive) {
+      return;
+    }
+
+    document.removeEventListener("mousedown", handleCopyPanelContextMenuMouseDown);
+    document.removeEventListener("keydown", handleCopyPanelContextMenuKeyDown);
+    window.removeEventListener("resize", closeCopyPanelContextMenu);
+    window.removeEventListener("scroll", closeCopyPanelContextMenu, true);
+    copyPanelContextMenuListenersActive = false;
+  }
+
+  function closeCopyPanelContextMenu() {
+    const menu = getCopyPanelContextMenu();
+
+    if (menu) {
+      menu.classList.add("hidden");
+      menu.replaceChildren();
+    }
+
+    removeCopyPanelContextMenuListeners();
+  }
+
+  function handleCopyPanelContextMenuMouseDown(event) {
+    const menu = getCopyPanelContextMenu();
+    const copyButton = document.getElementById("export");
+
+    if (
+      menu &&
+      (menu.contains(event.target) ||
+        (copyButton && copyButton.contains(event.target)))
+    ) {
+      return;
+    }
+
+    closeCopyPanelContextMenu();
+  }
+
+  function handleCopyPanelContextMenuKeyDown(event) {
+    if (event.key === "Escape") {
+      closeCopyPanelContextMenu();
+    }
+  }
+
+  const positionCopyPanelContextMenu = function (menu, event) {
+    const viewportMargin = 4;
+    const rect = menu.getBoundingClientRect();
+    const maxLeft = Math.max(viewportMargin, window.innerWidth - rect.width - viewportMargin);
+    const maxTop = Math.max(viewportMargin, window.innerHeight - rect.height - viewportMargin);
+    const left = Math.min(Math.max(event.clientX, viewportMargin), maxLeft);
+    const top = Math.min(Math.max(event.clientY, viewportMargin), maxTop);
+
+    menu.style.left = left + "px";
+    menu.style.top = top + "px";
+  };
+
+  const openCopyPanelContextMenu = function (event) {
+    const menu = getCopyPanelContextMenu();
+
+    if (!menu) {
+      return;
+    }
+
+    closeCopyPanelContextMenu();
+
+    const panelCount = Array.isArray(post.panels) ? post.panels.length : 0;
+
+    if (!panelCount) {
+      return;
+    }
+
+    if (menu.parentElement !== document.body) {
+      document.body.appendChild(menu);
+    }
+
+    for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
+      const item = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Panel " + (panelIndex + 1).toString();
+      button.addEventListener("click", (clickEvent) => {
+        clickEvent.preventDefault();
+        closeCopyPanelContextMenu();
+        copyPanelToClipboard(panelIndex);
+      });
+      item.appendChild(button);
+      menu.appendChild(item);
+    }
+
+    menu.classList.remove("hidden");
+    positionCopyPanelContextMenu(menu, event);
+
+    const firstButton = menu.querySelector("button");
+    if (firstButton) {
+      firstButton.focus({ preventScroll: true });
+    }
+
+    setTimeout(() => {
+      document.addEventListener("mousedown", handleCopyPanelContextMenuMouseDown);
+      document.addEventListener("keydown", handleCopyPanelContextMenuKeyDown);
+      window.addEventListener("resize", closeCopyPanelContextMenu);
+      window.addEventListener("scroll", closeCopyPanelContextMenu, true);
+      copyPanelContextMenuListenersActive = true;
+    }, 0);
+  };
+
+  const downloadCopiedSign = async function () {
+    if (copySignInProgress || downloadCopiedSignInProgress) {
+      return false;
+    }
+
+    downloadCopiedSignInProgress = true;
+    setDownloadButtonState("downloading");
+
+    try {
+      const file = getClipboardFile();
+      const blob = await renderSignExport(file, "blob", false);
+      downloadBlob(blob, ".png");
+      setDownloadButtonState("downloaded");
+      return true;
+    } catch (error) {
+      console.error("Error Downloading Sign!", error);
+      setDownloadButtonState("error");
+      alert("Unable to download the sign: " + error.message);
+      return false;
+    } finally {
+      downloadCopiedSignInProgress = false;
+    }
   };
 
   const downloadSign = async function () {
@@ -1913,6 +3990,10 @@ const app = (function () {
       : availableColors[0];
     const colorClass = normalizedPostColor ? ` postColor${normalizedPostColor}` : "";
     postContainerElmt.className = `${polePositionClass}${colorClass}`;
+    postContainerElmt.classList.toggle(
+      "showBlockBoundingBoxes",
+      !!post.showBlockBoundingBoxes
+    );
     const normalizedThickness = post.normalizeThickness(post.thickness);
     post.thickness = normalizedThickness;
     postContainerElmt.style.setProperty(
@@ -2955,20 +5036,17 @@ const app = (function () {
 
       // Calculate APL arrow groups before the loop
       const aplArrows = panel.sign.aplArrows || [];
-      let arrowGroups = [];
-      if (aplArrows.length > 0) {
-        let currentGroup = [];
-        for (let ai = 0; ai < aplArrows.length; ai++) {
-          currentGroup.push({ arrow: aplArrows[ai], index: ai });
-          if (aplArrows[ai].dividerAfter && ai < aplArrows.length - 1) {
-            arrowGroups.push(currentGroup);
-            currentGroup = [];
-          }
-        }
-        if (currentGroup.length > 0) {
-          arrowGroups.push(currentGroup);
-        }
-      }
+      const arrowGroups =
+        aplArrows.length > 0
+          ? getAPLArrowBuckets(panel.sign).map((bucket) =>
+            bucket
+              .map((arrow) => ({
+                arrow,
+                index: aplArrows.indexOf(arrow),
+              }))
+              .filter((arrowData) => arrowData.index >= 0)
+          )
+          : [];
 
       const firstRenderedSubPanelIndex = isPanelGroupPreview
         ? clamp(
@@ -3948,6 +6026,9 @@ const app = (function () {
     setSelectedRow,
     setSelectedControlElem,
     moveControlElem,
+    copyControlElements,
+    pasteControlElements,
+    replaceControlElemTypeAt,
     moveRow,
     enterGroupElement,
     exitGroupElement,
@@ -3973,17 +6054,32 @@ const app = (function () {
     duplicateShield,
     addAPLArrow,
     removeAPLArrow,
+    removeAPLArrowAt,
     selectAPLArrow,
     updateAPLArrowType,
     toggleAPLArrowFlip,
     addAPLDivider,
+    addAPLDividerArrow,
+    moveAPLArrow,
+    initializeAPLArrowsForCurrentPanel,
+    addAPLSubPanelLeftAndOpen,
+    addAPLSubPanelRightAndOpen,
+    getAPLSubpanelGroups: getAPLSubpanelGroupsForCurrentPanel,
+    getAPLArrowKind,
+    setCurrentPanelArrowMode,
     setAPLGroupedWithDivider: (index, grouped) => {
       getCurrentPanel().sign.setAPLGroupedWithDivider(index, grouped);
+      formHandler.updateForm();
       redraw();
     },
     setAPLExitOnly: (index, isExitOnly) => {
-      getCurrentPanel().sign.setAPLExitOnly(index, isExitOnly);
-      redraw();
+      const sign = getCurrentPanel().sign;
+      if (index >= 0 && index < sign.aplArrows.length) {
+        sign.aplArrows[index].exitOnly = !!isExitOnly;
+        currentlySelectedAPLArrowIndex = index;
+        formHandler.updateForm();
+        redraw();
+      }
     },
     setAPLArrowMarginLeft: (index, margin) => {
       getCurrentPanel().sign.setAPLArrowMarginLeft(index, margin);
@@ -4466,6 +6562,14 @@ const app = (function () {
     }
     post.panelOrientation = normalizePanelOrientation(post.panelOrientation);
     post.thickness = post.normalizeThickness(post.thickness);
+    if (typeof post.copySignsOnly !== "boolean") {
+      post.copySignsOnly = true;
+    }
+    if (!Number.isFinite(post.copyScale)) {
+      post.copyScale = 8;
+    }
+    post.copyScale = Math.min(8, Math.max(0, post.copyScale));
+    post.showBlockBoundingBoxes = !!post.showBlockBoundingBoxes;
     if (selection) {
       applySelectionState(selection);
     } else {
@@ -4645,6 +6749,11 @@ const app = (function () {
     removeSubPanel: removeSubPanel,
     changeEditingSubPanel: changeEditingSubPanel,
     duplicateSubPanel: duplicateSubPanel,
+    copySignToClipboard: copySignToClipboard,
+    copyPanelToClipboard: copyPanelToClipboard,
+    openCopyPanelContextMenu: openCopyPanelContextMenu,
+    closeCopyPanelContextMenu: closeCopyPanelContextMenu,
+    downloadCopiedSign: downloadCopiedSign,
     downloadSign: downloadSign,
     updatePreview: updatePreview,
     updateFileType: updateFileType,
@@ -4666,6 +6775,9 @@ const app = (function () {
     dupRow: dupRow,
     delRow: delRow,
     newControlElem: newControlElem,
+    copyControlElements: copyControlElements,
+    pasteControlElements: pasteControlElements,
+    replaceControlElemTypeAt: replaceControlElemTypeAt,
     delControlElem: delControlElem,
     enterGroupElement: enterGroupElement,
     exitGroupElement: exitGroupElement,

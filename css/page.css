@@ -213,8 +213,7 @@
 
 @font-face {
   font-family: "Modern VMS";
-  src: url("../fonts/VCR_OSD_MONO.woff") format("woff"),
-    url("../fonts/VCR_OSD_MONO.ttf") format("truetype");
+  src: url("../fonts/VCR_OSD_MONO.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

@@ -114,6 +114,8 @@ class TextElement {
 
     // Set custom CSS properties here based off the this. properties
     newText.style.setProperty("--fontFamily", '"' + this.fontFamily + '"');
+    newText.style.fontFamily = '"' + this.fontFamily + '", "Series EM"';
+    newText.dataset.exportFontFamily = this.fontFamily;
     newText.style.setProperty(
       "--fontSize",
       1.75 * (this.fontSize / 100) + "rem"
@@ -586,6 +588,11 @@ class ShieldElement extends Shield {
     const shieldContainer = document.createElement("div");
     const containerClass = config.className || config.value;
     shieldContainer.className = `bannerShieldContainer ${containerClass}`;
+    if (variantKey) {
+      shieldContainer.classList.add(
+        "variant-" + variantKey.toLowerCase().replace(/[^a-z0-9_-]/g, "-")
+      );
+    }
     const containerSizeClass = ShieldElement.prototype.getContainerSizeClass(
       routeText
     );
@@ -675,7 +682,11 @@ class ShieldElement extends Shield {
       }
     }
 
-    shieldEl.appendChild(routeEl);
+    if (
+      !ShieldElement.prototype.isFixedRouteVariant(config, variantKey)
+    ) {
+      shieldEl.appendChild(routeEl);
+    }
 
     shieldContainer.appendChild(shieldEl);
 
@@ -782,6 +793,9 @@ ShieldElement.prototype.buildBlockShieldList = function () {
           value: normalizedCode,
           label: value.name || normalizedCode,
           variants,
+          fixedRouteVariants: Array.isArray(value.fixedRouteVariants)
+            ? value.fixedRouteVariants.slice()
+            : [],
           assetFolder: ["img/shields"].concat(pathParts).join("/"),
           className: ShieldElement.prototype.getShieldClassNames(normalizedCode),
           assetName: normalizedCode,
@@ -808,6 +822,7 @@ ShieldElement.prototype.buildBlockShieldList = function () {
       value: normalizedValue,
       label: label || normalizedValue,
       variants: variants || [],
+      fixedRouteVariants: [],
       assetFolder,
       className: ShieldElement.prototype.getShieldClassNames(normalizedValue),
       assetName: normalizedValue,
@@ -1148,6 +1163,13 @@ ShieldElement.prototype.getShieldAssetPath = function (config, variantKey) {
   const assetName = config?.assetName || config?.value || "I";
   const suffix = variantKey ? `-${variantKey}` : "";
   return `${assetFolder}/${assetName}${suffix}.svg`;
+};
+
+ShieldElement.prototype.isFixedRouteVariant = function (config, variantKey) {
+  return Array.isArray(config?.fixedRouteVariants) &&
+    config.fixedRouteVariants
+      .map((variant) => ShieldElement.prototype.formatVariantKey(variant))
+      .includes(variantKey);
 };
 
 ShieldElement.prototype.isCountyShield = function (config) {
@@ -1687,6 +1709,15 @@ ArrowElement.prototype.arrows = {
   APL_UP_TURN: { label: "APL Up Turn", src: "img/arrowBlocks/APL_UP_TURN.svg" },
   APL_TURN: { label: "APL Turn", src: "img/arrowBlocks/APL_TURN.svg" },
   APL_DUAL_TURN: { label: "APL Dual Turn", src: "img/arrowBlocks/APL_DUAL_TURN.svg" },
+  APL_UP_CFX: { label: "APL Up CFX", src: "img/arrowBlocks/APL_UP_CFX.svg" },
+  APL_UP_TURN_CFX: {
+    label: "APL Up Turn CFX",
+    src: "img/arrowBlocks/APL_UP_TURN_CFX.svg",
+  },
+  APL_TURN_CFX: {
+    label: "APL Turn CFX",
+    src: "img/arrowBlocks/APL_TURN_CFX.svg",
+  },
 };
 ArrowElement.prototype.defaultArrow = "TYPE_A";
 ArrowElement.prototype.defaultSize = 1.75;
@@ -1862,7 +1893,7 @@ class Control {
     let newElement = new element(properties);
     if (!this.rows[row]) {
       this.rows[row] = [];
-      this.blockProperties[row] = new Block();
+      this.blockProperties[row] = this.createBlockWithNeighborBackground(row);
     }
 
     if (column) {
@@ -1886,10 +1917,44 @@ class Control {
     return false;
   }
 
-  addRow(row, element) {
+  createBlockWithNeighborBackground(row, sourceRowIndex) {
+    const newBlock = new Block();
+    const neighborIndexes = [];
+
+    if (Number.isInteger(sourceRowIndex)) {
+      neighborIndexes.push(sourceRowIndex);
+    }
+
+    neighborIndexes.push(row - 1, row);
+
+    for (const index of [...new Set(neighborIndexes)]) {
+      const neighborProperties = this.blockProperties[index];
+      if (
+        neighborProperties &&
+        typeof neighborProperties.backgroundColor === "string"
+      ) {
+        newBlock.backgroundColor = neighborProperties.backgroundColor;
+        break;
+      }
+    }
+
+    return newBlock;
+  }
+
+  addRow(row, element, { sourceRowIndex } = {}) {
+    const newBlockProperties = this.createBlockWithNeighborBackground(
+      row,
+      sourceRowIndex
+    );
+
     if (this.rows[row] && this.rows[row].length != 0) {
       this.rows.splice(row, 0, []);
-      this.blockProperties.splice(row, 0, new Block());
+      this.blockProperties.splice(row, 0, newBlockProperties);
+    } else if (!this.rows[row]) {
+      this.rows[row] = [];
+      this.blockProperties[row] = newBlockProperties;
+    } else if (!this.blockProperties[row]) {
+      this.blockProperties[row] = newBlockProperties;
     }
     this.addElement(Control.prototype.blockToClassElems[element], {}, row, 0);
   }

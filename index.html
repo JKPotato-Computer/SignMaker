@@ -46,6 +46,8 @@
   <script src="js/form.js" type="text/javascript"></script>
   <script src="js/IndexDB.js" type="text/javascript"></script>
   <script src="js/CustomShields.js" type="text/javascript"></script>
+  <script src="js/ExportFontData.js" type="text/javascript"></script>
+  <script src="js/ExportAssetData.js" type="text/javascript"></script>
   <script src="js/main.js" type="text/javascript"></script>
 </head>
 
@@ -227,6 +229,17 @@
               <label for="showPost" id="showPostLabel"> Hide Post: </label>
               <input type="checkbox" id="showPost" name="showPost" value="showPost"
                 onchange="formHandler.readForm();" />
+              <br />
+              <label for="copySignsOnly" id="copySignsOnlyLabel"> Copy Signs Only: </label>
+              <input type="checkbox" id="copySignsOnly" name="copySignsOnly" value="copySignsOnly"
+                onchange="formHandler.readForm();" checked />
+              <br />
+              <label for="copyScale" id="copyScaleLabel">Copy Size:</label>
+              <input type="range" id="copyScale" name="copyScale" min="0" max="8" step="0.25" value="8"
+                oninput="document.getElementById('copyScaleValue').value = this.value; formHandler.readForm();" />
+              <input type="number" id="copyScaleValue" name="copyScaleValue" min="0" max="8" step="0.25" value="8"
+                onchange="document.getElementById('copyScale').value = this.value; formHandler.readForm();" />
+              <span>x</span>
             </div>
           </div>
         </div>
@@ -256,6 +269,10 @@
               <br />
               <label for="disableFlash">Disable Selection Flash: </label>
               <input type="checkbox" id="disableFlash" name="disableFlash" onchange="formHandler.readForm();" />
+              <br />
+              <label for="showBlockBoundingBoxes">Show Block Bounds: </label>
+              <input type="checkbox" id="showBlockBoundingBoxes" name="showBlockBoundingBoxes"
+                onchange="formHandler.readForm();" />
             </div>
           </div>
           <div id="sMPanelPadding" class="tabHidden">
@@ -1122,7 +1139,7 @@
           <div data-tab="sMStandardArrows" class="sMModalTab selected">
             Standard Arrows
           </div>
-          <div data-tab="sMAPL" class="sMModalTab">APL (Arrow Per Lane)</div>
+          <div data-tab="sMAPL" class="sMModalTab">Arrow-Per-Lane (APL)</div>
         </nav>
         <div class="sMModalContent">
           <div id="sMStandardArrows">
@@ -1199,27 +1216,12 @@
           <div id="sMAPL" class="tabHidden">
             <div>
               <legend>Arrow Per Lane</legend>
+
+              <div id="aplSelectedSubpanelStatus" class="aplSelectedSubpanelStatus">
+                Selected Subpanel: Subpanel 1
+              </div>
+
               <div id="aplArrowList" class="scrollMenu">
-                <!-- APL arrows will be dynamically populated here -->
-              </div>
-              <div class="listNavOptions">
-                <button id="addAPLArrow" type="button">Add Arrow</button>
-                <button id="removeAPLArrow" type="button">Remove Arrow</button>
-              </div>
-              <div class="aplArrowControls">
-                <label for="aplArrowType">Arrow Type:</label>
-                <select id="aplArrowType">
-                  <option value="APL_UP">Up</option>
-                  <option value="APL_UP_TURN">Up Turn</option>
-                  <option value="APL_TURN">Turn</option>
-                  <option value="APL_DUAL_TURN">Dual Turn</option>
-                </select>
-                <button type="button" id="aplArrowFlipButton" aria-pressed="false">
-                  Flip
-                </button>
-              </div>
-              <div id="aplArrowSettings" class="aplArrowControls" style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
-                <!-- Per-arrow settings dynamically populated here -->
               </div>
             </div>
           </div>
@@ -1354,7 +1356,11 @@
         <img src="img/other-symbols/ui/template.svg" alt="Templates" class="configIcon templateIcon" />
         <span>Templates</span>
       </button>
-      <button id="export" class="sMConfigOption" data-toolTip="Export">
+      <button id="export" class="sMConfigOption" data-toolTip="Copy Sign">
+        <span class="material-symbols-outlined"> content_copy </span>
+      </button>
+      <menu id="copyPanelContextMenu" class="copyPanelContextMenu hidden"></menu>
+      <button id="exportDownload" class="sMConfigOption" data-toolTip="Download Sign">
         <span class="material-symbols-outlined"> download </span>
       </button>
       <button id="nightMode" class="sMConfigOption" data-toolTip="Dark Mode">

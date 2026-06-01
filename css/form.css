@@ -111,12 +111,37 @@ nav#sMConfigBar {
   max-height: 87.5%;
 }
 
-#export {
+#export,
+#exportDownload {
   background-color: rgba(255, 0, 0, 0.25);
 }
 
-#export.hover {
+#export.hover,
+#exportDownload.hover {
   background-color: rgba(255, 0, 0, 0.5);
+}
+
+.copyPanelContextMenu {
+  position: fixed;
+  z-index: 6;
+  min-width: 8rem;
+  margin: 0;
+  padding: 0.25rem;
+  background: var(--hotbarColor);
+  border: 1px solid rgba(var(--baseColor), 0.4);
+  list-style: none;
+}
+
+.copyPanelContextMenu li {
+  margin: 0;
+  padding: 0;
+}
+
+.copyPanelContextMenu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
 }
 
 span.toolTip {
@@ -738,6 +763,45 @@ input[type="button"]:disabled {
   font-size: 1.1rem;
 }
 
+.textEditorBlockLabel {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.textEditorBlock .blockTypeChevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.textEditorBlock .blockTypeInlineSelect {
+  position: absolute;
+  top: 0;
+  right: 0.35rem;
+  width: 1.25rem;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.textEditorBlock .blockTypeInlineSelect:focus {
+  outline: none;
+}
+
 .textEditorBlock:active {
   cursor: grabbing;
 }
@@ -1188,6 +1252,11 @@ nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
 .sdBeacon {
   background-color: var(--black);
   color: var(--yellow);
+}
+
+.sdArrow {
+  background-color: var(--black);
+  color: white;
 }
 
 .sdActionMessage {
@@ -1764,6 +1833,148 @@ dialog:not([open]) {
 .aplArrowControls select,
 .aplArrowControls button {
   padding: 0.25rem 0.5rem;
+}
+
+.aplSelectedSubpanelStatus {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  padding: 0.35rem 0.55rem;
+  background: rgba(var(--baseColor), 0.25);
+  width: max-content;
+}
+
+#aplArrowList {
+  width: min(44rem, calc(100vw - 4rem));
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.aplSubpanelSection,
+.aplDividerSection {
+  width: 100%;
+  margin: 0.65rem 0;
+  padding: 0.5rem;
+  background: rgba(var(--baseColor), 0.18);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.aplSubpanelSection.selected {
+  outline: 2px solid rgba(var(--baseColor), 0.45);
+}
+
+.aplSubpanelSectionHeader,
+.aplDividerSectionHeader {
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+
+.aplArrowDropZone {
+  border: 1px dashed rgba(var(--baseColor), 0.45);
+  padding: 0.35rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.aplArrowDropZone.dragOver,
+.aplArrowListItem.dragOver,
+.aplArrowListItem.dragging {
+  outline: 2px solid var(--selectedColor);
+}
+
+.aplArrowEditorBlock {
+  margin: 0.35rem 0;
+}
+
+.aplArrowListItem {
+  display: grid;
+  grid-template-columns: 3rem minmax(10rem, 1fr) 6rem 4.5rem;
+  gap: 0.45rem;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0.35rem 0;
+  padding: 0;
+}
+
+.aplArrowListItem > * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.aplArrowDragHandle,
+.aplArrowDeleteButton,
+.aplSubpanelSection > button,
+.aplDividerSection > button {
+  padding: 0.35rem 0.55rem;
+}
+
+.aplArrowDragHandle {
+  width: 3rem;
+}
+
+.aplInlineTypeSelect {
+  width: 100%;
+  max-width: 100%;
+}
+
+.aplExitOnlyInlineLabel {
+  width: auto;
+  max-width: 6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.aplArrowDeleteButton {
+  width: 4.5rem;
+}
+
+.aplExitOnlySettings {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.55rem 3.45rem;
+  padding: 0.45rem;
+  background: rgba(var(--baseColor), 0.16);
+}
+
+.aplExitOnlySettingsTitle {
+  font-weight: 800;
+}
+
+.aplExitOnlySettingsRow {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.aplExitOnlySettingsRow label {
+  width: auto;
+}
+
+.aplExitOnlySettingsRow input[type="number"],
+.aplExitOnlySettingsRow input[type="text"],
+.aplExitOnlySettingsRow select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.aplExitOnlyHideLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
 }
 
 /* Template Management Styles */

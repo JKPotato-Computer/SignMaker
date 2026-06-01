@@ -131,8 +131,50 @@
   flex-direction: column;
 }
 
+.exportStaticCaptureWrapper #panelContainer[data-panel-orientation="vertical"] {
+  flex-direction: column;
+}
+
 #panelContainer[data-panel-orientation="vertical"] .panel .exitTabContainer:not(.tabVisible) {
   display: none;
+}
+
+.exportCaptureTarget,
+.exportCaptureTarget * {
+  box-sizing: border-box;
+}
+
+#panelContainer.exportCaptureTarget {
+  width: max-content !important;
+  min-width: max-content !important;
+  height: max-content !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  background-image: none !important;
+  align-items: flex-start !important;
+}
+
+#panelContainer.exportCaptureTarget .panel:first-child {
+  padding-left: 0 !important;
+}
+
+#panelContainer.exportCaptureTarget .panel:last-child {
+  padding-right: 0 !important;
+}
+
+.exportStaticCaptureWrapper,
+.exportStaticCaptureClone {
+  box-sizing: border-box;
+}
+
+.exportStaticCaptureWrapper {
+  isolation: isolate;
+}
+
+.exportStaticCaptureWrapper .groupPreviewPanel .signContainer,
+.exportStaticCaptureClone.groupPreviewPanel .signContainer {
+  outline: none !important;
 }
 
 .panel {
@@ -1175,7 +1217,15 @@
 
 .arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
 .arrowContainer.hideExitOnlyArrows .halfarrow {
-  opacity: 0;
+  display: none;
+}
+
+.arrowContainer.hideExitOnlyArrows {
+  min-height: calc(2rem + 4px);
+}
+
+.arrowContainer.hideExitOnlyArrows .exitOnlySpace {
+  display: none;
 }
 
 .exitOnlyText {
@@ -1413,6 +1463,10 @@
   height: 3.5rem;
 }
 
+.aplDividerArrow[data-type="APL_TURN_CFX"] {
+  height: 3.25rem;
+}
+
 .aplDividerArrow[data-type="APL_DUAL_TURN"] {
   height: 4.5rem;
 }
@@ -1532,6 +1586,10 @@ img.exitOnlyArrow:last-child {
 
 .aplArrow[data-type="APL_TURN"] {
   height: 3.5rem;
+}
+
+.aplArrow[data-type="APL_TURN_CFX"] {
+  height: 3.25rem;
 }
 
 .aplArrow[data-type="APL_DUAL_TURN"] {
@@ -1698,4 +1756,71 @@ img.exitOnlyArrow:last-child {
   z-index: 50;
   background: transparent;
   animation: flashSelection 0.5s ease-in forwards;
+}
+
+/* Exit Only / Half Exit Only corner fill */
+.signContainer:has(> .guideArrows.exit_only),
+.signContainer:has(> .guideArrows.half_exit.only) {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.signContainer:has(> .guideArrows.exit_only) > *,
+.signContainer:has(> .guideArrows.half_exit.only) > * {
+  position: relative;
+  z-index: 2;
+}
+
+.signContainer:has(> .guideArrows.exit_only)::before,
+.signContainer:has(> .guideArrows.exit_only)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: var(--signBorderRadius, 0.75rem);
+  height: var(--signBorderRadius, 0.75rem);
+  background-color: var(--yellow) !important;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.signContainer:has(> .guideArrows.exit_only)::before {
+  left: 0;
+}
+
+.signContainer:has(> .guideArrows.exit_only)::after {
+  right: 0;
+}
+
+.guideArrows.exit_only,
+.guideArrows.exit_only.new,
+.guideArrows.exit_only.new2 {
+  background-color: var(--yellow) !important;
+  border-color: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.left.new2)::before,
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.new:first-child)::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--signBorderRadius, 0.75rem);
+  height: var(--signBorderRadius, 0.75rem);
+  background-color: var(--yellow) !important;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.right.new2)::after,
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.new:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: var(--signBorderRadius, 0.75rem);
+  height: var(--signBorderRadius, 0.75rem);
+  background-color: var(--yellow) !important;
+  z-index: 1;
+  pointer-events: none;
 }

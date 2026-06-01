@@ -36,6 +36,9 @@ class Post {
 		this.panelOrientation = this.normalizePanelOrientation(
 			Post.prototype.defaultPanelOrientation
 		);
+		this.copySignsOnly = true;
+		this.copyScale = 8;
+		this.showBlockBoundingBoxes = false;
 	}
 
 	/**

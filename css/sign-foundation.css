@@ -6,6 +6,11 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   --fhwaBaselineShift: 1px;
 }
 
+#postContainer.showBlockBoundingBoxes [data-sign-row][data-sign-block] {
+  outline: 1px solid red;
+  outline-offset: -1px;
+}
+
 .blockElementMaster {
   display: flex;
   flex-direction: column;
@@ -103,6 +108,16 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
 
 .bE-banner:first-letter {
   font-size: calc(var(--fontSize) * (var(--bannerSize) / 100) * (var(--bannerFirstLetterSize) / 100));
+}
+
+.bE-banner.exportRealFirstLetter:first-letter,
+.exportRealFirstLetter::first-letter {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.exportBannerFirstLetter {
+  display: inline-block;
 }
 
 .bE-tollLogoElement {

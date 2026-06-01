@@ -18,6 +18,8 @@ const formHandler = (function () {
     postPosition: "signMaker.postPosition",
     postColor: "signMaker.postColor",
     showPost: "signMaker.showPost",
+    copySignsOnly: "signMaker.copySignsOnly",
+    copyScale: "signMaker.copyScale",
     postThickness: "signMaker.postThickness",
     controlTextFont: "signMaker.controlTextFont",
     bannerFontFamily: "signMaker.bannerFontFamily",
@@ -101,6 +103,20 @@ const formHandler = (function () {
     const storedShowPost = getStoredItem(STORAGE_KEYS.showPost);
     if (storedShowPost !== null) {
       post.showPost = storedShowPost === "true";
+    }
+
+    const storedCopySignsOnly = getStoredItem(STORAGE_KEYS.copySignsOnly);
+    if (storedCopySignsOnly !== null) {
+      post.copySignsOnly = storedCopySignsOnly === "true";
+    } else if (typeof post.copySignsOnly !== "boolean") {
+      post.copySignsOnly = true;
+    }
+
+    const storedCopyScale = parseFloat(getStoredItem(STORAGE_KEYS.copyScale));
+    if (Number.isFinite(storedCopyScale)) {
+      post.copyScale = Math.min(8, Math.max(0, storedCopyScale));
+    } else if (!Number.isFinite(post.copyScale)) {
+      post.copyScale = 8;
     }
 
     const storedPostColor = getStoredItem(STORAGE_KEYS.postColor);
@@ -699,6 +715,73 @@ const formHandler = (function () {
     return false;
   };
 
+  const isShortcutEditableTarget = (element) => {
+    if (!element) {
+      return false;
+    }
+
+    if (isTextInputElement(element)) {
+      return true;
+    }
+
+    if (element.isContentEditable || element.tagName === "SELECT") {
+      return true;
+    }
+
+    return !!(
+      element.closest &&
+      element.closest("input, textarea, select, [contenteditable='true']")
+    );
+  };
+
+  const isSubpanelBlockEditorActive = () => {
+    const configBar = document.getElementById("sMConfigBar");
+    const blocksTab = document.getElementById("sMSPBlocks");
+
+    return !!(
+      configBar?.dataset.currentMenu === "subPanelConfig" &&
+      blocksTab &&
+      !blocksTab.classList.contains("tabHidden")
+    );
+  };
+
+  const handleBlockClipboardShortcut = (event) => {
+    if (
+      !isSubpanelBlockEditorActive() ||
+      isShortcutEditableTarget(event.target) ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    const primaryModifier = event.metaKey || event.ctrlKey;
+    if (!primaryModifier) {
+      return;
+    }
+
+    const key = String(event.key || "").toLowerCase();
+    if (key === "c" && !event.shiftKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (exposed && typeof exposed.copyControlElements === "function") {
+        exposed.copyControlElements(getSelectedBlockRefs());
+      }
+      return;
+    }
+
+    if (key === "v" && !event.shiftKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (exposed && typeof exposed.pasteControlElements === "function") {
+        const result = exposed.pasteControlElements();
+        if (result?.pasted) {
+          clearBlockSelection();
+          updateForm();
+        }
+      }
+    }
+  };
+
   const checkForLimonEasterEgg = (event) => {
     const target = event.target;
     if (!isTextInputElement(target)) {
@@ -1035,6 +1118,47 @@ const formHandler = (function () {
           return;
         }
 
+        if (button.dataset.tab === "sMAPL") {
+          const panel = post?.panels?.[exposed.vars.currentlySelectedPanelIndex];
+          const subPanelCount = panel?.sign?.subPanels?.length || 0;
+
+          if (subPanelCount <= 1) {
+            const shouldAddSubPanel = window.confirm(
+              "APL arrows need at least two subpanels. Add a new subpanel?"
+            );
+
+            if (!shouldAddSubPanel) {
+              return;
+            }
+
+            if (
+              exposed &&
+              typeof exposed.addAPLSubPanelRightAndOpen === "function"
+            ) {
+              exposed.addAPLSubPanelRightAndOpen();
+            }
+          }
+
+          if (
+            exposed &&
+            typeof exposed.initializeAPLArrowsForCurrentPanel === "function"
+          ) {
+            const guideArrowSelect = document.getElementById("guideArrow");
+            if (guideArrowSelect) {
+              guideArrowSelect.value = "None";
+            }
+            exposed.initializeAPLArrowsForCurrentPanel();
+          }
+        }
+
+        if (
+          button.dataset.tab === "sMStandardArrows" &&
+          exposed &&
+          typeof exposed.setCurrentPanelArrowMode === "function"
+        ) {
+          exposed.setCurrentPanelArrowMode("standard");
+        }
+
         const modal = document.querySelectorAll(
           '.sMModal:has(.sMModalTab[data-tab="' + button.dataset.tab + '"]'
         )[0];
@@ -1218,14 +1342,31 @@ const formHandler = (function () {
     }
 
     document.addEventListener("input", checkForLimonEasterEgg, true);
+    document.addEventListener("keydown", handleBlockClipboardShortcut, true);
 
-    document.getElementById("export").onclick = function () {
-      /*
-      document.querySelector("#modalHolder").style.display = "flex";
-      document.querySelector("#downloadContent").showModal();
-      document.querySelector("#downloadContent").style.display = "flex";
-      app.updatePreview();
-      */
+    document.getElementById("export").onclick = function (event) {
+      event.preventDefault();
+      if (typeof app !== "undefined" && typeof app.closeCopyPanelContextMenu === "function") {
+        app.closeCopyPanelContextMenu();
+      }
+      if (typeof app !== "undefined" && typeof app.copySignToClipboard === "function") {
+        app.copySignToClipboard();
+      }
+    };
+
+    document.getElementById("export").oncontextmenu = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof app !== "undefined" && typeof app.openCopyPanelContextMenu === "function") {
+        app.openCopyPanelContextMenu(event);
+      }
+    };
+
+    document.getElementById("exportDownload").onclick = function (event) {
+      event.preventDefault();
+      if (typeof app !== "undefined" && typeof app.downloadCopiedSign === "function") {
+        app.downloadCopiedSign();
+      }
     };
 
     document.getElementById("hideConfig").onclick = function () {
@@ -1508,47 +1649,6 @@ const formHandler = (function () {
     const otherSymbolSelectElement = document.getElementById("otherSymbol");
     for (const otherSymbol of Sign.prototype.otherSymbols) {
       lib.appendOption(otherSymbolSelectElement, otherSymbol);
-    }
-
-    // APL Arrow Per Lane event listeners
-    const addAPLArrowBtn = document.getElementById("addAPLArrow");
-    const removeAPLArrowBtn = document.getElementById("removeAPLArrow");
-    const aplArrowTypeSelect = document.getElementById("aplArrowType");
-
-    if (addAPLArrowBtn) {
-      addAPLArrowBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (exposed && typeof exposed.addAPLArrow === "function") {
-          const type = aplArrowTypeSelect ? aplArrowTypeSelect.value : "APL_UP";
-          exposed.addAPLArrow(type);
-        }
-      });
-    }
-
-    if (removeAPLArrowBtn) {
-      removeAPLArrowBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (exposed && typeof exposed.removeAPLArrow === "function") {
-          exposed.removeAPLArrow();
-        }
-      });
-    }
-
-    if (aplArrowTypeSelect) {
-      aplArrowTypeSelect.addEventListener("change", () => {
-        if (exposed && typeof exposed.updateAPLArrowType === "function") {
-          exposed.updateAPLArrowType(aplArrowTypeSelect.value);
-        }
-      });
-    }
-
-    const aplArrowFlipButton = document.getElementById("aplArrowFlipButton");
-    if (aplArrowFlipButton) {
-      aplArrowFlipButton.addEventListener("click", () => {
-        if (exposed && typeof exposed.toggleAPLArrowFlip === "function") {
-          exposed.toggleAPLArrowFlip();
-        }
-      });
     }
 
     // Control Signs Revision
@@ -2222,12 +2322,19 @@ const formHandler = (function () {
       post.color = requestedPostColor;
     }
     post.showPost = form["showPost"].checked;
+    post.copySignsOnly = form["copySignsOnly"] ? form["copySignsOnly"].checked : true;
+    const copyScaleInput = parseFloat(form["copyScaleValue"]?.value || form["copyScale"]?.value);
+    post.copyScale = Number.isFinite(copyScaleInput)
+      ? Math.min(8, Math.max(0, copyScaleInput))
+      : 8;
     post.secondExitOnly = form["secondExitOnly"].checked;
     post.panelOrientation = form["panelOrientationVertical"]?.checked
       ? "Vertical"
       : "Horizontal";
     setStoredItem(STORAGE_KEYS.postPosition, post.polePosition);
     setStoredItem(STORAGE_KEYS.showPost, String(!!post.showPost));
+    setStoredItem(STORAGE_KEYS.copySignsOnly, String(post.copySignsOnly !== false));
+    setStoredItem(STORAGE_KEYS.copyScale, String(post.copyScale));
     setStoredItem(STORAGE_KEYS.postColor, post.color);
 
     // Panel
@@ -2239,6 +2346,7 @@ const formHandler = (function () {
       : Panel.prototype.defaultBorderRadius;
 
     post.disableFlash = form["disableFlash"].checked;
+    post.showBlockBoundingBoxes = !!form["showBlockBoundingBoxes"]?.checked;
 
     // Exit Tab
     exitTab.number = form["exitNumber"].value;
@@ -3078,9 +3186,31 @@ const formHandler = (function () {
       showPostCheckbox.checked = !!post.showPost;
     }
 
+    const copySignsOnlyCheckbox = document.getElementById("copySignsOnly");
+    if (copySignsOnlyCheckbox) {
+      copySignsOnlyCheckbox.checked = post.copySignsOnly !== false;
+    }
+
+    const copyScaleValue = Number.isFinite(post.copyScale) ? post.copyScale : 8;
+    const copyScaleSlider = document.getElementById("copyScale");
+    const copyScaleNumber = document.getElementById("copyScaleValue");
+    if (copyScaleSlider) {
+      copyScaleSlider.value = copyScaleValue;
+    }
+    if (copyScaleNumber) {
+      copyScaleNumber.value = copyScaleValue;
+    }
+
     const secondExitOnlyCheckbox = document.getElementById("secondExitOnly");
     if (secondExitOnlyCheckbox) {
       secondExitOnlyCheckbox.checked = !!post.secondExitOnly;
+    }
+
+    const showBlockBoundingBoxesCheckbox = document.getElementById(
+      "showBlockBoundingBoxes"
+    );
+    if (showBlockBoundingBoxesCheckbox) {
+      showBlockBoundingBoxesCheckbox.checked = !!post.showBlockBoundingBoxes;
     }
 
     while (panelList.firstChild) {
@@ -3292,407 +3422,550 @@ const formHandler = (function () {
 
     // APL Arrow List Update
     const aplArrowList = document.getElementById("aplArrowList");
-    const aplArrowTypeSelect = document.getElementById("aplArrowType");
     const selectedAPLIndex = exposed.vars.currentlySelectedAPLArrowIndex;
+    const APL_ARROW_TYPE_OPTIONS = [
+      { value: "UP", label: "Up" },
+      { value: "UP_LEFT", label: "Up Left Turn" },
+      { value: "UP_RIGHT", label: "Up Right Turn" },
+      { value: "DUAL_TURN", label: "Dual Turn" },
+      { value: "LEFT_TURN", label: "Left Turn" },
+      { value: "RIGHT_TURN", label: "Right Turn" },
+      { value: "UP_CFX", label: "CFX Up" },
+      { value: "UP_LEFT_CFX", label: "CFX Up Left Turn" },
+      { value: "UP_RIGHT_CFX", label: "CFX Up Right Turn" },
+      { value: "LEFT_TURN_CFX", label: "CFX Left Turn" },
+      { value: "RIGHT_TURN_CFX", label: "CFX Right Turn" },
+    ];
+
+    const getAPLArrowKind = (arrow) => {
+      if (exposed && typeof exposed.getAPLArrowKind === "function") {
+        return exposed.getAPLArrowKind(arrow);
+      }
+      if (arrow?.type === "APL_UP_TURN") return arrow.flip ? "UP_LEFT" : "UP_RIGHT";
+      if (arrow?.type === "APL_DUAL_TURN") return "DUAL_TURN";
+      if (arrow?.type === "APL_TURN") return arrow.flip ? "LEFT_TURN" : "RIGHT_TURN";
+      if (arrow?.type === "APL_UP_CFX") return "UP_CFX";
+      if (arrow?.type === "APL_UP_TURN_CFX") {
+        return arrow.flip ? "UP_LEFT_CFX" : "UP_RIGHT_CFX";
+      }
+      if (arrow?.type === "APL_TURN_CFX") {
+        return arrow.flip ? "LEFT_TURN_CFX" : "RIGHT_TURN_CFX";
+      }
+      return "UP";
+    };
+
+    const appendAPLTypeOptions = (select, selectedKind) => {
+      for (const option of APL_ARROW_TYPE_OPTIONS) {
+        lib.appendOption(select, option.value, {
+          selected: option.value === selectedKind,
+          text: option.label,
+        });
+      }
+    };
+
+    const createAPLDropZone = ({ placement, subPanelIndex, dividerAfterSubPanelIndex }) => {
+      const dropZone = document.createElement("div");
+      dropZone.className = "aplArrowDropZone";
+      dropZone.textContent = "Drop arrow here";
+
+      dropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropZone.classList.add("dragOver");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragOver");
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("dragOver");
+        const fromIndex = Number(event.dataTransfer.getData("text/plain"));
+        if (!Number.isFinite(fromIndex) || !exposed || typeof exposed.moveAPLArrow !== "function") {
+          return;
+        }
+
+        exposed.moveAPLArrow(fromIndex, {
+          placement,
+          subPanelIndex,
+          dividerAfterSubPanelIndex,
+        });
+      });
+
+      return dropZone;
+    };
+
+    const stopAPLControlDrag = (element) => {
+      element.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+      element.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+      });
+      element.addEventListener("mousedown", (event) => {
+        event.stopPropagation();
+      });
+    };
+
+    const stopAPLControlEvents = (element) => {
+      stopAPLControlDrag(element);
+      ["click", "change", "input"].forEach((eventName) => {
+        element.addEventListener(eventName, (event) => {
+          event.stopPropagation();
+        });
+      });
+    };
+
+    const parseAPLNullableNumber = (value) => {
+      const text = String(value ?? "").trim();
+      if (!text.length) {
+        return null;
+      }
+      const parsedValue = parseFloat(text);
+      return Number.isFinite(parsedValue) ? parsedValue : null;
+    };
+
+    const callAPLArrowSetter = (setterName, arrowIndex, value) => {
+      if (exposed && typeof exposed[setterName] === "function") {
+        exposed[setterName](arrowIndex, value);
+      }
+    };
+
+    const createAPLSettingsRow = (labelText, controls) => {
+      const row = document.createElement("div");
+      row.className = "aplExitOnlySettingsRow";
+
+      const label = document.createElement("label");
+      label.textContent = labelText;
+      row.appendChild(label);
+
+      for (const control of Array.isArray(controls) ? controls : [controls]) {
+        row.appendChild(control);
+      }
+
+      return row;
+    };
+
+    const createAPLNumberSetting = ({
+      value,
+      placeholder,
+      setterName,
+      arrowIndex,
+      min = null,
+      max = null,
+      step = "0.1",
+    }) => {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = step;
+      input.placeholder = placeholder;
+      input.value = value != null ? String(value) : "";
+
+      if (min != null) {
+        input.min = String(min);
+      }
+      if (max != null) {
+        input.max = String(max);
+      }
+
+      input.addEventListener("change", () => {
+        callAPLArrowSetter(
+          setterName,
+          arrowIndex,
+          parseAPLNullableNumber(input.value)
+        );
+      });
+      stopAPLControlEvents(input);
+
+      return input;
+    };
+
+    const createAPLTextSetting = ({ value, fallback, setterName, arrowIndex }) => {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = value != null ? value : fallback;
+      input.addEventListener("change", () => {
+        callAPLArrowSetter(setterName, arrowIndex, input.value);
+      });
+      stopAPLControlEvents(input);
+
+      return input;
+    };
+
+    const createAPLHideSetting = ({ checked, setterName, arrowIndex }) => {
+      const label = document.createElement("label");
+      label.className = "aplExitOnlyHideLabel";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = checked === true;
+      checkbox.addEventListener("change", () => {
+        callAPLArrowSetter(setterName, arrowIndex, checkbox.checked);
+      });
+      stopAPLControlEvents(checkbox);
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(" Hide"));
+      label.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      stopAPLControlDrag(label);
+
+      return label;
+    };
+
+    const createAPLExitOnlySettings = (arrow, arrowIndex) => {
+      const settings = document.createElement("div");
+      settings.className = "aplExitOnlySettings";
+
+      const settingsTitle = document.createElement("div");
+      settingsTitle.className = "aplExitOnlySettingsTitle";
+      settingsTitle.textContent = "Exit Only Settings";
+      settings.appendChild(settingsTitle);
+
+      const bgSelect = document.createElement("select");
+      lib.appendOption(bgSelect, "yellow", {
+        selected: arrow.exitOnlyBgColor !== "white",
+        text: "Yellow",
+      });
+      lib.appendOption(bgSelect, "white", {
+        selected: arrow.exitOnlyBgColor === "white",
+        text: "White",
+      });
+      bgSelect.addEventListener("change", () => {
+        callAPLArrowSetter("setAPLExitOnlyBgColor", arrowIndex, bgSelect.value);
+      });
+      stopAPLControlEvents(bgSelect);
+
+      const leftTextInput = createAPLTextSetting({
+        value: arrow.exitOnlyTextLeft,
+        fallback: "EXIT",
+        setterName: "setAPLExitOnlyTextLeft",
+        arrowIndex,
+      });
+      const rightTextInput = createAPLTextSetting({
+        value: arrow.exitOnlyTextRight,
+        fallback: "ONLY",
+        setterName: "setAPLExitOnlyTextRight",
+        arrowIndex,
+      });
+
+      settings.appendChild(
+        createAPLSettingsRow(
+          "Margin Left",
+          createAPLNumberSetting({
+            value: arrow.arrowMarginLeft,
+            placeholder: "Default",
+            setterName: "setAPLArrowMarginLeft",
+            arrowIndex,
+            min: 0,
+          })
+        )
+      );
+      settings.appendChild(
+        createAPLSettingsRow(
+          "Margin Right",
+          createAPLNumberSetting({
+            value: arrow.arrowMarginRight,
+            placeholder: "Default",
+            setterName: "setAPLArrowMarginRight",
+            arrowIndex,
+            min: 0,
+          })
+        )
+      );
+      settings.appendChild(createAPLSettingsRow("Background", bgSelect));
+      settings.appendChild(
+        createAPLSettingsRow(
+          "Padding",
+          createAPLNumberSetting({
+            value: arrow.exitOnlyPadding,
+            placeholder: "Default",
+            setterName: "setAPLExitOnlyPadding",
+            arrowIndex,
+            min: 0,
+            step: "0.05",
+          })
+        )
+      );
+      settings.appendChild(
+        createAPLSettingsRow(
+          "Radius",
+          createAPLNumberSetting({
+            value: arrow.exitOnlyBorderRadius,
+            placeholder: "Default",
+            setterName: "setAPLExitOnlyBorderRadius",
+            arrowIndex,
+            min: 0,
+            step: "0.05",
+          })
+        )
+      );
+      settings.appendChild(
+        createAPLSettingsRow("Left Text", [
+          leftTextInput,
+          createAPLHideSetting({
+            checked: arrow.exitOnlyHideLeft,
+            setterName: "setAPLExitOnlyHideLeft",
+            arrowIndex,
+          }),
+        ])
+      );
+      settings.appendChild(
+        createAPLSettingsRow("Right Text", [
+          rightTextInput,
+          createAPLHideSetting({
+            checked: arrow.exitOnlyHideRight,
+            setterName: "setAPLExitOnlyHideRight",
+            arrowIndex,
+          }),
+        ])
+      );
+
+      return settings;
+    };
+
+    const createAPLArrowRow = (arrow, arrowIndex, placement, placementIndex) => {
+      const arrowBlock = document.createElement("div");
+      arrowBlock.className = "aplArrowEditorBlock";
+
+      const arrowRow = document.createElement("div");
+      arrowRow.className =
+        "aplArrowListItem" + (arrowIndex === selectedAPLIndex ? " active" : "");
+      arrowRow.dataset.aplIndex = String(arrowIndex);
+
+      const dragHandle = document.createElement("button");
+      dragHandle.type = "button";
+      dragHandle.className = "aplArrowDragHandle";
+      dragHandle.textContent = "Move";
+      dragHandle.draggable = true;
+      dragHandle.addEventListener("dragstart", (event) => {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", String(arrowIndex));
+        arrowRow.classList.add("dragging");
+      });
+      dragHandle.addEventListener("dragend", () => {
+        arrowRow.classList.remove("dragging");
+      });
+
+      arrowRow.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        arrowRow.classList.add("dragOver");
+      });
+
+      arrowRow.addEventListener("dragleave", () => {
+        arrowRow.classList.remove("dragOver");
+      });
+
+      arrowRow.addEventListener("drop", (event) => {
+        event.preventDefault();
+        arrowRow.classList.remove("dragOver");
+        const fromIndex = Number(event.dataTransfer.getData("text/plain"));
+
+        if (!Number.isFinite(fromIndex) || !exposed || typeof exposed.moveAPLArrow !== "function") {
+          return;
+        }
+
+        if (placement === "divider") {
+          exposed.moveAPLArrow(fromIndex, {
+            placement: "divider",
+            dividerAfterSubPanelIndex:
+              placementIndex ?? arrow.dividerAfterSubPanelIndex,
+            beforeIndex: arrowIndex,
+          });
+        } else {
+          exposed.moveAPLArrow(fromIndex, {
+            placement: "subpanel",
+            subPanelIndex: placementIndex ?? arrow.subPanelIndex,
+            beforeIndex: arrowIndex,
+          });
+        }
+      });
+
+      const typeSelect = document.createElement("select");
+      typeSelect.className = "aplInlineTypeSelect";
+      appendAPLTypeOptions(typeSelect, getAPLArrowKind(arrow));
+      typeSelect.addEventListener("change", () => {
+        if (exposed && typeof exposed.updateAPLArrowType === "function") {
+          exposed.updateAPLArrowType(typeSelect.value, arrowIndex);
+        }
+      });
+      stopAPLControlEvents(typeSelect);
+
+      const exitOnlyLabel = document.createElement("label");
+      exitOnlyLabel.className = "aplExitOnlyInlineLabel";
+      const exitOnlyCheckbox = document.createElement("input");
+      exitOnlyCheckbox.type = "checkbox";
+      exitOnlyCheckbox.checked = arrow.exitOnly === true;
+      exitOnlyCheckbox.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      exitOnlyCheckbox.addEventListener("change", (event) => {
+        event.stopPropagation();
+        if (exposed && typeof exposed.setAPLExitOnly === "function") {
+          exposed.setAPLExitOnly(arrowIndex, exitOnlyCheckbox.checked);
+        }
+      });
+      stopAPLControlEvents(exitOnlyCheckbox);
+      exitOnlyLabel.appendChild(exitOnlyCheckbox);
+      exitOnlyLabel.appendChild(document.createTextNode(" Exit Only"));
+      exitOnlyLabel.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      stopAPLControlDrag(exitOnlyLabel);
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "aplArrowDeleteButton";
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (exposed && typeof exposed.removeAPLArrowAt === "function") {
+          exposed.removeAPLArrowAt(arrowIndex);
+        }
+      });
+      stopAPLControlEvents(deleteButton);
+
+      arrowRow.appendChild(dragHandle);
+      arrowRow.appendChild(typeSelect);
+      arrowRow.appendChild(exitOnlyLabel);
+      arrowRow.appendChild(deleteButton);
+
+      arrowRow.addEventListener("click", () => {
+        if (exposed && typeof exposed.selectAPLArrow === "function") {
+          exposed.selectAPLArrow(arrowIndex);
+        }
+      });
+
+      arrowBlock.appendChild(arrowRow);
+
+      if (arrow.exitOnly === true) {
+        arrowBlock.appendChild(createAPLExitOnlySettings(arrow, arrowIndex));
+      }
+
+      return arrowBlock;
+    };
 
     if (aplArrowList) {
       lib.clearChildren(aplArrowList);
 
-      // Add hint text
-      const hintText = document.createElement("p");
-      hintText.style.fontSize = "0.8rem";
-      hintText.style.color = "#888";
-      hintText.style.marginBottom = "8px";
-      hintText.style.fontStyle = "italic";
-      hintText.textContent = "To adjust spacing of each APL section, use the spacing section in the subpanel tab.";
-      aplArrowList.appendChild(hintText);
-
+      const selectedSubPanelIndex = exposed.vars.currentlySelectedSubPanelIndex;
+      const selectedSubpanelStatus = document.getElementById("aplSelectedSubpanelStatus");
       const aplArrows = panel.sign.aplArrows || [];
+      const aplGroups =
+        exposed && typeof exposed.getAPLSubpanelGroups === "function"
+          ? exposed.getAPLSubpanelGroups()
+          : [];
 
-      for (let i = 0; i < aplArrows.length; i++) {
-        const arrow = aplArrows[i];
+      if (selectedSubpanelStatus) {
+        const selectedGroup =
+          aplGroups.find((group) => group.indices.includes(selectedSubPanelIndex)) ||
+          aplGroups[0];
+        selectedSubpanelStatus.textContent =
+          "Selected Subpanel: " +
+          (selectedGroup ? selectedGroup.label : "Subpanel 1");
+      }
 
-        // Create container for arrow button and divider button
-        const arrowContainer = document.createElement("div");
-        arrowContainer.className = "aplArrowListItem";
-        arrowContainer.style.display = "flex";
-        arrowContainer.style.alignItems = "center";
-        arrowContainer.style.gap = "4px";
+      aplGroups.forEach((group, groupIndex) => {
+        const subPanelSection = document.createElement("div");
+        subPanelSection.className =
+          "aplSubpanelSection" +
+          (group.indices.includes(selectedSubPanelIndex) ? " selected" : "");
 
-        const arrowButton = document.createElement("button");
-        arrowButton.type = "button";
-        arrowButton.className = "scrollMenuItem" + (i === selectedAPLIndex ? " active" : "");
-        arrowButton.dataset.aplIndex = i.toString();
-        arrowButton.style.flex = "1";
-
-        const arrowDef = ArrowElement.prototype.arrows[arrow.type];
-        let label = arrowDef ? arrowDef.label : arrow.type;
-        // Remove "APL " prefix if present
-        if (label.startsWith("APL ")) {
-          label = label.substring(4);
-        }
-        arrowButton.textContent = "Arrow " + (i + 1) + ": " + label;
-
-        arrowButton.addEventListener("click", function () {
-          if (exposed && typeof exposed.selectAPLArrow === "function") {
-            exposed.selectAPLArrow(i);
+        const sectionHeader = document.createElement("div");
+        sectionHeader.className = "aplSubpanelSectionHeader";
+        sectionHeader.textContent = group.label;
+        sectionHeader.addEventListener("click", () => {
+          if (exposed && typeof exposed.changeEditingSubPanel === "function") {
+            exposed.changeEditingSubPanel(group.start);
           }
         });
+        subPanelSection.appendChild(sectionHeader);
 
-        arrowContainer.appendChild(arrowButton);
+        subPanelSection.appendChild(
+          createAPLDropZone({
+            placement: "subpanel",
+            subPanelIndex: group.start,
+          })
+        );
 
-        // Add divider button (available on all arrows if at least 2 arrows)
-        if (aplArrows.length >= 2) {
-          const dividerContainer = document.createElement("div");
-          dividerContainer.style.display = "flex";
-          dividerContainer.style.flexDirection = "row";
-          dividerContainer.style.alignItems = "center";
-          dividerContainer.style.gap = "4px";
-          dividerContainer.style.marginLeft = "4px";
+        const subpanelArrowIndexes = group.arrowIndexes.filter(
+          (arrowIndex) => !aplArrows[arrowIndex]?.groupedWithDivider
+        );
 
-          const dividerButton = document.createElement("button");
-          dividerButton.type = "button";
-          dividerButton.className = "aplDividerButton" + (arrow.dividerAfter ? " active" : "");
-          dividerButton.title = arrow.dividerAfter ? "Remove Divider" : "Add Divider";
-          dividerButton.style.minWidth = "28px";
-          dividerButton.style.padding = "4px";
-          dividerButton.style.display = "flex";
-          dividerButton.style.alignItems = "center";
-          dividerButton.style.justifyContent = "center";
+        subpanelArrowIndexes.forEach((arrowIndex) => {
+          subPanelSection.appendChild(
+            createAPLArrowRow(
+              aplArrows[arrowIndex],
+              arrowIndex,
+              "subpanel",
+              group.start
+            )
+          );
+        });
 
-          if (arrow.dividerAfter) {
-            const closeIcon = document.createElement("img");
-            closeIcon.src = "img/other-symbols/ui/close.svg";
-            closeIcon.alt = "Remove Divider";
-            closeIcon.className = "aplDividerIcon";
-            closeIcon.style.width = "20px";
-            closeIcon.style.height = "20px";
-            dividerButton.appendChild(closeIcon);
-          } else {
-            const dividerIcon = document.createElement("img");
-            dividerIcon.src = "img/other-symbols/ui/divider_add.svg";
-            dividerIcon.alt = "Add Divider";
-            dividerIcon.className = "aplDividerIcon";
-            dividerIcon.style.width = "20px";
-            dividerIcon.style.height = "20px";
-            dividerButton.appendChild(dividerIcon);
+        const addToSubpanelButton = document.createElement("button");
+        addToSubpanelButton.type = "button";
+        addToSubpanelButton.textContent = "Add arrow to " + group.label;
+        addToSubpanelButton.addEventListener("click", () => {
+          if (exposed && typeof exposed.addAPLArrow === "function") {
+            exposed.addAPLArrow(null, {
+              placement: "subpanel",
+              subPanelIndex: group.start,
+            });
           }
+        });
+        subPanelSection.appendChild(addToSubpanelButton);
+        aplArrowList.appendChild(subPanelSection);
 
-          dividerButton.addEventListener("click", function (e) {
-            e.stopPropagation();
-            if (exposed && typeof exposed.addAPLDivider === "function") {
-              exposed.addAPLDivider(i);
-            }
+        if (groupIndex < aplGroups.length - 1) {
+          const dividerSection = document.createElement("div");
+          dividerSection.className = "aplDividerSection";
+
+          const dividerHeader = document.createElement("div");
+          dividerHeader.className = "aplDividerSectionHeader";
+          dividerHeader.textContent = "Divider " + (group.end + 1);
+          dividerSection.appendChild(dividerHeader);
+
+          dividerSection.appendChild(
+            createAPLDropZone({
+              placement: "divider",
+              dividerAfterSubPanelIndex: group.end,
+            })
+          );
+
+          const dividerArrowIndexes = group.arrowIndexes.filter(
+            (arrowIndex) => aplArrows[arrowIndex]?.groupedWithDivider
+          );
+
+          dividerArrowIndexes.forEach((arrowIndex) => {
+            dividerSection.appendChild(
+              createAPLArrowRow(
+                aplArrows[arrowIndex],
+                arrowIndex,
+                "divider",
+                group.end
+              )
+            );
           });
 
-          dividerContainer.appendChild(dividerButton);
-
-          if (arrow.dividerAfter) {
-            // Radio buttons for divider options (when divider is active)
-            const radioGroup = document.createElement("div");
-            radioGroup.className = "aplDividerRadioGroup";
-            radioGroup.style.display = "flex";
-            radioGroup.style.flexDirection = "row";
-            radioGroup.style.gap = "8px";
-            radioGroup.style.fontSize = "0.75rem";
-            radioGroup.style.marginLeft = "8px";
-            radioGroup.style.flexWrap = "wrap";
-
-            const radioName = "aplDividerOption_" + i;
-
-            // Option 1: Normal (default)
-            const normalLabel = document.createElement("label");
-            normalLabel.className = "aplDividerRadioLabel";
-            const normalRadio = document.createElement("input");
-            normalRadio.type = "radio";
-            normalRadio.name = radioName;
-            normalRadio.value = "normal";
-            normalRadio.checked = !arrow.groupedWithDivider && !arrow.exitOnly;
-            normalRadio.addEventListener("change", function (e) {
-              e.stopPropagation();
-              if (exposed) {
-                if (typeof exposed.setAPLGroupedWithDivider === "function") {
-                  exposed.setAPLGroupedWithDivider(i, false);
-                }
-                if (typeof exposed.setAPLExitOnly === "function") {
-                  exposed.setAPLExitOnly(i, false);
-                }
-                if (typeof exposed.selectAPLArrow === "function") {
-                  exposed.selectAPLArrow(i);
-                }
+          if (dividerArrowIndexes.length === 0) {
+            const addDividerArrowButton = document.createElement("button");
+            addDividerArrowButton.type = "button";
+            addDividerArrowButton.textContent = "Add divider arrow";
+            addDividerArrowButton.addEventListener("click", () => {
+              if (exposed && typeof exposed.addAPLDividerArrow === "function") {
+                exposed.addAPLDividerArrow(group.end);
               }
             });
-            normalLabel.appendChild(normalRadio);
-            normalLabel.appendChild(document.createTextNode("Normal"));
-            radioGroup.appendChild(normalLabel);
-
-            // Option 2: Group with Last Arrow
-            const groupLabel = document.createElement("label");
-            groupLabel.className = "aplDividerRadioLabel";
-            const groupRadio = document.createElement("input");
-            groupRadio.type = "radio";
-            groupRadio.name = radioName;
-            groupRadio.value = "group";
-            groupRadio.checked = arrow.groupedWithDivider === true;
-            groupRadio.addEventListener("change", function (e) {
-              e.stopPropagation();
-              if (exposed && typeof exposed.setAPLGroupedWithDivider === "function") {
-                exposed.setAPLGroupedWithDivider(i, true);
-              }
-              if (exposed && typeof exposed.selectAPLArrow === "function") {
-                exposed.selectAPLArrow(i);
-              }
-            });
-            groupLabel.appendChild(groupRadio);
-            groupLabel.appendChild(document.createTextNode("Group"));
-            radioGroup.appendChild(groupLabel);
-
-            // Option 3: Exit Only
-            const exitOnlyLabel = document.createElement("label");
-            exitOnlyLabel.className = "aplDividerRadioLabel";
-            const exitOnlyRadio = document.createElement("input");
-            exitOnlyRadio.type = "radio";
-            exitOnlyRadio.name = radioName;
-            exitOnlyRadio.value = "exitOnly";
-            exitOnlyRadio.checked = arrow.exitOnly === true;
-            exitOnlyRadio.addEventListener("change", function (e) {
-              e.stopPropagation();
-              if (exposed && typeof exposed.setAPLExitOnly === "function") {
-                exposed.setAPLExitOnly(i, true);
-              }
-              if (exposed && typeof exposed.selectAPLArrow === "function") {
-                exposed.selectAPLArrow(i);
-              }
-            });
-            exitOnlyLabel.appendChild(exitOnlyRadio);
-            exitOnlyLabel.appendChild(document.createTextNode("Exit Only"));
-            radioGroup.appendChild(exitOnlyLabel);
-
-            dividerContainer.appendChild(radioGroup);
-          } else {
-            // Checkbox for Exit Only (when no divider)
-            const exitOnlyCheckLabel = document.createElement("label");
-            exitOnlyCheckLabel.className = "aplDividerRadioLabel";
-            exitOnlyCheckLabel.style.marginLeft = "8px";
-
-            const exitOnlyCheckbox = document.createElement("input");
-            exitOnlyCheckbox.type = "checkbox";
-            exitOnlyCheckbox.checked = arrow.exitOnly === true;
-            exitOnlyCheckbox.addEventListener("change", function (e) {
-              e.stopPropagation();
-              if (exposed && typeof exposed.setAPLExitOnly === "function") {
-                exposed.setAPLExitOnly(i, this.checked);
-              }
-              if (exposed && typeof exposed.selectAPLArrow === "function") {
-                exposed.selectAPLArrow(i);
-              }
-            });
-
-            exitOnlyCheckLabel.appendChild(exitOnlyCheckbox);
-            exitOnlyCheckLabel.appendChild(document.createTextNode("Exit Only"));
-            dividerContainer.appendChild(exitOnlyCheckLabel);
+            dividerSection.appendChild(addDividerArrowButton);
           }
 
-          arrowContainer.appendChild(dividerContainer);
+          aplArrowList.appendChild(dividerSection);
         }
-
-        aplArrowList.appendChild(arrowContainer);
-      }
-
-      // Update the type selector to match the selected arrow
-      if (aplArrowTypeSelect && aplArrows.length > 0 && selectedAPLIndex < aplArrows.length) {
-        aplArrowTypeSelect.value = aplArrows[selectedAPLIndex].type;
-      }
-
-      // Update the flip button state
-      const aplArrowFlipButton = document.getElementById("aplArrowFlipButton");
-      if (aplArrowFlipButton && aplArrows.length > 0 && selectedAPLIndex < aplArrows.length) {
-        const isFlipped = aplArrows[selectedAPLIndex].flip === true;
-        aplArrowFlipButton.classList.toggle("activated", isFlipped);
-        aplArrowFlipButton.setAttribute("aria-pressed", isFlipped ? "true" : "false");
-        aplArrowFlipButton.textContent = isFlipped ? "Unflip" : "Flip";
-      }
-
-      // Per-arrow settings controls
-      const aplArrowSettingsContainer = document.getElementById("aplArrowSettings");
-      if (aplArrowSettingsContainer) {
-        lib.clearChildren(aplArrowSettingsContainer);
-
-        if (aplArrows.length > 0 && selectedAPLIndex < aplArrows.length) {
-          const arrow = aplArrows[selectedAPLIndex];
-          const idx = selectedAPLIndex;
-
-          // Arrow Margin Left
-          const marginLeftLabel = document.createElement("label");
-          marginLeftLabel.textContent = "Arrow Margin Left (rem):";
-          marginLeftLabel.style.fontSize = "0.8rem";
-          const marginLeftInput = document.createElement("input");
-          marginLeftInput.type = "number";
-          marginLeftInput.step = "0.1";
-          marginLeftInput.min = "0";
-          marginLeftInput.placeholder = "3.6";
-          marginLeftInput.style.width = "5rem";
-          if (arrow.arrowMarginLeft != null) {
-            marginLeftInput.value = arrow.arrowMarginLeft;
-          }
-          marginLeftInput.addEventListener("change", function () {
-            const val = this.value === "" ? null : parseFloat(this.value);
-            if (exposed) exposed.setAPLArrowMarginLeft(idx, val);
-          });
-          aplArrowSettingsContainer.appendChild(marginLeftLabel);
-          aplArrowSettingsContainer.appendChild(marginLeftInput);
-
-          // Arrow Margin Right
-          const marginRightLabel = document.createElement("label");
-          marginRightLabel.textContent = "Arrow Margin Right (rem):";
-          marginRightLabel.style.fontSize = "0.8rem";
-          const marginRightInput = document.createElement("input");
-          marginRightInput.type = "number";
-          marginRightInput.step = "0.1";
-          marginRightInput.min = "0";
-          marginRightInput.placeholder = "3.6";
-          marginRightInput.style.width = "5rem";
-          if (arrow.arrowMarginRight != null) {
-            marginRightInput.value = arrow.arrowMarginRight;
-          }
-          marginRightInput.addEventListener("change", function () {
-            const val = this.value === "" ? null : parseFloat(this.value);
-            if (exposed) exposed.setAPLArrowMarginRight(idx, val);
-          });
-          aplArrowSettingsContainer.appendChild(marginRightLabel);
-          aplArrowSettingsContainer.appendChild(marginRightInput);
-
-          // Exit Only settings (only when exitOnly is enabled)
-          if (arrow.exitOnly) {
-            const exitOnlyHeader = document.createElement("p");
-            exitOnlyHeader.textContent = "Exit Only Settings";
-            exitOnlyHeader.style.fontWeight = "bold";
-            exitOnlyHeader.style.fontSize = "0.85rem";
-            exitOnlyHeader.style.marginTop = "8px";
-            exitOnlyHeader.style.marginBottom = "4px";
-            aplArrowSettingsContainer.appendChild(exitOnlyHeader);
-
-            // Background Color
-            const bgLabel = document.createElement("label");
-            bgLabel.textContent = "Background Color:";
-            bgLabel.style.fontSize = "0.8rem";
-            const bgSelect = document.createElement("select");
-            bgSelect.style.width = "5rem";
-            const yellowOpt = document.createElement("option");
-            yellowOpt.value = "yellow";
-            yellowOpt.textContent = "Yellow";
-            const whiteOpt = document.createElement("option");
-            whiteOpt.value = "white";
-            whiteOpt.textContent = "White";
-            bgSelect.appendChild(yellowOpt);
-            bgSelect.appendChild(whiteOpt);
-            bgSelect.value = arrow.exitOnlyBgColor || "yellow";
-            bgSelect.addEventListener("change", function () {
-              if (exposed) exposed.setAPLExitOnlyBgColor(idx, this.value);
-            });
-            aplArrowSettingsContainer.appendChild(bgLabel);
-            aplArrowSettingsContainer.appendChild(bgSelect);
-
-            // Horizontal Padding
-            const padLabel = document.createElement("label");
-            padLabel.textContent = "Horizontal Padding (rem):";
-            padLabel.style.fontSize = "0.8rem";
-            const padInput = document.createElement("input");
-            padInput.type = "number";
-            padInput.step = "0.1";
-            padInput.min = "0";
-            padInput.placeholder = "1";
-            padInput.style.width = "5rem";
-            if (arrow.exitOnlyPadding != null) {
-              padInput.value = arrow.exitOnlyPadding;
-            }
-            padInput.addEventListener("change", function () {
-              const val = this.value === "" ? null : parseFloat(this.value);
-              if (exposed) exposed.setAPLExitOnlyPadding(idx, val);
-            });
-            aplArrowSettingsContainer.appendChild(padLabel);
-            aplArrowSettingsContainer.appendChild(padInput);
-
-            // Border Radius
-            const radLabel = document.createElement("label");
-            radLabel.textContent = "Border Radius (rem):";
-            radLabel.style.fontSize = "0.8rem";
-            const radInput = document.createElement("input");
-            radInput.type = "number";
-            radInput.step = "0.1";
-            radInput.min = "0";
-            radInput.placeholder = "0.1";
-            radInput.style.width = "5rem";
-            if (arrow.exitOnlyBorderRadius != null) {
-              radInput.value = arrow.exitOnlyBorderRadius;
-            }
-            radInput.addEventListener("change", function () {
-              const val = this.value === "" ? null : parseFloat(this.value);
-              if (exposed) exposed.setAPLExitOnlyBorderRadius(idx, val);
-            });
-            aplArrowSettingsContainer.appendChild(radLabel);
-            aplArrowSettingsContainer.appendChild(radInput);
-
-            // Left Label Text + Hide
-            const leftLabel = document.createElement("label");
-            leftLabel.textContent = "Left Label Text:";
-            leftLabel.style.fontSize = "0.8rem";
-            const leftInput = document.createElement("input");
-            leftInput.type = "text";
-            leftInput.placeholder = "EXIT";
-            leftInput.style.width = "5rem";
-            leftInput.value = arrow.exitOnlyTextLeft != null ? arrow.exitOnlyTextLeft : "EXIT";
-            leftInput.addEventListener("change", function () {
-              if (exposed) exposed.setAPLExitOnlyTextLeft(idx, this.value);
-            });
-            const hideLeftLabel = document.createElement("label");
-            hideLeftLabel.style.fontSize = "0.8rem";
-            hideLeftLabel.style.display = "inline-flex";
-            hideLeftLabel.style.alignItems = "center";
-            hideLeftLabel.style.gap = "4px";
-            const hideLeftCheck = document.createElement("input");
-            hideLeftCheck.type = "checkbox";
-            hideLeftCheck.checked = arrow.exitOnlyHideLeft === true;
-            hideLeftCheck.addEventListener("change", function () {
-              if (exposed) exposed.setAPLExitOnlyHideLeft(idx, this.checked);
-            });
-            hideLeftLabel.appendChild(hideLeftCheck);
-            hideLeftLabel.appendChild(document.createTextNode("Hide"));
-            aplArrowSettingsContainer.appendChild(leftLabel);
-            aplArrowSettingsContainer.appendChild(leftInput);
-            aplArrowSettingsContainer.appendChild(hideLeftLabel);
-
-            // Right Label Text + Hide
-            const rightLabel = document.createElement("label");
-            rightLabel.textContent = "Right Label Text:";
-            rightLabel.style.fontSize = "0.8rem";
-            const rightInput = document.createElement("input");
-            rightInput.type = "text";
-            rightInput.placeholder = "ONLY";
-            rightInput.style.width = "5rem";
-            rightInput.value = arrow.exitOnlyTextRight != null ? arrow.exitOnlyTextRight : "ONLY";
-            rightInput.addEventListener("change", function () {
-              if (exposed) exposed.setAPLExitOnlyTextRight(idx, this.value);
-            });
-            const hideRightLabel = document.createElement("label");
-            hideRightLabel.style.fontSize = "0.8rem";
-            hideRightLabel.style.display = "inline-flex";
-            hideRightLabel.style.alignItems = "center";
-            hideRightLabel.style.gap = "4px";
-            const hideRightCheck = document.createElement("input");
-            hideRightCheck.type = "checkbox";
-            hideRightCheck.checked = arrow.exitOnlyHideRight === true;
-            hideRightCheck.addEventListener("change", function () {
-              if (exposed) exposed.setAPLExitOnlyHideRight(idx, this.checked);
-            });
-            hideRightLabel.appendChild(hideRightCheck);
-            hideRightLabel.appendChild(document.createTextNode("Hide"));
-            aplArrowSettingsContainer.appendChild(rightLabel);
-            aplArrowSettingsContainer.appendChild(rightInput);
-            aplArrowSettingsContainer.appendChild(hideRightLabel);
-          }
-        }
-      }
+      });
     }
 
     // Panel Setting Config
@@ -4092,7 +4365,7 @@ const formHandler = (function () {
           sMControlRow.appendChild(selectionCheckbox);
         }
 
-        const textEditorBlock = document.createElement("button");
+        const textEditorBlock = document.createElement("div");
         textEditorBlock.className =
           "textEditorBlock " +
           Control.prototype.blockInternalElements[
@@ -4105,19 +4378,64 @@ const formHandler = (function () {
         textEditorBlock.dataset.row = row.toString();
         textEditorBlock.dataset.block = item.toString();
         textEditorBlock.draggable = true;
+
+        const blockTypeLabel = document.createElement("span");
+        blockTypeLabel.className = "textEditorBlockLabel";
         if (blockElementType === "GroupedBlockElement") {
-          const label = document.createElement("span");
-          label.textContent = blockElement.label || "Grouped Block";
-          textEditorBlock.appendChild(label);
+          blockTypeLabel.textContent = blockElement.label || "Grouped Block";
+          textEditorBlock.appendChild(blockTypeLabel);
           const chevron = document.createElement("span");
           chevron.className =
             "groupExpandButton material-symbols-outlined";
           chevron.textContent = "chevron_right";
           textEditorBlock.appendChild(chevron);
         } else {
-          textEditorBlock.textContent =
-            Control.prototype.blockElements[blockElementType];
+          blockTypeLabel.textContent =
+            Control.prototype.blockElements[blockElementType] || "Block";
+          textEditorBlock.appendChild(blockTypeLabel);
         }
+
+        const blockTypeChevron = document.createElement("span");
+        blockTypeChevron.className = "blockTypeChevron";
+        blockTypeChevron.textContent = "▾";
+
+        const blockTypeSelect = document.createElement("select");
+        blockTypeSelect.className = "blockTypeInlineSelect";
+        blockTypeSelect.value = blockElementType;
+        blockTypeSelect.setAttribute("aria-label", "Change block type");
+        blockTypeSelect.title = "Change block type";
+
+        for (const element in Control.prototype.blockElements) {
+          lib.appendOption(blockTypeSelect, element, {
+            selected: element === blockElementType,
+            text: Control.prototype.blockElements[element],
+          });
+        }
+
+        blockTypeSelect.addEventListener("mousedown", (event) => {
+          event.stopPropagation();
+        });
+
+        blockTypeSelect.addEventListener("click", (event) => {
+          event.stopPropagation();
+        });
+
+        blockTypeSelect.addEventListener("dragstart", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+
+        blockTypeSelect.addEventListener("change", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (typeof exposed.replaceControlElemTypeAt === "function") {
+            exposed.replaceControlElemTypeAt(row, item, blockTypeSelect.value);
+          }
+        });
+
+        textEditorBlock.appendChild(blockTypeChevron);
+        textEditorBlock.appendChild(blockTypeSelect);
         sMControlRow.appendChild(textEditorBlock);
         textEditorBlock.addEventListener("dragstart", handleBlockDragStart);
         textEditorBlock.addEventListener("dragend", handleBlockDragEnd);
