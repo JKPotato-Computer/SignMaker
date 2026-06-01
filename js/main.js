@@ -140,12 +140,29 @@ const app = (function () {
       (lib.colors && lib.colors.White) ||
       "rgb(255, 255, 255)";
     const borderWidth = parseFloat(computed.borderTopWidth) || 0;
+    const borderTopWidth = parseFloat(computed.borderTopWidth) || borderWidth;
+    const borderRightWidth =
+      parseFloat(computed.borderRightWidth) || borderWidth;
+    const borderBottomWidth =
+      parseFloat(computed.borderBottomWidth) || borderWidth;
+    const borderLeftWidth = parseFloat(computed.borderLeftWidth) || borderWidth;
     const fillColor =
       computed.backgroundColor && computed.backgroundColor !== "rgba(0, 0, 0, 0)"
         ? computed.backgroundColor
         : "transparent";
+    const overlayHost = signElmt.parentElement || signElmt;
 
     const clearDynamicBorder = () => {
+      signElmt.querySelectorAll(".fullBleedBorderOverlay").forEach((overlay) => {
+        overlay.remove();
+      });
+      if (overlayHost !== signElmt) {
+        overlayHost
+          .querySelectorAll(":scope > .fullBleedBorderOverlay")
+          .forEach((overlay) => {
+            overlay.remove();
+          });
+      }
       signElmt.style.removeProperty("backgroundImage");
       signElmt.style.removeProperty("backgroundOrigin");
       signElmt.style.removeProperty("backgroundClip");
@@ -164,9 +181,175 @@ const app = (function () {
     }
 
     const signRect = signElmt.getBoundingClientRect();
+    const overlayHostRect = overlayHost.getBoundingClientRect();
     const signHeight = signRect.height;
-    if (!signHeight) {
+    const signWidth = signRect.width;
+    if (!signHeight || !signWidth || !overlayHostRect.width) {
       clearDynamicBorder();
+      return;
+    }
+
+    const subPanelCount = Array.from(
+      signElmt.querySelectorAll(".subPanelDisplay")
+    ).reduce((count, subPanelEl) => {
+      const renderedCount = parseInt(subPanelEl.dataset.subpanelCount, 10);
+      return Number.isFinite(renderedCount) && renderedCount > count
+        ? renderedCount
+        : count;
+    }, 0);
+
+    const multiSubPanelSign = subPanelCount > 1;
+    if (multiSubPanelSign) {
+      clearDynamicBorder();
+
+      const parseRadius = (radiusValue) => {
+        const parsed = parseFloat(radiusValue);
+        return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+      };
+      const radius = {
+        topLeft: parseRadius(computed.borderTopLeftRadius),
+        topRight: parseRadius(computed.borderTopRightRadius),
+        bottomRight: parseRadius(computed.borderBottomRightRadius),
+        bottomLeft: parseRadius(computed.borderBottomLeftRadius),
+      };
+      const overlayEdgeThreshold = 1;
+      const signInnerHeight =
+        signElmt.clientHeight ||
+        Math.max(0, signHeight - borderTopWidth - borderBottomWidth);
+      const normalizeColor = (color) =>
+        typeof color === "string" ? color.trim().toLowerCase() : "";
+      const getHorizontalDivider = (rowEl) =>
+        rowEl?.querySelector(".dividerElement.fullBleed:not(.vertical)") ||
+        null;
+      const getHorizontalDividerColor = (rowEl) => {
+        const dividerEl = getHorizontalDivider(rowEl);
+        if (!dividerEl) {
+          return "";
+        }
+        const dividerColor = window.getComputedStyle(dividerEl).backgroundColor;
+        return normalizeColor(
+          dividerColor || rowEl.dataset.fullBleedBorderColor
+        );
+      };
+      const rowSharesStroke = (rowEl, color) =>
+        rowEl?.dataset?.fullBleedStroke === "true" &&
+        normalizeColor(rowEl.dataset.fullBleedBorderColor) === color;
+      const rowHasMatchingDivider = (rowEl, color) =>
+        getHorizontalDividerColor(rowEl) === color;
+      const strokeRows = Array.from(fullBleedRows).filter(
+        (rowEl) =>
+          rowEl.dataset.fullBleedStroke === "true" ||
+          getHorizontalDivider(rowEl)
+      );
+      if (!strokeRows.length) {
+        return;
+      }
+
+      for (const rowEl of strokeRows) {
+        const color = rowEl.dataset.fullBleedBorderColor;
+        if (!color) {
+          continue;
+        }
+
+        const colorKey = normalizeColor(color);
+        const subPanelEl = rowEl.closest(".subPanelDisplay");
+        const subPanelIndex = parseInt(subPanelEl?.dataset.subpanelIndex, 10);
+        const renderedSubPanelCount = parseInt(
+          subPanelEl?.dataset.subpanelCount,
+          10
+        );
+        const resolvedSubPanelCount =
+          Number.isFinite(renderedSubPanelCount) && renderedSubPanelCount > 0
+            ? renderedSubPanelCount
+            : subPanelCount;
+        const resolvedSubPanelIndex = Number.isFinite(subPanelIndex)
+          ? subPanelIndex
+          : 0;
+        const touchesOuterLeft = resolvedSubPanelIndex <= 0;
+        const touchesOuterRight =
+          resolvedSubPanelIndex >= resolvedSubPanelCount - 1;
+        const rowRect = rowEl.getBoundingClientRect();
+        const baseTop = rowRect.top - signRect.top - borderTopWidth;
+        const touchesTop = baseTop <= overlayEdgeThreshold;
+        const touchesBottom =
+          signInnerHeight - (baseTop + rowRect.height) <= overlayEdgeThreshold;
+        const outerTopBleed = touchesTop ? borderTopWidth : 0;
+        const outerBottomBleed = touchesBottom ? borderBottomWidth : 0;
+        const outerLeftBleed = touchesOuterLeft ? borderLeftWidth : 0;
+        const outerRightBleed = touchesOuterRight ? borderRightWidth : 0;
+        const internalLeftBleed = touchesOuterLeft ? 0 : borderWidth;
+        const internalRightBleed = touchesOuterRight ? 0 : borderWidth;
+        const top =
+          rowRect.top - overlayHostRect.top - outerTopBleed;
+        const left =
+          rowRect.left -
+          overlayHostRect.left -
+          internalLeftBleed -
+          outerLeftBleed;
+        const width =
+          rowRect.width +
+          internalLeftBleed +
+          internalRightBleed +
+          outerLeftBleed +
+          outerRightBleed;
+        const height = rowRect.height + outerTopBleed + outerBottomBleed;
+        if (width <= 0 || height <= 0) {
+          continue;
+        }
+
+        const previousRow = rowEl.previousElementSibling;
+        const nextRow = rowEl.nextElementSibling;
+        const isHorizontalDividerRow = !!getHorizontalDivider(rowEl);
+        const omitTopBorder =
+          rowSharesStroke(previousRow, colorKey) ||
+          rowHasMatchingDivider(previousRow, colorKey);
+        const omitBottomBorder =
+          rowSharesStroke(nextRow, colorKey) ||
+          rowHasMatchingDivider(nextRow, colorKey);
+        const drawTopBorder =
+          !isHorizontalDividerRow && touchesTop && !omitTopBorder;
+        const drawBottomBorder =
+          !isHorizontalDividerRow && touchesBottom && !omitBottomBorder;
+
+        const overlay = document.createElement("div");
+        overlay.className = "fullBleedBorderOverlay";
+        overlay.style.left = `${left}px`;
+        overlay.style.top = `${top}px`;
+        overlay.style.width = `${width}px`;
+        overlay.style.height = `${height}px`;
+        overlay.style.borderColor = color;
+        overlay.style.borderTopWidth = drawTopBorder
+          ? `${borderWidth}px`
+          : "0";
+        overlay.style.borderRightWidth = `${borderWidth}px`;
+        overlay.style.borderBottomWidth = drawBottomBorder
+          ? `${borderWidth}px`
+          : "0";
+        overlay.style.borderLeftWidth = `${borderWidth}px`;
+
+        const topLeftRadius =
+          drawTopBorder && touchesOuterLeft
+            ? radius.topLeft
+            : 0;
+        const topRightRadius =
+          drawTopBorder && touchesOuterRight
+            ? radius.topRight
+            : 0;
+        const bottomRightRadius =
+          drawBottomBorder && touchesOuterRight
+            ? radius.bottomRight
+            : 0;
+        const bottomLeftRadius =
+          drawBottomBorder && touchesOuterLeft
+            ? radius.bottomLeft
+            : 0;
+        overlay.style.borderRadius =
+          `${topLeftRadius}px ${topRightRadius}px ` +
+          `${bottomRightRadius}px ${bottomLeftRadius}px`;
+
+        overlayHost.appendChild(overlay);
+      }
+
       return;
     }
 
@@ -5194,6 +5377,9 @@ const app = (function () {
         const new_subPanel = document.createElement("div");
         new_subPanel.className = "subPanelDisplay";
         new_subPanel.id = "S_subPanel" + subPanelIndex.toString();
+        new_subPanel.dataset.subpanelIndex = subPanelIndex.toString();
+        new_subPanel.dataset.subpanelCount =
+          panel.sign.subPanels.length.toString();
         signHolderElmt.appendChild(new_subPanel);
 
         const signContentContainerElmt = document.createElement("div");

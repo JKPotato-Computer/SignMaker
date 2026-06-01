@@ -2269,6 +2269,20 @@ class Control {
       flexRow.dataset.lightBackground = usesLightBleedBackground
         ? "true"
         : "false";
+      if (
+        properties.backgroundFullWidth &&
+        usesLightBleedBackground &&
+        appliedFullBleedBorderColor
+      ) {
+        flexRow.dataset.fullBleedStroke = "true";
+        flexRow.style.setProperty(
+          "--fullBleedBorderColor",
+          appliedFullBleedBorderColor
+        );
+      } else {
+        delete flexRow.dataset.fullBleedStroke;
+        flexRow.style.removeProperty("--fullBleedBorderColor");
+      }
 
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);

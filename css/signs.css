@@ -571,6 +571,11 @@
   gap: var(--nestedTabSpacing, 0);
 }
 
+.signContainer {
+  position: relative;
+  isolation: isolate;
+}
+
 .exitTabContainer.attached {
   align-items: flex-start;
   margin-bottom: calc(-1 * var(--signBorderWidth, 0.2rem));
@@ -641,9 +646,20 @@
   border-width: var(--signBorderWidth, 0.2rem);
   display: block;
   clear: both;
+  position: relative;
+  isolation: isolate;
   visibility: visible;
   overflow: hidden;
   width: 100%;
+}
+
+.fullBleedBorderOverlay {
+  position: absolute;
+  box-sizing: border-box;
+  border-style: solid;
+  pointer-events: none;
+  visibility: visible;
+  z-index: 20;
 }
 
 .signHolder {
