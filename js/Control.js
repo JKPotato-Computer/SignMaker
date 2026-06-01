@@ -299,15 +299,32 @@ ControlTextElement.getTextColorOptions = function () {
 class ActionMessageElement extends TextElement {
   constructor(options = {}) {
     const {
-      fontFamily = "Series E",
       fontSize = 70,
       useNumeralFormatting = true,
       textColor = ActionMessageElement.defaultTextColor,
     } = options;
+    const resolvedOptions = { ...options };
+    const availableFonts =
+      TextElement && TextElement.prototype
+        ? TextElement.prototype.fontFamily
+        : null;
+    const providedFont = resolvedOptions.fontFamily;
+    if (
+      !providedFont ||
+      !Array.isArray(availableFonts) ||
+      !availableFonts.includes(providedFont)
+    ) {
+      const defaultFont =
+        typeof ActionMessageElement.getDefaultFont === "function"
+          ? ActionMessageElement.getDefaultFont()
+          : ActionMessageElement.defaultFont;
+      if (defaultFont) {
+        resolvedOptions.fontFamily = defaultFont;
+      }
+    }
 
     super({
-      ...options,
-      fontFamily,
+      ...resolvedOptions,
       fontSize,
       useNumeralFormatting,
     });
@@ -340,6 +357,29 @@ class ActionMessageElement extends TextElement {
     return newText;
   }
 }
+
+ActionMessageElement.defaultFont = TextElement.prototype.fontFamily.includes(
+  "Series E"
+)
+  ? "Series E"
+  : TextElement.prototype.fontFamily[0];
+
+ActionMessageElement.getDefaultFont = function () {
+  const availableFonts = TextElement.prototype.fontFamily;
+  const currentDefault = ActionMessageElement.defaultFont || availableFonts[0];
+  return availableFonts.includes(currentDefault)
+    ? currentDefault
+    : availableFonts[0];
+};
+
+ActionMessageElement.setDefaultFont = function (font) {
+  const availableFonts = TextElement.prototype.fontFamily;
+  if (!font || !availableFonts.includes(font)) {
+    return false;
+  }
+  ActionMessageElement.defaultFont = font;
+  return true;
+};
 
 ActionMessageElement.defaultTextColor = "Match BG";
 ActionMessageElement.getTextColorOptions = function () {

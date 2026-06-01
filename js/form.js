@@ -8,6 +8,7 @@ const formHandler = (function () {
   let post;
   let blockDragState = null;
   let panelDragState = null;
+  let subPanelDragState = null;
   let exitTabDragState = null;
   let rowDragState = null;
   let newRowDropTargetButton = null;
@@ -22,17 +23,27 @@ const formHandler = (function () {
     copyScale: "signMaker.copyScale",
     postThickness: "signMaker.postThickness",
     controlTextFont: "signMaker.controlTextFont",
+    actionMessageFont: "signMaker.actionMessageFont",
     bannerFontFamily: "signMaker.bannerFontFamily",
     exitTabFHWAFont: "signMaker.exitTabFHWAFont",
     exitTabFullBorder: "signMaker.exitTabFullBorder",
     exitTabSquareCorners: "signMaker.exitTabSquareCorners",
     exitTabAttached: "signMaker.exitTabAttached",
     exitTabTopOffset: "signMaker.exitTabTopOffset",
+    panelPadding: "signMaker.panelPadding",
   };
   let localStorageAvailable;
   let localStorageWarningLogged = false;
   const LIMON_TRIGGER_VALUE = "limon";
   const LIMON_VIDEO_URL = "https://www.youtube.com/watch?v=qA7qUG6uEbY";
+  const BUILT_IN_PANEL_PADDING = "0.3rem 0.75rem 0.3rem 0.75rem";
+  const BUILT_IN_PANEL_PADDING_VALUES = [0.3, 0.75, 0.3, 0.75];
+  const PANEL_PADDING_FIELDS = [
+    "paddingTop",
+    "paddingRight",
+    "paddingBottom",
+    "paddingLeft",
+  ];
   const getPostThicknessFallback = () =>
     typeof Post.prototype.defaultThickness === "number"
       ? Post.prototype.defaultThickness
@@ -44,6 +55,74 @@ const formHandler = (function () {
       return Math.max(0, parsed);
     }
     return getPostThicknessFallback();
+  };
+  const getDefaultPanelPadding = () =>
+    typeof Sign !== "undefined" &&
+      Sign.prototype &&
+      typeof Sign.prototype.defaultPadding === "string"
+      ? Sign.prototype.defaultPadding
+      : BUILT_IN_PANEL_PADDING;
+  const clampPanelPaddingValue = (value, fallback) => {
+    const parsed = typeof value === "string" ? parseFloat(value) : Number(value);
+    if (!Number.isFinite(parsed)) {
+      return fallback;
+    }
+    return Math.min(20, Math.max(0, parsed));
+  };
+  const parsePanelPaddingValues = (padding) => {
+    const fallbackValues = BUILT_IN_PANEL_PADDING_VALUES.slice();
+    const source =
+      typeof padding === "string" && padding.trim().length > 0
+        ? padding
+        : getDefaultPanelPadding();
+    const parts = source.trim().split(/\s+/).map((part) => parseFloat(part));
+    let values = fallbackValues;
+
+    if (parts.length === 1) {
+      values = [parts[0], parts[0], parts[0], parts[0]];
+    } else if (parts.length === 2) {
+      values = [parts[0], parts[1], parts[0], parts[1]];
+    } else if (parts.length === 3) {
+      values = [parts[0], parts[1], parts[2], parts[1]];
+    } else if (parts.length >= 4) {
+      values = [parts[0], parts[1], parts[2], parts[3]];
+    }
+
+    return values.map((value, index) =>
+      clampPanelPaddingValue(value, fallbackValues[index])
+    );
+  };
+  const formatPanelPaddingValues = (values) =>
+    values.map((value) => value + "rem").join(" ");
+  const normalizePanelPaddingString = (padding) =>
+    formatPanelPaddingValues(parsePanelPaddingValues(padding));
+  const getPanelPaddingInputString = (fallbackPadding) => {
+    const fallbackValues = parsePanelPaddingValues(fallbackPadding);
+    const values = PANEL_PADDING_FIELDS.map((fieldId, index) => {
+      const field = document.getElementById(fieldId);
+      if (!field) {
+        return fallbackValues[index];
+      }
+      return clampPanelPaddingValue(field.value, fallbackValues[index]);
+    });
+    return formatPanelPaddingValues(values);
+  };
+  const writePanelPaddingInputs = (padding) => {
+    const values = parsePanelPaddingValues(padding);
+    PANEL_PADDING_FIELDS.forEach((fieldId, index) => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.value = values[index];
+      }
+    });
+  };
+  const savePanelPaddingPreference = (padding) => {
+    const normalizedPadding = normalizePanelPaddingString(padding);
+    setStoredItem(STORAGE_KEYS.panelPadding, normalizedPadding);
+    if (typeof Sign !== "undefined" && Sign.prototype) {
+      Sign.prototype.defaultPadding = normalizedPadding;
+    }
+    return normalizedPadding;
   };
 
   const logStorageWarning = (message, error) => {
@@ -137,6 +216,11 @@ const formHandler = (function () {
       post.thickness = normalizedThickness;
     }
 
+    const storedPanelPadding = getStoredItem(STORAGE_KEYS.panelPadding);
+    if (storedPanelPadding !== null) {
+      savePanelPaddingPreference(storedPanelPadding);
+    }
+
     const storedControlFont = getStoredItem(STORAGE_KEYS.controlTextFont);
     const availableFonts = TextElement.prototype.fontFamily;
     if (
@@ -145,6 +229,15 @@ const formHandler = (function () {
       availableFonts.includes(storedControlFont)
     ) {
       ControlTextElement.setDefaultFont(storedControlFont);
+    }
+
+    const storedActionMessageFont = getStoredItem(STORAGE_KEYS.actionMessageFont);
+    if (
+      storedActionMessageFont &&
+      Array.isArray(availableFonts) &&
+      availableFonts.includes(storedActionMessageFont)
+    ) {
+      ActionMessageElement.setDefaultFont(storedActionMessageFont);
     }
 
     const storedBannerFont = getStoredItem(STORAGE_KEYS.bannerFontFamily);
@@ -197,6 +290,18 @@ const formHandler = (function () {
 
   const toggleExitTabWiggle = (isActive) => {
     const buttons = document.querySelectorAll(".exitTabButton");
+    for (const button of buttons) {
+      button.classList.toggle("blockWiggle", isActive);
+      if (isActive) {
+        button.style.setProperty("--wiggle-delay", `${Math.random() * 0.12}s`);
+      } else {
+        button.style.removeProperty("--wiggle-delay");
+      }
+    }
+  };
+
+  const toggleSubPanelWiggle = (isActive) => {
+    const buttons = document.querySelectorAll(".subPanelButton");
     for (const button of buttons) {
       button.classList.toggle("blockWiggle", isActive);
       if (isActive) {
@@ -404,6 +509,141 @@ const formHandler = (function () {
   const handleExitTabDragEnd = () => {
     if (exitTabDragState) {
       endExitTabDrag();
+    }
+  };
+
+  const clearSubPanelDropIndicators = () => {
+    document
+      .querySelectorAll(".subPanelButton.dropBefore, .subPanelButton.dropAfter")
+      .forEach((button) => button.classList.remove("dropBefore", "dropAfter"));
+  };
+
+  const endSubPanelDrag = () => {
+    toggleSubPanelWiggle(false);
+    clearSubPanelDropIndicators();
+    subPanelDragState = null;
+    document
+      .querySelectorAll(".subPanelButton.dragging")
+      .forEach((button) => {
+        button.classList.remove("dragging");
+        delete button.dataset.dragging;
+      });
+  };
+
+  const getSubPanelDropPosition = (container, clientX) => {
+    const buttons = Array.from(container.querySelectorAll(".subPanelButton"));
+    if (!buttons.length) {
+      return { dropIndex: 0, targetButton: null, placement: null };
+    }
+
+    let dropIndex = Number(
+      buttons[buttons.length - 1].dataset.subPanelIndex || buttons.length - 1
+    ) + 1;
+    let targetButton = null;
+    let placement = "after";
+    let foundPosition = false;
+
+    for (const button of buttons) {
+      const rect = button.getBoundingClientRect();
+      const midpoint = rect.left + rect.width / 2;
+      if (clientX < midpoint) {
+        dropIndex = Number(button.dataset.subPanelIndex || 0);
+        placement = "before";
+        foundPosition = true;
+        targetButton = button.dataset.dragging === "true" ? null : button;
+        break;
+      }
+    }
+
+    if (!foundPosition) {
+      const lastButton = buttons[buttons.length - 1];
+      if (lastButton.dataset.dragging !== "true") {
+        targetButton = lastButton;
+        placement = "after";
+      } else {
+        placement = null;
+      }
+    } else if (!targetButton) {
+      placement = null;
+    }
+
+    return { dropIndex, targetButton, placement };
+  };
+
+  const handleSubPanelDragStart = (event) => {
+    const button = event.currentTarget;
+    const fromIndex = Number(button.dataset.subPanelIndex);
+    if (Number.isNaN(fromIndex)) {
+      return;
+    }
+    subPanelDragState = { fromIndex, dropIndex: fromIndex };
+    button.dataset.dragging = "true";
+    button.classList.add("dragging");
+    toggleSubPanelWiggle(true);
+    clearSubPanelDropIndicators();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.setData("text/plain", "");
+    }
+  };
+
+  const handleSubPanelDragOver = (event) => {
+    if (!subPanelDragState) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    const container = event.currentTarget;
+    const { dropIndex, targetButton, placement } = getSubPanelDropPosition(
+      container,
+      event.clientX
+    );
+    subPanelDragState.dropIndex = dropIndex;
+
+    clearSubPanelDropIndicators();
+    if (targetButton && placement) {
+      targetButton.classList.add(
+        placement === "before" ? "dropBefore" : "dropAfter"
+      );
+    }
+  };
+
+  const handleSubPanelDrop = (event) => {
+    if (!subPanelDragState) {
+      return;
+    }
+    event.preventDefault();
+    const fromIndex = subPanelDragState.fromIndex;
+    const dropIndex =
+      subPanelDragState.dropIndex !== undefined
+        ? subPanelDragState.dropIndex
+        : fromIndex;
+    if (typeof exposed.moveSubPanel === "function") {
+      exposed.moveSubPanel(fromIndex, dropIndex);
+    }
+    endSubPanelDrag();
+  };
+
+  const handleSubPanelDragLeave = (event) => {
+    if (!subPanelDragState) {
+      return;
+    }
+    const container = event.currentTarget;
+    const related = event.relatedTarget;
+    if (related && container.contains(related)) {
+      return;
+    }
+    clearSubPanelDropIndicators();
+  };
+
+  const handleSubPanelDragEnd = () => {
+    if (subPanelDragState) {
+      endSubPanelDrag();
     }
   };
 
@@ -995,6 +1235,27 @@ const formHandler = (function () {
       .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
   };
 
+  const commitPanelPaddingChange = ({ syncInputs = false } = {}) => {
+    const currentPanel =
+      exposed && typeof exposed.getCurrentPanel === "function"
+        ? exposed.getCurrentPanel()
+        : null;
+    if (!currentPanel || !currentPanel.sign) {
+      return;
+    }
+
+    currentPanel.sign.padding = savePanelPaddingPreference(
+      getPanelPaddingInputString(currentPanel.sign.padding)
+    );
+
+    if (syncInputs) {
+      writePanelPaddingInputs(currentPanel.sign.padding);
+    }
+
+    if (exposed && typeof exposed.redraw === "function") {
+      exposed.redraw();
+    }
+  };
 
   const initialize = async (appExposed) => {
     exposed = appExposed;
@@ -1340,6 +1601,20 @@ const formHandler = (function () {
         commitPostThicknessChange(postThicknessValueInput.value);
       });
     }
+
+    PANEL_PADDING_FIELDS.forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+      if (!field || field.dataset.panelPaddingPersist === "true") {
+        return;
+      }
+      field.dataset.panelPaddingPersist = "true";
+      field.addEventListener("input", () => {
+        commitPanelPaddingChange();
+      });
+      field.addEventListener("change", () => {
+        commitPanelPaddingChange({ syncInputs: true });
+      });
+    });
 
     document.addEventListener("input", checkForLimonEasterEgg, true);
     document.addEventListener("keydown", handleBlockClipboardShortcut, true);
@@ -1781,6 +2056,26 @@ const formHandler = (function () {
         }
         ControlTextElement.setDefaultFont(selectedFont);
         setStoredItem(STORAGE_KEYS.controlTextFont, selectedFont);
+      });
+    }
+
+    const actionMessageFontSelect = document.querySelector(
+      "#sdActionMessage_fontFamily"
+    );
+    if (actionMessageFontSelect) {
+      const defaultActionMessageFont = ActionMessageElement.getDefaultFont();
+      if (defaultActionMessageFont) {
+        actionMessageFontSelect.value = defaultActionMessageFont;
+      }
+
+      actionMessageFontSelect.addEventListener("change", () => {
+        const selectedFont = actionMessageFontSelect.value;
+        const availableFonts = TextElement.prototype.fontFamily;
+        if (!selectedFont || !availableFonts.includes(selectedFont)) {
+          return;
+        }
+        ActionMessageElement.setDefaultFont(selectedFont);
+        setStoredItem(STORAGE_KEYS.actionMessageFont, selectedFont);
       });
     }
 
@@ -2454,15 +2749,9 @@ const formHandler = (function () {
     currentPanel.sign.shieldBacks = form["shieldBacks"].checked;
 
     // Sign
-    currentPanel.sign.padding =
-      form["paddingTop"].value.toString() +
-      "rem " +
-      form["paddingRight"].value.toString() +
-      "rem " +
-      form["paddingBottom"].value.toString() +
-      "rem " +
-      form["paddingLeft"].value.toString() +
-      "rem";
+    currentPanel.sign.padding = savePanelPaddingPreference(
+      getPanelPaddingInputString(currentPanel.sign.padding)
+    );
     // Global Settings
     currentPanel.sign.globalPositioning = form["globalPosition"].value;
 
@@ -2887,22 +3176,7 @@ const formHandler = (function () {
       }
     }
 
-    var paddingValues = currentPanel.sign.padding.split("rem");
-
-    var left = parseFloat(paddingValues[3]);
-    var ctop = parseFloat(paddingValues[0]);
-    var right = parseFloat(paddingValues[1]);
-    var bottom = parseFloat(paddingValues[2]);
-
-    const paddingLeft = document.getElementById("paddingLeft");
-    const paddingTop = document.getElementById("paddingTop");
-    const paddingRight = document.getElementById("paddingRight");
-    const paddingBottom = document.getElementById("paddingBottom");
-
-    paddingLeft.value = left;
-    paddingTop.value = ctop;
-    paddingRight.value = right;
-    paddingBottom.value = bottom;
+    writePanelPaddingInputs(currentPanel.sign.padding);
 
     updateForm();
     exposed.redraw();
@@ -3154,6 +3428,7 @@ const formHandler = (function () {
     toggleExitTabWiggle(false);
     clearExitTabDropIndicators();
     exitTabDragState = null;
+    endSubPanelDrag();
     endPanelDrag();
     togglePanelListWiggle(false);
 
@@ -3169,6 +3444,13 @@ const formHandler = (function () {
       panelList.addEventListener("drop", handlePanelDrop);
       panelList.addEventListener("dragleave", handlePanelDragLeave);
       panelList.dataset.panelDragAttached = "true";
+    }
+
+    if (subPanelList && !subPanelList.dataset.subPanelDragAttached) {
+      subPanelList.addEventListener("dragover", handleSubPanelDragOver);
+      subPanelList.addEventListener("drop", handleSubPanelDrop);
+      subPanelList.addEventListener("dragleave", handleSubPanelDragLeave);
+      subPanelList.dataset.subPanelDragAttached = "true";
     }
 
     const postPositionSelectElmt = document.getElementById("postPosition");
@@ -3326,16 +3608,22 @@ const formHandler = (function () {
     ) {
       const subPanelButton = document.createElement("button");
       subPanelButton.id = "sub_edit" + (subPanelIndex + 1);
+      subPanelButton.type = "button";
       subPanelButton.textContent = "SubPanel " + (subPanelIndex + 1);
       subPanelButton.className =
-        exposed.vars.currentlySelectedSubPanelIndex == subPanelIndex
-          ? "active"
-          : "";
+        "subPanelButton" +
+        (exposed.vars.currentlySelectedSubPanelIndex == subPanelIndex
+          ? " active"
+          : "");
+      subPanelButton.dataset.subPanelIndex = subPanelIndex.toString();
+      subPanelButton.draggable = panel.sign.subPanels.length > 1;
 
       subPanelButton.addEventListener("click", function () {
         exposed.changeEditingSubPanel(subPanelIndex, panel);
-        subPanelButton.className = "active";
+        subPanelButton.classList.add("active");
       });
+      subPanelButton.addEventListener("dragstart", handleSubPanelDragStart);
+      subPanelButton.addEventListener("dragend", handleSubPanelDragEnd);
 
       subPanelList.appendChild(subPanelButton);
     }
@@ -3996,19 +4284,7 @@ const formHandler = (function () {
       panelBorderRadiusElmt.value = resolvedRadius;
     }
 
-    const signPadding =
-      typeof panel.sign.padding === "string"
-        ? panel.sign.padding
-        : "0.3rem 0.75rem 0.3rem 0.75rem";
-    const paddingParts = signPadding.split("rem");
-    const paddingTopElmt = document.getElementById("paddingTop");
-    const paddingRightElmt = document.getElementById("paddingRight");
-    const paddingBottomElmt = document.getElementById("paddingBottom");
-    const paddingLeftElmt = document.getElementById("paddingLeft");
-    if (paddingTopElmt) paddingTopElmt.value = parseFloat(paddingParts[0]);
-    if (paddingRightElmt) paddingRightElmt.value = parseFloat(paddingParts[1]);
-    if (paddingBottomElmt) paddingBottomElmt.value = parseFloat(paddingParts[2]);
-    if (paddingLeftElmt) paddingLeftElmt.value = parseFloat(paddingParts[3]);
+    writePanelPaddingInputs(panel.sign.padding);
 
     // Global Panel
     const outActionMessage = document.getElementById("outActionMessage");
@@ -5581,6 +5857,7 @@ const formHandler = (function () {
   return {
     init: initialize,
     readForm,
+    commitPanelPadding: commitPanelPaddingChange,
     updateForm,
     updateShieldSubform,
   };

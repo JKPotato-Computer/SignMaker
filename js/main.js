@@ -756,6 +756,76 @@ const app = (function () {
     redraw();
   };
 
+  const moveSubPanel = function (fromIndex, toIndex) {
+    const panel = getCurrentPanel();
+    const sign = panel && panel.sign;
+    const subPanels = sign && sign.subPanels;
+    if (!Array.isArray(subPanels) || subPanels.length < 2) {
+      return;
+    }
+
+    const subPanelCount = subPanels.length;
+    const fromNumber = Number(fromIndex);
+    const toNumber = Number(toIndex);
+    const normalizedFrom = clamp(
+      Number.isFinite(fromNumber) ? Math.trunc(fromNumber) : 0,
+      0,
+      subPanelCount - 1
+    );
+    let normalizedTo = clamp(
+      Number.isFinite(toNumber) ? Math.trunc(toNumber) : normalizedFrom,
+      0,
+      subPanelCount
+    );
+
+    if (
+      normalizedFrom === normalizedTo ||
+      normalizedFrom + 1 === normalizedTo
+    ) {
+      return;
+    }
+
+    const selectedSubPanelRef =
+      currentlySelectedSubPanelIndex >= 0 &&
+        currentlySelectedSubPanelIndex < subPanels.length
+        ? subPanels[currentlySelectedSubPanelIndex]
+        : null;
+    const aplBuckets =
+      Array.isArray(sign.aplArrows) && sign.aplArrows.length
+        ? getAPLArrowBuckets(sign)
+        : null;
+
+    const [movedSubPanel] = subPanels.splice(normalizedFrom, 1);
+    if (!movedSubPanel) {
+      return;
+    }
+
+    if (normalizedTo > normalizedFrom) {
+      normalizedTo--;
+    }
+
+    subPanels.splice(normalizedTo, 0, movedSubPanel);
+
+    if (aplBuckets) {
+      const [movedBucket] = aplBuckets.splice(normalizedFrom, 1);
+      aplBuckets.splice(normalizedTo, 0, movedBucket || []);
+      rebuildAPLArrowBuckets(sign, aplBuckets);
+    }
+
+    if (selectedSubPanelRef) {
+      const updatedIndex = subPanels.indexOf(selectedSubPanelRef);
+      currentlySelectedSubPanelIndex =
+        updatedIndex >= 0
+          ? updatedIndex
+          : clamp(currentlySelectedSubPanelIndex, 0, subPanels.length - 1);
+    }
+
+    resetGroupEditing();
+    normalizeEditorSelection();
+    formHandler.updateForm();
+    redraw();
+  };
+
   // Set the current editing (SUB)panel based off paramter number, within the correct range (0 < # of panels - 1)
   const changeEditingSubPanel = function (subPanelNumber) {
     currentlySelectedSubPanelIndex = clamp(
@@ -3967,8 +4037,15 @@ const app = (function () {
     document.getElementById("paddingBottom").value = 0.3;
     document.getElementById("paddingLeft").value = 0.75;
 
-    formHandler.updateForm();
-    redraw();
+    if (
+      formHandler &&
+      typeof formHandler.commitPanelPadding === "function"
+    ) {
+      formHandler.commitPanelPadding({ syncInputs: true });
+    } else {
+      formHandler.updateForm();
+      redraw();
+    }
   };
 
   /**
@@ -6040,6 +6117,7 @@ const app = (function () {
     duplicatePanel,
     deletePanel,
     changeEditingSubPanel,
+    moveSubPanel,
     changeEditingExitTab,
     newExitTab,
     duplicateExitTab,
@@ -6748,6 +6826,7 @@ const app = (function () {
     newSubPanel: addSubPanel,
     removeSubPanel: removeSubPanel,
     changeEditingSubPanel: changeEditingSubPanel,
+    moveSubPanel: moveSubPanel,
     duplicateSubPanel: duplicateSubPanel,
     copySignToClipboard: copySignToClipboard,
     copyPanelToClipboard: copyPanelToClipboard,

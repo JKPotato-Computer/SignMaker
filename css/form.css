@@ -629,6 +629,7 @@ div.options a {
 /* OLD - TO CONFIGURE */
 
 .active,
+.subPanelButton.active,
 .exitTabButton.active,
 .exitTabNestedButton.active {
   background-color: rgb(200, 200, 200);
@@ -1050,6 +1051,7 @@ textarea {
   flex: 0 0 auto;
 }
 
+.subPanelButton,
 .exitTabButton,
 .exitTabNestedButton {
   background: rgb(230, 230, 230);
@@ -1058,6 +1060,7 @@ textarea {
   padding: 0.25rem 0.5rem;
   flex: 0 0 auto;
   position: relative;
+  cursor: grab;
 }
 
 .exitTabNestedButton {
@@ -1066,22 +1069,27 @@ textarea {
   min-width: 5rem;
 }
 
+.subPanelButton:hover,
 .exitTabButton:hover,
 .exitTabNestedButton:hover {
   background: rgb(200, 200, 200);
 }
 
+.subPanelButton.blockWiggle,
 .exitTabButton.blockWiggle {
   animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
   animation-delay: var(--wiggle-delay, 0s);
 }
 
+.subPanelButton.dragging,
 .exitTabButton.dragging {
   opacity: 0.6;
   animation: none;
   cursor: grabbing;
 }
 
+.subPanelButton.dropBefore::before,
+.subPanelButton.dropAfter::after,
 .exitTabButton.dropBefore::before,
 .exitTabButton.dropAfter::after {
   content: "";
@@ -1093,10 +1101,12 @@ textarea {
   pointer-events: none;
 }
 
+.subPanelButton.dropBefore::before,
 .exitTabButton.dropBefore::before {
   left: -0.25rem;
 }
 
+.subPanelButton.dropAfter::after,
 .exitTabButton.dropAfter::after {
   right: -0.25rem;
 }

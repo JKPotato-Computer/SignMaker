@@ -58,7 +58,7 @@ class Sign {
 		advisoryText = "",
 
 		// panel
-		padding = "0.3rem 0.75rem 0.3rem 0.75rem",
+		padding,
 		arrowPosition = "Middle",
 		halfExitGap = 5
 	} = {}
@@ -90,7 +90,14 @@ class Sign {
 		this.actionMessage = actionMessage;
 		this.subPanels = subPanels;
 		this.advisoryMessage = advisoryMessage;
-		this.padding = padding;
+		const defaultPadding =
+			typeof Sign.prototype.defaultPadding === "string"
+				? Sign.prototype.defaultPadding
+				: "0.3rem 0.75rem 0.3rem 0.75rem";
+		this.padding =
+			typeof padding === "string" && padding.trim().length > 0
+				? padding
+				: defaultPadding;
 		this.arrowPosition = arrowPosition;
 		this.halfExitGap = halfExitGap;
 		this.shields = shields;
@@ -417,6 +424,8 @@ Sign.prototype.exitOnlyBorderModes = [
 	"edge",
 	"white-edge"
 ];
+
+Sign.prototype.defaultPadding = "0.3rem 0.75rem 0.3rem 0.75rem";
 
 Sign.prototype.arrowPositions = [
 	"Middle",
