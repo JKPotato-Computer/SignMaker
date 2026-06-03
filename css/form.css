@@ -765,8 +765,33 @@ input[type="button"]:disabled {
 }
 
 .textEditorBlockLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
   white-space: nowrap;
+}
+
+.blockElementSymbol {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.blockElementAsset {
+  display: block;
+  width: 1.65rem;
+  height: 1.65rem;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.sdArrow .blockElementAsset,
+.sdIcon .blockElementAsset {
+  filter: brightness(0) invert(1);
+}
+
+.sdTollLogo .blockElementAsset {
+  width: 2.4rem;
 }
 
 .textEditorBlock .blockTypeChevron {
@@ -2095,4 +2120,255 @@ dialog:not([open]) {
   background-color: rgb(50, 50, 50);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#mobileToolbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-toolbar-height: 0px;
+    --mobile-tabbar-height: 4.8rem;
+    --mobile-sheet-height: 0px;
+    --mobile-sign-scale: 1;
+  }
+
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  main {
+    height: max(7rem,
+        calc(100dvh - var(--mobile-toolbar-height) - var(--mobile-tabbar-height) - var(--mobile-sheet-height)));
+    margin-top: var(--mobile-toolbar-height);
+    padding: 0.5rem;
+    overflow: hidden;
+    transition: none;
+  }
+
+  #postContainer {
+    transform: scale(var(--mobile-sign-scale));
+    transform-origin: center center;
+    transition: none;
+  }
+
+  #mobileToolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: calc(0.35rem + env(safe-area-inset-top)) 0.5rem 0.35rem;
+    pointer-events: none;
+  }
+
+  .mobileToolbarGroup {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem;
+    background: var(--hotbarColor);
+    border: 1px solid rgba(var(--baseColor), 0.25);
+    pointer-events: auto;
+  }
+
+  #mobileToolbar .sMConfigOption,
+  #mobileToolbar .mutcd-link {
+    position: static;
+    min-width: 2.4rem;
+    height: 2.4rem;
+    padding: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--baseColor), 0.25);
+    border: 0;
+    box-shadow: none;
+    color: var(--textColor);
+    line-height: 1;
+    text-decoration: none;
+    transform: none;
+  }
+
+  #mobileToolbar .mutcd-link {
+    width: auto;
+    min-width: 3.8rem;
+    font-size: 0.7rem;
+    font-family: "Overpass";
+  }
+
+  #mobileToolbar .sMConfigOption>span:not(.material-symbols-outlined, .toolTip),
+  #mobileToolbar .sMConfigOption .configIcon {
+    display: none;
+  }
+
+  #mobileToolbar .material-symbols-outlined {
+    font-size: 1.35rem;
+    line-height: 1;
+  }
+
+  nav#sMConfigBar {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    transform: none;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.3rem 0 calc(0.3rem + env(safe-area-inset-bottom));
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    z-index: 5;
+  }
+
+  nav#sMConfigBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  nav#sMConfigBar.invisible {
+    left: 0;
+    transform: translateY(100%);
+  }
+
+  nav#sMConfigBar .sMConfigOption {
+    flex: 0 0 20%;
+    min-width: 20%;
+    max-width: 20%;
+    min-height: 4.1rem;
+    padding: 0.35rem 0.15rem;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    background: transparent;
+    line-height: 1;
+    scroll-snap-align: start;
+    transition: none;
+  }
+
+  nav#sMConfigBar .sMConfigOption.selected {
+    background: var(--selectedColor);
+  }
+
+  nav#sMConfigBar .sMConfigOption .material-symbols-outlined {
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  nav#sMConfigBar .sMConfigOption .configIcon {
+    height: 1.45rem;
+    width: 1.45rem;
+  }
+
+  nav#sMConfigBar .sMConfigOption>span:not(.material-symbols-outlined, .toolTip) {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-align: center;
+    font-size: 0.58rem;
+    line-height: 0.72rem;
+    white-space: normal;
+    word-break: normal;
+  }
+
+  nav#sMConfigBar .sMConfigOption:has(#panelSelector)>span:last-of-type {
+    display: none;
+  }
+
+  .modals {
+    inset: auto 0 var(--mobile-tabbar-height) 0;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .sMModal {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    max-height: 48dvh;
+    overflow: hidden;
+    pointer-events: auto;
+    transition: none;
+  }
+
+  nav.sMModalBar {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav.sMModalBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  div.sMModalTitle {
+    flex: 0 0 auto;
+    margin-right: 0.25rem;
+    padding: 0.3rem 0.55rem;
+  }
+
+  div.sMModalTab {
+    flex: 0 0 auto;
+    padding: 0.35rem 0.45rem;
+    white-space: nowrap;
+  }
+
+  .sMModalContent {
+    max-height: calc(48dvh - 4.8rem);
+    overflow: auto;
+    padding: 0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sMModalContent>div:not(#sMSPSettings),
+  #sMSPSettings>div {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .listNav,
+  .listNavOptions {
+    min-width: 0;
+  }
+
+  .listNavOptions {
+    gap: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  #panelSelect {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: var(--mobile-tabbar-height);
+    width: 100%;
+    min-height: 0;
+    max-height: 42dvh;
+    overflow: auto;
+    padding: 0.65rem;
+    z-index: 4;
+    pointer-events: auto;
+    box-shadow: 0 -0.35rem 0.8rem rgba(0, 0, 0, 0.2);
+    -webkit-overflow-scrolling: touch;
+    transition: none;
+  }
+
+  #panelList {
+    max-height: 18dvh;
+  }
 }

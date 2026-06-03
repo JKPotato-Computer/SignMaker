@@ -15,6 +15,7 @@ const formHandler = (function () {
   let blockSelectionMode = false;
   let selectedBlockKeys = new Set();
   let blockSelectionContextKey = "";
+  let scheduleMobileLayoutUpdate = () => {};
   const STORAGE_KEYS = {
     postPosition: "signMaker.postPosition",
     postColor: "signMaker.postColor",
@@ -44,6 +45,37 @@ const formHandler = (function () {
     "paddingBottom",
     "paddingLeft",
   ];
+  const BLOCK_ELEMENT_SYMBOLS = {
+    ControlTextElement: "text_fields",
+    ActionMessageElement: "campaign",
+    AdvisoryMessageElement: "warning",
+    DividerElement: "horizontal_rule",
+    BeaconElement: "lightbulb",
+    ElectronicSignElement: "display_settings",
+    GroupedBlockElement: "folder",
+  };
+  const BLOCK_ELEMENT_ASSETS = {
+    ShieldElement: "img/shields/United States/I-2Digit.svg",
+    ArrowElement: "img/arrowBlocks/TYPE_A.svg",
+    IconElement: "img/icons/AIRPORT.svg",
+    TollLogoElement: "img/tolls/EZPass.png",
+  };
+  const createBlockElementVisual = (blockElementType) => {
+    if (BLOCK_ELEMENT_ASSETS[blockElementType]) {
+      const asset = document.createElement("img");
+      asset.className = "blockElementAsset";
+      asset.src = BLOCK_ELEMENT_ASSETS[blockElementType];
+      asset.alt = "";
+      asset.setAttribute("aria-hidden", "true");
+      return asset;
+    }
+
+    const symbol = document.createElement("span");
+    symbol.className = "material-symbols-outlined blockElementSymbol";
+    symbol.setAttribute("aria-hidden", "true");
+    symbol.textContent = BLOCK_ELEMENT_SYMBOLS[blockElementType] || "widgets";
+    return symbol;
+  };
   const getPostThicknessFallback = () =>
     typeof Post.prototype.defaultThickness === "number"
       ? Post.prototype.defaultThickness
@@ -1273,12 +1305,22 @@ const formHandler = (function () {
   const initUI = async () => {
     const sMConfigBar = document.querySelector("#sMConfigBar");
     const htmlElement = document.documentElement;
+    const bodyElement = document.body;
     const nightModeButton = document.querySelector("#nightMode");
+    const mobileMediaQuery =
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(max-width: 768px)")
+        : null;
     const prefersDarkScheme =
       typeof window.matchMedia === "function"
         ? window.matchMedia("(prefers-color-scheme: dark)")
         : null;
     let userThemeOverride = false;
+    let mobileToolbar;
+    let mobileToolbarLeading;
+    let mobileToolbarTrailing;
+    const mobileToolbarPlaceholders = new Map();
+    let panelSelectPlaceholder;
 
     const getSystemTheme = () =>
       prefersDarkScheme && prefersDarkScheme.matches ? "dark" : "light";
@@ -1308,7 +1350,212 @@ const formHandler = (function () {
       }
     }
 
+    const isMobileLayout = () =>
+      mobileMediaQuery ? mobileMediaQuery.matches : window.innerWidth <= 768;
+
+    const ensureMobileToolbar = () => {
+      if (mobileToolbar) {
+        return;
+      }
+
+      mobileToolbar = document.createElement("nav");
+      mobileToolbar.id = "mobileToolbar";
+      mobileToolbar.setAttribute("aria-label", "Toolbar");
+
+      mobileToolbarLeading = document.createElement("div");
+      mobileToolbarLeading.className = "mobileToolbarGroup mobileToolbarLeading";
+
+      mobileToolbarTrailing = document.createElement("div");
+      mobileToolbarTrailing.className = "mobileToolbarGroup mobileToolbarTrailing";
+
+      mobileToolbar.appendChild(mobileToolbarLeading);
+      mobileToolbar.appendChild(mobileToolbarTrailing);
+      bodyElement.appendChild(mobileToolbar);
+    };
+
+    const rememberToolbarItemPosition = (element) => {
+      if (
+        !element ||
+        mobileToolbarPlaceholders.has(element) ||
+        !element.parentNode
+      ) {
+        return;
+      }
+
+      const placeholder = document.createComment("mobile toolbar placeholder");
+      element.parentNode.insertBefore(placeholder, element);
+      mobileToolbarPlaceholders.set(element, placeholder);
+    };
+
+    const moveToolbarItem = (element, container) => {
+      if (!element || !container || container.contains(element)) {
+        return;
+      }
+
+      rememberToolbarItemPosition(element);
+      container.appendChild(element);
+    };
+
+    const moveMobileToolbarItems = () => {
+      ensureMobileToolbar();
+
+      const mutcdLink = document.querySelector(".mutcd-link");
+      const exportButton = document.getElementById("export");
+      const downloadButton = document.getElementById("exportDownload");
+      const hideButton = document.getElementById("hideConfig");
+
+      moveToolbarItem(mutcdLink, mobileToolbarLeading);
+
+      for (const button of [
+        exportButton,
+        downloadButton,
+        nightModeButton,
+        hideButton,
+      ]) {
+        moveToolbarItem(button, mobileToolbarTrailing);
+      }
+    };
+
+    const restoreDesktopToolbarItems = () => {
+      for (const [element, placeholder] of mobileToolbarPlaceholders) {
+        if (
+          element &&
+          placeholder?.parentNode &&
+          element.parentNode !== placeholder.parentNode
+        ) {
+          placeholder.parentNode.insertBefore(element, placeholder.nextSibling);
+        }
+      }
+    };
+
+    const moveMobilePanelSelect = (panelSelect) => {
+      const modalLayer = document.querySelector(".modals");
+      if (!panelSelect || !modalLayer) {
+        return;
+      }
+
+      if (!panelSelectPlaceholder && panelSelect.parentNode) {
+        panelSelectPlaceholder = document.createComment(
+          "panel selector placeholder"
+        );
+        panelSelect.parentNode.insertBefore(panelSelectPlaceholder, panelSelect);
+      }
+
+      if (panelSelect.parentNode !== modalLayer) {
+        modalLayer.appendChild(panelSelect);
+      }
+    };
+
+    const restoreDesktopPanelSelect = (panelSelect) => {
+      if (
+        panelSelect &&
+        panelSelectPlaceholder?.parentNode &&
+        panelSelect.parentNode !== panelSelectPlaceholder.parentNode
+      ) {
+        panelSelectPlaceholder.parentNode.insertBefore(
+          panelSelect,
+          panelSelectPlaceholder.nextSibling
+        );
+      }
+    };
+
+    const updateMobileLayoutMetrics = () => {
+      const mainElmt = document.querySelector("main");
+      const postContainer = document.getElementById("postContainer");
+      const panelSelect = document.getElementById("panelSelect");
+
+      if (!isMobileLayout()) {
+        restoreDesktopPanelSelect(panelSelect);
+        restoreDesktopToolbarItems();
+        bodyElement.classList.remove("mobile-sheet-open");
+        htmlElement.style.removeProperty("--mobile-sheet-height");
+        htmlElement.style.removeProperty("--mobile-sign-scale");
+        htmlElement.style.removeProperty("--mobile-toolbar-height");
+        htmlElement.style.removeProperty("--mobile-tabbar-height");
+        return;
+      }
+
+      moveMobileToolbarItems();
+      moveMobilePanelSelect(panelSelect);
+
+      const currentMenu = sMConfigBar.dataset.currentMenu;
+      const activeModal = currentMenu
+        ? document.querySelector(".sMModal." + currentMenu)
+        : null;
+      const openModal =
+        activeModal && activeModal.style.display !== "" ? activeModal : null;
+      const openSheet =
+        openModal ||
+        (currentMenu === "panelSelector" &&
+        panelSelect &&
+        panelSelect.style.display !== ""
+          ? panelSelect
+          : null);
+
+      const toolbarHeight = mobileToolbar
+        ? mobileToolbar.getBoundingClientRect().height
+        : 0;
+      const tabbarHeight = sMConfigBar.getBoundingClientRect().height;
+      const sheetHeight = openSheet
+        ? openSheet.getBoundingClientRect().height
+        : 0;
+
+      htmlElement.style.setProperty(
+        "--mobile-toolbar-height",
+        Math.ceil(toolbarHeight) + "px"
+      );
+      htmlElement.style.setProperty(
+        "--mobile-tabbar-height",
+        Math.ceil(tabbarHeight) + "px"
+      );
+      htmlElement.style.setProperty(
+        "--mobile-sheet-height",
+        Math.ceil(sheetHeight) + "px"
+      );
+
+      bodyElement.classList.toggle("mobile-sheet-open", !!openSheet);
+
+      if (!mainElmt || !postContainer) {
+        return;
+      }
+
+      const mainRect = mainElmt.getBoundingClientRect();
+      const postWidth = postContainer.offsetWidth;
+      const postHeight = postContainer.offsetHeight;
+      const horizontalInset = 16;
+      const verticalInset = 16;
+      const scaleValues = [];
+
+      if (postWidth > 0 && mainRect.width > horizontalInset) {
+        scaleValues.push((mainRect.width - horizontalInset) / postWidth);
+      }
+
+      if (postHeight > 0 && mainRect.height > verticalInset) {
+        scaleValues.push((mainRect.height - verticalInset) / postHeight);
+      }
+
+      const nextScale = Math.max(
+        0.1,
+        Math.min(1, ...(scaleValues.length ? scaleValues : [1]))
+      );
+      htmlElement.style.setProperty(
+        "--mobile-sign-scale",
+        nextScale.toFixed(3)
+      );
+    };
+
+    scheduleMobileLayoutUpdate = () => {
+      requestAnimationFrame(updateMobileLayoutMetrics);
+    };
+
     function reDisplay() {
+      const panelSelect = document.querySelector("#panelSelect");
+      if (isMobileLayout()) {
+        moveMobilePanelSelect(panelSelect);
+      } else {
+        restoreDesktopPanelSelect(panelSelect);
+      }
+
       for (const holder of document.querySelectorAll(".sMModal")) {
         if (holder.classList.contains(sMConfigBar.dataset.currentMenu)) {
           holder.style.display = "block";
@@ -1318,12 +1565,16 @@ const formHandler = (function () {
       }
 
       if (sMConfigBar.dataset.currentMenu == "panelSelector") {
-        document.querySelector("#panelSelect").style.display = "flex";
+        if (panelSelect) {
+          panelSelect.style.display = "flex";
+        }
         document.querySelectorAll(
           ".sMConfigOption:has(#panelSelector)"
         )[0].className = "sMConfigOption selected";
       } else {
-        document.querySelector("#panelSelect").style.display = "";
+        if (panelSelect) {
+          panelSelect.style.display = "";
+        }
         document.querySelectorAll(
           ".sMConfigOption:has(#panelSelector)"
         )[0].className = "sMConfigOption";
@@ -1348,13 +1599,17 @@ const formHandler = (function () {
         const openModal = currentMenu
           ? document.querySelector(".sMModal." + currentMenu)
           : null;
-        if (openModal) {
+        if (isMobileLayout()) {
+          mainElmt.style.transform = "";
+        } else if (openModal) {
           const modalWidth = openModal.offsetWidth;
           mainElmt.style.transform = "translateX(" + (modalWidth / 2) + "px)";
         } else {
           mainElmt.style.transform = "";
         }
       }
+
+      scheduleMobileLayoutUpdate();
     }
 
     for (const button of document.querySelectorAll(".sMConfigOption")) {
@@ -1448,6 +1703,8 @@ const formHandler = (function () {
         if (button.dataset.tab === "sMTemplatesSaved" && typeof app !== "undefined" && typeof app.refreshTemplatesList === "function") {
           app.refreshTemplatesList();
         }
+
+        scheduleMobileLayoutUpdate();
       };
     }
 
@@ -1652,6 +1909,7 @@ const formHandler = (function () {
         sMConfigBar.classList.add("invisible");
         this.dataset.tooltip = "Show";
       }
+      scheduleMobileLayoutUpdate();
     };
 
     document.getElementById("cancelDownload").onclick = function () {
@@ -2541,6 +2799,17 @@ const formHandler = (function () {
         };
         searchFromDir(Shield.prototype.shieldDirectory, presetShieldList);
       });
+
+    window.addEventListener("resize", scheduleMobileLayoutUpdate);
+    window.addEventListener("orientationchange", scheduleMobileLayoutUpdate);
+    if (mobileMediaQuery) {
+      if (typeof mobileMediaQuery.addEventListener === "function") {
+        mobileMediaQuery.addEventListener("change", scheduleMobileLayoutUpdate);
+      } else if (typeof mobileMediaQuery.addListener === "function") {
+        mobileMediaQuery.addListener(scheduleMobileLayoutUpdate);
+      }
+    }
+    scheduleMobileLayoutUpdate();
   };
 
   // Show/hide dependent small inputs for a given block (e.g. sdCtrlText, sdAdvisory, sdActionMessage, sdIcon)
@@ -3180,6 +3449,7 @@ const formHandler = (function () {
 
     updateForm();
     exposed.redraw();
+    scheduleMobileLayoutUpdate();
   };
 
   /**
@@ -4657,8 +4927,14 @@ const formHandler = (function () {
 
         const blockTypeLabel = document.createElement("span");
         blockTypeLabel.className = "textEditorBlockLabel";
+        const visibleBlockLabel =
+          blockElementType === "GroupedBlockElement"
+            ? blockElement.label || "Grouped Block"
+            : Control.prototype.blockElements[blockElementType] || "Block";
+        textEditorBlock.setAttribute("aria-label", visibleBlockLabel);
+        textEditorBlock.title = visibleBlockLabel;
+        blockTypeLabel.appendChild(createBlockElementVisual(blockElementType));
         if (blockElementType === "GroupedBlockElement") {
-          blockTypeLabel.textContent = blockElement.label || "Grouped Block";
           textEditorBlock.appendChild(blockTypeLabel);
           const chevron = document.createElement("span");
           chevron.className =
@@ -4666,8 +4942,6 @@ const formHandler = (function () {
           chevron.textContent = "chevron_right";
           textEditorBlock.appendChild(chevron);
         } else {
-          blockTypeLabel.textContent =
-            Control.prototype.blockElements[blockElementType] || "Block";
           textEditorBlock.appendChild(blockTypeLabel);
         }
 
@@ -5303,6 +5577,7 @@ const formHandler = (function () {
       "sdIcon",
       "sdTollLogo",
     ].forEach((block) => setDependentVisibility(block));
+    scheduleMobileLayoutUpdate();
   };
 
   /**
