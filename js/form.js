@@ -4934,6 +4934,10 @@ const formHandler = (function () {
         textEditorBlock.setAttribute("aria-label", visibleBlockLabel);
         textEditorBlock.title = visibleBlockLabel;
         blockTypeLabel.appendChild(createBlockElementVisual(blockElementType));
+        const blockTypeText = document.createElement("span");
+        blockTypeText.className = "blockElementText";
+        blockTypeText.textContent = visibleBlockLabel;
+        blockTypeLabel.appendChild(blockTypeText);
         if (blockElementType === "GroupedBlockElement") {
           textEditorBlock.appendChild(blockTypeLabel);
           const chevron = document.createElement("span");

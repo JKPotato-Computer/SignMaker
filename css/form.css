@@ -773,16 +773,21 @@ input[type="button"]:disabled {
 }
 
 .blockElementSymbol {
+  display: none;
   font-size: 1.15rem;
   line-height: 1;
 }
 
 .blockElementAsset {
-  display: block;
+  display: none;
   width: 1.65rem;
   height: 1.65rem;
   object-fit: contain;
   pointer-events: none;
+}
+
+.blockElementText {
+  display: inline-block;
 }
 
 .sdArrow .blockElementAsset,
@@ -2634,12 +2639,20 @@ dialog:not([open]) {
   }
 
   .blockElementSymbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.45rem;
   }
 
   .blockElementAsset {
+    display: block;
     width: 2rem;
     height: 2rem;
+  }
+
+  .blockElementText {
+    display: none;
   }
 
   .textEditorBlock .blockTypeChevron {
