@@ -772,14 +772,14 @@ input[type="button"]:disabled {
   white-space: nowrap;
 }
 
-.blockElementSymbol {
-  display: none;
+.textEditorBlock .blockElementSymbol {
+  display: none !important;
   font-size: 1.15rem;
   line-height: 1;
 }
 
-.blockElementAsset {
-  display: none;
+.textEditorBlock .blockElementAsset {
+  display: none !important;
   width: 1.65rem;
   height: 1.65rem;
   object-fit: contain;
@@ -2638,15 +2638,15 @@ dialog:not([open]) {
     transition: none;
   }
 
-  .blockElementSymbol {
-    display: inline-flex;
+  .textEditorBlock .blockElementSymbol {
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     font-size: 1.45rem;
   }
 
-  .blockElementAsset {
-    display: block;
+  .textEditorBlock .blockElementAsset {
+    display: block !important;
     width: 2rem;
     height: 2rem;
   }
