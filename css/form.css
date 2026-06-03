@@ -2656,13 +2656,11 @@ dialog:not([open]) {
   }
 
   .textEditorBlock .blockTypeChevron {
-    width: 1.15rem;
-    height: 1.15rem;
+    display: none;
   }
 
   .textEditorBlock .blockTypeInlineSelect {
-    right: 0;
-    width: 2.4rem;
+    display: none;
   }
 
   #smSPProperties,
