@@ -5,3 +5,5 @@
 # Windows
 Thumbs.db
 .vscode/
+js/ExportFontData.js
+js/ExportAssetData.js

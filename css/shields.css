@@ -1,15 +1,233 @@
+.shield {
+	margin: 0.07rem;
+	position: relative;
+}
+
+.shieldImg {
+	height: 3rem;
+}
+
+.to {
+	--fhwaBaselineOffset: 0px;
+	display: none;
+	margin: auto 0 auto auto;
+	padding-left: 0.25rem;
+	font-family: "Series E";
+	margin-bottom: 1.8rem;
+	margin-right: 1.8rem;
+	font-size: 1.5rem;
+	position: relative;
+	top: -0.55rem;
+}
+
+.bannerShieldContainer {
+	display: flex;
+	flex-direction: column;
+	padding: 0.1rem;
+}
+
+.bannerShieldContainer.bannerPositionLeft {
+	flex-direction: row;
+}
+
+.bannerShieldContainer.bannerPositionAbove {
+	flex-direction: column;
+}
+
+.bannerShieldContainer.bannerPositionRight {
+	flex-direction: row-reverse;
+}
+
+.bannerA,
+.bannerB {
+	--fhwaBaselineOffset: 0px;
+	border-radius: 0.1rem;
+	font-size: var(--fontSize);
+	text-transform: uppercase;
+	font-family: var(--bannerFontFamily, "Series E");
+	margin-bottom: auto;
+	position: relative;
+	top: -0.4rem;
+}
+
+.bannerA:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter,
+.bannerB:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter {
+	font-size: calc(var(--fontSize) + 0.3rem);
+}
+
+.bE-shieldElement {
+	--shieldScale: 1;
+	--bannerScale: var(--shieldScale, 1);
+	--shieldSize: calc(3rem * var(--shieldScale, 1));
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	margin: 0 var(--spacing, 0.15rem);
+}
+
+/* this should be updated when the new shields ui is done */
+.bannerA.noSmallCaps,
+.bannerB.noSmallCaps {
+	text-transform: none;
+	font-variant: normal;
+}
+
+.bE-shieldElement .bannerShieldContainer {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-template-rows: auto auto auto;
+	grid-template-areas:
+		". top ."
+		"left center right"
+		". bottom .";
+	align-items: center;
+	justify-items: center;
+	margin: 0;
+	padding: calc(0.2rem * var(--shieldScale, 1));
+	font-size: calc(1rem * var(--shieldScale, 1));
+}
+
+.bE-shieldElement .bannerShieldContainer.noBanners {
+	padding: 0;
+	gap: 0;
+}
+
+.bE-shieldElement .to {
+	margin: 0;
+	order: -1;
+	position: static;
+	padding: 0;
+	align-self: center;
+	margin-right: 0.35rem;
+	flex: 0 0 auto;
+}
+
+.bE-shieldElement .bannerShieldContainer .shield {
+	grid-area: center;
+}
+
+.bE-shieldElement .shield {
+	margin: calc(0.07rem * var(--shieldScale, 1));
+}
+
+.bE-shieldElement .shieldImg {
+	height: var(--shieldSize);
+}
+
+.bE-shieldElement .bannerSlot-above {
+	grid-area: top;
+	margin-bottom: -0.5rem;
+}
+
+.bE-shieldElement .bannerSlot-below {
+	grid-area: bottom;
+	margin-top: 0.5rem;
+}
+
+.bE-shieldElement .bannerSlot-left {
+	grid-area: left;
+	justify-self: end;
+	align-self: start;
+	margin-top: -0rem;
+}
+
+.bE-shieldElement .bannerSlot-right {
+	grid-area: right;
+	justify-self: start;
+	align-self: start;
+	margin-top: -0rem;
+}
+
+.bE-shieldElement .bannerShieldContainer .stackedBannerSlot {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: -2rem;
+}
+
+.bE-shieldElement .bannerShieldContainer .stackedBannerSlot.bannerSlot-left {
+	align-items: flex-end;
+	margin-top: 0.6rem;
+}
+
+.bE-shieldElement .bannerShieldContainer .stackedBannerSlot.bannerSlot-right {
+	align-items: flex-start;
+	margin-top: 0.6rem;
+}
+
+.bE-shieldElement .bannerSlot-right .bannerA,
+.bE-shieldElement .bannerSlot-right .bannerB {
+	padding-left: 0.55rem;
+	padding-right: 0;
+}
+
+.bE-shieldElement .bannerSlot-left .bannerA,
+.bE-shieldElement .bannerSlot-left .bannerB {
+	padding-right: 0.55rem;
+	padding-left: 0;
+}
+
+.bE-shieldElement .countyLabel,
+.bannerShieldContainer .countyLabel {
+	position: absolute;
+	top: 0.3rem;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 100%;
+	text-align: center;
+	font-family: "Series D";
+	font-size: 0.5rem;
+	line-height: 0.8rem;
+	color: var(--countyYellow);
+}
+
+.bE-shieldElement .routeNumber {
+	font-size: calc(1.5rem * var(--shieldScale, 1));
+}
+
+.bE-shieldElement .bannerA,
+.bE-shieldElement .bannerB {
+	font-size: calc(var(--fontSize) * var(--bannerScale, 1));
+}
+
+.bE-shieldElement .bannerA:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter,
+.bE-shieldElement .bannerB:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter {
+	font-size: calc((var(--fontSize) + 0.3rem) * var(--bannerScale, 1));
+}
+
+.bE-shieldElement .to {
+	font-size: calc(1.5rem * var(--shieldScale, 1));
+}
+
+.bE-shieldElement .countyLabel,
+.bE-shieldElement .bannerShieldContainer .countyLabel {
+	top: calc(0.3rem * var(--shieldScale, 1));
+	font-size: calc(0.5rem * var(--shieldScale, 1));
+	line-height: calc(0.8rem * var(--shieldScale, 1));
+}
+
+
+/* === Number offsets start === */
 .bannerShieldContainer.I .routeNumber {
 	color: var(--white);
 	top: .16em;
 	font-size: 2em;
 }
+
 .bannerShieldContainer.I.one .routeNumber,
 .bannerShieldContainer.I.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.I.three .routeNumber {
 	font-family: "Series D";
 }
+
+.bannerShieldContainer.I.four .routeNumber {
+	font-family: "Series C";
+}
+
 .bannerShieldContainer.I.bus .banner {
 	display: none;
 }
@@ -22,23 +240,29 @@
 .bannerShieldContainer.rec .routeNumber,
 .bannerShieldContainer.rec2 .routeNumber {
 	color: var(--black);
-    font-size: 2.2em;
+	font-size: 2.2em;
 	font-family: "Series D";
 	top: 0em;
 }
 
+.bannerShieldContainer.US.four .routeNumber {
+	font-family: "Series C";
+}
+
 .bannerShieldContainer.C .routeNumber {
 	color: var(--countyYellow);
-	font-size: 1.4em;
-	top: 0.1em;
+	font-size: 1.5em;
+	top: 0.3em;
 }
+
 .bannerShieldContainer.C.one .routeNumber,
-.bannerShieldContainer.Ctwo .routeNumber {
+.bannerShieldContainer.C.two .routeNumber,
+.bannerShieldContainer.C.three .routeNumber {
 	font-family: "Series D";
 }
-.bannerShieldContainer.C.three .routeNumber {
+
+.bannerShieldContainer.C.four .routeNumber {
 	font-family: "Series C";
-	font-size: 1.3em;
 }
 
 .bannerShieldContainer.AL .routeNumber {
@@ -52,11 +276,13 @@
 	color: var(--black);
 	top: 0.27em;
 }
+
 .bannerShieldContainer.AK.one .routeNumber {
 	font-family: "Series E";
 	text-align: center;
 	left: 0.35em;
 }
+
 .bannerShieldContainer.AK.two .routeNumber,
 .bannerShieldContainer.AK.three .routeNumber {
 	font-family: "Series C";
@@ -70,6 +296,7 @@
 	top: 0.2em;
 	font-size: 1.5em;
 }
+
 .bannerShieldContainer.AZ.loop.three .banner {
 	display: none;
 }
@@ -80,10 +307,12 @@
 	right: 0.125em;
 	font-size: 1.5em;
 }
+
 .bannerShieldContainer.AR.one .routeNumber,
 .bannerShieldContainer.AR.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.AR.three .routeNumber {
 	font-family: "Series C";
 	right: 0.15em;
@@ -101,10 +330,12 @@
 	font-size: 1.3em;
 	top: 0.7em;
 }
+
 .bannerShieldContainer.CO.one .routeNumber,
 .bannerShieldContainer.CO.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.CO.three .routeNumber {
 	font-family: "Series C";
 }
@@ -122,33 +353,53 @@
 	right: 0.15em;
 	font-size: 1.5em;
 }
+
 .bannerShieldContainer.FL.one .routeNumber,
-.bannerShieldContainer.FL.two .routeNumber {
-	font-family: "Series D";
-}
+.bannerShieldContainer.FL.two .routeNumber,
 .bannerShieldContainer.FL.three .routeNumber {
-	font-family: "Series C";
+	font-family: "Series D";
+	font-size: 2.2em;
+	top: 0.2em;
 }
+
+
+
+
+.bannerShieldContainer.FL.four .routeNumber {
+	font-family: "Series C";
+	font-size: 2.2em;
+	top: 0.2em;
+}
+
 .bannerShieldContainer.FL.toll .banner {
 	display: none;
 }
-.bannerShieldContainer.FL.toll .routeNumber {
+
+.bannerShieldContainer.FL.toll .routeNumber,
+.bannerShieldContainer.FL.cfxtoll .routeNumber {
 	font-family: "Series C";
-	font-size: 1em;
-	top: 0.85em;
+	font-size: 1.3em;
+	top: 0.7em;
+}
+
+.bannerShieldContainer.FL.turnpike .routeNumber {
+	opacity: 0;
 }
 
 .bannerShieldContainer.GA .routeNumber {
 	color: var(--black);
 	top: 0.3em;
 }
+
 .bannerShieldContainer.GA.one .routeNumber,
 .bannerShieldContainer.GA.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.GA.three .routeNumber {
 	font-family: "Series C";
 }
+
 .bannerShieldContainer.GA.alt .banner,
 .bannerShieldContainer.GA.byp .banner,
 .bannerShieldContainer.GA.conn .banner,
@@ -161,11 +412,13 @@
 	color: var(--black);
 	font-size: 1.35em;
 }
+
 .bannerShieldContainer.HI.one .routeNumber,
 .bannerShieldContainer.HI.two .routeNumber {
 	font-family: "Series D";
 	top: 0.3em;
 }
+
 .bannerShieldContainer.HI.three .routeNumber {
 	font-family: "Series C";
 	font-size: 1.15em;
@@ -178,17 +431,21 @@
 	top: -0.15em;
 	font-size: 1.25em;
 }
+
 .bannerShieldContainer.ID.one .routeNumber,
 .bannerShieldContainer.ID.two .routeNumber {
 	right: 0.3em;
 }
+
 .bannerShieldContainer.ID.three .routeNumber {
 	font-size: 1.15em;
 	right: 0.2em;
 }
+
 .shieldsContainer.shieldBacks .ID .routeNumber {
 	color: var(--white);
 }
+
 .shieldsContainer:not(.shieldBacks) .ID .routeNumber {
 	color: var(--black);
 }
@@ -233,10 +490,12 @@
 	font-size: 1.15em;
 	top: 0.5em;
 }
+
 .bannerShieldContainer.MI.one .routeNumber,
 .bannerShieldContainer.MI.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.MI.three .routeNumber {
 	font-family: "Series C";
 }
@@ -247,6 +506,7 @@
 	font-size: 1.6em;
 	top: 0.25em;
 }
+
 .bannerShieldContainer.MN.bus .banner {
 	display: none;
 }
@@ -255,10 +515,12 @@
 	color: var(--black);
 	top: 0.15em;
 }
+
 .bannerShieldContainer.MO.one .routeNumber,
 .bannerShieldContainer.MO.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.MO.three .routeNumber {
 	font-family: "Series C";
 }
@@ -273,73 +535,89 @@
 .bannerShieldContainer.MT2 .routeNumber {
 	color: var(--black);
 }
+
 .bannerShieldContainer.MT2.one .routeNumber,
 .bannerShieldContainer.MT2.two .routeNumber {
 	top: 0.2em;
 }
+
 .bannerShieldContainer.MT2.three .routeNumber {
 	font-size: 1.15em;
 	top: 0.3em;
 }
+
 .bannerShieldContainer.MT2.one .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.MT2.two .routeNumber,
 .bannerShieldContainer.MT2.three .routeNumber {
 	font-family: "Series C";
 }
+
 .bannerShieldContainer.NB .routeNumber {
 	color: var(--black);
 	top: 0.43em;
 	font-family: "Helvetica";
 	font-weight: bold;
 }
+
 .bannerShieldContainer.NB.one .routeNumber,
 .bannerShieldContainer.NB.two .routeNumber {
 	font-size: 1.3em;
 }
+
 .bannerShieldContainer.NB.three .routeNumber {
 	font-size: 0.9em;
 	top: 0.87em;
 	left: -0.03em;
 }
+
 .bannerShieldContainer.NB.local.three .banner {
 	display: none;
 }
+
 .bannerShieldContainer.NE .routeNumber {
 	color: var(--black);
 	top: 0.05em;
 }
+
 .bannerShieldContainer.NE.one .routeNumber,
 .bannerShieldContainer.NE.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.NE.three .routeNumber {
 	font-family: "Series C";
 }
+
 .bannerShieldContainer.NE.link.one .banner,
 .bannerShieldContainer.NE.link.two .banner,
 .bannerShieldContainer.NE.spur.one .banner,
 .bannerShieldContainer.NE.spur.two .banner {
 	display: none;
 }
-.bannerShieldContainer.NE.link.one .routeNumber
-.bannerShieldContainer.NE.link.two .routeNumber,
-.bannerShieldContainer.NE.spur.one .routeNumber
-.bannerShieldContainer.NE.spur.two .routeNumber {
+
+.bannerShieldContainer.NE.link.one .routeNumber .bannerShieldContainer.NE.link.two .routeNumber,
+.bannerShieldContainer.NE.spur.one .routeNumber .bannerShieldContainer.NE.spur.two .routeNumber {
 	top: -0.1em;
 }
+
+
+
 .bannerShieldContainer.NL .routeNumber {
 	font-size: 1.8em;
 	color: var(--black);
 	font-family: "Series EM";
 	top: 0.03em;
 }
+
 .bannerShieldContainer.NL.three .routeNumber {
 	font-size: 1.6em;
 	font-family: "Series D";
 	top: 0.12em;
 }
+
 .bannerShieldContainer.NS.three .routeNumber {
 	font-size: 1.05em;
 	top: 0.8em;
@@ -348,6 +626,7 @@
 	color: white;
 	font-family: "Series C";
 }
+
 .bannerShieldContainer.bannerShieldContainer.NS.conn.three .routeNumber {
 	font-size: 1.05em;
 	color: white;
@@ -356,27 +635,48 @@
 	left: .015em;
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.NS.trunk.two .banner,
 .bannerShieldContainer.NS.conn .banner,
 .bannerShieldContainer.NS.arterial.three .banner {
-	display: none;	
+	display: none;
 }
 
 .bannerShieldContainer.NV .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
-	font-size: 0.9em;
-	top: 0.15em;
+	font-size: 1.35em;
+	top: 0.05em;
+}
+
+.bannerShieldContainer.NV.three .routeNumber {
+	font-family: "Series D";
+	font-size: 1.25em;
+	top: 0.075em;
+}
+
+.bannerShieldContainer.C .shield,
+.bannerShieldContainer.NV.cc215 .shield,
+.bannerShieldContainer.NV.variant-cc215 .shield {
+	align-items: center;
+	background: var(--yellow);
+	box-sizing: content-box;
+	display: inline-flex;
+	justify-content: center;
+	line-height: 0;
+	padding: calc(0.18rem * var(--shieldScale, 1));
 }
 
 .bannerShieldContainer.NH .routeNumber {
 	color: var(--black);
 	top: 0.15em;
 }
+
 .bannerShieldContainer.NH.one .routeNumber,
 .bannerShieldContainer.NH.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.NH.three .routeNumber {
 	font-family: "Series C";
 	font-size: 1.4em;
@@ -386,17 +686,21 @@
 .bannerShieldContainer.NM .routeNumber {
 	color: var(--black);
 }
+
 .bannerShieldContainer.NM.one .routeNumber,
 .bannerShieldContainer.NM.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.NM.one .routeNumber {
 	top: 0.15em;
 }
+
 .bannerShieldContainer.NM.two .routeNumber {
 	font-size: 1.2em;
 	top: 0.35em;
 }
+
 .bannerShieldContainer.NM.three .routeNumber {
 	font-family: "Series C";
 	font-size: 1em;
@@ -406,8 +710,8 @@
 .bannerShieldContainer.NY .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
-	top: 0.15em;
-	font-size: 1.5em;
+	top: 0.05em;
+	font-size: 2em;
 }
 
 .bannerShieldContainer.NC .routeNumber {
@@ -415,10 +719,12 @@
 	font-size: 1.15em;
 	top: 0.4em;
 }
+
 .bannerShieldContainer.NC.one .routeNumber,
 .bannerShieldContainer.NC.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.NC.three .routeNumber {
 	font-family: "Series C";
 }
@@ -448,10 +754,12 @@
 	top: 0.1em;
 	font-size: 1.5em;
 }
+
 .bannerShieldContainer.OR.one .routeNumber,
 .bannerShieldContainer.OR.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.OR.three .routeNumber {
 	font-family: "Series C";
 }
@@ -462,26 +770,31 @@
 	top: 0.2em;
 	font-size: 1.4em;
 }
+
 .bannerShieldContainer.PEI .routeNumber {
 	font-size: 1.2em;
 	top: 0.5em;
 	color: var(--black);
 	font-family: "Series C";
 }
+
 .bannerShieldContainer.PEI.three .routeNumber {
 	font-size: 1.1em;
 	top: .6em;
 }
+
 .bannerShieldContainer.QC .routeNumber {
 	font-size: 1.5rem;
 	color: var(--white);
 	top: 0.4em;
 	font-family: "Series EM";
 }
+
 .bannerShieldContainer.QC.two .routeNumber {
 	font-family: "Series D";
 	top: 0.42em;
 }
+
 .bannerShieldContainer.QC2 .routeNumber {
 	font-size: 1.2rem;
 	color: var(--white);
@@ -489,6 +802,7 @@
 	font-family: "Series D";
 	font-size: 1.3em;
 }
+
 .bannerShieldContainer.RI .routeNumber {
 	color: var(--black);
 	font-family: "Series D";
@@ -522,10 +836,12 @@
 	top: -0.15em;
 	font-size: 1.35em;
 }
+
 .bannerShieldContainer.TN2.one .routeNumber,
 .bannerShieldContainer.TN2.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.TN2.three .routeNumber {
 	font-family: "Series C";
 }
@@ -535,34 +851,37 @@
 	font-size: 2.2em;
 	top: 0.2em;
 }
+
 .bannerShieldContainer.TX.one .routeNumber,
-.bannerShieldContainer.TX.two .routeNumber {
+.bannerShieldContainer.TX.two .routeNumber,
+.bannerShieldContainer.TX.three .routeNumber {
 	font-family: "Series D";
 }
-.bannerShieldContainer.TX.three .routeNumber {
+
+.bannerShieldContainer.TX.four .routeNumber {
 	font-family: "Series D";
 }
 
 .bannerShieldContainer.TX.toll.three .routeNumber {
 	font-family: "Series D";
-    left: 0rem;
-    font-size: 1.8em;
-    letter-spacing: 0;
-    top: -0.2rem;
+	left: 0rem;
+	font-size: 1.8em;
+	letter-spacing: 0;
+	top: -0.2rem;
 }
 
 .bannerShieldContainer.TX.toll.four .routeNumber {
 	font-family: "Series C";
-    left: 0rem;
-    font-size: 2em;
-    top: -.45rem;
+	left: 0rem;
+	font-size: 2em;
+	top: -.45rem;
 }
 
 .bannerShieldContainer.TX.toll .routeNumber {
 	color: var(--white);
-    top: -0.45rem;
-    font-size: 2.2em;
-    font-family: "Series E";
+	top: -0.45rem;
+	font-size: 2.2em;
+	font-family: "Series E";
 }
 
 .bannerShieldContainer.TX.express .routeNumber {
@@ -576,15 +895,21 @@
 	display: none;
 }
 
+.bannerShieldContainer.TX.loop.four .routeNumber {
+	font-family: "Series D";
+}
+
 .bannerShieldContainer.UT .routeNumber {
 	color: var(--black);
 }
+
 .bannerShieldContainer.UT.one .routeNumber,
 .bannerShieldContainer.UT.two .routeNumber {
 	font-family: "Series D";
 	font-size: 1.15em;
 	top: 0.4em;
 }
+
 .bannerShieldContainer.UT.three .routeNumber {
 	font-family: "Series C";
 	font-size: 1em;
@@ -612,10 +937,12 @@
 	left: 0.025em;
 	font-size: 1.5em;
 }
+
 .bannerShieldContainer.VA2.one .routeNumber,
 .bannerShieldContainer.VA2.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.VA2.three .routeNumber {
 	font-family: "Series C";
 }
@@ -623,12 +950,14 @@
 .bannerShieldContainer.WA .routeNumber {
 	color: var(--black);
 }
+
 .bannerShieldContainer.WA.one .routeNumber,
 .bannerShieldContainer.WA.two .routeNumber {
 	font-family: "Series D";
 	font-size: 1.35em;
 	top: 0.1em;
 }
+
 .bannerShieldContainer.WA.three .routeNumber {
 	font-family: "Series C";
 	font-size: 1.15em;
@@ -640,10 +969,12 @@
 	top: 0.15em;
 	font-size: 1.5em;
 }
+
 .bannerShieldContainer.WI.one .routeNumber,
 .bannerShieldContainer.WI.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.WI.three .routeNumber {
 	font-family: "Series C";
 }
@@ -653,10 +984,62 @@
 	top: 0.2em;
 	font-size: 1.4em;
 }
+
 .bannerShieldContainer.WY.one .routeNumber,
 .bannerShieldContainer.WY.two .routeNumber {
 	font-family: "Series D";
 }
+
 .bannerShieldContainer.WY.three .routeNumber {
+	font-family: "Series C";
+}
+
+.bannerShieldContainer.DUSKSMP.one .routeNumber,
+.bannerShieldContainer.DUSKSMP.two .routeNumber,
+.bannerShieldContainer.DUSKSMP.three .routeNumber {
+	color: var(--black);
+	font-family: "Series D";
+	top: calc(0.6rem * var(--shieldScale, 1));
+	font-size: calc(2rem * var(--shieldScale, 1));
+}
+
+.bannerShieldContainer.DUSKSMP.four .routeNumber {
+	color: var(--black);
+	font-family: "Series C";
+	top: calc(0.6rem * var(--shieldScale, 1));
+	font-size: calc(2rem * var(--shieldScale, 1));
+}
+
+.bannerShieldContainer.DUSKSMP_TOLL.one .routeNumber,
+.bannerShieldContainer.DUSKSMP_TOLL.two .routeNumber,
+.bannerShieldContainer.DUSKSMP_TOLL.three .routeNumber {
+	color: var(--black);
+	font-family: "Series D";
+	top: calc(0.9rem * var(--shieldScale, 1));
+	font-size: calc(1.2rem * var(--shieldScale, 1));
+}
+
+.bannerShieldContainer.DUSKSMP_TOLL.four .routeNumber {
+	color: var(--black);
+	font-family: "Series C";
+	top: calc(0.9rem * var(--shieldScale, 1));
+	font-size: calc(1.2rem * var(--shieldScale, 1));
+}
+.bannerShieldContainer.AB .routeNumber {
+	color: var(--black);
+	top: 0.5em;
+	font-size: 1.4em;
+}
+.bannerShieldContainer.AB.one .routeNumber {
+	font-family: "Series E";
+}
+.bannerShieldContainer.AB.two .routeNumber,
+.bannerShieldContainer.AB.three .routeNumber {
+	font-family: "Series C";
+}
+.bannerShieldContainer.AB2 .routeNumber {
+		color: var(--black);
+	top: 0.65em;
+	font-size: 1.4em;
 	font-family: "Series C";
 }

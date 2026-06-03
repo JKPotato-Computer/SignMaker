@@ -2,13 +2,50 @@
   display: flex;
   flex-direction: row;
   height: 30rem;
+  position: relative;
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  --postThickness: 1rem;
+  --postGradient: linear-gradient(90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%);
+}
+
+#postContainer.postColorSilver {
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+}
+
+#postContainer.postColorBlack {
+  --post-color-mid: rgb(74, 74, 74);
+  --post-color-light: rgb(120, 120, 120);
+  --post-color-dark: rgb(20, 20, 20);
+}
+
+#postContainer.postColorBrown {
+  --post-color-mid: rgb(124, 86, 52);
+  --post-color-light: rgb(171, 124, 82);
+  --post-color-dark: rgb(86, 55, 28);
+}
+
+#postContainer.postColorRed {
+  --post-color-mid: rgb(193, 38, 38);
+  --post-color-light: rgb(235, 110, 110);
+  --post-color-dark: rgb(120, 16, 16);
 }
 
 #postContainer.polePositionOverhead .post {
   visibility: visible;
 }
+
 #postContainer.polePositionLeft .post:last-child,
-#postContainer.polePositionRight .post:first-child,
+#postContainer.polePositionRight .post:first-child {
+  visibility: hidden;
+}
+
 #postContainer.polePositionRural .post,
 #postContainer.polePositionCenter .post {
   visibility: hidden;
@@ -17,67 +54,65 @@
 #postContainer.polePositionLeft #panelContainer,
 #postContainer.polePositionRight #panelContainer,
 #postContainer.polePositionOverhead #panelContainer {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 47%,
-    rgba(191, 191, 191, 1) 47%,
-    rgba(240, 240, 240, 1) 49%,
-    rgba(128, 128, 128, 1) 52%,
-    rgba(255, 255, 255, 0) 52%,
-    rgba(255, 255, 255, 0) 64%,
-    rgba(191, 191, 191, 1) 64%,
-    rgba(240, 240, 240, 1) 66%,
-    rgba(128, 128, 128, 1) 69%,
-    rgba(255, 255, 255, 0) 69%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0) 47%,
+      var(--post-color-mid) 47%,
+      var(--post-color-light) 49%,
+      var(--post-color-dark) 52%,
+      rgba(255, 255, 255, 0) 52%,
+      rgba(255, 255, 255, 0) 64%,
+      var(--post-color-mid) 64%,
+      var(--post-color-light) 66%,
+      var(--post-color-dark) 69%,
+      rgba(255, 255, 255, 0) 69%);
   height: 15rem;
 }
+
 #postContainer.polePositionRural #panelContainer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 20%,
-    rgba(191, 191, 191, 1) 20%,
-    rgba(240, 240, 240, 1) 22%,
-    rgba(128, 128, 128, 1) 25%,
-    rgba(255, 255, 255, 0) 25%,
-    rgba(255, 255, 255, 0) 75%,
-    rgba(191, 191, 191, 1) 75%,
-    rgba(240, 240, 240, 1) 77%,
-    rgba(128, 128, 128, 1) 80%,
-    rgba(255, 255, 255, 0) 80%
-  );
+  position: relative;
+  background-image: linear-gradient(90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%),
+    linear-gradient(90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%);
+  background-repeat: no-repeat;
+  background-size:
+    var(--postThickness, 1rem) 24rem,
+    var(--postThickness, 1rem) 24rem;
+  background-position:
+    left 1rem bottom,
+    right 1rem bottom;
   margin-top: 20rem;
 }
+
 #postContainer.polePositionCenter #panelContainer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 45%,
-    rgba(191, 191, 191, 1) 45%,
-    rgba(240, 240, 240, 1) 49%,
-    rgba(128, 128, 128, 1) 55%,
-    rgba(255, 255, 255, 0) 55%
-  );
+  position: relative;
+  background-image: linear-gradient(90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%);
+  background-repeat: no-repeat;
+  background-size: var(--postThickness, 1rem) 24rem;
+  background-position: center bottom;
   margin-top: 7.5rem;
 }
 
 .post {
-  background: linear-gradient(
-    90deg,
-    rgb(191, 191, 191) 0%,
-    rgb(240, 240, 240) 40%,
-    rgb(128, 128, 128) 100%
-  );
-  width: 1rem;
+  background: var(--postGradient);
+  width: var(--postThickness, 1rem);
   height: 24rem;
 
   align-self: flex-end;
 }
+
 .post:first-child {
   margin-left: auto;
 }
+
 .post:last-child {
   margin-right: auto;
 }
@@ -89,9 +124,62 @@
   width: -moz-max-content;
   width: -webkit-max-content;
   width: intrinsic;
+  gap: var(--panelSpacing, 0rem);
+}
+
+#postContainer #panelContainer[data-panel-orientation="vertical"] {
+  flex-direction: column;
+}
+
+.exportStaticCaptureWrapper #panelContainer[data-panel-orientation="vertical"] {
+  flex-direction: column;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel .exitTabContainer:not(.tabVisible) {
+  display: none;
+}
+
+.exportCaptureTarget,
+.exportCaptureTarget * {
+  box-sizing: border-box;
+}
+
+#panelContainer.exportCaptureTarget {
+  width: max-content !important;
+  min-width: max-content !important;
+  height: max-content !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  background-image: none !important;
+  align-items: flex-start !important;
+}
+
+#panelContainer.exportCaptureTarget .panel:first-child {
+  padding-left: 0 !important;
+}
+
+#panelContainer.exportCaptureTarget .panel:last-child {
+  padding-right: 0 !important;
+}
+
+.exportStaticCaptureWrapper,
+.exportStaticCaptureClone {
+  box-sizing: border-box;
+}
+
+.exportStaticCaptureWrapper {
+  isolation: isolate;
+}
+
+.exportStaticCaptureWrapper .groupPreviewPanel .signContainer,
+.exportStaticCaptureClone.groupPreviewPanel .signContainer {
+  outline: none !important;
 }
 
 .panel {
+  --signBorderRadius: 0.75rem;
+  --signBorderWidth: 0.2rem;
   text-align: center;
   display: block;
   padding: 0rem;
@@ -101,6 +189,7 @@
 .panel:first-child {
   padding-left: 1rem;
 }
+
 .panel:last-child {
   padding-right: 1rem;
 }
@@ -108,9 +197,11 @@
 #postContainer.polePositionRural .panel {
   margin-top: -10rem;
 }
+
 #postContainer.polePositionCenter .panel {
   margin-top: -22.5rem;
 }
+
 #postContainer.polePositionRural .panel:not(:first-child),
 #postContainer.polePositionCenter .panel:not(:first-child) {
   display: none;
@@ -120,16 +211,69 @@
   background-color: var(--orange);
 }
 
+/* Panel drag-and-drop on rendered sign */
+.panel.panelWiggle {
+  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
+  animation-delay: var(--wiggle-delay, 0s);
+  cursor: grab;
+}
+
+.panel.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  animation: none;
+}
+
+.panel.dropBefore::before,
+.panel.dropAfter::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  width: 0.3rem;
+  border-radius: 0.2rem;
+  background: var(--selectedColor, rgb(100, 150, 255));
+  pointer-events: none;
+  z-index: 10;
+}
+
+.panel.dropBefore::before {
+  left: 0.25rem;
+}
+
+.panel.dropAfter::after {
+  right: 0.25rem;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel.dropBefore::before,
+#panelContainer[data-panel-orientation="vertical"] .panel.dropAfter::after {
+  left: 10%;
+  right: 10%;
+  width: auto;
+  height: 0.3rem;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel.dropBefore::before {
+  top: 0.25rem;
+  bottom: auto;
+}
+
+#panelContainer[data-panel-orientation="vertical"] .panel.dropAfter::after {
+  top: auto;
+  bottom: 0.25rem;
+}
+
 .panel.green .sign,
+
 .panel.blue .sign,
 .panel.brown .sign,
 .panel.black .sign,
-.panel.fluorescent.pink .sign,
+.panel.red .sign,
 .panel.green .guideArrows,
 .panel.blue .guideArrows,
 .panel.brown .guideArrows,
 .panel.black .guideArrows,
-.panel.fluorescent.pink .guideArrows {
+.panel.red .guideArrows {
   color: var(--white);
   border-color: var(--white);
 }
@@ -137,9 +281,11 @@
 .panel.white .sign,
 .panel.yellow .sign,
 .panel.fluorescent.yellow-green .sign,
+.panel.fluorescent.pink .sign,
 .panel.white .guideArrows,
 .panel.yellow .guideArrows,
 .panel.fluorescent.yellow-green .guideArrows,
+.panel.fluorescent.pink .guideArrows,
 .panel.orange .sign,
 .panel.orange .guideArrows {
   color: var(--black);
@@ -188,6 +334,13 @@
   background-color: var(--black);
 }
 
+.panel.red .sign,
+.panel.red .signContainer,
+.panel.red .exitTabContainer,
+.panel.red .guideArrows {
+  background-color: var(--red);
+}
+
 .panel.purple .sign,
 .panel.purple .signContainer,
 .panel.purple .exitTabContainer,
@@ -223,12 +376,14 @@
 .panel.white .dividerElement,
 .panel.orange .dividerElement,
 .panel.yellow .dividerElement,
-.panel.fluorescent.yellow-green .dividerElement {
+.panel.fluorescent.yellow-green .dividerElement,
+.panel.fluorescent.pink .dividerElement {
   background-color: black;
 }
 
 .panel.orange .arrow,
-.panel.fluorescent.yellow-green .arrow {
+.panel.fluorescent.yellow-green .arrow,
+.panel.fluorescent.pink .arrow {
   filter: invert(100%);
   -webkit-filter: invert(100%);
 }
@@ -276,6 +431,13 @@
   color: var(--white);
 }
 
+.exitTab.red,
+.exitTabHolder.red {
+  background-color: var(--red);
+  border-color: var(--white);
+  color: var(--white);
+}
+
 .exitTab.purple,
 .exitTabHolder.purple {
   background-color: var(--purple);
@@ -283,11 +445,18 @@
   color: var(--white);
 }
 
+.exitTab.orange,
+.exitTabHolder.orange {
+  background-color: var(--orange);
+  border-color: var(--black);
+  color: var(--black);
+}
+
 .exitTab.fluorescent.pink,
 .exitTabHolder.fluorescent.pink {
   background-color: var(--fluorescent-pink);
-  border-color: var(--white);
-  color: var(--white);
+  border-color: var(--black);
+  color: var(--black);
 }
 
 .exitTab.fluorescent.yellow-green,
@@ -312,7 +481,8 @@
   border-left-style: solid;
   border-left-width: 0.2rem;
   font-size: 1rem;
-  visibility: hidden; /* hides exitTab by default when loading page */
+  visibility: hidden;
+  /* hides exitTab by default when loading page */
   float: none;
   min-height: 2.25rem;
   padding: 0 0.5rem;
@@ -325,6 +495,10 @@
 
 .exitTab.squareCorners.out {
   border-radius: 0.25rem;
+}
+
+.exitTab.borderless {
+  border-radius: 0;
 }
 
 .exitTab.out {
@@ -356,8 +530,12 @@
 
 .exitTabContainer.out {
   margin-bottom: 0.25rem;
-  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-  margin-left: 0.75rem; /* curved corners of the panel below */
+  margin-right: var(--signBorderRadius,
+      0.75rem);
+  /* Margin keeps the edge of the tab from going above the */
+  margin-left: var(--signBorderRadius,
+      0.75rem);
+  /* curved corners of the panel below */
 }
 
 .exitTabContainer.out.right {
@@ -366,22 +544,47 @@
 
 .exitTabContainer.wide,
 .exitTabContainer.narrow {
-  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-  margin-left: 0.75rem; /* curved corners of the panel below */
+  margin-right: var(--signBorderRadius,
+      0.75rem);
+  /* Margin keeps the edge of the tab from going above the */
+  margin-left: var(--signBorderRadius,
+      0.75rem);
+  /* curved corners of the panel below */
 }
+
 .exitTabContainer.edge.right {
   margin-right: 0rem;
 }
+
 .exitTabContainer.edge.left {
   margin-left: 0rem;
 }
+
 .narrow.center,
 .edge.center {
   margin: auto;
 }
+
 .exitTabContainer,
 .signContainer {
   z-index: 2;
+  gap: var(--nestedTabSpacing, 0);
+}
+
+.signContainer {
+  position: relative;
+  isolation: isolate;
+}
+
+.exitTabContainer.attached {
+  align-items: flex-start;
+  margin-bottom: calc(-1 * var(--signBorderWidth, 0.2rem));
+  position: relative;
+  z-index: 3;
+}
+
+.exitTabHolder.attached {
+  padding-bottom: var(--signBorderWidth, 0.2rem);
 }
 
 .signContainer,
@@ -389,38 +592,47 @@
 .exitTabContainer.edge {
   width: max-content;
 }
+
 .exitTabContainer.narrow.left,
 .exitTabContainer.edge.left {
   margin-right: auto;
 }
+
 .exitTabContainer.narrow.right,
 .exitTabContainer.edge.right {
   margin-left: auto;
 }
+
 .exitTab.wide.left,
 .exitTab.full.left {
   justify-content: flex-start;
 }
+
 .exitTab.wide.center,
 .exitTab.full.center {
   justify-content: center;
 }
+
 .exitTab.wide.right,
 .exitTab.full.right {
   justify-content: flex-end;
 }
+
 .exitTab.full {
   width: 100%;
-  border-radius: 0.75rem 0.75rem 0 0;
+  border-radius: var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem) 0 0;
 }
+
 .sign.full.tabVisible {
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
+
 .sign.edge.right.tabVisible {
-  border-radius: 0.75rem 0 0.75rem 0.75rem;
+  border-radius: var(--signBorderRadius, 0.75rem) 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
+
 .sign.edge.left.tabVisible {
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
+  border-radius: 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 }
 
 .panel.round .exitTabContainer,
@@ -429,19 +641,33 @@
 }
 
 .sign {
-  border-radius: 0.75rem;
+  border-radius: var(--signBorderRadius, 0.75rem);
   border-style: solid;
-  border-width: 0.2rem;
+  border-width: var(--signBorderWidth, 0.2rem);
   display: block;
   clear: both;
+  position: relative;
+  isolation: isolate;
   visibility: visible;
   overflow: hidden;
+  width: 100%;
+}
+
+.fullBleedBorderOverlay {
+  position: absolute;
+  box-sizing: border-box;
+  border-style: solid;
+  pointer-events: none;
+  visibility: visible;
+  z-index: 20;
 }
 
 .signHolder {
   display: flex;
   clear: both;
   flex-direction: row;
+  width: 100%;
+  justify-content: center;
 }
 
 .panel.round .exitTabContainer,
@@ -452,9 +678,11 @@
 .panel .exitTabContainer {
   visibility: hidden;
 }
+
 .panel .tabVisible {
   visibility: visible;
 }
+
 .sideLeftArrow,
 .sideRightArrow {
   margin-top: auto;
@@ -475,16 +703,20 @@
 .signContentContainer {
   display: flex;
   width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.75rem;
+  justify-content: center;
 }
+
 .signContentContainer.shieldPositionLeft {
   flex-direction: row;
   align-items: center;
 }
+
 .signContentContainer.shieldPositionAbove {
   flex-direction: column;
   justify-content: center;
 }
+
 .signContentContainer.shieldPositionRight {
   flex-direction: row-reverse;
   align-items: center;
@@ -499,68 +731,19 @@
   gap: 1rem;
 }
 
-.to {
-  display: none;
-  margin: auto 0 auto auto;
-  padding-left: 0.25rem;
-  font-family: "Clearview 5WR";
-  margin-bottom: 1.8rem;
-  margin-right: 1.8rem;
-  font-size: 1.5rem;
-}
-
-.bannerShieldContainer {
-  display: flex;
-  flex-direction: column;
-  /* margin-right: auto; */
-  /* margin-left: auto; */
-  padding: 0.1rem;
-}
-.bannerShieldContainer.bannerPositionLeft {
-  flex-direction: row;
-}
-.bannerShieldContainer.bannerPositionAbove {
-  flex-direction: column;
-}
-.bannerShieldContainer.bannerPositionRight {
-  flex-direction: row-reverse;
-}
-
-.bannerA,
-.bannerB {
-  border-radius: 0.1rem;
-  font-size: var(--fontSize);
-  text-transform: uppercase;
-  font-family: "Clearview 5WR";
-  margin-bottom: auto;
-}
-.bannerA:not(.TOLL, .noIndent):first-letter,
-.bannerB:not(.TOLL, .noIndent):first-letter {
-  font-size: calc(var(--fontSize) + 0.3rem);
-  /* margin-right: -0.1rem; */
-}
-
-.shield {
-  margin: 0.15rem;
-  position: relative;
-}
-
-.shieldImg {
-  /* width:max-content; */
-  height: 3rem;
-}
-
 .markerImg {
   height: 1.5rem;
   top: 0.25rem;
   position: relative;
   z-index: 0;
 }
+
 .left .markerImg {
   transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
   -moz-transform: scaleX(-1);
 }
+
 .otherSymbols {
   display: inline-flex;
   flex-direction: column;
@@ -570,6 +753,7 @@
   position: relative;
   margin-bottom: 0.5rem;
 }
+
 .oSNum {
   /* Add .left and .right */
   font-family: "Series EM";
@@ -582,17 +766,21 @@
   left: -0.3rem;
   color: black;
 }
+
 .left .oSNum {
   left: 0.3rem;
 }
+
 .oSNum.short {
   letter-spacing: 0.1rem;
 }
+
 .oSNum.five {
   font-family: "Series C";
   top: 0.29rem;
   font-size: 1.2em;
 }
+
 .routeNumber {
   font-size: 1.5rem;
 
@@ -607,9 +795,11 @@
   margin-bottom: 0.5rem;
   padding: 0 1rem;
 }
+
 .streetName:last-child {
   margin-bottom: 0;
 }
+
 .streetName,
 .controlText {
   font-family: "Clearview 5WR";
@@ -618,14 +808,21 @@
   white-space: pre-wrap;
 }
 
+.controlText {
+  --fhwaBaselineOffset: 0px;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
+}
+
 .guideArrows {
   border-style: solid;
   border-width: 0.2rem;
   border-top-width: 0;
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
 
   display: none;
 }
+
 .guideArrows.exit_only {
   background-color: var(--yellow) !important;
   border-color: var(--black) !important;
@@ -653,10 +850,31 @@
 
 .guideArrows.half_exit.only.default {
   padding: 0;
+  position: relative;
+  overflow: visible;
 }
 
 .guideArrows.half_exit.only {
   color: black !important;
+}
+
+.guideArrows.half_exit.only.default.halfExitNoBorder::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.25rem;
+  height: 0.35rem;
+  background: var(--white);
+  border-bottom-left-radius: 0.9rem;
+  border-bottom-right-radius: 0.9rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.guideArrows.half_exit.only.default .arrowContainer {
+  position: relative;
+  z-index: 1;
 }
 
 .halfarrow {
@@ -666,38 +884,341 @@
 }
 
 .specialExitOnly {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   color: var(--black);
   background-color: var(--yellow);
   font-family: "Series EM";
   border-radius: 0.2rem;
   border-width: 0rem;
   padding: 0.1rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
-.otherSymbols + .actionMessage {
+.otherSymbols+.actionMessage {
   padding-right: 0.2rem;
 }
 
 .exitTab {
+  --fhwaBaselineOffset: 0px;
   display: flex;
   align-items: center;
   font-family: "Clearview 4W";
   font-size: 18px;
 }
 
-.action_message {
+.exitTab .exitTabText {
+  position: relative;
+  top: calc(var(--exitTabTextBaseOffset, 0px) + var(--fhwaBaselineOffset) + var(--exitTabAdditionalOffset, 0px));
+}
+
+.exitTab .numeral {
+  font-size: calc(1.5em * var(--exitTabNumeralScale, 1));
+}
+
+.exitTab .exitTabTextSpacer {
+  display: inline-block;
+  min-width: 0.35rem;
+}
+
+.exitTab .exitTabNumberLinesContainer {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.exitTab .exitTabNumberLine {
+  display: inline-flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
+.exitTab .exitTabVerticalContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  padding: 0;
+}
+
+.exitTab .exitTabVerticalText {
+  line-height: 1.3;
+  margin-bottom: 0;
+}
+
+.exitTab .exitTabVerticalNumber {
+  line-height: 1.3;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-top: 0;
+}
+
+.exitTab.verticalArrangement {
+  padding: 0 0.75rem 0.2rem 0.75rem;
+  align-items: flex-start;
+}
+
+.exitTabContainer.caStyle {
+  width: auto;
+  margin: 0;
+  padding: 0 0.5rem;
+  order: -1;
+}
+
+.exitTabContainer.caStyle .exitTab {
+  border-radius: 0.25rem;
+  min-height: auto;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.9rem;
+  border: 0.15rem solid;
+}
+
+.signContentContainer:has(.exitTabContainer.caStyle) {
+  align-items: flex-start;
+}
+
+.exitTabContainer.hovExitTabContainer,
+.panel .exitTabContainer.hovExitTabContainer {
+  background: transparent;
+  border-color: transparent;
+}
+
+.exitTabHolder.hovExitTabHolder {
+  background: transparent;
+  border-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.exitTab.hovExitTab {
+  display: flex;
+  padding: 0;
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--black);
+  gap: 0;
+}
+
+.exitTab.hovExitTab .hovIconColumn {
+  flex: 0 0 auto;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  min-width: 3.25rem;
+  position: relative;
+  box-shadow: inset 0 0 0 0.18rem var(--white);
+  border-right: 0.25rem solid var(--white);
+}
+
+.exitTab.hovExitTab .hovIconColumn .hovIcon {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.exitTab.hovExitTab .hovContentColumn {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.35rem 1.25rem 0.3rem;
+  background: var(--white);
+}
+
+.exitTab.hovExitTab .hovTextRow {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.exitTab.hovExitTab .hovTextRow .exitTabText {
+  position: static;
+  top: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.exitTab.hovExitTab .hovBottomBar {
+  width: 100%;
+  height: 0.7rem;
+  margin-top: 0.3rem;
+  background: var(--green);
+  border-top: 0.2rem solid var(--white);
+}
+
+.exitTabContainer.tollLogoExitTabContainer.logoOnly {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-style: none;
+}
+
+.exitTabHolder.tollLogoExitHolder.logoOnly {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-style: none;
+  flex-grow: 0;
+  width: auto;
+  padding: 0;
   display: inline-flex;
   align-items: center;
-  font-family: "Clearview 5WR";
-}
-.action_message {
   justify-content: center;
+}
+
+.exitTab.tollLogoExitTab {
+  --tollLogoSize: 3rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.6rem;
+  gap: 0.35rem;
+}
+
+.exitTab.tollLogoExitTab.logoOnly {
+  padding: 0;
+  border: none;
+  border-width: 0 !important;
+  border-style: none !important;
+  min-height: unset;
+  background: transparent !important;
+  gap: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border-radius: 0;
+  width: auto;
+}
+
+.exitTab.tollLogoExitTab.logoOnly .tollLogoLogoWrapper {
+  width: auto;
+}
+
+.exitTab.tollLogoExitTab.logoOnly .tollLogoImageHolder {
+  margin: 0;
+  width: auto;
+  max-width: none;
+  max-height: var(--tollLogoSize, 3rem);
+}
+
+.exitTab.tollLogoExitTab .tollLogoLogoWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.exitTab.tollLogoExitTab .tollLogoImageHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: calc(var(--tollLogoSize, 3rem) * 2.25);
+  max-height: var(--tollLogoSize, 3rem);
+  min-height: var(--tollLogoSize, 3rem);
+}
+
+.exitTab.tollLogoExitTab .tollLogoImageHolder.squareIcon {
+  aspect-ratio: 1 / 1;
+  width: var(--tollLogoSize, 3rem);
+  height: var(--tollLogoSize, 3rem);
+}
+
+.exitTab.tollLogoExitTab .tollLogoImageHolder.squareIcon .tollLogoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.exitTab.tollLogoExitTab .tollLogoImage {
+  max-width: 100%;
+  width: auto;
+  height: var(--tollLogoSize, 3rem);
+  object-fit: contain;
+}
+
+.exitTab.tollLogoExitTab .tollLogoNumberWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.exitTab.tollLogoExitTab .tollLogoNumberWrapper .exitTabTextSpacer {
+  min-width: 0.3rem;
+}
+
+.exitTab.fullLeft {
+  padding: 0;
+  flex-direction: column;
+  align-items: stretch;
+  border-color: var(--white);
+  border-top-width: 0;
+  border-top-style: none;
+  overflow: visible;
+}
+
+.exitTab.fullLeft .fullLeftBanner {
+  background: var(--yellow);
+  color: var(--black);
+  font-family: "Series E", var(--fontFamily, "Clearview 4W");
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  padding: 0.2rem 0.5rem;
+  border: 0.2rem solid var(--black);
+  border-bottom-width: 0.2rem;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin: -0.2rem -0.2rem 0;
+}
+
+.exitTab.fullLeft .fullLeftNumber {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem 0.4rem;
+  border: 0.2rem solid var(--white);
+  border-top-width: 0;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin: 0 -0.2rem -0.2rem;
+  background: inherit;
+}
+
+.exitTab.fullLeft .fullLeftNumber .exitTabTextSpacer {
+  min-width: 0.35rem;
+}
+
+.action_message {
+  --fhwaBaselineOffset: 0px;
+  display: inline-flex;
+  align-items: center;
+  font-family: "Series E";
+  justify-content: center;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitFormat {
   display: inline;
-  position: relative;
-  top: -0.1rem;
+  --exitTabTextBaseOffset: -0.1rem;
 }
 
 .exitOnlyArrow {
@@ -710,7 +1231,21 @@
   padding: 2px;
 }
 
+.arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
+.arrowContainer.hideExitOnlyArrows .halfarrow {
+  display: none;
+}
+
+.arrowContainer.hideExitOnlyArrows {
+  min-height: calc(2rem + 4px);
+}
+
+.arrowContainer.hideExitOnlyArrows .exitOnlySpace {
+  display: none;
+}
+
 .exitOnlyText {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   font-family: "Series E";
   padding: 0px 10px 0 10px;
   padding-top: 0.18rem;
@@ -718,9 +1253,12 @@
   word-spacing: 0.3rem;
   letter-spacing: 0.03rem;
   margin: -1rem 0rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitOnlyText.split {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   background-color: var(--yellow);
   color: var(--black);
   border-radius: 0.1rem;
@@ -731,6 +1269,8 @@
   margin-top: 0.5rem;
   font-family: "Series EM";
   height: 1.15rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitOnlySpace {
@@ -742,8 +1282,10 @@
 }
 
 .arrow {
-  font-size: 4rem; /* Makes arrows large and visble */
-  line-height: 0; /* Makes space text (arrow) takes up minimal */
+  font-size: 4rem;
+  /* Makes arrows large and visble */
+  line-height: 0;
+  /* Makes space text (arrow) takes up minimal */
   display: inline-block;
   margin: 0.5rem 5rem;
   padding: 0 0.1rem 0 0.05rem;
@@ -760,6 +1302,7 @@
 .arrow:first-child {
   margin-left: 1rem;
 }
+
 .arrow:last-child {
   margin-right: 1rem;
 }
@@ -781,7 +1324,7 @@
   margin-top: -0.25rem;
 }
 
-.actionMessage + .arrow {
+.actionMessage+.arrow {
   margin-left: 0.5rem;
 }
 
@@ -793,7 +1336,10 @@
 }
 
 .actionMessage {
+  --fhwaBaselineOffset: 0px;
   font-size: 1.2rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .numeral {
@@ -801,6 +1347,7 @@
   word-spacing: -0.4rem;
   line-height: 0;
 }
+
 .fraction {
   font-size: 1.5rem;
 }
@@ -809,6 +1356,7 @@
 .fraction:first-child {
   padding-right: 0.5rem;
 }
+
 .numeral:last-child,
 .fraction:last-child {
   padding-left: 0.5rem;
@@ -847,18 +1395,96 @@
   margin: 0.4rem 0rem;
 }
 
-.exitOnlyText.yellowElmt,
+.exitOnlyText.yellowElmt {
+  margin-top: 0;
+}
+
 .TOLL {
   margin-top: 0;
 }
 
 .subPanelDisplay {
   height: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Center subpanel content vertically, except for APL subpanels */
+.subPanelDisplay:not(:has(.subpanelAplArrows)) .signContentContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* When APL arrows are present, make subpanels stretch equally */
+.subPanelDisplay:has(.subpanelAplArrows) {
+  flex: 1;
+}
+
+/* Make content area grow to push APL arrows to consistent bottom position */
+.subPanelDisplay:has(.subpanelAplArrows) .signContentContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .subDivider {
-  width: 8px;
+  width: 0.2rem;
   background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  /* Align arrow to bottom */
+}
+
+/* When APL arrows are present, shorten the divider to stop above arrows */
+.signHolder:has(.subpanelAplArrows) .subDivider {
+  margin-bottom: 6.2rem;
+  /* 6rem min-height + 0.2rem border */
+}
+
+/* If the divider has an arrow, remove the margin so it extends down */
+.signHolder:has(.subpanelAplArrows) .subDivider.hasArrow {
+  margin-bottom: 0;
+  background-color: transparent;
+  /* Transparent background so we can simulate the line */
+  position: relative;
+}
+
+/* Simulate the white line stopping above the arrow */
+.subDivider.hasArrow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 6.2rem;
+  /* Stop where the line would normally stop */
+  width: 0.2rem;
+  background-color: var(--white);
+}
+
+.aplDividerArrow {
+  height: 4.75rem;
+  /* Default size (UP) */
+  width: auto;
+  margin-bottom: 0.7rem;
+  /* Align with other arrows */
+  z-index: 10;
+}
+
+.aplDividerArrow[data-type="APL_TURN"] {
+  height: 3.5rem;
+}
+
+.aplDividerArrow[data-type="APL_TURN_CFX"] {
+  height: 3.25rem;
+}
+
+.aplDividerArrow[data-type="APL_DUAL_TURN"] {
+  height: 4.5rem;
 }
 
 .arrowContainer.new {
@@ -906,4 +1532,311 @@ img.exitOnlyArrow:last-child {
 
 .signContainer:has(.guideArrows.exit_only) {
   /* background: linear-gradient(180deg, var(--green), var(--yellow)); */
+}
+
+/* APL Arrows */
+.aplContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.aplArrowWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.aplExitBox {
+  background-color: var(--yellow);
+  color: black;
+  font-family: "Series E";
+  padding: 0.2rem;
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.aplDivider {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 0.4rem;
+  background-color: white;
+  z-index: 10;
+  transform: translateX(50%);
+}
+
+
+.aplArrows {
+  border-style: solid;
+  border-width: 0.2rem;
+  border-top-width: 0;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem) var(--signBorderRadius, 0.75rem);
+  display: none;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0.5rem 1rem;
+}
+
+.aplArrow {
+  height: 4.75rem;
+  width: auto;
+  margin-left: 3.6rem;
+  margin-right: 3.6rem;
+}
+
+.aplArrow:first-child {
+  margin-left: 1rem;
+}
+
+.aplArrow:last-child {
+  margin-right: 1rem;
+}
+
+.aplArrow[data-type="APL_TURN"] {
+  height: 3.5rem;
+}
+
+.aplArrow[data-type="APL_TURN_CFX"] {
+  height: 3.25rem;
+}
+
+.aplArrow[data-type="APL_DUAL_TURN"] {
+  height: 4.5rem;
+}
+
+.panel.green .aplArrows {
+  background-color: var(--green);
+  border-color: var(--white);
+}
+
+.panel.white .aplArrows {
+  background-color: var(--white);
+  border-color: var(--black);
+}
+
+.panel.yellow .aplArrows {
+  background-color: var(--yellow);
+  border-color: var(--black);
+}
+
+.panel.orange .aplArrows {
+  background-color: var(--orange);
+  border-color: var(--black);
+}
+
+/* not adding colors other than green, white, yellow, orange bc no apl uses those colors */
+.panel.yellow .aplArrow,
+.panel.white .aplArrow,
+.panel.orange .aplArrow {
+  filter: invert(1);
+}
+
+/* APL arrows inside subpanels - extends past parent to cover side borders */
+.subpanelAplArrows {
+  padding: 0.5rem 1rem;
+  margin-left: -0.2rem;
+  margin-right: -0.2rem;
+  border: 0.2rem solid var(--white);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  position: relative;
+  /*z-index: 5;*/
+  align-items: flex-end;
+  min-height: 6rem;
+  /* Matches largest arrow height (4.75rem) + padding */
+}
+
+/* Only first subpanel gets left border and bottom-left radius */
+.subPanelDisplay:first-of-type .subpanelAplArrows {
+  border-left: 0.2rem solid var(--white);
+  border-bottom-left-radius: var(--signBorderRadius, 0.75rem);
+  justify-content: flex-start;
+  /* Left align arrows */
+  padding-left: 0;
+  /* Remove left padding as requested */
+}
+
+/* Only last subpanel gets right border and bottom-right radius */
+.subPanelDisplay:last-of-type .subpanelAplArrows {
+  border-right: 0.2rem solid var(--white);
+  border-bottom-right-radius: var(--signBorderRadius, 0.75rem);
+  justify-content: flex-end;
+  /* Right align arrows */
+  padding-right: 0;
+  /* Remove right padding for symmetry */
+}
+
+/* When a divider follows the last subpanel, remove the right border/radius from that subpanel */
+.subPanelDisplay:has(+ .subDivider:last-child) .subpanelAplArrows {
+  border-right: none;
+  border-bottom-right-radius: 0;
+}
+
+/* Add a pseudo-element to extend the bottom border after the last divider */
+.signHolder:has(.subpanelAplArrows) .subDivider:last-child {
+  border-bottom: 0.2rem solid var(--white);
+  border-right: 0.2rem solid var(--white);
+  border-bottom-right-radius: var(--signBorderRadius, 0.75rem);
+}
+
+.panel.white .subpanelAplArrows,
+.panel.yellow .subpanelAplArrows,
+.panel.orange .subpanelAplArrows {
+  border-color: var(--black);
+}
+
+.panel.white .subPanelDisplay:first-of-type .subpanelAplArrows,
+.panel.yellow .subPanelDisplay:first-of-type .subpanelAplArrows,
+.panel.orange .subPanelDisplay:first-of-type .subpanelAplArrows {
+  border-left-color: var(--black);
+}
+
+.panel.white .subPanelDisplay:last-of-type .subpanelAplArrows,
+.panel.yellow .subPanelDisplay:last-of-type .subpanelAplArrows,
+.panel.orange .subPanelDisplay:last-of-type .subpanelAplArrows {
+  border-right-color: var(--black);
+}
+
+/* APL Exit Only Styling */
+.aplExitOnlyContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  gap: 0.25rem;
+}
+
+.aplExitOnlyLabel {
+  background-color: var(--yellow);
+  color: var(--black);
+  font-family: "Series E", sans-serif;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.1rem 1rem;
+  border-radius: 0.1rem
+}
+
+/* APL Exit Only - TURN arrow */
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"] .aplExitOnlyExit {
+  margin-right: 0.15rem
+}
+
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"] .aplExitOnlyOnly {
+  /* Shift ONLY to the left (closer to arrow) */
+  margin-left: -2rem;
+}
+
+/* APL Exit Only - TURN arrow flipped */
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"][data-flipped="true"] .aplExitOnlyExit {
+  /* Shift EXIT to the right (closer to arrow) */
+  margin-right: -2rem;
+}
+
+.aplExitOnlyContainer[data-arrow-type="APL_TURN"][data-flipped="true"] .aplExitOnlyOnly {
+  /* Reset ONLY shift for flipped TURN */
+  margin-left: 0.15rem;
+}
+
+@keyframes flashSelection {
+  0% {
+    outline: 0.5rem solid yellow;
+  }
+
+  15% {
+    outline: 1.125rem solid yellow;
+  }
+
+  25% {
+    outline: 0.5rem solid yellow;
+  }
+
+  100% {
+    outline: 0.5rem solid rgba(255, 255, 0, 0);
+  }
+}
+
+.flash-selection {
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+  background: transparent;
+  animation: flashSelection 0.5s ease-in forwards;
+}
+
+/* Exit Only / Half Exit Only corner fill */
+.signContainer:has(> .guideArrows.exit_only),
+.signContainer:has(> .guideArrows.half_exit.only) {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.signContainer:has(> .guideArrows.exit_only) > *,
+.signContainer:has(> .guideArrows.half_exit.only) > * {
+  position: relative;
+  z-index: 2;
+}
+
+.signContainer:has(> .guideArrows.exit_only)::before,
+.signContainer:has(> .guideArrows.exit_only)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: var(--signBorderRadius, 0.75rem);
+  height: var(--signBorderRadius, 0.75rem);
+  background-color: var(--yellow) !important;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.signContainer:has(> .guideArrows.exit_only)::before {
+  left: 0;
+}
+
+.signContainer:has(> .guideArrows.exit_only)::after {
+  right: 0;
+}
+
+.guideArrows.exit_only,
+.guideArrows.exit_only.new,
+.guideArrows.exit_only.new2 {
+  background-color: var(--yellow) !important;
+  border-color: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.left.new2)::before,
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.new:first-child)::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--signBorderRadius, 0.75rem);
+  height: var(--signBorderRadius, 0.75rem);
+  background-color: var(--yellow) !important;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.right.new2)::after,
+.signContainer:has(> .guideArrows.half_exit.only .arrowContainer.new:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: var(--signBorderRadius, 0.75rem);
+  height: var(--signBorderRadius, 0.75rem);
+  background-color: var(--yellow) !important;
+  z-index: 1;
+  pointer-events: none;
 }

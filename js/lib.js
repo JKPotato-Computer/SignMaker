@@ -33,11 +33,12 @@ const lib = (function() {
 		Green : "rgb(0, 95, 77)",
 		Blue : "rgb(0, 67, 123)",
 		Brown : "rgb(98, 51, 30)",
-		Yellow : "rgb(255, 178, 0)",
+		Yellow : "rgb(252, 207, 52)",
 		White : "rgb(255, 255, 255)",
 		Black : "rgb(0, 0, 0)",
         Purple : "#4B0082",
 		Orange : "rgb(255, 89, 4)",
+		Red : "rgb(255, 0, 0)",
 		"Fluorescent Pink" : "rgb(255, 51, 204)",
 		"Fluorescent Yellow-Green" : "rgb(153, 255, 0)"
 	};

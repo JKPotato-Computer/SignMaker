@@ -75,6 +75,12 @@ class Shield {
     imageType = "",
     imageData = "",
   } = {}) {
+    const defaultBannerFont = ShieldElement.prototype.defaultBannerFontFamily;
+    this.indentFirstLetter = true;
+    this.indentFirstLetter2 = true;
+    this.smallCaps = true;
+    this.smallCaps2 = true;
+    this.bannerFontFamily = defaultBannerFont;
     this.shieldType = shieldType;
     this.shieldName = shieldName;
     this.shieldValue = shieldValue;
@@ -95,7 +101,7 @@ class Banner {
     backgroundColor = "None",
     padding = .01,
     borderRadius = 4,
-    fontFamily = "Clearview 5WR",
+    fontFamily = "Series E",
     margins = {
       left: 0,
       right: 0,
@@ -127,15 +133,18 @@ class BannerGroup {
 }
 
 class ShieldBlock {
-  constructor({} = {}) {}
+  constructor({ } = {}) { }
 }
 
 class ShieldContainer {
-  constructor({} = {}) {}
+  constructor({ } = {}) { }
 }
 
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
   variant = variant.replace(/\s/g, "");
+  if (name === "NV" && variant === "3Digit") {
+    variant = "2Digit";
+  }
 
   let directory = "img/shields/";
   const search = (dir, str) => {
@@ -222,7 +231,7 @@ Shield.prototype.shieldDirectory = {
     CT: {
       type: "shield",
       name: "Connecticut",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Merritt"],
     },
     DE: { type: "shield", name: "Delaware", variants: ["2 Digit", "3 Digit"] },
     DC: {
@@ -235,13 +244,13 @@ Shield.prototype.shieldDirectory = {
       FL: {
         type: "shield",
         name: "Florida",
-        variants: ["2 Digit", "3 Digit", "No Outline"],
+        variants: ["2 Digit Overhead", "3 Digit Overhead"],
       },
-      FLTURNPIKE: { type: "shield", name: "Florida's Turnpike", variants: [] },
+      FLTURNPIKE: { type: "shield", name: "Florida's Turnpike", variants: ["Standard", "Toll"] },
       FLToll: {
         type: "shield",
         name: "Florida Toll",
-        variants: ["Current", "Old"],
+        variants: ["Current", "Old", "Selmon"],
       },
       FLCFXToll: {
         type: "shield",
@@ -284,14 +293,15 @@ Shield.prototype.shieldDirectory = {
     IN: { type: "shield", name: "Indiana", variants: ["2 Digit", "3 Digit"] },
     IA: { type: "shield", name: "Iowa", variants: ["2 Digit", "3 Digit"] },
     KS: { type: "shield", name: "Kansas", variants: ["2 Digit", "3 Digit"] },
-    KY: { type: "shield", name: "Kentucky", variants: ["2 Digit", "3 Digit"] },
+    KY: { type: "shield", name: "Kentucky", variants: ["2 Digit", "3 Digit", "AA"] },
+    KYPKWY: {type: "shield", name: "Kentucky Parkway", variants: ["Audubon", "Bluegrass", "Cumberland", "Hal Rogers", "Mountain", "Western KY"] },
     LA: { type: "shield", name: "Louisiana", variants: ["2 Digit", "3 Digit"] },
-    ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit"] },
+    ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit", "Turnpike"] },
     MD: { type: "shield", name: "Maryland", variants: ["2 Digit", "3 Digit"] },
     MA: {
       type: "shield",
       name: "Massachusetts",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Turnpike"],
     },
     MI: { type: "shield", name: "Michigan", variants: ["2 Digit", "3 Digit"] },
     Minnesota: {
@@ -333,23 +343,32 @@ Shield.prototype.shieldDirectory = {
         variants: ["2 Digit"],
       },
     },
-    NV: { type: "shield", name: "Nevada", variants: ["2 Digit", "3 Digit"] },
+    Nevada: {
+      type: "category",
+      NV: {
+        type: "shield",
+        name: "Nevada",
+        variants: ["2 Digit", "CC215"],
+        fixedRouteVariants: ["CC215"],
+      },
+    },
     NH: {
       type: "shield",
       name: "New Hampshire",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Blue", "Spaulding", "Everett"],
     },
     NJ: {
       type: "shield",
       name: "New Jersey",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "NJTP", "GSP"],
     },
     NM: {
       type: "shield",
       name: "New Mexico",
       variants: ["2 Digit", "3 Digit"],
     },
-    NY: { type: "shield", name: "New York", variants: ["2 Digit", "3 Digit"] },
+    NY: { type: "shield", name: "New York", variants: ["2 Digit", "3 Digit", "Thruway"] },
+    NYPKWY: { type: "shield", name: "New York Parkway", variants: ["Bear Mountain", "Belt", "Bethpage", "Bronx River 1", "Bronx River 2", "Cross County", "Cross Island", "FDR Drive", "Grand Central", "Harlem River Drive", "Heckscher", "Henry Hudson", "Hutchinson River 1", "Hutchinson River 2", "Jackie Robinson", "Korean War Vets", "Lake Ontario", "Loop", "Meadowbrook", "Mosholu", "Niagra Scenic", "Northern", "Ocean", "Palisades Interstate", "Pelham", "Robert Moses Causeway", "Sagitkos", "Saw Mill", "Southern", "Sprain Brook", "Sunken Meadow", "Taconic State", "Wantagh"] },
     NC: {
       type: "shield",
       name: "North Carolina",
@@ -360,13 +379,13 @@ Shield.prototype.shieldDirectory = {
       name: "North Dakota",
       variants: ["2 Digit", "3 Digit"],
     },
-    OH: { type: "shield", name: "Ohio", variants: ["2 Digit", "3 Digit"] },
+    OH: { type: "shield", name: "Ohio", variants: ["2 Digit", "3 Digit", "Turnpike"] },
     OK: { type: "shield", name: "Oklahoma", variants: ["2 Digit", "3 Digit"] },
     OR: { type: "shield", name: "Oregon", variants: ["2 Digit", "3 Digit"] },
     PA: {
       type: "shield",
       name: "Pennsylvania",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["2 Digit", "3 Digit", "Turnpike"],
     },
     RI: {
       type: "shield",
@@ -395,12 +414,12 @@ Shield.prototype.shieldDirectory = {
       TXLOOP: {
         type: "shield",
         name: "Texas Loop",
-        variants: ["2 Digit", "3 Digit"],
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
       },
       TXSPUR: {
         type: "shield",
         name: "Texas Spur",
-        variants: ["2 Digit", "3 Digit"],
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
       },
       TXTOLL: {
         type: "shield",
@@ -412,7 +431,7 @@ Shield.prototype.shieldDirectory = {
         name: "Texas Express",
         variants: ["2 Digit", "3 Digit"],
       },
-      TXFM: { type: "shield", name: "Texas FM", variants: ["4 Digit"] },
+      TXFM: { type: "shield", name: "Texas FM", variants: ["2 Digit", "3 Digit", "4 Digit", "5 Digit"] },
       TXPARK: { type: "shield", name: "Texas Park", variants: ["2 Digit"] },
       TXRM: { type: "shield", name: "Texas RM", variants: ["2 Digit"] },
       TXBELTWAY: {
@@ -455,13 +474,23 @@ Shield.prototype.shieldDirectory = {
       name: "Prince Edward Island",
       variants: ["2 Digit", "3 Digit"],
     },
+    AB: {
+      type: "shield",
+      name: "Alberta",
+      variants: ["2 Digit"],
+    },
+      AB2: {
+      type: "shield",
+      name: "Alberta (alt)",
+      variants: ["3 Digit"],
+    },
     NS: {
       type: "shield",
       name: "Nova Scotia",
       variants: ["2 Digit", "3 Digit"],
     },
     QC: { type: "shield", name: "Quebec", variants: ["2 Digit", "3 Digit"] },
-    "QC 2nd": {
+    QC2: {
       type: "shield",
       name: "Quebec (alt)",
       variants: ["2 Digit", "3 Digit"],
@@ -490,23 +519,36 @@ Shield.prototype.shieldDirectory = {
       },
     },
   },
+  DuskSMP: {
+    type: "category",
+    DUSKSMP: {
+      type: "shield",
+      name: "DuskSMP",
+      variants: [],
+    },
+    DUSKSMP_TOLL: {
+      type: "shield",
+      name: "DuskSMP Toll",
+      variants: [],
+    },
+  },
 };
 
 Shield.prototype.bannerTypes = [
   "None",
-  "Arterial",
   "North",
   "East",
   "South",
   "West",
+  "Arterial",
   "Jct",
   "Begin",
   "End",
   "Spur",
   "Alt",
   "Truck",
-  "Trunk",
   "Business",
+  "Bus",
   "Byp",
   "Loop",
   "Express",
@@ -518,5 +560,10 @@ Shield.prototype.bannerTypes = [
   "City",
   "Conn",
   "To",
+  "Turnpike",
+  "Nord",
+  "Est",
+  "Sud",
+  "Ouest",
 ];
 Shield.prototype.bannerPositions = ["Above", "Right", "Left"];

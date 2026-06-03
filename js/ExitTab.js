@@ -5,7 +5,7 @@ class ExitTab {
 	 * @param {string} [position=null] - Position to display the exit tab relative to the sign.
 	 * @param {string} [width=null] - Width of the exit tab (narrow or wide).
 	 */
-	constructor ({
+	constructor({
 		number = null,
 		position = null,
 		width = null,
@@ -13,17 +13,24 @@ class ExitTab {
 		variant = "Default",
 		icon = null,
 		useTextBasedIcon = false,
-		fullBorder = false,
-		squareCorners = false,
-		topOffset = true,
+		fullBorder = ExitTab.prototype.defaultFullBorder,
+		squareCorners = ExitTab.prototype.defaultSquareCorners,
+		attached = ExitTab.prototype.defaultAttached,
+		topOffset = ExitTab.prototype.defaultTopOffset,
 		showLeft = false,
 		borderThickness = 0.2,
 		minHeight = 2.25,
 		nestedExitTabs = [],
-		FHWAFont = false,
-		fontSize = 18
-		} = {}
-	)  {
+		nestedTabSpacing = 0,
+		FHWAFont = ExitTab.prototype.defaultFHWAFont,
+		fontSize = 18,
+		tollLogoOnly = true,
+		tollLogoSquare = false,
+		tollLogoSize = null,
+		verticalArrangement = ExitTab.prototype.defaultVerticalArrangement,
+		caStyle = ExitTab.prototype.defaultCAStyle
+	} = {}
+	) {
 		this.number = number;
 		if (this.positions.includes(position)) {
 			this.position = position;
@@ -35,64 +42,152 @@ class ExitTab {
 		} else {
 			this.width = this.widths[0];
 		}
-        if (this.colors.includes(color)) {
-            this.color = color;
-        } else {
-            this.color = this.colors[0];
-        }
-		
+		if (this.colors.includes(color)) {
+			this.color = color;
+		} else {
+			this.color = this.colors[0];
+		}
+
 		if (this.variants.includes(variant)) {
 			this.variant = variant;
 		} else {
 			this.variant = this.variants[0];
 		}
-		
+
 		this.fullBorder = fullBorder;
 		this.squareCorners = squareCorners;
-		this.borderThickness = borderThickness;
+		this.attached = !!attached;
+		const parsedBorderThickness =
+			typeof borderThickness === "number"
+				? borderThickness
+				: parseFloat(borderThickness);
+		const fallbackBorderThickness =
+			typeof ExitTab.prototype.defaultBorderThickness === "number"
+				? ExitTab.prototype.defaultBorderThickness
+				: 0.2;
+		this.borderThickness = Number.isFinite(parsedBorderThickness)
+			? Math.max(0, parsedBorderThickness)
+			: fallbackBorderThickness;
 		this.topOffset = topOffset;
 		this.minHeight = minHeight;
 		this.nestedExitTabs = nestedExitTabs;
+		const parsedNestedTabSpacing =
+			typeof nestedTabSpacing === "number"
+				? nestedTabSpacing
+				: parseFloat(nestedTabSpacing);
+		this.nestedTabSpacing = Number.isFinite(parsedNestedTabSpacing)
+			? Math.max(0, parsedNestedTabSpacing)
+			: 0;
 		this.FHWAFont = FHWAFont;
 		this.icon = icon;
 		this.showLeft = showLeft;
 		this.fontSize = fontSize;
+		this.verticalArrangement = verticalArrangement;
+		this.caStyle = caStyle;
+		const defaultTollLogoSize =
+			typeof ExitTab.prototype.defaultTollLogoSize === "number"
+				? ExitTab.prototype.defaultTollLogoSize
+				: 3;
+		this.tollLogoOnly = !!tollLogoOnly;
+		this.tollLogoSquare = !!tollLogoSquare;
+		const parsedTollLogoSize =
+			typeof tollLogoSize === "number" ? tollLogoSize : parseFloat(tollLogoSize);
+		this.tollLogoSize = Number.isFinite(parsedTollLogoSize) && parsedTollLogoSize > 0
+			? parsedTollLogoSize
+			: defaultTollLogoSize;
+		if (
+			Array.isArray(this.nestedExitTabs) &&
+			ExitTab.prototype.maxNested != null &&
+			this.nestedExitTabs.length > ExitTab.prototype.maxNested
+		) {
+			this.nestedExitTabs = this.nestedExitTabs.slice(
+				0,
+				ExitTab.prototype.maxNested
+			);
+		}
 	}
-	
+
 	nestExitTab() {
+		if (this.nestedExitTabs.length >= ExitTab.prototype.maxNested) {
+			return null;
+		}
 		const exitTab = new ExitTab();
 		this.nestedExitTabs.push(exitTab);
+		return exitTab;
 	}
-	
+
 	deleteNestExitTab(index) {
 		this.nestedExitTabs.splice(index, 1);
 	}
-	
+
 	duplicateNestExitTab(index) {
+		if (this.nestedExitTabs.length >= ExitTab.prototype.maxNested) {
+			return null;
+		}
 		const exisitingTab = this.nestedExitTabs[index];
+		if (!exisitingTab) {
+			return null;
+		}
 		const exitTab = new ExitTab({
-			number : exisitingTab.number,
-			position : exisitingTab.position,
-			width : exisitingTab.width,
-			color : exisitingTab.color,
-			variant : exisitingTab.variant,
-			icon : exisitingTab.icon,
-			squareCorners : exisitingTab.squareCorners,
-			fullBorder : exisitingTab.fullBorder,
-			borderThickness : exisitingTab.borderThickness,
-			minHeight : exisitingTab.minHeight
+			number: exisitingTab.number,
+			position: exisitingTab.position,
+			width: exisitingTab.width,
+			color: exisitingTab.color,
+			variant: exisitingTab.variant,
+			icon: exisitingTab.icon,
+			squareCorners: exisitingTab.squareCorners,
+			fullBorder: exisitingTab.fullBorder,
+			attached: exisitingTab.attached,
+			borderThickness: exisitingTab.borderThickness,
+			minHeight: exisitingTab.minHeight,
+			tollLogoOnly: exisitingTab.tollLogoOnly,
+			tollLogoSquare: exisitingTab.tollLogoSquare,
+			tollLogoSize: exisitingTab.tollLogoSize,
+			verticalArrangement: exisitingTab.verticalArrangement,
+			caStyle: exisitingTab.caStyle
 		});
-		
+
 		this.nestedExitTabs.push(exitTab);
+		return exitTab;
 	}
 }
 
 ExitTab.prototype.positions = ["Left", "Center", "Right"];
-ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge","Out"];
-ExitTab.prototype.colors = ["Panel Color","Green","Blue","Brown","Yellow","White","Black","Purple"]
-ExitTab.prototype.variants = ["Default","Toll","Icon","Full Left","HOV 1","HOV 2"];
+ExitTab.prototype.variants = ["Default", "Toll Logo", "Icon", "Full Left", "Stacked", "HOV 1", "HOV 2"];
+ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge", "Out", "Side"];
+ExitTab.prototype.defaultBorderThickness = 0.2;
+ExitTab.prototype.defaultTollLogoSize = 3;
+ExitTab.prototype.defaultFullBorder = false;
+ExitTab.prototype.defaultSquareCorners = false;
+ExitTab.prototype.defaultAttached = false;
+ExitTab.prototype.defaultTopOffset = true;
+ExitTab.prototype.defaultFHWAFont = false;
+ExitTab.prototype.defaultVerticalArrangement = false;
+ExitTab.prototype.defaultCAStyle = false;
+ExitTab.prototype.colors = (() => {
+	const colors = ["Panel Color"];
+	if (typeof lib !== "undefined" && lib?.colors) {
+		colors.push(...Object.keys(lib.colors));
+	} else {
+		colors.push(
+			"Green",
+			"Blue",
+			"Brown",
+			"Yellow",
+			"White",
+			"Black",
+			"Purple",
+			"Orange",
+			"Red",
+			"Fluorescent Pink",
+			"Fluorescent Yellow-Green"
+		);
+	}
+	return colors;
+})();
 ExitTab.prototype.icons = [
 	"Hazardous Materials:HM.png:var(--white):var(--white)",
 	"No Hazardous Materials:NO-HM.png:var(--white):var(--white)",
 	"Hospital:H.png:var(--blue):var(--white)"
 ]
+ExitTab.prototype.maxNested = 999;
