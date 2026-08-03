@@ -566,4 +566,13 @@ Shield.prototype.bannerTypes = [
   "Sud",
   "Ouest",
 ];
+
+Shield.prototype.getBannerDisplayText = function (value) {
+  if (!value || value === "None") {
+    return " ";
+  }
+
+  return String(value).replace(/\\n/g, "\n");
+};
+
 Shield.prototype.bannerPositions = ["Above", "Right", "Left"];

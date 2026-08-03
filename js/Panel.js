@@ -6,7 +6,7 @@ class Panel {
    * @param {String} corner - Choice of Sharp or Rounded Corners on the Panel
    * @param {ExitTab} [exitTab=null] - Optional exit tab to include in the panel.
    */
-  constructor(sign, color, exitTabs = [], corner, borderRadius) {
+  constructor(sign, color, exitTabs = [], corner, borderRadius, dms = false) {
     if (Object.keys(lib.colors).includes(color)) {
       this.color = color;
     } else {
@@ -20,6 +20,7 @@ class Panel {
 
     this.sign = sign;
     this.exitTabs = exitTabs;
+    this.dms = !!dms;
 
     if (typeof borderRadius === "number" && borderRadius >= 0) {
       this.borderRadius = borderRadius;

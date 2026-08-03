@@ -221,6 +221,10 @@
               </label>
               <select id="postColor" onchange="formHandler.readForm();"></select>
               <br />
+              <label for="signAlignment" data-toolTip="Aligns all signs vertically on the post.">Sign Alignment:
+              </label>
+              <select id="signAlignment" onchange="formHandler.readForm();"></select>
+              <br />
               <div class="postThicknessControl">
                 <label for="postThicknessValue">Post Thickness (rem):</label>
                 <input type="number" id="postThicknessValue" min="0" step="0.25" value="1" />
@@ -266,6 +270,10 @@
               <label for="panelBorderRadius">Sign Border Radius (rem): </label>
               <input type="number" id="panelBorderRadius" name="panelBorderRadius" value=".75" min="0" max="5"
                 step=".05" onblur="formHandler.readForm();" />
+              <br />
+              <label for="dynamicMessageSign">Dynamic Message Sign: </label>
+              <input type="checkbox" id="dynamicMessageSign" name="dynamicMessageSign"
+                onchange="formHandler.readForm();" />
               <br />
               <label for="disableFlash">Disable Selection Flash: </label>
               <input type="checkbox" id="disableFlash" name="disableFlash" onchange="formHandler.readForm();" />
@@ -1268,7 +1276,7 @@
           </div>
           <div id="sMTemplatesSaved" class="tabHidden">
             <div class="templateSaveSection">
-              <h4>Save Current Sign as Template</h4>
+              <h4>Save Current Panel as Template</h4>
               <div class="templateSaveInput">
                 <input type="text" id="templateNameInput" placeholder="Enter template name..." 
                   onkeypress="if(event.key === 'Enter') app.saveTemplate(this.value);" />
@@ -1374,6 +1382,7 @@
       <button id="exportDownload" class="sMConfigOption" data-toolTip="Download Sign">
         <span class="material-symbols-outlined"> download </span>
       </button>
+      <menu id="downloadPanelContextMenu" class="copyPanelContextMenu hidden"></menu>
       <button id="nightMode" class="sMConfigOption" data-toolTip="Dark Mode">
         <span class="material-symbols-outlined"> dark_mode </span>
       </button>

@@ -19,6 +19,7 @@ const formHandler = (function () {
   const STORAGE_KEYS = {
     postPosition: "signMaker.postPosition",
     postColor: "signMaker.postColor",
+    signAlignment: "signMaker.signAlignment",
     showPost: "signMaker.showPost",
     copySignsOnly: "signMaker.copySignsOnly",
     copyScale: "signMaker.copyScale",
@@ -26,6 +27,8 @@ const formHandler = (function () {
     controlTextFont: "signMaker.controlTextFont",
     actionMessageFont: "signMaker.actionMessageFont",
     bannerFontFamily: "signMaker.bannerFontFamily",
+    exitTabPosition: "signMaker.exitTabPosition",
+    exitTabWidth: "signMaker.exitTabWidth",
     exitTabFHWAFont: "signMaker.exitTabFHWAFont",
     exitTabFullBorder: "signMaker.exitTabFullBorder",
     exitTabSquareCorners: "signMaker.exitTabSquareCorners",
@@ -239,6 +242,14 @@ const formHandler = (function () {
       post.color = storedPostColor;
     }
 
+    const storedSignAlignment = getStoredItem(STORAGE_KEYS.signAlignment);
+    if (storedSignAlignment !== null && post) {
+      post.signAlignment =
+        typeof post.normalizeSignAlignment === "function"
+          ? post.normalizeSignAlignment(storedSignAlignment)
+          : storedSignAlignment;
+    }
+
     const storedPostThickness = getStoredItem(STORAGE_KEYS.postThickness);
     if (storedPostThickness !== null && post) {
       const normalizedThickness =
@@ -285,6 +296,22 @@ const formHandler = (function () {
     const storedExitFHWA = getStoredItem(STORAGE_KEYS.exitTabFHWAFont);
     if (storedExitFHWA !== null) {
       ExitTab.prototype.defaultFHWAFont = storedExitFHWA === "true";
+    }
+
+    const storedExitPosition = getStoredItem(STORAGE_KEYS.exitTabPosition);
+    if (
+      storedExitPosition &&
+      ExitTab.prototype.positions.includes(storedExitPosition)
+    ) {
+      ExitTab.prototype.defaultPosition = storedExitPosition;
+    }
+
+    const storedExitWidth = getStoredItem(STORAGE_KEYS.exitTabWidth);
+    if (
+      storedExitWidth &&
+      ExitTab.prototype.widths.includes(storedExitWidth)
+    ) {
+      ExitTab.prototype.defaultWidth = storedExitWidth;
     }
 
     const storedExitFullBorder = getStoredItem(STORAGE_KEYS.exitTabFullBorder);
@@ -360,6 +387,22 @@ const formHandler = (function () {
     const tollOptionsElmt = document.getElementById("exitTollLogoOptions");
     if (tollOptionsElmt) {
       tollOptionsElmt.classList.toggle("hidden", variantValue !== "Toll Logo");
+    }
+  };
+
+  const toggleExitTabAttachedOptionVisibility = (widthValue) => {
+    const isSideExitTab = widthValue === "Side";
+    const attachedInput = document.getElementById("exitTabAttached");
+    const attachedLabel = document.querySelector(
+      'label[for="exitTabAttached"]'
+    );
+
+    if (attachedInput) {
+      attachedInput.classList.toggle("hidden", isSideExitTab);
+      attachedInput.disabled = isSideExitTab;
+    }
+    if (attachedLabel) {
+      attachedLabel.classList.toggle("hidden", isSideExitTab);
     }
   };
 
@@ -1881,6 +1924,9 @@ const formHandler = (function () {
       if (typeof app !== "undefined" && typeof app.closeCopyPanelContextMenu === "function") {
         app.closeCopyPanelContextMenu();
       }
+      if (typeof app !== "undefined" && typeof app.closeDownloadPanelContextMenu === "function") {
+        app.closeDownloadPanelContextMenu();
+      }
       if (typeof app !== "undefined" && typeof app.copySignToClipboard === "function") {
         app.copySignToClipboard();
       }
@@ -1889,6 +1935,9 @@ const formHandler = (function () {
     document.getElementById("export").oncontextmenu = function (event) {
       event.preventDefault();
       event.stopPropagation();
+      if (typeof app !== "undefined" && typeof app.closeDownloadPanelContextMenu === "function") {
+        app.closeDownloadPanelContextMenu();
+      }
       if (typeof app !== "undefined" && typeof app.openCopyPanelContextMenu === "function") {
         app.openCopyPanelContextMenu(event);
       }
@@ -1896,8 +1945,25 @@ const formHandler = (function () {
 
     document.getElementById("exportDownload").onclick = function (event) {
       event.preventDefault();
+      if (typeof app !== "undefined" && typeof app.closeCopyPanelContextMenu === "function") {
+        app.closeCopyPanelContextMenu();
+      }
+      if (typeof app !== "undefined" && typeof app.closeDownloadPanelContextMenu === "function") {
+        app.closeDownloadPanelContextMenu();
+      }
       if (typeof app !== "undefined" && typeof app.downloadCopiedSign === "function") {
         app.downloadCopiedSign();
+      }
+    };
+
+    document.getElementById("exportDownload").oncontextmenu = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof app !== "undefined" && typeof app.closeCopyPanelContextMenu === "function") {
+        app.closeCopyPanelContextMenu();
+      }
+      if (typeof app !== "undefined" && typeof app.openDownloadPanelContextMenu === "function") {
+        app.openDownloadPanelContextMenu(event);
       }
     };
 
@@ -2058,6 +2124,15 @@ const formHandler = (function () {
       }
     }
 
+    const signAlignmentSelectElmt = document.getElementById("signAlignment");
+    if (signAlignmentSelectElmt) {
+      for (const alignmentOption of Post.prototype.signAlignments) {
+        lib.appendOption(signAlignmentSelectElmt, alignmentOption, {
+          selected: alignmentOption === post.signAlignment,
+        });
+      }
+    }
+
     // Populate color options
     const colorSelectElmt = document.getElementById("panelColor");
     for (const color in lib.colors) {
@@ -2078,7 +2153,7 @@ const formHandler = (function () {
       document.getElementById("exitTabPosition");
     for (const position of ExitTab.prototype.positions) {
       lib.appendOption(exitTabPositionSelectElmt, position, {
-        selected: position == "Right",
+        selected: position == ExitTab.prototype.defaultPosition,
       });
     }
 
@@ -2086,7 +2161,7 @@ const formHandler = (function () {
     const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
     for (const width of ExitTab.prototype.widths) {
       lib.appendOption(exitTabWidthSelectElmt, width, {
-        selected: width == "Narrow",
+        selected: width == ExitTab.prototype.defaultWidth,
       });
     }
 
@@ -2887,6 +2962,10 @@ const formHandler = (function () {
     }
     post.showPost = form["showPost"].checked;
     post.copySignsOnly = form["copySignsOnly"] ? form["copySignsOnly"].checked : true;
+    post.signAlignment =
+      form["signAlignment"] && typeof post.normalizeSignAlignment === "function"
+        ? post.normalizeSignAlignment(form["signAlignment"].value)
+        : "Center";
     const copyScaleInput = parseFloat(form["copyScaleValue"]?.value || form["copyScale"]?.value);
     post.copyScale = Number.isFinite(copyScaleInput)
       ? Math.min(8, Math.max(0, copyScaleInput))
@@ -2900,6 +2979,7 @@ const formHandler = (function () {
     setStoredItem(STORAGE_KEYS.copySignsOnly, String(post.copySignsOnly !== false));
     setStoredItem(STORAGE_KEYS.copyScale, String(post.copyScale));
     setStoredItem(STORAGE_KEYS.postColor, post.color);
+    setStoredItem(STORAGE_KEYS.signAlignment, post.signAlignment);
 
     // Panel
     currentPanel.color = form["panelColor"].value;
@@ -2908,6 +2988,7 @@ const formHandler = (function () {
     currentPanel.borderRadius = Number.isFinite(panelBorderRadiusInput)
       ? Math.max(0, panelBorderRadiusInput)
       : Panel.prototype.defaultBorderRadius;
+    currentPanel.dms = !!form["dynamicMessageSign"]?.checked;
 
     post.disableFlash = form["disableFlash"].checked;
     post.showBlockBoundingBoxes = !!form["showBlockBoundingBoxes"]?.checked;
@@ -2993,6 +3074,8 @@ const formHandler = (function () {
     exitTab.verticalArrangement = form["verticalArrangement"].checked;
     exitTab.caStyle = form["caStyle"].checked;
 
+    setStoredItem(STORAGE_KEYS.exitTabPosition, exitTab.position);
+    setStoredItem(STORAGE_KEYS.exitTabWidth, exitTab.width);
     setStoredItem(STORAGE_KEYS.exitTabFHWAFont, String(!!exitTab.FHWAFont));
     setStoredItem(STORAGE_KEYS.exitTabFullBorder, String(!!exitTab.fullBorder));
     setStoredItem(STORAGE_KEYS.exitTabSquareCorners, String(!!exitTab.squareCorners));
@@ -3731,6 +3814,18 @@ const formHandler = (function () {
     const postColorSelectElmt = document.getElementById("postColor");
     if (postColorSelectElmt && post.color) {
       postColorSelectElmt.value = post.color;
+    }
+
+    const signAlignmentSelectElmt = document.getElementById("signAlignment");
+    const resolvedSignAlignment =
+      post && typeof post.normalizeSignAlignment === "function"
+        ? post.normalizeSignAlignment(post.signAlignment)
+        : post?.signAlignment || "Center";
+    if (post) {
+      post.signAlignment = resolvedSignAlignment;
+    }
+    if (signAlignmentSelectElmt) {
+      signAlignmentSelectElmt.value = resolvedSignAlignment;
     }
 
     const showPostCheckbox = document.getElementById("showPost");
@@ -4554,6 +4649,11 @@ const formHandler = (function () {
       panelBorderRadiusElmt.value = resolvedRadius;
     }
 
+    const dynamicMessageSignElmt = document.getElementById("dynamicMessageSign");
+    if (dynamicMessageSignElmt) {
+      dynamicMessageSignElmt.checked = !!panel.dms;
+    }
+
     writePanelPaddingInputs(panel.sign.padding);
 
     // Global Panel
@@ -4622,6 +4722,7 @@ const formHandler = (function () {
         break;
       }
     }
+    toggleExitTabAttachedOptionVisibility(exitTab.width);
 
     const exitTabColorElmt = document.querySelector("#exitColor");
     for (const option of exitTabColorElmt.options) {

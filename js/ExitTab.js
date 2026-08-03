@@ -7,8 +7,8 @@ class ExitTab {
 	 */
 	constructor({
 		number = null,
-		position = null,
-		width = null,
+		position = ExitTab.prototype.defaultPosition,
+		width = ExitTab.prototype.defaultWidth,
 		color = null,
 		variant = "Default",
 		icon = null,
@@ -32,15 +32,23 @@ class ExitTab {
 	} = {}
 	) {
 		this.number = number;
+		const defaultPosition = this.positions.includes(
+			ExitTab.prototype.defaultPosition
+		)
+			? ExitTab.prototype.defaultPosition
+			: this.positions[1];
 		if (this.positions.includes(position)) {
 			this.position = position;
 		} else {
-			this.position = this.positions[1];
+			this.position = defaultPosition;
 		}
+		const defaultWidth = this.widths.includes(ExitTab.prototype.defaultWidth)
+			? ExitTab.prototype.defaultWidth
+			: this.widths[0];
 		if (this.widths.includes(width)) {
 			this.width = width;
 		} else {
-			this.width = this.widths[0];
+			this.width = defaultWidth;
 		}
 		if (this.colors.includes(color)) {
 			this.color = color;
@@ -155,6 +163,8 @@ class ExitTab {
 ExitTab.prototype.positions = ["Left", "Center", "Right"];
 ExitTab.prototype.variants = ["Default", "Toll Logo", "Icon", "Full Left", "Stacked", "HOV 1", "HOV 2"];
 ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge", "Out", "Side"];
+ExitTab.prototype.defaultPosition = "Center";
+ExitTab.prototype.defaultWidth = "Narrow";
 ExitTab.prototype.defaultBorderThickness = 0.2;
 ExitTab.prototype.defaultTollLogoSize = 3;
 ExitTab.prototype.defaultFullBorder = false;

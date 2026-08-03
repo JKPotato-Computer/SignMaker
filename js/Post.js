@@ -36,6 +36,9 @@ class Post {
 		this.panelOrientation = this.normalizePanelOrientation(
 			Post.prototype.defaultPanelOrientation
 		);
+		this.signAlignment = this.normalizeSignAlignment(
+			Post.prototype.defaultSignAlignment
+		);
 		this.copySignsOnly = true;
 		this.copyScale = 8;
 		this.showBlockBoundingBoxes = false;
@@ -168,10 +171,26 @@ class Post {
 		);
 		return normalized || fallback;
 	}
+
+	normalizeSignAlignment(value) {
+		const options = Array.isArray(Post.prototype.signAlignments)
+			? Post.prototype.signAlignments
+			: ["Center", "Top", "Bottom"];
+		const fallback = Post.prototype.defaultSignAlignment || options[0];
+		if (typeof value !== "string") {
+			return fallback;
+		}
+		const normalized = options.find(
+			(option) => option.toLowerCase() === value.toLowerCase()
+		);
+		return normalized || fallback;
+	}
 }
 
 Post.prototype.panelOrientations = ["Horizontal", "Vertical"];
 Post.prototype.defaultPanelOrientation = "Horizontal";
+Post.prototype.signAlignments = ["Center", "Top", "Bottom"];
+Post.prototype.defaultSignAlignment = "Center";
 
 Post.cloneData = function (value) {
 	if (Array.isArray(value)) {
@@ -360,7 +379,8 @@ Post.clonePanel = function (panelData) {
 		safeData.color,
 		exitTabs,
 		safeData.corner,
-		safeData.borderRadius
+		safeData.borderRadius,
+		safeData.dms
 	);
 	Object.assign(panel, safeData);
 	panel.sign = sign;

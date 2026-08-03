@@ -48,6 +48,23 @@
 	margin-bottom: auto;
 	position: relative;
 	top: -0.4rem;
+	white-space: pre-line;
+}
+
+.bannerA.multilineBanner,
+.bannerB.multilineBanner {
+	line-height: 0.85;
+	text-align: center;
+}
+
+.bannerShieldContainer.bannerPositionRight .multilineBanner,
+.bE-shieldElement .bannerSlot-right .multilineBanner {
+	text-align: left;
+}
+
+.bannerShieldContainer.bannerPositionLeft .multilineBanner,
+.bE-shieldElement .bannerSlot-left .multilineBanner {
+	text-align: right;
 }
 
 .bannerA:not(.TOLL, .noIndent, .exportRealFirstLetter):first-letter,
@@ -663,7 +680,6 @@
 	box-sizing: content-box;
 	display: inline-flex;
 	justify-content: center;
-	line-height: 0;
 	padding: calc(0.18rem * var(--shieldScale, 1));
 }
 

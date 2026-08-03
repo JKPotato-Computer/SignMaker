@@ -19,6 +19,11 @@ const app = (function () {
   const SESSION_STORAGE_KEY = "signMaker.session";
   const SESSION_STORAGE_VERSION = 1;
   let isSessionPersisting = false;
+  const HISTORY_LIMIT = 100;
+  const undoHistory = [];
+  const redoHistory = [];
+  let lastHistoryEntry = null;
+  let isApplyingHistory = false;
 
   const getCurrentPanel = () => {
     return post.panels[currentlySelectedPanelIndex];
@@ -115,6 +120,22 @@ const app = (function () {
       return post.normalizePanelOrientation(value);
     }
     return value === "Vertical" ? "Vertical" : "Horizontal";
+  };
+  const normalizeSignAlignment = (value) => {
+    if (post && typeof post.normalizeSignAlignment === "function") {
+      return post.normalizeSignAlignment(value);
+    }
+    return value === "Top" || value === "Bottom" ? value : "Center";
+  };
+  const getSignAlignmentFlexValue = (value) => {
+    const normalized = normalizeSignAlignment(value);
+    if (normalized === "Top") {
+      return "flex-start";
+    }
+    if (normalized === "Bottom") {
+      return "flex-end";
+    }
+    return "center";
   };
   const resetGroupEditing = () => {
     currentlyEditingGroupPath = [];
@@ -498,6 +519,144 @@ const app = (function () {
     currentlyEditingGroupPath,
   });
 
+  const createHistoryEntry = () => ({
+    post: serializePostWithElementTypes(),
+    selection: JSON.parse(JSON.stringify(getSelectionState())),
+  });
+
+  const captureHistoryAfterRedraw = () => {
+    if (
+      !post ||
+      !Array.isArray(post.panels) ||
+      post.panels.length === 0
+    ) {
+      return;
+    }
+
+    const currentEntry = createHistoryEntry();
+    if (isApplyingHistory) {
+      lastHistoryEntry = currentEntry;
+      return;
+    }
+
+    if (!lastHistoryEntry) {
+      lastHistoryEntry = currentEntry;
+      return;
+    }
+
+    if (lastHistoryEntry.post === currentEntry.post) {
+      lastHistoryEntry.selection = currentEntry.selection;
+      return;
+    }
+
+    undoHistory.push({
+      post: lastHistoryEntry.post,
+      selection: lastHistoryEntry.selection,
+    });
+    if (undoHistory.length > HISTORY_LIMIT) {
+      undoHistory.splice(0, undoHistory.length - HISTORY_LIMIT);
+    }
+    redoHistory.length = 0;
+    lastHistoryEntry = currentEntry;
+  };
+
+  const applyHistoryEntry = (entry) => {
+    if (!entry || typeof entry.post !== "string") {
+      return false;
+    }
+
+    isApplyingHistory = true;
+    try {
+      setPost(reconstructPostFromData(JSON.parse(entry.post)), entry.selection);
+      lastHistoryEntry = createHistoryEntry();
+      return true;
+    } catch (error) {
+      console.warn("Unable to restore SignMaker history", error);
+      return false;
+    } finally {
+      isApplyingHistory = false;
+    }
+  };
+
+  const undo = () => {
+    if (!undoHistory.length) {
+      return false;
+    }
+
+    const currentEntry = createHistoryEntry();
+    const previousEntry = undoHistory.pop();
+    redoHistory.push(currentEntry);
+    if (applyHistoryEntry(previousEntry)) {
+      return true;
+    }
+
+    redoHistory.pop();
+    undoHistory.push(previousEntry);
+    return false;
+  };
+
+  const redo = () => {
+    if (!redoHistory.length) {
+      return false;
+    }
+
+    const currentEntry = createHistoryEntry();
+    const nextEntry = redoHistory.pop();
+    undoHistory.push(currentEntry);
+    if (applyHistoryEntry(nextEntry)) {
+      return true;
+    }
+
+    undoHistory.pop();
+    redoHistory.push(nextEntry);
+    return false;
+  };
+
+  const syncFocusedEditorBeforeHistory = () => {
+    const activeElement = document.activeElement;
+    if (
+      !activeElement ||
+      !activeElement.matches?.("input, select, textarea, [contenteditable='true']")
+    ) {
+      return;
+    }
+
+    if (formHandler && typeof formHandler.readForm === "function") {
+      formHandler.readForm();
+    }
+  };
+
+  const handleUndoRedoShortcut = (event) => {
+    if (
+      event.altKey ||
+      (!event.metaKey && !event.ctrlKey) ||
+      (event.metaKey && event.ctrlKey)
+    ) {
+      return;
+    }
+
+    const key = String(event.key || "").toLowerCase();
+    const isUndo = key === "z" && !event.shiftKey;
+    const isRedo =
+      (key === "z" && event.shiftKey) ||
+      (key === "y" && !event.shiftKey);
+    if (!isUndo && !isRedo) {
+      return;
+    }
+
+    try {
+      syncFocusedEditorBeforeHistory();
+    } catch (error) {
+      console.warn("Unable to sync the active editor before history", error);
+    }
+
+    const didApplyHistory = isUndo ? undo() : redo();
+    if (didApplyHistory) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  };
+
   const persistSessionState = ({ syncForm = false } = {}) => {
     if (
       isSessionPersisting ||
@@ -517,6 +676,12 @@ const app = (function () {
       } finally {
         isSessionPersisting = false;
       }
+    }
+
+    if (lastHistoryEntry) {
+      lastHistoryEntry.selection = JSON.parse(
+        JSON.stringify(getSelectionState())
+      );
     }
 
     try {
@@ -579,6 +744,7 @@ const app = (function () {
     window.addEventListener("beforeunload", () => {
       persistSessionState({ syncForm: true });
     });
+    document.addEventListener("keydown", handleUndoRedoShortcut, true);
 
     if (!restoreSavedSession()) {
       newPanel();
@@ -905,6 +1071,19 @@ const app = (function () {
       return;
     }
     post.panelOrientation = normalized;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setSignAlignment = function (value) {
+    if (!post) {
+      return;
+    }
+    const normalized = normalizeSignAlignment(value);
+    if (post.signAlignment === normalized) {
+      return;
+    }
+    post.signAlignment = normalized;
     formHandler.updateForm();
     redraw();
   };
@@ -2499,7 +2678,12 @@ const app = (function () {
     const destinations = ["A", "B", "C"];
     const rows = destinations.map((label) => [
       new ControlTextElement({ textContent: `Destination ${label}` }),
-      new DividerElement({ visible: false, dividerWidth: 3, dividerMeasurement: "rem" }),
+      new DividerElement({
+        visible: false,
+        dividerWidth: 3,
+        dividerMeasurement: "rem",
+        fullBleed: true,
+      }),
       new ControlTextElement({ textContent: "X" }),
     ]);
     const blockProperties = rows.map(() => new Block());
@@ -4029,57 +4213,99 @@ const app = (function () {
     }
   };
 
-  let copyPanelContextMenuListenersActive = false;
+  const downloadPanelSign = async function (panelIndex) {
+    if (copySignInProgress || downloadCopiedSignInProgress) {
+      return false;
+    }
 
-  function getCopyPanelContextMenu() {
-    return document.getElementById("copyPanelContextMenu");
+    const normalizedPanelIndex = Number.parseInt(panelIndex, 10);
+    const panelLabel = Number.isInteger(normalizedPanelIndex)
+      ? "Panel " + (normalizedPanelIndex + 1).toString()
+      : "the panel";
+    downloadCopiedSignInProgress = true;
+    setDownloadButtonState("downloading");
+
+    try {
+      const file = getPanelClipboardFile(panelIndex);
+      const blob = await renderSignExport(file, "blob", false);
+      downloadBlob(blob, ".png");
+      setDownloadButtonState("downloaded");
+      return true;
+    } catch (error) {
+      console.error("Error Downloading Panel!", error);
+      setDownloadButtonState("error");
+      alert("Unable to download " + panelLabel + ": " + error.message);
+      return false;
+    } finally {
+      downloadCopiedSignInProgress = false;
+    }
+  };
+
+  let panelContextMenuListenersActive = false;
+
+  function getPanelContextMenu(type) {
+    return document.getElementById(
+      type === "download" ? "downloadPanelContextMenu" : "copyPanelContextMenu"
+    );
   }
 
-  function removeCopyPanelContextMenuListeners() {
-    if (!copyPanelContextMenuListenersActive) {
+  function removePanelContextMenuListeners() {
+    if (!panelContextMenuListenersActive) {
       return;
     }
 
-    document.removeEventListener("mousedown", handleCopyPanelContextMenuMouseDown);
-    document.removeEventListener("keydown", handleCopyPanelContextMenuKeyDown);
-    window.removeEventListener("resize", closeCopyPanelContextMenu);
-    window.removeEventListener("scroll", closeCopyPanelContextMenu, true);
-    copyPanelContextMenuListenersActive = false;
+    document.removeEventListener("mousedown", handlePanelContextMenuMouseDown);
+    document.removeEventListener("keydown", handlePanelContextMenuKeyDown);
+    window.removeEventListener("resize", closePanelContextMenus);
+    window.removeEventListener("scroll", closePanelContextMenus, true);
+    panelContextMenuListenersActive = false;
+  }
+
+  function closePanelContextMenus() {
+    ["copy", "download"].forEach((type) => {
+      const menu = getPanelContextMenu(type);
+      if (menu) {
+        menu.classList.add("hidden");
+        menu.replaceChildren();
+      }
+    });
+
+    removePanelContextMenuListeners();
   }
 
   function closeCopyPanelContextMenu() {
-    const menu = getCopyPanelContextMenu();
-
-    if (menu) {
-      menu.classList.add("hidden");
-      menu.replaceChildren();
-    }
-
-    removeCopyPanelContextMenuListeners();
+    closePanelContextMenus();
   }
 
-  function handleCopyPanelContextMenuMouseDown(event) {
-    const menu = getCopyPanelContextMenu();
+  function closeDownloadPanelContextMenu() {
+    closePanelContextMenus();
+  }
+
+  function handlePanelContextMenuMouseDown(event) {
+    const copyMenu = getPanelContextMenu("copy");
+    const downloadMenu = getPanelContextMenu("download");
     const copyButton = document.getElementById("export");
+    const downloadButton = document.getElementById("exportDownload");
 
     if (
-      menu &&
-      (menu.contains(event.target) ||
-        (copyButton && copyButton.contains(event.target)))
+      (copyMenu && copyMenu.contains(event.target)) ||
+      (downloadMenu && downloadMenu.contains(event.target)) ||
+      (copyButton && copyButton.contains(event.target)) ||
+      (downloadButton && downloadButton.contains(event.target))
     ) {
       return;
     }
 
-    closeCopyPanelContextMenu();
+    closePanelContextMenus();
   }
 
-  function handleCopyPanelContextMenuKeyDown(event) {
+  function handlePanelContextMenuKeyDown(event) {
     if (event.key === "Escape") {
-      closeCopyPanelContextMenu();
+      closePanelContextMenus();
     }
   }
 
-  const positionCopyPanelContextMenu = function (menu, event) {
+  const positionPanelContextMenu = function (menu, event) {
     const viewportMargin = 4;
     const rect = menu.getBoundingClientRect();
     const maxLeft = Math.max(viewportMargin, window.innerWidth - rect.width - viewportMargin);
@@ -4091,14 +4317,14 @@ const app = (function () {
     menu.style.top = top + "px";
   };
 
-  const openCopyPanelContextMenu = function (event) {
-    const menu = getCopyPanelContextMenu();
+  const openPanelContextMenu = function (event, type, selectPanel) {
+    const menu = getPanelContextMenu(type);
 
-    if (!menu) {
+    if (!menu || typeof selectPanel !== "function") {
       return;
     }
 
-    closeCopyPanelContextMenu();
+    closePanelContextMenus();
 
     const panelCount = Array.isArray(post.panels) ? post.panels.length : 0;
 
@@ -4117,15 +4343,15 @@ const app = (function () {
       button.textContent = "Panel " + (panelIndex + 1).toString();
       button.addEventListener("click", (clickEvent) => {
         clickEvent.preventDefault();
-        closeCopyPanelContextMenu();
-        copyPanelToClipboard(panelIndex);
+        closePanelContextMenus();
+        selectPanel(panelIndex);
       });
       item.appendChild(button);
       menu.appendChild(item);
     }
 
     menu.classList.remove("hidden");
-    positionCopyPanelContextMenu(menu, event);
+    positionPanelContextMenu(menu, event);
 
     const firstButton = menu.querySelector("button");
     if (firstButton) {
@@ -4133,12 +4359,20 @@ const app = (function () {
     }
 
     setTimeout(() => {
-      document.addEventListener("mousedown", handleCopyPanelContextMenuMouseDown);
-      document.addEventListener("keydown", handleCopyPanelContextMenuKeyDown);
-      window.addEventListener("resize", closeCopyPanelContextMenu);
-      window.addEventListener("scroll", closeCopyPanelContextMenu, true);
-      copyPanelContextMenuListenersActive = true;
+      document.addEventListener("mousedown", handlePanelContextMenuMouseDown);
+      document.addEventListener("keydown", handlePanelContextMenuKeyDown);
+      window.addEventListener("resize", closePanelContextMenus);
+      window.addEventListener("scroll", closePanelContextMenus, true);
+      panelContextMenuListenersActive = true;
     }, 0);
+  };
+
+  const openCopyPanelContextMenu = function (event) {
+    openPanelContextMenu(event, "copy", copyPanelToClipboard);
+  };
+
+  const openDownloadPanelContextMenu = function (event) {
+    openPanelContextMenu(event, "download", downloadPanelSign);
   };
 
   const downloadCopiedSign = async function () {
@@ -4320,6 +4554,8 @@ const app = (function () {
     lib.clearChildren(panelContainerElmt);
     const panelOrientation = normalizePanelOrientation(post.panelOrientation);
     post.panelOrientation = panelOrientation;
+    const signAlignment = normalizeSignAlignment(post.signAlignment);
+    post.signAlignment = signAlignment;
     if (panelContainerElmt) {
       // Attach drag handlers to panelContainer once
       if (!panelContainerElmt.dataset.panelDragAttached) {
@@ -4337,8 +4573,18 @@ const app = (function () {
         "--panelSpacing",
         spacingValue + "rem"
       );
+      panelContainerElmt.style.alignItems =
+        panelOrientation === "Vertical"
+          ? ""
+          : getSignAlignmentFlexValue(signAlignment);
+      panelContainerElmt.style.justifyContent =
+        panelOrientation === "Vertical"
+          ? getSignAlignmentFlexValue(signAlignment)
+          : "";
       panelContainerElmt.dataset.panelOrientation =
         panelOrientation.toLowerCase();
+      panelContainerElmt.dataset.signAlignment =
+        signAlignment.toLowerCase();
     }
 
     var index = -1;
@@ -4353,6 +4599,7 @@ const app = (function () {
 
       const panelElmt = document.createElement("div");
       panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
+      panelElmt.classList.toggle("dms", !!panel.dms);
       panelElmt.classList.toggle("groupPreviewPanel", isPanelGroupPreview);
       const numericPanelBorderRadius =
         typeof panel.borderRadius === "number"
@@ -4387,6 +4634,7 @@ const app = (function () {
         const parentExitTab = panel.exitTabs[exitTabIndex];
         var exitTab = parentExitTab;
         const hasAttachedExitTab =
+          parentExitTab.width === "Side" ||
           !!parentExitTab.attached ||
           (Array.isArray(parentExitTab.nestedExitTabs) &&
             parentExitTab.nestedExitTabs.some(
@@ -4425,6 +4673,7 @@ const app = (function () {
 
           const exitTabElmt = document.createElement("div");
           exitTabElmt.className = `exitTab ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
+          const isSideExitTab = exitTab.width === "Side";
           if (exitTab.squareCorners) {
             exitTabElmt.className += " squareCorners";
           }
@@ -4467,14 +4716,9 @@ const app = (function () {
                 typeof lineText === "string" ? lineText : String(lineText || "");
               const txtArr = safeLineText.toUpperCase().split(/(\d+\S*)/);
 
-              // Handle vertical arrangement
               if (exitTab.verticalArrangement && txtArr.length > 1) {
-                // #region agent log
-                fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1564', message: 'Vertical arrangement active', data: { verticalArrangement: exitTab.verticalArrangement, leadingText: txtArr[0], number: txtArr[1], minHeight: exitTab.minHeight }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A,B' }) }).catch(() => { });
-                // #endregion
                 const verticalContainer = document.createElement("div");
                 verticalContainer.className = "exitTabVerticalContainer";
-                registerExitTabText(verticalContainer);
 
                 const leadingText = txtArr[0] || "";
                 if (leadingText && leadingText.trim().length > 0) {
@@ -4496,7 +4740,6 @@ const app = (function () {
 
                 const bottomNumberElmt = document.createElement("div");
                 bottomNumberElmt.className = "exitTabVerticalNumber";
-                registerExitTabText(bottomNumberElmt);
                 const spanNumeralElmt = document.createElement("span");
                 spanNumeralElmt.className = "numeral";
                 registerExitTabText(spanNumeralElmt);
@@ -4512,14 +4755,6 @@ const app = (function () {
                 }
                 verticalContainer.appendChild(bottomNumberElmt);
                 targetElmt.appendChild(verticalContainer);
-                // #region agent log
-                setTimeout(() => {
-                  const containerStyle = window.getComputedStyle(verticalContainer);
-                  const topTextStyle = topTextElmt ? window.getComputedStyle(topTextElmt) : null;
-                  const exitTabStyle = exitTabElmt ? window.getComputedStyle(exitTabElmt) : null;
-                  fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1607', message: 'Vertical container padding computed', data: { containerPaddingTop: containerStyle.paddingTop, containerPaddingBottom: containerStyle.paddingBottom, containerPadding: containerStyle.padding, topTextMarginTop: topTextStyle?.marginTop, topTextPaddingTop: topTextStyle?.paddingTop, exitTabPaddingTop: exitTabStyle?.paddingTop, exitTabPadding: exitTabStyle?.padding }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run3', hypothesisId: 'padding-source' }) }).catch(() => { });
-                }, 100);
-                // #endregion
                 return;
               }
 
@@ -4592,7 +4827,7 @@ const app = (function () {
           const exitTabHolderElmt = document.createElement("div");
           exitTabHolderElmt.className = "exitTabHolder";
           if (
-            exitTab.attached &&
+            (isSideExitTab || exitTab.attached) &&
             !(exitTab.caStyle && exitTab.variant == "Default")
           ) {
             exitTabElmt.classList.add("attached");
@@ -4612,12 +4847,6 @@ const app = (function () {
 
           if (exitTab.verticalArrangement && exitTab.variant == "Default") {
             exitTabElmt.classList.add("verticalArrangement");
-            // #region agent log
-            setTimeout(() => {
-              const computedStyle = window.getComputedStyle(exitTabElmt);
-              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1692', message: 'Vertical arrangement class added - computed padding', data: { verticalArrangement: exitTab.verticalArrangement, computedPaddingTop: computedStyle.paddingTop, computedPaddingRight: computedStyle.paddingRight, computedPaddingBottom: computedStyle.paddingBottom, computedPaddingLeft: computedStyle.paddingLeft, inlinePadding: exitTabElmt.style.padding }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run3', hypothesisId: 'padding-source' }) }).catch(() => { });
-            }, 100);
-            // #endregion
           }
 
           if (usesHighwayGothicFont) {
@@ -4770,7 +4999,7 @@ const app = (function () {
 
             const cornerRadius = exitTab.squareCorners ? "0.25rem" : "0.5rem";
 
-            if (exitTab.fullBorder == true) {
+            if (exitTab.fullBorder == true || isSideExitTab) {
               exitTabElmt.style.borderBottomWidth = borderThicknessRem;
               exitTabElmt.style.borderBottomStyle = isBorderlessTab ? "" : "solid";
               exitTabElmt.style.borderRadius = isBorderlessTab ? "0" : cornerRadius;
@@ -4795,22 +5024,12 @@ const app = (function () {
             }
             exitTabElmt.style.fontSize = resolvedFontSize.toString() + "px";
 
-            // #region agent log
-            fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1859', message: 'Setting exit tab minHeight', data: { verticalArrangement: exitTab.verticalArrangement, minHeight: exitTab.minHeight, variant: exitTab.variant, resolvedFontSize: resolvedFontSize }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'F,G,H' }) }).catch(() => { });
-            // #endregion
-            // Increase minHeight when vertical arrangement is enabled to accommodate stacked content
-            // Large numerals (1.5em scale) need extra space, so increase minHeight more
-            if (exitTab.verticalArrangement && exitTab.variant == "Default") {
-              const baseMinHeight = parseFloat(exitTab.minHeight) || 2.25;
-              // Account for numeral scaling (1.5em) and vertical spacing
-              const calculatedMinHeight = Math.max(baseMinHeight * 1.5, 3.75);
-              exitTabElmt.style.minHeight = calculatedMinHeight.toString() + "rem";
-              // #region agent log
-              fetch('http://127.0.0.1:7244/ingest/6501febc-ac26-4bc0-8a4d-3e287db43aa8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'main.js:1868', message: 'Vertical arrangement minHeight calculated', data: { baseMinHeight: baseMinHeight, calculatedMinHeight: calculatedMinHeight }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'G,H' }) }).catch(() => { });
-              // #endregion
-            } else {
-              exitTabElmt.style.minHeight = exitTab.minHeight.toString() + "rem";
-            }
+            const parsedMinHeight = parseFloat(exitTab.minHeight);
+            const resolvedMinHeight =
+              Number.isFinite(parsedMinHeight) && parsedMinHeight >= 0
+                ? parsedMinHeight
+                : 2.25;
+            exitTabElmt.style.minHeight = resolvedMinHeight.toString() + "rem";
             if (exitTab.variant == "Toll Logo" && exitTab.tollLogoOnly) {
               exitTabElmt.style.minHeight = "0";
             }
@@ -5058,15 +5277,25 @@ const app = (function () {
           }
 
           if (shield.bannerType != "None") {
-            bannerElmt.appendChild(document.createTextNode(shield.bannerType));
+            const bannerText =
+              Shield.prototype.getBannerDisplayText(shield.bannerType);
+            bannerElmt.appendChild(
+              document.createTextNode(bannerText)
+            );
+            if (bannerText.includes("\n")) {
+              bannerElmt.classList.add("multilineBanner");
+            }
           } else {
             bannerElmt.appendChild(document.createTextNode(" "));
           }
 
           if (shield.bannerType2 != "None") {
-            bannerElmt2.appendChild(
-              document.createTextNode(shield.bannerType2)
-            );
+            const bannerText2 =
+              Shield.prototype.getBannerDisplayText(shield.bannerType2);
+            bannerElmt2.appendChild(document.createTextNode(bannerText2));
+            if (bannerText2.includes("\n")) {
+              bannerElmt2.classList.add("multilineBanner");
+            }
           } else {
             bannerElmt2.appendChild(document.createTextNode(" "));
           }
@@ -5199,9 +5428,31 @@ const app = (function () {
         LineEditor(controlTextArray[controlTextArray.length - 1]);
       }
 
+      const visibleSideExitTabs = Array.from(panelElmt.children).filter(
+        (element) =>
+          element.matches(
+            ".exitTabContainer.side.tabVisible.left, .exitTabContainer.side.tabVisible.right"
+          )
+      );
+      const signRowElmt =
+        visibleSideExitTabs.length > 0 ? document.createElement("div") : null;
+      if (signRowElmt) {
+        signRowElmt.className = "signSideLayout";
+        panelElmt.appendChild(signRowElmt);
+        visibleSideExitTabs
+          .filter((element) => element.classList.contains("left"))
+          .forEach((element) => signRowElmt.appendChild(element));
+      }
+
       const signCont = document.createElement("div");
       signCont.className = `signContainer ${panel.exitTabs[0].width.toLowerCase()}`;
-      panelElmt.appendChild(signCont);
+      (signRowElmt || panelElmt).appendChild(signCont);
+
+      if (signRowElmt) {
+        visibleSideExitTabs
+          .filter((element) => element.classList.contains("right"))
+          .forEach((element) => signRowElmt.appendChild(element));
+      }
 
       const signElmt = document.createElement("div");
       signElmt.className = `sign ${panel.exitTabs[0].width.toLowerCase()}`;
@@ -6273,7 +6524,7 @@ const app = (function () {
       var width = signCont.clientWidth;
       var exitWidth = firstExitTab.clientWidth;
 
-      if (exitWidth > width) {
+      if (!firstExitTab.classList.contains("side") && exitWidth > width) {
         signCont.style.width = firstExitTab.clientWidth + "px";
       }
 
@@ -6293,6 +6544,7 @@ const app = (function () {
 
       schedulePanelBorderGradientUpdate(panelElmt);
     }
+    captureHistoryAfterRedraw();
     persistSessionState();
   };
 
@@ -6335,6 +6587,7 @@ const app = (function () {
     deleteNestExitTab,
     setPanelSpacing,
     setPanelOrientation,
+    setSignAlignment,
     duplicateBlockIntoNewRow,
     deleteShield,
     duplicateShield,
@@ -6635,6 +6888,27 @@ const app = (function () {
     }
   };
 
+  const serializeCurrentPanelTemplate = (space) => {
+    const panel = getCurrentPanel();
+    if (!panel) {
+      throw new Error("No panel is selected");
+    }
+
+    addElementTypes(panel);
+    try {
+      return JSON.stringify(
+        {
+          templateType: "panel",
+          panel,
+        },
+        null,
+        space
+      );
+    } finally {
+      removeElementTypes(panel);
+    }
+  };
+
   const inferControlElementType = (elemData) => {
     if (!elemData || typeof elemData !== "object") {
       return null;
@@ -6803,7 +7077,8 @@ const app = (function () {
           panelData.color,
           [],
           panelData.corner,
-          panelData.borderRadius
+          panelData.borderRadius,
+          panelData.dms
         );
 
         if (Array.isArray(panelData.exitTabs)) {
@@ -6834,6 +7109,66 @@ const app = (function () {
     return newPost;
   };
 
+  const getPanelDataFromTemplate = (templateData) => {
+    if (!templateData || typeof templateData !== "object") {
+      return null;
+    }
+
+    if (templateData.panel && typeof templateData.panel === "object") {
+      return templateData.panel;
+    }
+
+    if (templateData.sign && typeof templateData.sign === "object") {
+      return templateData;
+    }
+
+    if (Array.isArray(templateData.panels) && templateData.panels.length) {
+      const panelIndex = clamp(
+        normalizeIndex(currentlySelectedPanelIndex),
+        0,
+        templateData.panels.length - 1
+      );
+      return templateData.panels[panelIndex] || templateData.panels[0];
+    }
+
+    return null;
+  };
+
+  const replaceCurrentPanelFromTemplate = (templateData) => {
+    if (!post || !Array.isArray(post.panels) || !post.panels.length) {
+      throw new Error("No panel is available to replace");
+    }
+
+    const panelData = getPanelDataFromTemplate(templateData);
+    if (!panelData) {
+      throw new Error("Template does not include a panel");
+    }
+
+    const targetPanelIndex = clamp(
+      normalizeIndex(currentlySelectedPanelIndex),
+      0,
+      post.panels.length - 1
+    );
+    const templatePost = reconstructPostFromData({ panels: [panelData] });
+    const replacementPanel = templatePost.panels[0];
+    if (!replacementPanel) {
+      throw new Error("Template panel could not be loaded");
+    }
+
+    post.panels[targetPanelIndex] = replacementPanel;
+    currentlySelectedPanelIndex = targetPanelIndex;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabIndex = 0;
+    currentlySelectedNestedExitTabIndex = -1;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedAPLArrowIndex = 0;
+    resetGroupEditing();
+    normalizeEditorSelection();
+    formHandler.updateForm();
+    redraw();
+  };
+
   const getPost = function () {
     return post;
   };
@@ -6847,6 +7182,7 @@ const app = (function () {
       post.panelSpacing = 0;
     }
     post.panelOrientation = normalizePanelOrientation(post.panelOrientation);
+    post.signAlignment = normalizeSignAlignment(post.signAlignment);
     post.thickness = post.normalizeThickness(post.thickness);
     if (typeof post.copySignsOnly !== "boolean") {
       post.copySignsOnly = true;
@@ -6891,11 +7227,11 @@ const app = (function () {
       }
 
       const db = await initTemplateDB();
-      const postData = serializePostWithElementTypes(2);
+      const panelData = serializeCurrentPanelTemplate(2);
 
       const templateData = {
         name: templateName.trim(),
-        data: postData,
+        data: panelData,
         dateCreated: new Date().toISOString(),
       };
 
@@ -6920,7 +7256,7 @@ const app = (function () {
     }
 
     const confirmationMessage =
-      "Are you sure you want to load this template? THIS WILL REPLACE YOUR CURRENT SIGN!";
+      "Are you sure you want to apply this template? THIS WILL REPLACE YOUR SELECTED PANEL!";
     if (!window.confirm(confirmationMessage)) {
       return;
     }
@@ -6934,8 +7270,8 @@ const app = (function () {
         return;
       }
 
-      const postData = JSON.parse(template.data);
-      setPost(reconstructPostFromData(postData));
+      const templateData = JSON.parse(template.data);
+      replaceCurrentPanelFromTemplate(templateData);
     } catch (error) {
       console.error("Error loading template:", error);
       alert("Failed to load template: " + error.message);
@@ -7029,6 +7365,7 @@ const app = (function () {
     changeEditingPanel: changeEditingPanel,
     setPanelSpacing: setPanelSpacing,
     setPanelOrientation: setPanelOrientation,
+    setSignAlignment: setSignAlignment,
     newShield: newShield,
     clearShields: clearShields,
     newSubPanel: addSubPanel,
@@ -7040,7 +7377,10 @@ const app = (function () {
     copyPanelToClipboard: copyPanelToClipboard,
     openCopyPanelContextMenu: openCopyPanelContextMenu,
     closeCopyPanelContextMenu: closeCopyPanelContextMenu,
+    openDownloadPanelContextMenu: openDownloadPanelContextMenu,
+    closeDownloadPanelContextMenu: closeDownloadPanelContextMenu,
     downloadCopiedSign: downloadCopiedSign,
+    downloadPanelSign: downloadPanelSign,
     downloadSign: downloadSign,
     updatePreview: updatePreview,
     updateFileType: updateFileType,
@@ -7056,6 +7396,8 @@ const app = (function () {
     deleteNestExitTab: deleteNestExitTab,
     getPost: getPost,
     setPost: setPost,
+    undo: undo,
+    redo: redo,
     post: post,
 
     newRow: newRow,

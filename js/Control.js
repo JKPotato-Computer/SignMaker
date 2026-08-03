@@ -192,6 +192,7 @@ TextElement.prototype.fontFamily = [
   "Arial",
   "Arial Bold",
   "Transport",
+  "Modern VMS",
 ];
 
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
@@ -502,11 +503,9 @@ class ElectronicSignElement extends TextElement {
     return newText;
   }
 }
-ElectronicSignElement.prototype.fontFamily =
-  TextElement.prototype.fontFamily.concat([
-    "Electronic Highway Sign",
-    "Modern VMS",
-  ]);
+ElectronicSignElement.prototype.fontFamily = Array.from(
+  new Set(TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]))
+);
 ElectronicSignElement.prototype.textColors = [
   "Orange",
   "White",
@@ -1041,8 +1040,11 @@ ShieldElement.prototype.createBannerElement = function (
   if (bannerValue === "Toll") {
     bannerEl.classList.add("TOLL");
   }
-  bannerEl.textContent =
-    bannerValue && bannerValue !== "None" ? bannerValue : " ";
+  const displayText = Shield.prototype.getBannerDisplayText(bannerValue);
+  bannerEl.textContent = displayText;
+  if (displayText.includes("\n")) {
+    bannerEl.classList.add("multilineBanner");
+  }
   return bannerEl;
 };
 
