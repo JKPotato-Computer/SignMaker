@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-labelledby="title source">
+  <title id="title">FDOT Florida independent route marker, one or two digits</title>
+  <metadata id="source">FDOT FY 2026-27 Standard Plans, Index 700-102, Special Sign Details, sheets 15-16 of 21. Current plan set with 2026 errata incorporated.</metadata>
+  <rect width="24" height="24" rx="1.5" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="23" height="23" rx="1" fill="none" stroke="#000000" stroke-width="0.625"/>
+  <path d="M17.5715 20.7223L17.7498 21.322L18.3741 21.6487L18.6863 21.7474L19.7002 21.75L21.5054 20.1669L21.6862 19.8986L21.75 17.9546L21.5248 16.6177L20.5013 14.435L19.9108 11.1504L20.2766 8.6167L18.4061 2.4832L18.0417 2.3884L16.9696 2.427L16.5425 2.8679L16.2873 2.9056L8.8691 2.8935L8.5241 2.8307L8.2677 2.3322L7.9549 2.25L2.7357 2.2606L2.3182 2.3898L2.25 2.5115L2.4508 4.4134L2.499 4.5271L2.9058 4.6292L3.9532 4.6433L4.553 4.4947L6.1328 4.8517L8.735 6.813L11.3369 6.2043L11.5633 6.2491L12.3231 6.6312L12.5287 7.249" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="8"/>
+</svg>

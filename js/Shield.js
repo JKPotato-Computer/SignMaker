@@ -539,6 +539,246 @@ Shield.prototype.shieldDirectory = {
   },
 };
 
+// Current Florida route-marker catalogue. These definitions intentionally
+// replace the older raster-backed Florida entries above while retaining their
+// legacy codes so existing saves continue to load.
+(() => {
+  const unitedStates = Shield.prototype.shieldDirectory["United States"];
+  const florida = unitedStates.Florida;
+  const fdotFolder = "img/shields/United States/Florida/FDOT";
+  const cfxFolder = "img/shields/United States/Florida/CFX";
+
+  const routeStyle = (
+    capHeightIn,
+    fontFamily,
+    topIn,
+    horizontalPlacement = {},
+    fontFamilyByCharacterCount = null
+  ) => ({
+    capHeightIn,
+    fontFamily,
+    topIn,
+    color: "#000000",
+    ...horizontalPlacement,
+    ...(fontFamilyByCharacterCount
+      ? { fontFamilyByCharacterCount }
+      : {}),
+  });
+  const dimensions = (widthIn, heightIn) => ({ widthIn, heightIn });
+  const variableGuidePanel = (rightClearanceIn) => ({
+    minWidthIn: 48,
+    maxWidthIn: 58,
+    assetWidthIn: 48,
+    rightClearanceIn,
+  });
+
+  florida.FL = {
+    type: "shield",
+    name: "FDOT Florida State Route",
+    variants: [
+      "Guide 42x36 1-2 Digit",
+      "Guide 48-58x36 3+ Digit",
+      "Guide 36x30 1-2 Digit",
+      "Guide 48-58x30 3+ Digit",
+      "Guide 30x24 1-2 Digit",
+      "Guide 48-58x24 3+ Digit",
+      "Freeway 48x36 1-3 Digit",
+      "Freeway 48x36 4 Digit",
+      "Independent 24x24 1-2 Digit",
+      "Independent 24x24 3 Digit Cluster",
+      "Independent 30x24 3-4 Digit",
+    ],
+    className: "FL FDOTSTATE",
+    standard: "FDOT",
+    officialDimensions: true,
+    assetPathByVariant: {
+      "Guide42x361-2Digit": `${fdotFolder}/Florida-Guide-42x36-1to2.svg`,
+      "Guide48-58x363+Digit": `${fdotFolder}/Florida-Guide-48x36-3plus.svg`,
+      "Guide36x301-2Digit": `${fdotFolder}/Florida-Guide-36x30-1to2.svg`,
+      "Guide48-58x303+Digit": `${fdotFolder}/Florida-Guide-48x30-3plus.svg`,
+      "Guide30x241-2Digit": `${fdotFolder}/Florida-Guide-30x24-1to2.svg`,
+      "Guide48-58x243+Digit": `${fdotFolder}/Florida-Guide-48x24-3plus.svg`,
+      "Freeway48x361-3Digit": `${fdotFolder}/Florida-Freeway-1to3.svg`,
+      Freeway48x364Digit: `${fdotFolder}/Florida-Freeway-4.svg`,
+      "Independent24x241-2Digit": `${fdotFolder}/Florida-Nonfreeway-1to2.svg`,
+      "Independent24x243DigitCluster": `${fdotFolder}/Florida-Nonfreeway-1to2.svg`,
+      "Independent30x243-4Digit": `${fdotFolder}/Florida-Nonfreeway-3to4.svg`,
+    },
+    physicalDimensionsByVariant: {
+      "Guide42x361-2Digit": dimensions(42, 36),
+      "Guide48-58x363+Digit": dimensions(48, 36),
+      "Guide36x301-2Digit": dimensions(36, 30),
+      "Guide48-58x303+Digit": dimensions(48, 30),
+      "Guide30x241-2Digit": dimensions(30, 24),
+      "Guide48-58x243+Digit": dimensions(48, 24),
+      "Freeway48x361-3Digit": dimensions(48, 36),
+      Freeway48x364Digit: dimensions(48, 36),
+      "Independent24x241-2Digit": dimensions(24, 24),
+      "Independent24x243DigitCluster": dimensions(24, 24),
+      "Independent30x243-4Digit": dimensions(30, 24),
+    },
+    routeNumberByVariant: {
+      "Guide42x361-2Digit": routeStyle(15, "Series D", 14.75, {
+        rightIn: 31,
+      }),
+      "Guide48-58x363+Digit": routeStyle(15, "Series D", 14.75, {
+        leftIn: 1.25,
+        variablePanelWidth: variableGuidePanel(11),
+      }),
+      "Guide36x301-2Digit": routeStyle(15, "Series D", 11.75, {
+        rightIn: 27.25,
+      }),
+      "Guide48-58x303+Digit": routeStyle(15, "Series D", 11.75, {
+        leftIn: 1.25,
+        variablePanelWidth: variableGuidePanel(8.75),
+      }),
+      "Guide30x241-2Digit": routeStyle(12, "Series D", 9.25, {
+        rightIn: 21.75,
+      }),
+      "Guide48-58x243+Digit": routeStyle(12, "Series D", 9.25, {
+        leftIn: 1.25,
+        variablePanelWidth: variableGuidePanel(8.25),
+      }),
+      "Freeway48x361-3Digit": routeStyle(15, "Series C", 14, { centerXIn: 19 }),
+      Freeway48x364Digit: routeStyle(12, "Series C", 17, { centerXIn: 19 }),
+      "Independent24x241-2Digit": routeStyle(10, "Series D", 9, { centerXIn: 12 }),
+      "Independent24x243DigitCluster": routeStyle(8, "Series D", 10.5, {
+        centerXIn: 12,
+      }),
+      "Independent30x243-4Digit": routeStyle(
+        8,
+        "Series D",
+        10.5,
+        { centerXIn: 15 },
+        { 4: "Series C" }
+      ),
+    },
+    autoVariantByCharacterCount: {
+      oneToTwo: "Independent 24x24 1-2 Digit",
+      threeOrMore: "Independent 30x24 3-4 Digit",
+    },
+    legacyVariantAliases: {
+      "2DigitOverhead": "Guide 42x36 1-2 Digit",
+      "3DigitOverhead": "Guide 48-58x36 3+ Digit",
+      "Guide58x363+Digit": "Guide 48-58x36 3+ Digit",
+      "Guide53x303+Digit": "Guide 48-58x30 3+ Digit",
+      "Guide48x243+Digit": "Guide 48-58x24 3+ Digit",
+      "2Digit": "Independent 24x24 1-2 Digit",
+      "3Digit": "Independent 30x24 3-4 Digit",
+    },
+  };
+
+  florida.FLToll = {
+    type: "shield",
+    name: "FDOT Toll Route",
+    variants: ["40x48 Guide", "48x60 Overhead", "24x30 Route Marker"],
+    className: "FL FDOTTOLL",
+    standard: "FDOT",
+    officialDimensions: true,
+    assetPathByVariant: {
+      "40x48Guide": `${fdotFolder}/Toll-40x48.svg`,
+      "48x60Overhead": `${fdotFolder}/Toll-48x60.svg`,
+      "24x30RouteMarker": `${fdotFolder}/Toll-24x30.svg`,
+    },
+    physicalDimensionsByVariant: {
+      "40x48Guide": dimensions(40, 48),
+      "48x60Overhead": dimensions(48, 60),
+      "24x30RouteMarker": dimensions(24, 30),
+    },
+    routeNumberByVariant: {
+      "40x48Guide": routeStyle(10, "Series D", 25, { centerXIn: 17.112 }),
+      "48x60Overhead": routeStyle(12, "Series D", 28, { centerXIn: 19.76 }),
+      "24x30RouteMarker": routeStyle(6, "Series D", 16, { centerXIn: 10.588 }),
+    },
+    legacyVariantAliases: {
+      Current: "40x48 Guide",
+      Old: "40x48 Guide",
+      Selmon: "40x48 Guide",
+    },
+  };
+
+  florida.FLCFXToll = {
+    type: "shield",
+    name: "CFX Toll Route",
+    variants: [
+      "TM 36x48 CFX Jurisdiction",
+      "TM 48x60 CFX Jurisdiction",
+      "TM-ALT 36x48 FDOT Jurisdiction",
+      "TM-ALT 48x60 FDOT Jurisdiction",
+    ],
+    className: "FL CFXTOLL",
+    standard: "CFX",
+    officialDimensions: true,
+    assetPathByVariant: {
+      TM36x48CFXJurisdiction: `${cfxFolder}/CFX-TM-36x48.svg`,
+      TM48x60CFXJurisdiction: `${cfxFolder}/CFX-TM-48x60.svg`,
+      "TM-ALT36x48FDOTJurisdiction": `${cfxFolder}/CFX-TM-ALT-36x48.svg`,
+      "TM-ALT48x60FDOTJurisdiction": `${cfxFolder}/CFX-TM-ALT-48x60.svg`,
+    },
+    physicalDimensionsByVariant: {
+      TM36x48CFXJurisdiction: dimensions(36, 48),
+      TM48x60CFXJurisdiction: dimensions(48, 60),
+      "TM-ALT36x48FDOTJurisdiction": dimensions(36, 48),
+      "TM-ALT48x60FDOTJurisdiction": dimensions(48, 60),
+    },
+    routeNumberByVariant: {
+      TM36x48CFXJurisdiction: routeStyle(12, "Series D", 22.53, {
+        centerXIn: 15.64,
+        maxWidthIn: 22.84,
+        allowOpticalSpacing: true,
+      }),
+      TM48x60CFXJurisdiction: routeStyle(15, "Series D", 27.89, {
+        centerXIn: 20.48,
+        maxWidthIn: 31.84,
+        allowOpticalSpacing: true,
+      }),
+      "TM-ALT36x48FDOTJurisdiction": routeStyle(12, "Series D", 22.53, {
+        centerXIn: 15.64,
+        maxWidthIn: 22.84,
+        allowOpticalSpacing: true,
+      }),
+      "TM-ALT48x60FDOTJurisdiction": routeStyle(15, "Series D", 27.89, {
+        centerXIn: 20.48,
+        maxWidthIn: 31.84,
+        allowOpticalSpacing: true,
+      }),
+    },
+    legacyVariantAliases: {
+      Current: "TM 36x48 CFX Jurisdiction",
+      Old: "TM 36x48 CFX Jurisdiction",
+    },
+  };
+
+  florida.FLTURNPIKE = {
+    type: "shield",
+    name: "FDOT Florida's Turnpike",
+    variants: [
+      "40x48 Guide",
+      "48x60 Overhead",
+      "30x36 Route Marker",
+      "Toll",
+    ],
+    className: "FL FDOTTURNPIKE",
+    standard: "FDOT",
+    officialDimensions: true,
+    suppressRouteNumber: true,
+    assetPathByVariant: {
+      "40x48Guide": `${fdotFolder}/Turnpike-40x48.svg`,
+      "48x60Overhead": `${fdotFolder}/Turnpike-48x60.svg`,
+      "30x36RouteMarker": `${fdotFolder}/Turnpike-30x36.svg`,
+      Toll: "img/shields/United States/Florida/FLTurnpike-Toll.svg",
+    },
+    physicalDimensionsByVariant: {
+      "40x48Guide": dimensions(40, 48),
+      "48x60Overhead": dimensions(48, 60),
+      "30x36RouteMarker": dimensions(30, 36),
+    },
+    legacyVariantAliases: {
+      Standard: "40x48 Guide",
+    },
+  };
+})();
+
 Shield.prototype.bannerTypes = [
   "None",
   "North",

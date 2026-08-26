@@ -1103,3 +1103,62 @@
 	font-size: 1.4em;
 	font-family: "Series C";
 }
+
+/* Current FDOT/CFX route markers use published physical dimensions. */
+.bannerShieldContainer.officialFdotShield .shield,
+.bannerShieldContainer.officialCfxShield .shield {
+	box-sizing: border-box;
+	margin: 0;
+	position: relative;
+}
+
+.bannerShieldContainer.officialFdotShield .shieldImg,
+.bannerShieldContainer.officialCfxShield .shieldImg {
+	display: block;
+	max-width: none;
+	object-fit: fill;
+}
+
+.bannerShieldContainer.variableGuideWidth .shield {
+	background: var(--white);
+	border-radius: var(--variableGuideRadius);
+	overflow: hidden;
+}
+
+.bannerShieldContainer.variableGuideWidth .shieldImg {
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+}
+
+.bannerShieldContainer.variableGuideWidth .shield::before {
+	background: var(--white);
+	bottom: 0;
+	content: "";
+	left: calc(100% - var(--variableGuideAssetWidth));
+	position: absolute;
+	top: 0;
+	width: var(--variableGuideSeamCover);
+	z-index: 2;
+}
+
+.bannerShieldContainer.officialFdotShield .routeNumber.officialRouteNumber,
+.bannerShieldContainer.officialCfxShield .routeNumber.officialRouteNumber {
+	bottom: auto;
+	left: 0;
+	font-feature-settings: "kern" 0;
+	font-kerning: none;
+	font-synthesis: none;
+	letter-spacing: 0;
+	line-height: 1;
+	margin: 0;
+	right: auto;
+	text-align: left;
+	top: calc(var(--officialRouteCapTop, 0rem) - 0.142857143em);
+	transform: none;
+	transform-origin: 0 50%;
+	white-space: nowrap;
+	width: max-content;
+	z-index: 4;
+}

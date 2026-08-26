@@ -537,6 +537,7 @@ class ShieldElement extends Shield {
     bannerFontFamily2 = undefined,
     countyText = "",
     shieldSize,
+    useOfficialDimensions = true,
     scaleBannersWithShield = ShieldElement.prototype.defaultScaleBannersWithShield,
     size,
   } = {}) {
@@ -584,6 +585,7 @@ class ShieldElement extends Shield {
     this.shieldSize = ShieldElement.prototype.normalizeShieldSize(
       shieldSize !== undefined ? shieldSize : size
     );
+    this.useOfficialDimensions = useOfficialDimensions !== false;
     this.scaleBannersWithShield = scaleBannersWithShield !== false;
 
     // Legacy properties used by older save data and helpers
@@ -608,8 +610,16 @@ class ShieldElement extends Shield {
     );
     const normalizedRoute = `${this.routeNumber ?? ""}`.trim();
     const routeText = normalizedRoute;
+    const migratedShieldType =
+      ShieldElement.prototype.migrateLegacyBlockVariant(
+        this.shieldType,
+        config
+      );
+    if (migratedShieldType !== this.shieldType) {
+      this.shieldType = migratedShieldType;
+    }
     const variant = ShieldElement.prototype.resolveBlockVariant(
-      this.shieldType,
+      migratedShieldType,
       routeText,
       config
     );
@@ -618,11 +628,38 @@ class ShieldElement extends Shield {
       config,
       variantKey
     );
+    const officialPhysicalDimensions = config?.officialDimensions
+      ? ShieldElement.prototype.getVariantMetadata(
+          config,
+          "physicalDimensionsByVariant",
+          variantKey
+        )
+      : null;
+    const routeNumberStyle = ShieldElement.prototype.getVariantMetadata(
+      config,
+      "routeNumberByVariant",
+      variantKey
+    );
+    const renderedRouteText = routeNumberStyle
+      ? routeText.toUpperCase()
+      : routeText;
+    const variablePanelWidth = routeNumberStyle?.variablePanelWidth || null;
+    const physicalDimensions = this.useOfficialDimensions
+      ? officialPhysicalDimensions
+      : null;
     const normalizedShieldSize = ShieldElement.prototype.normalizeShieldSize(
       this.shieldSize
     );
-    const shieldScale =
-      ShieldElement.prototype.getShieldScale(normalizedShieldSize);
+    const physicalWidthRem = physicalDimensions?.widthIn
+      ? ShieldElement.prototype.inchesToRem(physicalDimensions.widthIn)
+      : null;
+    const physicalHeightRem = physicalDimensions?.heightIn
+      ? ShieldElement.prototype.inchesToRem(physicalDimensions.heightIn)
+      : null;
+    const renderedShieldHeight = physicalHeightRem || normalizedShieldSize;
+    const shieldScale = ShieldElement.prototype.getShieldScale(
+      renderedShieldHeight
+    );
     const bannerScale = this.scaleBannersWithShield ? shieldScale : 1;
     const fontSizeCss = ShieldElement.prototype.getFontSizeCss(this.fontSize);
     const bannerFontFamily =
@@ -634,13 +671,34 @@ class ShieldElement extends Shield {
     wrapper.style.setProperty("--shieldScale", shieldScale.toString());
     wrapper.style.setProperty(
       "--shieldSize",
-      normalizedShieldSize + "rem"
+      renderedShieldHeight + "rem"
     );
+    if (physicalWidthRem && physicalHeightRem) {
+      wrapper.style.setProperty("--shieldWidth", physicalWidthRem + "rem");
+      wrapper.style.setProperty("--shieldHeight", physicalHeightRem + "rem");
+    }
+    if (officialPhysicalDimensions) {
+      wrapper.dataset.widthIn = String(officialPhysicalDimensions.widthIn);
+      wrapper.dataset.heightIn = String(officialPhysicalDimensions.heightIn);
+    }
     wrapper.style.setProperty("--bannerScale", bannerScale.toString());
 
     const shieldContainer = document.createElement("div");
     const containerClass = config.className || config.value;
     shieldContainer.className = `bannerShieldContainer ${containerClass}`;
+    const usesOfficialShieldRendering = Boolean(officialPhysicalDimensions);
+    shieldContainer.classList.toggle(
+      "officialFdotShield",
+      usesOfficialShieldRendering && config?.standard === "FDOT"
+    );
+    shieldContainer.classList.toggle(
+      "officialCfxShield",
+      usesOfficialShieldRendering && config?.standard === "CFX"
+    );
+    shieldContainer.classList.toggle(
+      "variableGuideWidth",
+      Boolean(variablePanelWidth)
+    );
     if (variantKey) {
       shieldContainer.classList.add(
         "variant-" + variantKey.toLowerCase().replace(/[^a-z0-9_-]/g, "-")
@@ -729,6 +787,15 @@ class ShieldElement extends Shield {
 
     const shieldEl = document.createElement("div");
     shieldEl.className = "shield";
+    if (physicalWidthRem && physicalHeightRem) {
+      shieldEl.style.width = physicalWidthRem + "rem";
+      shieldEl.style.height = physicalHeightRem + "rem";
+    } else if (variablePanelWidth && officialPhysicalDimensions) {
+      shieldEl.style.width = `calc(var(--shieldSize) * ${
+        officialPhysicalDimensions.widthIn / officialPhysicalDimensions.heightIn
+      })`;
+      shieldEl.style.height = "var(--shieldSize)";
+    }
 
     const img = document.createElement("img");
     img.className = "shieldImg";
@@ -741,17 +808,74 @@ class ShieldElement extends Shield {
     img.loading = "lazy";
     img.decoding = "async";
     img.draggable = false;
+    if (physicalWidthRem && physicalHeightRem) {
+      img.style.width = physicalWidthRem + "rem";
+      img.style.height = physicalHeightRem + "rem";
+    } else if (variablePanelWidth && officialPhysicalDimensions) {
+      const assetWidthIn = Number(variablePanelWidth.assetWidthIn);
+      img.style.width = `calc(var(--shieldSize) * ${
+        assetWidthIn / officialPhysicalDimensions.heightIn
+      })`;
+      img.style.height = "var(--shieldSize)";
+    }
+    if (variablePanelWidth && officialPhysicalDimensions) {
+      const assetWidthIn = Number(variablePanelWidth.assetWidthIn);
+      const assetWidthCss = this.useOfficialDimensions
+        ? `${ShieldElement.prototype.inchesToRem(assetWidthIn)}rem`
+        : `calc(var(--shieldSize) * ${
+            assetWidthIn / officialPhysicalDimensions.heightIn
+          })`;
+      shieldEl.style.setProperty("--variableGuideAssetWidth", assetWidthCss);
+      shieldEl.style.setProperty(
+        "--variableGuideRadius",
+        `calc(var(--shieldSize) * ${
+          1.25 / officialPhysicalDimensions.heightIn
+        })`
+      );
+      shieldEl.style.setProperty(
+        "--variableGuideSeamCover",
+        `calc(var(--shieldSize) * ${
+          1.5 / officialPhysicalDimensions.heightIn
+        })`
+      );
+    }
     shieldEl.appendChild(img);
 
     const routeEl = document.createElement("p");
     routeEl.className = "routeNumber";
+    if (routeNumberStyle) {
+      routeEl.classList.add("officialRouteNumber");
+      if (Number.isFinite(routeNumberStyle.topIn)) {
+        routeEl.style.setProperty(
+          "--officialRouteCapTop",
+          `${ShieldElement.prototype.inchesToRem(routeNumberStyle.topIn)}rem`
+        );
+      }
+      const capHeightIn =
+        routeNumberStyle.capHeightInByCharacterCount?.[routeCharacterCount] ||
+        routeNumberStyle.capHeightIn;
+      const routeFontFamily =
+        routeNumberStyle.fontFamilyByCharacterCount?.[routeCharacterCount] ||
+        routeNumberStyle.fontFamily;
+      if (capHeightIn) {
+        routeEl.style.fontSize = ShieldElement.prototype.cssRemFromCapHeight(
+          capHeightIn
+        );
+      }
+      if (routeFontFamily) {
+        routeEl.style.fontFamily = `"${routeFontFamily}"`;
+      }
+      if (routeNumberStyle.color) {
+        routeEl.style.color = routeNumberStyle.color;
+      }
+    }
     const usesV22NumberStyle =
       ShieldElement.prototype.usesV22NumberStyle(config);
     if (usesV22NumberStyle) {
-      routeEl.textContent = routeText;
+      routeEl.textContent = renderedRouteText;
     } else {
       routeEl.replaceChildren(
-        ...Array.from(routeText).map((character) => {
+        ...Array.from(renderedRouteText).map((character) => {
           const characterEl = document.createElement("span");
           characterEl.className = "routeChar";
           if (/^[0-9A-Za-z]$/.test(character)) {
@@ -806,6 +930,24 @@ class ShieldElement extends Shield {
 
     wrapper.appendChild(shieldContainer);
 
+    if (
+      routeEl.parentElement &&
+      routeNumberStyle &&
+      officialPhysicalDimensions
+    ) {
+      ShieldElement.prototype.scheduleOfficialRouteNumberLayout({
+        wrapper,
+        routeEl,
+        shieldEl,
+        img,
+        routeText: renderedRouteText,
+        routeNumberStyle,
+        routeCharacterCount,
+        officialPhysicalDimensions,
+        useOfficialDimensions: this.useOfficialDimensions,
+      });
+    }
+
     if (routeEl.parentElement && !usesV22NumberStyle) {
       requestAnimationFrame(() => {
         if (!routeEl.isConnected) {
@@ -853,6 +995,92 @@ const V22_NUMBER_STYLE_SHIELDS = [
   "USCA",
 ];
 
+// Advance, left ink edge, and right ink edge, normalized to the 1,000-unit
+// cap height in the bundled Roadgeek 2014 fonts. Safari reports the advance
+// box as actualBoundingBox*, so official placements use these font metrics.
+const OFFICIAL_ROADGEEK_METRICS = {
+  "Series C": {
+    "0": [0.706, 0.059983, 0.646],
+    "1": [0.407, 0.09, 0.297],
+    "2": [0.677, 0.06, 0.617],
+    "3": [0.677, 0.06, 0.617],
+    "4": [0.738, 0.03, 0.648],
+    "5": [0.677, 0.06, 0.617],
+    "6": [0.738, 0.09, 0.648],
+    "7": [0.678, 0.03, 0.588],
+    "8": [0.677, 0.06, 0.617],
+    "9": [0.677, 0.06, 0.617],
+    A: [0.699, 0.03, 0.669],
+    B: [0.732, 0.11, 0.672],
+    C: [0.738, 0.09, 0.648],
+    D: [0.762, 0.11, 0.672],
+    E: [0.679, 0.11, 0.619],
+    F: [0.649, 0.11, 0.619],
+    G: [0.738, 0.09, 0.648],
+    H: [0.782, 0.11, 0.672],
+    I: [0.36, 0.11, 0.25],
+    J: [0.649, 0.03, 0.539],
+    K: [0.732, 0.11, 0.672],
+    L: [0.649, 0.11, 0.619],
+    M: [0.881, 0.11, 0.771],
+    N: [0.782, 0.11, 0.672],
+    O: [0.766, 0.089983, 0.676],
+    P: [0.762, 0.11, 0.672],
+    Q: [0.766, 0.090496, 0.677],
+    R: [0.732, 0.11, 0.672],
+    S: [0.677, 0.06, 0.617],
+    T: [0.569, 0.03, 0.539],
+    U: [0.782, 0.11, 0.672],
+    V: [0.678, 0.03, 0.648],
+    W: [0.819, 0.03, 0.789],
+    X: [0.646, 0.03, 0.616],
+    Y: [0.699, 0.03, 0.669],
+    Z: [0.67, 0.06, 0.61],
+    " ": [0.428, 0, 0],
+    "-": [0.411, 0.03, 0.381],
+  },
+  "Series D": {
+    "0": [0.909, 0.1, 0.809],
+    "1": [0.473, 0.1, 0.353],
+    "2": [0.881, 0.1, 0.781],
+    "3": [0.956, 0.18, 0.856],
+    "4": [0.888, 0.02, 0.768],
+    "5": [0.881, 0.1, 0.781],
+    "6": [0.881, 0.1, 0.781],
+    "7": [0.817, 0.07, 0.747],
+    "8": [0.881, 0.1, 0.781],
+    "9": [0.881, 0.1, 0.781],
+    A: [0.906, 0.03, 0.876],
+    B: [0.85, 0.12, 0.8],
+    C: [0.881, 0.099987, 0.781],
+    D: [0.9, 0.12, 0.8],
+    E: [0.79, 0.12, 0.74],
+    F: [0.77, 0.12, 0.74],
+    G: [0.881, 0.099985, 0.781],
+    H: [0.92, 0.12, 0.8],
+    I: [0.401, 0.12, 0.281],
+    J: [0.789, 0.03, 0.669],
+    K: [0.867, 0.12, 0.817],
+    L: [0.77, 0.12, 0.74],
+    M: [1.018, 0.12, 0.898],
+    N: [0.92, 0.12, 0.8],
+    O: [0.909, 0.1, 0.809],
+    P: [0.83, 0.12, 0.8],
+    Q: [0.909, 0.1, 0.809],
+    R: [0.85, 0.12, 0.8],
+    S: [0.78, 0.05, 0.73],
+    T: [0.678, 0.03, 0.648],
+    U: [0.92, 0.119978, 0.8],
+    V: [0.819, 0.03, 0.789],
+    W: [0.949, 0.03, 0.919],
+    X: [0.78, 0.05, 0.73],
+    Y: [0.914, 0.03, 0.884],
+    Z: [0.78, 0.05, 0.73],
+    " ": [0.599, 0, 0],
+    "-": [0.411, 0.03, 0.381],
+  },
+};
+
 ShieldElement.prototype.defaultShieldBase = "I";
 ShieldElement.prototype.defaultVariant = "Auto";
 ShieldElement.prototype.defaultRouteNumber = "1";
@@ -864,6 +1092,199 @@ ShieldElement.prototype.defaultCountyText = "";
 ShieldElement.prototype.defaultShieldSize = 3;
 ShieldElement.prototype.defaultScaleBannersWithShield = true;
 ShieldElement.prototype.alignment = TextElement.prototype.alignment;
+ShieldElement.prototype.inchesPerRem = 12;
+ShieldElement.prototype.roadgeekCapHeightRatio = 4 / 7;
+
+ShieldElement.prototype.inchesToRem = function (inches) {
+  const value = Number(inches);
+  return Number.isFinite(value)
+    ? value / ShieldElement.prototype.inchesPerRem
+    : 0;
+};
+
+ShieldElement.prototype.cssRemFromCapHeight = function (inches) {
+  const capHeightRem = ShieldElement.prototype.inchesToRem(inches);
+  const fontSizeRem =
+    capHeightRem / ShieldElement.prototype.roadgeekCapHeightRatio;
+  return `${fontSizeRem.toFixed(6).replace(/0+$/, "").replace(/\.$/, "")}rem`;
+};
+
+ShieldElement.prototype.measureOfficialRouteInk = function ({
+  routeText,
+  routeFontFamily,
+  capHeightPixels,
+  letterSpacingPixels = 0,
+  context,
+}) {
+  const characters = Array.from(routeText);
+  const familyMetrics = OFFICIAL_ROADGEEK_METRICS[routeFontFamily];
+  let cursor = 0;
+  let inkLeft = Number.POSITIVE_INFINITY;
+  let inkRight = Number.NEGATIVE_INFINITY;
+
+  characters.forEach((rawCharacter, index) => {
+    const character = rawCharacter.toUpperCase();
+    const glyphMetrics = familyMetrics?.[character];
+    if (glyphMetrics) {
+      const [advance, left, right] = glyphMetrics;
+      if (right > left) {
+        inkLeft = Math.min(inkLeft, cursor + left * capHeightPixels);
+        inkRight = Math.max(inkRight, cursor + right * capHeightPixels);
+      }
+      cursor += advance * capHeightPixels;
+    } else {
+      const metrics = context.measureText(rawCharacter);
+      const left = cursor - Number(metrics.actualBoundingBoxLeft || 0);
+      const right = cursor + Number(metrics.actualBoundingBoxRight || metrics.width);
+      inkLeft = Math.min(inkLeft, left);
+      inkRight = Math.max(inkRight, right);
+      cursor += metrics.width;
+    }
+
+    if (index < characters.length - 1) {
+      cursor += letterSpacingPixels;
+    }
+  });
+
+  if (!Number.isFinite(inkLeft) || !Number.isFinite(inkRight)) {
+    inkLeft = 0;
+    inkRight = 0;
+  }
+  return { inkLeft, inkRight, inkWidth: inkRight - inkLeft };
+};
+
+ShieldElement.prototype.scheduleOfficialRouteNumberLayout = function ({
+  wrapper,
+  routeEl,
+  shieldEl,
+  img,
+  routeText,
+  routeNumberStyle,
+  routeCharacterCount,
+  officialPhysicalDimensions,
+  useOfficialDimensions,
+}) {
+  const layout = () => {
+    if (!routeEl.isConnected || !shieldEl.isConnected) {
+      return;
+    }
+    const shieldBounds = shieldEl.getBoundingClientRect();
+    const officialHeight = Number(officialPhysicalDimensions.heightIn);
+    if (!(shieldBounds.height > 0) || !(officialHeight > 0)) {
+      return;
+    }
+
+    const pixelsPerInch = shieldBounds.height / officialHeight;
+    const capHeightIn = Number(
+      routeNumberStyle.capHeightInByCharacterCount?.[routeCharacterCount] ||
+        routeNumberStyle.capHeightIn
+    );
+    const routeFontFamily =
+      routeNumberStyle.fontFamilyByCharacterCount?.[routeCharacterCount] ||
+      routeNumberStyle.fontFamily;
+    const fontSizePixels =
+      (capHeightIn * pixelsPerInch) /
+      ShieldElement.prototype.roadgeekCapHeightRatio;
+    routeEl.style.fontSize = `${fontSizePixels}px`;
+    routeEl.style.fontFamily = `"${routeFontFamily}"`;
+    routeEl.style.top = `${
+      Number(routeNumberStyle.topIn) * pixelsPerInch - fontSizePixels / 7
+    }px`;
+    routeEl.style.letterSpacing = "0px";
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+    context.fontKerning = "none";
+    context.font = `${fontSizePixels}px "${routeFontFamily}"`;
+    const capHeightPixels = capHeightIn * pixelsPerInch;
+    let measuredInk = ShieldElement.prototype.measureOfficialRouteInk({
+      routeText,
+      routeFontFamily,
+      capHeightPixels,
+      context,
+    });
+
+    if (
+      routeNumberStyle.allowOpticalSpacing &&
+      routeCharacterCount > 1 &&
+      Number(routeNumberStyle.maxWidthIn) > 0
+    ) {
+      const maximumWidth = routeNumberStyle.maxWidthIn * pixelsPerInch;
+      if (measuredInk.inkWidth > maximumWidth) {
+        const spacingAdjustment =
+          (maximumWidth - measuredInk.inkWidth) / (routeCharacterCount - 1);
+        routeEl.style.letterSpacing = `${spacingAdjustment}px`;
+        measuredInk = ShieldElement.prototype.measureOfficialRouteInk({
+          routeText,
+          routeFontFamily,
+          capHeightPixels,
+          letterSpacingPixels: spacingAdjustment,
+          context,
+        });
+      }
+    }
+
+    const { inkLeft, inkRight } = measuredInk;
+
+    const variablePanelWidth = routeNumberStyle.variablePanelWidth;
+    if (variablePanelWidth) {
+      const minWidthIn = Number(variablePanelWidth.minWidthIn);
+      const maxWidthIn = Number(variablePanelWidth.maxWidthIn);
+      const assetWidthIn = Number(variablePanelWidth.assetWidthIn);
+      const leftClearanceIn = Number(routeNumberStyle.leftIn);
+      const rightClearanceIn = Number(variablePanelWidth.rightClearanceIn);
+      const requiredWidthIn =
+        leftClearanceIn +
+        (inkRight - inkLeft) / pixelsPerInch +
+        rightClearanceIn;
+      const renderedWidthIn = Math.min(
+        maxWidthIn,
+        Math.max(minWidthIn, requiredWidthIn)
+      );
+      const renderedWidthCss = useOfficialDimensions
+        ? `${ShieldElement.prototype.inchesToRem(renderedWidthIn)}rem`
+        : `calc(var(--shieldSize) * ${renderedWidthIn / officialHeight})`;
+      const assetWidthCss = useOfficialDimensions
+        ? `${ShieldElement.prototype.inchesToRem(assetWidthIn)}rem`
+        : `calc(var(--shieldSize) * ${assetWidthIn / officialHeight})`;
+
+      shieldEl.style.width = renderedWidthCss;
+      img.style.width = assetWidthCss;
+      shieldEl.style.setProperty("--variableGuideAssetWidth", assetWidthCss);
+      wrapper.style.setProperty("--shieldWidth", renderedWidthCss);
+      wrapper.dataset.widthIn = String(renderedWidthIn);
+    }
+
+    let targetPosition;
+    let sourcePosition;
+    if (Number.isFinite(routeNumberStyle.leftIn)) {
+      targetPosition = routeNumberStyle.leftIn * pixelsPerInch;
+      sourcePosition = inkLeft;
+    } else if (Number.isFinite(routeNumberStyle.rightIn)) {
+      targetPosition = routeNumberStyle.rightIn * pixelsPerInch;
+      sourcePosition = inkRight;
+    } else {
+      const centerXIn = Number.isFinite(routeNumberStyle.centerXIn)
+        ? routeNumberStyle.centerXIn
+        : officialPhysicalDimensions.widthIn / 2;
+      targetPosition = centerXIn * pixelsPerInch;
+      sourcePosition = (inkLeft + inkRight) / 2;
+    }
+    routeEl.style.transform = `translateX(${targetPosition - sourcePosition}px)`;
+  };
+
+  queueMicrotask(layout);
+  requestAnimationFrame(layout);
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      layout();
+      requestAnimationFrame(layout);
+    });
+  }
+};
 
 ShieldElement.prototype.normalizeShieldCode = function (code) {
   if (typeof code !== "string") {
@@ -948,6 +1369,13 @@ ShieldElement.prototype.buildBlockShieldList = function () {
           assetPathByVariant: value.assetPathByVariant || null,
           suppressRouteNumber: value.suppressRouteNumber === true,
           county: value.county === true,
+          standard: value.standard || null,
+          officialDimensions: value.officialDimensions === true,
+          physicalDimensionsByVariant: value.physicalDimensionsByVariant || null,
+          routeNumberByVariant: value.routeNumberByVariant || null,
+          autoVariantByCharacterCount:
+            value.autoVariantByCharacterCount || null,
+          legacyVariantAliases: value.legacyVariantAliases || null,
           categories: categoryParts.slice(),
         });
       }
@@ -978,6 +1406,14 @@ ShieldElement.prototype.buildBlockShieldList = function () {
       assetPathByVariant: definition.assetPathByVariant || null,
       suppressRouteNumber: definition.suppressRouteNumber === true,
       county: definition.county === true,
+      standard: definition.standard || null,
+      officialDimensions: definition.officialDimensions === true,
+      physicalDimensionsByVariant:
+        definition.physicalDimensionsByVariant || null,
+      routeNumberByVariant: definition.routeNumberByVariant || null,
+      autoVariantByCharacterCount:
+        definition.autoVariantByCharacterCount || null,
+      legacyVariantAliases: definition.legacyVariantAliases || null,
       categories: Array.isArray(definition.categories)
         ? definition.categories.slice()
         : [],
@@ -1565,6 +2001,13 @@ ShieldElement.prototype.resolveBlockVariant = function (
     if (allowed.includes(normalized)) {
       return normalized;
     }
+    const legacyVariantKey = ShieldElement.prototype.formatVariantKey(
+      normalized
+    );
+    const migratedVariant = config?.legacyVariantAliases?.[legacyVariantKey];
+    if (migratedVariant && allowed.includes(migratedVariant)) {
+      return migratedVariant;
+    }
     return allowed[0] || normalized;
   }
   const fallback = allowed[0] || ShieldElement.prototype.defaultVariant;
@@ -1572,9 +2015,36 @@ ShieldElement.prototype.resolveBlockVariant = function (
   return allowed.includes(inferred) ? inferred : fallback;
 };
 
+ShieldElement.prototype.migrateLegacyBlockVariant = function (
+  desiredVariant,
+  config
+) {
+  if (typeof desiredVariant !== "string") {
+    return desiredVariant;
+  }
+  const requested = desiredVariant.trim();
+  const allowed = config?.variants || [];
+  if (
+    !requested ||
+    requested.toLowerCase() === "auto" ||
+    allowed.includes(requested)
+  ) {
+    return desiredVariant;
+  }
+  const legacyKey = ShieldElement.prototype.formatVariantKey(requested);
+  const migrated = config?.legacyVariantAliases?.[legacyKey];
+  return migrated && allowed.includes(migrated) ? migrated : desiredVariant;
+};
+
 ShieldElement.prototype.getVariantFromRoute = function (routeNumber, config) {
   const characterCount =
     ShieldElement.prototype.getRouteCharacterCount(routeNumber);
+  const officialAutoVariants = config?.autoVariantByCharacterCount;
+  if (officialAutoVariants) {
+    return characterCount >= 3
+      ? officialAutoVariants.threeOrMore
+      : officialAutoVariants.oneToTwo;
+  }
   const supportsOneDigit =
     Array.isArray(config?.variants) && config.variants.includes("1 Digit");
   const supportsFourDigit =
@@ -1647,7 +2117,22 @@ ShieldElement.prototype.getShieldAssetPath = function (config, variantKey) {
   return `${assetFolder}/${assetName}${suffix}.svg`;
 };
 
+ShieldElement.prototype.getVariantMetadata = function (
+  config,
+  propertyName,
+  variantKey
+) {
+  const values = config?.[propertyName];
+  if (!values || typeof values !== "object") {
+    return null;
+  }
+  return values[variantKey] || values.Default || null;
+};
+
 ShieldElement.prototype.usesV22NumberStyle = function (config) {
+  if (config?.standard === "FDOT" || config?.standard === "CFX") {
+    return true;
+  }
   const normalized = ShieldElement.prototype.normalizeShieldCode(
     config?.value || config?.assetName || ""
   );

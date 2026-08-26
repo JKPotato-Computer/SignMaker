@@ -5864,6 +5864,14 @@ const formHandler = (function () {
     }
 
     if (blockElemType === "sdShield") {
+      const shieldConfig = ShieldElement.prototype.getBlockShieldConfig(
+        currentBlockElem.shieldBase
+      );
+      currentBlockElem.shieldType =
+        ShieldElement.prototype.migrateLegacyBlockVariant(
+          currentBlockElem.shieldType,
+          shieldConfig
+        );
       const normalizeDisableSmallCapsValue = (value) =>
         value === true ||
         value === "true" ||
