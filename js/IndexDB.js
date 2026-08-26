@@ -95,12 +95,19 @@ class IndexDB {
     await this.dbInitialized;
     
     return new Promise((resolve, reject) => {
+      const now = new Date().toISOString();
       const template = {
+        ...templateData,
         id: templateData.id || Date.now().toString(),
         name: templateData.name,
         data: templateData.data,
-        dateCreated: templateData.dateCreated || new Date().toISOString(),
-        dateModified: new Date().toISOString(),
+        templateScope: templateData.templateScope || "panel",
+        variants: Array.isArray(templateData.variants)
+          ? templateData.variants
+          : [],
+        dateCreated: templateData.dateCreated || now,
+        dateModified: templateData.dateModified || now,
+        dateLastUsed: templateData.dateLastUsed || null,
       };
 
       const transaction = this.db.transaction([this.templatesStoreName], "readwrite");
@@ -109,6 +116,14 @@ class IndexDB {
 
       request.onsuccess = () => resolve(template);
       request.onerror = () => reject(request.error);
+    });
+  }
+
+  async updateTemplate(templateId, templateData) {
+    return this.saveTemplate({
+      ...templateData,
+      id: templateId,
+      dateModified: new Date().toISOString(),
     });
   }
 

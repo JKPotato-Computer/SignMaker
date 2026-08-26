@@ -25,6 +25,7 @@
   <link href="css/page.css" rel="stylesheet" type="text/css" />
   <link href="css/signs.css" rel="stylesheet" type="text/css" />
   <link href="css/shields.css" rel="stylesheet" type="text/css" />
+  <link href="css/shield-presets.css" rel="stylesheet" type="text/css" />
   <link href="css/form.css" rel="stylesheet" type="text/css" />
   <link href="css/sign-foundation.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet"
@@ -52,15 +53,12 @@
 </head>
 
 <body onload="app.init();">
-  <a class="mutcd-link" href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf" target="_blank"
-    rel="noopener noreferrer">
-    MUTCD
-  </a>
   <main>
     <div id="postContainer">
       <div class="post"></div>
       <div id="panelContainer"></div>
       <div class="post"></div>
+      <div id="alignmentGuides" aria-hidden="true"></div>
     </div>
   </main>
   <div id="modalHolder">
@@ -265,7 +263,7 @@
               <select id="panelColor" onchange="formHandler.readForm();"></select>
               <br />
               <label for="panelCorner">Panel Corners: </label>
-              <select id="panelCorner" onchange="formHandler.readForm();"></select>
+              <select id="panelCorner" onchange="formHandler.setPanelCorner(this.value);"></select>
               <br />
               <label for="panelBorderRadius">Sign Border Radius (rem): </label>
               <input type="number" id="panelBorderRadius" name="panelBorderRadius" value=".75" min="0" max="5"
@@ -281,6 +279,23 @@
               <label for="showBlockBoundingBoxes">Show Block Bounds: </label>
               <input type="checkbox" id="showBlockBoundingBoxes" name="showBlockBoundingBoxes"
                 onchange="formHandler.readForm();" />
+              <br />
+              <label for="showAlignmentGuides"
+                data-toolTip="Draws evenly spaced vertical guides below the rendered signs.">Alignment Guides:
+              </label>
+              <input type="checkbox" id="showAlignmentGuides" name="showAlignmentGuides"
+                onchange="formHandler.readForm();" />
+              <div id="alignmentGuideControls" class="hidden">
+                <label for="alignmentGuideSpacing">Spacing (<output id="alignmentGuideSpacingValue">4</output>
+                  rem):</label>
+                <input type="range" id="alignmentGuideSpacing" name="alignmentGuideSpacing" min="1" max="15"
+                  step="0.25" value="4" oninput="formHandler.readForm();" />
+                <br />
+                <label for="alignmentGuidePhase">Phase (<output id="alignmentGuidePhaseValue">0</output>
+                  rem):</label>
+                <input type="range" id="alignmentGuidePhase" name="alignmentGuidePhase" min="0" max="4"
+                  step="0.25" value="0" oninput="formHandler.readForm();" />
+              </div>
             </div>
           </div>
           <div id="sMPanelPadding" class="tabHidden">
@@ -366,6 +381,12 @@
               <label for="squareCorners">Square Corners:</label>
               <input type="checkbox" id="squareCorners" value="squareCorners" name="squareCorners"
                 onchange="formHandler.readForm();" />
+              <label for="matchSignCornerRadius">Match Corner Radius to Sign Radius:</label>
+              <input type="checkbox" id="matchSignCornerRadius" value="matchSignCornerRadius"
+                name="matchSignCornerRadius" onchange="formHandler.readForm();" />
+              <label for="extendHorizontalPadding">Extend Left-Right Padding:</label>
+              <input type="checkbox" id="extendHorizontalPadding" value="extendHorizontalPadding"
+                name="extendHorizontalPadding" onchange="formHandler.readForm();" />
               <label for="exitTabAttached">Attached:</label>
               <input type="checkbox" id="exitTabAttached" value="exitTabAttached" name="exitTabAttached"
                 onchange="formHandler.readForm();" />
@@ -685,7 +706,7 @@
                 <div class="SMSPNewElementHolder">
                   <span>New: </span>
                   <select id="sMSPElementSelect" style="width: 30%"></select>
-                  <button id="sMSPCreateElement"
+                  <button id="sMSPCreateElement" draggable="true" title="Click or drag to add"
                     onclick="app.newControlElem(document.querySelector('#sMSPElementSelect').value);">
                     <span class="material-symbols-outlined">add</span> Add
                   </button>
@@ -783,6 +804,8 @@
                   <input type="number" id="sdShield_shieldSize" class="sdTextEditorSmall"
                     data-toolTip="Scales the shield and its number(s)" placeholder="3" min="0.1" max="20" step="0.1"
                     value="3" />
+                  <label for="sdShield_alignment">Alignment: </label>
+                  <select id="sdShield_alignment"></select>
                   <br />
                   <label for="sdShield_to">Show TO:</label>
                   <input type="checkbox" id="sdShield_to" />
@@ -797,6 +820,8 @@
                     <input type="checkbox" id="sdShield_indentFirstLetter" checked />
                     <label for="sdShield_disableSmallCaps">Disable Small Caps:</label>
                     <input type="checkbox" id="sdShield_disableSmallCaps" />
+                    <label for="sdShield_bannerFontFamily">Font:</label>
+                    <select id="sdShield_bannerFontFamily"></select>
                   </div>
                   <div class="sdShieldBannerGroup">
                     <label for="sdShield_bannerType2">2nd Banner:</label>
@@ -809,10 +834,9 @@
                     <input type="checkbox" id="sdShield_indentFirstLetter2" checked />
                     <label for="sdShield_disableSmallCaps2">Disable Small Caps:</label>
                     <input type="checkbox" id="sdShield_disableSmallCaps2" />
+                    <label for="sdShield_bannerFontFamily2">Font:</label>
+                    <select id="sdShield_bannerFontFamily2"></select>
                   </div>
-                  <br />
-                  <label for="sdShield_bannerFontFamily">Banner Font:</label>
-                  <select id="sdShield_bannerFontFamily"></select>
                   <br />
                   <label for="sdShield_fontSize">Banner Font Size (rem):</label>
                   <input type="number" id="sdShield_fontSize" placeholder="1.4" min="0.5" max="3" step="0.1"
@@ -877,6 +901,8 @@
                   <input type="hidden" id="sdIcon_icon" value="" />
                   <label for="sdIcon_iconSize">Size (rem): </label>
                   <input type="number" id="sdIcon_iconSize" placeholder="3" min="0.5" max="12" step="0.1" value="3" />
+                  <label for="sdIcon_invertColor">Invert Color: </label>
+                  <input type="checkbox" id="sdIcon_invertColor" />
                   <br />
                   <label for="sdIcon_backgroundColor">BG Color: </label>
                   <select id="sdIcon_backgroundColor"></select>
@@ -1164,20 +1190,59 @@
           <div id="sMStandardArrows">
             <div>
               <legend>Standard Arrows</legend>
-              <label for="guideArrow">Arrows:</label>
+              <label for="bottomArrowKind">Arrow Kind:</label>
+              <button type="button" id="bottomArrowChooseBtn">Choose Arrow...</button>
+              <span id="bottomArrowSelectedLabel">Current: None</span>
+              <input type="hidden" id="bottomArrowKind" value="None" />
+              <button type="button" id="bottomArrowClearBtn">Clear</button>
+              <br />
+              <label for="guideArrow">Arrow Type:</label>
               <select id="guideArrow" onchange="formHandler.readForm();"></select>
+              <label for="guideArrowLanes" class="noLabelAlignment">Lanes:</label>
               <input type="number" id="guideArrowLanes" name="guideArrowLanes" min="1" max="6"
                 onblur="formHandler.readForm();" />
               <br />
               <label id="arrowLocationLabel" for="arrowLocations">Arrow Location:</label>
               <select id="arrowLocations" onchange="formHandler.readForm();"></select>
               <br />
-              <label for="useCanadianDownArrows">Use Canadian Down Arrow</label>
-              <input type="checkbox" id="useCanadianDownArrows" name="useCanadianDownArrows"
+              <label for="bottomArrowGap" id="bottomArrowGapLabel">Arrow Gap (rem):</label>
+              <input type="range" id="bottomArrowGap" min="0" max="5" step="0.1" value="0.5"
+                oninput="document.querySelector('#bottomArrowGapValue').textContent = this.value;"
                 onchange="formHandler.readForm();" />
+              <label for="bottomArrowGap" id="bottomArrowGapValue" style="
+                    text-align: left;
+                    margin: 0;
+                    font-size: 2rem;
+                    width: auto;
+                  ">0.5</label>
               <br />
-              <label id="exitOnlyDirectionLabel" for="exitOnlyDirection" class="invisible">Direction:</label>
-              <select id="exitOnlyDirection" onchange="formHandler.readForm();" class="invisible"></select>
+              <label for="bottomArrowSpacing" id="bottomArrowSpacingLabel">Arrow Spacing (rem):</label>
+              <input type="range" id="bottomArrowSpacing" min="0" max="15" step="0.1" value="1"
+                oninput="document.querySelector('#bottomArrowSpacingValue').textContent = this.value;"
+                onchange="formHandler.readForm();" />
+              <label for="bottomArrowSpacing" id="bottomArrowSpacingValue" style="
+                    text-align: left;
+                    margin: 0;
+                    font-size: 2rem;
+                    width: auto;
+                  ">1</label>
+              <br />
+              <label for="bottomArrowRotation">Arrow Rotation (deg):</label>
+              <input type="range" id="bottomArrowRotation" min="0" max="360" step="1" value="0" />
+              <input id="bottomArrowRotationVal" class="smallVal" type="number" value="0" />
+              <div class="sdArrow_rotationButtons bottomArrowRotationButtons">
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="0">0°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="45">45°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="90">90°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="135">135°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="180">180°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="225">225°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="270">270°</button>
+                <button type="button" class="bottomArrowRotationPreset" data-degrees="315">315°</button>
+              </div>
+              <br />
+              <label id="exitOnlyDirectionLabel" for="exitOnlyDirection" class="invisible" hidden>Direction:</label>
+              <select id="exitOnlyDirection" onchange="formHandler.readForm();" class="invisible" hidden></select>
               <label id="showExitOnlyLabel" for="showExitOnly" class="invisible">Hide Label</label>
               <input type="checkbox" id="showExitOnly" name="showExitOnly" onchange="formHandler.readForm();"
                 class="invisible" />
@@ -1208,6 +1273,18 @@
                     font-size: 2rem;
                     width: auto;
                   " class="invisible">0.25</label>
+              <br />
+              <label id="exitOnlyArrowHorizontalPaddingLabel" for="exitOnlyArrowHorizontalPadding"
+                class="invisible">Arrow Horizontal Padding (rem):</label>
+              <input id="exitOnlyArrowHorizontalPadding" type="range" min="0" max="6" step="0.05" value="0"
+                oninput="document.querySelector('#exitOnlyArrowHorizontalPaddingValue').textContent = this.value;"
+                onchange="formHandler.readForm();" class="invisible" />
+              <label for="exitOnlyArrowHorizontalPadding" id="exitOnlyArrowHorizontalPaddingValue" style="
+                    text-align: left;
+                    margin: 0;
+                    font-size: 2rem;
+                    width: auto;
+                  " class="invisible">0</label>
               <br />
               <label id="halfExitGapLabel" for="halfExitGap" class="invisible">Gap (rem):
                 <input type="button" class="resetBtn clear" id="halfExitGapReset" value="Reset" />
@@ -1240,57 +1317,114 @@
                 Selected Subpanel: Subpanel 1
               </div>
 
+              <label for="combineAPLExitOnlyLabels" class="aplCombineExitOnlySetting">
+                <input type="checkbox" id="combineAPLExitOnlyLabels"
+                  onchange="app.setAPLCombineExitOnlyLabels(this.checked);" />
+                Combine adjacent EXIT ONLY labels
+              </label>
+
               <div id="aplArrowList" class="scrollMenu">
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="sMModal templates" data-current-menu="sMTemplatesPreset">
+      <div class="sMModal templates" data-current-menu="sMTemplatesSaved">
         <nav class="sMModalBar">
           <div class="sMModalTitle">
             <img src="img/other-symbols/ui/template.svg" alt="" class="configIcon templateIcon" />
             Templates
           </div>
-          <div data-tab="sMTemplatesPreset" class="sMModalTab selected">
-            Presets
-          </div>
-          <div data-tab="sMTemplatesSaved" class="sMModalTab" id="sMTemplatesSavedTab">Saved</div>
+          <div data-tab="sMTemplatesSaved" class="sMModalTab selected" id="sMTemplatesSavedTab">Templates</div>
+          <div data-tab="sMTemplateEditor" class="sMModalTab" id="sMTemplateEditorTab">Template Editor</div>
         </nav>
         <div class="sMModalContent">
-          <div id="sMTemplatesPreset">
-            <p>Select a template to apply to the current subpanel.</p>
-            <button id="templateSimpleExit" onclick="app.applyTemplate('simple-exit');">
-              Simple Exit
-            </button>
-            <button id="templateMileage" onclick="app.applyTemplate('mileage-sign');">
-              Mileage Sign
-            </button>
-            <button id="templateTolledExit" onclick="app.applyTemplate('tolled-exit');">
-              Tolled Exit
-            </button>
-            <button id="templateControlCitiesAdvanceJunction"
-              onclick="app.applyTemplate('control-cities-advance-junction');">
-              Control Cities Advance Junction
-            </button>
-          </div>
-          <div id="sMTemplatesSaved" class="tabHidden">
+          <div id="sMTemplatesSaved">
+            <div id="templateEditingNotice" class="templateEditingNotice" hidden>
+              <span id="templateEditingNoticeText"></span>
+              <button type="button" onclick="app.showActiveTemplateEditor();">Return to Editor</button>
+            </div>
             <div class="templateSaveSection">
-              <h4>Save Current Panel as Template</h4>
+              <h4>Save New Template</h4>
               <div class="templateSaveInput">
-                <input type="text" id="templateNameInput" placeholder="Enter template name..." 
-                  onkeypress="if(event.key === 'Enter') app.saveTemplate(this.value);" />
-                <button id="saveTemplateBtn" onclick="app.saveTemplate(document.getElementById('templateNameInput').value);">
+                <input type="text" id="templateNameInput" placeholder="Enter template name..."
+                  onkeypress="if(event.key === 'Enter') app.savePostTemplate(this.value);" />
+                <button type="button" id="savePanelTemplateBtn"
+                  onclick="app.savePanelTemplate(document.getElementById('templateNameInput').value);">
                   <span class="material-symbols-outlined">save</span>
-                  Save Template
+                  Save Panel
+                </button>
+                <button type="button" id="savePostTemplateBtn"
+                  onclick="app.savePostTemplate(document.getElementById('templateNameInput').value);">
+                  <span class="material-symbols-outlined">save</span>
+                  Save Post
                 </button>
               </div>
+              <div class="templateSearchSortRow">
+                <input type="search" id="templateSearchInput" placeholder="Search templates..."
+                  oninput="app.refreshTemplatesList();" />
+                <select id="templateSortSelect" onchange="app.refreshTemplatesList();" aria-label="Template sort order">
+                  <option value="date-created">Date Created</option>
+                  <option value="last-used">Last Used</option>
+                  <option value="alphabetical">Alphabetical</option>
+                </select>
+              </div>
+              <label class="templateWarningSetting" for="templateLoadWarning">
+                <input type="checkbox" id="templateLoadWarning"
+                  onchange="app.setTemplateLoadWarningEnabled(this.checked);" />
+                Confirm before replacing a post or panel
+              </label>
             </div>
             <hr />
             <div class="templateListSection">
-              <h4>Saved Templates</h4>
+              <h4>Templates</h4>
               <div id="savedTemplatesList">
                 <p style="padding: 1rem; color: #666;">Loading templates...</p>
+              </div>
+            </div>
+          </div>
+          <div id="sMTemplateEditor" class="tabHidden">
+            <p id="templateEditorEmpty">Choose Edit on a template to edit it.</p>
+            <div id="templateEditorForm" hidden>
+              <h4 id="templateEditorHeading">Template Editor</h4>
+              <div class="templateEditorFields">
+                <label for="templateEditorName">Name</label>
+                <input type="text" id="templateEditorName" oninput="app.updateTemplateEditorStatus();" />
+                <span>Scope</span>
+                <span id="templateEditorScope">Panel</span>
+                <label for="templateEditorVariantSelect">Version Being Edited</label>
+                <select id="templateEditorVariantSelect"
+                  onchange="app.switchTemplateEditorVariant(this.value);"></select>
+                <label for="templateEditorVariantName">Variant Name</label>
+                <input type="text" id="templateEditorVariantName" oninput="app.updateTemplateEditorStatus();" />
+                <label for="templateEditorVariantFont">Variant Font</label>
+                <select id="templateEditorVariantFont"></select>
+              </div>
+              <p class="templateEditorHint">Edit the template directly on the sign canvas. The selected version is captured when you switch versions or save.</p>
+              <div class="templateEditorActions">
+                <button type="button" id="templateEditorApplyFont" onclick="app.applyTemplateEditorFont();">
+                  Apply Font
+                </button>
+                <button type="button" id="templateEditorDeleteVariant" onclick="app.deleteTemplateEditorVariant();">
+                  Delete Variant
+                </button>
+              </div>
+              <hr />
+              <h4>Add Variant</h4>
+              <div class="templateAddVariantRow">
+                <input type="text" id="templateNewVariantName" placeholder="Variant name..." />
+                <select id="templateNewVariantFont" aria-label="New variant font"></select>
+                <button type="button" onclick="app.addTemplateEditorVariant();">
+                  <span class="material-symbols-outlined">add</span>
+                  Add Variant
+                </button>
+              </div>
+              <div class="templateEditorFooter">
+                <button type="button" id="templateEditorSaveBtn" onclick="app.saveTemplateEditor();">
+                  <span class="material-symbols-outlined">save</span>
+                  Save &amp; Exit
+                </button>
+                <button type="button" onclick="app.cancelTemplateEditor();">Cancel</button>
               </div>
             </div>
           </div>
@@ -1319,6 +1453,14 @@
       <div id="arrowGrid" class="iconGrid"></div>
       <div class="options">
         <button id="closeArrowSelector">OK</button>
+      </div>
+    </dialog>
+    <dialog id="bottomArrowSelectorModal">
+      <h3>Select a Guide Arrow</h3>
+      <input type="text" id="bottomArrowSearch" placeholder="Search arrows..." />
+      <div id="bottomArrowGrid" class="iconGrid"></div>
+      <div class="options">
+        <button id="closeBottomArrowSelector">OK</button>
       </div>
     </dialog>
     <nav id="sMConfigBar" data-current-menu="postConfig">
@@ -1373,8 +1515,14 @@
       </button>
       <button id="templates" class="sMConfigOption">
         <img src="img/other-symbols/ui/template.svg" alt="Templates" class="configIcon templateIcon" />
-        <span>Templates</span>
+        <span id="templatesButtonLabel">Templates</span>
       </button>
+      <a class="mutcd-link sMConfigOption"
+        href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf" target="_blank"
+        rel="noopener noreferrer">
+        <span class="material-symbols-outlined">menu_book</span>
+        <span>MUTCD</span>
+      </a>
       <button id="export" class="sMConfigOption" data-toolTip="Copy Sign">
         <span class="material-symbols-outlined"> content_copy </span>
       </button>

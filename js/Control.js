@@ -523,6 +523,7 @@ class ShieldElement extends Shield {
     type,
     specialBannerType,
     to = false,
+    alignment = "Center",
     bannerType = ShieldElement.prototype.defaultBannerType,
     bannerType2 = ShieldElement.prototype.defaultBannerType,
     bannerPosition = ShieldElement.prototype.defaultBannerPosition,
@@ -533,6 +534,7 @@ class ShieldElement extends Shield {
     smallCaps2 = undefined,
     fontSize = ShieldElement.prototype.defaultBannerFontSize,
     bannerFontFamily = ShieldElement.prototype.defaultBannerFontFamily,
+    bannerFontFamily2 = undefined,
     countyText = "",
     shieldSize,
     scaleBannersWithShield = ShieldElement.prototype.defaultScaleBannersWithShield,
@@ -551,6 +553,10 @@ class ShieldElement extends Shield {
       ShieldElement.prototype.defaultRouteNumber;
 
     this.to = !!to;
+    const validAlignments = Array.isArray(TextElement.prototype.alignment)
+      ? TextElement.prototype.alignment
+      : [];
+    this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
     this.indentFirstLetter = indentFirstLetter !== false;
     const normalizedIndentSecond =
       indentFirstLetter2 !== undefined ? indentFirstLetter2 : indentFirstLetter;
@@ -570,6 +576,10 @@ class ShieldElement extends Shield {
     this.fontSize = ShieldElement.prototype.normalizeFontSize(fontSize);
     this.bannerFontFamily =
       ShieldElement.prototype.normalizeBannerFontFamily(bannerFontFamily);
+    this.bannerFontFamily2 =
+      ShieldElement.prototype.normalizeBannerFontFamily(
+        bannerFontFamily2 || this.bannerFontFamily
+      );
     this.countyText = typeof countyText === "string" ? countyText : "";
     this.shieldSize = ShieldElement.prototype.normalizeShieldSize(
       shieldSize !== undefined ? shieldSize : size
@@ -617,6 +627,10 @@ class ShieldElement extends Shield {
     const fontSizeCss = ShieldElement.prototype.getFontSizeCss(this.fontSize);
     const bannerFontFamily =
       ShieldElement.prototype.normalizeBannerFontFamily(this.bannerFontFamily);
+    const bannerFontFamily2 =
+      ShieldElement.prototype.normalizeBannerFontFamily(
+        this.bannerFontFamily2 || bannerFontFamily
+      );
     wrapper.style.setProperty("--shieldScale", shieldScale.toString());
     wrapper.style.setProperty(
       "--shieldSize",
@@ -638,6 +652,26 @@ class ShieldElement extends Shield {
     if (containerSizeClass) {
       shieldContainer.classList.add(containerSizeClass);
     }
+
+    const routeCharacterCount =
+      ShieldElement.prototype.getRouteCharacterCount(routeText);
+    const routeHasOne = routeText.includes("1");
+    shieldContainer.classList.toggle(
+      "threeNoOne",
+      routeCharacterCount === 3 &&
+        !routeHasOne &&
+        SERIES_C_THREE_CHAR_NO_ONE_SHIELDS.some((className) =>
+          shieldContainer.classList.contains(className)
+        )
+    );
+    shieldContainer.classList.toggle(
+      "threeWithOne",
+      routeCharacterCount === 3 &&
+        routeHasOne &&
+        SERIES_D_THREE_CHAR_WITH_ONE_SHIELDS.some((className) =>
+          shieldContainer.classList.contains(className)
+        )
+    );
 
     const hasBannerA = ShieldElement.prototype.hasBannerValue(this.bannerType);
     const hasBannerB = ShieldElement.prototype.hasBannerValue(this.bannerType2);
@@ -661,6 +695,7 @@ class ShieldElement extends Shield {
               containerClass: "bannerContainer",
               indentFirstLetter: this.indentFirstLetter,
               smallCaps: this.smallCaps,
+              bannerFontFamily,
             },
             {
               bannerClass: "bannerB",
@@ -668,9 +703,9 @@ class ShieldElement extends Shield {
               containerClass: "bannerContainer2",
               indentFirstLetter: this.indentFirstLetter2,
               smallCaps: this.smallCaps2,
+              bannerFontFamily: bannerFontFamily2,
             },
           ],
-          fontSizeCss,
           fontSizeCss,
           this.indentFirstLetter,
           bannerFontFamily,
@@ -710,7 +745,27 @@ class ShieldElement extends Shield {
 
     const routeEl = document.createElement("p");
     routeEl.className = "routeNumber";
-    routeEl.textContent = routeText;
+    const usesV22NumberStyle =
+      ShieldElement.prototype.usesV22NumberStyle(config);
+    if (usesV22NumberStyle) {
+      routeEl.textContent = routeText;
+    } else {
+      routeEl.replaceChildren(
+        ...Array.from(routeText).map((character) => {
+          const characterEl = document.createElement("span");
+          characterEl.className = "routeChar";
+          if (/^[0-9A-Za-z]$/.test(character)) {
+            characterEl.classList.add(`routeChar-${character.toUpperCase()}`);
+          } else if (character === " ") {
+            characterEl.classList.add("routeChar-space");
+            characterEl.textContent = "\u00a0";
+            return characterEl;
+          }
+          characterEl.textContent = character;
+          return characterEl;
+        })
+      );
+    }
 
     if (ShieldElement.prototype.isCountyShield(config)) {
       const countyLabel = document.createElement("p");
@@ -722,6 +777,7 @@ class ShieldElement extends Shield {
     }
 
     if (
+      !config?.suppressRouteNumber &&
       !ShieldElement.prototype.isFixedRouteVariant(config, variantKey)
     ) {
       shieldEl.appendChild(routeEl);
@@ -736,7 +792,7 @@ class ShieldElement extends Shield {
         this.bannerType2,
         fontSizeCss,
         this.indentFirstLetter2,
-        bannerFontFamily,
+        bannerFontFamily2,
         true,
         normalizedBannerPosition2,
         this.smallCaps2
@@ -750,9 +806,52 @@ class ShieldElement extends Shield {
 
     wrapper.appendChild(shieldContainer);
 
+    if (routeEl.parentElement && !usesV22NumberStyle) {
+      requestAnimationFrame(() => {
+        if (!routeEl.isConnected) {
+          return;
+        }
+        const routeFont = getComputedStyle(routeEl).fontFamily.toLowerCase();
+        shieldContainer.classList.toggle(
+          "seriesDSpacingFix",
+          routeFont.includes("series d")
+        );
+      });
+    }
+
     return wrapper;
   }
 }
+
+const SERIES_C_THREE_CHAR_NO_ONE_SHIELDS = [
+  "AZ",
+  "AZLOOP",
+  "CA",
+  "CO",
+  "HI",
+  "IN",
+  "MB",
+  "MD",
+  "ME",
+  "MN",
+  "MNBUS",
+  "SC",
+  "WI",
+  "WY",
+];
+const SERIES_D_THREE_CHAR_WITH_ONE_SHIELDS =
+  SERIES_C_THREE_CHAR_NO_ONE_SHIELDS;
+const V22_NUMBER_STYLE_SHIELDS = [
+  "I",
+  "I-BUS",
+  "I-BL",
+  "I-BS",
+  "I-DL",
+  "I-DS",
+  "I-F",
+  "US",
+  "USCA",
+];
 
 ShieldElement.prototype.defaultShieldBase = "I";
 ShieldElement.prototype.defaultVariant = "Auto";
@@ -764,6 +863,7 @@ ShieldElement.prototype.defaultBannerFontFamily = "Series E";
 ShieldElement.prototype.defaultCountyText = "";
 ShieldElement.prototype.defaultShieldSize = 3;
 ShieldElement.prototype.defaultScaleBannersWithShield = true;
+ShieldElement.prototype.alignment = TextElement.prototype.alignment;
 
 ShieldElement.prototype.normalizeShieldCode = function (code) {
   if (typeof code !== "string") {
@@ -815,7 +915,7 @@ ShieldElement.prototype.buildBlockShieldList = function () {
   const shields = [];
   const directory = Shield.prototype.shieldDirectory;
 
-  const traverse = (node, pathParts = []) => {
+  const traverse = (node, assetPathParts = [], categoryParts = []) => {
     if (!node || typeof node !== "object") {
       return;
     }
@@ -824,7 +924,11 @@ ShieldElement.prototype.buildBlockShieldList = function () {
         continue;
       }
       if (value.type === "category") {
-        traverse(value, pathParts.concat(key));
+        traverse(
+          value,
+          assetPathParts.concat(value.folder || key),
+          categoryParts.concat(key)
+        );
       } else if (value.type === "shield") {
         const normalizedCode = ShieldElement.prototype.normalizeShieldCode(key);
         const variants = Array.isArray(value.variants) ? value.variants.slice() : [];
@@ -835,10 +939,16 @@ ShieldElement.prototype.buildBlockShieldList = function () {
           fixedRouteVariants: Array.isArray(value.fixedRouteVariants)
             ? value.fixedRouteVariants.slice()
             : [],
-          assetFolder: ["img/shields"].concat(pathParts).join("/"),
-          className: ShieldElement.prototype.getShieldClassNames(normalizedCode),
-          assetName: normalizedCode,
-          categories: pathParts.slice(),
+          assetFolder: ["img/shields"].concat(assetPathParts).join("/"),
+          className:
+            value.className ||
+            ShieldElement.prototype.getShieldClassNames(normalizedCode),
+          assetName: value.assetName || normalizedCode,
+          assetPath: value.assetPath || null,
+          assetPathByVariant: value.assetPathByVariant || null,
+          suppressRouteNumber: value.suppressRouteNumber === true,
+          county: value.county === true,
+          categories: categoryParts.slice(),
         });
       }
     }
@@ -846,57 +956,360 @@ ShieldElement.prototype.buildBlockShieldList = function () {
 
   traverse(directory);
 
-  const ensureShield = (value, label, variants, assetFolder, categories = []) => {
-    const normalizedValue = ShieldElement.prototype.normalizeShieldCode(value);
-    if (
-      shields.some(
-        (shield) =>
-          ShieldElement.prototype.normalizeShieldCode(shield.value) ===
-          normalizedValue
-      )
-    ) {
-      return;
-    }
-    shields.push({
+  const upsertShield = (definition) => {
+    const normalizedValue = ShieldElement.prototype.normalizeShieldCode(
+      definition.value
+    );
+    const normalizedDefinition = {
       value: normalizedValue,
-      label: label || normalizedValue,
-      variants: variants || [],
-      fixedRouteVariants: [],
-      assetFolder,
-      className: ShieldElement.prototype.getShieldClassNames(normalizedValue),
-      assetName: normalizedValue,
-      categories,
-    });
+      label: definition.label || normalizedValue,
+      variants: Array.isArray(definition.variants)
+        ? definition.variants.slice()
+        : [],
+      fixedRouteVariants: Array.isArray(definition.fixedRouteVariants)
+        ? definition.fixedRouteVariants.slice()
+        : [],
+      assetFolder: definition.assetFolder || "img/shields",
+      className:
+        definition.className ||
+        ShieldElement.prototype.getShieldClassNames(normalizedValue),
+      assetName: definition.assetName || normalizedValue,
+      assetPath: definition.assetPath || null,
+      assetPathByVariant: definition.assetPathByVariant || null,
+      suppressRouteNumber: definition.suppressRouteNumber === true,
+      county: definition.county === true,
+      categories: Array.isArray(definition.categories)
+        ? definition.categories.slice()
+        : [],
+    };
+    const existing = shields.find(
+      (shield) =>
+        ShieldElement.prototype.normalizeShieldCode(shield.value) ===
+        normalizedValue
+    );
+    if (existing) {
+      Object.assign(existing, normalizedDefinition);
+    } else {
+      shields.push(normalizedDefinition);
+    }
   };
 
-  ensureShield(
-    "cir",
-    "Circle",
-    ["2 Digit", "3 Digit"],
-    "img/shields/United States",
-    ["United States"]
+  const addVariantGroup = (assetFolder, categories, definitions) => {
+    definitions.forEach(
+      ([value, label, variants = ["2 Digit", "3 Digit"], assetName = value, className]) => {
+        const assetPathByVariant = {};
+        variants.forEach((variant) => {
+          const variantKey = ShieldElement.prototype.formatVariantKey(variant);
+          assetPathByVariant[variantKey] =
+            `${assetFolder}/${assetName}-${variantKey}.svg`;
+        });
+        upsertShield({
+          value,
+          label,
+          variants,
+          assetFolder,
+          assetName,
+          assetPathByVariant,
+          className,
+          categories,
+        });
+      }
+    );
+  };
+
+  const addExactGroup = (assetFolder, categories, definitions) => {
+    definitions.forEach(
+      ([value, label, fileName, suppressRouteNumber = true, className]) => {
+        upsertShield({
+          value,
+          label,
+          variants: ["Image"],
+          assetFolder,
+          assetName: value,
+          assetPath: `${assetFolder}/${fileName}`,
+          suppressRouteNumber,
+          className,
+          categories,
+        });
+      }
+    );
+  };
+
+  addVariantGroup("img/shields/United States", ["United States"], [
+    ["cir", "Circle"],
+    ["elp", "Ellipse"],
+    ["rec", "Rectangle"],
+    ["rec2", "Rectangle (Alt)"],
+  ]);
+
+  addVariantGroup(
+    "img/shields/United States/Interstate",
+    ["United States", "Interstate"],
+    [
+      ["I", "Interstate"],
+      ["I-BUS", "Interstate Business"],
+      ["I-BL", "Interstate Business Loop"],
+      ["I-BS", "Interstate Business Spur"],
+      ["I-DL", "Interstate Downtown Loop"],
+      ["I-DS", "Interstate Downtown Spur"],
+      ["I-F", "Future Interstate"],
+    ]
   );
-  ensureShield(
-    "elp",
-    "Ellipse",
-    ["2 Digit", "3 Digit"],
-    "img/shields/United States",
-    ["United States"]
+
+  addVariantGroup(
+    "img/shields/United States/US Route",
+    ["United States", "U.S. Route"],
+    [
+      ["US", "U.S. Route"],
+      ["USCA", "U.S. Route (California style)", undefined, "US-CA", "USCA"],
+    ]
   );
-  ensureShield(
-    "rec",
-    "Rectangle",
-    ["2 Digit", "3 Digit"],
-    "img/shields/United States",
-    ["United States"]
-  );
-  ensureShield(
-    "rec2",
-    "Rectangle (Alt)",
-    ["2 Digit", "3 Digit"],
-    "img/shields/United States",
-    ["United States"]
-  );
+
+  addVariantGroup("img/shields/United States/AZ", ["United States", "Arizona"], [
+    ["AZ", "Arizona"],
+    ["AZLOOP", "Arizona Loop", ["3 Digit"]],
+  ]);
+  addVariantGroup("img/shields/United States/GA", ["United States", "Georgia"], [
+    ["GA", "Georgia"],
+    ["GAALT", "Georgia Alternate"],
+    ["GABYP", "Georgia Bypass"],
+    ["GACONN", "Georgia Connector"],
+    ["GALOOP", "Georgia Loop"],
+    ["GASPUR", "Georgia Spur"],
+  ]);
+  addVariantGroup("img/shields/United States/IN", ["United States", "Indiana"], [
+    ["IN", "Indiana"],
+  ]);
+  addExactGroup("img/shields/United States/IN", ["United States", "Indiana"], [
+    ["INTR", "Indiana Toll Road", "INTR.png"],
+  ]);
+  addVariantGroup("img/shields/United States/KS", ["United States", "Kansas"], [
+    ["KS", "Kansas"],
+  ]);
+  addExactGroup("img/shields/United States/KS", ["United States", "Kansas"], [
+    ["KSTP", "Kansas Turnpike", "KSTP.png"],
+  ]);
+  addVariantGroup("img/shields/United States/KY", ["United States", "Kentucky"], [
+    ["KY", "Kentucky"],
+  ]);
+  addExactGroup("img/shields/United States/KY", ["United States", "Kentucky"], [
+    ["KYAA", "AA Highway", "KYAA.png"],
+    ["KYAU", "Audubon Parkway", "KYAU.png"],
+    ["KYBG", "Bluegrass Parkway", "KYBG.png"],
+    ["KYCM", "Cumberland Parkway", "KYCM.png"],
+    ["KYHR", "Hal Rogers Parkway", "KYHR.png"],
+    ["KYMT", "Mountain Parkway", "KYMT.png"],
+    ["KYPR", "Pennyrile Parkway", "KYPR.png"],
+    ["KYPU", "Purchase Parkway", "KYPU.png"],
+    ["KYWK", "Western Kentucky Parkway", "KYWK.png"],
+    ["KYWN", "Natcher Parkway", "KYWN.png"],
+  ]);
+  addVariantGroup("img/shields/United States/MA", ["United States", "Massachusetts"], [
+    ["MA", "Massachusetts"],
+  ]);
+  addExactGroup("img/shields/United States/MA", ["United States", "Massachusetts"], [
+    ["MATP", "Massachusetts Turnpike", "MATP.png"],
+  ]);
+  addVariantGroup("img/shields/United States/ME", ["United States", "Maine"], [
+    ["ME", "Maine"],
+  ]);
+  addExactGroup("img/shields/United States/ME", ["United States", "Maine"], [
+    ["METP", "Maine Turnpike", "METP.png"],
+  ]);
+  addVariantGroup("img/shields/United States/MN", ["United States", "Minnesota"], [
+    ["MN", "Minnesota", ["2 Digit"]],
+    ["MNBUS", "Minnesota Business", ["2 Digit"]],
+  ]);
+  addVariantGroup("img/shields/United States/NE", ["United States", "Nebraska"], [
+    ["NE", "Nebraska"],
+    ["NELINK", "Nebraska Link", ["2 Digit"]],
+    ["NESPUR", "Nebraska Spur", ["2 Digit"]],
+  ]);
+  upsertShield({
+    value: "NV",
+    label: "Nevada",
+    variants: ["2 Digit", "3 Digit", "CC215"],
+    fixedRouteVariants: ["CC215"],
+    assetFolder: "img/shields/United States",
+    assetPathByVariant: {
+      "2Digit": "img/shields/United States/NV-2Digit.svg",
+      "3Digit": "img/shields/United States/NV-3Digit.svg",
+      CC215: "img/shields/United States/Nevada/NV-CC215.svg",
+    },
+    categories: ["United States", "Nevada"],
+  });
+  addVariantGroup("img/shields/United States/NJ", ["United States", "New Jersey"], [
+    ["NJ", "New Jersey"],
+  ]);
+  addExactGroup("img/shields/United States/NJ", ["United States", "New Jersey"], [
+    ["GSP", "Garden State Parkway", "GSP.png"],
+    ["NJTP", "New Jersey Turnpike", "NJTP.png"],
+    ["PIP", "Palisades Interstate Parkway", "PIP.png"],
+  ]);
+  addVariantGroup("img/shields/United States/NY", ["United States", "New York"], [
+    ["NY", "New York"],
+  ]);
+  addExactGroup("img/shields/United States/NY", ["United States", "New York"], [
+    ["B", "Bethpage Parkway", "B.png"],
+    ["BMP", "Bear Mountain Parkway", "BMP.png"],
+    ["BP", "Belt Parkway", "BP.png"],
+    ["BR", "Bronx River Parkway", "BR.png"],
+    ["BRP", "Bronx River Parkway (alternate)", "BRP.png"],
+    ["CCP", "Cross County Parkway", "CCP.png"],
+    ["CI", "Cross Island Parkway", "CI.png"],
+    ["FDR", "FDR Drive", "FDR.png"],
+    ["GCP", "Grand Central Parkway", "GCP.png"],
+    ["H", "Heckscher Parkway", "H.png"],
+    ["HH", "Henry Hudson Parkway", "HH.png"],
+    ["HR", "Hutchinson River Parkway", "HR.png"],
+    ["HRD", "Harlem River Drive", "HRD.png"],
+    ["HRP", "Hutchinson River Parkway (alternate)", "HRP.png"],
+    ["JR", "Jackie Robinson Parkway", "JR.png"],
+    ["KWV", "Korean War Veterans Parkway", "KWV.png"],
+    ["LOSP", "Lake Ontario State Parkway", "LOSP.png"],
+    ["M", "Meadowbrook Parkway", "M.png"],
+    ["MP", "Mosholu Parkway", "MP.png"],
+    ["N", "Northern State Parkway", "N.png"],
+    ["NSP", "Niagara Scenic Parkway", "NSP.png"],
+    ["NYST", "New York State Thruway", "NYST.png"],
+    ["O", "Ocean Parkway", "O.png"],
+    ["Pe", "Pelham Parkway", "Pe.png", true, "Pe"],
+    ["RM", "Robert Moses Causeway", "RM.png"],
+    ["SA", "Sagtikos Parkway", "SA.png"],
+    ["SBP", "Sprain Brook Parkway", "SBP.png"],
+    ["SM", "Sunken Meadow Parkway", "SM.png"],
+    ["SMP", "Saw Mill Parkway", "SMP.png"],
+    ["SO", "Southern State Parkway", "SO.png"],
+    ["TSP", "Taconic State Parkway", "TSP.png"],
+    ["W", "Wantagh Parkway", "W.png"],
+  ]);
+  addVariantGroup("img/shields/United States/OH", ["United States", "Ohio"], [
+    ["OH", "Ohio"],
+  ]);
+  addExactGroup("img/shields/United States/OH", ["United States", "Ohio"], [
+    ["OHTP", "Ohio Turnpike", "OHTP.png"],
+  ]);
+  addVariantGroup("img/shields/United States/OK", ["United States", "Oklahoma"], [
+    ["OK", "Oklahoma"],
+  ]);
+  addExactGroup("img/shields/United States/OK", ["United States", "Oklahoma"], [
+    ["OKCH", "Cherokee Turnpike", "OKCH.png"],
+    ["OKCR", "Creek Turnpike", "OKCR.png"],
+    ["OKHB", "H.E. Bailey Turnpike", "OKHB.png"],
+    ["OKIN", "Indian Nation Turnpike", "OKIN.png"],
+    ["OKKC", "Kickapoo Turnpike", "OKKC.png"],
+    ["OKKL", "Kilpatrick Turnpike", "OKKL.png"],
+    ["OKMS", "Muskogee Turnpike", "OKMS.png"],
+    ["OKTU", "Turner Turnpike", "OKTU.png"],
+    ["OKWR", "Will Rogers Turnpike", "OKWR.png"],
+  ]);
+  addVariantGroup("img/shields/United States/PA", ["United States", "Pennsylvania"], [
+    ["PA", "Pennsylvania"],
+    ["PATP", "Pennsylvania Turnpike Route"],
+  ]);
+  addExactGroup("img/shields/United States/PA", ["United States", "Pennsylvania"], [
+    ["PATPLOGO", "Pennsylvania Turnpike", "PATP.png"],
+  ]);
+  addVariantGroup("img/shields/United States/TX", ["United States", "Texas"], [
+    ["TX", "Texas"],
+    ["TXBELT", "Texas Beltway", ["2 Digit"], "TXBELTWAY", "TX BELTWAY"],
+    ["TXEXPRESS", "Texas Express Toll", undefined, "TXEXPRESS", "TX EXPRESS"],
+    ["TXFM", "Texas Farm to Market", ["4 Digit"], "TXFM", "TX FM"],
+    ["TXLOOP", "Texas Loop", ["2 Digit", "3 Digit", "4 Digit"], "TXLOOP", "TX LOOP"],
+    ["TXPARK", "Texas Park Road", ["2 Digit", "3 Digit"], "TXPARK", "TX PARK"],
+    ["TXRM", "Texas Ranch to Market", ["2 Digit"], "TXRM", "TX RM"],
+    ["TXSPUR", "Texas Spur", ["2 Digit", "3 Digit", "4 Digit"], "TXSPUR", "TX SPUR"],
+    ["TXTOLL", "Texas Toll", undefined, "TXTOLL", "TX TOLL"],
+  ]);
+  addExactGroup("img/shields/United States/TX", ["United States", "Texas"], [
+    ["HTR", "Hardy Toll Road", "HTR.png"],
+    ["SHT", "Sam Houston Tollway", "SHT.png"],
+    ["TXTOLLCTRMA", "Central Texas Regional Mobility Authority", "TXTollCTRMA.svg", false, "TX tollctrma"],
+    ["TXTOLLNTTA", "North Texas Tollway Authority", "TXTollNTTA.svg", false, "TX tollntta"],
+    ["TXTOLLFBTR", "Fort Bend Toll Road", "TXTollFBTR.png"],
+    ["WPT", "Westpark Tollway", "WPT.png"],
+  ]);
+  addVariantGroup("img/shields/United States/WI", ["United States", "Wisconsin"], [
+    ["WI", "Wisconsin"],
+    ["WICo", "Wisconsin County"],
+  ]);
+
+  addVariantGroup("img/shields/Canada", ["Canada"], [
+    ["TCH", "Trans-Canada Highway"],
+    ["TCHLeaf", "Trans-Canada Highway Leaf"],
+  ]);
+  addVariantGroup("img/shields/Canada/AB", ["Canada", "Alberta"], [
+    ["AB", "Alberta"],
+    ["AB2", "Alberta Oval"],
+    ["ABTC", "Alberta Trans-Canada Highway"],
+  ]);
+  addVariantGroup("img/shields/Canada/BC", ["Canada", "British Columbia"], [
+    ["BC", "British Columbia"],
+    ["BCYH", "British Columbia Yellowhead Highway"],
+    ["BCTC", "British Columbia Trans-Canada Highway"],
+  ]);
+  addVariantGroup("img/shields/Canada/MB", ["Canada", "Manitoba"], [
+    ["MB", "Manitoba"],
+    ["MB2", "Manitoba Secondary"],
+    ["MBTC", "Manitoba Trans-Canada Highway"],
+  ]);
+  addVariantGroup("img/shields/Canada/NB", ["Canada", "New Brunswick"], [
+    ["NB", "New Brunswick"],
+    ["NBCONN", "New Brunswick Connector", undefined, "NBCONN", "NBCONN"],
+    ["NBLOCAL", "New Brunswick Local", undefined, "NBLOCAL", "NBLOCAL"],
+    ["NBTC", "New Brunswick Trans-Canada Highway", undefined, "NBTC", "NB TC"],
+  ]);
+  addVariantGroup("img/shields/Canada/NL", ["Canada", "Newfoundland and Labrador"], [
+    ["NL", "Newfoundland and Labrador"],
+    ["NLTC", "Newfoundland and Labrador Trans-Canada Highway"],
+  ]);
+  addVariantGroup("img/shields/Canada/NS", ["Canada", "Nova Scotia"], [
+    ["NS", "Nova Scotia"],
+    ["NSCONN", "Nova Scotia Connector", ["2 Digit"], "NSCONN", "NSCONN"],
+    ["NSTC", "Nova Scotia Trans-Canada Highway", undefined, "NSTC", "NSTC"],
+  ]);
+  addVariantGroup("img/shields/Canada/ON", ["Canada", "Ontario"], [
+    ["ON", "Ontario"],
+    ["ON2", "Ontario Secondary"],
+    ["ON3", "Ontario County"],
+    ["ONTC", "Ontario Trans-Canada Highway"],
+  ]);
+  addExactGroup("img/shields/Canada/ON", ["Canada", "Ontario"], [
+    ["ONDVP", "Don Valley Parkway", "ON-DVP.png"],
+    ["ONGAR", "Gardiner Expressway", "ON-GAR.png"],
+    ["ONTCCOR", "Central Ontario Route", "ONTC-COR.svg"],
+    ["ONTCGBR", "Georgian Bay Route", "ONTC-GBR.svg"],
+    ["ONTCLSR", "Lake Superior Route", "ONTC-LSR.svg"],
+    ["ONTCNOR", "Northern Ontario Route", "ONTC-NOR.svg"],
+    ["ONTCOVR", "Ottawa Valley Route", "ONTC-OVR.svg"],
+  ]);
+  addVariantGroup("img/shields/Canada/PEI", ["Canada", "Prince Edward Island"], [
+    ["PEI", "Prince Edward Island", ["2 Digit"]],
+  ]);
+  addVariantGroup("img/shields/Canada/QC", ["Canada", "Quebec"], [
+    ["QC", "Quebec Autoroute"],
+    ["QC2", "Quebec Route"],
+    ["QCTC", "Quebec Trans-Canada Highway"],
+  ]);
+  addVariantGroup("img/shields/Canada/SK", ["Canada", "Saskatchewan"], [
+    ["SK", "Saskatchewan"],
+    ["SK2", "Saskatchewan Secondary"],
+    ["SKTC", "Saskatchewan Trans-Canada Highway"],
+  ]);
+
+  addVariantGroup("img/shields/Australia", ["Australia"], [
+    ["ALPHANUM", "Alphanumeric Route", ["2 Digit", "3 Digit", "4 Digit"]],
+    ["NAT", "National Route", ["1 Digit", "2 Digit", "3 Digit"]],
+    ["SR", "State Route", ["2 Digit"]],
+    ["NR", "National Route (black)", ["2 Digit"]],
+    ["MR", "Metroad", ["1 Digit", "2 Digit"]],
+    ["TOLLBLUE", "Tollway", ["2 Digit", "3 Digit", "4 Digit"]],
+    ["TD", "Tourist Drive", ["2 Digit", "3 Digit"]],
+    ["FNSW", "New South Wales Freeway (retired)", ["2 Digit"]],
+  ]);
+  addVariantGroup("img/shields/New Zealand", ["New Zealand"], [
+    ["SH", "State Highway", ["1 Digit", "2 Digit"]],
+  ]);
 
   return shields;
 };
@@ -937,15 +1350,10 @@ ShieldElement.prototype.getBannerFontOptions = function () {
 };
 
 ShieldElement.prototype.normalizeBannerType = function (value) {
-  const options = Shield.prototype.bannerTypes || [];
-  const trimmed = typeof value === "string" ? value.trim() : "";
-  if (!trimmed) {
+  if (typeof value !== "string" || value.length === 0) {
     return ShieldElement.prototype.defaultBannerType;
   }
-  if (!options.length || options.includes(trimmed)) {
-    return trimmed;
-  }
-  return trimmed;
+  return value;
 };
 
 ShieldElement.prototype.normalizeBannerPosition = function (value) {
@@ -1015,7 +1423,7 @@ ShieldElement.prototype.normalizeScaleBannersWithShield = function (value) {
 };
 
 ShieldElement.prototype.hasBannerValue = function (value) {
-  return typeof value === "string" && value !== "None" && value.trim().length > 0;
+  return typeof value === "string" && value !== "None" && value.length > 0;
 };
 
 ShieldElement.prototype.createBannerElement = function (
@@ -1066,7 +1474,14 @@ ShieldElement.prototype.createStackedBannerSlot = function (
   );
 
   banners.forEach(
-    ({ bannerClass, bannerValue, containerClass, indentFirstLetter: bannerSpecificIndent, smallCaps: bannerSpecificSmallCaps }) => {
+    ({
+      bannerClass,
+      bannerValue,
+      containerClass,
+      indentFirstLetter: bannerSpecificIndent,
+      smallCaps: bannerSpecificSmallCaps,
+      bannerFontFamily: bannerSpecificFontFamily,
+    }) => {
       if (containerClass) {
         container.classList.add(containerClass);
       }
@@ -1078,12 +1493,13 @@ ShieldElement.prototype.createStackedBannerSlot = function (
         typeof bannerSpecificSmallCaps === "boolean"
           ? bannerSpecificSmallCaps
           : smallCaps;
+      const bannerFont = bannerSpecificFontFamily || bannerFontFamily;
       const bannerEl = ShieldElement.prototype.createBannerElement(
         bannerClass,
         bannerValue,
         fontSizeCss,
         bannerIndent,
-        bannerFontFamily,
+        bannerFont,
         bannerSmallCaps
       );
       container.appendChild(bannerEl);
@@ -1157,54 +1573,85 @@ ShieldElement.prototype.resolveBlockVariant = function (
 };
 
 ShieldElement.prototype.getVariantFromRoute = function (routeNumber, config) {
-  const digitsOnly = (routeNumber || "").replace(/[^0-9]/g, "");
+  const characterCount =
+    ShieldElement.prototype.getRouteCharacterCount(routeNumber);
+  const supportsOneDigit =
+    Array.isArray(config?.variants) && config.variants.includes("1 Digit");
   const supportsFourDigit =
     Array.isArray(config?.variants) && config.variants.includes("4 Digit");
-  if (supportsFourDigit && digitsOnly.length >= 4) {
+  if (supportsOneDigit && characterCount <= 1) {
+    return "1 Digit";
+  }
+  if (supportsFourDigit && characterCount >= 4) {
     return "4 Digit";
   }
-  return digitsOnly.length >= 3 ? "3 Digit" : "2 Digit";
+  return characterCount >= 3 ? "3 Digit" : "2 Digit";
+};
+
+ShieldElement.prototype.getRouteCharacterCount = function (routeNumber) {
+  const rawRoute = String(routeNumber || "").trim();
+  if (!rawRoute) {
+    return 0;
+  }
+  try {
+    return (rawRoute.match(/[\p{L}\p{N}]/gu) || []).length;
+  } catch (error) {
+    return (rawRoute.match(/[A-Za-z0-9]/g) || []).length;
+  }
+};
+
+ShieldElement.prototype.getRouteSizeClassFromCount = function (count) {
+  if (!count) {
+    return "";
+  }
+  if (count <= 1) {
+    return "one";
+  }
+  if (count === 2) {
+    return "two";
+  }
+  if (count === 3) {
+    return "three";
+  }
+  if (count === 4) {
+    return "four";
+  }
+  if (count === 5) {
+    return "five";
+  }
+  return "six";
 };
 
 ShieldElement.prototype.getContainerSizeClass = function (routeNumber) {
-  const length = (routeNumber || "").trim().length;
-  if (length === 0) {
-    return "";
-  }
-  if (length <= 1) {
-    return "one";
-  }
-  if (length === 2) {
-    return "two";
-  }
-  if (length === 3) {
-    return "three";
-  }
-  return "four";
+  return ShieldElement.prototype.getRouteSizeClassFromCount(
+    ShieldElement.prototype.getRouteCharacterCount(routeNumber)
+  );
 };
 
 ShieldElement.prototype.getImageSizeClass = function (routeNumber) {
-  const length = (routeNumber || "").trim().length;
-  if (length === 0) {
-    return "";
-  }
-  if (length <= 1) {
-    return "one";
-  }
-  if (length === 2) {
-    return "two";
-  }
-  if (length === 3) {
-    return "three";
-  }
-  return "four";
+  return ShieldElement.prototype.getRouteSizeClassFromCount(
+    ShieldElement.prototype.getRouteCharacterCount(routeNumber)
+  );
 };
 
 ShieldElement.prototype.getShieldAssetPath = function (config, variantKey) {
+  if (config?.assetPathByVariant?.[variantKey]) {
+    return config.assetPathByVariant[variantKey];
+  }
+  if (config?.assetPath) {
+    return config.assetPath;
+  }
   const assetFolder = config?.assetFolder || "img/shields";
   const assetName = config?.assetName || config?.value || "I";
   const suffix = variantKey ? `-${variantKey}` : "";
   return `${assetFolder}/${assetName}${suffix}.svg`;
+};
+
+ShieldElement.prototype.usesV22NumberStyle = function (config) {
+  const normalized = ShieldElement.prototype.normalizeShieldCode(
+    config?.value || config?.assetName || ""
+  );
+  return V22_NUMBER_STYLE_SHIELDS.includes(normalized);
 };
 
 ShieldElement.prototype.isFixedRouteVariant = function (config, variantKey) {
@@ -1218,7 +1665,7 @@ ShieldElement.prototype.isCountyShield = function (config) {
   const normalized = ShieldElement.prototype.normalizeShieldCode(
     config?.value || config?.assetName || ""
   );
-  return normalized === "C";
+  return config?.county === true || normalized === "C";
 };
 
 class DividerElement {
@@ -1346,6 +1793,7 @@ class IconElement {
     borderColor = "White",
     spacing = 0,
     alignment = "Center",
+    invertColor = false,
   } = {}) {
     this.icon = IconElement.prototype.icons[icon]
       ? icon
@@ -1356,6 +1804,12 @@ class IconElement {
     this.borderRadius = borderRadius;
     this.borderColor = borderColor;
     this.spacing = spacing;
+    this.invertColor =
+      invertColor === true ||
+      invertColor === "true" ||
+      invertColor === 1 ||
+      invertColor === "1" ||
+      invertColor === "on";
     const validAlignments = Array.isArray(TextElement.prototype.alignment)
       ? TextElement.prototype.alignment
       : [];
@@ -1388,6 +1842,10 @@ class IconElement {
 
     if (this.backgroundColor !== "Inherit") {
       container.classList.add("hasBackground");
+    }
+
+    if (this.invertColor) {
+      container.classList.add("invertColor");
     }
 
     const iconDefinition =
@@ -1925,6 +2383,26 @@ class Block {
 }
 Block.defaultBorderColor = "Match BG";
 
+const resolveFullBleedDividerBorderColor = ({
+  dividerBorderColor,
+  rowBorderColor,
+  defaultDividerColor,
+  isHorizontalDivider,
+  backgroundFullWidth,
+  usesLightBleedBackground,
+}) => {
+  const normalizeColor = (color) =>
+    typeof color === "string" ? color.trim().toLowerCase() : color;
+  const shouldPreserveRowBorder =
+    isHorizontalDivider &&
+    backgroundFullWidth &&
+    usesLightBleedBackground &&
+    rowBorderColor &&
+    normalizeColor(dividerBorderColor) === normalizeColor(defaultDividerColor);
+
+  return shouldPreserveRowBorder ? rowBorderColor : dividerBorderColor;
+};
+
 class Control {
   constructor({ rows = [], blockProperties = [] } = {}) {
     this.rows = rows;
@@ -2111,6 +2589,10 @@ class Control {
       );
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
+      flexRow.dataset.blockBackgroundColor =
+        typeof properties.backgroundColor === "string"
+          ? properties.backgroundColor.trim().toLowerCase()
+          : "inherit";
       if (hasVerticalDivider) {
         flexRow.classList.add("hasVerticalDivider");
       }
@@ -2198,6 +2680,7 @@ class Control {
 
       let lastKnownAlignment = centerAlignment;
       let dividerBorderColor = null;
+      let fullBleedDividerIsHorizontal = false;
       for (let blockIdx = 0; blockIdx < row.length; blockIdx++) {
         let elem = row[blockIdx];
         switch (elem.alignment) {
@@ -2224,6 +2707,8 @@ class Control {
           } else {
             dividerBorderColor = lib.colors.White || "white";
           }
+          fullBleedDividerIsHorizontal =
+            elem.orientation !== DividerElement.prototype.verticalOrientation;
         }
 
         const blockElmt = elem.createElement(panel, subPanel);
@@ -2260,10 +2745,19 @@ class Control {
           : "0";
 
       if (dividerBorderColor) {
+        const resolvedDividerBorderColor =
+          resolveFullBleedDividerBorderColor({
+            dividerBorderColor,
+            rowBorderColor: appliedFullBleedBorderColor,
+            defaultDividerColor: (lib.colors && lib.colors.White) || "white",
+            isHorizontalDivider: fullBleedDividerIsHorizontal,
+            backgroundFullWidth: !!properties.backgroundFullWidth,
+            usesLightBleedBackground,
+          });
         const normalizedDividerColor =
-          typeof dividerBorderColor === "string"
-            ? dividerBorderColor.toLowerCase()
-            : dividerBorderColor;
+          typeof resolvedDividerBorderColor === "string"
+            ? resolvedDividerBorderColor.toLowerCase()
+            : resolvedDividerBorderColor;
         flexRow.dataset.fullBleedBorderColor = normalizedDividerColor;
         appliedFullBleedBorderColor = normalizedDividerColor;
       }

@@ -12,10 +12,15 @@ class Panel {
     } else {
       this.color = "Green";
     }
-    if (Object.keys(this.cornerType).includes(corner)) {
+    const availableCornerTypes = Array.isArray(this.cornerType)
+      ? this.cornerType
+      : ["Sharp", "Round"];
+    if (availableCornerTypes.includes(corner)) {
       this.corner = corner;
     } else {
-      this.corner = this.cornerType[1];
+      this.corner = availableCornerTypes.includes(this.defaultCorner)
+        ? this.defaultCorner
+        : availableCornerTypes[1] || "Round";
     }
 
     this.sign = sign;
@@ -68,7 +73,7 @@ class Panel {
       if (newNest.length >= maxNested) {
         break;
       }
-      newNest.push(Object.assign(new ExitTab(), nest));
+      newNest.push(Object.assign(new ExitTab(nest), nest));
     }
 
     const exitTab = new ExitTab({
@@ -79,6 +84,8 @@ class Panel {
       variant: exisitingTab.variant,
       icon: exisitingTab.icon,
       squareCorners: exisitingTab.squareCorners,
+      extendHorizontalPadding: exisitingTab.extendHorizontalPadding,
+      matchSignCornerRadius: exisitingTab.matchSignCornerRadius,
       fullBorder: exisitingTab.fullBorder,
       attached: exisitingTab.attached,
       borderThickness: exisitingTab.borderThickness,
@@ -96,4 +103,5 @@ class Panel {
 Panel.prototype.cornerType = ["Sharp", "Round"];
 /* ^^^ DO NOT CHANGE THIS, IDK WHY BUT THE ENTIRE PROGRAM BREAKS WITHOUT THIS LINE ^^^ */
 
+Panel.prototype.defaultCorner = "Round";
 Panel.prototype.defaultBorderRadius = 0.75;

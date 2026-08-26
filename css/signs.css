@@ -13,6 +13,24 @@
       var(--post-color-dark) 100%);
 }
 
+#alignmentGuides {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  pointer-events: none;
+  background-image: linear-gradient(to right,
+      rgba(255, 255, 255, 0.7) 0,
+      rgba(255, 255, 255, 0.7) 1px,
+      transparent 1px);
+  background-position: var(--alignmentGuidePhase, 0rem) 0;
+  background-size: var(--alignmentGuideSpacing, 4rem) 100%;
+  background-repeat: repeat-x;
+}
+
+#alignmentGuides.visible {
+  display: block;
+}
+
 #postContainer.postColorSilver {
   --post-color-mid: rgb(191, 191, 191);
   --post-color-light: rgb(240, 240, 240);
@@ -309,6 +327,11 @@
   animation: none;
 }
 
+.panel.templateReplaceTarget {
+  outline: 0.3rem solid var(--selectedColor, rgb(100, 150, 255));
+  outline-offset: 0.2rem;
+}
+
 .panel.dropBefore::before,
 .panel.dropAfter::after {
   content: "";
@@ -575,6 +598,9 @@
 
 .exitTab.squareCorners {
   border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.exitTab.extendedHorizontalPadding {
   padding: 0 1.3rem;
 }
 
@@ -594,6 +620,15 @@
   border-bottom-width: 0.2rem;
   border-bottom-style: solid;
   border-radius: 0.5rem;
+}
+
+.exitTab.matchSignCornerRadius:not(.borderless) {
+  border-radius: var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem) 0 0;
+}
+
+.exitTab.matchSignCornerRadius.out:not(.borderless) {
+  border-radius: var(--signBorderRadius, 0.75rem);
 }
 
 .out.center {
@@ -820,6 +855,17 @@
   padding: 0.2rem;
 }
 
+.sideLeftArrow.bE-arrowElement img,
+.sideRightArrow.bE-arrowElement img {
+  width: auto;
+  max-height: 2.5rem;
+}
+
+.sideLeftArrow.bE-arrowElement,
+.sideRightArrow.bE-arrowElement {
+  display: none;
+}
+
 .sideLeftArrow {
   margin-left: 1rem;
 }
@@ -1006,9 +1052,25 @@
 }
 
 .halfarrow {
-  height: 1.8rem;
+  height: 2rem;
   position: relative;
   margin-left: 0rem;
+}
+
+.halfarrow.bE-arrowElement img {
+  width: auto;
+  max-height: 2rem;
+}
+
+.halfarrow.bE-arrowElement {
+  padding-left: var(--exitOnlyArrowHorizontalPadding, 0rem);
+  padding-right: var(--exitOnlyArrowHorizontalPadding, 0rem);
+}
+
+.halfarrow.bE-arrowElement[data-arrow-kind="TYPE_A"] img {
+  width: 1.75rem;
+  height: auto;
+  max-height: none;
 }
 
 .specialExitOnly {
@@ -1292,6 +1354,7 @@
 }
 
 .exitTab.fullLeft {
+  font-family: "Series E";
   padding: 0;
   flex-direction: column;
   align-items: stretch;
@@ -1339,6 +1402,24 @@
   min-width: 0.35rem;
 }
 
+.exitTab .exitTabTrailing {
+  margin-left: var(--exitTabTrailingGap, 0.04em);
+}
+
+.exitTab .exitTabSeparatedSuffixSpacer {
+  min-width: 1rem;
+}
+
+.exitTab.verticalArrangement .exitTabVerticalTrailing {
+  margin-left: var(--exitTabTrailingGap, 0.04em);
+  position: relative;
+  top: 0;
+}
+
+.exitTab.verticalArrangement .exitTabSeparatedSuffixSpacer {
+  min-width: 0;
+}
+
 .action_message {
   --fhwaBaselineOffset: 0px;
   display: inline-flex;
@@ -1354,14 +1435,65 @@
   --exitTabTextBaseOffset: -0.1rem;
 }
 
+/* Exit tabs sized to the nearest subpanel border. */
+.exitTabContainer.aplEdge {
+  width: var(--aplEdgeTabWidth, auto);
+  min-width: var(--aplEdgeTabWidth, auto);
+  max-width: var(--aplEdgeTabWidth, none);
+  box-sizing: border-box;
+}
+
+.exitTabContainer.aplEdge.left {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.exitTabContainer.aplEdge.right {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+.exitTab.aplEdge {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.exitTab.aplEdge.left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.exitTab.aplEdge.right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.exitTab.aplEdge.center {
+  justify-content: center;
+  text-align: center;
+}
+
 .exitOnlyArrow {
   display: inline-block;
 
   margin-top: 0.1em;
 
   height: 2rem;
+}
 
-  padding: 2px;
+.exitOnlyArrow.bE-arrowElement {
+  padding: 2px calc(2px + var(--exitOnlyArrowHorizontalPadding, 0rem));
+}
+
+.exitOnlyArrow.bE-arrowElement img {
+  width: auto;
+  max-height: 2rem;
+}
+
+.exitOnlyArrow.bE-arrowElement[data-arrow-kind="TYPE_A"] img {
+  width: 1.75rem;
+  height: auto;
+  max-height: none;
 }
 
 .arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
@@ -1430,6 +1562,35 @@
   justify-content: center;
   align-items: center;
   /* gap: 3rem; */
+}
+
+.bottomGuideArrow {
+  margin: 0;
+}
+
+.guideArrowAsset {
+  box-sizing: content-box;
+  overflow: visible;
+}
+
+.panel.white .bottomGuideArrow img,
+.panel.yellow .bottomGuideArrow img,
+.panel.orange .bottomGuideArrow img,
+.panel.fluorescent.yellow-green .bottomGuideArrow img,
+.panel.fluorescent.pink .bottomGuideArrow img,
+.panel.white .sideLeftArrow img,
+.panel.white .sideRightArrow img,
+.panel.yellow .sideLeftArrow img,
+.panel.yellow .sideRightArrow img,
+.panel.orange .sideLeftArrow img,
+.panel.orange .sideRightArrow img,
+.panel.fluorescent.yellow-green .sideLeftArrow img,
+.panel.fluorescent.yellow-green .sideRightArrow img,
+.panel.fluorescent.pink .sideLeftArrow img,
+.panel.fluorescent.pink .sideRightArrow img,
+.guideArrows.exit_only .bE-arrowElement img,
+.guideArrows.half_exit.only .halfExitOnlyPanel .bE-arrowElement img {
+  filter: brightness(0);
 }
 
 .arrow:first-child {
@@ -1551,9 +1712,63 @@
   justify-content: center;
 }
 
-/* When APL arrows are present, make subpanels stretch equally */
-.subPanelDisplay:has(.subpanelAplArrows) {
-  flex: 1;
+/* APL spacing belongs to each lane, so APL subpanels size to their own
+   content/arrow reserve instead of splitting the sign width equally. */
+.signHolder:has(.subpanelAplArrows) .subPanelDisplay {
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: max-content;
+  box-sizing: border-box;
+}
+
+.subPanelDisplay.hasAplWidthReserve {
+  min-width: var(--aplSubpanelMinWidth, max-content) !important;
+}
+
+/* Keep the APL holder as wide as the sign while each lane uses its measured
+   content width. The linked width is cleared before every measurement in
+   main.js, so removing a divider-mounted arrow can shrink either lane again. */
+.signHolder.aplContentHolder {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  justify-content: center !important;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.signHolder.aplContentHolder > .subPanelDisplay {
+  flex: 0 0 auto !important;
+  width: var(--linkedSubpanelWidth, max-content) !important;
+  min-width: var(--linkedSubpanelWidth, max-content) !important;
+  max-width: none !important;
+  box-sizing: border-box;
+}
+
+.signHolder.aplContentHolder > .subPanelDisplay.hasAplWidthReserve {
+  min-width: var(
+    --linkedSubpanelWidth,
+    var(--aplSubpanelMinWidth, max-content)
+  ) !important;
+}
+
+.signHolder.aplContentHolder
+  > .subPanelDisplay
+  > .signContentContainer {
+  width: max-content !important;
+  min-width: max-content !important;
+  box-sizing: border-box;
+}
+
+.signHolder.aplContentHolder
+  > .subPanelDisplay.hasAplWidthReserve
+  > .signContentContainer {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+.signHolder.aplContentHolder > .subDivider {
+  flex: 0 0 auto;
 }
 
 /* Make content area grow to push APL arrows to consistent bottom position */
@@ -1576,8 +1791,7 @@
 
 /* When APL arrows are present, shorten the divider to stop above arrows */
 .signHolder:has(.subpanelAplArrows) .subDivider {
-  margin-bottom: 6.2rem;
-  /* 6rem min-height + 0.2rem border */
+  margin-bottom: var(--aplArrowZoneHeight, 6.2rem);
 }
 
 /* If the divider has an arrow, remove the margin so it extends down */
@@ -1593,8 +1807,7 @@
   content: "";
   position: absolute;
   top: 0;
-  bottom: 6.2rem;
-  /* Stop where the line would normally stop */
+  bottom: var(--aplDividerStopOffset, var(--aplArrowZoneHeight, 6.2rem));
   width: 0.2rem;
   background-color: var(--white);
 }
@@ -1603,7 +1816,7 @@
   height: 4.75rem;
   /* Default size (UP) */
   width: auto;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.45rem;
   /* Align with other arrows */
   z-index: 10;
 }
@@ -1638,14 +1851,14 @@
   border-bottom-right-radius: 0.5rem;
 }
 
-img.exitOnlyArrow:first-child {
-  padding-left: 0.8rem;
-  padding-right: 0.45rem;
+.exitOnlyArrow:first-child {
+  padding-left: calc(0.8rem + var(--exitOnlyArrowHorizontalPadding, 0rem));
+  padding-right: calc(0.45rem + var(--exitOnlyArrowHorizontalPadding, 0rem));
 }
 
-img.exitOnlyArrow:last-child {
-  padding-right: 0.8rem;
-  padding-left: 0.6rem;
+.exitOnlyArrow:last-child {
+  padding-right: calc(0.8rem + var(--exitOnlyArrowHorizontalPadding, 0rem));
+  padding-left: calc(0.6rem + var(--exitOnlyArrowHorizontalPadding, 0rem));
 }
 
 .tagOnlyText {
@@ -1772,54 +1985,75 @@ img.exitOnlyArrow:last-child {
   filter: invert(1);
 }
 
-/* APL arrows inside subpanels - extends past parent to cover side borders */
+/* The outer sign owns the border and rounded corners. Keeping the APL row
+   borderless lets its panel-color fill reach the sign edge without an inset. */
 .subpanelAplArrows {
-  padding: 0.5rem 1rem;
-  margin-left: -0.2rem;
-  margin-right: -0.2rem;
-  border: 0.2rem solid var(--white);
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  display: block !important;
+  width: 100%;
+  height: var(--aplArrowZoneHeight, 6rem);
+  min-height: var(--aplArrowZoneHeight, 6rem);
+  padding: 0.5rem 0;
+  margin: 0;
+  border: 0;
   border-radius: 0;
   position: relative;
   /*z-index: 5;*/
+  box-sizing: border-box;
+}
+
+.aplArrowTrack {
+  display: flex;
   align-items: flex-end;
-  min-height: 6rem;
-  /* Matches largest arrow height (4.75rem) + padding */
+  width: max-content;
+  height: 100%;
+  min-height: 0;
+  gap: 0;
 }
 
-/* Only first subpanel gets left border and bottom-left radius */
-.subPanelDisplay:first-of-type .subpanelAplArrows {
-  border-left: 0.2rem solid var(--white);
-  border-bottom-left-radius: var(--signBorderRadius, 0.75rem);
-  justify-content: flex-start;
-  /* Left align arrows */
+.aplArrowLayoutItem {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  min-width: 0;
+  line-height: 0;
+}
+
+/* Extra content room on edge lanes grows outward, keeping the APL track
+   aligned with the divider/edge it belongs to. */
+.subPanelDisplay:first-of-type .aplArrowTrack,
+.subPanelDisplay.firstAplSubPanel .aplArrowTrack {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.subPanelDisplay:last-of-type .aplArrowTrack,
+.subPanelDisplay.lastAplSubPanel .aplArrowTrack {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.subPanelDisplay.firstAplSubPanel.lastAplSubPanel .aplArrowTrack,
+.subPanelDisplay:only-of-type .aplArrowTrack,
+.subPanelDisplay:not(:first-of-type):not(:last-of-type) .aplArrowTrack {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Edge APL tracks align to the sign edge; the sign supplies the corner. */
+.subPanelDisplay:first-of-type .subpanelAplArrows,
+.subPanelDisplay.firstAplSubPanel .subpanelAplArrows {
   padding-left: 0;
-  /* Remove left padding as requested */
 }
 
-/* Only last subpanel gets right border and bottom-right radius */
-.subPanelDisplay:last-of-type .subpanelAplArrows {
-  border-right: 0.2rem solid var(--white);
-  border-bottom-right-radius: var(--signBorderRadius, 0.75rem);
-  justify-content: flex-end;
-  /* Right align arrows */
+.subPanelDisplay:last-of-type .subpanelAplArrows,
+.subPanelDisplay.lastAplSubPanel .subpanelAplArrows {
   padding-right: 0;
-  /* Remove right padding for symmetry */
 }
 
-/* When a divider follows the last subpanel, remove the right border/radius from that subpanel */
-.subPanelDisplay:has(+ .subDivider:last-child) .subpanelAplArrows {
-  border-right: none;
-  border-bottom-right-radius: 0;
-}
-
-/* Add a pseudo-element to extend the bottom border after the last divider */
+/* A trailing divider must not reconstruct a second outer corner. */
 .signHolder:has(.subpanelAplArrows) .subDivider:last-child {
-  border-bottom: 0.2rem solid var(--white);
-  border-right: 0.2rem solid var(--white);
-  border-bottom-right-radius: var(--signBorderRadius, 0.75rem);
+  border: 0;
+  border-radius: 0;
 }
 
 .panel.white .subpanelAplArrows,
@@ -1830,13 +2064,19 @@ img.exitOnlyArrow:last-child {
 
 .panel.white .subPanelDisplay:first-of-type .subpanelAplArrows,
 .panel.yellow .subPanelDisplay:first-of-type .subpanelAplArrows,
-.panel.orange .subPanelDisplay:first-of-type .subpanelAplArrows {
+.panel.orange .subPanelDisplay:first-of-type .subpanelAplArrows,
+.panel.white .subPanelDisplay.firstAplSubPanel .subpanelAplArrows,
+.panel.yellow .subPanelDisplay.firstAplSubPanel .subpanelAplArrows,
+.panel.orange .subPanelDisplay.firstAplSubPanel .subpanelAplArrows {
   border-left-color: var(--black);
 }
 
 .panel.white .subPanelDisplay:last-of-type .subpanelAplArrows,
 .panel.yellow .subPanelDisplay:last-of-type .subpanelAplArrows,
-.panel.orange .subPanelDisplay:last-of-type .subpanelAplArrows {
+.panel.orange .subPanelDisplay:last-of-type .subpanelAplArrows,
+.panel.white .subPanelDisplay.lastAplSubPanel .subpanelAplArrows,
+.panel.yellow .subPanelDisplay.lastAplSubPanel .subpanelAplArrows,
+.panel.orange .subPanelDisplay.lastAplSubPanel .subpanelAplArrows {
   border-right-color: var(--black);
 }
 
@@ -1848,6 +2088,26 @@ img.exitOnlyArrow:last-child {
   padding-left: 1rem;
   padding-right: 1rem;
   gap: 0.25rem;
+}
+
+.aplCombinedExitOnlyGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 0.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.aplCombinedExitOnlyGroup > .aplCombinedExitOnlyMember {
+  padding-left: 0;
+  padding-right: 0;
+  gap: 0;
+}
+
+.aplExitOnlyCombinedLabel {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .aplExitOnlyLabel {

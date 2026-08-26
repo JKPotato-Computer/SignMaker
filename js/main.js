@@ -17,16 +17,115 @@ const app = (function () {
 
   let currentlySelectedAPLArrowIndex = 0;
   const SESSION_STORAGE_KEY = "signMaker.session";
-  const SESSION_STORAGE_VERSION = 1;
+  const SESSION_STORAGE_VERSION = 2;
   let isSessionPersisting = false;
   const HISTORY_LIMIT = 100;
   const undoHistory = [];
   const redoHistory = [];
   let lastHistoryEntry = null;
   let isApplyingHistory = false;
+  const EXIT_TAB_APL_EDGE_WIDTH = "APL Edge";
+
+  const isAplEdgeExitTabWidth = (width) =>
+    String(width || "").trim().toLowerCase() ===
+    EXIT_TAB_APL_EDGE_WIDTH.toLowerCase();
+
+  const GUIDE_ARROW_ASPECT_RATIOS = Object.freeze({
+    TYPE_A: 2667 / 4188,
+    TYPE_A_EXTENDED: 3405 / 7346,
+    TYPE_B: 11937 / 13642,
+    TYPE_C_45: 22103 / 35195,
+    TYPE_C_45_ALT: 2863 / 3007,
+    TYPE_C_90: 13398 / 13416,
+    TYPE_D: 641 / 1044,
+    DOWN: 6667 / 4584,
+    DOWN_CA: 2848 / 1676,
+    UK: 4954 / 12396,
+    APL_UP: 537 / 1675,
+    APL_UP_TURN: 1418 / 1678,
+    APL_TURN: 1081 / 1347,
+    APL_DUAL_TURN: 2267 / 1794,
+    APL_UP_CFX: 311 / 752,
+    APL_UP_TURN_CFX: 640 / 752,
+    APL_TURN_CFX: 502 / 501,
+  });
+
+  const reserveRotatedGuideArrowSpace = function (
+    element,
+    arrowKind,
+    rotation,
+    { width = null, height = null } = {}
+  ) {
+    if (!element) {
+      return;
+    }
+
+    const aspectRatio = GUIDE_ARROW_ASPECT_RATIOS[arrowKind] || 1;
+    const resolvedWidth = Number.isFinite(width)
+      ? Math.max(width, 0)
+      : Math.max((Number.isFinite(height) ? height : 0) * aspectRatio, 0);
+    const resolvedHeight = Number.isFinite(height)
+      ? Math.max(height, 0)
+      : Math.max(resolvedWidth / aspectRatio, 0);
+    const parsedRotation = parseFloat(rotation);
+    const radians =
+      ((Number.isFinite(parsedRotation) ? parsedRotation : 0) * Math.PI) / 180;
+    const rotatedWidth =
+      Math.abs(resolvedWidth * Math.cos(radians)) +
+      Math.abs(resolvedHeight * Math.sin(radians));
+    const rotatedHeight =
+      Math.abs(resolvedWidth * Math.sin(radians)) +
+      Math.abs(resolvedHeight * Math.cos(radians));
+
+    element.classList.add("guideArrowAsset");
+    element.style.width = rotatedWidth + "rem";
+    element.style.height = rotatedHeight + "rem";
+  };
 
   const getCurrentPanel = () => {
     return post.panels[currentlySelectedPanelIndex];
+  };
+
+  const canUseAplEdgeExitTab = (panel = getCurrentPanel()) =>
+    !!(
+      panel &&
+      panel.sign &&
+      Array.isArray(panel.sign.subPanels) &&
+      panel.sign.subPanels.length > 1
+    );
+
+  const normalizeExitTabAplEdgeAvailabilityForPanel = (panel) => {
+    if (!panel || !Array.isArray(panel.exitTabs) || canUseAplEdgeExitTab(panel)) {
+      return false;
+    }
+
+    let changed = false;
+    const normalizeTab = (tab) => {
+      if (tab && isAplEdgeExitTabWidth(tab.width)) {
+        tab.width = "Edge";
+        changed = true;
+      }
+    };
+
+    panel.exitTabs.forEach((tab) => {
+      normalizeTab(tab);
+      if (Array.isArray(tab?.nestedExitTabs)) {
+        tab.nestedExitTabs.forEach(normalizeTab);
+      }
+    });
+
+    return changed;
+  };
+
+  const getAplEdgeDividerForExitTab = (sign, position = "Right") => {
+    const dividerCount = Math.max(0, sign?.subPanels?.length - 1);
+    if (!dividerCount) {
+      return null;
+    }
+
+    return String(position || "Right").toLowerCase() === "left"
+      ? 0
+      : dividerCount - 1;
   };
 
   const getCurrentSubPanel = () => {
@@ -508,6 +607,68 @@ const app = (function () {
     }
   };
 
+  const scheduleAlignmentGuideUpdate = (
+    postContainerElmt,
+    panelContainerElmt
+  ) => {
+    const guideElmt = document.getElementById("alignmentGuides");
+    if (!guideElmt || !postContainerElmt || !panelContainerElmt) {
+      return;
+    }
+
+    const spacing = post.normalizeAlignmentGuideSpacing(
+      post.alignmentGuideSpacing
+    );
+    const phase = post.normalizeAlignmentGuidePhase(
+      post.alignmentGuidePhase,
+      spacing
+    );
+    post.alignmentGuideSpacing = spacing;
+    post.alignmentGuidePhase = phase;
+    guideElmt.classList.toggle("visible", !!post.showAlignmentGuides);
+    guideElmt.style.setProperty("--alignmentGuideSpacing", spacing + "rem");
+    guideElmt.style.setProperty("--alignmentGuidePhase", phase + "rem");
+
+    if (!post.showAlignmentGuides) {
+      return;
+    }
+
+    const update = () => {
+      const panelElmts = Array.from(
+        panelContainerElmt.querySelectorAll(":scope > .panel")
+      );
+      if (!panelElmts.length) {
+        guideElmt.classList.remove("visible");
+        return;
+      }
+
+      const postRect = postContainerElmt.getBoundingClientRect();
+      const panelContainerRect = panelContainerElmt.getBoundingClientRect();
+      const panelBottom = Math.max(
+        ...panelElmts.map((panelElmt) => panelElmt.getBoundingClientRect().bottom)
+      );
+      const top = Math.min(
+        postRect.height,
+        Math.max(0, panelBottom - postRect.top)
+      );
+      const left = Math.max(0, panelContainerRect.left - postRect.left);
+      const right = Math.min(
+        postRect.width,
+        panelContainerRect.right - postRect.left
+      );
+
+      guideElmt.style.top = top + "px";
+      guideElmt.style.left = left + "px";
+      guideElmt.style.width = Math.max(0, right - left) + "px";
+    };
+
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(update);
+    } else {
+      update();
+    }
+  };
+
   const getSelectionState = () => ({
     currentlySelectedPanelIndex,
     currentlySelectedSubPanelIndex,
@@ -525,6 +686,9 @@ const app = (function () {
   });
 
   const captureHistoryAfterRedraw = () => {
+    if (activeTemplateEditor) {
+      return;
+    }
     if (
       !post ||
       !Array.isArray(post.panels) ||
@@ -579,6 +743,9 @@ const app = (function () {
   };
 
   const undo = () => {
+    if (activeTemplateEditor) {
+      return false;
+    }
     if (!undoHistory.length) {
       return false;
     }
@@ -596,6 +763,9 @@ const app = (function () {
   };
 
   const redo = () => {
+    if (activeTemplateEditor) {
+      return false;
+    }
     if (!redoHistory.length) {
       return false;
     }
@@ -685,12 +855,18 @@ const app = (function () {
     }
 
     try {
+      const templateWorkspaceData = activeTemplateEditor?.workspaceData;
       const sessionData = {
         version: SESSION_STORAGE_VERSION,
         savedAt: new Date().toISOString(),
-        post: JSON.parse(serializePostWithElementTypes()),
-        selection: getSelectionState(),
+        post: templateWorkspaceData
+          ? JSON.parse(templateWorkspaceData)
+          : JSON.parse(serializePostWithElementTypes()),
+        selection: templateWorkspaceData
+          ? cloneTemplateValue(activeTemplateEditor.workspaceSelection)
+          : getSelectionState(),
         fileInfo: { ...fileInfo },
+        templateEditor: createTemplateEditorSessionState(),
       };
       window.localStorage.setItem(
         SESSION_STORAGE_KEY,
@@ -718,7 +894,29 @@ const app = (function () {
         fileInfo = { ...fileInfo, ...sessionData.fileInfo };
       }
 
-      setPost(reconstructPostFromData(postData), sessionData.selection);
+      const workspacePost = reconstructPostFromData(postData);
+      if (sessionData.templateEditor) {
+        try {
+          restoreTemplateEditorSession(
+            sessionData.templateEditor,
+            postData,
+            sessionData.selection
+          );
+          return true;
+        } catch (editorError) {
+          console.warn(
+            "Unable to restore the template editing session; restoring the workspace instead",
+            editorError
+          );
+          activeTemplateEditor = null;
+          setPost(workspacePost, sessionData.selection);
+          updateTemplateEditorControls();
+          return true;
+        }
+      }
+
+      setPost(workspacePost, sessionData.selection);
+      updateTemplateEditorStatus();
       return true;
     } catch (error) {
       console.warn("Unable to restore SignMaker session", error);
@@ -749,12 +947,20 @@ const app = (function () {
     if (!restoreSavedSession()) {
       newPanel();
     }
+
+    await refreshTemplatesList();
   };
 
   // Create a new panel, set the current editing panel to that panel, update the form, and redraw.
   const newPanel = function () {
     post.newPanel();
     currentlySelectedPanelIndex = post.panels.length - 1;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabIndex = 0;
+    currentlySelectedNestedExitTabIndex = -1;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedAPLArrowIndex = 0;
     resetGroupEditing();
     formHandler.updateForm();
     redraw();
@@ -868,6 +1074,7 @@ const app = (function () {
 
   // --- Rendered Panel Drag and Drop ---
   let renderedPanelDragState = null;
+  let templatePanelDragState = null;
 
   const toggleRenderedPanelWiggle = (isActive) => {
     const panels = document.querySelectorAll("#panelContainer > .panel");
@@ -885,6 +1092,12 @@ const app = (function () {
     document
       .querySelectorAll(".panel.dropBefore, .panel.dropAfter")
       .forEach((el) => el.classList.remove("dropBefore", "dropAfter"));
+  };
+
+  const clearTemplatePanelDropIndicator = () => {
+    document
+      .querySelectorAll(".panel.templateReplaceTarget")
+      .forEach((panel) => panel.classList.remove("templateReplaceTarget"));
   };
 
   const endRenderedPanelDrag = () => {
@@ -964,6 +1177,20 @@ const app = (function () {
   };
 
   const handleRenderedPanelDragOver = (event) => {
+    if (templatePanelDragState) {
+      const targetPanel = event.target.closest?.("#panelContainer > .panel");
+      if (!targetPanel) {
+        return;
+      }
+      event.preventDefault();
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "copy";
+      }
+      clearTemplatePanelDropIndicator();
+      targetPanel.classList.add("templateReplaceTarget");
+      return;
+    }
+
     if (!renderedPanelDragState) {
       return;
     }
@@ -992,6 +1219,26 @@ const app = (function () {
   };
 
   const handleRenderedPanelDrop = (event) => {
+    if (templatePanelDragState) {
+      const targetPanel = event.target.closest?.("#panelContainer > .panel");
+      if (!targetPanel) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      const targetPanelIndex = Number(targetPanel.dataset.panelIndex);
+      const { templateId, variantId } = templatePanelDragState;
+      templatePanelDragState = null;
+      clearTemplatePanelDropIndicator();
+      document
+        .querySelectorAll(".templateReplacePanelBtn.templateDragging")
+        .forEach((button) => button.classList.remove("templateDragging"));
+      if (!Number.isNaN(targetPanelIndex)) {
+        loadTemplate(templateId, "replace-panel", variantId, targetPanelIndex);
+      }
+      return;
+    }
+
     if (!renderedPanelDragState) {
       return;
     }
@@ -1006,6 +1253,15 @@ const app = (function () {
   };
 
   const handleRenderedPanelDragLeave = (event) => {
+    if (templatePanelDragState) {
+      const container = document.getElementById("panelContainer");
+      const related = event.relatedTarget;
+      if (!related || !container || !container.contains(related)) {
+        clearTemplatePanelDropIndicator();
+      }
+      return;
+    }
+
     if (!renderedPanelDragState) {
       return;
     }
@@ -1526,16 +1782,85 @@ const app = (function () {
     persistSessionState();
   };
 
-  const newControlElem = (selectedElem) => {
+  const insertControlElemAt = (selectedElem, rowIndex, blockIndex) => {
     const blockElems = getActiveBlockElements();
-    blockElems.addElement(
-      Control.prototype.blockToClassElems[selectedElem],
-      {},
-      currentlySelectedRowIndex,
-      ++currentlySelectedBlockIndex
+    const Constructor = Control.prototype.blockToClassElems[selectedElem];
+    if (
+      typeof Constructor !== "function" ||
+      !blockElems ||
+      !Array.isArray(blockElems.rows) ||
+      !blockElems.rows.length
+    ) {
+      return false;
+    }
+
+    const normalizedRowIndex = clamp(
+      Number(rowIndex),
+      0,
+      blockElems.rows.length - 1
     );
+    const targetRow = blockElems.rows[normalizedRowIndex];
+    const normalizedBlockIndex = clamp(
+      Number(blockIndex),
+      0,
+      targetRow.length
+    );
+    targetRow.splice(normalizedBlockIndex, 0, new Constructor());
+
+    currentlySelectedRowIndex = normalizedRowIndex;
+    currentlySelectedBlockIndex = normalizedBlockIndex;
     formHandler.updateForm();
     redraw();
+    return true;
+  };
+
+  const insertControlElemInNewRow = (selectedElem, rowIndex) => {
+    const blockElems = getActiveBlockElements();
+    const Constructor = Control.prototype.blockToClassElems[selectedElem];
+    if (
+      typeof Constructor !== "function" ||
+      !blockElems ||
+      !Array.isArray(blockElems.rows)
+    ) {
+      return false;
+    }
+
+    const normalizedRowIndex = clamp(
+      Number(rowIndex),
+      0,
+      blockElems.rows.length
+    );
+    const neighborRowIndex = normalizedRowIndex === 0
+      ? 0
+      : normalizedRowIndex - 1;
+    const rowProperties =
+      typeof blockElems.createBlockWithNeighborBackground === "function"
+        ? blockElems.createBlockWithNeighborBackground(
+          normalizedRowIndex,
+          neighborRowIndex
+        )
+        : new Block();
+
+    blockElems.rows.splice(normalizedRowIndex, 0, [new Constructor()]);
+    blockElems.blockProperties.splice(
+      normalizedRowIndex,
+      0,
+      rowProperties
+    );
+
+    currentlySelectedRowIndex = normalizedRowIndex;
+    currentlySelectedBlockIndex = 0;
+    formHandler.updateForm();
+    redraw();
+    return true;
+  };
+
+  const newControlElem = (selectedElem) => {
+    return insertControlElemAt(
+      selectedElem,
+      currentlySelectedRowIndex,
+      currentlySelectedBlockIndex + 1
+    );
   };
 
   const normalizeControlElemRefs = (refs, blockElements) => {
@@ -1634,6 +1959,79 @@ const app = (function () {
       copied: true,
       copiedBlockCount: normalizedRefs.length,
       rowCount: clipboardRows.length,
+    };
+  };
+
+  const cutControlElements = (refs) => {
+    const blockElements = getActiveBlockElements();
+    const rows = blockElements?.rows;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return { cut: false, copiedBlockCount: 0 };
+    }
+
+    const normalizedRefs = normalizeControlElemRefs(refs, blockElements);
+    if (!normalizedRefs.length) {
+      return { cut: false, copiedBlockCount: 0 };
+    }
+
+    const totalBlockCount = rows.reduce(
+      (total, row) => total + (Array.isArray(row) ? row.length : 0),
+      0
+    );
+    if (normalizedRefs.length >= totalBlockCount) {
+      return {
+        cut: false,
+        copiedBlockCount: 0,
+        reason: "At least one block must remain.",
+      };
+    }
+
+    const copyResult = copyControlElements(normalizedRefs);
+    if (!copyResult.copied) {
+      return { cut: false, copiedBlockCount: 0 };
+    }
+
+    const firstSelection = normalizedRefs[0];
+    const selectionsByRow = new Map();
+    normalizedRefs.forEach(({ rowIndex, blockIndex }) => {
+      if (!selectionsByRow.has(rowIndex)) {
+        selectionsByRow.set(rowIndex, []);
+      }
+      selectionsByRow.get(rowIndex).push(blockIndex);
+    });
+
+    Array.from(selectionsByRow.keys())
+      .sort((left, right) => right - left)
+      .forEach((rowIndex) => {
+        const row = rows[rowIndex];
+        selectionsByRow
+          .get(rowIndex)
+          .sort((left, right) => right - left)
+          .forEach((blockIndex) => row.splice(blockIndex, 1));
+
+        if (row.length === 0) {
+          rows.splice(rowIndex, 1);
+          blockElements.blockProperties.splice(rowIndex, 1);
+        }
+      });
+
+    currentlySelectedRowIndex = clamp(
+      firstSelection.rowIndex,
+      0,
+      rows.length - 1
+    );
+    currentlySelectedBlockIndex = clamp(
+      firstSelection.blockIndex,
+      0,
+      rows[currentlySelectedRowIndex].length - 1
+    );
+
+    formHandler.updateForm();
+    redraw();
+    return {
+      cut: true,
+      copiedBlockCount: copyResult.copiedBlockCount,
+      rowCount: copyResult.rowCount,
     };
   };
 
@@ -2223,6 +2621,64 @@ const app = (function () {
     RIGHT_TURN_CFX: { type: "APL_TURN_CFX", flip: false },
   };
 
+  const DEFAULT_APL_ARROW_SPACING_REM = 12;
+  const APL_ARROW_ZONE_EXTRA_REM = 1.15;
+  const APL_ARROW_EDGE_PADDING_REM = 1;
+  const APL_ARROW_OUTER_EDGE_PADDING_REM = APL_ARROW_EDGE_PADDING_REM / 4;
+  const APL_EXIT_ONLY_STRAIGHT_GAP_REM = 1.15;
+  const APL_EXIT_ONLY_TURN_GAP_REM = 0.72;
+  const APL_EXIT_ONLY_TURN_STEM_OFFSET_REM = 1.1;
+
+  const getDefaultAPLArrowSizeRem = function (arrowType) {
+    if (arrowType === "APL_TURN") return 3.5;
+    if (arrowType === "APL_TURN_CFX") return 3.25;
+    if (arrowType === "APL_DUAL_TURN") return 4.5;
+    return 4.75;
+  };
+
+  const normalizeAPLArrowSpacing = function (
+    value,
+    fallback = DEFAULT_APL_ARROW_SPACING_REM
+  ) {
+    if (value == null || String(value).trim() === "") {
+      return fallback;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+  };
+
+  const normalizeAPLArrowData = function (arrow) {
+    if (!arrow || typeof arrow !== "object") {
+      return arrow;
+    }
+
+    const legacyLeftSpacing =
+      arrow.arrowMarginLeft == null ? NaN : Number(arrow.arrowMarginLeft);
+    const legacyRightSpacing =
+      arrow.arrowMarginRight == null ? NaN : Number(arrow.arrowMarginRight);
+    arrow.spacingBeforeRem = normalizeAPLArrowSpacing(
+      arrow.spacingBeforeRem,
+      Number.isFinite(legacyLeftSpacing)
+        ? Math.max(0, legacyLeftSpacing)
+        : DEFAULT_APL_ARROW_SPACING_REM
+    );
+    arrow.spacingAfterRem = normalizeAPLArrowSpacing(
+      arrow.spacingAfterRem,
+      Number.isFinite(legacyRightSpacing)
+        ? Math.max(0, legacyRightSpacing)
+        : DEFAULT_APL_ARROW_SPACING_REM
+    );
+
+    const parsedSize = Number(arrow.arrowSizeRem);
+    arrow.arrowSizeRem =
+      Number.isFinite(parsedSize) && parsedSize > 0
+        ? parsedSize
+        : getDefaultAPLArrowSizeRem(arrow.type);
+
+    arrow.aplSpacingInitialized = true;
+    return arrow;
+  };
+
   const getAPLArrowKind = function (arrow) {
     if (arrow && APL_ARROW_KINDS[arrow.kind]) {
       return arrow.kind;
@@ -2275,6 +2731,7 @@ const app = (function () {
     arrow.kind = kind;
     arrow.type = definition.type;
     arrow.flip = definition.flip;
+    normalizeAPLArrowData(arrow);
   };
 
   const createAPLArrowData = function (kindOrType = "UP") {
@@ -2282,6 +2739,7 @@ const app = (function () {
     sign.newAPLArrow((APL_ARROW_KINDS[kindOrType] || {}).type || kindOrType || "APL_UP");
     const arrow = sign.aplArrows.pop();
     applyAPLArrowKind(arrow, kindOrType);
+    arrow.arrowSizeRem = getDefaultAPLArrowSizeRem(arrow.type);
     return arrow;
   };
 
@@ -2299,6 +2757,7 @@ const app = (function () {
     const subPanelCount = Math.max(1, sign?.subPanels?.length || 1);
     const buckets = Array.from({ length: subPanelCount }, () => []);
     const aplArrows = sign?.aplArrows || [];
+    aplArrows.forEach(normalizeAPLArrowData);
     const hasExplicitPlacement = aplArrows.some((arrow) => {
       return (
         arrow &&
@@ -2441,6 +2900,8 @@ const app = (function () {
 
     sign.arrowMode = "apl";
     sign.guideArrow = "None";
+    sign.bottomArrowKind = "None";
+    sign.bottomArrowRotation = 0;
     formHandler.updateForm();
     redraw();
   };
@@ -2478,7 +2939,9 @@ const app = (function () {
   const updateAPLArrowType = function (kindOrType, index = currentlySelectedAPLArrowIndex) {
     const sign = getCurrentPanel().sign;
     if (sign.aplArrows.length > 0 && index >= 0 && index < sign.aplArrows.length) {
-      applyAPLArrowKind(sign.aplArrows[index], kindOrType);
+      const arrow = sign.aplArrows[index];
+      applyAPLArrowKind(arrow, kindOrType);
+      arrow.arrowSizeRem = getDefaultAPLArrowSizeRem(arrow.type);
       currentlySelectedAPLArrowIndex = index;
       formHandler.updateForm();
       redraw();
@@ -2525,6 +2988,48 @@ const app = (function () {
       placement: "divider",
       dividerAfterSubPanelIndex,
     });
+  };
+
+  const setAPLArrowSpacing = function (arrowIndex, spacingRem) {
+    const sign = getCurrentPanel().sign;
+    const arrow = sign.aplArrows[arrowIndex];
+    if (!arrow) {
+      return;
+    }
+
+    arrow.spacingAfterRem = normalizeAPLArrowSpacing(spacingRem);
+    arrow.aplSpacingInitialized = true;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setAPLArrowBeforeSpacing = function (arrowIndex, spacingRem) {
+    const sign = getCurrentPanel().sign;
+    const arrow = sign.aplArrows[arrowIndex];
+    if (!arrow) {
+      return;
+    }
+
+    arrow.spacingBeforeRem = normalizeAPLArrowSpacing(spacingRem);
+    arrow.aplSpacingInitialized = true;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setAPLArrowSize = function (arrowIndex, sizeRem) {
+    const sign = getCurrentPanel().sign;
+    const arrow = sign.aplArrows[arrowIndex];
+    if (!arrow) {
+      return;
+    }
+
+    const parsedSize = Number(sizeRem);
+    arrow.arrowSizeRem =
+      Number.isFinite(parsedSize) && parsedSize > 0
+        ? parsedSize
+        : getDefaultAPLArrowSizeRem(arrow.type);
+    formHandler.updateForm();
+    redraw();
   };
 
   const moveAPLArrow = function (
@@ -2584,6 +3089,8 @@ const app = (function () {
     const sign = getCurrentPanel().sign;
     sign.arrowMode = "apl";
     sign.guideArrow = "None";
+    sign.bottomArrowKind = "None";
+    sign.bottomArrowRotation = 0;
 
     if (sign.aplArrows && sign.aplArrows.length > 0) {
       formHandler.updateForm();
@@ -2632,6 +3139,13 @@ const app = (function () {
     redraw();
   };
 
+  const setAPLCombineExitOnlyLabels = function (enabled) {
+    const sign = getCurrentPanel().sign;
+    sign.combineAPLExitOnlyLabels = !!enabled;
+    formHandler.updateForm();
+    redraw();
+  };
+
   const addAPLSubPanelLeftAndOpen = function () {
     const sign = getCurrentPanel().sign;
     const selectedIndex = clamp(
@@ -2669,6 +3183,8 @@ const app = (function () {
     sign.arrowMode = mode === "apl" ? "apl" : "standard";
     if (sign.arrowMode === "apl") {
       sign.guideArrow = "None";
+      sign.bottomArrowKind = "None";
+      sign.bottomArrowRotation = 0;
     }
     formHandler.updateForm();
     redraw();
@@ -3350,49 +3866,130 @@ const app = (function () {
     );
   };
 
-  const inlineBundledExportAssets = (root) => {
+  const fetchedExportAssetDataUrls = new Map();
+
+  const fetchExportAssetDataUrl = (rawUrl) => {
+    if (!rawUrl) {
+      return Promise.resolve("");
+    }
+
+    const stringUrl = String(rawUrl);
+    if (stringUrl.startsWith("data:")) {
+      return Promise.resolve(stringUrl);
+    }
+
+    let resolvedUrl;
+    try {
+      resolvedUrl = new URL(stringUrl, document.baseURI).href;
+    } catch (error) {
+      return Promise.resolve("");
+    }
+
+    if (fetchedExportAssetDataUrls.has(resolvedUrl)) {
+      return fetchedExportAssetDataUrls.get(resolvedUrl);
+    }
+
+    const dataUrlPromise = (async () => {
+      try {
+        const response = await fetch(resolvedUrl);
+        if (!response.ok) {
+          return "";
+        }
+        return await readBlobAsDataUrl(await response.blob());
+      } catch (error) {
+        return "";
+      }
+    })();
+
+    fetchedExportAssetDataUrls.set(resolvedUrl, dataUrlPromise);
+    return dataUrlPromise;
+  };
+
+  const getExportAssetDataUrl = async (...rawUrls) => {
+    for (const rawUrl of rawUrls) {
+      const bundledDataUrl = getBundledExportAssetDataUrl(rawUrl);
+      if (bundledDataUrl) {
+        return bundledDataUrl;
+      }
+    }
+
+    for (const rawUrl of rawUrls) {
+      const fetchedDataUrl = await fetchExportAssetDataUrl(rawUrl);
+      if (fetchedDataUrl) {
+        return fetchedDataUrl;
+      }
+    }
+
+    return "";
+  };
+
+  const inlineBundledExportAssets = async (root) => {
     if (!root) {
       return;
     }
 
-    root.querySelectorAll("img[src]").forEach((img) => {
-      const dataUrl =
-        getBundledExportAssetDataUrl(img.getAttribute("src")) ||
-        getBundledExportAssetDataUrl(img.src);
+    const imagePromises = Array.from(root.querySelectorAll("img[src]")).map(
+      async (img) => {
+        const dataUrl = await getExportAssetDataUrl(
+          img.getAttribute("src"),
+          img.src
+        );
 
-      if (!dataUrl) {
-        return;
+        if (!dataUrl) {
+          return;
+        }
+
+        img.removeAttribute("srcset");
+        img.loading = "eager";
+        img.decoding = "sync";
+        img.src = dataUrl;
+
+        if (typeof img.decode === "function") {
+          try {
+            await img.decode();
+          } catch (error) {
+            // The later image wait still handles browsers without SVG decode support.
+          }
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
+    );
 
-      img.removeAttribute("srcset");
-      img.src = dataUrl;
-    });
-
-    root.querySelectorAll("object[data]").forEach((objectElement) => {
-      const dataUrl =
-        getBundledExportAssetDataUrl(objectElement.getAttribute("data")) ||
-        getBundledExportAssetDataUrl(objectElement.data);
+    const objectPromises = Array.from(
+      root.querySelectorAll("object[data]")
+    ).map(async (objectElement) => {
+      const dataUrl = await getExportAssetDataUrl(
+        objectElement.getAttribute("data"),
+        objectElement.data
+      );
 
       if (dataUrl) {
         objectElement.data = dataUrl;
       }
     });
 
-    root
-      .querySelectorAll("image[href], image[xlink\\:href]")
-      .forEach((imageElement) => {
-        const href =
-          imageElement.getAttribute("href") ||
-          imageElement.getAttribute("xlink:href");
-        const dataUrl = getBundledExportAssetDataUrl(href);
+    const svgImagePromises = Array.from(
+      root.querySelectorAll("image[href], image[xlink\\:href]")
+    ).map(async (imageElement) => {
+      const href =
+        imageElement.getAttribute("href") ||
+        imageElement.getAttribute("xlink:href");
+      const dataUrl = await getExportAssetDataUrl(href);
 
-        if (!dataUrl) {
-          return;
-        }
+      if (!dataUrl) {
+        return;
+      }
 
-        imageElement.setAttribute("href", dataUrl);
-        imageElement.setAttribute("xlink:href", dataUrl);
-      });
+      imageElement.setAttribute("href", dataUrl);
+      imageElement.setAttribute("xlink:href", dataUrl);
+    });
+
+    await Promise.all([
+      ...imagePromises,
+      ...objectPromises,
+      ...svgImagePromises,
+    ]);
   };
 
   let safeExportFontEmbedCSSPromise = null;
@@ -3886,7 +4483,7 @@ const app = (function () {
         materializeExportBannerFirstLetters(exportElement);
       restoreExplicitExportFontFamilies =
         applyExplicitExportFontFamilies(exportElement);
-      inlineBundledExportAssets(exportElement);
+      await inlineBundledExportAssets(exportElement);
       await waitForNextFrame();
       await waitForImagesInElement(exportElement);
       await waitForNextFrame();
@@ -3910,6 +4507,44 @@ const app = (function () {
         element.style.background = oldInline.background;
       }
     }
+  };
+
+  const scaleRasterExportUSRouteOutlines = (element, pixelRatio) => {
+    if (!element || !Number.isFinite(pixelRatio) || pixelRatio <= 0) {
+      return () => {};
+    }
+
+    const restores = [];
+    const outlineWidth = pixelRatio;
+
+    element
+      .querySelectorAll(".blockElementMaster .bannerShieldContainer.US .shieldImg")
+      .forEach((shieldImage) => {
+        const computedStyle = window.getComputedStyle(shieldImage);
+        if (computedStyle.filter === "none") {
+          return;
+        }
+
+        const previousFilter = shieldImage.style.filter;
+        const outlineColor =
+          computedStyle.getPropertyValue("--black").trim() || "#000";
+        shieldImage.style.filter = [
+          `drop-shadow(${outlineWidth}px 0 0 ${outlineColor})`,
+          `drop-shadow(-${outlineWidth}px 0 0 ${outlineColor})`,
+          `drop-shadow(0 ${outlineWidth}px 0 ${outlineColor})`,
+          `drop-shadow(0 -${outlineWidth}px 0 ${outlineColor})`,
+        ].join(" ");
+
+        restores.push(() => {
+          if (previousFilter) {
+            shieldImage.style.filter = previousFilter;
+          } else {
+            shieldImage.style.removeProperty("filter");
+          }
+        });
+      });
+
+    return () => restores.forEach((restore) => restore());
   };
 
   const renderSignExport = async function (file, format, isPreview = false) {
@@ -3940,21 +4575,34 @@ const app = (function () {
 
         const pixelRatio = getExportPixelRatio(width, height, isPreview);
 
-        if (format === "blob") {
-          const blob = await htmlToImage.toBlob(exportElement, {
+        // html-to-image scales the SVG artwork for high-resolution PNG exports,
+        // but WebKit leaves CSS filter offsets at their original raster size.
+        // Materialize the U.S. Route outline at the export pixel ratio so the
+        // copied/downloaded image matches the one-pixel outline on the sign.
+        const restoreUSRouteOutlines = scaleRasterExportUSRouteOutlines(
+          exportElement,
+          pixelRatio
+        );
+
+        try {
+          if (format === "blob") {
+            const blob = await htmlToImage.toBlob(exportElement, {
+              ...exportOptions,
+              pixelRatio,
+            });
+            if (!blob) {
+              throw new Error("PNG render failed");
+            }
+            return await trimTransparentPngBlob(blob);
+          }
+
+          return await htmlToImage.toPng(exportElement, {
             ...exportOptions,
             pixelRatio,
           });
-          if (!blob) {
-            throw new Error("PNG render failed");
-          }
-          return await trimTransparentPngBlob(blob);
+        } finally {
+          restoreUSRouteOutlines();
         }
-
-        return await htmlToImage.toPng(exportElement, {
-          ...exportOptions,
-          pixelRatio,
-        });
       }
     );
   };
@@ -4592,6 +5240,7 @@ const app = (function () {
 
     for (const panel of post.panels) {
       index++;
+      normalizeExitTabAplEdgeAvailabilityForPanel(panel);
       const isPanelGroupPreview =
         currentlyEditingGroupPath.length > 0 &&
         index === currentlySelectedPanelIndex &&
@@ -4643,6 +5292,12 @@ const app = (function () {
 
         const exitTabCont = document.createElement("div");
         exitTabCont.className = `exitTabContainer ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
+        if (isAplEdgeExitTabWidth(exitTab.width)) {
+          exitTabCont.classList.add("aplEdge");
+          exitTabCont.dataset.aplEdgePosition = String(
+            exitTab.position || "Right"
+          );
+        }
         if (
           hasAttachedExitTab &&
           !(parentExitTab.caStyle && parentExitTab.variant == "Default")
@@ -4673,9 +5328,18 @@ const app = (function () {
 
           const exitTabElmt = document.createElement("div");
           exitTabElmt.className = `exitTab ${exitTab.position.toLowerCase()} ${exitTab.width.toLowerCase()}`;
+          if (isAplEdgeExitTabWidth(exitTab.width)) {
+            exitTabElmt.classList.add("aplEdge");
+          }
           const isSideExitTab = exitTab.width === "Side";
           if (exitTab.squareCorners) {
             exitTabElmt.className += " squareCorners";
+          }
+          if (exitTab.extendHorizontalPadding) {
+            exitTabElmt.classList.add("extendedHorizontalPadding");
+          }
+          if (!exitTab.squareCorners && exitTab.matchSignCornerRadius) {
+            exitTabElmt.classList.add("matchSignCornerRadius");
           }
           const numericBorderThickness =
             typeof exitTab.borderThickness === "number"
@@ -4715,6 +5379,17 @@ const app = (function () {
               const safeLineText =
                 typeof lineText === "string" ? lineText : String(lineText || "");
               const txtArr = safeLineText.toUpperCase().split(/(\d+\S*)/);
+              const rawTrailingText = txtArr.slice(2).join("");
+              const separatedSuffixMatch = rawTrailingText.match(
+                /^(\s+)(\S[\s\S]*?)\s*$/
+              );
+              const trailingText = separatedSuffixMatch
+                ? separatedSuffixMatch[2]
+                : rawTrailingText;
+              const suffixWasSeparated = !!separatedSuffixMatch;
+              const separatedSuffixSpaceCount = suffixWasSeparated
+                ? Math.max(1, separatedSuffixMatch[1].length)
+                : 0;
 
               if (exitTab.verticalArrangement && txtArr.length > 1) {
                 const verticalContainer = document.createElement("div");
@@ -4745,11 +5420,18 @@ const app = (function () {
                 registerExitTabText(spanNumeralElmt);
                 spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
                 bottomNumberElmt.appendChild(spanNumeralElmt);
-                const trailingText = txtArr.slice(2).join("");
                 if (trailingText) {
                   const trailingSpanElmt = document.createElement("span");
-                  trailingSpanElmt.className = "numeral exitTabTrailing";
+                  trailingSpanElmt.className =
+                    "numeral exitTabTrailing exitTabVerticalTrailing";
                   trailingSpanElmt.textContent = trailingText;
+                  if (suffixWasSeparated) {
+                    trailingSpanElmt.classList.add("exitTabSeparatedSuffix");
+                    trailingSpanElmt.style.setProperty(
+                      "--exitTabTrailingGap",
+                      `${separatedSuffixSpaceCount * 0.02}em`
+                    );
+                  }
                   registerExitTabText(trailingSpanElmt);
                   bottomNumberElmt.appendChild(trailingSpanElmt);
                 }
@@ -4785,6 +5467,9 @@ const app = (function () {
                   const spacerElmt = document.createElement("span");
                   spacerElmt.textContent = " ";
                   spacerElmt.classList.add("exitTabTextSpacer");
+                  if (suffixWasSeparated) {
+                    spacerElmt.classList.add("exitTabSeparatedSuffixSpacer");
+                  }
                   registerExitTabText(spacerElmt);
                   targetElmt.appendChild(spacerElmt);
                 }
@@ -4793,11 +5478,17 @@ const app = (function () {
                 registerExitTabText(spanNumeralElmt);
                 spanNumeralElmt.appendChild(document.createTextNode(txtArr[1]));
                 targetElmt.appendChild(spanNumeralElmt);
-                const trailingText = txtArr.slice(2).join("");
                 if (trailingText) {
                   const trailingSpanElmt = document.createElement("span");
                   trailingSpanElmt.className = "numeral exitTabTrailing";
                   trailingSpanElmt.textContent = trailingText;
+                  if (suffixWasSeparated) {
+                    trailingSpanElmt.classList.add("exitTabSeparatedSuffix");
+                    trailingSpanElmt.style.setProperty(
+                      "--exitTabTrailingGap",
+                      `${separatedSuffixSpaceCount * 0.02}em`
+                    );
+                  }
                   registerExitTabText(trailingSpanElmt);
                   targetElmt.appendChild(trailingSpanElmt);
                 }
@@ -4997,7 +5688,11 @@ const app = (function () {
               panelElmt.classList.add("hasVisibleExitTab");
             }
 
-            const cornerRadius = exitTab.squareCorners ? "0.25rem" : "0.5rem";
+            const cornerRadius = exitTab.squareCorners
+              ? "0.25rem"
+              : exitTab.matchSignCornerRadius
+                ? "var(--signBorderRadius, 0.75rem)"
+                : "0.5rem";
 
             if (exitTab.fullBorder == true || isSideExitTab) {
               exitTabElmt.style.borderBottomWidth = borderThicknessRem;
@@ -5471,6 +6166,67 @@ const app = (function () {
       signHolderElmt.className = `signHolder`;
       signElmt.appendChild(signHolderElmt);
 
+      const applyAplEdgeExitTabLayout = () => {
+        const aplEdgeTabs = Array.from(
+          panelElmt.querySelectorAll(":scope > .exitTabContainer.aplEdge")
+        );
+
+        if (!aplEdgeTabs.length) {
+          return;
+        }
+
+        const signRect = signElmt.getBoundingClientRect();
+        if (!signRect.width) {
+          return;
+        }
+
+        aplEdgeTabs.forEach((tabContainer) => {
+          const tabPosition = String(
+            tabContainer.dataset.aplEdgePosition ||
+              (tabContainer.classList.contains("left") ? "Left" : "Right")
+          ).toLowerCase();
+          const dividerIndex = getAplEdgeDividerForExitTab(
+            panel.sign,
+            tabPosition
+          );
+
+          if (dividerIndex == null) {
+            return;
+          }
+
+          const dividerElmt = signHolderElmt.querySelector(
+            `:scope > #subDivider${dividerIndex + 1}`
+          );
+          if (!dividerElmt) {
+            return;
+          }
+
+          const dividerRect = dividerElmt.getBoundingClientRect();
+          const rawWidth =
+            tabPosition === "left"
+              ? dividerRect.right - signRect.left
+              : signRect.right - dividerRect.left;
+          const tabWidth = Math.max(0, Math.ceil(rawWidth));
+
+          if (!tabWidth) {
+            return;
+          }
+
+          tabContainer.style.setProperty("--aplEdgeTabWidth", `${tabWidth}px`);
+          tabContainer.style.width = `${tabWidth}px`;
+          tabContainer.style.minWidth = `${tabWidth}px`;
+          tabContainer.style.maxWidth = `${tabWidth}px`;
+
+          if (tabPosition === "left") {
+            tabContainer.style.marginLeft = "0";
+            tabContainer.style.marginRight = "auto";
+          } else {
+            tabContainer.style.marginLeft = "auto";
+            tabContainer.style.marginRight = "0";
+          }
+        });
+      };
+
       const g_bottom = document.createElement("div");
       g_bottom.className = `globalBottom`;
       signElmt.appendChild(g_bottom);
@@ -5533,11 +6289,67 @@ const app = (function () {
       }
       */
 
+      const configuredGuideArrowKind = ArrowElement.prototype.arrows[
+        panel.sign.bottomArrowKind
+      ]
+        ? panel.sign.bottomArrowKind
+        : null;
+      const resolvedGuideArrowKind =
+        configuredGuideArrowKind ||
+        (panel.sign.guideArrow !== "None"
+          ? ArrowElement.prototype.defaultArrow
+          : null);
+      const createConfiguredGuideArrow = function (name, extra) {
+        if (!resolvedGuideArrowKind) {
+          return null;
+        }
+
+        const arrow = new ArrowElement({
+          arrow: resolvedGuideArrowKind,
+          rotation: panel.sign.bottomArrowRotation,
+        });
+        const arrowElement = arrow.createElement();
+        arrowElement.dataset.arrowKind = resolvedGuideArrowKind;
+        for (const className of `${name || "exitOnlyArrow"} ${extra || ""}`
+          .trim()
+          .split(/\s+/)) {
+          if (className) {
+            arrowElement.classList.add(className);
+          }
+        }
+
+        let reservedArrowSize = { height: 2 };
+        if (name === "sideLeftArrow" || name === "sideRightArrow") {
+          reservedArrowSize = { height: 2.5 };
+        } else if (
+          (!name || name === "exitOnlyArrow" || name === "halfarrow") &&
+          resolvedGuideArrowKind === "TYPE_A"
+        ) {
+          reservedArrowSize = { width: 1.75 };
+        }
+        const layoutRotation = panel.sign.guideArrow.includes("Exit Only")
+          ? 0
+          : panel.sign.bottomArrowRotation;
+        reserveRotatedGuideArrowSpace(
+          arrowElement,
+          resolvedGuideArrowKind,
+          layoutRotation,
+          reservedArrowSize
+        );
+        return arrowElement;
+      };
+      const hasBottomArrow =
+        panel.sign.arrowMode !== "apl" &&
+        panel.sign.guideArrow === "None" &&
+        !!configuredGuideArrowKind;
+      const guideArrowClass = hasBottomArrow
+        ? "bottom_arrow"
+        : panel.sign.guideArrow
+          .replace("/", "-")
+          .replace(" ", "_")
+          .toLowerCase();
       const guideArrowsElmt = document.createElement("div");
-      guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow
-        .replace("/", "-")
-        .replace(" ", "_")
-        .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
+      guideArrowsElmt.className = `guideArrows ${guideArrowClass} ${panel.sign.arrowPosition.toLowerCase()}`;
       signCont.appendChild(guideArrowsElmt);
 
       const otherSymbolsElmt = document.createElement("div");
@@ -5560,26 +6372,183 @@ const app = (function () {
       aplArrowsElmt.className = "aplArrows";
       signCont.appendChild(aplArrowsElmt);
 
-      const sideLeftArrowElmt = document.createElement("img");
-      sideLeftArrowElmt.className = "sideLeftArrow";
-      sideLeftArrowElmt.src = "img/arrows/A-4.svg";
-      signHolderElmt.appendChild(sideLeftArrowElmt);
+      const sideLeftArrowElmt = createConfiguredGuideArrow("sideLeftArrow");
+      if (sideLeftArrowElmt) {
+        signHolderElmt.appendChild(sideLeftArrowElmt);
+      }
 
       // subpanels
 
       // Calculate APL arrow groups before the loop
       const aplArrows = panel.sign.aplArrows || [];
-      const arrowGroups =
+      const aplBuckets =
+        aplArrows.length > 0 ? getAPLArrowBuckets(panel.sign) : [];
+      const toIndexedAPLArrow = (arrow) => ({
+        arrow,
+        index: aplArrows.indexOf(arrow),
+      });
+      const arrowGroups = aplBuckets.map((bucket) =>
+        bucket
+          .filter((arrow) => !isAPLDividerArrow(arrow))
+          .map(toIndexedAPLArrow)
+          .filter((arrowData) => arrowData.index >= 0)
+      );
+      const dividerArrowGroups = aplBuckets.map((bucket) =>
+        bucket
+          .filter(isAPLDividerArrow)
+          .map(toIndexedAPLArrow)
+          .filter((arrowData) => arrowData.index >= 0)
+      );
+
+      const isAPLExitOnlyValue = (value) =>
+        value === true ||
+        value === "true" ||
+        value === "on" ||
+        value === 1 ||
+        value === "1";
+
+      const getSafeAPLSizeRem = (arrow) => {
+        const parsed = Number(arrow?.arrowSizeRem);
+        return Number.isFinite(parsed) && parsed > 0
+          ? parsed
+          : getDefaultAPLArrowSizeRem(arrow?.type);
+      };
+
+      const isAPLTurnArrowWithOffset = (arrow) =>
+        arrow?.type === "APL_TURN" ||
+        arrow?.type === "APL_UP_TURN" ||
+        arrow?.type === "APL_TURN_CFX" ||
+        arrow?.type === "APL_UP_TURN_CFX";
+
+      const getAPLExitOnlyGapRem = (arrow) =>
+        isAPLTurnArrowWithOffset(arrow)
+          ? APL_EXIT_ONLY_TURN_GAP_REM
+          : APL_EXIT_ONLY_STRAIGHT_GAP_REM;
+
+      const getAPLExitOnlyStemOffsetRem = (arrow) => {
+        if (!isAPLTurnArrowWithOffset(arrow)) {
+          return 0;
+        }
+
+        const sizeBasedOffset = getSafeAPLSizeRem(arrow) * 0.32;
+        const offset = Math.max(
+          0.9,
+          Math.min(1.2, sizeBasedOffset || APL_EXIT_ONLY_TURN_STEM_OFFSET_REM)
+        );
+        return arrow?.flip ? offset : -offset;
+      };
+
+      const getAPLLabelWidthRem = (arrow, side = "left") => {
+        const fallback = side === "left" ? "EXIT" : "ONLY";
+        const value =
+          side === "left" ? arrow?.exitOnlyTextLeft : arrow?.exitOnlyTextRight;
+        const text = String(value == null ? fallback : value);
+        const padding = Number(arrow?.exitOnlyPadding);
+        const horizontalPadding = Number.isFinite(padding)
+          ? Math.max(0, padding) * 2
+          : 0.36;
+        return Math.max(4, text.length * 0.7 + horizontalPadding);
+      };
+
+      const isAPLArrowInCombinedRun = (arrowGroup, arrowIndex) =>
+        panel.sign.combineAPLExitOnlyLabels === true &&
+        isAPLExitOnlyValue(arrowGroup[arrowIndex]?.arrow?.exitOnly) &&
+        (isAPLExitOnlyValue(arrowGroup[arrowIndex - 1]?.arrow?.exitOnly) ||
+          isAPLExitOnlyValue(arrowGroup[arrowIndex + 1]?.arrow?.exitOnly));
+
+      const getAPLArrowHalfWidthRem = (arrow) => {
+        const aspectRatio = GUIDE_ARROW_ASPECT_RATIOS[arrow?.type] || 1;
+        return Math.max(0.65, (getSafeAPLSizeRem(arrow) * aspectRatio) / 2);
+      };
+
+      const getAPLVisualExtentsRem = (arrowGroup, arrowIndex) => {
+        const arrow = arrowGroup[arrowIndex]?.arrow;
+        const arrowHalfWidth = getAPLArrowHalfWidthRem(arrow);
+
+        if (
+          !isAPLExitOnlyValue(arrow?.exitOnly) ||
+          isAPLArrowInCombinedRun(arrowGroup, arrowIndex)
+        ) {
+          return { left: arrowHalfWidth, right: arrowHalfWidth };
+        }
+
+        const gap = getAPLExitOnlyGapRem(arrow);
+        const stemOffset = getAPLExitOnlyStemOffsetRem(arrow);
+        const leftLabelExtent = arrow?.exitOnlyHideLeft
+          ? 0
+          : getAPLLabelWidthRem(arrow, "left") + gap - stemOffset;
+        const rightLabelExtent = arrow?.exitOnlyHideRight
+          ? 0
+          : getAPLLabelWidthRem(arrow, "right") + gap + stemOffset;
+
+        return {
+          left: Math.max(arrowHalfWidth, leftLabelExtent),
+          right: Math.max(arrowHalfWidth, rightLabelExtent),
+        };
+      };
+
+      const getAPLLeftReserveRem = (arrowGroup, subPanelIndex) => {
+        if (!arrowGroup.length) return 0;
+        const visual = getAPLVisualExtentsRem(arrowGroup, 0);
+        if (subPanelIndex === 0) {
+          return visual.left + APL_ARROW_OUTER_EDGE_PADDING_REM;
+        }
+        return Math.max(
+          normalizeAPLArrowSpacing(arrowGroup[0].arrow.spacingBeforeRem),
+          visual.left + APL_ARROW_EDGE_PADDING_REM
+        );
+      };
+
+      const getAPLRightReserveRem = (arrowGroup, subPanelIndex) => {
+        if (!arrowGroup.length) return 0;
+        const lastIndex = arrowGroup.length - 1;
+        const visual = getAPLVisualExtentsRem(arrowGroup, lastIndex);
+        if (subPanelIndex >= panel.sign.subPanels.length - 1) {
+          return visual.right + APL_ARROW_OUTER_EDGE_PADDING_REM;
+        }
+        return Math.max(
+          normalizeAPLArrowSpacing(
+            arrowGroup[lastIndex].arrow.spacingAfterRem
+          ),
+          visual.right + APL_ARROW_EDGE_PADDING_REM
+        );
+      };
+
+      const getAPLSubpanelMinWidthRem = (arrowGroup, subPanelIndex) => {
+        if (!arrowGroup.length) return 0;
+
+        let widthRem = getAPLLeftReserveRem(arrowGroup, subPanelIndex);
+        for (let index = 1; index < arrowGroup.length; index++) {
+          widthRem += normalizeAPLArrowSpacing(
+            arrowGroup[index - 1].arrow.spacingAfterRem
+          );
+        }
+        widthRem += getAPLRightReserveRem(arrowGroup, subPanelIndex);
+        return widthRem;
+      };
+
+      const aplArrowZoneHeightRem =
         aplArrows.length > 0
-          ? getAPLArrowBuckets(panel.sign).map((bucket) =>
-            bucket
-              .map((arrow) => ({
-                arrow,
-                index: aplArrows.indexOf(arrow),
-              }))
-              .filter((arrowData) => arrowData.index >= 0)
-          )
-          : [];
+          ? Math.max(...aplArrows.map(getSafeAPLSizeRem)) +
+            APL_ARROW_ZONE_EXTRA_REM
+          : 5.9;
+      const aplDividerStopOffsetRem = Math.max(
+        0,
+        aplArrowZoneHeightRem - APL_ARROW_ZONE_EXTRA_REM + 0.25
+      );
+
+      if (aplArrows.length > 0) {
+        [signElmt, signHolderElmt].forEach((targetElmt) => {
+          targetElmt.style.setProperty(
+            "--aplArrowZoneHeight",
+            `${aplArrowZoneHeightRem}rem`
+          );
+          targetElmt.style.setProperty(
+            "--aplDividerStopOffset",
+            `${aplDividerStopOffsetRem}rem`
+          );
+        });
+      }
 
       const firstRenderedSubPanelIndex = isPanelGroupPreview
         ? clamp(
@@ -5606,30 +6575,27 @@ const app = (function () {
           subDivider.className = "subDivider";
           subDivider.id = "subDivider" + subPanelIndex.toString();
 
-          // Check for grouped divider arrow
-          if (arrowGroups.length > 0 && subPanelIndex - 1 < arrowGroups.length) {
-            const prevGroup = arrowGroups[subPanelIndex - 1];
-            if (prevGroup.length > 0) {
-              const lastArrowOfPrevGroup = prevGroup[prevGroup.length - 1].arrow;
-              if (lastArrowOfPrevGroup.groupedWithDivider) {
-                const arrowDef = ArrowElement.prototype.arrows[lastArrowOfPrevGroup.type];
-                if (arrowDef) {
-                  const divArrowImg = document.createElement("img");
-                  divArrowImg.className = "aplDividerArrow";
-                  divArrowImg.dataset.type = lastArrowOfPrevGroup.type;
-                  divArrowImg.src = arrowDef.src;
-                  divArrowImg.alt = arrowDef.label;
+          const dividerGroup = dividerArrowGroups[subPanelIndex - 1] || [];
+          const dividerArrow =
+            dividerGroup.length > 0
+              ? dividerGroup[dividerGroup.length - 1].arrow
+              : null;
+          const dividerArrowDefinition =
+            ArrowElement.prototype.arrows[dividerArrow?.type];
+          if (dividerArrow && dividerArrowDefinition) {
+            const divArrowImg = document.createElement("img");
+            divArrowImg.className = "aplDividerArrow";
+            divArrowImg.dataset.type = dividerArrow.type;
+            divArrowImg.src = dividerArrowDefinition.src;
+            divArrowImg.alt = dividerArrowDefinition.label;
+            divArrowImg.style.height = `${getSafeAPLSizeRem(dividerArrow)}rem`;
 
-                  // Flip divider arrow if the arrow is flipped
-                  if (lastArrowOfPrevGroup.flip) {
-                    divArrowImg.style.transform = "scaleX(-1)";
-                  }
-
-                  subDivider.appendChild(divArrowImg);
-                  subDivider.classList.add("hasArrow");
-                }
-              }
+            if (dividerArrow.flip) {
+              divArrowImg.style.transform = "scaleX(-1)";
             }
+
+            subDivider.appendChild(divArrowImg);
+            subDivider.classList.add("hasArrow");
           }
 
           const dividerHeight = (subPanel && subPanel.height) || "";
@@ -5653,6 +6619,11 @@ const app = (function () {
         new_subPanel.dataset.subpanelIndex = subPanelIndex.toString();
         new_subPanel.dataset.subpanelCount =
           panel.sign.subPanels.length.toString();
+        new_subPanel.classList.toggle("firstAplSubPanel", subPanelIndex === 0);
+        new_subPanel.classList.toggle(
+          "lastAplSubPanel",
+          subPanelIndex === panel.sign.subPanels.length - 1
+        );
         signHolderElmt.appendChild(new_subPanel);
 
         const signContentContainerElmt = document.createElement("div");
@@ -5711,7 +6682,9 @@ const app = (function () {
         // sign
         signContentContainerElmt.style.padding = panel.sign.padding;
 
-        // APL Arrows for this subpanel - always create container if APL arrows exist on sign
+        // APL Arrows for this subpanel - always create the bottom border zone
+        // when APL mode is active. EXIT ONLY keeps v2.2's existing markup and
+        // styling; only the outer layout item participates in lane spacing.
         if (
           !isPanelGroupPreview &&
           panel.sign.aplArrows &&
@@ -5719,109 +6692,288 @@ const app = (function () {
         ) {
           const subPanelArrowContainer = document.createElement("div");
           subPanelArrowContainer.className = "aplArrows subpanelAplArrows";
-          subPanelArrowContainer.style.display = "flex";
-          // subPanelArrowContainer.style.justifyContent = "center"; // Moved to CSS
-          subPanelArrowContainer.style.gap = "0";
 
-          // Only add arrows if this subpanel has an arrow group
-          if (arrowGroups.length > 0 && subPanelIndex < arrowGroups.length) {
-            const arrowGroup = arrowGroups[subPanelIndex];
-            for (let gi = 0; gi < arrowGroup.length; gi++) {
-              const arrowData = arrowGroup[gi];
-              const arrow = arrowData.arrow;
+          const arrowTrack = document.createElement("div");
+          arrowTrack.className = "aplArrowTrack";
+          subPanelArrowContainer.appendChild(arrowTrack);
 
-              const arrowDef = ArrowElement.prototype.arrows[arrow.type];
-              if (arrowDef) {
-                const arrowImg = document.createElement("img");
-                arrowImg.className = "aplArrow";
-                arrowImg.dataset.type = arrow.type;
-                arrowImg.src = arrowDef.src;
-                arrowImg.alt = arrowDef.label;
+          const arrowGroup = arrowGroups[subPanelIndex] || [];
+          const fallbackTrackWidthRem = getAPLSubpanelMinWidthRem(
+            arrowGroup,
+            subPanelIndex
+          );
+          const renderedItems = [];
 
-                // If this arrow is grouped with divider, make it invisible but keep space
-                if (arrow.groupedWithDivider) {
-                  arrowImg.style.visibility = "hidden";
+          if (fallbackTrackWidthRem > 0) {
+            new_subPanel.classList.add("hasAplWidthReserve");
+            new_subPanel.style.setProperty(
+              "--aplSubpanelMinWidth",
+              `${fallbackTrackWidthRem}rem`
+            );
+          }
+
+          const applyAPLExitOnlyLabelStyles = (label, arrow) => {
+            if (arrow.exitOnlyBgColor === "white") {
+              label.style.backgroundColor = "var(--white)";
+            }
+            if (arrow.exitOnlyPadding != null) {
+              const padding = `${arrow.exitOnlyPadding}rem`;
+              label.style.paddingLeft = padding;
+              label.style.paddingRight = padding;
+            }
+            if (arrow.exitOnlyBorderRadius != null) {
+              label.style.borderRadius = `${arrow.exitOnlyBorderRadius}rem`;
+            }
+          };
+
+          const createAPLArrowImage = (arrow) => {
+            const arrowDefinition = ArrowElement.prototype.arrows[arrow.type];
+            if (!arrowDefinition) {
+              return null;
+            }
+
+            const arrowImage = document.createElement("img");
+            const arrowSizeRem = getSafeAPLSizeRem(arrow);
+            const aspectRatio = GUIDE_ARROW_ASPECT_RATIOS[arrow.type] || 1;
+            arrowImage.className = "aplArrow";
+            arrowImage.dataset.type = arrow.type;
+            arrowImage.src = arrowDefinition.src;
+            arrowImage.alt = arrowDefinition.label;
+            arrowImage.style.height = `${arrowSizeRem}rem`;
+            arrowImage.style.width = `${arrowSizeRem * aspectRatio}rem`;
+            arrowImage.style.margin = "0";
+            if (arrow.flip) {
+              arrowImage.style.transform = "scaleX(-1)";
+            }
+            return arrowImage;
+          };
+
+          const createAPLExitOnlyContainer = (arrow, includeLabels = true) => {
+            const arrowImage = createAPLArrowImage(arrow);
+            if (!arrowImage) {
+              return null;
+            }
+
+            const container = document.createElement("div");
+            container.className = "aplExitOnlyContainer";
+            container.dataset.arrowType = arrow.type;
+            if (arrow.flip) {
+              container.dataset.flipped = "true";
+            }
+
+            if (includeLabels) {
+              const exitSpan = document.createElement("span");
+              exitSpan.className = "aplExitOnlyLabel aplExitOnlyExit";
+              exitSpan.textContent =
+                arrow.exitOnlyTextLeft != null
+                  ? arrow.exitOnlyTextLeft
+                  : "EXIT";
+              applyAPLExitOnlyLabelStyles(exitSpan, arrow);
+              if (arrow.exitOnlyHideLeft) {
+                exitSpan.style.display = "none";
+              }
+              container.appendChild(exitSpan);
+            }
+
+            container.appendChild(arrowImage);
+
+            if (includeLabels) {
+              const onlySpan = document.createElement("span");
+              onlySpan.className = "aplExitOnlyLabel aplExitOnlyOnly";
+              onlySpan.textContent =
+                arrow.exitOnlyTextRight != null
+                  ? arrow.exitOnlyTextRight
+                  : "ONLY";
+              applyAPLExitOnlyLabelStyles(onlySpan, arrow);
+              if (arrow.exitOnlyHideRight) {
+                onlySpan.style.display = "none";
+              }
+              container.appendChild(onlySpan);
+            }
+
+            return container;
+          };
+
+          const appendAPLLayoutItem = (content, startIndex, endIndex) => {
+            if (!content) {
+              return;
+            }
+            const layoutItem = document.createElement("div");
+            layoutItem.className = "aplArrowLayoutItem";
+            layoutItem.appendChild(content);
+            arrowTrack.appendChild(layoutItem);
+            renderedItems.push({ layoutItem, startIndex, endIndex });
+          };
+
+          for (let groupIndex = 0; groupIndex < arrowGroup.length;) {
+            const arrow = arrowGroup[groupIndex].arrow;
+
+            if (
+              panel.sign.combineAPLExitOnlyLabels === true &&
+              isAPLExitOnlyValue(arrow.exitOnly) &&
+              isAPLExitOnlyValue(arrowGroup[groupIndex + 1]?.arrow?.exitOnly)
+            ) {
+              let runEndIndex = groupIndex + 1;
+              while (
+                isAPLExitOnlyValue(
+                  arrowGroup[runEndIndex + 1]?.arrow?.exitOnly
+                )
+              ) {
+                runEndIndex++;
+              }
+
+              const firstArrow = arrow;
+              const lastArrow = arrowGroup[runEndIndex].arrow;
+              const combinedText = [];
+              if (!firstArrow.exitOnlyHideLeft) {
+                combinedText.push(
+                  firstArrow.exitOnlyTextLeft != null
+                    ? firstArrow.exitOnlyTextLeft
+                    : "EXIT"
+                );
+              }
+              if (!lastArrow.exitOnlyHideRight) {
+                combinedText.push(
+                  lastArrow.exitOnlyTextRight != null
+                    ? lastArrow.exitOnlyTextRight
+                    : "ONLY"
+                );
+              }
+
+              const sharedLabel = document.createElement("span");
+              sharedLabel.className =
+                "aplExitOnlyLabel aplExitOnlyCombinedLabel";
+              sharedLabel.textContent = combinedText
+                .filter((part) => String(part).trim().length > 0)
+                .join(" ");
+              if (!sharedLabel.textContent) {
+                sharedLabel.style.display = "none";
+              }
+              applyAPLExitOnlyLabelStyles(sharedLabel, firstArrow);
+
+              const combinedGroup = document.createElement("div");
+              combinedGroup.className = "aplCombinedExitOnlyGroup";
+              const memberCount = runEndIndex - groupIndex + 1;
+              const labelInsertIndex = Math.ceil(memberCount / 2);
+
+              for (
+                let memberIndex = groupIndex;
+                memberIndex <= runEndIndex;
+                memberIndex++
+              ) {
+                if (memberIndex - groupIndex === labelInsertIndex) {
+                  combinedGroup.appendChild(sharedLabel);
                 }
-
-                if (arrow.flip) {
-                  arrowImg.style.transform = "scaleX(-1)";
-                }
-
-                if (arrow.exitOnly) {
-                  const container = document.createElement("div");
-                  container.className = "aplExitOnlyContainer";
-                  container.dataset.arrowType = arrow.type;
-                  if (arrow.flip) {
-                    container.dataset.flipped = "true";
-                  }
-
-                  // Apply arrow margins to container (arrow margin is zeroed inside container)
-                  if (arrow.arrowMarginLeft != null) {
-                    container.style.marginLeft = arrow.arrowMarginLeft + "rem";
-                  }
-                  if (arrow.arrowMarginRight != null) {
-                    container.style.marginRight = arrow.arrowMarginRight + "rem";
-                  }
-
-                  const exitSpan = document.createElement("span");
-                  exitSpan.className = "aplExitOnlyLabel aplExitOnlyExit";
-                  exitSpan.textContent = arrow.exitOnlyTextLeft != null ? arrow.exitOnlyTextLeft : "EXIT";
-
-                  const onlySpan = document.createElement("span");
-                  onlySpan.className = "aplExitOnlyLabel aplExitOnlyOnly";
-                  onlySpan.textContent = arrow.exitOnlyTextRight != null ? arrow.exitOnlyTextRight : "ONLY";
-
-                  // Background color
-                  if (arrow.exitOnlyBgColor === "white") {
-                    exitSpan.style.backgroundColor = "var(--white)";
-                    onlySpan.style.backgroundColor = "var(--white)";
-                  }
-
-                  // Horizontal padding
-                  if (arrow.exitOnlyPadding != null) {
-                    const pad = arrow.exitOnlyPadding + "rem";
-                    exitSpan.style.paddingLeft = pad;
-                    exitSpan.style.paddingRight = pad;
-                    onlySpan.style.paddingLeft = pad;
-                    onlySpan.style.paddingRight = pad;
-                  }
-
-                  // Border radius
-                  if (arrow.exitOnlyBorderRadius != null) {
-                    const rad = arrow.exitOnlyBorderRadius + "rem";
-                    exitSpan.style.borderRadius = rad;
-                    onlySpan.style.borderRadius = rad;
-                  }
-
-                  // Hide labels
-                  if (arrow.exitOnlyHideLeft) {
-                    exitSpan.style.display = "none";
-                  }
-                  if (arrow.exitOnlyHideRight) {
-                    onlySpan.style.display = "none";
-                  }
-
-                  container.appendChild(exitSpan);
-                  arrowImg.style.margin = "0"; // Remove margins from arrow
-                  container.appendChild(arrowImg);
-                  container.appendChild(onlySpan);
-
-                  subPanelArrowContainer.appendChild(container);
-                } else {
-                  // Apply per-arrow margins
-                  if (arrow.arrowMarginLeft != null) {
-                    arrowImg.style.marginLeft = arrow.arrowMarginLeft + "rem";
-                  }
-                  if (arrow.arrowMarginRight != null) {
-                    arrowImg.style.marginRight = arrow.arrowMarginRight + "rem";
-                  }
-                  subPanelArrowContainer.appendChild(arrowImg);
+                const memberContainer = createAPLExitOnlyContainer(
+                  arrowGroup[memberIndex].arrow,
+                  false
+                );
+                if (memberContainer) {
+                  memberContainer.classList.add("aplCombinedExitOnlyMember");
+                  combinedGroup.appendChild(memberContainer);
                 }
               }
+              if (!sharedLabel.parentElement) {
+                combinedGroup.appendChild(sharedLabel);
+              }
+
+              appendAPLLayoutItem(
+                combinedGroup,
+                groupIndex,
+                runEndIndex
+              );
+              groupIndex = runEndIndex + 1;
+              continue;
             }
+
+            const content = isAPLExitOnlyValue(arrow.exitOnly)
+              ? createAPLExitOnlyContainer(arrow)
+              : createAPLArrowImage(arrow);
+            appendAPLLayoutItem(content, groupIndex, groupIndex);
+            groupIndex++;
           }
 
           new_subPanel.appendChild(subPanelArrowContainer);
+
+          if (renderedItems.length > 0) {
+            const rootFontSize =
+              parseFloat(getComputedStyle(document.documentElement).fontSize) ||
+              16;
+            const getItemWidthRem = (item) =>
+              item.layoutItem.getBoundingClientRect().width / rootFontSize;
+
+            renderedItems.forEach((item, itemIndex) => {
+              const itemWidthRem = getItemWidthRem(item);
+              const isFirstRenderedItem = itemIndex === 0;
+              const isLastRenderedItem =
+                itemIndex === renderedItems.length - 1;
+              const isLeftSignEdge =
+                isFirstRenderedItem && subPanelIndex === 0;
+              const isRightSignEdge =
+                isLastRenderedItem &&
+                subPanelIndex >= panel.sign.subPanels.length - 1;
+              let marginLeftRem = 0;
+
+              if (isFirstRenderedItem) {
+                const visualReserve =
+                  itemWidthRem / 2 +
+                  (isLeftSignEdge
+                    ? APL_ARROW_OUTER_EDGE_PADDING_REM
+                    : APL_ARROW_EDGE_PADDING_REM);
+                const requestedReserve = isLeftSignEdge
+                  ? 0
+                  : normalizeAPLArrowSpacing(
+                    arrowGroup[item.startIndex].arrow.spacingBeforeRem
+                  );
+                marginLeftRem =
+                  Math.max(visualReserve, requestedReserve) - itemWidthRem / 2;
+              } else {
+                const previousItem = renderedItems[itemIndex - 1];
+                const previousWidthRem = getItemWidthRem(previousItem);
+                const requestedSpacing = normalizeAPLArrowSpacing(
+                  arrowGroup[previousItem.endIndex].arrow.spacingAfterRem
+                );
+                marginLeftRem = Math.max(
+                  0,
+                  requestedSpacing - previousWidthRem / 2 - itemWidthRem / 2
+                );
+              }
+
+              item.layoutItem.style.marginLeft = `${marginLeftRem}rem`;
+
+              if (isLastRenderedItem) {
+                const visualReserve =
+                  itemWidthRem / 2 +
+                  (isRightSignEdge
+                    ? APL_ARROW_OUTER_EDGE_PADDING_REM
+                    : APL_ARROW_EDGE_PADDING_REM);
+                const requestedReserve = isRightSignEdge
+                  ? 0
+                  : normalizeAPLArrowSpacing(
+                    arrowGroup[item.endIndex].arrow.spacingAfterRem
+                  );
+                item.layoutItem.style.marginRight = `${
+                  Math.max(visualReserve, requestedReserve) - itemWidthRem / 2
+                }rem`;
+              }
+
+              const visualInsetRem =
+                (isLeftSignEdge ? APL_ARROW_OUTER_EDGE_PADDING_REM : 0) -
+                (isRightSignEdge ? APL_ARROW_OUTER_EDGE_PADDING_REM : 0);
+              if (visualInsetRem !== 0) {
+                item.layoutItem.style.transform =
+                  `translateX(${visualInsetRem}rem)`;
+              }
+            });
+
+            const trackWidthRem =
+              arrowTrack.getBoundingClientRect().width / rootFontSize;
+            new_subPanel.classList.add("hasAplWidthReserve");
+            new_subPanel.style.setProperty(
+              "--aplSubpanelMinWidth",
+              `${Math.max(fallbackTrackWidthRem, trackWidthRem)}rem`
+            );
+          }
         }
 
         /*
@@ -5835,54 +6987,149 @@ const app = (function () {
         */
       }
 
-      const sideRightArrowElmt = document.createElement("img");
-      sideRightArrowElmt.className = "sideRightArrow";
-      sideRightArrowElmt.src = "img/arrows/A-1.svg";
-      signHolderElmt.appendChild(sideRightArrowElmt);
+      // v2.19 measures each APL column after its content has rendered and then
+      // pins that natural width. Relying on flex/max-content alone lets a
+      // widening APL divider become part of the neighboring subpanel's
+      // intrinsic width, so removing the divider does not reliably shrink the
+      // boundary again.
+      const syncAplSubpanelWidths = () => {
+        if (isPanelGroupPreview || !aplArrows.length || !signHolderElmt) {
+          return;
+        }
+
+        const subpanelCells = Array.from(
+          signHolderElmt.querySelectorAll(":scope > .subPanelDisplay")
+        );
+        if (!subpanelCells.length) {
+          return;
+        }
+
+        signHolderElmt.classList.add("aplContentHolder");
+
+        const rootFontSize =
+          parseFloat(getComputedStyle(document.documentElement).fontSize) ||
+          16;
+        const clearLinkedWidth = (cell) => {
+          cell.style.removeProperty("--linkedSubpanelWidth");
+          cell.style.removeProperty("width");
+          cell.style.removeProperty("min-width");
+          cell.style.removeProperty("max-width");
+          cell.style.removeProperty("flex");
+        };
+        const getNaturalWidth = (element) => {
+          if (!element) {
+            return 0;
+          }
+          const rect = element.getBoundingClientRect();
+          return Math.max(
+            rect.width || 0,
+            element.scrollWidth || 0,
+            element.offsetWidth || 0
+          );
+        };
+
+        // Clear the previous measurement first. This is the important v2.19
+        // behavior that allows an APL column to shrink after a divider arrow is
+        // removed instead of measuring the old width as new content.
+        subpanelCells.forEach(clearLinkedWidth);
+
+        const desiredWidths = subpanelCells.map((cell) => {
+          const contentContainer = cell.querySelector(
+            ":scope > .signContentContainer"
+          );
+          const arrowTrack = cell.querySelector(
+            ":scope > .subpanelAplArrows > .aplArrowTrack"
+          );
+          const aplReserveRem = parseFloat(
+            cell.style.getPropertyValue("--aplSubpanelMinWidth") || "0"
+          );
+          const aplReservePx = Number.isFinite(aplReserveRem)
+            ? aplReserveRem * rootFontSize
+            : 0;
+
+          return Math.ceil(
+            Math.max(
+              getNaturalWidth(contentContainer),
+              getNaturalWidth(arrowTrack),
+              aplReservePx,
+              1
+            )
+          );
+        });
+
+        // A divider-mounted arrow straddles two subpanels. Reserve its visible
+        // half on each side only while that arrow exists; an empty divider no
+        // longer holds either neighboring column at the wider size.
+        const holderChildren = Array.from(signHolderElmt.children);
+        holderChildren.forEach((child, childIndex) => {
+          if (!child.classList.contains("subDivider")) {
+            return;
+          }
+
+          const dividerArrow = child.querySelector(".aplDividerArrow");
+          if (!dividerArrow) {
+            return;
+          }
+
+          if (
+            !dividerArrow.complete &&
+            !dividerArrow.dataset.aplWidthLoadBound
+          ) {
+            dividerArrow.dataset.aplWidthLoadBound = "true";
+            dividerArrow.addEventListener("load", syncAplSubpanelWidths, {
+              once: true,
+            });
+          }
+
+          const dividerRect = child.getBoundingClientRect();
+          const arrowRect = dividerArrow.getBoundingClientRect();
+          if (!dividerRect.width || !arrowRect.width) {
+            return;
+          }
+
+          const dividerCenter = dividerRect.left + dividerRect.width / 2;
+          const leftNeeded = Math.max(0, dividerCenter - arrowRect.left);
+          const rightNeeded = Math.max(0, arrowRect.right - dividerCenter);
+          const leftCellIndex = holderChildren
+            .slice(0, childIndex)
+            .filter((node) => node.classList.contains("subPanelDisplay"))
+            .length - 1;
+          const rightCellIndex = leftCellIndex + 1;
+
+          if (leftCellIndex >= 0 && leftCellIndex < desiredWidths.length) {
+            desiredWidths[leftCellIndex] = Math.ceil(
+              Math.max(desiredWidths[leftCellIndex], leftNeeded * 2)
+            );
+          }
+          if (rightCellIndex >= 0 && rightCellIndex < desiredWidths.length) {
+            desiredWidths[rightCellIndex] = Math.ceil(
+              Math.max(desiredWidths[rightCellIndex], rightNeeded * 2)
+            );
+          }
+        });
+
+        desiredWidths.forEach((resolvedWidth, cellIndex) => {
+          const cell = subpanelCells[cellIndex];
+          const widthPx = `${Math.max(1, resolvedWidth)}px`;
+          cell.style.setProperty("--linkedSubpanelWidth", widthPx);
+          cell.style.flex = "0 0 auto";
+          cell.style.width = widthPx;
+          cell.style.minWidth = widthPx;
+          cell.style.maxWidth = "none";
+        });
+      };
+
+      const sideRightArrowElmt = createConfiguredGuideArrow("sideRightArrow");
+      if (sideRightArrowElmt) {
+        signHolderElmt.appendChild(sideRightArrowElmt);
+      }
 
       // Guide arrows
 
-      const ExitKeys = ["EA", "EB", "EC"];
-      const MainKeys = ["A", "B", "C", "D", "E"];
       var path;
 
-      const createArrowElmt = function (key, dir, name, extra) {
-        if (dir == "MainArrows!ExitOnly") {
-          key = key.split("/")[1];
-        } else {
-          key = key.split("/")[0];
-        }
-
-        console.log(key);
-
-        if (
-          ExitKeys.includes(key.split("-")[0]) ||
-          MainKeys.includes(key.split("-")[0])
-        ) {
-          const downArrowElmt = document.createElement("img");
-          downArrowElmt.className = name || "exitOnlyArrow ";
-
-          if (extra) {
-            downArrowElmt.className += " " + extra;
-          }
-
-          if (ExitKeys.includes(key.split("-")[0])) {
-            key = key.split("-")[0].split("")[1] + "-" + key.split("-")[1];
-            downArrowElmt.style.filter = "invert(1)";
-          }
-
-          const shouldUseCanadianDownArrow =
-            panel.sign.useCanadianDownArrows && key === "C-1";
-
-          if (shouldUseCanadianDownArrow) {
-            downArrowElmt.src = "img/arrowBlocks/DOWN_CA.svg";
-            downArrowElmt.classList.add("canadianDownArrow");
-          } else {
-            downArrowElmt.src = "img/arrows/" + key + ".svg";
-          }
-
-          return downArrowElmt;
-        }
+      const createArrowElmt = function (_key, _dir, name, extra) {
+        return createConfiguredGuideArrow(name, extra);
       };
 
       if (
@@ -5916,6 +7163,23 @@ const app = (function () {
         const hideExitOnlyArrows = panel.sign.hideExitArrow === true;
         arrowContElmt.classList.toggle("hideExitOnlyArrows", hideExitOnlyArrows);
         if (
+          panel.sign.guideArrow === "Exit Only" ||
+          panel.sign.guideArrow === "Half Exit Only"
+        ) {
+          const parsedArrowHorizontalPadding = parseFloat(
+            panel.sign.exitOnlyArrowHorizontalPadding
+          );
+          const arrowHorizontalPadding = Number.isFinite(
+            parsedArrowHorizontalPadding
+          )
+            ? Math.min(Math.max(parsedArrowHorizontalPadding, 0), 6)
+            : 0;
+          arrowContElmt.style.setProperty(
+            "--exitOnlyArrowHorizontalPadding",
+            `${arrowHorizontalPadding}rem`
+          );
+        }
+        if (
           !post.secondExitOnly &&
           panel.sign.guideArrow != "Split Exit Only" &&
           panel.sign.guideArrow != "Half Exit Only"
@@ -5936,7 +7200,7 @@ const app = (function () {
           secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow
             .replace("/", "-")
             .replace(" ", "_")
-            .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
+            .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()} halfExitOnlyPanel`;
 
           guideArrowsElmt.className += post.secondExitOnly
             ? " new2"
@@ -6079,10 +7343,14 @@ const app = (function () {
       }
 
       if ("Side Left" == panel.sign.guideArrow) {
-        sideLeftArrowElmt.style.display = "block";
+        if (sideLeftArrowElmt) {
+          sideLeftArrowElmt.style.display = "flex";
+        }
       } else if ("Side Right" == panel.sign.guideArrow) {
-        sideRightArrowElmt.style.display = "block";
-      } else if ("None" != panel.sign.guideArrow) {
+        if (sideRightArrowElmt) {
+          sideRightArrowElmt.style.display = "flex";
+        }
+      } else if ("None" != panel.sign.guideArrow || hasBottomArrow) {
         signElmt.style.borderBottomLeftRadius = "0";
         signElmt.style.borderBottomRightRadius = "0";
         signElmt.style.borderBottomWidth = "0";
@@ -6433,6 +7701,45 @@ const app = (function () {
               }
             }
           }
+        } else if (hasBottomArrow) {
+          arrowContElmt.classList.remove("hideExitOnlyArrows");
+          const bottomArrowGap = Number.isFinite(panel.sign.bottomArrowGap)
+            ? Math.max(panel.sign.bottomArrowGap, 0)
+            : 0.5;
+          const bottomArrowSpacing = Number.isFinite(
+            panel.sign.bottomArrowSpacing
+          )
+            ? Math.max(panel.sign.bottomArrowSpacing, 0)
+            : 1;
+          guideArrowsElmt.style.padding = bottomArrowGap + "rem";
+          arrowContElmt.style.gap = bottomArrowSpacing + "rem";
+          for (
+            let arrowIndex = 0, length = panel.sign.guideArrowLanes;
+            arrowIndex < length;
+            arrowIndex++
+          ) {
+            const bottomArrow = new ArrowElement({
+              arrow: panel.sign.bottomArrowKind,
+              rotation: panel.sign.bottomArrowRotation,
+            });
+            const bottomArrowElmt = bottomArrow.createElement();
+            bottomArrowElmt.classList.add("bottomGuideArrow");
+            reserveRotatedGuideArrowSpace(
+              bottomArrowElmt,
+              panel.sign.bottomArrowKind,
+              panel.sign.bottomArrowRotation,
+              { width: bottomArrow.size }
+            );
+
+            if (arrowIndex % 2 == 0) {
+              arrowContElmt.insertBefore(
+                bottomArrowElmt,
+                arrowContElmt.childNodes[0]
+              );
+            } else {
+              arrowContElmt.appendChild(bottomArrowElmt);
+            }
+          }
         } else {
           arrowContElmt.classList.remove("hideExitOnlyArrows");
           for (
@@ -6515,11 +7822,22 @@ const app = (function () {
       // APL Arrows Rendering
       // aplArrows is already defined above
       if (aplArrows.length > 0) {
-        // Extend sign bottom for APL arrows (like guide arrows)
-        signElmt.style.borderBottomWidth = "0";
-        signElmt.style.width = "100%";
+        // The APL row lives inside the sign, so the sign keeps its own bottom
+        // border and rounded corners (matching v2.19).
+        signElmt.style.removeProperty("border-bottom-width");
+        signElmt.style.removeProperty("width");
         // APL arrows are now rendered inside subpanels
+        syncAplSubpanelWidths();
+        requestAnimationFrame(() => {
+          syncAplSubpanelWidths();
+          requestAnimationFrame(syncAplSubpanelWidths);
+        });
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(syncAplSubpanelWidths).catch(() => {});
+        }
       }
+
+      applyAplEdgeExitTabLayout();
 
       var width = signCont.clientWidth;
       var exitWidth = firstExitTab.clientWidth;
@@ -6544,6 +7862,7 @@ const app = (function () {
 
       schedulePanelBorderGradientUpdate(panelElmt);
     }
+    scheduleAlignmentGuideUpdate(postContainerElmt, panelContainerElmt);
     captureHistoryAfterRedraw();
     persistSessionState();
   };
@@ -6563,7 +7882,10 @@ const app = (function () {
     setSelectedRow,
     setSelectedControlElem,
     moveControlElem,
+    insertControlElemAt,
+    insertControlElemInNewRow,
     copyControlElements,
+    cutControlElements,
     pasteControlElements,
     replaceControlElemTypeAt,
     moveRow,
@@ -6599,12 +7921,17 @@ const app = (function () {
     toggleAPLArrowFlip,
     addAPLDivider,
     addAPLDividerArrow,
+    setAPLArrowSpacing,
+    setAPLArrowBeforeSpacing,
+    setAPLArrowSize,
     moveAPLArrow,
     initializeAPLArrowsForCurrentPanel,
+    setAPLCombineExitOnlyLabels,
     addAPLSubPanelLeftAndOpen,
     addAPLSubPanelRightAndOpen,
     getAPLSubpanelGroups: getAPLSubpanelGroupsForCurrentPanel,
     getAPLArrowKind,
+    canUseAplEdgeExitTab,
     setCurrentPanelArrowMode,
     setAPLGroupedWithDivider: (index, grouped) => {
       getCurrentPanel().sign.setAPLGroupedWithDivider(index, grouped);
@@ -6622,11 +7949,11 @@ const app = (function () {
     },
     setAPLArrowMarginLeft: (index, margin) => {
       getCurrentPanel().sign.setAPLArrowMarginLeft(index, margin);
-      redraw();
+      setAPLArrowBeforeSpacing(index, margin);
     },
     setAPLArrowMarginRight: (index, margin) => {
       getCurrentPanel().sign.setAPLArrowMarginRight(index, margin);
-      redraw();
+      setAPLArrowSpacing(index, margin);
     },
     setAPLExitOnlyBgColor: (index, color) => {
       getCurrentPanel().sign.setAPLExitOnlyBgColor(index, color);
@@ -7192,6 +8519,14 @@ const app = (function () {
     }
     post.copyScale = Math.min(8, Math.max(0, post.copyScale));
     post.showBlockBoundingBoxes = !!post.showBlockBoundingBoxes;
+    post.showAlignmentGuides = !!post.showAlignmentGuides;
+    post.alignmentGuideSpacing = post.normalizeAlignmentGuideSpacing(
+      post.alignmentGuideSpacing
+    );
+    post.alignmentGuidePhase = post.normalizeAlignmentGuidePhase(
+      post.alignmentGuidePhase,
+      post.alignmentGuideSpacing
+    );
     if (selection) {
       applySelectionState(selection);
     } else {
@@ -7205,6 +8540,32 @@ const app = (function () {
 
   // Template management functions
   let templateDB = null;
+  let defaultTemplatesPromise = null;
+  let activeTemplateEditor = null;
+  const TEMPLATE_LOAD_WARNING_STORAGE_KEY = "signMaker.templateLoadWarning";
+  const DEFAULT_TEMPLATE_DATE = "2026-08-24T00:00:00.000Z";
+  const DEFAULT_TEMPLATE_DEFINITIONS = [
+    {
+      id: "default-simple-exit",
+      name: "Simple Exit",
+      build: buildSimpleExitTemplate,
+    },
+    {
+      id: "default-mileage-sign",
+      name: "Mileage Sign",
+      build: buildMileageTemplate,
+    },
+    {
+      id: "default-tolled-exit",
+      name: "Tolled Exit",
+      build: buildTolledExitTemplate,
+    },
+    {
+      id: "default-control-cities-advance-junction",
+      name: "Control Cities Advance Junction",
+      build: buildControlCitiesAdvanceJunctionTemplate,
+    },
+  ];
 
   const initTemplateDB = async function () {
     if (!templateDB) {
@@ -7214,30 +8575,264 @@ const app = (function () {
     return templateDB;
   };
 
-  const saveTemplate = async function (templateName) {
+  const getTemplateLoadWarningEnabled = function () {
+    try {
+      return window.localStorage.getItem(TEMPLATE_LOAD_WARNING_STORAGE_KEY) === "true";
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const setTemplateLoadWarningEnabled = function (enabled) {
+    try {
+      window.localStorage.setItem(
+        TEMPLATE_LOAD_WARNING_STORAGE_KEY,
+        enabled ? "true" : "false"
+      );
+    } catch (error) {
+      console.warn("Unable to save template load warning setting", error);
+    }
+  };
+
+  const cloneTemplateValue = (value) => JSON.parse(JSON.stringify(value));
+
+  const createDefaultTemplateData = (buildTemplate) => {
+    const defaultPost = new Post(Post.prototype.polePositions[0]);
+    defaultPost.newPanel();
+    defaultPost.panels[0].sign.subPanels[0].blockElements = new Control(
+      buildTemplate()
+    );
+
+    addElementTypes(defaultPost);
+    try {
+      return JSON.stringify(defaultPost, null, 2);
+    } finally {
+      removeElementTypes(defaultPost);
+    }
+  };
+
+  const ensureDefaultTemplates = async function (db) {
+    if (!defaultTemplatesPromise) {
+      defaultTemplatesPromise = (async () => {
+        const existingTemplates = await db.getAllTemplates();
+        const existingIds = new Set(
+          existingTemplates.map((template) => String(template.id))
+        );
+
+        for (const definition of DEFAULT_TEMPLATE_DEFINITIONS) {
+          if (existingIds.has(definition.id)) {
+            continue;
+          }
+
+          await db.saveTemplate({
+            id: definition.id,
+            name: definition.name,
+            data: createDefaultTemplateData(definition.build),
+            templateScope: "panel",
+            variants: [],
+            isDefault: true,
+            dateCreated: DEFAULT_TEMPLATE_DATE,
+            dateModified: DEFAULT_TEMPLATE_DATE,
+          });
+        }
+      })().catch((error) => {
+        defaultTemplatesPromise = null;
+        throw error;
+      });
+    }
+
+    return defaultTemplatesPromise;
+  };
+
+  const serializeTemplateData = function (scope = "post") {
+    if (!post || !Array.isArray(post.panels) || post.panels.length === 0) {
+      throw new Error("There is no sign to save.");
+    }
+
+    addElementTypes(post);
+    let snapshot;
+    try {
+      snapshot = cloneTemplateValue(post);
+    } finally {
+      removeElementTypes(post);
+    }
+
+    if (scope === "panel") {
+      const selectedPanel = snapshot.panels?.[currentlySelectedPanelIndex];
+      if (!selectedPanel) {
+        throw new Error("There is no selected panel to save.");
+      }
+      snapshot.panels = [selectedPanel];
+    }
+
+    return JSON.stringify(snapshot, null, 2);
+  };
+
+  const normalizeTemplateSnapshot = (snapshot) => {
+    if (!snapshot || typeof snapshot !== "object") {
+      throw new Error("Template data is invalid.");
+    }
+
+    if (snapshot.panel && typeof snapshot.panel === "object") {
+      return { panels: [snapshot.panel] };
+    }
+
+    if (snapshot.sign && typeof snapshot.sign === "object") {
+      return { panels: [snapshot] };
+    }
+
+    if (Array.isArray(snapshot.panels)) {
+      return snapshot;
+    }
+
+    throw new Error("Template does not contain any panels.");
+  };
+
+  const inferTemplateScope = (template) => {
+    if (template?.templateScope === "post") {
+      return "post";
+    }
+    if (template?.templateScope === "panel") {
+      return "panel";
+    }
+
+    try {
+      const snapshot = JSON.parse(template?.data || "{}");
+      return Array.isArray(snapshot.panels) && snapshot.panels.length > 1
+        ? "post"
+        : "panel";
+    } catch (error) {
+      return "panel";
+    }
+  };
+
+  const normalizeTemplateVariants = (template) => {
+    if (!Array.isArray(template?.variants)) {
+      return [];
+    }
+
+    const usedVariantIds = new Set();
+    return template.variants
+      .filter((variant) => variant && typeof variant === "object")
+      .map((variant, index) => {
+        const originalId = String(variant.id || `variant-${index + 1}`);
+        let uniqueId = originalId;
+        let duplicateNumber = 2;
+        while (usedVariantIds.has(uniqueId)) {
+          uniqueId = `${originalId}-${duplicateNumber}`;
+          duplicateNumber += 1;
+        }
+        usedVariantIds.add(uniqueId);
+
+        return {
+          ...variant,
+          id: uniqueId,
+          name: String(variant.name || `Variant ${index + 1}`),
+          data:
+            typeof variant.data === "string" && variant.data.length > 0
+              ? variant.data
+              : template.data,
+          fontFamily:
+            typeof variant.fontFamily === "string" ? variant.fontFamily : "",
+        };
+      });
+  };
+
+  const applyFontFamilyToTemplateData = (value, fontFamily, visited = new WeakSet()) => {
+    if (!value || typeof value !== "object" || visited.has(value)) {
+      return;
+    }
+
+    visited.add(value);
+    if (Array.isArray(value)) {
+      value.forEach((item) =>
+        applyFontFamilyToTemplateData(item, fontFamily, visited)
+      );
+      return;
+    }
+
+    for (const [key, child] of Object.entries(value)) {
+      if (key === "fontFamily") {
+        value[key] = fontFamily;
+      } else {
+        applyFontFamilyToTemplateData(child, fontFamily, visited);
+      }
+    }
+  };
+
+  const getTemplateVariant = (template, variantId) => {
+    const normalizedId = String(variantId || "");
+    if (!normalizedId) {
+      return null;
+    }
+
+    const variant = normalizeTemplateVariants(template).find(
+      (candidate) => candidate.id === normalizedId
+    );
+    if (!variant) {
+      throw new Error(
+        `Template variant "${normalizedId}" no longer exists. Base was not changed.`
+      );
+    }
+    return variant;
+  };
+
+  const getTemplateSnapshot = (template, variantId) => {
+    const variant = getTemplateVariant(template, variantId);
+    const serializedData = variant?.data || template?.data;
+    if (typeof serializedData !== "string") {
+      throw new Error("Template data is missing.");
+    }
+
+    const snapshot = normalizeTemplateSnapshot(JSON.parse(serializedData));
+    if (variant?.fontFamily) {
+      applyFontFamilyToTemplateData(snapshot, variant.fontFamily);
+    }
+    return snapshot;
+  };
+
+  const getTemplatePostFromData = (template, variantId) =>
+    reconstructPostFromData(getTemplateSnapshot(template, variantId));
+
+  const getTemplatePanelsFromData = (template, variantId) => {
+    const rebuiltPost = getTemplatePostFromData(template, variantId);
+    return Array.isArray(rebuiltPost?.panels) ? rebuiltPost.panels : [];
+  };
+
+  const saveTemplate = async function (templateName, scope = "post") {
+    if (activeTemplateEditor) {
+      showTemplateTab("sMTemplateEditor");
+      alert("Save or cancel the current template edit before creating another template.");
+      return;
+    }
+
     if (!templateName || templateName.trim() === "") {
       alert("Please enter a template name");
       return;
     }
 
     try {
-      // Sync form values (padding, border radius, etc.) to the model before saving
       if (formHandler && typeof formHandler.readForm === "function") {
         formHandler.readForm();
       }
 
       const db = await initTemplateDB();
-      const panelData = serializeCurrentPanelTemplate(2);
+      await ensureDefaultTemplates(db);
+      const normalizedScope = scope === "panel" ? "panel" : "post";
+      const serializedData = serializeTemplateData(normalizedScope);
+      const now = new Date().toISOString();
 
       const templateData = {
         name: templateName.trim(),
-        data: panelData,
-        dateCreated: new Date().toISOString(),
+        data: serializedData,
+        templateScope: normalizedScope,
+        variants: [],
+        dateCreated: now,
+        dateModified: now,
       };
 
       await db.saveTemplate(templateData);
 
-      // Clear the input field
       const templateNameInput = document.getElementById("templateNameInput");
       if (templateNameInput) {
         templateNameInput.value = "";
@@ -7250,14 +8845,63 @@ const app = (function () {
     }
   };
 
-  const loadTemplate = async function (templateId) {
+  const savePanelTemplate = function (templateName) {
+    return saveTemplate(templateName, "panel");
+  };
+
+  const savePostTemplate = function (templateName) {
+    return saveTemplate(templateName, "post");
+  };
+
+  const normalizeTemplateLoadMode = (mode) => {
+    const normalized = String(mode || "replace-post").toLowerCase();
+    if (normalized === "replace-panel" || normalized === "add") {
+      return normalized;
+    }
+    return "replace-post";
+  };
+
+  const getTemplateLoadConfirmationMessage = (mode) =>
+    mode === "replace-panel"
+      ? "Are you sure you want to load this template? THIS WILL REPLACE THE SELECTED PANEL!"
+      : "Are you sure you want to load this template? THIS WILL REPLACE YOUR CURRENT POST!";
+
+  const recordTemplateUse = async function (db, template) {
+    try {
+      await db.saveTemplate({
+        ...template,
+        dateLastUsed: new Date().toISOString(),
+      });
+      if (getTemplateSortMode() === "last-used") {
+        await refreshTemplatesList();
+      }
+    } catch (error) {
+      console.warn("Unable to update template last-used date", error);
+    }
+  };
+
+  const loadTemplate = async function (
+    templateId,
+    mode = "replace-post",
+    variantId = "",
+    targetPanelIndex = null
+  ) {
     if (!templateId) {
       return;
     }
 
-    const confirmationMessage =
-      "Are you sure you want to apply this template? THIS WILL REPLACE YOUR SELECTED PANEL!";
-    if (!window.confirm(confirmationMessage)) {
+    if (activeTemplateEditor) {
+      showTemplateTab("sMTemplateEditor");
+      alert("Save or cancel the current template edit before loading another template.");
+      return;
+    }
+
+    const loadMode = normalizeTemplateLoadMode(mode);
+    if (
+      loadMode !== "add" &&
+      getTemplateLoadWarningEnabled() &&
+      !window.confirm(getTemplateLoadConfirmationMessage(loadMode))
+    ) {
       return;
     }
 
@@ -7270,8 +8914,53 @@ const app = (function () {
         return;
       }
 
-      const templateData = JSON.parse(template.data);
-      replaceCurrentPanelFromTemplate(templateData);
+      if (loadMode === "replace-post") {
+        const newPost = getTemplatePostFromData(template, variantId);
+        if (!newPost || !Array.isArray(newPost.panels) || !newPost.panels.length) {
+          throw new Error("Template does not contain any panels.");
+        }
+        setPost(newPost);
+        await recordTemplateUse(db, template);
+        return;
+      }
+
+      const templatePanels = getTemplatePanelsFromData(template, variantId);
+      if (!templatePanels.length) {
+        throw new Error("Template does not contain any panels.");
+      }
+
+      const hasRequestedIndex =
+        targetPanelIndex !== null && targetPanelIndex !== undefined;
+      const requestedIndex = hasRequestedIndex
+        ? Number(targetPanelIndex)
+        : Number.NaN;
+      const selectedIndex = clamp(
+        Number.isInteger(requestedIndex)
+          ? requestedIndex
+          : currentlySelectedPanelIndex,
+        0,
+        Math.max(0, post.panels.length - 1)
+      );
+
+      if (loadMode === "replace-panel") {
+        post.panels.splice(selectedIndex, 1, ...templatePanels);
+        currentlySelectedPanelIndex = selectedIndex;
+      } else {
+        post.panels.splice(selectedIndex + 1, 0, ...templatePanels);
+        currentlySelectedPanelIndex = selectedIndex + 1;
+      }
+
+      currentlySelectedSubPanelIndex = 0;
+      currentlySelectedExitTabIndex = 0;
+      currentlySelectedNestedExitTabIndex = -1;
+      currentlySelectedRowIndex = 0;
+      currentlySelectedBlockIndex = 0;
+      currentlySelectedAPLArrowIndex = 0;
+      resetGroupEditing();
+      normalizeEditorSelection();
+      formHandler.updateForm();
+      redraw();
+      await recordTemplateUse(db, template);
     } catch (error) {
       console.error("Error loading template:", error);
       alert("Failed to load template: " + error.message);
@@ -7283,8 +8972,18 @@ const app = (function () {
       return;
     }
 
+    if (activeTemplateEditor) {
+      showTemplateTab("sMTemplateEditor");
+      alert("Save or cancel the current template edit before deleting a template.");
+      return;
+    }
+
     try {
       const db = await initTemplateDB();
+      const template = await db.getTemplate(templateId);
+      if (template?.isDefault || String(templateId).startsWith("default-")) {
+        return;
+      }
       await db.deleteTemplate(templateId);
       await refreshTemplatesList();
     } catch (error) {
@@ -7293,49 +8992,811 @@ const app = (function () {
     }
   };
 
+  const getTemplateSearchValue = function () {
+    const searchInput = document.getElementById("templateSearchInput");
+    return String(searchInput?.value || "").trim().toLowerCase();
+  };
+
+  const getTemplateSortMode = function () {
+    const sortSelect = document.getElementById("templateSortSelect");
+    const sortMode = sortSelect?.value;
+    return sortMode === "alphabetical" || sortMode === "last-used"
+      ? sortMode
+      : "date-created";
+  };
+
+  const createTemplateActionButton = (className, icon, label, title) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.title = title || label;
+
+    const iconElement = document.createElement("span");
+    iconElement.className = "material-symbols-outlined";
+    iconElement.textContent = icon;
+    button.appendChild(iconElement);
+
+    if (label) {
+      const labelElement = document.createElement("span");
+      labelElement.textContent = label;
+      button.appendChild(labelElement);
+    }
+    return button;
+  };
+
+  const endTemplatePanelDrag = () => {
+    templatePanelDragState = null;
+    clearTemplatePanelDropIndicator();
+    document
+      .querySelectorAll(".templateReplacePanelBtn.templateDragging")
+      .forEach((button) => button.classList.remove("templateDragging"));
+  };
+
+  const getTemplateEditorFormState = () => ({
+    name: String(document.getElementById("templateEditorName")?.value || ""),
+    variantName: String(
+      document.getElementById("templateEditorVariantName")?.value || ""
+    ),
+    variantFont: String(
+      document.getElementById("templateEditorVariantFont")?.value || ""
+    ),
+    newVariantName: String(
+      document.getElementById("templateNewVariantName")?.value || ""
+    ),
+    newVariantFont: String(
+      document.getElementById("templateNewVariantFont")?.value || ""
+    ),
+  });
+
+  const applyTemplateEditorFormState = (formState) => {
+    if (!formState || typeof formState !== "object") {
+      return;
+    }
+
+    const valuesById = {
+      templateEditorName: formState.name,
+      templateEditorVariantName: formState.variantName,
+      templateEditorVariantFont: formState.variantFont,
+      templateNewVariantName: formState.newVariantName,
+      templateNewVariantFont: formState.newVariantFont,
+    };
+    for (const [id, value] of Object.entries(valuesById)) {
+      const input = document.getElementById(id);
+      if (input && typeof value === "string") {
+        input.value = value;
+      }
+    }
+  };
+
+  const createTemplateEditorSessionState = () => {
+    if (!activeTemplateEditor) {
+      return null;
+    }
+
+    const templatesModal = document.querySelector(".sMModal.templates");
+    const selectedTab = ["sMTemplatesSaved", "sMTemplateEditor"].includes(
+      templatesModal?.dataset.currentMenu
+    )
+      ? templatesModal.dataset.currentMenu
+      : "sMTemplateEditor";
+
+    return {
+      draft: cloneTemplateValue(activeTemplateEditor.draft),
+      activeVariantId: String(activeTemplateEditor.activeVariantId || ""),
+      editorData: JSON.parse(serializePostWithElementTypes()),
+      editorSelection: cloneTemplateValue(getSelectionState()),
+      selectedTab,
+      modalOpen:
+        document.getElementById("sMConfigBar")?.dataset.currentMenu ===
+        "templates",
+      formState: getTemplateEditorFormState(),
+    };
+  };
+
+  const restoreTemplateEditorSession = (
+    editorSession,
+    workspaceData,
+    workspaceSelection
+  ) => {
+    if (!editorSession || typeof editorSession !== "object") {
+      throw new Error("Template editor session is invalid.");
+    }
+
+    const draft = cloneTemplateValue(editorSession.draft);
+    if (!draft || typeof draft !== "object") {
+      throw new Error("Template editor draft is missing.");
+    }
+    draft.templateScope = inferTemplateScope(draft);
+    draft.variants = normalizeTemplateVariants(draft);
+
+    const activeVariantId = String(editorSession.activeVariantId || "");
+    if (activeVariantId) {
+      getTemplateVariant(draft, activeVariantId);
+    }
+
+    const editorData = editorSession.editorData;
+    if (
+      !editorData ||
+      typeof editorData !== "object" ||
+      !Array.isArray(editorData.panels) ||
+      !editorData.panels.length
+    ) {
+      throw new Error("Template editor canvas is missing.");
+    }
+
+    activeTemplateEditor = {
+      draft,
+      activeVariantId,
+      workspaceData: JSON.stringify(workspaceData, null, 2),
+      workspaceSelection: cloneTemplateValue(workspaceSelection),
+    };
+
+    isSessionPersisting = true;
+    try {
+      setPost(
+        reconstructPostFromData(editorData),
+        editorSession.editorSelection
+      );
+    } finally {
+      isSessionPersisting = false;
+    }
+
+    updateTemplateEditorControls();
+    applyTemplateEditorFormState(editorSession.formState);
+    updateTemplateEditorStatus();
+
+    const selectedTab = ["sMTemplatesSaved", "sMTemplateEditor"].includes(
+      editorSession.selectedTab
+    )
+      ? editorSession.selectedTab
+      : "sMTemplateEditor";
+    showTemplateTab(selectedTab);
+
+    if (editorSession.modalOpen) {
+      const configBar = document.getElementById("sMConfigBar");
+      if (configBar?.dataset.currentMenu !== "templates") {
+        document.getElementById("templates")?.click();
+      }
+    }
+  };
+
+  const updateTemplateEditorStatus = () => {
+    const hasEditor = !!activeTemplateEditor;
+    const nameInput = document.getElementById("templateEditorName");
+    const variantNameInput = document.getElementById(
+      "templateEditorVariantName"
+    );
+    const templateName = hasEditor
+      ? String(nameInput?.value || activeTemplateEditor.draft.name || "").trim() ||
+        "Untitled Template"
+      : "";
+    const activeVariant = hasEditor && activeTemplateEditor.activeVariantId
+      ? activeTemplateEditor.draft.variants.find(
+          (variant) => variant.id === activeTemplateEditor.activeVariantId
+        )
+      : null;
+    const versionName = !hasEditor
+      ? ""
+      : activeTemplateEditor.activeVariantId
+        ? String(variantNameInput?.value || activeVariant?.name || "").trim() ||
+          "Missing Variant"
+        : "Base";
+    const statusText = hasEditor
+      ? `Editing “${templateName}” — ${versionName}`
+      : "";
+
+    const templatesButtonLabel = document.getElementById(
+      "templatesButtonLabel"
+    );
+    if (templatesButtonLabel) {
+      templatesButtonLabel.textContent = hasEditor
+        ? "Templates (Editing)"
+        : "Templates";
+    }
+
+    const templatesButton = document.getElementById("templates");
+    if (templatesButton) {
+      if (hasEditor) {
+        templatesButton.title = statusText;
+        templatesButton.setAttribute("aria-label", statusText);
+      } else {
+        templatesButton.removeAttribute("title");
+        templatesButton.removeAttribute("aria-label");
+      }
+    }
+
+    const editorTab = document.getElementById("sMTemplateEditorTab");
+    if (editorTab) {
+      editorTab.textContent = hasEditor
+        ? "Template Editor (Editing)"
+        : "Template Editor";
+      editorTab.title = hasEditor ? statusText : "";
+    }
+
+    const heading = document.getElementById("templateEditorHeading");
+    if (heading) {
+      heading.textContent = hasEditor ? statusText : "Template Editor";
+    }
+
+    const notice = document.getElementById("templateEditingNotice");
+    if (notice) {
+      notice.hidden = !hasEditor;
+    }
+    const noticeText = document.getElementById("templateEditingNoticeText");
+    if (noticeText) {
+      noticeText.textContent = hasEditor
+        ? `${statusText}. Unsaved changes are preserved.`
+        : "";
+    }
+
+    const saveButton = document.getElementById("templateEditorSaveBtn");
+    if (saveButton) {
+      const saveLabel = hasEditor
+        ? `Save ${templateName} — ${versionName} and exit`
+        : "Save template and exit";
+      saveButton.title = saveLabel;
+      saveButton.setAttribute("aria-label", saveLabel);
+    }
+  };
+
+  const showTemplateTab = (tabId) => {
+    const modal = document.querySelector(".sMModal.templates");
+    if (!modal) {
+      return;
+    }
+
+    modal.dataset.currentMenu = tabId;
+    modal.querySelectorAll(":scope > .sMModalContent > div").forEach((holder) => {
+      holder.classList.toggle("tabHidden", holder.id !== tabId);
+    });
+    modal.querySelectorAll(":scope > .sMModalBar .sMModalTab").forEach((tab) => {
+      tab.classList.toggle("selected", tab.dataset.tab === tabId);
+    });
+    updateTemplateEditorStatus();
+  };
+
+  const showActiveTemplateEditor = () => {
+    if (!activeTemplateEditor) {
+      return;
+    }
+    showTemplateTab("sMTemplateEditor");
+    const configBar = document.getElementById("sMConfigBar");
+    if (configBar?.dataset.currentMenu !== "templates") {
+      document.getElementById("templates")?.click();
+    }
+    persistSessionState();
+  };
+
+  const populateTemplateFontSelect = (select, emptyLabel) => {
+    if (!select) {
+      return;
+    }
+    select.innerHTML = "";
+    if (emptyLabel) {
+      const emptyOption = document.createElement("option");
+      emptyOption.value = "";
+      emptyOption.textContent = emptyLabel;
+      select.appendChild(emptyOption);
+    }
+    for (const fontFamily of TextElement.prototype.fontFamily || []) {
+      const option = document.createElement("option");
+      option.value = fontFamily;
+      option.textContent = fontFamily;
+      select.appendChild(option);
+    }
+  };
+
+  const getActiveTemplateEditorVariant = () => {
+    if (!activeTemplateEditor?.activeVariantId) {
+      return null;
+    }
+    const variant = activeTemplateEditor.draft.variants.find(
+      (variant) => variant.id === activeTemplateEditor.activeVariantId
+    );
+    if (!variant) {
+      throw new Error(
+        `The selected template variant "${activeTemplateEditor.activeVariantId}" no longer exists. Base was not changed.`
+      );
+    }
+    return variant;
+  };
+
+  const updateTemplateEditorControls = () => {
+    const empty = document.getElementById("templateEditorEmpty");
+    const form = document.getElementById("templateEditorForm");
+    if (!empty || !form) {
+      return;
+    }
+
+    const hasEditor = !!activeTemplateEditor;
+    empty.hidden = hasEditor;
+    form.hidden = !hasEditor;
+    if (!hasEditor) {
+      updateTemplateEditorStatus();
+      return;
+    }
+
+    const draft = activeTemplateEditor.draft;
+    const nameInput = document.getElementById("templateEditorName");
+    const scopeLabel = document.getElementById("templateEditorScope");
+    const versionSelect = document.getElementById("templateEditorVariantSelect");
+    const variantNameInput = document.getElementById("templateEditorVariantName");
+    const variantFontSelect = document.getElementById("templateEditorVariantFont");
+    const applyFontButton = document.getElementById("templateEditorApplyFont");
+    const deleteVariantButton = document.getElementById("templateEditorDeleteVariant");
+
+    nameInput.value = draft.name || "";
+    scopeLabel.textContent = draft.templateScope === "post" ? "Post" : "Panel";
+
+    versionSelect.innerHTML = "";
+    const baseOption = document.createElement("option");
+    baseOption.value = "";
+    baseOption.textContent = "Base";
+    versionSelect.appendChild(baseOption);
+    for (const variant of draft.variants) {
+      const option = document.createElement("option");
+      option.value = variant.id;
+      option.textContent = variant.name;
+      versionSelect.appendChild(option);
+    }
+    versionSelect.value = activeTemplateEditor.activeVariantId || "";
+
+    const activeVariant = getActiveTemplateEditorVariant();
+    variantNameInput.disabled = !activeVariant;
+    variantNameInput.value = activeVariant?.name || "Base";
+    populateTemplateFontSelect(variantFontSelect, "Keep Current Fonts");
+    variantFontSelect.disabled = !activeVariant;
+    variantFontSelect.value = activeVariant?.fontFamily || "";
+    applyFontButton.disabled = !activeVariant;
+    deleteVariantButton.disabled = !activeVariant;
+
+    const newVariantFont = document.getElementById("templateNewVariantFont");
+    if (newVariantFont && !newVariantFont.options.length) {
+      populateTemplateFontSelect(newVariantFont, "Keep Current Fonts");
+    }
+    updateTemplateEditorStatus();
+  };
+
+  const captureActiveTemplateEditorVersion = () => {
+    if (!activeTemplateEditor) {
+      return;
+    }
+    if (formHandler && typeof formHandler.readForm === "function") {
+      formHandler.readForm();
+    }
+
+    const nameInput = document.getElementById("templateEditorName");
+    const variantNameInput = document.getElementById("templateEditorVariantName");
+    const variantFontSelect = document.getElementById("templateEditorVariantFont");
+    const activeVariant = getActiveTemplateEditorVariant();
+    activeTemplateEditor.draft.name = String(nameInput?.value || "").trim();
+    const serializedData = serializeTemplateData(
+      activeTemplateEditor.draft.templateScope
+    );
+    if (activeVariant) {
+      activeVariant.name = String(variantNameInput?.value || activeVariant.name).trim();
+      activeVariant.fontFamily = String(variantFontSelect?.value || "");
+      activeVariant.data = serializedData;
+      activeVariant.dateModified = new Date().toISOString();
+    } else {
+      activeTemplateEditor.draft.data = serializedData;
+    }
+  };
+
+  const loadActiveTemplateEditorVersion = () => {
+    if (!activeTemplateEditor) {
+      return;
+    }
+    const editorPost = getTemplatePostFromData(
+      activeTemplateEditor.draft,
+      activeTemplateEditor.activeVariantId
+    );
+    setPost(editorPost);
+  };
+
+  const restoreTemplateEditorWorkspace = () => {
+    if (!activeTemplateEditor) {
+      return;
+    }
+    const { workspaceData, workspaceSelection } = activeTemplateEditor;
+    activeTemplateEditor = null;
+    setPost(
+      reconstructPostFromData(JSON.parse(workspaceData)),
+      workspaceSelection
+    );
+    updateTemplateEditorControls();
+  };
+
+  const editTemplate = async function (templateId, variantId = "") {
+    if (!templateId) {
+      return;
+    }
+
+    if (activeTemplateEditor) {
+      if (!window.confirm("Discard the current template editing session?")) {
+        return;
+      }
+      restoreTemplateEditorWorkspace();
+    }
+
+    try {
+      if (formHandler && typeof formHandler.readForm === "function") {
+        formHandler.readForm();
+      }
+      const db = await initTemplateDB();
+      const template = await db.getTemplate(templateId);
+      if (!template) {
+        throw new Error("Template not found.");
+      }
+
+      const draft = cloneTemplateValue(template);
+      draft.templateScope = inferTemplateScope(draft);
+      draft.variants = normalizeTemplateVariants(draft);
+      const normalizedVariantId = String(variantId || "");
+      const requestedVariant = draft.variants.find(
+        (variant) => variant.id === normalizedVariantId
+      );
+      if (normalizedVariantId && !requestedVariant) {
+        throw new Error(
+          `Template variant "${normalizedVariantId}" no longer exists. Base was not opened.`
+        );
+      }
+
+      activeTemplateEditor = {
+        draft,
+        activeVariantId: normalizedVariantId,
+        workspaceData: serializePostWithElementTypes(2),
+        workspaceSelection: cloneTemplateValue(getSelectionState()),
+      };
+
+      updateTemplateEditorControls();
+      showTemplateTab("sMTemplateEditor");
+      loadActiveTemplateEditorVersion();
+    } catch (error) {
+      if (activeTemplateEditor) {
+        try {
+          restoreTemplateEditorWorkspace();
+          showTemplateTab("sMTemplatesSaved");
+        } catch (restoreError) {
+          activeTemplateEditor = null;
+          updateTemplateEditorControls();
+        }
+      }
+      console.error("Error opening template editor:", error);
+      alert("Failed to open template editor: " + error.message);
+    }
+  };
+
+  const switchTemplateEditorVariant = function (variantId) {
+    if (!activeTemplateEditor) {
+      return;
+    }
+    try {
+      captureActiveTemplateEditorVersion();
+      const normalizedId = String(variantId || "");
+      if (
+        normalizedId &&
+        !activeTemplateEditor.draft.variants.some(
+          (variant) => variant.id === normalizedId
+        )
+      ) {
+        throw new Error(
+          `Template variant "${normalizedId}" no longer exists. Base was not selected.`
+        );
+      }
+      activeTemplateEditor.activeVariantId = normalizedId;
+      updateTemplateEditorControls();
+      loadActiveTemplateEditorVersion();
+    } catch (error) {
+      updateTemplateEditorControls();
+      console.error("Error switching template variant:", error);
+      alert("Failed to switch template variant: " + error.message);
+    }
+  };
+
+  const createTemplateVariantId = () =>
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? `variant-${crypto.randomUUID()}`
+      : `variant-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  const addTemplateEditorVariant = function () {
+    if (!activeTemplateEditor) {
+      return;
+    }
+
+    const nameInput = document.getElementById("templateNewVariantName");
+    const fontSelect = document.getElementById("templateNewVariantFont");
+    const variantName = String(nameInput?.value || "").trim();
+    if (!variantName) {
+      alert("Please enter a variant name");
+      return;
+    }
+
+    try {
+      captureActiveTemplateEditorVersion();
+      const sourceVariant = getActiveTemplateEditorVariant();
+      const sourceData = sourceVariant?.data || activeTemplateEditor.draft.data;
+      const snapshot = normalizeTemplateSnapshot(JSON.parse(sourceData));
+      const fontFamily = String(fontSelect?.value || "");
+      if (fontFamily) {
+        applyFontFamilyToTemplateData(snapshot, fontFamily);
+      }
+
+      const variant = {
+        id: createTemplateVariantId(),
+        name: variantName,
+        data: JSON.stringify(snapshot, null, 2),
+        fontFamily,
+        dateCreated: new Date().toISOString(),
+        dateModified: new Date().toISOString(),
+      };
+      activeTemplateEditor.draft.variants.push(variant);
+      activeTemplateEditor.activeVariantId = variant.id;
+      if (nameInput) {
+        nameInput.value = "";
+      }
+      if (fontSelect) {
+        fontSelect.value = "";
+      }
+      updateTemplateEditorControls();
+      loadActiveTemplateEditorVersion();
+    } catch (error) {
+      console.error("Error adding template variant:", error);
+      alert("Failed to add template variant: " + error.message);
+    }
+  };
+
+  const applyTemplateEditorFont = function () {
+    const variant = getActiveTemplateEditorVariant();
+    if (!variant) {
+      return;
+    }
+    const fontSelect = document.getElementById("templateEditorVariantFont");
+    const fontFamily = String(fontSelect?.value || "");
+    variant.fontFamily = fontFamily;
+    if (!fontFamily) {
+      return;
+    }
+    applyFontFamilyToTemplateData(post, fontFamily);
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const deleteTemplateEditorVariant = function () {
+    const variant = getActiveTemplateEditorVariant();
+    if (!activeTemplateEditor || !variant) {
+      return;
+    }
+    if (!window.confirm(`Delete the "${variant.name}" variant?`)) {
+      return;
+    }
+
+    activeTemplateEditor.draft.variants = activeTemplateEditor.draft.variants.filter(
+      (candidate) => candidate.id !== variant.id
+    );
+    activeTemplateEditor.activeVariantId = "";
+    updateTemplateEditorControls();
+    loadActiveTemplateEditorVersion();
+  };
+
+  const saveTemplateEditor = async function () {
+    if (!activeTemplateEditor) {
+      return;
+    }
+
+    try {
+      captureActiveTemplateEditorVersion();
+      if (!activeTemplateEditor.draft.name) {
+        alert("Please enter a template name");
+        return;
+      }
+
+      const db = await initTemplateDB();
+      const updatedTemplate = {
+        ...activeTemplateEditor.draft,
+        variants: activeTemplateEditor.draft.variants,
+        dateModified: new Date().toISOString(),
+      };
+      await db.updateTemplate(updatedTemplate.id, updatedTemplate);
+      restoreTemplateEditorWorkspace();
+      showTemplateTab("sMTemplatesSaved");
+      await refreshTemplatesList();
+    } catch (error) {
+      console.error("Error saving template:", error);
+      alert("Failed to save template: " + error.message);
+    }
+  };
+
+  const cancelTemplateEditor = function () {
+    restoreTemplateEditorWorkspace();
+    showTemplateTab("sMTemplatesSaved");
+    refreshTemplatesList();
+  };
+
   const refreshTemplatesList = async function () {
     try {
       const db = await initTemplateDB();
-      const templates = await db.getAllTemplates();
+      await ensureDefaultTemplates(db);
+      let templates = await db.getAllTemplates();
 
       const templatesList = document.getElementById("savedTemplatesList");
       if (!templatesList) {
         return;
       }
 
-      // Clear existing list
       templatesList.innerHTML = "";
 
+      const warningCheckbox = document.getElementById("templateLoadWarning");
+      if (warningCheckbox) {
+        warningCheckbox.checked = getTemplateLoadWarningEnabled();
+      }
+
+      const searchValue = getTemplateSearchValue();
+      if (searchValue) {
+        templates = templates.filter((template) => {
+          const variantNames = normalizeTemplateVariants(template)
+            .map((variant) => variant.name)
+            .join(" ");
+          return `${template.name || ""} ${variantNames}`
+            .toLowerCase()
+            .includes(searchValue);
+        });
+      }
+
       if (templates.length === 0) {
-        templatesList.innerHTML = "<p style='padding: 1rem; color: #666;'>No saved templates</p>";
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "templateEmptyMessage";
+        emptyMessage.textContent = searchValue
+          ? "No templates match your search"
+          : "No templates";
+        templatesList.appendChild(emptyMessage);
         return;
       }
 
-      // Sort templates by date (newest first)
+      const sortMode = getTemplateSortMode();
       templates.sort((a, b) => {
-        const dateA = new Date(a.dateModified || a.dateCreated);
-        const dateB = new Date(b.dateModified || b.dateCreated);
+        if (sortMode === "last-used") {
+          const dateLastUsedA = Date.parse(a.dateLastUsed || "") || 0;
+          const dateLastUsedB = Date.parse(b.dateLastUsed || "") || 0;
+          const lastUsedDifference = dateLastUsedB - dateLastUsedA;
+          if (lastUsedDifference) {
+            return lastUsedDifference;
+          }
+        }
+        const defaultDifference = Number(!!b.isDefault) - Number(!!a.isDefault);
+        if (defaultDifference) {
+          return defaultDifference;
+        }
+        if (sortMode === "alphabetical") {
+          return String(a.name || "").localeCompare(
+            String(b.name || ""),
+            undefined,
+            { sensitivity: "base", numeric: true }
+          );
+        }
+        const dateA = new Date(a.dateCreated || a.dateModified || 0);
+        const dateB = new Date(b.dateCreated || b.dateModified || 0);
         return dateB - dateA;
       });
 
-      // Create template items
       templates.forEach((template) => {
+        const variants = normalizeTemplateVariants(template);
         const templateItem = document.createElement("div");
         templateItem.className = "templateItem";
-        templateItem.innerHTML = `
-          <div class="templateItemInfo">
-            <span class="templateItemName">${escapeHtml(template.name)}</span>
-            <span class="templateItemDate">${formatDate(template.dateModified || template.dateCreated)}</span>
-          </div>
-          <div class="templateItemActions">
-            <button class="templateLoadBtn" onclick="app.loadTemplate('${template.id}')" title="Load Template">
-              <span class="material-symbols-outlined">upload</span>
-            </button>
-            <button class="templateDeleteBtn" onclick="app.deleteTemplate('${template.id}')" title="Delete Template">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
-          </div>
-        `;
+
+        const info = document.createElement("div");
+        info.className = "templateItemInfo";
+        const nameRow = document.createElement("div");
+        nameRow.className = "templateNameRow";
+        const name = document.createElement("span");
+        name.className = "templateItemName";
+        name.textContent = template.name || "Untitled Template";
+        nameRow.appendChild(name);
+
+        let variantSelect = null;
+        if (variants.length) {
+          variantSelect = document.createElement("select");
+          variantSelect.className = "templateVariantSelect";
+          variantSelect.setAttribute("aria-label", `${template.name} variant`);
+          const baseOption = document.createElement("option");
+          baseOption.value = "";
+          baseOption.textContent = "Base";
+          variantSelect.appendChild(baseOption);
+          for (const variant of variants) {
+            const option = document.createElement("option");
+            option.value = variant.id;
+            option.textContent = variant.name;
+            variantSelect.appendChild(option);
+          }
+          nameRow.appendChild(variantSelect);
+        }
+
+        const selectedVariantId = () => variantSelect?.value || "";
+        const editButton = createTemplateActionButton(
+          "templateEditBtn",
+          "edit",
+          "",
+          "Edit Template"
+        );
+        editButton.setAttribute("aria-label", "Edit Template");
+        editButton.addEventListener("click", () =>
+          editTemplate(template.id, selectedVariantId())
+        );
+        nameRow.appendChild(editButton);
+        info.appendChild(nameRow);
+
+        const metadata = document.createElement("span");
+        metadata.className = "templateItemDate";
+        const scope = inferTemplateScope(template) === "post" ? "Post" : "Panel";
+        metadata.textContent = `${template.isDefault ? "Default · " : ""}${scope} · ${formatDate(
+          template.dateModified || template.dateCreated
+        )}`;
+        info.appendChild(metadata);
+        templateItem.appendChild(info);
+
+        const actions = document.createElement("div");
+        actions.className = "templateItemActions";
+        const replacePostButton = createTemplateActionButton(
+          "templateLoadBtn templateLoadPostBtn",
+          "upload",
+          "Replace Post"
+        );
+        replacePostButton.addEventListener("click", () =>
+          loadTemplate(template.id, "replace-post", selectedVariantId())
+        );
+        actions.appendChild(replacePostButton);
+
+        const replacePanelButton = createTemplateActionButton(
+          "templateLoadBtn templateReplacePanelBtn",
+          "move_down",
+          "Replace Panel",
+          "Replace the selected panel, or drag this button onto a panel"
+        );
+        replacePanelButton.draggable = true;
+        replacePanelButton.addEventListener("click", () =>
+          loadTemplate(template.id, "replace-panel", selectedVariantId())
+        );
+        replacePanelButton.addEventListener("dragstart", (event) => {
+          templatePanelDragState = {
+            templateId: template.id,
+            variantId: selectedVariantId(),
+          };
+          replacePanelButton.classList.add("templateDragging");
+          if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "copy";
+            event.dataTransfer.setData(
+              "application/x-signmaker-template",
+              JSON.stringify(templatePanelDragState)
+            );
+            event.dataTransfer.setData("text/plain", template.name || "Template");
+          }
+        });
+        replacePanelButton.addEventListener("dragend", endTemplatePanelDrag);
+        actions.appendChild(replacePanelButton);
+
+        const addButton = createTemplateActionButton(
+          "templateLoadBtn templateAddBtn",
+          "add",
+          "Add",
+          "Add template after the selected panel"
+        );
+        addButton.addEventListener("click", () =>
+          loadTemplate(template.id, "add", selectedVariantId())
+        );
+        actions.appendChild(addButton);
+
+        if (!template.isDefault && !String(template.id).startsWith("default-")) {
+          const deleteButton = createTemplateActionButton(
+            "templateDeleteBtn",
+            "delete",
+            "",
+            "Delete Template"
+          );
+          deleteButton.setAttribute("aria-label", "Delete Template");
+          deleteButton.addEventListener("click", () => deleteTemplate(template.id));
+          actions.appendChild(deleteButton);
+        }
+        templateItem.appendChild(actions);
         templatesList.appendChild(templateItem);
       });
     } catch (error) {
@@ -7366,6 +9827,7 @@ const app = (function () {
     setPanelSpacing: setPanelSpacing,
     setPanelOrientation: setPanelOrientation,
     setSignAlignment: setSignAlignment,
+    canUseAplEdgeExitTab: canUseAplEdgeExitTab,
     newShield: newShield,
     clearShields: clearShields,
     newSubPanel: addSubPanel,
@@ -7384,6 +9846,7 @@ const app = (function () {
     downloadSign: downloadSign,
     updatePreview: updatePreview,
     updateFileType: updateFileType,
+    setAPLCombineExitOnlyLabels: setAPLCombineExitOnlyLabels,
     resetPadding: resetPadding,
     duplicateControlElem: duplicateControlElem,
     applyTemplate: applyTemplate,
@@ -7405,6 +9868,7 @@ const app = (function () {
     delRow: delRow,
     newControlElem: newControlElem,
     copyControlElements: copyControlElements,
+    cutControlElements: cutControlElements,
     pasteControlElements: pasteControlElements,
     replaceControlElemTypeAt: replaceControlElemTypeAt,
     delControlElem: delControlElem,
@@ -7414,9 +9878,22 @@ const app = (function () {
     ungroupSelectedBlockElement: ungroupSelectedBlockElement,
 
     saveTemplate: saveTemplate,
+    savePanelTemplate: savePanelTemplate,
+    savePostTemplate: savePostTemplate,
     loadTemplate: loadTemplate,
+    editTemplate: editTemplate,
+    renameTemplate: editTemplate,
+    showActiveTemplateEditor: showActiveTemplateEditor,
+    updateTemplateEditorStatus: updateTemplateEditorStatus,
+    switchTemplateEditorVariant: switchTemplateEditorVariant,
+    addTemplateEditorVariant: addTemplateEditorVariant,
+    applyTemplateEditorFont: applyTemplateEditorFont,
+    deleteTemplateEditorVariant: deleteTemplateEditorVariant,
+    saveTemplateEditor: saveTemplateEditor,
+    cancelTemplateEditor: cancelTemplateEditor,
     deleteTemplate: deleteTemplate,
     refreshTemplatesList: refreshTemplatesList,
+    setTemplateLoadWarningEnabled: setTemplateLoadWarningEnabled,
 
     exposeToFormHandler,
   };

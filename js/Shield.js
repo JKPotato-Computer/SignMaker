@@ -251,6 +251,11 @@ Shield.prototype.shieldDirectory = {
         type: "shield",
         name: "Florida Toll",
         variants: ["Current", "Old", "Selmon"],
+        assetPathByVariant: {
+          Current: "img/shields/United States/Florida/FLToll-Current.svg",
+          Old: "img/shields/United States/Florida/FLToll-Old.svg",
+          Selmon: "img/shields/United States/Florida/FLToll-Selmon.png",
+        },
       },
       FLCFXToll: {
         type: "shield",
@@ -355,7 +360,7 @@ Shield.prototype.shieldDirectory = {
     NH: {
       type: "shield",
       name: "New Hampshire",
-      variants: ["2 Digit", "3 Digit", "Blue", "Spaulding", "Everett"],
+      variants: ["2 Digit", "3 Digit", "Spaulding", "Everett"],
     },
     NJ: {
       type: "shield",
@@ -368,7 +373,7 @@ Shield.prototype.shieldDirectory = {
       variants: ["2 Digit", "3 Digit"],
     },
     NY: { type: "shield", name: "New York", variants: ["2 Digit", "3 Digit", "Thruway"] },
-    NYPKWY: { type: "shield", name: "New York Parkway", variants: ["Bear Mountain", "Belt", "Bethpage", "Bronx River 1", "Bronx River 2", "Cross County", "Cross Island", "FDR Drive", "Grand Central", "Harlem River Drive", "Heckscher", "Henry Hudson", "Hutchinson River 1", "Hutchinson River 2", "Jackie Robinson", "Korean War Vets", "Lake Ontario", "Loop", "Meadowbrook", "Mosholu", "Niagra Scenic", "Northern", "Ocean", "Palisades Interstate", "Pelham", "Robert Moses Causeway", "Sagitkos", "Saw Mill", "Southern", "Sprain Brook", "Sunken Meadow", "Taconic State", "Wantagh"] },
+    NYPKWY: { type: "shield", name: "New York Parkway", variants: ["Bear Mountain", "Belt", "Bethpage", "Bronx River 1", "Bronx River 2", "Cross County", "FDR Drive", "Grand Central", "Harlem River Drive", "Heckscher", "Henry Hudson", "Hutchinson River 1", "Hutchinson River 2", "Jackie Robinson", "Korean War Vets", "Loop", "Meadowbrook", "Mosholu", "Niagra Scenic", "Northern", "Ocean", "Palisades Interstate", "Pelham", "Robert Moses Causeway", "Sagtikos", "Saw Mill", "Southern", "Sprain Brook", "Sunken Meadow", "Taconic State", "Wantagh"] },
     NC: {
       type: "shield",
       name: "North Carolina",
@@ -560,6 +565,7 @@ Shield.prototype.bannerTypes = [
   "City",
   "Conn",
   "To",
+  "Via",
   "Turnpike",
   "Nord",
   "Est",

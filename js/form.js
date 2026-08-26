@@ -12,6 +12,8 @@ const formHandler = (function () {
   let exitTabDragState = null;
   let rowDragState = null;
   let newRowDropTargetButton = null;
+  let newBlockDragSourceButton = null;
+  let blockCreateNewRowDropIndex = null;
   let blockSelectionMode = false;
   let selectedBlockKeys = new Set();
   let blockSelectionContextKey = "";
@@ -32,14 +34,54 @@ const formHandler = (function () {
     exitTabFHWAFont: "signMaker.exitTabFHWAFont",
     exitTabFullBorder: "signMaker.exitTabFullBorder",
     exitTabSquareCorners: "signMaker.exitTabSquareCorners",
+    exitTabExtendHorizontalPadding:
+      "signMaker.exitTabExtendHorizontalPadding",
+    exitTabMatchSignCornerRadius: "signMaker.exitTabMatchSignCornerRadius",
     exitTabAttached: "signMaker.exitTabAttached",
     exitTabTopOffset: "signMaker.exitTabTopOffset",
+    panelCorner: "signMaker.panelCorner",
     panelPadding: "signMaker.panelPadding",
   };
   let localStorageAvailable;
   let localStorageWarningLogged = false;
+  let hasPanelCornerPreference = false;
   const LIMON_TRIGGER_VALUE = "limon";
   const LIMON_VIDEO_URL = "https://www.youtube.com/watch?v=qA7qUG6uEbY";
+  const EXIT_TAB_APL_EDGE_WIDTH = "APL Edge";
+  const isAplEdgeExitTabWidth = (width) =>
+    String(width || "").trim().toLowerCase() ===
+    EXIT_TAB_APL_EDGE_WIDTH.toLowerCase();
+  const canUseAplEdgeExitTab = () =>
+    !!(
+      exposed &&
+      typeof exposed.canUseAplEdgeExitTab === "function" &&
+      exposed.canUseAplEdgeExitTab()
+    );
+  const syncExitTabWidthOptions = (exitTab = null) => {
+    const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
+    if (!exitTabWidthSelectElmt) {
+      return false;
+    }
+
+    const shouldAllowAplEdge = canUseAplEdgeExitTab();
+    const aplEdgeOptions = Array.from(exitTabWidthSelectElmt.options).filter(
+      (option) => isAplEdgeExitTabWidth(option.value)
+    );
+
+    if (shouldAllowAplEdge) {
+      if (!aplEdgeOptions.length) {
+        lib.appendOption(exitTabWidthSelectElmt, EXIT_TAB_APL_EDGE_WIDTH);
+      }
+      aplEdgeOptions.slice(1).forEach((option) => option.remove());
+    } else if (exitTab && isAplEdgeExitTabWidth(exitTab.width)) {
+      aplEdgeOptions.forEach((option) => option.remove());
+      exitTab.width = "Edge";
+    } else {
+      aplEdgeOptions.forEach((option) => option.remove());
+    }
+
+    return shouldAllowAplEdge;
+  };
   const BUILT_IN_PANEL_PADDING = "0.3rem 0.75rem 0.3rem 0.75rem";
   const BUILT_IN_PANEL_PADDING_VALUES = [0.3, 0.75, 0.3, 0.75];
   const PANEL_PADDING_FIELDS = [
@@ -160,6 +202,26 @@ const formHandler = (function () {
     return normalizedPadding;
   };
 
+  const normalizePanelCorner = (corner) => {
+    const availableCorners = Array.isArray(Panel.prototype.cornerType)
+      ? Panel.prototype.cornerType
+      : ["Sharp", "Round"];
+    if (availableCorners.includes(corner)) {
+      return corner;
+    }
+    return availableCorners.includes(Panel.prototype.defaultCorner)
+      ? Panel.prototype.defaultCorner
+      : "Round";
+  };
+
+  const savePanelCornerPreference = (corner) => {
+    const normalizedCorner = normalizePanelCorner(corner);
+    Panel.prototype.defaultCorner = normalizedCorner;
+    setStoredItem(STORAGE_KEYS.panelCorner, normalizedCorner);
+    hasPanelCornerPreference = true;
+    return normalizedCorner;
+  };
+
   const logStorageWarning = (message, error) => {
     if (!localStorageWarningLogged) {
       console.warn(message, error);
@@ -259,6 +321,15 @@ const formHandler = (function () {
       post.thickness = normalizedThickness;
     }
 
+    const storedPanelCorner = getStoredItem(STORAGE_KEYS.panelCorner);
+    if (
+      storedPanelCorner &&
+      Array.isArray(Panel.prototype.cornerType) &&
+      Panel.prototype.cornerType.includes(storedPanelCorner)
+    ) {
+      savePanelCornerPreference(storedPanelCorner);
+    }
+
     const storedPanelPadding = getStoredItem(STORAGE_KEYS.panelPadding);
     if (storedPanelPadding !== null) {
       savePanelPaddingPreference(storedPanelPadding);
@@ -322,6 +393,26 @@ const formHandler = (function () {
     const storedExitSquareCorners = getStoredItem(STORAGE_KEYS.exitTabSquareCorners);
     if (storedExitSquareCorners !== null) {
       ExitTab.prototype.defaultSquareCorners = storedExitSquareCorners === "true";
+    }
+
+    const storedExitExtendedPadding = getStoredItem(
+      STORAGE_KEYS.exitTabExtendHorizontalPadding
+    );
+    if (storedExitExtendedPadding !== null) {
+      ExitTab.prototype.defaultExtendHorizontalPadding =
+        storedExitExtendedPadding === "true";
+    } else if (storedExitSquareCorners !== null) {
+      // The former Square Corners setting included extended padding.
+      ExitTab.prototype.defaultExtendHorizontalPadding =
+        storedExitSquareCorners === "true";
+    }
+
+    const storedExitMatchSignRadius = getStoredItem(
+      STORAGE_KEYS.exitTabMatchSignCornerRadius
+    );
+    if (storedExitMatchSignRadius !== null) {
+      ExitTab.prototype.defaultMatchSignCornerRadius =
+        storedExitMatchSignRadius === "true";
     }
 
     const storedExitAttached = getStoredItem(STORAGE_KEYS.exitTabAttached);
@@ -403,6 +494,21 @@ const formHandler = (function () {
     }
     if (attachedLabel) {
       attachedLabel.classList.toggle("hidden", isSideExitTab);
+    }
+  };
+
+  const toggleExitTabMatchRadiusVisibility = (squareCornersEnabled) => {
+    const matchRadiusInput = document.getElementById("matchSignCornerRadius");
+    const matchRadiusLabel = document.querySelector(
+      'label[for="matchSignCornerRadius"]'
+    );
+
+    if (matchRadiusInput) {
+      matchRadiusInput.classList.toggle("hidden", squareCornersEnabled);
+      matchRadiusInput.disabled = squareCornersEnabled;
+    }
+    if (matchRadiusLabel) {
+      matchRadiusLabel.classList.toggle("hidden", squareCornersEnabled);
     }
   };
 
@@ -931,6 +1037,41 @@ const formHandler = (function () {
     return { dropIndex, targetRow, placement };
   };
 
+  const getBlockCreateNewRowDropPosition = (container, clientY) => {
+    const rows = Array.from(container.querySelectorAll(".sMControlRow"));
+    if (!rows.length) {
+      return { dropIndex: 0, targetRow: null, placement: null };
+    }
+
+    const rowRects = rows.map((row) => row.getBoundingClientRect());
+    if (clientY < rowRects[0].top) {
+      return { dropIndex: 0, targetRow: rows[0], placement: "before" };
+    }
+
+    for (let rowIndex = 1; rowIndex < rows.length; rowIndex++) {
+      if (
+        clientY > rowRects[rowIndex - 1].bottom &&
+        clientY < rowRects[rowIndex].top
+      ) {
+        return {
+          dropIndex: rowIndex,
+          targetRow: rows[rowIndex],
+          placement: "before",
+        };
+      }
+    }
+
+    if (clientY > rowRects[rowRects.length - 1].bottom) {
+      return {
+        dropIndex: rows.length,
+        targetRow: rows[rows.length - 1],
+        placement: "after",
+      };
+    }
+
+    return { dropIndex: null, targetRow: null, placement: null };
+  };
+
   const handleRowDragStart = (event) => {
     const row = event.currentTarget;
     const fromIndex = Number(row.dataset.dataRow);
@@ -951,6 +1092,31 @@ const formHandler = (function () {
   };
 
   const handleRowListDragOver = (event) => {
+    if (blockDragState?.mode === "create") {
+      const container = event.currentTarget;
+      const { dropIndex, targetRow, placement } =
+        getBlockCreateNewRowDropPosition(container, event.clientY);
+      blockCreateNewRowDropIndex = dropIndex;
+      container
+        .querySelectorAll(".newBlockRowBefore, .newBlockRowAfter")
+        .forEach((row) =>
+          row.classList.remove("newBlockRowBefore", "newBlockRowAfter")
+        );
+
+      if (targetRow && placement) {
+        event.preventDefault();
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "copy";
+        }
+        targetRow.classList.add(
+          placement === "before"
+            ? "newBlockRowBefore"
+            : "newBlockRowAfter"
+        );
+      }
+      return;
+    }
+
     if (!rowDragState) {
       return;
     }
@@ -975,6 +1141,22 @@ const formHandler = (function () {
   };
 
   const handleRowListDrop = (event) => {
+    if (
+      blockDragState?.mode === "create" &&
+      Number.isInteger(blockCreateNewRowDropIndex)
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof exposed.insertControlElemInNewRow === "function") {
+        exposed.insertControlElemInNewRow(
+          blockDragState.elementType,
+          blockCreateNewRowDropIndex
+        );
+      }
+      endBlockDrag();
+      return;
+    }
+
     if (!rowDragState) {
       return;
     }
@@ -991,6 +1173,21 @@ const formHandler = (function () {
   };
 
   const handleRowListDragLeave = (event) => {
+    if (blockDragState?.mode === "create") {
+      const container = event.currentTarget;
+      const related = event.relatedTarget;
+      if (related && container.contains(related)) {
+        return;
+      }
+      blockCreateNewRowDropIndex = null;
+      container
+        .querySelectorAll(".newBlockRowBefore, .newBlockRowAfter")
+        .forEach((row) =>
+          row.classList.remove("newBlockRowBefore", "newBlockRowAfter")
+        );
+      return;
+    }
+
     if (!rowDragState) {
       return;
     }
@@ -1060,6 +1257,62 @@ const formHandler = (function () {
     );
   };
 
+  const addHeaderFooter = (blockElems, placement, backgroundColor) => {
+    if (
+      !blockElems ||
+      !Array.isArray(blockElems.rows) ||
+      !Object.prototype.hasOwnProperty.call(lib.colors, backgroundColor)
+    ) {
+      return false;
+    }
+
+    const textFont =
+      backgroundColor === "White" || backgroundColor === "Yellow"
+        ? "Series E"
+        : "Series EM";
+    const dividerColor =
+      backgroundColor === "Yellow" || backgroundColor === "White"
+        ? "Black"
+        : "White";
+    let textRowIndex;
+
+    if (placement === "header") {
+      blockElems.addRow(0, "ControlTextElement");
+      textRowIndex = 0;
+      blockElems.addRow(1, "DividerElement");
+      if (blockElems.rows[1]?.[0]) {
+        blockElems.rows[1][0].dividerColor = dividerColor;
+        blockElems.rows[1][0].fullBleed = true;
+      }
+      blockElems.blockProperties[textRowIndex].bottomPadding = 0.2;
+    } else {
+      const dividerRowIndex = blockElems.rows.length;
+      blockElems.addRow(dividerRowIndex, "DividerElement");
+      if (blockElems.rows[dividerRowIndex]?.[0]) {
+        blockElems.rows[dividerRowIndex][0].dividerColor = dividerColor;
+        blockElems.rows[dividerRowIndex][0].fullBleed = true;
+      }
+      textRowIndex = dividerRowIndex + 1;
+      blockElems.addRow(textRowIndex, "ControlTextElement");
+      blockElems.blockProperties[textRowIndex].topPadding = 0.2;
+    }
+
+    const textElement = blockElems.rows[textRowIndex]?.[0];
+    if (textElement) {
+      textElement.textContent = placement === "header" ? "Header" : "Footer";
+      textElement.backgroundColor = "Inherit";
+      textElement.textColor = ControlTextElement.defaultTextColor;
+      textElement.fontFamily = textFont;
+    }
+    blockElems.blockProperties[textRowIndex].backgroundColor = backgroundColor;
+
+    updateForm();
+    if (exposed && typeof exposed.redraw === "function") {
+      exposed.redraw();
+    }
+    return true;
+  };
+
   const handleBlockClipboardShortcut = (event) => {
     if (
       !isSubpanelBlockEditorActive() ||
@@ -1080,6 +1333,19 @@ const formHandler = (function () {
       event.stopPropagation();
       if (exposed && typeof exposed.copyControlElements === "function") {
         exposed.copyControlElements(getSelectedBlockRefs());
+      }
+      return;
+    }
+
+    if (key === "x" && !event.shiftKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (exposed && typeof exposed.cutControlElements === "function") {
+        const result = exposed.cutControlElements(getSelectedBlockRefs());
+        if (result?.cut) {
+          clearBlockSelection();
+          updateForm();
+        }
       }
       return;
     }
@@ -1126,6 +1392,17 @@ const formHandler = (function () {
     document
       .querySelectorAll(".sMControlRow.dropActive")
       .forEach((el) => el.classList.remove("dropActive"));
+    document
+      .querySelectorAll(".newBlockRowBefore, .newBlockRowAfter")
+      .forEach((el) =>
+        el.classList.remove("newBlockRowBefore", "newBlockRowAfter")
+      );
+  };
+
+  const setBlockCreateDragState = (isActive) => {
+    document
+      .querySelector("#sMSPTextList")
+      ?.classList.toggle("blockCreateDragActive", isActive);
   };
 
   const setNewRowDropState = (isActive) => {
@@ -1140,7 +1417,10 @@ const formHandler = (function () {
   };
 
   const handleNewRowDragEnter = (event) => {
-    if (!blockDragState || !newRowDropTargetButton) {
+    if (
+      blockDragState?.mode !== "move" ||
+      !newRowDropTargetButton
+    ) {
       return;
     }
     event.preventDefault();
@@ -1148,7 +1428,10 @@ const formHandler = (function () {
   };
 
   const handleNewRowDragOver = (event) => {
-    if (!blockDragState || !newRowDropTargetButton) {
+    if (
+      blockDragState?.mode !== "move" ||
+      !newRowDropTargetButton
+    ) {
       return;
     }
     event.preventDefault();
@@ -1159,7 +1442,10 @@ const formHandler = (function () {
   };
 
   const handleNewRowDragLeave = (event) => {
-    if (!blockDragState || !newRowDropTargetButton) {
+    if (
+      blockDragState?.mode !== "move" ||
+      !newRowDropTargetButton
+    ) {
       return;
     }
     const related = event.relatedTarget;
@@ -1170,7 +1456,10 @@ const formHandler = (function () {
   };
 
   const handleNewRowDrop = (event) => {
-    if (!blockDragState || !newRowDropTargetButton) {
+    if (
+      blockDragState?.mode !== "move" ||
+      !newRowDropTargetButton
+    ) {
       return;
     }
     event.preventDefault();
@@ -1188,6 +1477,8 @@ const formHandler = (function () {
     toggleBlockWiggle(false);
     clearBlockDragIndicators();
     setNewRowDropState(false);
+    setBlockCreateDragState(false);
+    blockCreateNewRowDropIndex = null;
     blockDragState = null;
     document
       .querySelectorAll(".textEditorBlock.dragging")
@@ -1195,6 +1486,10 @@ const formHandler = (function () {
     document
       .querySelectorAll(".textEditorBlock")
       .forEach((el) => delete el.dataset.dragging);
+    if (newBlockDragSourceButton) {
+      newBlockDragSourceButton.classList.remove("dragging");
+      delete newBlockDragSourceButton.dataset.dragging;
+    }
   };
 
   const getDropIndexForRow = (rowEl, clientX) => {
@@ -1236,7 +1531,7 @@ const formHandler = (function () {
     const target = event.currentTarget;
     const rowIndex = Number(target.dataset.row);
     const blockIndex = Number(target.dataset.block);
-    blockDragState = { rowIndex, blockIndex };
+    blockDragState = { mode: "move", rowIndex, blockIndex };
     target.dataset.dragging = "true";
     target.classList.add("dragging");
     toggleBlockWiggle(true);
@@ -1254,10 +1549,39 @@ const formHandler = (function () {
     }
   };
 
+  const handleNewBlockDragStart = (event) => {
+    const elementType = document.querySelector("#sMSPElementSelect")?.value;
+    if (!Control.prototype.blockToClassElems[elementType]) {
+      event.preventDefault();
+      return;
+    }
+
+    blockDragState = { mode: "create", elementType };
+    blockCreateNewRowDropIndex = null;
+    event.currentTarget.dataset.dragging = "true";
+    event.currentTarget.classList.add("dragging");
+    toggleBlockWiggle(true);
+    clearBlockDragIndicators();
+    setBlockCreateDragState(true);
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "copy";
+      event.dataTransfer.dropEffect = "copy";
+      event.dataTransfer.setData("text/plain", elementType);
+    }
+  };
+
+  const handleNewBlockDragEnd = () => {
+    if (blockDragState?.mode === "create") {
+      endBlockDrag();
+    }
+  };
+
   const handleRowDragEnter = (event) => {
     if (!blockDragState) {
       return;
     }
+    blockCreateNewRowDropIndex = null;
     clearBlockDragIndicators();
     const rowEl = event.currentTarget;
     rowEl.classList.add("dropActive");
@@ -1270,7 +1594,8 @@ const formHandler = (function () {
     const rowEl = event.currentTarget;
     event.preventDefault();
     if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.dropEffect =
+        blockDragState.mode === "create" ? "copy" : "move";
     }
     rowEl.classList.add("dropActive");
     getDropIndexForRow(rowEl, event.clientX);
@@ -1283,13 +1608,25 @@ const formHandler = (function () {
     const rowEl = event.currentTarget;
     const rowIndex = Number(rowEl.dataset.dataRow);
     event.preventDefault();
+    event.stopPropagation();
     const dropIndex = getDropIndexForRow(rowEl, event.clientX);
-    exposed.moveControlElem(
-      blockDragState.rowIndex,
-      blockDragState.blockIndex,
-      rowIndex,
-      dropIndex
-    );
+    if (
+      blockDragState.mode === "create" &&
+      typeof exposed.insertControlElemAt === "function"
+    ) {
+      exposed.insertControlElemAt(
+        blockDragState.elementType,
+        rowIndex,
+        dropIndex
+      );
+    } else {
+      exposed.moveControlElem(
+        blockDragState.rowIndex,
+        blockDragState.blockIndex,
+        rowIndex,
+        dropIndex
+      );
+    }
     endBlockDrag();
   };
 
@@ -1330,6 +1667,53 @@ const formHandler = (function () {
     if (exposed && typeof exposed.redraw === "function") {
       exposed.redraw();
     }
+  };
+
+  const getBottomArrowLabel = (arrowKind) => {
+    const arrowDefinition = ArrowElement.prototype.arrows[arrowKind];
+    if (!arrowDefinition) {
+      return "None";
+    }
+    return arrowDefinition.label || arrowKind;
+  };
+
+  const syncBottomArrowRotationControls = (rotation) => {
+    const parsedRotation = parseFloat(rotation);
+    const resolvedRotation = Number.isFinite(parsedRotation)
+      ? parsedRotation
+      : 0;
+    const rotationSlider = document.getElementById("bottomArrowRotation");
+    const rotationValue = document.getElementById("bottomArrowRotationVal");
+    if (rotationSlider) {
+      rotationSlider.value = resolvedRotation.toString();
+    }
+    if (rotationValue) {
+      rotationValue.value = resolvedRotation.toString();
+    }
+
+    const normalizedRotation =
+      ((resolvedRotation % 360) + 360) % 360;
+    document.querySelectorAll(".bottomArrowRotationPreset").forEach((button) => {
+      const degrees = parseFloat(button.dataset.degrees || "0") || 0;
+      button.classList.toggle(
+        "activated",
+        Math.abs(normalizedRotation - degrees) < 0.5
+      );
+    });
+  };
+
+  const clearBottomArrowKind = () => {
+    const bottomArrowInput = document.getElementById("bottomArrowKind");
+    const bottomArrowLabel = document.getElementById(
+      "bottomArrowSelectedLabel"
+    );
+    if (bottomArrowInput) {
+      bottomArrowInput.value = "None";
+    }
+    if (bottomArrowLabel) {
+      bottomArrowLabel.textContent = "Current: None";
+    }
+    syncBottomArrowRotationControls(0);
   };
 
   const initialize = async (appExposed) => {
@@ -1442,12 +1826,9 @@ const formHandler = (function () {
     const moveMobileToolbarItems = () => {
       ensureMobileToolbar();
 
-      const mutcdLink = document.querySelector(".mutcd-link");
       const exportButton = document.getElementById("export");
       const downloadButton = document.getElementById("exportDownload");
       const hideButton = document.getElementById("hideConfig");
-
-      moveToolbarItem(mutcdLink, mobileToolbarLeading);
 
       for (const button of [
         exportButton,
@@ -1668,6 +2049,15 @@ const formHandler = (function () {
         }
 
         reDisplay();
+
+        if (
+          button.id === "templates" &&
+          sMConfigBar.dataset.currentMenu === "templates" &&
+          typeof app !== "undefined" &&
+          typeof app.refreshTemplatesList === "function"
+        ) {
+          app.refreshTemplatesList();
+        }
       };
     }
 
@@ -1742,7 +2132,7 @@ const formHandler = (function () {
           }
         }
 
-        // Refresh templates list when Saved tab is opened
+        // Refresh the unified template list when its tab is opened.
         if (button.dataset.tab === "sMTemplatesSaved" && typeof app !== "undefined" && typeof app.refreshTemplatesList === "function") {
           app.refreshTemplatesList();
         }
@@ -1998,6 +2388,18 @@ const formHandler = (function () {
       newRowDropTargetButton.addEventListener("drop", handleNewRowDrop);
     }
 
+    newBlockDragSourceButton = document.getElementById("sMSPCreateElement");
+    if (newBlockDragSourceButton) {
+      newBlockDragSourceButton.addEventListener(
+        "dragstart",
+        handleNewBlockDragStart
+      );
+      newBlockDragSourceButton.addEventListener(
+        "dragend",
+        handleNewBlockDragEnd
+      );
+    }
+
     const blockSelectionModeInput = document.getElementById(
       "sMSPBlockSelectionMode"
     );
@@ -2144,7 +2546,7 @@ const formHandler = (function () {
     const cornerTypeSelectElmt = document.getElementById("panelCorner");
     for (const corner of Panel.prototype.cornerType) {
       lib.appendOption(cornerTypeSelectElmt, corner, {
-        selected: corner == "Round",
+        selected: corner === normalizePanelCorner(Panel.prototype.defaultCorner),
       });
     }
 
@@ -2250,7 +2652,9 @@ const formHandler = (function () {
     // Populate the arrow directions
     const arrowDirectionElmt = document.getElementById("arrowLocations");
     for (const arrowDirection of Sign.prototype.arrowPositions) {
-      lib.appendOption(arrowDirectionElmt, arrowDirection);
+      lib.appendOption(arrowDirectionElmt, arrowDirection, {
+        text: arrowDirection === "Middle" ? "Center" : arrowDirection,
+      });
     }
 
     // Populate the other symbol options
@@ -2274,6 +2678,7 @@ const formHandler = (function () {
       document.querySelector("#sdTollLogo_alignment"),
       document.querySelector("#sdBeacon_alignment"),
       document.querySelector("#sdIcon_alignment"),
+      document.querySelector("#sdShield_alignment"),
       document.querySelector("#sdGroupedBlock_alignment"),
     ];
     let textElem_bgColorSelects = [
@@ -2576,10 +2981,14 @@ const formHandler = (function () {
       }
     }
 
-    const blockBannerFontSelect = document.querySelector(
-      "#sdShield_bannerFontFamily"
-    );
-    if (blockBannerFontSelect) {
+    const blockBannerFontSelects = [
+      document.querySelector("#sdShield_bannerFontFamily"),
+      document.querySelector("#sdShield_bannerFontFamily2"),
+    ];
+    for (const blockBannerFontSelect of blockBannerFontSelects) {
+      if (!blockBannerFontSelect) {
+        continue;
+      }
       const bannerFontOptions = ShieldElement.prototype.getBannerFontOptions();
       if (
         (!bannerFontOptions || !bannerFontOptions.length) &&
@@ -2602,7 +3011,10 @@ const formHandler = (function () {
       }
       blockBannerFontSelect.addEventListener("change", () => {
         const selectedFont = blockBannerFontSelect.value;
-        if (selectedFont) {
+        if (
+          selectedFont &&
+          blockBannerFontSelect.id === "sdShield_bannerFontFamily"
+        ) {
           ShieldElement.prototype.defaultBannerFontFamily = selectedFont;
           setStoredItem(STORAGE_KEYS.bannerFontFamily, selectedFont);
         }
@@ -2664,6 +3076,30 @@ const formHandler = (function () {
         arrowRotationButtons.forEach((presetButton) => {
           presetButton.classList.toggle("activated", presetButton === button);
         });
+        readForm();
+      });
+    }
+
+    const bottomArrowRotationSlider = document.getElementById(
+      "bottomArrowRotation"
+    );
+    const bottomArrowRotationValue = document.getElementById(
+      "bottomArrowRotationVal"
+    );
+    if (bottomArrowRotationSlider && bottomArrowRotationValue) {
+      bottomArrowRotationSlider.addEventListener("input", () => {
+        bottomArrowRotationValue.value = bottomArrowRotationSlider.value;
+      });
+      bottomArrowRotationSlider.addEventListener("change", readForm);
+    }
+
+    const bottomArrowRotationButtons = document.querySelectorAll(
+      ".bottomArrowRotationPreset"
+    );
+    for (const button of bottomArrowRotationButtons) {
+      button.addEventListener("click", () => {
+        const degrees = parseFloat(button.dataset.degrees || "0") || 0;
+        syncBottomArrowRotationControls(degrees);
         readForm();
       });
     }
@@ -2983,7 +3419,7 @@ const formHandler = (function () {
 
     // Panel
     currentPanel.color = form["panelColor"].value;
-    currentPanel.corner = form["panelCorner"].value;
+    currentPanel.corner = normalizePanelCorner(form["panelCorner"].value);
     const panelBorderRadiusInput = parseFloat(form["panelBorderRadius"].value);
     currentPanel.borderRadius = Number.isFinite(panelBorderRadiusInput)
       ? Math.max(0, panelBorderRadiusInput)
@@ -2992,10 +3428,23 @@ const formHandler = (function () {
 
     post.disableFlash = form["disableFlash"].checked;
     post.showBlockBoundingBoxes = !!form["showBlockBoundingBoxes"]?.checked;
+    post.showAlignmentGuides = !!form["showAlignmentGuides"]?.checked;
+    post.alignmentGuideSpacing = post.normalizeAlignmentGuideSpacing(
+      form["alignmentGuideSpacing"]?.value
+    );
+    post.alignmentGuidePhase = post.normalizeAlignmentGuidePhase(
+      form["alignmentGuidePhase"]?.value,
+      post.alignmentGuideSpacing
+    );
 
     // Exit Tab
     exitTab.number = form["exitNumber"].value;
-    exitTab.width = form["exitTabWidth"].value;
+    const aplEdgeAllowed = syncExitTabWidthOptions(exitTab);
+    const requestedExitTabWidth = form["exitTabWidth"].value;
+    exitTab.width =
+      isAplEdgeExitTabWidth(requestedExitTabWidth) && !aplEdgeAllowed
+        ? "Edge"
+        : requestedExitTabWidth;
     exitTab.position = form["exitTabPosition"].value;
     exitTab.color = form["exitColor"].value;
     exitTab.variant = form["exitVariant"].value;
@@ -3069,6 +3518,10 @@ const formHandler = (function () {
     exitTab.showLeft = form["showLeft"].checked;
     exitTab.fullBorder = form["fullBorder"].checked;
     exitTab.squareCorners = form["squareCorners"].checked;
+    exitTab.extendHorizontalPadding =
+      form["extendHorizontalPadding"].checked;
+    exitTab.matchSignCornerRadius =
+      form["matchSignCornerRadius"].checked;
     exitTab.attached = form["exitTabAttached"].checked;
     exitTab.topOffset = form["topOffset"].checked;
     exitTab.verticalArrangement = form["verticalArrangement"].checked;
@@ -3079,6 +3532,14 @@ const formHandler = (function () {
     setStoredItem(STORAGE_KEYS.exitTabFHWAFont, String(!!exitTab.FHWAFont));
     setStoredItem(STORAGE_KEYS.exitTabFullBorder, String(!!exitTab.fullBorder));
     setStoredItem(STORAGE_KEYS.exitTabSquareCorners, String(!!exitTab.squareCorners));
+    setStoredItem(
+      STORAGE_KEYS.exitTabExtendHorizontalPadding,
+      String(!!exitTab.extendHorizontalPadding)
+    );
+    setStoredItem(
+      STORAGE_KEYS.exitTabMatchSignCornerRadius,
+      String(!!exitTab.matchSignCornerRadius)
+    );
     setStoredItem(STORAGE_KEYS.exitTabAttached, String(!!exitTab.attached));
     setStoredItem(STORAGE_KEYS.exitTabTopOffset, String(!!exitTab.topOffset));
     const borderThicknessInput = parseFloat(form["borderThickness"].value);
@@ -3126,10 +3587,12 @@ const formHandler = (function () {
         `shield${shieldIndex}_bannerCustomText`
       );
       const customBannerText =
-        customBannerInput && customBannerInput.value
-          ? customBannerInput.value.trim()
+        customBannerInput && typeof customBannerInput.value === "string"
+          ? customBannerInput.value
           : "";
-      shield.bannerType = customBannerText || shield.bannerType;
+      if (customBannerText.length > 0) {
+        shield.bannerType = customBannerText;
+      }
       shield.bannerPosition = document.getElementById(
         `shield${shieldIndex}_bannerPosition`
       ).value;
@@ -3140,10 +3603,12 @@ const formHandler = (function () {
         `shield${shieldIndex}_bannerCustomText2`
       );
       const customBannerText2 =
-        customBannerInput2 && customBannerInput2.value
-          ? customBannerInput2.value.trim()
+        customBannerInput2 && typeof customBannerInput2.value === "string"
+          ? customBannerInput2.value
           : "";
-      shield.bannerType2 = customBannerText2 || shield.bannerType2;
+      if (customBannerText2.length > 0) {
+        shield.bannerType2 = customBannerText2;
+      }
       shield.specialBannerType =
         document.getElementById(`shield${shieldIndex}_specialBannerType`)
           .value || "None";
@@ -3227,9 +3692,9 @@ const formHandler = (function () {
           const customInput = document.getElementById(customInputId);
           const customValue =
             customInput && typeof customInput.value === "string"
-              ? customInput.value.trim()
+              ? customInput.value
               : "";
-          if (customValue) {
+          if (customValue.length > 0) {
             currentBlockElem[propertyName] = customValue;
           } else if (element.tagName === "SELECT") {
             currentBlockElem[propertyName] = element.value;
@@ -3347,6 +3812,52 @@ const formHandler = (function () {
     currentPanel.sign.guideArrowLanes = form["guideArrowLanes"].value;
     currentPanel.sign.arrowPosition = form["arrowLocations"].value;
 
+    const bottomArrowKindField = form["bottomArrowKind"];
+    const selectedBottomArrowKind = bottomArrowKindField
+      ? bottomArrowKindField.value
+      : "None";
+    const resolvedBottomArrowKind = ArrowElement.prototype.arrows[
+      selectedBottomArrowKind
+    ]
+      ? selectedBottomArrowKind
+      : guideArrow_result !== "None"
+        ? ArrowElement.prototype.defaultArrow
+        : "None";
+    currentPanel.sign.bottomArrowKind = resolvedBottomArrowKind;
+    if (bottomArrowKindField) {
+      bottomArrowKindField.value = resolvedBottomArrowKind;
+    }
+    const bottomArrowSelectedLabel = document.getElementById(
+      "bottomArrowSelectedLabel"
+    );
+    if (bottomArrowSelectedLabel) {
+      bottomArrowSelectedLabel.textContent =
+        "Current: " + getBottomArrowLabel(resolvedBottomArrowKind);
+    }
+    const bottomArrowRotationField = form["bottomArrowRotation"];
+    const parsedBottomArrowRotation = parseFloat(
+      bottomArrowRotationField ? bottomArrowRotationField.value : 0
+    );
+    currentPanel.sign.bottomArrowRotation = Number.isFinite(
+      parsedBottomArrowRotation
+    )
+      ? parsedBottomArrowRotation
+      : 0;
+    const parsedBottomArrowGap = parseFloat(
+      form["bottomArrowGap"] ? form["bottomArrowGap"].value : 0.5
+    );
+    currentPanel.sign.bottomArrowGap = Number.isFinite(parsedBottomArrowGap)
+      ? Math.max(parsedBottomArrowGap, 0)
+      : 0.5;
+    const parsedBottomArrowSpacing = parseFloat(
+      form["bottomArrowSpacing"] ? form["bottomArrowSpacing"].value : 1
+    );
+    currentPanel.sign.bottomArrowSpacing = Number.isFinite(
+      parsedBottomArrowSpacing
+    )
+      ? Math.max(parsedBottomArrowSpacing, 0)
+      : 1;
+
     var exitOnlyDirection_result = form["exitOnlyDirection"].value;
 
     for (const exitOnlyDirection_value of Sign.prototype.exitguideArrows) {
@@ -3364,7 +3875,9 @@ const formHandler = (function () {
 
         for (const arrowPosition of Sign.prototype.arrowPositions) {
           if (arrowPosition != "Middle") {
-            lib.appendOption(form["arrowLocations"], arrowPosition);
+            lib.appendOption(form["arrowLocations"], arrowPosition, {
+              text: arrowPosition,
+            });
           }
         }
 
@@ -3374,7 +3887,9 @@ const formHandler = (function () {
         currentPanel.sign.arrowPosition = form["arrowLocations"].value;
 
         if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
-          lib.appendOption(form["arrowLocations"], "Middle");
+          lib.appendOption(form["arrowLocations"], "Middle", {
+            text: "Center",
+          });
         }
       }
     } else if (
@@ -3390,14 +3905,18 @@ const formHandler = (function () {
             `option[value="${arrowPosition}"]`
           )
         ) {
-          lib.appendOption(form["arrowLocations"], arrowPosition);
+          lib.appendOption(form["arrowLocations"], arrowPosition, {
+            text: arrowPosition === "Middle" ? "Center" : arrowPosition,
+          });
         }
       }
     } else {
       currentPanel.sign.arrowPosition = form["arrowLocations"].value;
 
       if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
-        lib.appendOption(form["arrowLocations"], "Middle");
+        lib.appendOption(form["arrowLocations"], "Middle", {
+          text: "Center",
+        });
       }
     }
 
@@ -3436,6 +3955,14 @@ const formHandler = (function () {
       .join(" ")
       .trim();
     currentPanel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
+    const exitOnlyArrowHorizontalPaddingInput = parseFloat(
+      form["exitOnlyArrowHorizontalPadding"]?.value
+    );
+    currentPanel.sign.exitOnlyArrowHorizontalPadding = Number.isFinite(
+      exitOnlyArrowHorizontalPaddingInput
+    )
+      ? Math.min(Math.max(exitOnlyArrowHorizontalPaddingInput, 0), 6)
+      : 0;
     const halfExitGapInput = parseFloat(document.getElementById("halfExitGap")?.value);
     currentPanel.sign.halfExitGap = Number.isFinite(halfExitGapInput) ? halfExitGapInput : 5;
 
@@ -3533,6 +4060,15 @@ const formHandler = (function () {
     updateForm();
     exposed.redraw();
     scheduleMobileLayoutUpdate();
+  };
+
+  const setPanelCorner = (corner) => {
+    const normalizedCorner = savePanelCornerPreference(corner);
+    const panelCornerSelect = document.getElementById("panelCorner");
+    if (panelCornerSelect) {
+      panelCornerSelect.value = normalizedCorner;
+    }
+    readForm();
   };
 
   /**
@@ -3739,6 +4275,92 @@ const formHandler = (function () {
       }
     }
 
+    const bottomArrowChooseBtn = document.getElementById(
+      "bottomArrowChooseBtn"
+    );
+    const bottomArrowClearBtn = document.getElementById("bottomArrowClearBtn");
+    const bottomArrowModal = document.getElementById(
+      "bottomArrowSelectorModal"
+    );
+    const closeBottomArrowModalBtn = document.getElementById(
+      "closeBottomArrowSelector"
+    );
+    const bottomArrowSearch = document.getElementById("bottomArrowSearch");
+    const bottomArrowGrid = document.getElementById("bottomArrowGrid");
+    const bottomArrowInput = document.getElementById("bottomArrowKind");
+    const bottomArrowLabel = document.getElementById(
+      "bottomArrowSelectedLabel"
+    );
+
+    if (
+      bottomArrowChooseBtn &&
+      bottomArrowClearBtn &&
+      bottomArrowModal &&
+      closeBottomArrowModalBtn &&
+      bottomArrowSearch &&
+      bottomArrowGrid &&
+      bottomArrowInput &&
+      bottomArrowLabel &&
+      !bottomArrowChooseBtn.hasAttribute("data-initialized")
+    ) {
+      bottomArrowChooseBtn.setAttribute("data-initialized", "true");
+
+      const populateBottomArrowGrid = (filter = "") => {
+        lib.clearChildren(bottomArrowGrid);
+        const filterText = filter.toLowerCase();
+
+        const arrowKeys =
+          ArrowElement.prototype.arrowKeys ||
+          Object.keys(ArrowElement.prototype.arrows || {});
+        for (const arrowKey of arrowKeys) {
+          const arrowDefinition = ArrowElement.prototype.arrows[arrowKey];
+          const label = arrowDefinition.label || arrowKey;
+          if (!label.toLowerCase().includes(filterText)) {
+            continue;
+          }
+
+          const item = document.createElement("div");
+          item.className = "iconGridItem";
+
+          const img = document.createElement("img");
+          img.src = arrowDefinition.src;
+          img.alt = label;
+          img.loading = "lazy";
+          img.title = label;
+          item.appendChild(img);
+
+          item.onclick = () => {
+            bottomArrowInput.value = arrowKey;
+            bottomArrowLabel.textContent = "Current: " + label;
+            readForm();
+            bottomArrowModal.close();
+          };
+
+          bottomArrowGrid.appendChild(item);
+        }
+      };
+
+      bottomArrowChooseBtn.onclick = () => {
+        populateBottomArrowGrid();
+        bottomArrowSearch.value = "";
+        bottomArrowModal.showModal();
+      };
+
+      bottomArrowClearBtn.onclick = () => {
+        clearBottomArrowKind();
+        document.getElementById("guideArrow").value = "None";
+        readForm();
+      };
+
+      closeBottomArrowModalBtn.onclick = () => {
+        bottomArrowModal.close();
+      };
+
+      bottomArrowSearch.oninput = (event) => {
+        populateBottomArrowGrid(event.target.value);
+      };
+    }
+
     const panel = exposed.getCurrentPanel();
     const sign =
       exposed.vars.currentlySelectedSubPanelIndex != -1
@@ -3858,6 +4480,58 @@ const formHandler = (function () {
     );
     if (showBlockBoundingBoxesCheckbox) {
       showBlockBoundingBoxesCheckbox.checked = !!post.showBlockBoundingBoxes;
+    }
+
+    const showAlignmentGuidesCheckbox = document.getElementById(
+      "showAlignmentGuides"
+    );
+    const alignmentGuideControls = document.getElementById(
+      "alignmentGuideControls"
+    );
+    const alignmentGuideSpacingSlider = document.getElementById(
+      "alignmentGuideSpacing"
+    );
+    const alignmentGuidePhaseSlider = document.getElementById(
+      "alignmentGuidePhase"
+    );
+    const alignmentGuideSpacingValue = document.getElementById(
+      "alignmentGuideSpacingValue"
+    );
+    const alignmentGuidePhaseValue = document.getElementById(
+      "alignmentGuidePhaseValue"
+    );
+    const resolvedAlignmentGuideSpacing = post.normalizeAlignmentGuideSpacing(
+      post.alignmentGuideSpacing
+    );
+    const resolvedAlignmentGuidePhase = post.normalizeAlignmentGuidePhase(
+      post.alignmentGuidePhase,
+      resolvedAlignmentGuideSpacing
+    );
+    post.alignmentGuideSpacing = resolvedAlignmentGuideSpacing;
+    post.alignmentGuidePhase = resolvedAlignmentGuidePhase;
+    if (showAlignmentGuidesCheckbox) {
+      showAlignmentGuidesCheckbox.checked = !!post.showAlignmentGuides;
+    }
+    if (alignmentGuideControls) {
+      alignmentGuideControls.classList.toggle(
+        "hidden",
+        !post.showAlignmentGuides
+      );
+    }
+    if (alignmentGuideSpacingSlider) {
+      alignmentGuideSpacingSlider.value = resolvedAlignmentGuideSpacing;
+    }
+    if (alignmentGuidePhaseSlider) {
+      alignmentGuidePhaseSlider.max = resolvedAlignmentGuideSpacing;
+      alignmentGuidePhaseSlider.value = resolvedAlignmentGuidePhase;
+    }
+    if (alignmentGuideSpacingValue) {
+      alignmentGuideSpacingValue.value = resolvedAlignmentGuideSpacing;
+      alignmentGuideSpacingValue.textContent = resolvedAlignmentGuideSpacing;
+    }
+    if (alignmentGuidePhaseValue) {
+      alignmentGuidePhaseValue.value = resolvedAlignmentGuidePhase;
+      alignmentGuidePhaseValue.textContent = resolvedAlignmentGuidePhase;
     }
 
     while (panelList.firstChild) {
@@ -4075,6 +4749,13 @@ const formHandler = (function () {
 
     // APL Arrow List Update
     const aplArrowList = document.getElementById("aplArrowList");
+    const combineAPLExitOnlyLabels = document.getElementById(
+      "combineAPLExitOnlyLabels"
+    );
+    if (combineAPLExitOnlyLabels) {
+      combineAPLExitOnlyLabels.checked =
+        panel.sign.combineAPLExitOnlyLabels === true;
+    }
     const selectedAPLIndex = exposed.vars.currentlySelectedAPLArrowIndex;
     const APL_ARROW_TYPE_OPTIONS = [
       { value: "UP", label: "Up" },
@@ -4633,6 +5314,10 @@ const formHandler = (function () {
     }
 
     const panelCornerSelectElmt = document.getElementById("panelCorner");
+    panel.corner = normalizePanelCorner(panel.corner);
+    if (!hasPanelCornerPreference) {
+      savePanelCornerPreference(panel.corner);
+    }
     for (const option of panelCornerSelectElmt.options) {
       if (option.value == panel.corner) {
         option.selected = true;
@@ -4716,11 +5401,18 @@ const formHandler = (function () {
     }
 
     const exitTabWidthSelectElmt = document.getElementById("exitTabWidth");
+    syncExitTabWidthOptions(exitTab);
+    let exitTabWidthMatched = false;
     for (const option of exitTabWidthSelectElmt.options) {
       if (option.value == exitTab.width) {
         option.selected = true;
+        exitTabWidthMatched = true;
         break;
       }
+    }
+    if (!exitTabWidthMatched) {
+      exitTab.width = "Edge";
+      exitTabWidthSelectElmt.value = "Edge";
     }
     toggleExitTabAttachedOptionVisibility(exitTab.width);
 
@@ -4810,6 +5502,17 @@ const formHandler = (function () {
     const squareCorners = document.getElementById("squareCorners");
     squareCorners.checked = exitTab.squareCorners;
 
+    const extendHorizontalPadding = document.getElementById(
+      "extendHorizontalPadding"
+    );
+    extendHorizontalPadding.checked = !!exitTab.extendHorizontalPadding;
+
+    const matchSignCornerRadius = document.getElementById(
+      "matchSignCornerRadius"
+    );
+    matchSignCornerRadius.checked = !!exitTab.matchSignCornerRadius;
+    toggleExitTabMatchRadiusVisibility(!!exitTab.squareCorners);
+
     const exitTabAttached = document.getElementById("exitTabAttached");
     exitTabAttached.checked = !!exitTab.attached;
 
@@ -4888,7 +5591,7 @@ const formHandler = (function () {
         : "Editing Group";
     }
 
-    // START Add Header/Footer Buttons
+    // START Add Header/Footer Controls
     const addHeaderFooterContainer = document.createElement("div");
     addHeaderFooterContainer.style.width = "100%";
     addHeaderFooterContainer.style.display = "flex";
@@ -4896,71 +5599,30 @@ const formHandler = (function () {
     addHeaderFooterContainer.style.gap = "10px";
     addHeaderFooterContainer.style.paddingBottom = "10px";
 
-    const createButton = (text, onClick) => {
-      const btn = document.createElement("button");
-      btn.textContent = text;
-      btn.type = "button";
-      btn.style.padding = "0.4rem 0.8rem";
-      btn.onclick = onClick;
-      return btn;
+    const createHeaderFooterSelect = (label, placement) => {
+      const select = document.createElement("select");
+      select.setAttribute("aria-label", label);
+      lib.appendOption(select, "", { text: label, selected: true });
+      select.options[0].disabled = true;
+      Object.keys(lib.colors).forEach((color) => {
+        lib.appendOption(select, color);
+      });
+      select.addEventListener("change", () => {
+        if (select.value) {
+          addHeaderFooter(activeBlockElements, placement, select.value);
+        }
+      });
+      return select;
     };
 
-    const addHeaderButton = createButton("Add Header", () => {
-      const blockElems = activeBlockElements;
-
-      // Add Header text at the top
-      blockElems.addRow(0, "ControlTextElement");
-      if (blockElems.rows[0] && blockElems.rows[0][0]) {
-        blockElems.rows[0][0].textContent = "Header";
-        // Set element background just in case, though row background is usually preferred for full strips
-        blockElems.rows[0][0].backgroundColor = "Yellow";
-      }
-      if (blockElems.blockProperties[0]) {
-        blockElems.blockProperties[0].bottomPadding = 0.2;
-        blockElems.blockProperties[0].backgroundColor = "Yellow";
-      }
-
-      // Add Divider below the Header
-      blockElems.addRow(1, "DividerElement");
-      if (blockElems.rows[1] && blockElems.rows[1][0]) {
-        blockElems.rows[1][0].dividerColor = "Black";
-        blockElems.rows[1][0].fullBleed = true;
-      }
-
-      if (typeof updateForm === "function") updateForm();
-      if (exposed && typeof exposed.redraw === "function") exposed.redraw();
-    });
-
-    const addFooterButton = createButton("Add Footer", () => {
-      const blockElems = activeBlockElements;
-      const lastIndex = blockElems.rows.length;
-
-      // Add Divider at the bottom
-      blockElems.addRow(lastIndex, "DividerElement");
-      if (blockElems.rows[lastIndex] && blockElems.rows[lastIndex][0]) {
-        blockElems.rows[lastIndex][0].dividerColor = "Black";
-        blockElems.rows[lastIndex][0].fullBleed = true;
-      }
-
-      // Add Footer text below the divider
-      blockElems.addRow(lastIndex + 1, "ControlTextElement");
-      if (blockElems.rows[lastIndex + 1] && blockElems.rows[lastIndex + 1][0]) {
-        blockElems.rows[lastIndex + 1][0].textContent = "Footer";
-        blockElems.rows[lastIndex + 1][0].backgroundColor = "Yellow";
-      }
-      if (blockElems.blockProperties[lastIndex + 1]) {
-        blockElems.blockProperties[lastIndex + 1].topPadding = 0.2;
-        blockElems.blockProperties[lastIndex + 1].backgroundColor = "Yellow";
-      }
-
-      if (typeof updateForm === "function") updateForm();
-      if (exposed && typeof exposed.redraw === "function") exposed.redraw();
-    });
-
-    addHeaderFooterContainer.appendChild(addHeaderButton);
-    addHeaderFooterContainer.appendChild(addFooterButton);
+    addHeaderFooterContainer.appendChild(
+      createHeaderFooterSelect("Add Header…", "header")
+    );
+    addHeaderFooterContainer.appendChild(
+      createHeaderFooterSelect("Add Footer…", "footer")
+    );
     sMSPTextList.appendChild(addHeaderFooterContainer);
-    // END Add Header/Footer Buttons
+    // END Add Header/Footer Controls
     document.querySelector("#SMSPSelectLabel").textContent =
       "Selected: Row " + (exposed.vars.currentlySelectedRowIndex + 1);
     document.querySelector("#SMSPElementLabel").textContent =
@@ -4984,6 +5646,10 @@ const formHandler = (function () {
       sMControlRow.dataset.dataRow = row.toString();
       sMControlRow.className =
         "sMControlRow" +
+        (row === 0 ? " firstBlockEditorRow" : "") +
+        (row === activeBlockElements.rows.length - 1
+          ? " lastBlockEditorRow"
+          : "") +
         (row == exposed.vars.currentlySelectedRowIndex ? " selected" : "");
 
       for (let item = 0; item < activeBlockElements.rows[row].length; item++) {
@@ -5224,6 +5890,11 @@ const formHandler = (function () {
 
       currentBlockElem.bannerFontFamily =
         ShieldElement.prototype.normalizeBannerFontFamily(
+          currentBlockElem.bannerFontFamily
+        );
+      currentBlockElem.bannerFontFamily2 =
+        ShieldElement.prototype.normalizeBannerFontFamily(
+          currentBlockElem.bannerFontFamily2 ||
           currentBlockElem.bannerFontFamily
         );
       currentBlockElem.scaleBannersWithShield =
@@ -5506,11 +6177,105 @@ const formHandler = (function () {
     shieldBacksElmt.checked = panel.sign.shieldBacks;
 
     const guideArrowSelectElmt = document.getElementById("guideArrow");
-    for (const option of guideArrowSelectElmt.options) {
-      if (option.value == panel.sign.guideArrow) {
-        option.selected = true;
-        break;
+    guideArrowSelectElmt.value = Sign.prototype.guideArrows.includes(
+      panel.sign.guideArrow
+    )
+      ? panel.sign.guideArrow
+      : "None";
+
+    const bottomArrowKindElmt = document.getElementById("bottomArrowKind");
+    const bottomArrowSelectedLabelElmt = document.getElementById(
+      "bottomArrowSelectedLabel"
+    );
+    const resolvedBottomArrowKind =
+      ArrowElement.prototype.arrows[panel.sign.bottomArrowKind]
+        ? panel.sign.bottomArrowKind
+        : panel.sign.guideArrow !== "None"
+          ? ArrowElement.prototype.defaultArrow
+          : "None";
+    if (bottomArrowKindElmt) {
+      bottomArrowKindElmt.value = resolvedBottomArrowKind;
+    }
+    if (bottomArrowSelectedLabelElmt) {
+      bottomArrowSelectedLabelElmt.textContent =
+        "Current: " + getBottomArrowLabel(resolvedBottomArrowKind);
+    }
+    syncBottomArrowRotationControls(panel.sign.bottomArrowRotation);
+    const bottomArrowGapElmt = document.getElementById("bottomArrowGap");
+    const bottomArrowGapValueElmt = document.getElementById(
+      "bottomArrowGapValue"
+    );
+    const resolvedBottomArrowGap = Number.isFinite(panel.sign.bottomArrowGap)
+      ? panel.sign.bottomArrowGap
+      : 0.5;
+    if (bottomArrowGapElmt) {
+      bottomArrowGapElmt.value = resolvedBottomArrowGap;
+    }
+    if (bottomArrowGapValueElmt) {
+      bottomArrowGapValueElmt.textContent = resolvedBottomArrowGap;
+    }
+    const bottomArrowSpacingElmt = document.getElementById(
+      "bottomArrowSpacing"
+    );
+    const bottomArrowSpacingValueElmt = document.getElementById(
+      "bottomArrowSpacingValue"
+    );
+    const resolvedBottomArrowSpacing = Number.isFinite(
+      panel.sign.bottomArrowSpacing
+    )
+      ? panel.sign.bottomArrowSpacing
+      : 1;
+    if (bottomArrowSpacingElmt) {
+      bottomArrowSpacingElmt.value = resolvedBottomArrowSpacing;
+    }
+    if (bottomArrowSpacingValueElmt) {
+      bottomArrowSpacingValueElmt.textContent = resolvedBottomArrowSpacing;
+    }
+    const bottomArrowGapLabelElmt = document.getElementById(
+      "bottomArrowGapLabel"
+    );
+    const bottomArrowSpacingLabelElmt = document.getElementById(
+      "bottomArrowSpacingLabel"
+    );
+    const showStandardArrowLayout =
+      panel.sign.guideArrow === "None" && resolvedBottomArrowKind !== "None";
+    for (const element of [
+      bottomArrowGapLabelElmt,
+      bottomArrowGapElmt,
+      bottomArrowGapValueElmt,
+      bottomArrowSpacingLabelElmt,
+      bottomArrowSpacingElmt,
+      bottomArrowSpacingValueElmt,
+    ]) {
+      if (element) {
+        element.classList.toggle("invisible", !showStandardArrowLayout);
       }
+    }
+
+    const arrowLocationsElmt = document.getElementById("arrowLocations");
+    if (arrowLocationsElmt) {
+      const availableArrowPositions = Sign.prototype.arrowPositions.filter(
+        (position) =>
+          panel.sign.guideArrow !== "Half Exit Only" || position !== "Middle"
+      );
+      const currentArrowPositions = Array.from(arrowLocationsElmt.options).map(
+        (option) => option.value
+      );
+      if (
+        currentArrowPositions.join("|") !== availableArrowPositions.join("|")
+      ) {
+        lib.clearChildren(arrowLocationsElmt);
+        for (const position of availableArrowPositions) {
+          lib.appendOption(arrowLocationsElmt, position, {
+            text: position === "Middle" ? "Center" : position,
+          });
+        }
+      }
+      arrowLocationsElmt.value = availableArrowPositions.includes(
+        panel.sign.arrowPosition
+      )
+        ? panel.sign.arrowPosition
+        : availableArrowPositions[0];
     }
 
     const guideArrowLanesElmt = document.getElementById("guideArrowLanes");
@@ -5550,47 +6315,80 @@ const formHandler = (function () {
     const exitOnlyPaddingLabel = document.getElementById(
       "exitOnlyPaddingLabel"
     );
+    const exitOnlyArrowHorizontalPaddingElmt = document.getElementById(
+      "exitOnlyArrowHorizontalPadding"
+    );
+    const exitOnlyArrowHorizontalPaddingValueElmt = document.getElementById(
+      "exitOnlyArrowHorizontalPaddingValue"
+    );
+    const exitOnlyArrowHorizontalPaddingLabelElmt = document.getElementById(
+      "exitOnlyArrowHorizontalPaddingLabel"
+    );
     const halfExitGapElmt = document.getElementById("halfExitGap");
     const halfExitGapValueElmt = document.getElementById("halfExitGapValue");
     const halfExitGapLabelElmt = document.getElementById("halfExitGapLabel");
+    const secondExitOnlyLabelElmt = document.getElementById(
+      "secondExitOnlyLabel"
+    );
+    const secondExitOnlyElmt = document.getElementById("secondExitOnly");
+    const isExitOnlyType = panel.sign.guideArrow.includes("Exit Only");
 
-    exitOnlyDirectionLabel.className = !panel.sign.guideArrow.includes(
-      "Exit Only"
-    )
+    exitOnlyDirectionLabel.className = !isExitOnlyType
       ? "invisible"
       : "";
     exitOnlyPaddingLabel.className =
-      !panel.sign.guideArrow.includes("Exit Only") ||
+      !isExitOnlyType ||
         panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
-    showExitOnlyLabel.className = !panel.sign.guideArrow.includes("Exit Only")
+    showExitOnlyLabel.className = !isExitOnlyType
       ? "invisible"
       : "";
     if (hideExitArrowLabel) {
-      hideExitArrowLabel.className = !panel.sign.guideArrow.includes("Exit Only")
+      hideExitArrowLabel.className = !isExitOnlyType
         ? "invisible"
         : "";
     }
-    exitOnlyDirection.className = !panel.sign.guideArrow.includes("Exit Only")
+    exitOnlyDirection.className = !isExitOnlyType
       ? "invisible"
       : "";
     exitOnlyPadding.className =
-      !panel.sign.guideArrow.includes("Exit Only") ||
+      !isExitOnlyType ||
         panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
+    const showExitOnlyArrowHorizontalPadding =
+      panel.sign.guideArrow === "Exit Only" ||
+      panel.sign.guideArrow === "Half Exit Only";
+    for (const element of [
+      exitOnlyArrowHorizontalPaddingLabelElmt,
+      exitOnlyArrowHorizontalPaddingElmt,
+      exitOnlyArrowHorizontalPaddingValueElmt,
+    ]) {
+      if (element) {
+        element.classList.toggle(
+          "invisible",
+          !showExitOnlyArrowHorizontalPadding
+        );
+      }
+    }
     const isHalfExitOnly = panel.sign.guideArrow === "Half Exit Only";
     if (halfExitGapElmt) halfExitGapElmt.className = isHalfExitOnly ? "" : "invisible";
     if (halfExitGapValueElmt) halfExitGapValueElmt.className = isHalfExitOnly ? "" : "invisible";
     if (halfExitGapLabelElmt) halfExitGapLabelElmt.className = isHalfExitOnly ? "" : "invisible";
-    showExitOnly.className = !panel.sign.guideArrow.includes("Exit Only")
+    showExitOnly.className = !isExitOnlyType
       ? "invisible"
       : "";
     if (hideExitArrow) {
-      hideExitArrow.className = !panel.sign.guideArrow.includes("Exit Only")
+      hideExitArrow.className = !isExitOnlyType
         ? "invisible"
         : "";
+    }
+    if (secondExitOnlyLabelElmt) {
+      secondExitOnlyLabelElmt.classList.toggle("invisible", !isExitOnlyType);
+    }
+    if (secondExitOnlyElmt) {
+      secondExitOnlyElmt.classList.toggle("invisible", !isExitOnlyType);
     }
     if (exitOnlyLeftTextLabel && exitOnlyLeftTextInput) {
       exitOnlyLeftTextLabel.className = !panel.sign.guideArrow.includes(
@@ -5619,7 +6417,7 @@ const formHandler = (function () {
       exitOnlyRightTextInput.value = panel.sign.exitOnlyRightText || "";
     }
     paddingValue.className =
-      !panel.sign.guideArrow.includes("Exit Only") ||
+      !isExitOnlyType ||
         panel.sign.guideArrow == "Split Exit Only"
         ? "invisible"
         : "";
@@ -5649,6 +6447,22 @@ const formHandler = (function () {
     }
     exitOnlyPadding.value = panel.sign.exitOnlyPadding;
     exitOnlyPaddingValue.textContent = panel.sign.exitOnlyPadding;
+    const parsedExitOnlyArrowHorizontalPadding = parseFloat(
+      panel.sign.exitOnlyArrowHorizontalPadding
+    );
+    const resolvedExitOnlyArrowHorizontalPadding = Number.isFinite(
+      parsedExitOnlyArrowHorizontalPadding
+    )
+      ? Math.min(Math.max(parsedExitOnlyArrowHorizontalPadding, 0), 6)
+      : 0;
+    if (exitOnlyArrowHorizontalPaddingElmt) {
+      exitOnlyArrowHorizontalPaddingElmt.value =
+        resolvedExitOnlyArrowHorizontalPadding;
+    }
+    if (exitOnlyArrowHorizontalPaddingValueElmt) {
+      exitOnlyArrowHorizontalPaddingValueElmt.textContent =
+        resolvedExitOnlyArrowHorizontalPadding;
+    }
     const resolvedGap = typeof panel.sign.halfExitGap === "number" ? panel.sign.halfExitGap : 5;
     if (halfExitGapElmt) halfExitGapElmt.value = resolvedGap;
     if (halfExitGapValueElmt) halfExitGapValueElmt.textContent = resolvedGap;
@@ -6237,6 +7051,8 @@ const formHandler = (function () {
   return {
     init: initialize,
     readForm,
+    setPanelCorner,
+    clearBottomArrowKind,
     commitPanelPadding: commitPanelPaddingChange,
     updateForm,
     updateShieldSubform,

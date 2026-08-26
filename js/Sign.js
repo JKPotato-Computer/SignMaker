@@ -8,6 +8,11 @@ class Sign {
 	 * @param {boolean} [opt.shieldBacks=false] - Whether or not shields should be displayed with backings.
 	 * @param {string} [opt.guideArrow] - Which guide arrow to display on the sign, if any.
 	 * @param {number} [opt.guideArrowLanes=1] - Number of lanes actoss to display guide arrows.
+	 * @param {string} [opt.bottomArrowKind="None"] - Arrow block asset used for standard bottom arrows.
+	 * @param {number} [opt.bottomArrowRotation=0] - Rotation applied to standard bottom arrows.
+	 * @param {number} [opt.bottomArrowGap=0.5] - Padding around standard bottom arrows.
+	 * @param {number} [opt.bottomArrowSpacing=1] - Spacing between standard bottom arrows.
+	 * @param {number} [opt.exitOnlyArrowHorizontalPadding=0] - Extra horizontal padding around arrows inside an Exit Only or Half Exit Only row.
 	 * @param {string} [opt.otherSymbols] - Other symbols on the bottom of signs (like Quebec style exit markers)
 	 * @param {string} [opt.oSNum=""] - Number to place on otherSymbol
 	 * @param {string} [opt.actionMessage=""] - Custom subtext to display on the sign.
@@ -22,11 +27,17 @@ class Sign {
 		arrowMode = "Standard",
 		arrows = [],
 		aplArrows = [],
+		combineAPLExitOnlyLabels = false,
 		guideArrow,
 		guideArrowLanes = 1,
+		bottomArrowKind = "None",
+		bottomArrowRotation = 0,
+		bottomArrowGap = 0.5,
+		bottomArrowSpacing = 1,
 		useCanadianDownArrows = false,
 		exitguideArrows = "Down Arrow",
 		exitOnlyPadding = 0,
+		exitOnlyArrowHorizontalPadding = 0,
 		exitOnlyBorderMode,
 		exitOnlyLeftText = "EXIT",
 		exitOnlyRightText = "ONLY",
@@ -80,6 +91,22 @@ class Sign {
 		} else {
 			this.guideArrow = "None";
 		}
+		this.bottomArrowKind =
+			typeof bottomArrowKind === "string" && bottomArrowKind.length > 0
+				? bottomArrowKind
+				: "None";
+		const parsedBottomArrowRotation = parseFloat(bottomArrowRotation);
+		this.bottomArrowRotation = Number.isFinite(parsedBottomArrowRotation)
+			? parsedBottomArrowRotation
+			: 0;
+		const parsedBottomArrowGap = parseFloat(bottomArrowGap);
+		this.bottomArrowGap = Number.isFinite(parsedBottomArrowGap)
+			? Math.max(parsedBottomArrowGap, 0)
+			: 0.5;
+		const parsedBottomArrowSpacing = parseFloat(bottomArrowSpacing);
+		this.bottomArrowSpacing = Number.isFinite(parsedBottomArrowSpacing)
+			? Math.max(parsedBottomArrowSpacing, 0)
+			: 1;
 		if (guideArrowLanes >= 0 && guideArrowLanes <= 6) {
 			this.guideArrowLanes = guideArrowLanes;
 		} else {
@@ -107,8 +134,17 @@ class Sign {
 		this.arrowMode = arrowMode;
 		this.arrows = arrows;
 		this.aplArrows = aplArrows;
+		this.combineAPLExitOnlyLabels = !!combineAPLExitOnlyLabels;
 		this.exitguideArrows = exitguideArrows;
 		this.exitOnlyPadding = exitOnlyPadding;
+		const parsedExitOnlyArrowHorizontalPadding = parseFloat(
+			exitOnlyArrowHorizontalPadding
+		);
+		this.exitOnlyArrowHorizontalPadding = Number.isFinite(
+			parsedExitOnlyArrowHorizontalPadding
+		)
+			? Math.min(Math.max(parsedExitOnlyArrowHorizontalPadding, 0), 6)
+			: 0;
 		const exitOnlyBorderModes = Sign.prototype.exitOnlyBorderModes;
 		if (exitOnlyBorderModes.includes(exitOnlyBorderMode)) {
 			this.exitOnlyBorderMode = exitOnlyBorderMode;
@@ -395,21 +431,7 @@ Sign.prototype.guideArrows = [
 	"Side Right",
 	"Exit Only",
 	"Split Exit Only",
-	"Half Exit Only",
-	"Left/Down Arrow:A-3",
-	"Left Arrow:D-1",
-	"Left/Up Arrow:A-4",
-	"Right/Down Arrow:A-2",
-	"Right Arrow:D-2",
-	"Right/Up Arrow:A-1",
-	"Down Arrow:C-1",
-	"Up Arrow:C-2",
-	"alt. Left/Down Arrow:B-3",
-	"alt. Left/Up Arrow:B-4",
-	"alt. Right/Up Arrow:B-1",
-	"alt. Right/Down Arrow:B-2",
-	"Sharp Left:E-1",
-	"Sharp Right:E-2"
+	"Half Exit Only"
 ];
 Sign.prototype.exitguideArrows = [
 	"Down Arrow:EC-1/C-1",
@@ -428,9 +450,9 @@ Sign.prototype.exitOnlyBorderModes = [
 Sign.prototype.defaultPadding = "0.3rem 0.75rem 0.3rem 0.75rem";
 
 Sign.prototype.arrowPositions = [
-	"Middle",
 	"Left",
-	"Right"
+	"Right",
+	"Middle"
 ]
 
 Sign.prototype.otherSymbols = [

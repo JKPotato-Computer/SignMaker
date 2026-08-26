@@ -1,3 +1,10 @@
+const normalizeExitTabBoolean = (value) =>
+	value === true ||
+	value === "true" ||
+	value === 1 ||
+	value === "1" ||
+	value === "on";
+
 class ExitTab {
 	/**
 	 * Creates a new ExitTab.
@@ -15,6 +22,9 @@ class ExitTab {
 		useTextBasedIcon = false,
 		fullBorder = ExitTab.prototype.defaultFullBorder,
 		squareCorners = ExitTab.prototype.defaultSquareCorners,
+		extendHorizontalPadding =
+			ExitTab.prototype.defaultExtendHorizontalPadding,
+		matchSignCornerRadius = ExitTab.prototype.defaultMatchSignCornerRadius,
 		attached = ExitTab.prototype.defaultAttached,
 		topOffset = ExitTab.prototype.defaultTopOffset,
 		showLeft = false,
@@ -62,8 +72,34 @@ class ExitTab {
 			this.variant = this.variants[0];
 		}
 
+		const sourceOptions =
+			arguments.length > 0 &&
+			arguments[0] &&
+			typeof arguments[0] === "object"
+				? arguments[0]
+				: null;
+		const hasExplicitHorizontalPadding =
+			sourceOptions &&
+			Object.prototype.hasOwnProperty.call(
+				sourceOptions,
+				"extendHorizontalPadding"
+			);
+
 		this.fullBorder = fullBorder;
-		this.squareCorners = squareCorners;
+		this.squareCorners = normalizeExitTabBoolean(squareCorners);
+		// Before these controls were separated, squareCorners also extended the
+		// padding. Preserve that appearance when loading older saved tabs that do
+		// not yet have an explicit padding preference.
+		this.extendHorizontalPadding = hasExplicitHorizontalPadding
+			? normalizeExitTabBoolean(extendHorizontalPadding)
+			: sourceOptions
+				? this.squareCorners
+				: normalizeExitTabBoolean(
+					ExitTab.prototype.defaultExtendHorizontalPadding
+				);
+		this.matchSignCornerRadius = normalizeExitTabBoolean(
+			matchSignCornerRadius
+		);
 		this.attached = !!attached;
 		const parsedBorderThickness =
 			typeof borderThickness === "number"
@@ -144,6 +180,8 @@ class ExitTab {
 			variant: exisitingTab.variant,
 			icon: exisitingTab.icon,
 			squareCorners: exisitingTab.squareCorners,
+			extendHorizontalPadding: exisitingTab.extendHorizontalPadding,
+			matchSignCornerRadius: exisitingTab.matchSignCornerRadius,
 			fullBorder: exisitingTab.fullBorder,
 			attached: exisitingTab.attached,
 			borderThickness: exisitingTab.borderThickness,
@@ -169,6 +207,8 @@ ExitTab.prototype.defaultBorderThickness = 0.2;
 ExitTab.prototype.defaultTollLogoSize = 3;
 ExitTab.prototype.defaultFullBorder = false;
 ExitTab.prototype.defaultSquareCorners = false;
+ExitTab.prototype.defaultExtendHorizontalPadding = false;
+ExitTab.prototype.defaultMatchSignCornerRadius = false;
 ExitTab.prototype.defaultAttached = false;
 ExitTab.prototype.defaultTopOffset = true;
 ExitTab.prototype.defaultFHWAFont = false;

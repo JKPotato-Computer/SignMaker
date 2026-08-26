@@ -89,36 +89,31 @@ nav#sMConfigBar {
 }
 
 .sMModal {
-  max-width: 80vh;
   background: var(--hotbarColor);
   display: none;
-  min-width: 45vh;
+  min-width: min(45vh, calc(100vw - 3rem));
   width: max-content;
+  max-width: min(80vh, calc(100vw - 3rem));
   height: max-content;
+  overflow: hidden;
 }
 
 .sMModalContent {
+  width: 100%;
+  max-width: 100%;
   padding: 1rem;
   max-height: 80vh;
-  overflow-x: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .modals {
-  width: max-content;
-  inset: 1.5rem;
+  width: fit-content;
+  max-width: min(80vh, calc(100vw - 3rem));
+  inset: 1.5rem auto auto 1.5rem;
   position: fixed;
   height: max-content;
-  max-height: 87.5%;
-}
-
-#export,
-#exportDownload {
-  background-color: rgba(255, 0, 0, 0.25);
-}
-
-#export.hover,
-#exportDownload.hover {
-  background-color: rgba(255, 0, 0, 0.5);
+  max-height: calc(100dvh - 3rem);
 }
 
 .copyPanelContextMenu {
@@ -406,9 +401,29 @@ label span.toolTip,
 
 .sMModalContent>div:not(#sMSPSettings),
 #sMSPSettings>div {
-  width: max-content;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   flex-grow: 1;
   height: 100%;
+}
+
+.sMModalContent div,
+.sMModalContent input,
+.sMModalContent select,
+.sMModalContent textarea,
+.sMModalContent button,
+.sMModalContent fieldset,
+.sMModalContent label,
+nav.sMModalBar,
+nav.sMModalBar>* {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sMModalContent textarea {
+  min-width: 0;
 }
 
 legend {
@@ -422,9 +437,11 @@ legend {
 nav.sMModalBar {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: left;
   align-items: center;
   height: max-content;
+  max-width: 100%;
   background-color: rgba(var(--baseColor), 0.5);
 }
 
@@ -481,6 +498,15 @@ div.sMModalTitle {
   display: none !important;
 }
 
+.sMModalContent .invisible {
+  display: none !important;
+}
+
+#exitOnlyDirectionLabel,
+#exitOnlyDirection {
+  display: none !important;
+}
+
 div#sMPanelPadding,
 div#sMExitTabSetting,
 div#sMSPSettings,
@@ -500,9 +526,11 @@ input[type="number"] {
 .listNav {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   flex-grow: 1;
+  min-width: 0;
 }
 
 .listNavOptions {
@@ -616,14 +644,23 @@ div.options a {
 .SMSPNewElementHolder {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 16rem;
   background-color: rgb(var(--baseColor), 0.4);
 }
 
 .SMSPNewElementHolder>span {
+  flex: 0 0 auto;
   font-size: 0.7rem;
+}
+
+.SMSPNewElementHolder>select {
+  flex: 1 1 8rem;
+  width: auto !important;
 }
 
 /* OLD - TO CONFIGURE */
@@ -848,6 +885,15 @@ input[type="button"]:disabled {
   animation: none;
 }
 
+#sMSPCreateElement[draggable="true"] {
+  cursor: grab;
+}
+
+#sMSPCreateElement.dragging {
+  opacity: 0.55;
+  cursor: grabbing;
+}
+
 .textEditorBlock.dropBefore::before,
 .textEditorBlock.dropAfter::after {
   content: "";
@@ -870,6 +916,38 @@ input[type="button"]:disabled {
 
 .sMControlRow.dropActive {
   background-color: rgba(var(--baseColor), 0.35);
+}
+
+.sMControlRow {
+  transition: margin 0.12s ease;
+}
+
+#sMSPTextList.blockCreateDragActive .sMControlRow {
+  margin-top: 0.5rem;
+}
+
+#sMSPTextList.blockCreateDragActive .sMControlRow.lastBlockEditorRow {
+  margin-bottom: 0.5rem;
+}
+
+.sMControlRow.newBlockRowBefore::before,
+.sMControlRow.newBlockRowAfter::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 0.2rem;
+  border-radius: 0.2rem;
+  background: var(--selectedColor);
+  pointer-events: none;
+}
+
+.sMControlRow.newBlockRowBefore::before {
+  top: -0.55rem;
+}
+
+.sMControlRow.newBlockRowAfter::after {
+  bottom: -0.55rem;
 }
 
 #sMSPCreateRow.dropActive {
@@ -1163,11 +1241,12 @@ nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
 }
 
 #sMSPCreate,
-#smSPElement,
+#sMSPElement,
 #smSPShieldHeader,
 #smSPShieldList {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 0.4rem;
@@ -1176,7 +1255,7 @@ nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
   width: 100%;
 }
 
-#smSPElement,
+#sMSPElement,
 #smSPShieldList {
   gap: 1rem;
 }
@@ -1196,6 +1275,22 @@ nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.15);
   padding: 0.5rem;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.sMControlRow {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .smControlRow {
@@ -1452,6 +1547,7 @@ nav#SMConfigBar.invisible>.sMConfigOption:not(#hideConfig) {
 #smSPShieldImgConfig {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 1rem;
@@ -1805,7 +1901,8 @@ dialog:not([open]) {
   font-size: 1rem;
 }
 
-:root:not([data-theme="dark"]) #arrowGrid .iconGridItem img {
+:root:not([data-theme="dark"]) #arrowGrid .iconGridItem img,
+:root:not([data-theme="dark"]) #bottomArrowGrid .iconGridItem img {
   filter: invert(1);
 }
 
@@ -1885,6 +1982,14 @@ dialog:not([open]) {
   width: max-content;
 }
 
+.aplCombineExitOnlySetting {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: max-content;
+  margin: 0 0 0.5rem;
+}
+
 #aplArrowList {
   width: min(44rem, calc(100vw - 4rem));
   max-width: 100%;
@@ -1931,7 +2036,7 @@ dialog:not([open]) {
 
 .aplArrowListItem {
   display: grid;
-  grid-template-columns: 3rem minmax(10rem, 1fr) 6rem 4.5rem;
+  grid-template-columns: 3rem minmax(0, 1fr) 6rem 4.5rem;
   gap: 0.45rem;
   align-items: center;
   width: 100%;
@@ -2018,26 +2123,74 @@ dialog:not([open]) {
 }
 
 /* Template Management Styles */
+.templateEditingNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  max-width: 46rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  background: rgba(var(--baseColor), 0.12);
+}
+
+.templateEditingNotice[hidden] {
+  display: none !important;
+}
+
+.templateEditingNotice span {
+  min-width: 0;
+}
+
 .templateSaveSection {
   margin-bottom: 1rem;
+  max-width: 46rem;
 }
 
-.templateSaveSection h4 {
-  margin-bottom: 0.5rem;
+.templateSaveSection h4,
+.templateListSection h4 {
+  margin: 0 0 0.75rem;
 }
 
-.templateSaveInput {
+.templateSaveInput,
+.templateSearchSortRow,
+.templateAddVariantRow,
+.templateEditorActions,
+.templateEditorFooter {
   display: flex;
+  flex-direction: row;
   gap: 0.5rem;
   align-items: center;
+  margin-bottom: 0.65rem;
 }
 
-.templateSaveInput input {
-  flex: 1;
+.templateSaveInput input,
+.templateSearchSortRow input {
+  width: 15rem;
+  min-width: 15rem;
+  flex: 0 0 15rem;
 }
 
-.templateListSection h4 {
-  margin-bottom: 0.5rem;
+.templateSearchSortRow select {
+  width: 10.5rem;
+}
+
+.templates select {
+  -moz-appearance: auto;
+  -webkit-appearance: menulist;
+  appearance: auto;
+  background-image: none;
+  padding-right: 0.35rem;
+}
+
+.templateWarningSetting {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.templateListSection {
+  max-width: min(72rem, 100%);
 }
 
 #savedTemplatesList {
@@ -2045,26 +2198,65 @@ dialog:not([open]) {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.45rem;
+  padding-right: 0.25rem;
+}
+
+.templateEmptyMessage {
+  padding: 1rem;
+  opacity: 0.75;
+  margin: 0;
 }
 
 .templateItem {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(13rem, 20rem) max-content;
   align-items: center;
-  padding: 0.5rem;
-  gap: 0.5rem;
+  column-gap: 1rem;
+  row-gap: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(var(--baseColor), 0.12);
 }
 
 .templateItemInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
-  flex: 1;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.templateNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
 .templateItemName {
   font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.templateVariantSelect {
+  width: auto;
+  max-width: 11rem;
+  min-width: 6rem;
+}
+
+.templateEditBtn {
+  width: 1.8rem;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.templateEditBtn .material-symbols-outlined {
+  font-size: 1.05rem;
 }
 
 .templateItemDate {
@@ -2074,16 +2266,89 @@ dialog:not([open]) {
 
 .templateItemActions {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .templateLoadBtn,
 .templateDeleteBtn {
-  padding: 0.25rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.templateLoadBtn .material-symbols-outlined,
+.templateDeleteBtn .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+.templateReplacePanelBtn[draggable="true"] {
+  cursor: grab;
+}
+
+.templateReplacePanelBtn.templateDragging {
+  opacity: 0.55;
+  cursor: grabbing;
+}
+
+.templateDeleteBtn {
+  width: 2rem;
+  min-width: 2rem;
+  padding: 0;
 }
 
 .templates .sMModalContent hr {
   margin: 1rem 0;
+}
+
+#templateEditorForm[hidden],
+#templateEditorEmpty[hidden] {
+  display: none !important;
+}
+
+.templateEditorFields {
+  display: grid;
+  grid-template-columns: 8rem minmax(12rem, 1fr);
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.templateEditorFields input,
+.templateEditorFields select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.templateEditorHint {
+  max-width: 36rem;
+  margin: 0.8rem 0;
+  opacity: 0.75;
+}
+
+.templateAddVariantRow input {
+  min-width: 10rem;
+}
+
+.templateEditorFooter {
+  margin: 1rem 0 0;
+}
+
+@media (max-width: 980px) {
+  .templateItem {
+    grid-template-columns: 1fr;
+  }
+
+  .templateItemActions {
+    justify-content: flex-start;
+  }
 }
   font-size: 0.9rem;
 }
@@ -2121,6 +2386,7 @@ dialog:not([open]) {
 
 :root[data-theme="dark"] #iconSearch,
 :root[data-theme="dark"] #arrowSearch,
+:root[data-theme="dark"] #bottomArrowSearch,
 :root[data-theme="dark"] #tollLogoSearch {
   background-color: rgb(50, 50, 50);
   color: white;
@@ -2299,6 +2565,7 @@ dialog:not([open]) {
   .modals {
     inset: auto 0 var(--mobile-tabbar-height) 0;
     width: 100%;
+    max-width: none;
     height: auto;
     max-height: none;
     z-index: 4;
@@ -2339,7 +2606,8 @@ dialog:not([open]) {
 
   .sMModalContent {
     max-height: calc(48dvh - 4.8rem);
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     padding: 0.75rem;
     -webkit-overflow-scrolling: touch;
   }
@@ -2626,13 +2894,14 @@ dialog:not([open]) {
 
   #sMSPTextList {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: hidden;
     padding-bottom: 0.15rem;
     -webkit-overflow-scrolling: touch;
   }
 
   .sMControlRow {
-    min-width: max-content;
+    min-width: 0;
+    flex-wrap: wrap;
   }
 
   .textEditorBlock {
@@ -2709,16 +2978,33 @@ dialog:not([open]) {
     max-width: 100%;
   }
 
-  .templates #sMTemplatesPreset button,
-  .templates #saveTemplateBtn {
+  .templates #savePanelTemplateBtn,
+  .templates #savePostTemplateBtn {
     width: 100%;
     margin: 0.25rem 0;
   }
 
-  .templateSaveInput {
+  .templateSaveInput,
+  .templateSearchSortRow,
+  .templateAddVariantRow,
+  .templateEditorActions,
+  .templateEditorFooter {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 0.4rem;
+  }
+
+  .templateSaveInput input,
+  .templateSearchSortRow input,
+  .templateSearchSortRow select,
+  .templateAddVariantRow input,
+  .templateAddVariantRow select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .templateEditorFields {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .templateItem,

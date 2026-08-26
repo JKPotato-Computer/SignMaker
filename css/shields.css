@@ -7,6 +7,31 @@
 	height: 3rem;
 }
 
+/* Outline the white standard U.S. Route SVG only on effective white blocks. */
+.blockElementMaster .bannerShieldContainer.US .shieldImg {
+	filter: var(--usRouteShieldOutline, none);
+}
+
+.panel.white {
+	--usRouteShieldOutline:
+		drop-shadow(1px 0 0 var(--black))
+		drop-shadow(-1px 0 0 var(--black))
+		drop-shadow(0 1px 0 var(--black))
+		drop-shadow(0 -1px 0 var(--black));
+}
+
+.blockElementRow[data-block-background-color="white"] {
+	--usRouteShieldOutline:
+		drop-shadow(1px 0 0 var(--black))
+		drop-shadow(-1px 0 0 var(--black))
+		drop-shadow(0 1px 0 var(--black))
+		drop-shadow(0 -1px 0 var(--black));
+}
+
+.blockElementRow:not([data-block-background-color="white"]):not([data-block-background-color="inherit"]) {
+	--usRouteShieldOutline: none;
+}
+
 .to {
 	--fhwaBaselineOffset: 0px;
 	display: none;
@@ -48,7 +73,22 @@
 	margin-bottom: auto;
 	position: relative;
 	top: -0.4rem;
-	white-space: pre-line;
+	white-space: pre-wrap;
+}
+
+/* MUTCD-style yellow TOLL plaque. Keep the existing banner layout while
+	giving the plaque a little more rounding than ordinary shield banners. */
+.bannerShieldContainer .bannerA.TOLL,
+.bannerShieldContainer .bannerB.TOLL {
+	box-sizing: border-box;
+	width: max-content;
+	background-color: var(--yellow);
+	color: var(--black) !important;
+	border: none;
+	border-radius: calc(0.15rem * var(--shieldScale, 1));
+	padding: calc(0.1rem * var(--shieldScale, 1)) calc(0.35rem * var(--shieldScale, 1));
+	line-height: 0.9;
+	text-align: center;
 }
 
 .bannerA.multilineBanner,
@@ -397,6 +437,10 @@
 	font-family: "Series C";
 	font-size: 1.3em;
 	top: 0.7em;
+}
+
+.bannerShieldContainer.FL.toll .routeNumber {
+	left: -0.2rem;
 }
 
 .bannerShieldContainer.FL.turnpike .routeNumber {

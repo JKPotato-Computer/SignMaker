@@ -360,6 +360,11 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   display: block;
 }
 
+.bE-iconElement.invertColor img {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+}
+
 .bE-iconElement.hasBackground {
   background-color: var(--iconBgColor, inherit);
   padding: 0.2rem;

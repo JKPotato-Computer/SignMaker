@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="svg4523" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" version="1.1" viewBox="0 0 501.1 501">
+  <!-- Generator: Adobe Illustrator 29.8.3, SVG Export Plug-In . SVG Version: 2.1.1 Build 3)  -->
+  <defs>
+    <style>
+      .st0, .st1 {
+        fill-rule: evenodd;
+      }
+
+      .st0, .st2 {
+        fill: #fff;
+      }
+
+      .st1 {
+        fill: #00437b;
+      }
+
+      .st2 {
+        stroke: #000;
+        stroke-miterlimit: 11.8;
+        stroke-width: 1px;
+      }
+    </style>
+  </defs>
+  <g id="layer1">
+    <g id="g5257">
+      <g id="g3933">
+        <path id="path3935" class="st2" d="M250.5,500.5L.5,375.4V125.4L250.5.5l250,124.9v250l-250,125.1"/>
+      </g>
+      <g id="g3929">
+        <path id="path3931" class="st1" d="M250.5,478.1l230.1-114.9v-225.4L250.5,22.8,20.4,137.7v225.4l230.1,114.9"/>
+      </g>
+      <path id="path3939" class="st0" d="M460.7,350.9v-200.9L250.5,45,40.3,150v200.9l210.2,105,210.2-105"/>
+    </g>
+  </g>
+</svg>

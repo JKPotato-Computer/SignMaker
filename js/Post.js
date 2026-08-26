@@ -42,6 +42,14 @@ class Post {
 		this.copySignsOnly = true;
 		this.copyScale = 8;
 		this.showBlockBoundingBoxes = false;
+		this.showAlignmentGuides = false;
+		this.alignmentGuideSpacing = this.normalizeAlignmentGuideSpacing(
+			Post.prototype.defaultAlignmentGuideSpacing
+		);
+		this.alignmentGuidePhase = this.normalizeAlignmentGuidePhase(
+			Post.prototype.defaultAlignmentGuidePhase,
+			this.alignmentGuideSpacing
+		);
 	}
 
 	/**
@@ -185,12 +193,33 @@ class Post {
 		);
 		return normalized || fallback;
 	}
+
+	normalizeAlignmentGuideSpacing(value) {
+		const fallback = Post.prototype.defaultAlignmentGuideSpacing || 4;
+		const parsed =
+			typeof value === "string" ? parseFloat(value) : Number(value);
+		return Number.isFinite(parsed)
+			? Math.min(15, Math.max(1, parsed))
+			: fallback;
+	}
+
+	normalizeAlignmentGuidePhase(value, spacing = this.alignmentGuideSpacing) {
+		const normalizedSpacing = this.normalizeAlignmentGuideSpacing(spacing);
+		const fallback = Post.prototype.defaultAlignmentGuidePhase || 0;
+		const parsed =
+			typeof value === "string" ? parseFloat(value) : Number(value);
+		return Number.isFinite(parsed)
+			? Math.min(normalizedSpacing, Math.max(0, parsed))
+			: Math.min(normalizedSpacing, Math.max(0, fallback));
+	}
 }
 
 Post.prototype.panelOrientations = ["Horizontal", "Vertical"];
 Post.prototype.defaultPanelOrientation = "Horizontal";
 Post.prototype.signAlignments = ["Center", "Top", "Bottom"];
 Post.prototype.defaultSignAlignment = "Center";
+Post.prototype.defaultAlignmentGuideSpacing = 4;
+Post.prototype.defaultAlignmentGuidePhase = 0;
 
 Post.cloneData = function (value) {
 	if (Array.isArray(value)) {
