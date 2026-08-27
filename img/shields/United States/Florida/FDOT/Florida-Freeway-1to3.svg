@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36" viewBox="0 0 48 36" role="img" aria-labelledby="title source">
-  <title id="title">FDOT Florida freeway route marker, one to three digits</title>
-  <metadata id="source">FDOT FY 2026-27 Standard Plans, Index 700-102, Special Sign Details, sheets 15-16 of 21. Current plan set with 2026 errata incorporated.</metadata>
-  <rect width="48" height="36" rx="2.5" fill="#ffffff"/>
-  <rect x="1.5" y="1.5" width="45" height="33" rx="1" fill="none" stroke="#000000" stroke-width="0.625"/>
-  <path d="M37.5032 30.6096L37.8134 31.6434L38.4119 31.9461L38.717 32L40.4644 31.7369L43.7928 29.1439L43.9522 28.9791L44 28.6669L43.9999 24.7749L42.3786 19.79L39.8993 16.4886L39.862 15.1177L37.0804 11.1989L35.4609 5.0873L34.8144 4.936L32.7191 4.9723L32.5491 5.0124L32.0054 5.6857L31.6216 5.7417L17.1218 5.7735L16.4715 5.6412L15.8671 4.4421L15.3924 4.332L4.9687 4L4.0899 4.1975L4 4.8371L4.2599 7.9056L4.4738 8.506L4.9975 8.6363L6.6007 8.7113L7.8807 8.3886L12.5562 9.8004L12.9053 9.9556L15.6572 12.1148L16.2601 12.0444L19.7753 10.9228L21.8455 11.9169L23.0389 11.6011" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="8"/>
-</svg>

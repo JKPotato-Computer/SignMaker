@@ -1,11 +1,13 @@
 # Florida official shield sources
 
-The FDOT SVGs in `FDOT/` reconstruct the Florida State, Toll, and Florida's
-Turnpike markers from the current FY 2026-27 FDOT Standard Plans, Index
-700-102, sheets 15 and 16. The source is the errata-incorporated edition
-currently served by FDOT as of August 2026. Newly created FDOT-specific U.S.,
-Interstate, and County variants were intentionally removed; the app's existing
-families remain unchanged.
+The FDOT SVGs in `FDOT/` reconstruct the Florida State guide, Toll, and
+Florida's Turnpike markers from the current FY 2026-27 FDOT Standard Plans,
+Index 700-102, sheets 15 and 16. The source is the errata-incorporated edition
+currently served by FDOT as of August 2026. The FDOT State catalogue contains
+only guide-sign constructions; Freeway and Independent variants are excluded
+because FDOT designates those two groups for independent use outside
+SignMaker's overhead-sign scope. FDOT-specific U.S., Interstate, and County
+variants are likewise excluded; the app's existing families remain unchanged.
 
 - Current FDOT Standard Plans: https://www.fdot.gov/design/standardplans/current
 - Current FDOT CADD files: https://www.fdot.gov/design/standardplans/current/dgns
@@ -15,57 +17,53 @@ families remain unchanged.
 - FY 2026-27 Industry Review package: https://fdotwww.blob.core.windows.net/sitefinity/docs/default-source/design/standardplans/irr/2027/700-102indreviewpkg.pdf?sfvrsn=998527d8_1
 
 The fixed FDOT lettering, Florida ribbons, and Turnpike silhouettes come from
-the plan's authored vector paths. Published inch dimensions control view boxes,
-corner radii, ribbon widths, dividers, cap heights, and placement. The 40x48
-FDOT Toll illustration contains 36-inch-wide authored content; it is centered
-with 2-inch side margins instead of being stretched to 40 inches.
+the plan's authored vector paths. The guide Florida ribbons are closed filled
+compounds reconstructed from the distinct fixed and variable CADD polygons,
+not browser strokes around an approximate centerline. Their CADD rail geometry
+is retained while the 1.75-inch physical band and dimensioned 1.25-inch outer
+clearance remain fixed for all three panel heights. Published inch dimensions
+control view boxes, corner radii, ribbon widths, dividers, cap heights, and
+placement. The 40x48 FDOT Toll illustration contains 36-inch-wide authored
+content; it is centered with 2-inch side margins instead of being stretched to
+40 inches.
 
-FDOT State live numerals use the specified Series C or D, physical cap height,
+FDOT State guide numerals use the specified Series D, physical cap height,
 and dimensioned cap top. Guide-marker ink edges use the published `A-G` or `E`
 location, measured from the rendered glyph bounds rather than the CSS text box.
 Natural Roadgeek advances are retained with zero added tracking and kerning.
 The official Series D spacing intentionally leaves a wider left space on the
 digit `3`; these FDOT/CFX markers therefore do not use SignMaker's legacy
 noninitial-`3` tightening rule.
-The 3-or-more-digit guide width is published as variable from 48 to 58 inches;
-FDOT does not assign 53- and 58-inch widths to the 30- and 36-inch-high
-markers. SignMaker therefore starts with a 48-inch-wide construction and uses
-the sheet's dimension scheme for each numeral combination:
+FDOT publishes the 3-or-more-digit guide width as variable from 48 to 58
+inches; it does not assign 53- and 58-inch widths to the 30- and 36-inch-high
+markers. SignMaker intentionally limits this family to three-character route
+legends because four-digit Florida routes are outside the app's scope. It still
+starts with the official 48-inch-wide construction and uses the sheet's
+dimension scheme for each supported numeral combination:
 `width = clamp(48, 58, E + natural numeral ink width + G)`, where `E` is 1.25
 inches and `G` is 8.25, 8.75, or 11 inches for the 24-, 30-, or 36-inch-high
-marker. The Florida outline remains anchored to the right-hand edge as the
-panel changes width.
+marker. With the bundled Series D metrics, numeric three-character legends
+remain 48 inches wide at 24-inch height, range from 48 to 50.2 inches at
+30-inch height, and range from 48 to 52.45 inches at 36-inch height. The
+published 58-inch ceiling is consequently retained as source geometry but is
+unreachable for a numeric three-character legend. The Florida outline remains
+anchored to the right-hand edge as the panel changes width.
 
-The 24x24 3-digit-cluster choice is also retained separately. It follows the
-sheet's exception for a 3-digit route used in a sign cluster with other 24x24
-panels and uses an 8-inch Series D numeral.
-
-The current errata deliberately distinguishes the guide constructions. The
-fixed 1-2-digit marker retains its physical black border; the immediately
-preceding FY 2026-27 FDOT Industry Review sheet and the issued FY 2025-26 sheet
-both specify that border as 5/8 inch. For the revised 3-or-more-digit marker,
-FDOT removed both the border note and the thick CADD border while adding the
-48-58-inch width rule. SignMaker therefore leaves the variable-width marker
-borderless; the final detail's hairline rectangle is its drafting/cut edge, not
-physical black ink. The final sheet does not separately dimension the fixed
-marker's border inset, so its placement inside the cut edge is recorded as a
-reconstruction rather than a new callout.
-
-The current sheet retains physical borders on the independent-use State
-markers but does not restate their width. SignMaker uses the last explicit FDOT
-value of 5/8 inch for those borders as a continuity inference; it is not claimed
-as a new FY 2026-27 callout. The dimensioned Florida ribbon widths remain exact:
-1 inch for independent/freeway and 1.75 inches for guide markers. The state
-centerlines are derived from the authored vector ribbon rails, then restroked
-to those published widths; they are not claimed to be literal copies of a
-single centerline path.
-
-The sheet also leaves a few exemplar placements without independent numeric
-callouts. The freeway horizontal anchor and independent-use centering follow
-the current authored vectors; the four-digit freeway cap top extrapolates the
-published seven-inch lower clearance; and the optional 24x24 three-digit
-cluster uses the 30x24 row's eight-inch Series D treatment. These are recorded
-as current-source reconstructions, not separately published dimensions.
+All six guide constructions retain the rounded outer CADD contour. Its plotted
+lineweight converts to approximately 1/8 inch using the dimensioned 1.25-inch
+corner-radius scale; this is a CADD-display reconstruction, not a separately
+published fabrication callout. The fixed 1-2-digit construction additionally
+places a 5/8-inch physical black border on a centerline 5/8 inch inside the cut
+edge. Its ink therefore spans 5/16 to 15/16 inch, leaving 5/16 inch of white
+before the Florida ribbon begins at the dimensioned 1.25-inch outer rail. The
+current final sheet does not restate the 5/8-inch width; that value is retained
+from the issued FY 2025-26 sheet and the FY 2026-27 Industry Review detail. The
+current 3-or-more-digit CADD construction has only the common outer contour and
+no heavy inner border. At SignMaker's editor scale the physical 1/8-inch contour
+is less than one CSS pixel, so the variable-width preview adds a one-pixel
+display hairline above the seam cover. Export clones suppress that preview
+hairline and retain the dimensioned 1/8-inch inline SVG contour as the
+authoritative geometry.
 
 The CFX SVGs in `CFX/` implement the 2026 Toll Route Shield TM and TM-ALT
 details on sheets 5 and 6. The shell is built as a 0.75-inch white inset followed

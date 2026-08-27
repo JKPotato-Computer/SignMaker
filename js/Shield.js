@@ -140,10 +140,36 @@ class ShieldContainer {
   constructor({ } = {}) { }
 }
 
+Shield.prototype.migrateLegacyVariant = (name, variant) => {
+  const requestedVariant = String(variant ?? "");
+  const properties = Shield.prototype.getPropertiesFromName(name);
+  const legacyVariant =
+    properties?.legacyVariantAliases?.[requestedVariant.replace(/\s/g, "")];
+  const migratedVariant =
+    typeof legacyVariant === "string"
+      ? legacyVariant
+      : legacyVariant?.threeOrMore || legacyVariant?.oneToTwo;
+  return migratedVariant && properties?.variants?.includes(migratedVariant)
+    ? migratedVariant
+    : requestedVariant;
+};
+
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
-  variant = variant.replace(/\s/g, "");
+  variant = Shield.prototype.migrateLegacyVariant(name, variant).replace(
+    /\s/g,
+    ""
+  );
   if (name === "NV" && variant === "3Digit") {
     variant = "2Digit";
+  }
+
+  const properties = Shield.prototype.getPropertiesFromName(name);
+  const mappedAsset = properties?.assetPathByVariant?.[variant];
+  if (mappedAsset) {
+    return mappedAsset;
+  }
+  if (properties?.assetPath) {
+    return properties.assetPath;
   }
 
   let directory = "img/shields/";
@@ -577,94 +603,78 @@ Shield.prototype.shieldDirectory = {
     name: "FDOT Florida State Route",
     variants: [
       "Guide 42x36 1-2 Digit",
-      "Guide 48-58x36 3+ Digit",
+      "Guide 48-58x36 3 Digit",
       "Guide 36x30 1-2 Digit",
-      "Guide 48-58x30 3+ Digit",
+      "Guide 48-58x30 3 Digit",
       "Guide 30x24 1-2 Digit",
-      "Guide 48-58x24 3+ Digit",
-      "Freeway 48x36 1-3 Digit",
-      "Freeway 48x36 4 Digit",
-      "Independent 24x24 1-2 Digit",
-      "Independent 24x24 3 Digit Cluster",
-      "Independent 30x24 3-4 Digit",
+      "Guide 48-58x24 3 Digit",
     ],
     className: "FL FDOTSTATE",
     standard: "FDOT",
     officialDimensions: true,
+    maxRouteCharacters: 3,
     assetPathByVariant: {
       "Guide42x361-2Digit": `${fdotFolder}/Florida-Guide-42x36-1to2.svg`,
-      "Guide48-58x363+Digit": `${fdotFolder}/Florida-Guide-48x36-3plus.svg`,
+      "Guide48-58x363Digit": `${fdotFolder}/Florida-Guide-48x36-3plus.svg`,
       "Guide36x301-2Digit": `${fdotFolder}/Florida-Guide-36x30-1to2.svg`,
-      "Guide48-58x303+Digit": `${fdotFolder}/Florida-Guide-48x30-3plus.svg`,
+      "Guide48-58x303Digit": `${fdotFolder}/Florida-Guide-48x30-3plus.svg`,
       "Guide30x241-2Digit": `${fdotFolder}/Florida-Guide-30x24-1to2.svg`,
-      "Guide48-58x243+Digit": `${fdotFolder}/Florida-Guide-48x24-3plus.svg`,
-      "Freeway48x361-3Digit": `${fdotFolder}/Florida-Freeway-1to3.svg`,
-      Freeway48x364Digit: `${fdotFolder}/Florida-Freeway-4.svg`,
-      "Independent24x241-2Digit": `${fdotFolder}/Florida-Nonfreeway-1to2.svg`,
-      "Independent24x243DigitCluster": `${fdotFolder}/Florida-Nonfreeway-1to2.svg`,
-      "Independent30x243-4Digit": `${fdotFolder}/Florida-Nonfreeway-3to4.svg`,
+      "Guide48-58x243Digit": `${fdotFolder}/Florida-Guide-48x24-3plus.svg`,
     },
     physicalDimensionsByVariant: {
       "Guide42x361-2Digit": dimensions(42, 36),
-      "Guide48-58x363+Digit": dimensions(48, 36),
+      "Guide48-58x363Digit": dimensions(48, 36),
       "Guide36x301-2Digit": dimensions(36, 30),
-      "Guide48-58x303+Digit": dimensions(48, 30),
+      "Guide48-58x303Digit": dimensions(48, 30),
       "Guide30x241-2Digit": dimensions(30, 24),
-      "Guide48-58x243+Digit": dimensions(48, 24),
-      "Freeway48x361-3Digit": dimensions(48, 36),
-      Freeway48x364Digit: dimensions(48, 36),
-      "Independent24x241-2Digit": dimensions(24, 24),
-      "Independent24x243DigitCluster": dimensions(24, 24),
-      "Independent30x243-4Digit": dimensions(30, 24),
+      "Guide48-58x243Digit": dimensions(48, 24),
     },
     routeNumberByVariant: {
       "Guide42x361-2Digit": routeStyle(15, "Series D", 14.75, {
         rightIn: 31,
       }),
-      "Guide48-58x363+Digit": routeStyle(15, "Series D", 14.75, {
+      "Guide48-58x363Digit": routeStyle(15, "Series D", 14.75, {
         leftIn: 1.25,
         variablePanelWidth: variableGuidePanel(11),
       }),
       "Guide36x301-2Digit": routeStyle(15, "Series D", 11.75, {
         rightIn: 27.25,
       }),
-      "Guide48-58x303+Digit": routeStyle(15, "Series D", 11.75, {
+      "Guide48-58x303Digit": routeStyle(15, "Series D", 11.75, {
         leftIn: 1.25,
         variablePanelWidth: variableGuidePanel(8.75),
       }),
       "Guide30x241-2Digit": routeStyle(12, "Series D", 9.25, {
         rightIn: 21.75,
       }),
-      "Guide48-58x243+Digit": routeStyle(12, "Series D", 9.25, {
+      "Guide48-58x243Digit": routeStyle(12, "Series D", 9.25, {
         leftIn: 1.25,
         variablePanelWidth: variableGuidePanel(8.25),
       }),
-      "Freeway48x361-3Digit": routeStyle(15, "Series C", 14, { centerXIn: 19 }),
-      Freeway48x364Digit: routeStyle(12, "Series C", 17, { centerXIn: 19 }),
-      "Independent24x241-2Digit": routeStyle(10, "Series D", 9, { centerXIn: 12 }),
-      "Independent24x243DigitCluster": routeStyle(8, "Series D", 10.5, {
-        centerXIn: 12,
-      }),
-      "Independent30x243-4Digit": routeStyle(
-        8,
-        "Series D",
-        10.5,
-        { centerXIn: 15 },
-        { 4: "Series C" }
-      ),
     },
     autoVariantByCharacterCount: {
-      oneToTwo: "Independent 24x24 1-2 Digit",
-      threeOrMore: "Independent 30x24 3-4 Digit",
+      oneToTwo: "Guide 42x36 1-2 Digit",
+      threeOrMore: "Guide 48-58x36 3 Digit",
     },
     legacyVariantAliases: {
       "2DigitOverhead": "Guide 42x36 1-2 Digit",
-      "3DigitOverhead": "Guide 48-58x36 3+ Digit",
-      "Guide58x363+Digit": "Guide 48-58x36 3+ Digit",
-      "Guide53x303+Digit": "Guide 48-58x30 3+ Digit",
-      "Guide48x243+Digit": "Guide 48-58x24 3+ Digit",
-      "2Digit": "Independent 24x24 1-2 Digit",
-      "3Digit": "Independent 30x24 3-4 Digit",
+      "3DigitOverhead": "Guide 48-58x36 3 Digit",
+      "Guide48-58x363+Digit": "Guide 48-58x36 3 Digit",
+      "Guide48-58x303+Digit": "Guide 48-58x30 3 Digit",
+      "Guide48-58x243+Digit": "Guide 48-58x24 3 Digit",
+      "Guide58x363+Digit": "Guide 48-58x36 3 Digit",
+      "Guide53x303+Digit": "Guide 48-58x30 3 Digit",
+      "Guide48x243+Digit": "Guide 48-58x24 3 Digit",
+      "2Digit": "Guide 42x36 1-2 Digit",
+      "3Digit": "Guide 48-58x36 3 Digit",
+      "Freeway48x361-3Digit": {
+        oneToTwo: "Guide 42x36 1-2 Digit",
+        threeOrMore: "Guide 48-58x36 3 Digit",
+      },
+      Freeway48x364Digit: "Guide 48-58x36 3 Digit",
+      "Independent24x241-2Digit": "Guide 30x24 1-2 Digit",
+      "Independent24x243DigitCluster": "Guide 48-58x24 3 Digit",
+      "Independent30x243-4Digit": "Guide 48-58x24 3 Digit",
     },
   };
 

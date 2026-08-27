@@ -609,10 +609,17 @@ class ShieldElement extends Shield {
       this.shieldBase
     );
     const normalizedRoute = `${this.routeNumber ?? ""}`.trim();
-    const routeText = normalizedRoute;
+    const routeText = ShieldElement.prototype.limitRouteCharacters(
+      normalizedRoute,
+      config
+    );
+    if (routeText !== normalizedRoute) {
+      this.routeNumber = routeText;
+    }
     const migratedShieldType =
       ShieldElement.prototype.migrateLegacyBlockVariant(
         this.shieldType,
+        routeText,
         config
       );
     if (migratedShieldType !== this.shieldType) {
@@ -838,8 +845,53 @@ class ShieldElement extends Shield {
           1.5 / officialPhysicalDimensions.heightIn
         })`
       );
+      shieldEl.style.setProperty(
+        "--variableGuideArtworkClip",
+        `calc(var(--shieldSize) * ${
+          0.25 / officialPhysicalDimensions.heightIn
+        })`
+      );
     }
     shieldEl.appendChild(img);
+
+    let variableGuideContour = null;
+    let variableGuideContourRect = null;
+    if (
+      variablePanelWidth &&
+      officialPhysicalDimensions &&
+      shieldContainer.classList.contains("FDOTSTATE")
+    ) {
+      const svgNamespace = "http://www.w3.org/2000/svg";
+      const initialWidthIn = Number(officialPhysicalDimensions.widthIn);
+      const heightIn = Number(officialPhysicalDimensions.heightIn);
+      variableGuideContour = document.createElementNS(svgNamespace, "svg");
+      variableGuideContour.classList.add("variableGuideContour");
+      variableGuideContour.setAttribute(
+        "viewBox",
+        `0 0 ${initialWidthIn} ${heightIn}`
+      );
+      variableGuideContour.setAttribute("preserveAspectRatio", "none");
+      variableGuideContour.setAttribute("aria-hidden", "true");
+      variableGuideContour.setAttribute("focusable", "false");
+
+      variableGuideContourRect = document.createElementNS(
+        svgNamespace,
+        "rect"
+      );
+      variableGuideContourRect.setAttribute("x", "0.0625");
+      variableGuideContourRect.setAttribute("y", "0.0625");
+      variableGuideContourRect.setAttribute(
+        "width",
+        String(initialWidthIn - 0.125)
+      );
+      variableGuideContourRect.setAttribute("height", String(heightIn - 0.125));
+      variableGuideContourRect.setAttribute("rx", "1.1875");
+      variableGuideContourRect.setAttribute("fill", "none");
+      variableGuideContourRect.setAttribute("stroke", "#000000");
+      variableGuideContourRect.setAttribute("stroke-width", "0.125");
+      variableGuideContour.appendChild(variableGuideContourRect);
+      shieldEl.appendChild(variableGuideContour);
+    }
 
     const routeEl = document.createElement("p");
     routeEl.className = "routeNumber";
@@ -945,6 +997,8 @@ class ShieldElement extends Shield {
         routeCharacterCount,
         officialPhysicalDimensions,
         useOfficialDimensions: this.useOfficialDimensions,
+        variableGuideContour,
+        variableGuideContourRect,
       });
     }
 
@@ -1163,6 +1217,8 @@ ShieldElement.prototype.scheduleOfficialRouteNumberLayout = function ({
   routeCharacterCount,
   officialPhysicalDimensions,
   useOfficialDimensions,
+  variableGuideContour,
+  variableGuideContourRect,
 }) {
   const layout = () => {
     if (!routeEl.isConnected || !shieldEl.isConnected) {
@@ -1256,6 +1312,16 @@ ShieldElement.prototype.scheduleOfficialRouteNumberLayout = function ({
       shieldEl.style.setProperty("--variableGuideAssetWidth", assetWidthCss);
       wrapper.style.setProperty("--shieldWidth", renderedWidthCss);
       wrapper.dataset.widthIn = String(renderedWidthIn);
+      if (variableGuideContour && variableGuideContourRect) {
+        variableGuideContour.setAttribute(
+          "viewBox",
+          `0 0 ${renderedWidthIn} ${officialHeight}`
+        );
+        variableGuideContourRect.setAttribute(
+          "width",
+          String(renderedWidthIn - 0.125)
+        );
+      }
     }
 
     let targetPosition;
@@ -1371,6 +1437,7 @@ ShieldElement.prototype.buildBlockShieldList = function () {
           county: value.county === true,
           standard: value.standard || null,
           officialDimensions: value.officialDimensions === true,
+          maxRouteCharacters: value.maxRouteCharacters || null,
           physicalDimensionsByVariant: value.physicalDimensionsByVariant || null,
           routeNumberByVariant: value.routeNumberByVariant || null,
           autoVariantByCharacterCount:
@@ -1408,6 +1475,7 @@ ShieldElement.prototype.buildBlockShieldList = function () {
       county: definition.county === true,
       standard: definition.standard || null,
       officialDimensions: definition.officialDimensions === true,
+      maxRouteCharacters: definition.maxRouteCharacters || null,
       physicalDimensionsByVariant:
         definition.physicalDimensionsByVariant || null,
       routeNumberByVariant: definition.routeNumberByVariant || null,
@@ -2004,7 +2072,10 @@ ShieldElement.prototype.resolveBlockVariant = function (
     const legacyVariantKey = ShieldElement.prototype.formatVariantKey(
       normalized
     );
-    const migratedVariant = config?.legacyVariantAliases?.[legacyVariantKey];
+    const migratedVariant = ShieldElement.prototype.resolveLegacyVariantAlias(
+      config?.legacyVariantAliases?.[legacyVariantKey],
+      routeNumber
+    );
     if (migratedVariant && allowed.includes(migratedVariant)) {
       return migratedVariant;
     }
@@ -2017,6 +2088,7 @@ ShieldElement.prototype.resolveBlockVariant = function (
 
 ShieldElement.prototype.migrateLegacyBlockVariant = function (
   desiredVariant,
+  routeNumber,
   config
 ) {
   if (typeof desiredVariant !== "string") {
@@ -2032,8 +2104,26 @@ ShieldElement.prototype.migrateLegacyBlockVariant = function (
     return desiredVariant;
   }
   const legacyKey = ShieldElement.prototype.formatVariantKey(requested);
-  const migrated = config?.legacyVariantAliases?.[legacyKey];
+  const migrated = ShieldElement.prototype.resolveLegacyVariantAlias(
+    config?.legacyVariantAliases?.[legacyKey],
+    routeNumber
+  );
   return migrated && allowed.includes(migrated) ? migrated : desiredVariant;
+};
+
+ShieldElement.prototype.resolveLegacyVariantAlias = function (
+  alias,
+  routeNumber
+) {
+  if (typeof alias === "string") {
+    return alias;
+  }
+  if (!alias || typeof alias !== "object") {
+    return null;
+  }
+  return ShieldElement.prototype.getRouteCharacterCount(routeNumber) >= 3
+    ? alias.threeOrMore
+    : alias.oneToTwo;
 };
 
 ShieldElement.prototype.getVariantFromRoute = function (routeNumber, config) {
@@ -2068,6 +2158,15 @@ ShieldElement.prototype.getRouteCharacterCount = function (routeNumber) {
   } catch (error) {
     return (rawRoute.match(/[A-Za-z0-9]/g) || []).length;
   }
+};
+
+ShieldElement.prototype.limitRouteCharacters = function (routeNumber, config) {
+  const normalizedRoute = String(routeNumber ?? "").trim();
+  const maximumCharacters = Math.trunc(Number(config?.maxRouteCharacters));
+  if (!(maximumCharacters > 0)) {
+    return normalizedRoute;
+  }
+  return Array.from(normalizedRoute).slice(0, maximumCharacters).join("");
 };
 
 ShieldElement.prototype.getRouteSizeClassFromCount = function (count) {

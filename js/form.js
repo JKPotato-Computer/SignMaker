@@ -2698,6 +2698,9 @@ const formHandler = (function () {
     );
     let divider_colorSelect = document.querySelector("#sdBlocker_dividerColor");
     let shield_shieldBase = document.querySelector("#sdShield_shieldBase");
+    const shieldRouteNumberInput = document.querySelector(
+      "#sdShield_routeNumber"
+    );
     let iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
     const beaconColorSelect = document.querySelector("#sdBeacon_color");
     const controlTextColorSelect = document.querySelector(
@@ -2946,10 +2949,18 @@ const formHandler = (function () {
         shield_shieldBase?.value || ShieldElement.prototype.defaultShieldBase,
         shieldVariantSelect.value
       );
+      syncShieldRouteCharacterLimit(
+        shield_shieldBase?.value || ShieldElement.prototype.defaultShieldBase,
+        shieldRouteNumberInput
+      );
 
       if (shield_shieldBase) {
         shield_shieldBase.addEventListener("change", () => {
           populateVariantOptions(shield_shieldBase.value, null);
+          syncShieldRouteCharacterLimit(
+            shield_shieldBase.value,
+            shieldRouteNumberInput
+          );
         });
       }
     }
@@ -3369,6 +3380,26 @@ const formHandler = (function () {
     ]);
   };
 
+  const syncShieldRouteCharacterLimit = (
+    shieldBase,
+    routeInput = document.getElementById("sdShield_routeNumber")
+  ) => {
+    if (!routeInput) {
+      return;
+    }
+    const config = ShieldElement.prototype.getBlockShieldConfig(shieldBase);
+    const maximumCharacters = Math.trunc(Number(config?.maxRouteCharacters));
+    if (maximumCharacters > 0) {
+      routeInput.maxLength = maximumCharacters;
+      routeInput.value = ShieldElement.prototype.limitRouteCharacters(
+        routeInput.value,
+        config
+      );
+    } else {
+      routeInput.removeAttribute("maxlength");
+    }
+  };
+
   // Handle Form
   // Read the form and update the page by redrawing it.
   const readForm = function () {
@@ -3716,6 +3747,24 @@ const formHandler = (function () {
     }
 
     if (blockElemType === "sdShield") {
+      const shieldConfig = ShieldElement.prototype.getBlockShieldConfig(
+        currentBlockElem.shieldBase
+      );
+      currentBlockElem.routeNumber =
+        ShieldElement.prototype.limitRouteCharacters(
+          currentBlockElem.routeNumber,
+          shieldConfig
+        );
+      const routeNumberInput = document.getElementById(
+        "sdShield_routeNumber"
+      );
+      syncShieldRouteCharacterLimit(
+        currentBlockElem.shieldBase,
+        routeNumberInput
+      );
+      if (routeNumberInput) {
+        routeNumberInput.value = currentBlockElem.routeNumber;
+      }
       currentBlockElem.shieldSize =
         ShieldElement.prototype.normalizeShieldSize(
           currentBlockElem.shieldSize
@@ -5867,9 +5916,16 @@ const formHandler = (function () {
       const shieldConfig = ShieldElement.prototype.getBlockShieldConfig(
         currentBlockElem.shieldBase
       );
+      currentBlockElem.routeNumber =
+        ShieldElement.prototype.limitRouteCharacters(
+          currentBlockElem.routeNumber,
+          shieldConfig
+        );
+      syncShieldRouteCharacterLimit(currentBlockElem.shieldBase);
       currentBlockElem.shieldType =
         ShieldElement.prototype.migrateLegacyBlockVariant(
           currentBlockElem.shieldType,
+          currentBlockElem.routeNumber,
           shieldConfig
         );
       const normalizeDisableSmallCapsValue = (value) =>
@@ -6825,6 +6881,10 @@ const formHandler = (function () {
         imageType: currentValue?.imageType || "file",
         imageData: currentValue?.imageData || "",
       };
+      selectedShield.variant = Shield.prototype.migrateLegacyVariant(
+        selectedShield.shieldValue,
+        selectedShield.variant
+      );
 
       // Setup tabs
       document.querySelector("#presetShields").addEventListener("click", () => {

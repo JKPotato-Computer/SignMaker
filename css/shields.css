@@ -1125,7 +1125,8 @@
 	overflow: hidden;
 }
 
-.bannerShieldContainer.variableGuideWidth .shieldImg {
+.bannerShieldContainer.FDOTSTATE.variableGuideWidth .shieldImg {
+	clip-path: inset(var(--variableGuideArtworkClip));
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -1141,6 +1142,35 @@
 	top: 0;
 	width: var(--variableGuideSeamCover);
 	z-index: 2;
+}
+
+.bannerShieldContainer.FDOTSTATE.variableGuideWidth .variableGuideContour {
+	height: 100%;
+	inset: 0;
+	overflow: visible;
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+	z-index: 3;
+}
+
+/* Keep the official 1/8-inch SVG contour, but guarantee a visible editor pixel. */
+.bannerShieldContainer.FDOTSTATE.variableGuideWidth .shield::after {
+	border: 1px solid var(--black);
+	border-radius: inherit;
+	box-sizing: border-box;
+	content: "";
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	z-index: 3;
+}
+
+.exportCaptureTarget .bannerShieldContainer.FDOTSTATE.variableGuideWidth .shield::after,
+.exportStaticCaptureClone .bannerShieldContainer.FDOTSTATE.variableGuideWidth .shield::after,
+.exportCaptureTarget.bannerShieldContainer.FDOTSTATE.variableGuideWidth .shield::after,
+.exportStaticCaptureClone.bannerShieldContainer.FDOTSTATE.variableGuideWidth .shield::after {
+	display: none;
 }
 
 .bannerShieldContainer.officialFdotShield .routeNumber.officialRouteNumber,
