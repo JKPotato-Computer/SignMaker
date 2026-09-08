@@ -1,13 +1,11 @@
 const formHandler = (() => {
-  let exposed;
+  let app;
   let post;
   let zoomLevel = 1;
-  let selectedShieldGroupIndex = -1;
-  let selectedShieldIndex = -1;
 
-  const initialize = (appExposed) => {
-    exposed = appExposed;
-    post = exposed.getPost();
+  const initialize = (appModule) => {
+    app = appModule;
+    post = app.getPost();
 
     let postConfiguration = StorageManager.getItem(
       StorageManager.STORAGE_KEYS.post,
@@ -46,67 +44,24 @@ const formHandler = (() => {
     ControlTextElement.defaultFont =
       textElementConfiguration.defaultFont ?? ControlTextElement.defaultFont;
 
-    FormNavigation.initUI(exposed, post);
+    FormNavigation.initUI(app, post);
+  };
 
-    try {
-      //console.log(promptShield(null));
-    } catch (e) {
-      console.error(e);
+  const toggleVisibility = (checkbox, elements) => {
+    for (const elem of elements) {
+      if (checkbox.checked) {
+        elem.classList.remove("hidden");
+      } else {
+        elem.classList.add("hidden");
+      }
     }
   };
 
-  // Show/hide dependent small inputs for a given block (e.g. sdCtrlText, sdAdvisory, sdActionMessage, sdIcon)
-  const setDependentVisibility = (block) => {
-    const el = (id) => document.getElementById(id);
-
-    const toggleTargets = (checkboxId, targetIds) => {
-      const chk = el(checkboxId);
-      if (!chk) return;
-      for (const tid of targetIds) {
-        const target = el(tid);
-        if (!target) continue;
-        if (chk.checked) target.classList.remove("hidden");
-        else target.classList.add("hidden");
-
-        const labels = document.querySelectorAll(`label[for="${tid}"]`);
-        labels.forEach((label) => {
-          if (chk.checked) label.classList.remove("hidden");
-          else label.classList.add("hidden");
-        });
-      }
-    };
-
-    toggleTargets(`${block}_useNumeralFormatting`, [
-      `${block}_numeralFormattingSize`,
-    ]);
-    toggleTargets(`${block}_useBannerFormatting`, [
-      `${block}_bannerFormattingSize`,
-      `${block}_bannerFirstLetterSize`,
-    ]);
-    toggleTargets(`${block}_smallCapitals`, [`${block}_firstLetterSize`]);
-    toggleTargets(`${block}_border`, [
-      `${block}_borderColor`,
-      `${block}_borderRadius`,
-    ]);
-    toggleTargets(`${block}_background`, [
-      `${block}_backgroundColor`,
-      `${block}_borderRadius`,
-      `${block}_horizontalPadding`,
-      `${block}_verticalPadding`,
-      `${block}_hasOnlyBlock`,
-    ]);
-  };
-
-  const readForm = () => {
+  const readForm = (readProperties) => {
     const form = document.forms[0];
-    const currentPanel = exposed.getCurrentPanel();
+    const currentPanel = app.getCurrentPanel();
     const subPanel =
-      currentPanel.sign.subPanels[exposed.vars.currentlySelectedSubPanelIndex];
-    const exitTab =
-      exposed.vars.currentlySelectedNestedExitTabIndex != -1
-        ? currentPanel.exitTabs[exposed.vars.currentlySelectedExitTabIndex]
-            .nestedExitTabs[exposed.vars.currentlySelectedNestedExitTabIndex]
-        : currentPanel.exitTabs[exposed.vars.currentlySelectedExitTabIndex];
+      currentPanel.sign.subPanels[app.vars.currentlySelectedSubPanelIndex];
 
     // Post
     post.polePosition = form["postPosition"].value;
@@ -145,44 +100,287 @@ const formHandler = (() => {
     // Panel
     currentPanel.color = form["panelColor"].value;
     currentPanel.corner = form["panelCorner"].value;
+    currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
 
     currentPanel.borderRadius = Math.max(0, form["panelBorderRadius"].value);
 
     // Exit Tab
-    exitTab.number = form["exitNumber"].value;
-    exitTab.width = form["exitTabWidth"].value;
-    exitTab.position = form["exitTabPosition"].value;
-    exitTab.color = form["exitColor"].value;
-    exitTab.variant = form["exitVariant"].value;
-    exitTab.tollLogoSize = form["exitTollLogoSize"].value;
+    if (app.vars.currentlySelectedExitTabRowIndex != -1) {
+      const exitTabRow =
+        currentPanel.exitTabs[app.vars.currentlySelectedExitTabRowIndex];
+      if (app.vars.currentlySelectedExitTabIndex == -1) {
+        exitTabRow.gap = parseFloat(form["sMET_Gap"].value);
+        exitTabRow.panelEdgeType = form["sMET_PanelEdgeType"].value;
+        exitTabRow.position = form["sMET_Position"].value;
+        exitTabRow.marginBottom = parseFloat(form["smET_marginBottom"].value);
+      } else {
+        const exitTab =
+          exitTabRow.exitTabs[app.vars.currentlySelectedExitTabIndex];
 
-    if (exitTab.variant === "Toll Logo") {
-      exitTab.icon = form["exitTollLogoSelect"].value;
-      exitTab.tollLogoOnly = form["exitTollLogoOnly"].checked;
-      exitTab.tollLogoSquare = form["exitTollLogoSquare"].checked;
-    } else if (exitTab.variant === "Icon") {
-      exitTab.icon = form["iconSelect"].value;
-    } else {
-      exitTab.icon = null;
+        exitTab.variant = document
+          .querySelector("div.sMET_typeSelect > button.selected")
+          .id.split("sMET_type")[1];
+
+        exitTab.textContent = form["sMET_textContent"].value;
+        exitTab.subTextContent = form["sMET_subTextContent"].value;
+
+        exitTab.backgroundColor = form["sMET_backgroundColor"].value;
+        exitTab.borderStyle = form["sMET_borderStyle"].value;
+        exitTab.borderThickness = parseFloat(
+          form["sMET_borderThickness"].value,
+        );
+        exitTab.borderRadius = parseFloat(form["sMET_borderRadius"].value);
+        exitTab.useFullBorder = form["sMET_useFullBorder"].checked;
+        exitTab.horizontalPadding = parseFloat(
+          form["sMET_horizontalPadding"].value,
+        );
+        exitTab.verticalPadding = parseFloat(
+          form["sMET_verticalPadding"].value,
+        );
+        exitTab.minimumHeight = parseFloat(form["sMET_minimumHeight"].value);
+        exitTab.fontSize = parseFloat(form["sMET_fontSize"].value);
+        exitTab.lineHeight = parseFloat(form["sMET_lineHeight"].value);
+        exitTab.enlargeNumerals = form["sMET_enlargeNumerals"].checked;
+        exitTab.enlargeNumeralsSize = parseFloat(
+          form["sMET_enlargeNumeralsSize"].value,
+        );
+        exitTab.spaceLettersNumerals =
+          form["sMET_spaceLettersNumerals"].checked;
+        exitTab.useTrimFormat = form["smET_useTrimFormat"].checked;
+        exitTab.numeralWordSpacing = parseFloat(
+          form["sMET_numeralWordSpacing"].value,
+        );
+        exitTab.offsetNonNumerals = form["sMET_offsetNonNumerals"].checked;
+        exitTab.fontFamily = form["sMET_fontFamily"].value;
+        exitTab.numeralFontFamily = form["sMET_numeralFontFamily"].value;
+        exitTab.letterSpacing = parseFloat(form["sMET_letterSpacing"].value);
+        exitTab.numeralLetterSpacing = parseFloat(
+          form["sMET_numeralLetterSpacing"].value,
+        );
+        exitTab.contentDirection = form["sMET_contentDirection"].value;
+        exitTab.alignment = form["sMET_alignment"].value;
+        exitTab.width = form["sMET_width"].value;
+        exitTab.holderPadding = form["smET_containerHolderPadding"].value;
+
+        if (exitTab.width.toLowerCase().includes("percent")) {
+          exitTab.widthSize = Math.min(
+            parseInt(form["sMET_widthSize"].value),
+            100,
+          );
+        } else if (exitTab.width.toLowerCase().includes("size")) {
+          exitTab.widthSize = Math.min(
+            parseFloat(form["sMET_widthSize"].value),
+            20,
+          );
+        }
+
+        if (exitTab.variant == "PartialLeft") {
+          exitTab.variantSettings.partialLeft.separateRow =
+            form["smET_partialLeftCheckbox"].checked;
+          exitTab.variantSettings.partialLeft.horizontalPadding =
+            form["smET_partialLeftHorizontalPadding"].value;
+          exitTab.variantSettings.partialLeft.verticalPadding =
+            form["smET_partialLeftVerticalPadding"].value;
+          exitTab.variantSettings.partialLeft.minWidth =
+            form["smET_partialLeftMinWidth"].value;
+          exitTab.variantSettings.partialLeft.letterSpacing =
+            form["smET_partialLeftLetterSpacing"].value;
+          exitTab.variantSettings.partialLeft.spacing =
+            form["smET_partialLeftSpacing"].value;
+        }
+
+        if (
+          exitTab.variant == "HOVVariant1" ||
+          exitTab.variant == "HOVVariant2"
+        ) {
+          exitTab.variantSettings[
+            exitTab.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].width = parseFloat(
+            form[
+              exitTab.variant == "HOVVariant1"
+                ? "smET_HOV1Width"
+                : "smET_HOV2Width"
+            ].value,
+          );
+          exitTab.variantSettings[
+            exitTab.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].height = parseFloat(
+            form[
+              exitTab.variant == "HOVVariant1"
+                ? "smET_HOV1Height"
+                : "smET_HOV2Height"
+            ].value,
+          );
+          exitTab.variantSettings[
+            exitTab.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].verticalPadding = parseFloat(
+            form[
+              exitTab.variant == "HOVVariant1"
+                ? "smET_HOV1VerticalPadding"
+                : "smET_HOV2VerticalPadding"
+            ].value,
+          );
+        }
+
+        if (exitTab.variant == "HOVVariant1") {
+          exitTab.variantSettings.hovVariant1.roundCorners =
+            form["smET_HOV1RoundCorners"].checked;
+        }
+
+        /*
+        exitTab.variantSettings.icon.icon = form["sMET_variantIcon"].value;
+        exitTab.variantSettings.icon.isTextBased =
+          form["sMET_variantIsTextBased"].checked;
+        exitTab.variantSettings.icon.showBackground =
+          form["sMET_variantShowBackground"].checked;
+        exitTab.variantSettings.icon.addon = form["sMET_variantAddon"].value;
+        exitTab.variantSettings.icon.iconSize = parseFloat(
+          form["sMET_variantIconSize"].value,
+        );
+        exitTab.variantSettings.icon.isSquare =
+          form["sMET_variantIsSquare"].checked;
+        exitTab.variantSettings.icon.isTollIcon =
+          form["sMET_variantIsTollIcon"].checked;
+        */
+      }
     }
 
-    // Reset/Static flags
-    exitTab.useTextBasedIcon = false;
+    if (
+      app.getCurrentBlockElem().constructor.name === "ShieldGroupElement" &&
+      app.vars.currentlySelectedShieldIndex != -1
+    ) {
+      const currentShield =
+        app.getCurrentBlockElem().shields[
+          app.vars.currentlySelectedShieldIndex
+        ];
 
-    // Direct Assignments
-    exitTab.FHWAFont = form["exitFont"].checked;
-    exitTab.showLeft = form["showLeft"].checked;
-    exitTab.fullBorder = form["fullBorder"].checked;
-    exitTab.squareCorners = form["squareCorners"].checked;
-    exitTab.topOffset = form["topOffset"].checked;
+      currentShield.routeNumber = form["spShield_routeNumber"].value;
+      currentShield.designation = form["spShield_designation"].value;
+      currentShield.scale = parseFloat(form["spShield_scale"].value);
 
-    // Numeric and Value inputs
-    exitTab.borderThickness = parseFloat(form["borderThickness"].value);
-    exitTab.minHeight = form["minHeight"].value;
-    exitTab.fontSize = form["fontSize"].value;
+      currentShield.customShields.route_scale = parseFloat(
+        form["spShield_routeScale"].value,
+      );
+      currentShield.customShields.route_xOffset = parseFloat(
+        form["spShield_routeXOffset"].value,
+      );
+      currentShield.customShields.route_yOffset = parseFloat(
+        form["spShield_routeYOffset"].value,
+      );
+      currentShield.customShields.route_letterSpacing = parseFloat(
+        form["spShield_routeSpacing"].value,
+      );
+      currentShield.customShields.route_fontFamily =
+        form["spShield_routeFontFamily"].value;
 
-    // Misc Shields
-    currentPanel.sign.shieldBacks = form["shieldBacks"].checked;
+      currentShield.customShields.designation_scale = parseFloat(
+        form["spShield_designationScale"].value,
+      );
+      currentShield.customShields.designation_xOffset = parseFloat(
+        form["spShield_designationXOffset"].value,
+      );
+      currentShield.customShields.designation_yOffset = parseFloat(
+        form["spShield_designationYOffset"].value,
+      );
+      currentShield.customShields.designation_letterSpacing = parseFloat(
+        form["spShield_designationSpacing"].value,
+      );
+      currentShield.customShields.designation_fontFamily =
+        form["spShield_designationFontFamily"].value;
+
+      currentShield.horizMargin = form["spShield_horizMargins"].value;
+      currentShield.vertMargin = form["spShield_vertMargins"].value;
+
+      const bannerElements = document.querySelectorAll(".smSP_bannerElement");
+      let domIndex = bannerElements.length - 1;
+
+      let indexToSkip = {};
+
+      for (const alignment of ["top", "bottom", "left", "right"].reverse()) {
+        if (!currentShield.banners[alignment]) {
+          continue;
+        }
+
+        const bannerAlignmentElem = document.querySelector(
+          `.smSPBanner_alignmentHeader.${alignment}`,
+        );
+
+        if (!bannerAlignmentElem) {
+          continue;
+        }
+
+        currentShield.bannerSettings[alignment].alignment =
+          bannerAlignmentElem.querySelector(".smSPShieldBannerJustify").value;
+        currentShield.bannerSettings[alignment].gap =
+          parseFloat(
+            bannerAlignmentElem.querySelector(".smSPShieldBannerGap").value,
+          ) || 0;
+
+        for (let i = currentShield.banners[alignment].length - 1; i >= 0; i--) {
+          if (indexToSkip[alignment] === i) {
+            continue;
+          }
+
+          let banner = currentShield.banners[alignment][i];
+
+          const bannerElement = bannerElements[domIndex];
+          domIndex--;
+
+          if (!bannerElement) continue;
+
+          const newAlignment = bannerElement
+            .querySelector(".smSPBanner_position")
+            .value.toLowerCase();
+
+          if (newAlignment !== alignment) {
+            banner = currentShield.moveBanner(alignment, i, newAlignment);
+            indexToSkip[newAlignment] =
+              currentShield.banners[newAlignment].length - 1;
+          }
+
+          banner.textContent = bannerElement.querySelector(
+            ".smSPBanner_textContent",
+          ).value;
+          banner.backgroundColor = bannerElement.querySelector(
+            ".smSPBanner_bgColor",
+          ).value;
+          banner.fontFamily = bannerElement.querySelector(
+            ".smSPBanner_fontFamily",
+          ).value;
+
+          banner.firstLetterSize =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_firstLetterScale").value,
+            ) || 0;
+          banner.fontSize =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_fontSize").value,
+            ) || 0;
+          banner.horizontalMargin =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_horizontalMargins")
+                .value,
+            ) || 0;
+          banner.verticalMargin =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_verticalMargins").value,
+            ) || 0;
+          banner.borderRadius =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_borderRadius").value,
+            ) || 0;
+          banner.horizontalPadding =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_horizontalPadding")
+                .value,
+            ) || 0;
+          banner.verticalPadding =
+            parseFloat(
+              bannerElement.querySelector(".smSPBanner_verticalPadding").value,
+            ) || 0;
+        }
+      }
+    }
 
     // Sign
     currentPanel.sign.padding =
@@ -196,7 +394,7 @@ const formHandler = (() => {
       "rem";
 
     // Control Text Revision
-    const currentBlockElem = exposed.getCurrentBlockElem();
+    const currentBlockElem = app.getCurrentBlockElem();
     const blockElemType =
       Control.prototype.blockInternalElements[
         Control.prototype.blockToClassElems.getElem(currentBlockElem)
@@ -206,92 +404,116 @@ const formHandler = (() => {
       const element = document.getElementById(elementId);
 
       if (element) {
+        let nextValue = element.value;
+
         if (element.type === "checkbox") {
-          currentBlockElem[propertyName] = element.checked;
+          nextValue = element.checked;
         } else if (element.type === "radio") {
-          if (element.checked) {
-            currentBlockElem[propertyName] = element.value;
-          }
+          nextValue = element.checked
+            ? element.value
+            : currentBlockElem[propertyName];
         } else if (element.tagName === "SELECT") {
-          currentBlockElem[propertyName] = element.value;
-        } else {
-          currentBlockElem[propertyName] = element.value;
+          nextValue = element.value;
         }
+
+        currentBlockElem[propertyName] = nextValue;
       }
     }
 
+    if (currentBlockElem.constructor.name === "IconElement") {
+      currentBlockElem.icon =
+        document.querySelector("#sdIcon_selectPanel").dataset.selectedIcon ||
+        currentBlockElem.icon;
+    }
+
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].topPadding = document.querySelector("#sdBlock_topPadding").value;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].bottomPadding = document.querySelector("#sdBlock_bottomPadding").value;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor",
     ).value;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].backgroundFullWidth = document.querySelector(
       "#sdBlock_backgroundFullWidth",
     ).checked;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].width = document.querySelector("#sdBlock_width").value;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].stretchLeft = document.querySelector("#sdBlock_stretchLeft").checked;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].stretchCenter = document.querySelector("#sdBlock_stretchCenter").checked;
     subPanel.blockElements.blockProperties[
-      exposed.vars.currentlySelectedRowIndex
+      app.vars.currentlySelectedRowIndex
     ].stretchRight = document.querySelector("#sdBlock_stretchRight").checked;
 
-    subPanel.width = parseInt(form["subPanelLength"].value);
+    subPanel.laneWidth = parseInt(form["subPanelLength"].value);
+    subPanel.verticalAlign = form["subpanelAlign"].value;
 
-    if (exposed.vars.currentlySelectedSubPanelIndex != 0) {
-      subPanel.height = form["subPanelHeight"].value;
+    if (app.vars.currentlySelectedSubPanelIndex != 0) {
+      //subPanel.height = form["subPanelHeight"].value;
     }
 
-    currentPanel.sign.shieldPosition = form["shieldsPosition"].value;
-    var guideArrow_result = form["guideArrow"].value;
+    // guide arrows
+    currentPanel.sign.arrows.arrowMode = document
+      .querySelector("div.sMA_typeSelect > button.selected")
+      .id.split("sMA_type")[1]
+      .toLowerCase();
 
-    for (const guideArrow_value of Sign.prototype.guideArrows) {
-      if (guideArrow_result == guideArrow_value.split(":")[0]) {
-        guideArrow_result = guideArrow_value;
-        break;
-      }
-    }
+    if (currentPanel.sign.arrows.arrowMode == "standard") {
+      let guideArrow_result = form["guideArrow"].value;
 
-    currentPanel.sign.guideArrow = guideArrow_result;
-    currentPanel.sign.guideArrowLanes = form["guideArrowLanes"].value;
-    currentPanel.sign.arrowPosition = form["arrowLocations"].value;
-
-    var exitOnlyDirection_result = form["exitOnlyDirection"].value;
-
-    for (const exitOnlyDirection_value of Sign.prototype.exitguideArrows) {
-      if (exitOnlyDirection_result == exitOnlyDirection_value.split(":")[0]) {
-        exitOnlyDirection_result = exitOnlyDirection_value;
-        break;
-      }
-    }
-
-    if (currentPanel.sign.guideArrow == "Half Exit Only") {
-      if (form["arrowLocations"].value == "Middle") {
-        while (form["arrowLocations"].firstChild) {
-          form["arrowLocations"].removeChild(form["arrowLocations"].lastChild);
+      for (const guideArrow_value of Sign.prototype.guideArrows) {
+        if (guideArrow_result == guideArrow_value.split(":")[0]) {
+          guideArrow_result = guideArrow_value;
+          break;
         }
+      }
 
-        for (const arrowPosition of Sign.prototype.arrowPositions) {
-          if (arrowPosition != "Middle") {
-            lib.appendOption(form["arrowLocations"], arrowPosition);
+      currentPanel.sign.guideArrow = guideArrow_result;
+      currentPanel.sign.guideArrowLanes = form["guideArrowLanes"].value;
+      currentPanel.sign.arrowPosition = form["arrowLocations"].value;
+
+      let exitOnlyDirection_result = form["exitOnlyDirection"].value;
+
+      for (const exitOnlyDirection_value of Sign.prototype.exitguideArrows) {
+        if (exitOnlyDirection_result == exitOnlyDirection_value.split(":")[0]) {
+          exitOnlyDirection_result = exitOnlyDirection_value;
+          break;
+        }
+      }
+
+      if (currentPanel.sign.guideArrow == "Half Exit Only") {
+        if (form["arrowLocations"].value == "Middle") {
+          while (form["arrowLocations"].firstChild) {
+            form["arrowLocations"].removeChild(
+              form["arrowLocations"].lastChild,
+            );
+          }
+
+          for (const arrowPosition of Sign.prototype.arrowPositions) {
+            if (arrowPosition != "Middle") {
+              lib.appendOption(form["arrowLocations"], arrowPosition);
+            }
+          }
+
+          form["arrowLocations"].value = "Left";
+          currentPanel.sign.arrowPosition = "Left";
+        } else {
+          currentPanel.sign.arrowPosition = form["arrowLocations"].value;
+
+          if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
+            lib.appendOption(form["arrowLocations"], "Middle");
           }
         }
-
-        form["arrowLocations"].value = "Left";
-        currentPanel.sign.arrowPosition = "Left";
       } else {
         currentPanel.sign.arrowPosition = form["arrowLocations"].value;
 
@@ -299,102 +521,150 @@ const formHandler = (() => {
           lib.appendOption(form["arrowLocations"], "Middle");
         }
       }
-    } else {
-      currentPanel.sign.arrowPosition = form["arrowLocations"].value;
 
-      if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
-        lib.appendOption(form["arrowLocations"], "Middle");
+      const useCanadianDownArrowField = form["useCanadianDownArrows"];
+      currentPanel.sign.useCanadianDownArrows =
+        useCanadianDownArrowField && useCanadianDownArrowField.checked;
+
+      currentPanel.sign.exitguideArrows = exitOnlyDirection_result;
+      currentPanel.sign.showExitOnly = form["showExitOnly"].checked;
+      currentPanel.sign.hideExitArrow = form["hideExitArrow"]
+        ? form["hideExitArrow"].checked
+        : false;
+      const borderModeField = form["exitOnlyBorderMode"];
+      if (borderModeField) {
+        const selectedMode = borderModeField.value;
+        currentPanel.sign.exitOnlyBorderMode =
+          Sign.prototype.exitOnlyBorderModes.includes(selectedMode)
+            ? selectedMode
+            : Sign.prototype.exitOnlyBorderModes[0];
+      } else {
+        currentPanel.sign.exitOnlyBorderMode =
+          Sign.prototype.exitOnlyBorderModes[0];
       }
+      currentPanel.sign.exitOnlyLeftText = form["exitOnlyLeftText"]
+        ? form["exitOnlyLeftText"].value || ""
+        : "";
+      currentPanel.sign.exitOnlyRightText = form["exitOnlyRightText"]
+        ? form["exitOnlyRightText"].value || ""
+        : "";
+      currentPanel.sign.exitOnlyLabelPreset = [
+        currentPanel.sign.exitOnlyLeftText,
+        currentPanel.sign.exitOnlyRightText,
+      ]
+        .filter((part) => part && part.trim().length > 0)
+        .join(" ")
+        .trim();
+      currentPanel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
+
+      currentPanel.sign.otherSymbol = form["otherSymbol"].value;
+      currentPanel.sign.oSNum = form["oSNum"].value;
+    } else if (currentPanel.sign.arrows.arrowMode == "apl") {
+      const apl = currentPanel.sign.arrows.apl;
+      apl.horizontalPadding = parseFloat(form["smAPL_HorizPadding"].value);
+      apl.verticalTopPadding = parseFloat(form["smAPL_VertTopPadding"].value);
+      apl.verticalBottomPadding = parseFloat(
+        form["smAPL_VertBottomPadding"].value,
+      );
+
+      let containerIndex = 0;
+      for (let i = 0; i <= currentPanel.sign.subPanels.length - 1; i += 0.5) {
+        const aplContainer = document.querySelectorAll(".smAPLCat_container")[
+          containerIndex++
+        ];
+        const aplList = apl.subpanels[i];
+
+        if (!aplContainer || !aplList) {
+          continue;
+        }
+
+        if (i % 1 == 0) {
+          apl.subpanelConfigs[i].justify = aplContainer.querySelector(
+            ".smAPLCat_justifyAPLs",
+          ).value;
+        }
+
+        aplList.forEach((arrow, arrowIndex) => {
+          const arrowElement =
+            aplContainer.querySelectorAll(".smAPLCat_apl")[arrowIndex];
+
+          if (!arrowElement) {
+            return;
+          }
+
+          arrow.arrowVariant = arrowElement.querySelector(
+            ".smAPLCat_aplSelect",
+          ).value;
+          arrow.size = parseFloat(
+            arrowElement.querySelector(".sMAPL_size").value,
+          );
+          arrow.offset = parseFloat(
+            arrowElement.querySelector(".sMAPL_offset").value,
+          );
+          arrow.exitOnlyEnabled = arrowElement.querySelector(
+            ".smAPL_exitOnlyCheck",
+          ).checked;
+          arrow.exitTextContent = [
+            arrowElement.querySelector(".smAPL_leftText").value,
+            arrowElement.querySelector(".smAPL_rightText").value,
+          ];
+          arrow.exitBGColor =
+            arrowElement.querySelector(".smAPL_bgColor").value;
+          arrow.fontFamily = arrowElement.querySelector(".smAPL_font").value;
+          arrow.exitTextSize = parseFloat(
+            arrowElement.querySelector(".smAPL_fontSize").value,
+          );
+          arrow.exitTextRoundness = parseFloat(
+            arrowElement.querySelector(".smAPL_roundness").value,
+          );
+          arrow.exitTextHorizontalPadding = parseFloat(
+            arrowElement.querySelector(".smAPL_horizontalPadding").value,
+          );
+          arrow.exitTextMargins = [
+            parseFloat(arrowElement.querySelector(".smAPL_leftMargins").value),
+            parseFloat(arrowElement.querySelector(".smAPL_rightMargins").value),
+          ];
+        });
+      }
+    } else if (currentPanel.sign.arrows.arrowMode == "diagrammic") {
+      const diagrammicPreset = document.querySelector("#sMDiagrammicPreset");
+      currentPanel.sign.arrows.diagrammic.preset = diagrammicPreset.value;
+
+      if (
+        currentPanel.sign.arrows.diagrammic.preset !== "None" &&
+        readProperties &&
+        readProperties["diagrammicPresetChange"]
+      ) {
+        DiagrammicLibrary.getDiagramByName(
+          currentPanel.sign.arrows.diagrammic.preset,
+        ).then((diagramData) => {
+          if (diagramData) {
+            currentPanel.sign.arrows.diagrammic.diagramData = diagramData;
+            updateForm();
+            app.redraw();
+          }
+        });
+      }
+
+      currentPanel.sign.arrows.diagrammic.scale = parseInt(
+        document.querySelector("#sMDiagrammicScale").value,
+      );
     }
-
-    const useCanadianDownArrowField = form["useCanadianDownArrows"];
-    currentPanel.sign.useCanadianDownArrows =
-      useCanadianDownArrowField && useCanadianDownArrowField.checked;
-
-    currentPanel.sign.exitguideArrows = exitOnlyDirection_result;
-    currentPanel.sign.showExitOnly = form["showExitOnly"].checked;
-    currentPanel.sign.hideExitArrow = form["hideExitArrow"]
-      ? form["hideExitArrow"].checked
-      : false;
-    const borderModeField = form["exitOnlyBorderMode"];
-    if (borderModeField) {
-      const selectedMode = borderModeField.value;
-      currentPanel.sign.exitOnlyBorderMode =
-        Sign.prototype.exitOnlyBorderModes.includes(selectedMode)
-          ? selectedMode
-          : Sign.prototype.exitOnlyBorderModes[0];
-    } else {
-      currentPanel.sign.exitOnlyBorderMode =
-        Sign.prototype.exitOnlyBorderModes[0];
-    }
-    currentPanel.sign.exitOnlyLeftText = form["exitOnlyLeftText"]
-      ? form["exitOnlyLeftText"].value || ""
-      : "";
-    currentPanel.sign.exitOnlyRightText = form["exitOnlyRightText"]
-      ? form["exitOnlyRightText"].value || ""
-      : "";
-    currentPanel.sign.exitOnlyLabelPreset = [
-      currentPanel.sign.exitOnlyLeftText,
-      currentPanel.sign.exitOnlyRightText,
-    ]
-      .filter((part) => part && part.trim().length > 0)
-      .join(" ")
-      .trim();
-    currentPanel.sign.exitOnlyPadding = form["exitOnlyPadding"].value;
-
-    currentPanel.sign.otherSymbol = form["otherSymbol"].value;
-    currentPanel.sign.oSNum = form["oSNum"].value;
 
     updateForm();
-    exposed.redraw();
+    app.redraw();
   };
 
-  /**
-   * Update the fields in the form to the values of the currently selected panel.
-   */
   const updateForm = () => {
-    const panel = exposed.getCurrentPanel();
-    const sign =
-      panel.sign.subPanels[exposed.vars.currentlySelectedSubPanelIndex];
-
-    const selectedExitTabIndex = exposed.vars.currentlySelectedExitTabIndex;
-    const selectedNestedExitTabIndex =
-      exposed.vars.currentlySelectedNestedExitTabIndex;
-    const currentExitTab = panel.exitTabs[selectedExitTabIndex];
-
-    const maxNested =
-      typeof ExitTab !== "undefined" && ExitTab.prototype.maxNested != null
-        ? ExitTab.prototype.maxNested
-        : 1;
-
-    if (currentExitTab && currentExitTab.nestedExitTabs.length > maxNested) {
-      currentExitTab.nestedExitTabs.splice(maxNested);
-    }
-
-    if (
-      currentExitTab &&
-      selectedNestedExitTabIndex > -1 &&
-      selectedNestedExitTabIndex >= currentExitTab.nestedExitTabs.length
-    ) {
-      const newNestedIndex =
-        currentExitTab.nestedExitTabs.length > 0
-          ? currentExitTab.nestedExitTabs.length - 1
-          : -1;
-      exposed.changeEditingExitTab(selectedExitTabIndex, newNestedIndex);
-      return;
-    }
-
-    const exitTab =
-      currentExitTab && selectedNestedExitTabIndex > -1
-        ? currentExitTab.nestedExitTabs[selectedNestedExitTabIndex]
-        : currentExitTab;
+    const panel = app.getCurrentPanel();
+    const sign = panel.sign.subPanels[app.vars.currentlySelectedSubPanelIndex];
 
     const panelList = document.getElementById("panelList");
     const subPanelList = document.getElementById("subPanelList");
     const exitTabList = document.getElementById("exitTabList");
 
     document.querySelector("#currentlySelectedPanel").textContent = `Panel ${
-      exposed.vars.currentlySelectedPanelIndex + 1
+      app.vars.currentlySelectedPanelIndex + 1
     }`;
 
     document.getElementById("postPosition").value = post.polePosition;
@@ -410,7 +680,6 @@ const formHandler = (() => {
 
     panelList.innerHTML = "";
     exitTabList.innerHTML = "";
-
     subPanelList.innerHTML = "";
 
     for (
@@ -423,9 +692,7 @@ const formHandler = (() => {
       panelButton.type = "button";
       panelButton.className =
         "panelListButton" +
-        (exposed.vars.currentlySelectedPanelIndex == panelIndex
-          ? " active"
-          : "");
+        (app.vars.currentlySelectedPanelIndex == panelIndex ? " active" : "");
       panelButton.dataset.panelIndex = panelIndex.toString();
 
       const label = document.createElement("span");
@@ -434,7 +701,7 @@ const formHandler = (() => {
       panelButton.appendChild(label);
 
       panelButton.addEventListener("click", () => {
-        exposed.changeEditingPanel(panelIndex);
+        app.changeEditingPanel(panelIndex);
         panelButton.classList.add("active");
       });
 
@@ -449,12 +716,13 @@ const formHandler = (() => {
       const subPanelButton = document.createElement("button");
       subPanelButton.textContent = subPanelIndex + 1;
       subPanelButton.className =
-        exposed.vars.currentlySelectedSubPanelIndex == subPanelIndex
+        app.vars.currentlySelectedSubPanelIndex == subPanelIndex
           ? "active"
           : "";
 
       subPanelButton.addEventListener("click", () => {
-        exposed.changeEditingSubPanel(subPanelIndex, panel);
+        app.changeEditingSubPanel(subPanelIndex);
+        console.log(subPanelIndex, app.vars.currentlySelectedSubPanelIndex);
         subPanelButton.className = "active";
       });
 
@@ -466,71 +734,61 @@ const formHandler = (() => {
       exitTabIndex < exitTabLength;
       exitTabIndex++
     ) {
-      const nestedExitTabs = panel.exitTabs[exitTabIndex].nestedExitTabs || [];
-      const allowedNestedLength = Math.min(
-        nestedExitTabs.length,
-        maxNested != null ? maxNested : nestedExitTabs.length,
-      );
-
+      const exitTabs = panel.exitTabs[exitTabIndex].exitTabs;
       const exitTabGroup = document.createElement("div");
       exitTabGroup.className = "exitTabGroup";
 
       const exitTabButton = document.createElement("button");
       exitTabButton.type = "button";
       exitTabButton.className = "exitTabButton";
-      exitTabButton.textContent = "Tab " + (exitTabIndex + 1);
+      exitTabButton.textContent =
+        app.vars.currentlySelectedExitTabRowIndex == exitTabIndex
+          ? "Group " + (exitTabIndex + 1)
+          : "Group " + (exitTabIndex + 1) + " (" + exitTabs.length + ")";
+
+      if (app.vars.currentlySelectedExitTabRowIndex == exitTabIndex) {
+        exitTabGroup.classList.add("active");
+      }
 
       if (
-        exposed.vars.currentlySelectedExitTabIndex === exitTabIndex &&
-        exposed.vars.currentlySelectedNestedExitTabIndex === -1
+        app.vars.currentlySelectedExitTabRowIndex == exitTabIndex &&
+        app.vars.currentlySelectedExitTabIndex == -1
       ) {
         exitTabButton.classList.add("active");
-        exitTabButton.textContent = "Tab " + (exitTabIndex + 1);
-      } else if (
-        exposed.vars.currentlySelectedExitTabIndex != exitTabIndex &&
-        allowedNestedLength > 0
-      ) {
-        exitTabButton.textContent =
-          "Tab " + (exitTabIndex + 1) + " (" + allowedNestedLength + ")";
       }
 
       exitTabButton.addEventListener("click", () => {
-        exposed.changeEditingExitTab(exitTabIndex);
+        app.changeEditingExitTabRow(exitTabIndex);
       });
 
-      exitTabButton.dataset.exitTabIndex = exitTabIndex.toString();
       exitTabGroup.appendChild(exitTabButton);
 
-      for (
-        let nestIndex = 0;
-        nestIndex < allowedNestedLength + 1;
-        nestIndex++
-      ) {
-        const nestedButton = document.createElement("button");
-        nestedButton.type = "button";
-        nestedButton.className = "exitTabNestedButton";
+      for (let tabIndex = 0; tabIndex <= exitTabs.length; tabIndex++) {
+        const tabButton = document.createElement("button");
+        tabButton.type = "button";
+        tabButton.className = "exitTabNestedButton";
 
-        if (nestIndex < allowedNestedLength) {
-          nestedButton.textContent = "Sub " + (nestIndex + 1);
+        if (tabIndex < exitTabs.length) {
+          tabButton.textContent = "Tab " + (tabIndex + 1);
 
           if (
-            exposed.vars.currentlySelectedExitTabIndex === exitTabIndex &&
-            exposed.vars.currentlySelectedNestedExitTabIndex === nestIndex
+            app.vars.currentlySelectedExitTabRowIndex == exitTabIndex &&
+            app.vars.currentlySelectedExitTabIndex == tabIndex
           ) {
-            nestedButton.classList.add("active");
+            tabButton.classList.add("active");
           }
 
-          nestedButton.addEventListener("click", () => {
-            exposed.changeEditingExitTab(exitTabIndex, nestIndex);
+          tabButton.addEventListener("click", () => {
+            app.changeEditingExitTab(tabIndex);
           });
-        } else {
-          nestedButton.textContent = "+";
-          nestedButton.dataset.tooltip = "Add a sub-exit tab";
-          nestedButton.className = "exitTabNestedButton newNestedButton";
-          nestedButton.onclick = App.newNestExitTab;
+        } else if (app.vars.currentlySelectedExitTabRowIndex == exitTabIndex) {
+          tabButton.textContent = "+";
+          tabButton.dataset.tooltip = "Add a sub-exit tab";
+          tabButton.className = "exitTabtabButton newtabButton";
+          tabButton.addEventListener("click", app.newExitTab);
         }
 
-        exitTabGroup.appendChild(nestedButton);
+        exitTabGroup.appendChild(tabButton);
       }
 
       exitTabList.appendChild(exitTabGroup);
@@ -541,84 +799,54 @@ const formHandler = (() => {
     document.getElementById("panelCorner").value = panel.corner;
     document.getElementById("panelBorderRadius").value =
       panel.borderRadius || 0.5;
-    document.getElementById("outActionMessage").checked =
-      panel.sign.advisoryMessage;
+    document.getElementById("panelLaneSize").value = panel.sign.lanePanelSize;
+
+    // Exit Tabs
+    updateExitTabSubform();
 
     // Sub Panel
-    const isSubPanelSelected = exposed.vars.currentlySelectedSubPanelIndex > 0;
-    const hasMultipleSubPanels = panel.sign.subPanels.length > 1;
-
-    subPanelHeight.style.display = isSubPanelSelected ? "initial" : "none";
-    subPanelHeightLabel.style.display = isSubPanelSelected
-      ? "inline-block"
-      : "none";
-
-    const showLength = hasMultipleSubPanels;
-    subPanelLength.style.display = showLength ? "initial" : "none";
-    subPanelLengthLabel.style.display = showLength ? "inline-block" : "none";
-
-    document.getElementById("exitNumber").value = exitTab.number;
-    document
-      .getElementById("exitTollLogoOptions")
-      .classList.toggle("hidden", exitTab.variant !== "Toll Logo");
-
-    const selectFields = [
-      { id: "exitTabPosition", val: exitTab.position },
-      { id: "exitTabWidth", val: exitTab.width },
-      { id: "exitColor", val: exitTab.color },
-      { id: "exitVariant", val: exitTab.variant },
-      { id: "exitTollLogoSelect", val: exitTab.icon || "" },
-      { id: "iconSelect", val: exitTab.icon || "" },
-      { id: "shieldsPosition", val: panel.sign.shieldPosition },
-      { id: "guideArrow", val: panel.sign.guideArrow },
-      { id: "otherSymbol", val: panel.sign.otherSymbol },
-    ];
-
-    for (const field of selectFields) {
-      const el = document.getElementById(field.id);
-      if (!el) continue;
-      for (const option of el.options) {
-        if (option.value == field.val) {
-          option.selected = true;
-          break;
-        }
-      }
-    }
-
-    document.getElementById("exitTollLogoSize").value = exitTab.tollLogoSize;
-    document.getElementById("exitTollLogoSizeValue").textContent =
-      exitTab.tollLogoSize;
-    document.getElementById("exitTollLogoOnly").checked =
-      exitTab.tollLogoOnly !== false;
-    document.getElementById("exitTollLogoSquare").checked =
-      exitTab.tollLogoSquare;
-    document.getElementById("exitFont").checked = exitTab.FHWAFont;
-    document.getElementById("showLeft").checked = exitTab.showLeft;
-    document.getElementById("fullBorder").checked = exitTab.fullBorder;
-    document.getElementById("squareCorners").checked = exitTab.squareCorners;
-    document.getElementById("topOffset").checked = exitTab.topOffset;
-
-    document.getElementById("borderThickness").value = exitTab.borderThickness;
-    document.getElementById("borderValue").innerHTML = exitTab.borderThickness;
-
-    document.getElementById("minHeight").value = exitTab.minHeight;
-    document.getElementById("minValue").innerHTML = exitTab.minHeight;
+    document.getElementById("subPanelLength").value =
+      app.getCurrentSubPanel().laneWidth;
+    document.getElementById("subpanelAlign").value =
+      app.getCurrentSubPanel().verticalAlign;
 
     // Shields
     updateShieldSubform();
+
+    // Icons
+    if (app.getCurrentBlockElem().constructor.name === "IconElement") {
+      const iconFieldInput = document.getElementById("sdIcon_iconSearch");
+      const iconLabel = document.querySelector(
+        "#sdIcon_openSelectPanel .sdIcon_selectedLabel",
+      );
+      const iconList = document.querySelector(".sdIcon_iconList");
+      const currentIcon = app.getCurrentBlockElem().icon;
+
+      iconFieldInput.value = currentIcon.replace(/_/g, " ");
+      iconLabel.textContent = currentIcon.replace(/_/g, " ");
+      document.querySelector("#sdIcon_selectedImg").src = `./assets/icons/${
+        IconElement.prototype.icons[currentIcon]
+      }`;
+
+      iconList.querySelectorAll(".sdIcon_iconListButton").forEach((button) => {
+        const isSelected = button.dataset.icon === currentIcon;
+        button.classList.toggle("selected", isSelected);
+        button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      });
+    }
 
     // Control Text Revision
     const sMSPTextList = document.querySelector("#sMSPTextList");
     sMSPTextList.innerHTML = "";
     document.querySelector("#SMSPSelectLabel").textContent =
-      "Selected: Row " + (exposed.vars.currentlySelectedRowIndex + 1);
+      "Selected: Row " + (app.vars.currentlySelectedRowIndex + 1);
     document.querySelector("#SMSPElementLabel").textContent =
-      "Selected: Block " + (exposed.vars.currentlySelectedBlockIndex + 1);
+      "Selected: Block " + (app.vars.currentlySelectedBlockIndex + 1);
     document.querySelector("#sMSPDeleteSelectedRow").disabled =
-      exposed.getCurrentSubPanel().blockElements.rows.length == 1;
+      app.getCurrentSubPanel().blockElements.rows.length == 1;
     document.querySelector("#smSPDeleteSelectedBlock").disabled =
-      exposed.getCurrentSubPanel().blockElements.rows.length == 1 &&
-      exposed.getCurrentBlockRows().length == 1;
+      app.getCurrentSubPanel().blockElements.rows.length == 1 &&
+      app.getCurrentBlockRows().length == 1;
     for (
       let row = 0;
       row < Object.keys(sign.blockElements.rows).length;
@@ -628,7 +856,7 @@ const formHandler = (() => {
       sMControlRow.dataset.dataRow = row.toString();
       sMControlRow.className =
         "sMControlRow" +
-        (row == exposed.vars.currentlySelectedRowIndex ? " selected" : "");
+        (row == app.vars.currentlySelectedRowIndex ? " selected" : "");
 
       for (let item = 0; item < sign.blockElements.rows[row].length; item++) {
         const blockElement = sign.blockElements.rows[row][item];
@@ -639,8 +867,8 @@ const formHandler = (() => {
           Control.prototype.blockInternalElements[
             blockElement.constructor.name
           ] +
-          (item == exposed.vars.currentlySelectedBlockIndex &&
-          row == exposed.vars.currentlySelectedRowIndex
+          (item == app.vars.currentlySelectedBlockIndex &&
+          row == app.vars.currentlySelectedRowIndex
             ? " selected"
             : "");
         textEditorBlock.dataset.row = row.toString();
@@ -651,7 +879,7 @@ const formHandler = (() => {
         textEditorBlock.addEventListener(
           "click",
           () => {
-            exposed.setSelectedControlElem(item);
+            app.setSelectedControlElem(item);
           },
           { once: true },
         );
@@ -661,7 +889,7 @@ const formHandler = (() => {
       sMControlRow.addEventListener(
         "click",
         () => {
-          exposed.setSelectedRow(row);
+          app.setSelectedRow(row);
         },
         { once: true },
       );
@@ -673,9 +901,7 @@ const formHandler = (() => {
       if (
         divConfig.dataset.property ==
         Control.prototype.blockInternalElements[
-          Control.prototype.blockToClassElems.getElem(
-            exposed.getCurrentBlockElem(),
-          )
+          Control.prototype.blockToClassElems.getElem(app.getCurrentBlockElem())
         ]
       ) {
         divConfig.classList.remove("hidden");
@@ -685,7 +911,7 @@ const formHandler = (() => {
       }
     }
 
-    const currentBlockElem = exposed.getCurrentBlockElem();
+    const currentBlockElem = app.getCurrentBlockElem();
     const blockElemType =
       Control.prototype.blockInternalElements[
         Control.prototype.blockToClassElems.getElem(currentBlockElem)
@@ -780,7 +1006,7 @@ const formHandler = (() => {
 
     document.querySelector("#sdBlock_topPadding").value =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].topPadding;
     document
       .querySelector("#sdBlock_topPadding")
@@ -788,24 +1014,33 @@ const formHandler = (() => {
 
     document.querySelector("#sdBlock_bottomPadding").value =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].bottomPadding;
     document
       .querySelector("#sdBlock_bottomPadding")
       .addEventListener("change", readForm, { once: true });
 
-    document.querySelector("#sdBlock_topPaddingVal").textContent =
+    document.querySelector("#sdBlock_topPaddingVal").value =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].topPadding;
-    document.querySelector("#sdBlock_bottomPaddingVal").textContent =
+    document.querySelector("#sdBlock_bottomPaddingVal").value =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
+      ].bottomPadding;
+
+    document.querySelector("#sdBlock_topPadding").value =
+      sign.blockElements.blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].topPadding;
+    document.querySelector("#sdBlock_bottomPadding").value =
+      sign.blockElements.blockProperties[
+        app.vars.currentlySelectedRowIndex
       ].bottomPadding;
 
     document.querySelector("#sdBlock_backgroundColor").value =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].backgroundColor;
 
     document
@@ -814,7 +1049,7 @@ const formHandler = (() => {
 
     document.querySelector("#sdBlock_backgroundFullWidth").checked =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].backgroundFullWidth;
     document
       .querySelector("#sdBlock_backgroundFullWidth")
@@ -824,7 +1059,7 @@ const formHandler = (() => {
 
     document.querySelector("#sdBlock_width").value =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].width;
     document
       .querySelector("#sdBlock_width")
@@ -836,7 +1071,7 @@ const formHandler = (() => {
 
     document.querySelector("#sdBlock_stretchLeft").checked =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].stretchLeft;
 
     document
@@ -844,7 +1079,7 @@ const formHandler = (() => {
       .addEventListener("change", readForm, { once: true });
     document.querySelector("#sdBlock_stretchCenter").checked =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].stretchCenter;
 
     document
@@ -852,77 +1087,10 @@ const formHandler = (() => {
       .addEventListener("change", readForm, { once: true });
     document.querySelector("#sdBlock_stretchRight").checked =
       sign.blockElements.blockProperties[
-        exposed.vars.currentlySelectedRowIndex
+        app.vars.currentlySelectedRowIndex
       ].stretchRight;
 
-    const isExitOnly = panel.sign.guideArrow.includes("Exit Only");
-    const isSplit = panel.sign.guideArrow === "Split Exit Only";
-
-    // Toggle visibility for all Exit Only related elements
-    const exitOnlyElements = [
-      "exitOnlyDirectionLabel",
-      "showExitOnlyLabel",
-      "exitOnlyDirection",
-      "showExitOnly",
-      "hideExitArrowLabel",
-      "hideExitArrow",
-      "exitOnlyLeftTextLabel",
-      "exitOnlyLeftText",
-      "exitOnlyRightTextLabel",
-      "exitOnlyRightText",
-    ];
-
-    for (const id of exitOnlyElements) {
-      const el = document.getElementById(id);
-      if (el) el.style.visibility = isExitOnly ? "visible" : "hidden";
-    }
-
-    const showPadding = isExitOnly && !isSplit;
-    document.getElementById("exitOnlyPaddingLabel").className = showPadding
-      ? ""
-      : "invisible";
-    document.getElementById("exitOnlyPadding").className = showPadding
-      ? ""
-      : "invisible";
-    document.getElementById("paddingValue").className = showPadding
-      ? ""
-      : "invisible";
-
-    const shouldShowBorderMode =
-      !post.secondExitOnly &&
-      (panel.sign.guideArrow === "Half Exit Only" ||
-        panel.sign.guideArrow === "Exit Only");
-    document.getElementById("exitOnlyBorderModeLabel").style.visibility =
-      shouldShowBorderMode ? "visible" : "hidden";
-    document.getElementById("exitOnlyBorderMode").style.visibility =
-      shouldShowBorderMode ? "visible" : "hidden";
-    document.getElementById("exitOnlyBorderMode").value =
-      panel.sign.exitOnlyBorderMode || "None";
-
-    // Text inputs
-    document.getElementById("exitOnlyLeftText").value =
-      panel.sign.exitOnlyLeftText || "";
-    document.getElementById("exitOnlyRightText").value =
-      panel.sign.exitOnlyRightText || "";
-    document.getElementById("showExitOnly").checked = panel.sign.showExitOnly;
-    document.getElementById("hideExitArrow").checked = panel.sign.hideExitArrow;
-    document.getElementById("exitOnlyPadding").value =
-      panel.sign.exitOnlyPadding;
-    document.getElementById("paddingValue").textContent =
-      panel.sign.exitOnlyPadding;
-
-    // --- Other Symbols & Shields ---
-    document.getElementById("oSNum").style.display =
-      panel.sign.otherSymbol !== "None" ? "block" : "none";
-    document.getElementById("oSNum").value = panel.sign.oSNum;
-    document.getElementById("shieldBacks").checked = panel.sign.shieldBacks;
-    document.getElementById("guideArrowLanes").value =
-      panel.sign.guideArrowLanes;
-
-    if (document.getElementById("useCanadianDownArrows")) {
-      document.getElementById("useCanadianDownArrows").checked =
-        panel.sign.useCanadianDownArrows;
-    }
+    updateGuideArrowsSubform();
 
     const p = panel.sign.padding
       .split("rem")
@@ -933,25 +1101,405 @@ const formHandler = (() => {
     document.getElementById("paddingBottom").value = p[2];
     document.getElementById("paddingLeft").value = p[3];
 
-    // Ensure dependent small inputs reflect the corresponding checkbox state
-    [
-      "sdCtrlText",
-      "sdAdvisory",
-      "sdActionMessage",
-      "sdIcon",
-      "sdTollLogo",
-    ].forEach((block) => setDependentVisibility(block));
+    toggleVisibility(
+      document.querySelector("#sdCtrlText_useNumeralFormatting"),
+      [document.querySelector("#sdCtrlText_numeralFormattingSize")],
+    );
+    toggleVisibility(
+      document.querySelector("#sdActionMessage_useNumeralFormatting"),
+      [document.querySelector("#sdActionMessage_numeralFormattingSize")],
+    );
+    toggleVisibility(
+      document.querySelector("#sdAdvisory_useNumeralFormatting"),
+      [document.querySelector("#sdAdvisory_numeralFormattingSize")],
+    );
+    toggleVisibility(
+      document.querySelector("#sdCtrlText_useBannerFormatting"),
+      [
+        document.querySelector("#sdCtrlText_bannerFormattingSize"),
+        document.querySelector("#sdCtrlText_bannerFirstLetterSize"),
+      ],
+    );
+    toggleVisibility(
+      document.querySelector("#sdActionMessage_useBannerFormatting"),
+      [
+        document.querySelector("#sdActionMessage_bannerFormattingSize"),
+        document.querySelector("#sdActionMessage_bannerFirstLetterSize"),
+      ],
+    );
+    toggleVisibility(
+      document.querySelector("#sdAdvisory_useBannerFormatting"),
+      [
+        document.querySelector("#sdAdvisory_bannerFormattingSize"),
+        document.querySelector("#sdAdvisory_bannerFirstLetterSize"),
+      ],
+    );
+    toggleVisibility(document.querySelector("#sdIcon_border"), [
+      document.querySelector("#sdIcon_borderColor"),
+      document.querySelector("#sdIcon_borderRadius"),
+    ]);
+    toggleVisibility(document.querySelector("#sdTollLogo_background"), [
+      document.querySelector("#sdTollLogo_backgroundColor"),
+      document.querySelector("#sdTollLogo_borderRadius"),
+      document.querySelector("#sdTollLogo_horizontalPadding"),
+      document.querySelector("#sdTollLogo_verticalPadding"),
+      document.querySelector("#sdTollLogo_hasOnlyBlock"),
+    ]);
+    toggleVisibility(document.querySelector("#sMET_enlargeNumerals"), [
+      document.querySelector("#sMET_enlargeNumeralsSize"),
+    ]);
   };
 
-  /**
-   * Update the fields in the form relating to shields to the values of the currently selected panel.
-   */
-  const updateShieldSubform = () => {
-    const panel = exposed.getCurrentPanel();
-    const sign =
-      panel.sign.subPanels[exposed.vars.currentlySelectedSubPanelIndex];
+  const updateExitTabSubform = () => {
+    const panel = app.getCurrentPanel();
+    const currentExitTabRow =
+      panel.exitTabs[app.vars.currentlySelectedExitTabRowIndex];
 
-    const blockElements = exposed.getCurrentBlockElem();
+    if (!currentExitTabRow) {
+      return;
+    }
+
+    if (app.vars.currentlySelectedExitTabIndex == -1) {
+      document.querySelector('a[data-tab="sMExitTabVariant"]').style.display =
+        "none";
+      document.querySelector(
+        'a[data-tab="sMET_VariantProperties"]',
+      ).style.display = "none";
+      document.querySelector(
+        'a[data-tab="sMExitTabProperties"]',
+      ).style.display = "none";
+      document.querySelector(
+        'a[data-tab="sMExitTabGroupProperties"]',
+      ).style.display = "";
+      document.querySelector('a[data-tab="sMExitTabGroupProperties"]').click();
+
+      document.querySelector("#sMET_Position").value =
+        currentExitTabRow.position;
+      document.querySelector("#sMET_PanelEdgeType").value =
+        currentExitTabRow.panelEdgeType;
+
+      document.querySelector("#sMET_Gap").value = currentExitTabRow.gap;
+      document.querySelector("#smET_marginBottom").value =
+        currentExitTabRow.marginBottom;
+
+      document.querySelector("#smET_marginBottom").style.display =
+        currentExitTabRow.panelEdgeType == "extend" ? "" : "none";
+      document.querySelector("label[for='smET_marginBottom']").style.display =
+        currentExitTabRow.panelEdgeType == "extend" ? "" : "none";
+
+      return;
+    }
+
+    const currentExitTab =
+      currentExitTabRow.exitTabs[app.vars.currentlySelectedExitTabIndex];
+
+    document.querySelector('a[data-tab="sMExitTabVariant"]').style.display = "";
+    document.querySelector(
+      'a[data-tab="sMET_VariantProperties"]',
+    ).style.display = "";
+    document.querySelector('a[data-tab="sMExitTabProperties"]').style.display =
+      "";
+    document.querySelector(
+      'a[data-tab="sMExitTabGroupProperties"]',
+    ).style.display = "none";
+
+    let presetsLibrary =
+      StorageManager.getItem(StorageManager.STORAGE_KEYS.exitTabs) || {};
+
+    if (
+      presetsLibrary[currentExitTab.variant] ||
+      exitTabPresets[currentExitTab.variant]
+    ) {
+      let pastValue = document.querySelector("#smET_presetSelect").value;
+      document.querySelector("#smET_presetSelect").innerHTML = "";
+      lib.appendOption(document.querySelector("#smET_presetSelect"), "None", {
+        selected: pastValue == "",
+      });
+
+      for (const presetName in exitTabPresets[currentExitTab.variant] || {}) {
+        let option = lib.appendOption(
+          document.querySelector("#smET_presetSelect"),
+          presetName,
+          {
+            selected: presetName == pastValue,
+            text: "(Built-in) " + presetName,
+          },
+        );
+        option.className = "presetExitTab";
+      }
+
+      for (const presetName in presetsLibrary[currentExitTab.variant] || {}) {
+        lib.appendOption(
+          document.querySelector("#smET_presetSelect"),
+          presetName,
+          { selected: presetName == pastValue },
+        );
+      }
+    } else {
+      document.querySelector("#smET_presetSelect").innerHTML = "";
+      lib.appendOption(document.querySelector("#smET_presetSelect"), "None");
+    }
+
+    if (
+      document
+        .querySelector('a[data-tab="sMExitTabGroupProperties"]')
+        .classList.contains("selected")
+    ) {
+      document.querySelector('a[data-tab="sMExitTabVariant"]').click();
+    }
+
+    for (const e of document.querySelectorAll(".sMET_typeSelect > button")) {
+      if (e.id.split("sMET_type")[1] === currentExitTab.variant) {
+        e.classList.add("selected");
+      } else {
+        e.classList.remove("selected");
+      }
+    }
+
+    if (false) {
+      document.querySelector("#sMET_textContent").style.display = "none";
+      document.querySelector("#sMET_subTextContent").style.display = "none";
+      document.querySelector('label[for="sMET_textContent"]').style.display =
+        "none";
+      document.querySelector('label[for="sMET_subTextContent"]').style.display =
+        "none";
+      for (const e of document.querySelectorAll(
+        "#sMExitTabProperties > fieldset",
+      )) {
+        e.style.display = "none";
+      }
+    } else {
+      document.querySelector("#sMET_textContent").style.display = "";
+      document.querySelector("#sMET_subTextContent").style.display = "";
+      document.querySelector('label[for="sMET_textContent"]').style.display =
+        "";
+      document.querySelector('label[for="sMET_subTextContent"]').style.display =
+        "";
+      for (const e of document.querySelectorAll(
+        "#sMExitTabProperties > fieldset",
+      )) {
+        e.style.display = "";
+      }
+    }
+
+    document.querySelector("#sMET_textContent").value =
+      currentExitTab.textContent;
+    document.querySelector("#smET_subTextContent").value =
+      currentExitTab.subTextContent;
+    document.querySelector("#sMET_backgroundColor").value =
+      currentExitTab.backgroundColor;
+    document.querySelector("#sMET_borderStyle").value =
+      currentExitTab.borderStyle;
+    document.querySelector("#sMET_borderThickness").value =
+      currentExitTab.borderThickness;
+    document.querySelector("#sMET_borderThicknessVal").value =
+      currentExitTab.borderThickness;
+    document.querySelector("#sMET_borderRadius").value =
+      currentExitTab.borderRadius;
+    document.querySelector("#sMET_borderRadiusVal").value =
+      currentExitTab.borderRadius;
+    document.querySelector("#sMET_useFullBorder").checked =
+      currentExitTab.useFullBorder;
+    document.querySelector("#sMET_horizontalPadding").value =
+      currentExitTab.horizontalPadding;
+    document.querySelector("#sMET_horizontalPaddingVal").value =
+      currentExitTab.horizontalPadding;
+    document.querySelector("#sMET_verticalPadding").value =
+      currentExitTab.verticalPadding;
+    document.querySelector("#sMET_verticalPaddingVal").value =
+      currentExitTab.verticalPadding;
+    document.querySelector("#sMET_minimumHeight").value =
+      currentExitTab.minimumHeight;
+    document.querySelector("#sMET_minimumHeightVal").value =
+      currentExitTab.minimumHeight;
+    document.querySelector("#sMET_fontSize").value = currentExitTab.fontSize;
+    document.querySelector("#sMET_fontSizeVal").value = currentExitTab.fontSize;
+    document.querySelector("#sMET_lineHeight").value =
+      currentExitTab.lineHeight;
+    document.querySelector("#sMET_lineHeightVal").value =
+      currentExitTab.lineHeight;
+    document.querySelector("#sMET_enlargeNumerals").checked =
+      currentExitTab.enlargeNumerals;
+    document.querySelector("#sMET_enlargeNumeralsSize").value =
+      currentExitTab.enlargeNumeralsSize;
+    document.querySelector("#sMET_spaceLettersNumerals").checked =
+      currentExitTab.spaceLettersNumerals;
+    document.querySelector("#sMET_numeralWordSpacing").value =
+      currentExitTab.numeralWordSpacing;
+    document.querySelector("#sMET_numeralWordSpacingVal").value =
+      currentExitTab.numeralWordSpacing;
+    document.querySelector("#sMET_offsetNonNumerals").checked =
+      currentExitTab.offsetNonNumerals;
+    document.querySelector("#smET_useTrimFormat").checked =
+      currentExitTab.useTrimFormat;
+    document.querySelector("#smET_lineHeight").disabled =
+      currentExitTab.useTrimFormat;
+    document.querySelector("#smET_lineHeightVal").disabled =
+      currentExitTab.useTrimFormat;
+    document.querySelector("#sMET_fontFamily").value =
+      currentExitTab.fontFamily;
+    document.querySelector("#sMET_numeralFontFamily").value =
+      currentExitTab.numeralFontFamily;
+    document.querySelector("#sMET_letterSpacing").value =
+      currentExitTab.letterSpacing;
+    document.querySelector("#sMET_letterSpacingVal").value =
+      currentExitTab.letterSpacing;
+    document.querySelector("#sMET_numeralLetterSpacing").value =
+      currentExitTab.numeralLetterSpacing;
+    document.querySelector("#sMET_numeralLetterSpacingVal").value =
+      currentExitTab.numeralLetterSpacing;
+    document.querySelector("#sMET_contentDirection").value =
+      currentExitTab.contentDirection;
+    document.querySelector("#sMET_alignment").value = currentExitTab.alignment;
+    document.querySelector("#sMET_width").value = currentExitTab.width;
+    document.querySelector("#smET_containerHolderPadding").value =
+      currentExitTab.holderPadding;
+
+    if (currentExitTab.width.toLowerCase().includes("custom")) {
+      if (currentExitTab.width.toLowerCase().includes("percent")) {
+        document.querySelector("#sMET_widthSizeLabel").textContent =
+          "Width Size (%):";
+        document.querySelector("#sMET_widthSize").max = 100;
+        document.querySelector("#sMET_widthSize").step = 1;
+      } else {
+        document.querySelector("#sMET_widthSizeLabel").textContent =
+          "Width Size (rem):";
+        document.querySelector("#sMET_widthSize").max = 20;
+        document.querySelector("#sMET_widthSize").step = 0.1;
+      }
+
+      document.querySelector("#sMET_widthSize").value =
+        currentExitTab.widthSize;
+      document.querySelector("#sMET_widthSizeVal").value =
+        currentExitTab.widthSize;
+      document.querySelector("#sMET_widthSizeLabel").classList.remove("hidden");
+      document.querySelector("#sMET_widthSize").classList.remove("hidden");
+      document.querySelector("#sMET_widthSizeVal").classList.remove("hidden");
+    } else {
+      document.querySelector("#sMET_widthSizeLabel").classList.add("hidden");
+      document.querySelector("#sMET_widthSize").classList.add("hidden");
+      document.querySelector("#sMET_widthSizeVal").classList.add("hidden");
+    }
+
+    if (currentExitTab.borderStyle == "square") {
+      document
+        .querySelector('label[for="sMET_borderRadius"]')
+        .classList.add("hidden");
+      document.querySelector("#sMET_borderRadius").classList.add("hidden");
+      document.querySelector("#sMET_borderRadiusVal").classList.add("hidden");
+    } else {
+      document
+        .querySelector('label[for="sMET_borderRadius"]')
+        .classList.remove("hidden");
+      document.querySelector("#sMET_borderRadius").classList.remove("hidden");
+      document
+        .querySelector("#sMET_borderRadiusVal")
+        .classList.remove("hidden");
+    }
+
+    for (const elem of document.querySelectorAll(
+      "#sMET_VariantProperties > fieldset",
+    )) {
+      if (elem.id.includes(currentExitTab.variant)) {
+        elem.classList.remove("hidden");
+      } else {
+        elem.classList.add("hidden");
+      }
+    }
+
+    if (currentExitTab.variant == "partialLeft") {
+      document.querySelector("#smET_partialLeftCheckbox").checked =
+        currentExitTab.variantSettings.partialLeft.separateRow;
+      document.querySelector("#smET_partialLeftHorizontalPadding").value =
+        currentExitTab.variantSettings.partialLeft.horizontalPadding;
+      document.querySelector("#smET_partialLeftVerticalPadding").value =
+        currentExitTab.variantSettings.partialLeft.verticalPadding;
+      document.querySelector("#smET_partialLeftHorizontalPaddingVal").value =
+        currentExitTab.variantSettings.partialLeft.horizontalPadding;
+      document.querySelector("#smET_partialLeftVerticalPaddingVal").value =
+        currentExitTab.variantSettings.partialLeft.verticalPadding;
+      document.querySelector("#smET_partialLeftMinWidth").value =
+        currentExitTab.variantSettings.partialLeft.minWidth;
+      document.querySelector("#smET_partialLeftLetterSpacing").value =
+        currentExitTab.variantSettings.partialLeft.letterSpacing;
+      document.querySelector("#smET_partialLeftSpacing").value =
+        currentExitTab.variantSettings.partialLeft.spacing;
+    }
+
+    if (
+      currentExitTab.variant == "HOVVariant1" ||
+      currentExitTab.variant == "HOVVariant2"
+    ) {
+      document.querySelector(
+        "#" +
+          (currentExitTab.variant == "HOVVariant1"
+            ? "smET_HOV1Width"
+            : "smET_HOV2Width"),
+      ).value =
+        currentExitTab.variantSettings[
+          currentExitTab.variant == "HOVVariant1"
+            ? "hovVariant1"
+            : "hovVariant2"
+        ].width;
+      document.querySelector(
+        "#" +
+          (currentExitTab.variant == "HOVVariant1"
+            ? "smET_HOV1Height"
+            : "smET_HOV2Height"),
+      ).value =
+        currentExitTab.variantSettings[
+          currentExitTab.variant == "HOVVariant1"
+            ? "hovVariant1"
+            : "hovVariant2"
+        ].height;
+      document.querySelector(
+        "#" +
+          (currentExitTab.variant == "HOVVariant1"
+            ? "smET_HOV1VerticalPadding"
+            : "smET_HOV2VerticalPadding"),
+      ).value =
+        currentExitTab.variantSettings[
+          currentExitTab.variant == "HOVVariant1"
+            ? "hovVariant1"
+            : "hovVariant2"
+        ].verticalPadding;
+    }
+
+    if (currentExitTab.variant == "HOVVariant1") {
+      document.querySelector("#smET_HOV1RoundCorners").checked =
+        currentExitTab.variantSettings.hovVariant1.roundCorners;
+    }
+
+    /*
+    const variantIconSettings = currentExitTab.variantSettings?.icon || {};
+    document.querySelector("#sMET_variantIcon").value =
+      variantIconSettings.icon || "";
+    document.querySelector("#sMET_variantAddon").value =
+      variantIconSettings.addon || "none";
+    document.querySelector("#sMET_variantIconSize").value =
+      variantIconSettings.iconSize || 3;
+    document.querySelector("#sMET_variantIconSizeVal").value =
+      variantIconSettings.iconSize || 3;
+    document.querySelector("#sMET_variantIsTextBased").checked =
+      variantIconSettings.isTextBased || false;
+    document.querySelector("#sMET_variantShowBackground").checked =
+      variantIconSettings.showBackground !== false;
+    document.querySelector("#sMET_variantIsSquare").checked =
+      variantIconSettings.isSquare !== false;
+    document.querySelector("#sMET_variantIsTollIcon").checked =
+      variantIconSettings.isTollIcon || false;
+    */
+  };
+
+  const updateShieldSubform = () => {
+    const panel = app.getCurrentPanel();
+    const sign = panel.sign.subPanels[app.vars.currentlySelectedSubPanelIndex];
+
+    const shieldGroup = app.getCurrentBlockElem();
+    const selectedShieldIndex = app.vars.currentlySelectedShieldIndex;
+    const currentShield =
+      shieldGroup.constructor.name === "ShieldGroupElement" &&
+      shieldGroup.shields[selectedShieldIndex];
 
     const shieldGroupElements = [];
     for (const row of sign.blockElements.rows) {
@@ -962,180 +1510,763 @@ const formHandler = (() => {
       }
     }
 
-    // Update the shield group list
+    // Shield Group Identification
+    const smSPShieldList = document.querySelector("#smSPShieldList");
     const shieldGroupList = document.getElementById("shieldGroupList");
     shieldGroupList.innerHTML = "";
 
-    shieldGroupElements.forEach((shieldGroup, index) => {
+    shieldGroupElements.forEach((shieldGroup, id) => {
       const button = document.createElement("button");
-      button.textContent = `Shield Group ${index + 1} (Row ${sign.blockElements.rows.findIndex((row) => row.includes(shieldGroup)) + 1})`;
-      if (index === selectedShieldGroupIndex) {
+      button.textContent = `Shield Group ${id + 1} (Row ${sign.blockElements.rows.findIndex((row) => row.includes(shieldGroup)) + 1})`;
+      if (id === app.vars.currentlySelectedShieldGroupId) {
         button.classList.add("selected");
       }
       button.addEventListener("click", () => {
-        selectedShieldGroupIndex = index;
-        selectedShieldIndex = -1; // Reset shield selection
-        document
-          .querySelectorAll("#shieldGroupList button")
-          .forEach((btn) => btn.classList.remove("selected"));
-        button.classList.add("selected");
-        updateShieldListForGroup(shieldGroup, index);
+        app.changeCurrentlyEditingShieldGroup(id);
       });
       shieldGroupList.appendChild(button);
     });
 
-    // If a shield group is selected, update its list
-    if (
-      selectedShieldGroupIndex >= 0 &&
-      selectedShieldGroupIndex < shieldGroupElements.length
-    ) {
-      updateShieldListForGroup(
-        shieldGroupElements[selectedShieldGroupIndex],
-        selectedShieldGroupIndex,
-      );
+    if (shieldGroup.constructor.name !== "ShieldGroupElement") {
+      document.getElementById("smSPShieldHeader").style.display = "none";
+      document.getElementById("smSPShieldList").style.display = "none";
+      document.getElementById("smSPShieldProperties").style.display = "none";
+      return;
+    } else {
+      document.getElementById("smSPShieldHeader").style.display = "";
+      document.getElementById("smSPShieldList").style.display = "";
     }
 
-    // Show/hide shield group settings
-    const shieldGroupSettings = document.querySelector(
-      '[data-property="sdShieldGroup"]',
-    );
-    if (shieldGroupSettings) {
-      if (selectedShieldGroupIndex >= 0) {
-        shieldGroupSettings.classList.remove("hidden");
-      } else {
-        shieldGroupSettings.classList.add("hidden");
-      }
-    }
-
-    // Hide banner config initially
-    const bannerConfig = document.getElementById("smSPShieldBannerConfig");
-    if (bannerConfig) {
-      bannerConfig.style.display = "none";
-    }
-  };
-
-  const updateShieldListForGroup = (shieldGroup, groupIndex) => {
-    const shieldList = document.getElementById("smSPShieldList");
-    shieldList.innerHTML = "";
-
-    const shieldGroupDiv = document.createElement("div");
-    shieldGroupDiv.className = "smSPShieldGroup selected";
-
-    const dragIndicator = document.createElement("button");
-    dragIndicator.className = "dragIndicator";
-    dragIndicator.innerHTML =
-      '<span class="material-symbols-outlined">drag_indicator</span>';
-    shieldGroupDiv.appendChild(dragIndicator);
-
-    const holder = document.createElement("div");
-    holder.className = "smSPShieldGroupHolder";
-
-    shieldGroup.shields.forEach((shield, shieldIndex) => {
-      const shieldRow = document.createElement("div");
+    // Shield List
+    const createShieldRow = (shield, shieldIndex) => {
+      const shieldRow = document.createElement("button");
+      shieldRow.type = "button";
       shieldRow.className = "smSPShieldRow";
       if (shieldIndex === selectedShieldIndex) {
         shieldRow.classList.add("selected");
       }
 
-      const rowDragIndicator = document.createElement("button");
-      rowDragIndicator.className = "dragIndicator";
-      rowDragIndicator.innerHTML =
+      const dragButton = document.createElement("span");
+      dragButton.className = "dragIndicator";
+      dragButton.innerHTML =
         '<span class="material-symbols-outlined">drag_indicator</span>';
-      shieldRow.appendChild(rowDragIndicator);
+      shieldRow.appendChild(dragButton);
 
       const shieldBlock = document.createElement("span");
       shieldBlock.className = "smSPShieldBlock";
 
-      const img = document.createElement("img");
-      img.src = Shield.prototype.getDirectoryFromShield(
-        shield.shieldValue,
-        shield.variant,
-      );
-      img.className = "smSPShieldVisual";
-      shieldBlock.appendChild(img);
+      const shieldImg = document.createElement("img");
+      shieldImg.className = "smSPShieldVisual";
+      shieldImg.src =
+        shield.shieldType === "preset"
+          ? Shield.prototype.getDirectoryFromShield(
+              shield.shieldValue,
+              shield.variant,
+            )
+          : shield.imageData;
+      shieldImg.alt = `${shield.shieldValue}-${shield.routeNumber}`;
+      shieldBlock.appendChild(shieldImg);
 
-      shieldBlock.appendChild(
-        document.createTextNode(shield.routeNumber || ""),
-      );
+      const shieldLabel = document.createElement("span");
+      if (shield.routeNumber != "") {
+        shieldLabel.textContent = `${
+          shield.shieldType == "custom"
+            ? shield.shieldName.replace(/\.\w+/g, "")
+            : Shield.prototype
+                .getPropertiesFromName(shield.shieldValue)
+                .name.toUpperCase()
+        }-${shield.routeNumber}`;
+      } else {
+        shieldLabel.textContent = `${
+          shield.shieldType == "custom"
+            ? shield.shieldName.replace(/\.\w+/g, "")
+            : Shield.prototype
+                .getPropertiesFromName(shield.shieldValue)
+                .name.toUpperCase()
+        }`;
+      }
+      shieldBlock.appendChild(shieldLabel);
+
       shieldRow.appendChild(shieldBlock);
 
       shieldRow.addEventListener("click", () => {
-        selectedShieldIndex = shieldIndex;
-        document
-          .querySelectorAll(".smSPShieldRow")
-          .forEach((row) => row.classList.remove("selected"));
-        shieldRow.classList.add("selected");
-
-        // Show banner config
-        const bannerConfig = document.getElementById("smSPShieldBannerConfig");
-        if (bannerConfig) {
-          bannerConfig.style.display = "block";
+        if (selectedShieldIndex !== shieldIndex) {
+          app.setSelectedShieldId(shieldIndex);
+        } else {
+          app.setSelectedShieldId(-1);
         }
+        updateShieldSubform();
       });
 
-      holder.appendChild(shieldRow);
+      return shieldRow;
+    };
+
+    let lastGroup = null;
+    let groupHolder = null;
+    smSPShieldList.innerHTML = "";
+
+    for (
+      let shieldIndex = 0;
+      shieldIndex < shieldGroup.shields.length;
+      shieldIndex++
+    ) {
+      const shield = shieldGroup.shields[shieldIndex];
+
+      if (shield.group === 0) {
+        lastGroup = null;
+        groupHolder = null;
+
+        smSPShieldList.appendChild(createShieldRow(shield, shieldIndex));
+        continue;
+      }
+
+      if (shield.group !== lastGroup) {
+        lastGroup = shield.group;
+        const groupWrapper = document.createElement("div");
+        groupWrapper.className = "smSPShieldGroup";
+
+        if (
+          selectedShieldIndex != -1 &&
+          shieldGroup.shields[selectedShieldIndex] &&
+          shieldGroup.shields[selectedShieldIndex].group == shield.group
+        ) {
+          groupWrapper.classList.add("selected");
+        }
+
+        const groupDragButton = document.createElement("button");
+        groupDragButton.type = "button";
+        groupDragButton.className = "dragIndicator";
+        groupDragButton.innerHTML =
+          '<span class="material-symbols-outlined">drag_indicator</span>';
+        groupWrapper.appendChild(groupDragButton);
+
+        groupHolder = document.createElement("div");
+        groupHolder.className = "smSPShieldGroupHolder";
+        groupWrapper.appendChild(groupHolder);
+        smSPShieldList.appendChild(groupWrapper);
+      }
+
+      if (!groupHolder) {
+        groupHolder = document.createElement("div");
+        groupHolder.className = "smSPShieldGroupHolder";
+      }
+
+      groupHolder.appendChild(createShieldRow(shield, shieldIndex));
+    }
+
+    document.getElementById("smSPShieldProperties").style.display =
+      selectedShieldIndex == -1 ? "none" : "";
+    if (selectedShieldIndex == -1 || shieldGroup.shields.length == 0) {
+      document.querySelector("#smSPShieldSelectLabel").textContent = "";
+      document.querySelector("#smSPDeleteShield").disabled = true;
+      document.querySelector("#smSPGroupShieldNext").disabled = true;
+      document.querySelector("#smSPGroupShieldPrev").disabled = true;
+      document.querySelector("#smSPGroupShieldUngroup").disabled = true;
+      document.querySelector("#smSPUngroupAllShields").disabled = true;
+      return;
+    }
+
+    // Shield Settings
+    document.querySelector("#smSPDeleteShield").disabled =
+      shieldGroup.shields.length === 0;
+    document.querySelector("#smSPGroupShieldNext").disabled =
+      selectedShieldIndex === shieldGroup.shields.length - 1 ||
+      (selectedShieldIndex <= shieldGroup.shields.length - 2 &&
+        shieldGroup.shields[selectedShieldIndex + 1].group !== 0);
+    document.querySelector("#smSPGroupShieldPrev").disabled =
+      selectedShieldIndex === 0 ||
+      (selectedShieldIndex >= 1 &&
+        shieldGroup.shields[selectedShieldIndex - 1].group !== 0);
+    document.querySelector("#smSPGroupShieldUngroup").disabled =
+      shieldGroup.shields[selectedShieldIndex].group == 0;
+    document.querySelector("#smSPUngroupAllShields").disabled =
+      shieldGroup.shields[selectedShieldIndex].group == 0;
+    document.querySelector("#smSPShieldSelectLabel").textContent =
+      `Selected: Shield ${selectedShieldIndex + 1}`;
+
+    const shieldField = document.getElementById("spShield_routeNumber");
+    shieldField.value = currentShield.routeNumber;
+
+    const designationField = document.getElementById("spShield_designation");
+    designationField.value = currentShield.designation;
+
+    const shieldScaleField = document.getElementById("spShield_scale");
+    const shieldScaleValueField = document.getElementById("spShield_scaleVal");
+    shieldScaleField.value = currentShield.scale;
+    shieldScaleValueField.value = currentShield.scale;
+
+    document.getElementById("spShield_routeScale").value =
+      currentShield.customShields.route_scale;
+
+    document.getElementById("spShield_routeXOffset").value =
+      currentShield.customShields.route_xOffset;
+
+    document.getElementById("spShield_routeYOffset").value =
+      currentShield.customShields.route_yOffset;
+
+    document.getElementById("spShield_routeSpacing").value =
+      currentShield.customShields.route_letterSpacing;
+
+    document.getElementById("spShield_routeFontFamily").value =
+      currentShield.customShields.route_fontFamily || "";
+
+    document.getElementById("spShield_designationScale").value =
+      currentShield.customShields.designation_scale;
+
+    document.getElementById("spShield_designationXOffset").value =
+      currentShield.customShields.designation_xOffset;
+
+    document.getElementById("spShield_designationYOffset").value =
+      currentShield.customShields.designation_yOffset;
+
+    document.getElementById("spShield_designationSpacing").value =
+      currentShield.customShields.designation_letterSpacing;
+
+    document.getElementById("spShield_designationFontFamily").value =
+      currentShield.customShields.designation_fontFamily || "";
+
+    document.getElementById("spShield_horizMargins").value =
+      currentShield.horizMargin;
+    document.getElementById("spShield_vertMargins").value =
+      currentShield.vertMargin;
+
+    document.querySelector("#smSPShieldImgPreview").innerHTML = "";
+    let shieldElem = currentShield.createElement();
+    shieldElem.style.margin = "0";
+    shieldElem.style.scale = "1";
+
+    document.querySelector("#smSPShieldImgPreview").appendChild(shieldElem);
+
+    // Shield Image
+    const changeImageButton = document.getElementById("changeImgBtn");
+    const newButton = changeImageButton.cloneNode(true);
+    changeImageButton.parentNode.replaceChild(newButton, changeImageButton);
+    newButton.addEventListener("click", async () => {
+      const selectedShield = await promptShield(currentShield);
+      if (!selectedShield) {
+        return;
+      }
+
+      currentShield.shieldType = selectedShield.shieldType;
+      currentShield.shieldName = selectedShield.shieldName;
+      currentShield.shieldValue = selectedShield.shieldValue;
+      currentShield.variant = selectedShield.variant;
+      currentShield.shieldBacks = selectedShield.shieldBacks;
+      currentShield.shieldBackColor = selectedShield.shieldBackColor;
+      currentShield.shieldBackRadius = selectedShield.shieldBorderRadius;
+      currentShield.imageType = selectedShield.imageType;
+      currentShield.imageData = selectedShield.imageData;
+
+      updateShieldSubform();
+      app.redraw();
     });
 
-    shieldGroupDiv.appendChild(holder);
-    shieldList.appendChild(shieldGroupDiv);
-  };
+    const shieldScaleInputField = document.getElementById("spShield_scale");
+    shieldScaleInputField.addEventListener("input", (event) => {
+      document.getElementById("spShield_scale").value =
+        event.currentTarget.value;
+      document.getElementById("spShield_scaleVal").value =
+        event.currentTarget.value;
+    });
 
-  const updateShieldModalVisual = (selected, differentShield) => {
-    const holder = document.querySelector(".shieldPreview");
-    const img = holder.querySelector(".selectedShieldPreview");
+    const shieldScaleValueInputField =
+      document.getElementById("spShield_scaleVal");
+    shieldScaleValueInputField.addEventListener("input", (event) => {
+      document.getElementById("spShield_scale").value =
+        event.currentTarget.value;
+      document.getElementById("spShield_scaleVal").value =
+        event.currentTarget.value;
+    });
 
-    if (selected.shieldType === "custom" && selected.imageData) {
-      img.src = selected.imageData;
-    } else {
-      img.src = Shield.prototype.getDirectoryFromShield(
-        selected.shieldValue,
-        selected.variant,
-      );
+    // Shield Library
+    const saveButton = document.querySelector("#smSPShieldSave");
+    const cloneSaveButton = saveButton.cloneNode(true);
+    saveButton.parentNode.replaceChild(cloneSaveButton, saveButton);
+    cloneSaveButton.innerHTML = `<span class="material-symbols-outlined">file_save</span>Save to Library`;
+
+    cloneSaveButton.addEventListener(
+      "click",
+      async () => {
+        if (await ShieldLibrary.addShield(currentShield)) {
+          cloneSaveButton.innerHTML = `<span class="material-symbols-outlined">check</span>Saved!`;
+        }
+      },
+      { once: true },
+    );
+
+    const useUserShields = document.querySelector("#useUserShields");
+    const cloneUseUserShields = useUserShields.cloneNode(true);
+    useUserShields.parentNode.replaceChild(cloneUseUserShields, useUserShields);
+
+    cloneUseUserShields.addEventListener("click", async () => {
+      const shield = await promptShieldLibrary();
+      if (!shield) {
+        return;
+      }
+
+      for (const key of Object.keys(shield)) {
+        currentShield[key] = shield[key];
+      }
+
+      updateShieldSubform();
+      app.redraw();
+    });
+
+    // Banners
+    document.querySelector("#smSP_bannerMaster").innerHTML = "";
+
+    if (Object.values(currentShield.banners).flat().length == 0) {
+      document.querySelector("#smSP_bannerMaster").innerHTML =
+        "No banners found";
     }
 
-    if (selected.shieldBacks) {
-      img.style.setProperty(
-        "--shieldBackColor",
-        (
-          lib.colors[selected.shieldBackColor] || selected.shieldBackColor
-        ).toLowerCase(),
-      );
-      img.style.setProperty(
-        "--shieldBackRadius",
-        selected.shieldBorderRadius + "px",
-      );
+    // check if the shield is the first of its own group
+    const isFirstInGroup =
+      shieldGroup.shields.findIndex(
+        (shield) => shield.group === currentShield.group,
+      ) === selectedShieldIndex;
+
+    if (!isFirstInGroup && currentShield.group != 0) {
+      document.querySelector("#smSPShieldAddBanner").disabled = true;
+      document.querySelector("#smSP_bannerMaster").innerHTML =
+        "Please select the FIRST shield in this shield group!";
+      return;
     } else {
-      img.style.setProperty("--shieldBackColor", "");
-      img.style.setProperty("--shieldBackRadius", "");
+      document.querySelector("#smSPShieldAddBanner").disabled = false;
     }
 
-    holder.querySelector(".selectedShieldName").textContent =
-      selected.shieldName;
+    for (const alignment of ["top", "bottom", "left", "right"]) {
+      if (!currentShield.banners[alignment]) {
+        continue;
+      }
 
-    if (differentShield) {
-      document.querySelector("#selectedShieldVariant").innerHTML = "";
-      for (const variant of Shield.prototype.getPropertiesFromName(
-        selected.shieldValue,
-      ).variants) {
-        lib.appendOption(
-          document.querySelector("#selectedShieldVariant"),
-          variant,
-          { selected: selected.variant == variant },
-        );
+      const alignmentHeader = document.createElement("div");
+
+      const headerElem = document.createElement("span");
+      headerElem.textContent = alignment.toUpperCase();
+      headerElem.className = "smSPBanner_alignmentHeaderText";
+      alignmentHeader.appendChild(headerElem);
+
+      alignmentHeader.appendChild(document.createElement("br"));
+
+      const labelForJustify = document.createElement("label");
+      labelForJustify.textContent = "Align:";
+      alignmentHeader.appendChild(labelForJustify);
+
+      const justifySelect = document.createElement("select");
+      justifySelect.className = "smSPShieldBannerJustify";
+
+      for (const justify of Shield.prototype.bannerAlignments) {
+        lib.appendOption(justifySelect, justify.toLowerCase(), {
+          selected:
+            currentShield.bannerSettings[alignment].alignment ===
+            justify.toLowerCase(),
+          text: justify,
+        });
+      }
+
+      justifySelect.addEventListener("change", readForm);
+      labelForJustify.appendChild(justifySelect);
+
+      const labelForGap = document.createElement("label");
+      labelForGap.textContent = "Spacing: (rem)";
+      alignmentHeader.appendChild(labelForGap);
+
+      const gapInput = document.createElement("input");
+      gapInput.type = "number";
+      gapInput.min = "0";
+      gapInput.step = "0.1";
+      gapInput.value = currentShield.bannerSettings[alignment].gap || 0;
+      gapInput.className = "smSPShieldBannerGap";
+      gapInput.addEventListener("change", readForm);
+      labelForGap.appendChild(gapInput);
+
+      alignmentHeader.className = "smSPBanner_alignmentHeader " + alignment;
+      document.querySelector("#smSP_bannerMaster").appendChild(alignmentHeader);
+
+      for (let i = 0; i < currentShield.banners[alignment].length; i++) {
+        const banner = currentShield.banners[alignment][i];
+        const template = document.querySelector("#smSP_templateBannerElement");
+        const clone = template.content.cloneNode(true);
+        const bannerElement = clone.querySelector(".smSP_bannerElement");
+
+        bannerElement.querySelector(".smSPBanner_textContent").value =
+          banner.textContent;
+        bannerElement.querySelector(".smSPBanner_bgColor").value =
+          banner.backgroundColor;
+        bannerElement.querySelector(".smSPBanner_fontFamily").value =
+          banner.fontFamily;
+        bannerElement.querySelector(".smSPBanner_firstLetterScale").value =
+          banner.firstLetterSize;
+        bannerElement.querySelector(".smSPBanner_fontSize").value =
+          banner.fontSize;
+        bannerElement.querySelector(".smSPBanner_horizontalMargins").value =
+          banner.horizontalMargin;
+        bannerElement.querySelector(".smSPBanner_verticalMargins").value =
+          banner.verticalMargin;
+        bannerElement.querySelector(".smSPBanner_borderRadius").value =
+          banner.borderRadius;
+        bannerElement.querySelector(".smSPBanner_horizontalPadding").value =
+          banner.horizontalPadding;
+        bannerElement.querySelector(".smSPBanner_verticalPadding").value =
+          banner.verticalPadding;
+        bannerElement.querySelector(".smSPBanner_position").value = alignment;
+
+        bannerElement
+          .querySelector(".smSP_deleteBanner")
+          .addEventListener("click", () => {
+            currentShield.removeBanner(alignment, i);
+            updateShieldSubform();
+            app.redraw();
+          });
+        document.querySelector("#smSP_bannerMaster").appendChild(clone);
       }
     }
 
-    document.querySelector("#selectedShieldBacks").value = selected.shieldBacks;
-    document.querySelector("#selectedBackColor").value = selected.backColor;
-    document.querySelector("#selectedBackRoudness").value =
-      selected.shieldBorderRadius;
+    const addBanner = document.querySelector("#smSPShieldAddBanner");
+    const clone = addBanner.cloneNode(true);
+    addBanner.parentNode.replaceChild(clone, addBanner);
+
+    clone.addEventListener("click", () => {
+      currentShield.addBanner(
+        document.querySelector("#smSPShieldBannerAlignment").value,
+      );
+      updateShieldSubform();
+      app.redraw();
+    });
+  };
+
+  const updateGuideArrowsSubform = () => {
+    const panel = app.getCurrentPanel();
+    const sign = panel.sign;
+    const arrows = sign.arrows[sign.arrows.arrowMode];
+
+    document.querySelector('a[data-tab="sMStandardArrows"]').style.display =
+      sign.arrows.arrowMode == "standard" ? "" : "none";
+    document.querySelector('a[data-tab="sMAPL"]').style.display =
+      sign.arrows.arrowMode == "apl" ? "" : "none";
+    document.querySelector('a[data-tab="sMDiagrammic"]').style.display =
+      sign.arrows.arrowMode == "diagrammic" ? "" : "none";
+
+    for (const e of document.querySelectorAll(".sMA_typeSelect > button")) {
+      if (e.id.split("sMA_type")[1].toLowerCase() === sign.arrows.arrowMode) {
+        e.classList.add("selected");
+      } else {
+        e.classList.remove("selected");
+      }
+    }
+
+    if (sign.arrows.arrowMode == "standard") {
+      const isExitOnly = panel.sign.guideArrow.includes("Exit Only");
+      const isSplit = panel.sign.guideArrow === "Split Exit Only";
+
+      // Toggle visibility for all Exit Only related elements
+      const exitOnlyElements = [
+        "exitOnlyDirectionLabel",
+        "showExitOnlyLabel",
+        "exitOnlyDirection",
+        "showExitOnly",
+        "hideExitArrowLabel",
+        "hideExitArrow",
+        "exitOnlyLeftTextLabel",
+        "exitOnlyLeftText",
+        "exitOnlyRightTextLabel",
+        "exitOnlyRightText",
+      ];
+
+      for (const id of exitOnlyElements) {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = isExitOnly ? "visible" : "hidden";
+      }
+
+      const showPadding = isExitOnly && !isSplit;
+      document.getElementById("exitOnlyPaddingLabel").className = showPadding
+        ? ""
+        : "invisible";
+      document.getElementById("exitOnlyPadding").className = showPadding
+        ? ""
+        : "invisible";
+      document.getElementById("paddingValue").className = showPadding
+        ? ""
+        : "invisible";
+
+      const shouldShowBorderMode =
+        !post.secondExitOnly &&
+        (panel.sign.guideArrow === "Half Exit Only" ||
+          panel.sign.guideArrow === "Exit Only");
+      document.getElementById("exitOnlyBorderModeLabel").style.visibility =
+        shouldShowBorderMode ? "visible" : "hidden";
+      document.getElementById("exitOnlyBorderMode").style.visibility =
+        shouldShowBorderMode ? "visible" : "hidden";
+      document.getElementById("exitOnlyBorderMode").value =
+        panel.sign.exitOnlyBorderMode || "None";
+
+      // Text inputs
+      document.getElementById("exitOnlyLeftText").value =
+        panel.sign.exitOnlyLeftText || "";
+      document.getElementById("exitOnlyRightText").value =
+        panel.sign.exitOnlyRightText || "";
+      document.getElementById("showExitOnly").checked = panel.sign.showExitOnly;
+      document.getElementById("hideExitArrow").checked =
+        panel.sign.hideExitArrow;
+      document.getElementById("exitOnlyPadding").value =
+        panel.sign.exitOnlyPadding;
+      document.getElementById("paddingValue").textContent =
+        panel.sign.exitOnlyPadding;
+
+      // --- Other Symbols & Shields ---
+      document.getElementById("oSNum").style.display =
+        panel.sign.otherSymbol !== "None" ? "block" : "none";
+      document.getElementById("oSNum").value = panel.sign.oSNum;
+      document.getElementById("guideArrowLanes").value =
+        panel.sign.guideArrowLanes;
+
+      if (document.getElementById("useCanadianDownArrows")) {
+        document.getElementById("useCanadianDownArrows").checked =
+          panel.sign.useCanadianDownArrows;
+      }
+      return;
+    }
+
+    if (sign.arrows.arrowMode == "apl") {
+      document.querySelector("#smAPL_HorizPadding").value =
+        arrows.horizontalPadding;
+      document.querySelector("#smAPL_VertTopPadding").value =
+        arrows.verticalTopPadding;
+      document.querySelector("#smAPL_VertBottomPadding").value =
+        arrows.verticalBottomPadding;
+      document.querySelector("#sMAPL_APLCat").innerHTML = "";
+
+      let subpanels = app.getCurrentPanel().sign.subPanels;
+      for (let i = 0; i <= subpanels.length - 1; i += 0.5) {
+        let aplList = arrows.subpanels[i] || [];
+        const aplContTemplate = document
+          .querySelector("#smAPL_templateAPLContainer")
+          .content.cloneNode(true);
+        const aplContHolder = aplContTemplate.querySelector(
+          ".smAPLCat_container",
+        );
+
+        aplContHolder.querySelector(".smAPLCat_title").textContent =
+          i % 1 == 0 ? "Subpanel " + (i + 1) : "Divider";
+
+        if (i % 1 != 0) {
+          aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
+          aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
+        } else {
+          aplContHolder.querySelector(".smAPLCat_justifyAPLs").disabled =
+            !arrows.subpanelConfigs[i];
+          if (arrows.subpanelConfigs[i]) {
+            aplContHolder.querySelector(".smAPLCat_justifyAPLs").value =
+              arrows.subpanelConfigs[i].justify;
+          }
+        }
+
+        for (let j = 0; j < aplList.length; j++) {
+          const arrow = aplList[j];
+
+          const aplTemplate = document
+            .querySelector("#sMAPL_templateAPLItem")
+            .content.cloneNode(true);
+          const aplHolder = aplTemplate.querySelector(".smAPLCat_apl");
+
+          aplHolder.querySelector(".smAPLCat_aplSelect").value =
+            arrow.arrowVariant;
+          const arrowSelectImage = aplHolder.querySelector(".smAPL_arrowImage");
+          const arrowSelectLabel = aplHolder.querySelector(".smAPL_arrowLabel");
+          const arrowDefinition =
+            APLArrow.prototype.arrowTypes[arrow.arrowVariant];
+          arrowSelectImage.src = `assets/arrow/${arrowDefinition.asset}`;
+          arrowSelectImage.classList.toggle("flipped", arrowDefinition.flipped);
+          arrowSelectLabel.textContent = arrow.arrowVariant;
+          aplHolder.querySelectorAll(".smAPL_arrowOption").forEach((option) => {
+            option.classList.toggle(
+              "selected",
+              option.dataset.arrow === arrow.arrowVariant,
+            );
+          });
+          aplHolder.querySelector(".sMAPL_size").value = arrow.size;
+          aplHolder.querySelector(".sMAPL_offset").value = arrow.offset;
+          aplHolder.querySelector(".smAPL_exitOnlyCheck").checked =
+            arrow.exitOnlyEnabled;
+          aplHolder.querySelector(".smAPL_leftText").value =
+            arrow.exitTextContent[0];
+          aplHolder.querySelector(".smAPL_rightText").value =
+            arrow.exitTextContent[1];
+          aplHolder.querySelector(".smAPL_bgColor").value = arrow.exitBGColor;
+          aplHolder.querySelector(".smAPL_font").value = arrow.fontFamily;
+          aplHolder.querySelector(".smAPL_fontSize").value = arrow.exitTextSize;
+          aplHolder.querySelector(".smAPL_roundness").value =
+            arrow.exitTextRoundness;
+          aplHolder.querySelector(".smAPL_horizontalPadding").value =
+            arrow.exitTextHorizontalPadding;
+          aplHolder.querySelector(".smAPL_leftMargins").value =
+            arrow.exitTextMargins[0];
+          aplHolder.querySelector(".smAPL_rightMargins").value =
+            arrow.exitTextMargins[1];
+          aplHolder.querySelector(".smAPLCat_aplRow3").style.display =
+            arrow.exitOnlyEnabled ? "" : "none";
+
+          aplContHolder
+            .querySelector(".smAPLCat_aplList")
+            .appendChild(aplTemplate);
+
+          aplHolder
+            .querySelector(".smAPL_Delete")
+            .addEventListener("click", () => {
+              app.removeAPLArrow(i, j);
+            });
+        }
+
+        document.querySelector("#smAPL_APLCat").appendChild(aplContTemplate);
+
+        if (i % 1 != 0 && aplList.length > 0) {
+          aplContHolder.querySelector(".smAPLCat_addArrow").remove();
+        } else {
+          aplContHolder
+            .querySelector(".smAPLCat_addArrow")
+            .addEventListener("click", () => {
+              app.addAPLArrow(i);
+            });
+        }
+      }
+
+      return;
+    }
+
+    if (sign.arrows.arrowMode == "diagrammic") {
+      if (
+        !document.querySelector("#sMDiagrammicOpenEditor").dataset.connected
+      ) {
+        document.querySelector("#sMDiagrammicOpenEditor").dataset.connected =
+          true;
+        document
+          .querySelector("#sMDiagrammicOpenEditor")
+          .addEventListener("click", async () => {
+            await DiagramDrawing.promptDraw(
+              (retValue) => {
+                if (retValue) {
+                  arrows.diagramData = retValue;
+                  arrows.preset = "None";
+                  document.querySelector("#sMDiagrammicPreset").value = "None";
+                  formHandler.readForm();
+                }
+              },
+              false,
+              sign.arrows.diagrammic.diagramData,
+            );
+          });
+
+        document
+          .querySelector("#sMDiagrammicOpenEditorPresets")
+          .addEventListener("click", async () => {
+            await DiagramDrawing.promptDraw(
+              (retValue) => {
+                if (retValue) {
+                  arrows.diagramData = retValue;
+                  arrows.preset = "None";
+                  document.querySelector("#sMDiagrammicPreset").value = "None";
+                  formHandler.readForm();
+                }
+              },
+              true,
+              sign.arrows.diagrammic.diagramData,
+            );
+          });
+      }
+
+      const diagrammicPreset = document.querySelector("#sMDiagrammicPreset");
+      const populatePresetOptions = async () => {
+        const presetNames = await DiagrammicLibrary.getAllDiagramNames();
+        diagrammicPreset.innerHTML = "";
+
+        lib.appendOption(diagrammicPreset, "None", {
+          selected: arrows.preset === "None",
+          text: "None",
+        });
+
+        for (const presetName of presetNames) {
+          lib.appendOption(diagrammicPreset, presetName, {
+            selected: arrows.preset === presetName,
+            text: presetName,
+          });
+        }
+      };
+
+      populatePresetOptions();
+
+      document.querySelector("#sMDiagrammicScale").value = arrows.scale;
+      return;
+    }
+  };
+
+  const updateShieldModalVisual = (selectedShield, isDifferent = true) => {
+    const modalPreviewImg = document.querySelector(".selectedShieldPreview");
+    const modalPreviewName = document.querySelector(".selectedShieldName");
+    const variantSelect = document.querySelector("#selectedShieldVariant");
+    const backColorSelect = document.querySelector("#selectedBackColor");
+    const backCheckbox = document.querySelector("#selectedShieldBacks");
+    const borderRadiusInput = document.querySelector("#selectedBackRoudness");
+
+    const properties = Shield.prototype.getPropertiesFromName(
+      selectedShield.shieldValue,
+    );
+
+    if (isDifferent) {
+      variantSelect.innerHTML = "";
+      for (const variant of properties.variants) {
+        lib.appendOption(variantSelect, variant, {
+          selected: selectedShield.variant === variant,
+        });
+      }
+    }
+
+    backColorSelect.value = selectedShield.shieldBackColor;
+    backCheckbox.checked = selectedShield.shieldBacks;
+    borderRadiusInput.value = selectedShield.shieldBackRadius || 4;
+
+    modalPreviewName.textContent = selectedShield.shieldName || properties.name;
+
+    let imageSrc = Shield.prototype.getImageData(selectedShield);
+    modalPreviewImg.src = imageSrc;
+
+    modalPreviewImg.alt = selectedShield.shieldValue || "shield";
+
+    if (selectedShield.shieldBacks) {
+      modalPreviewImg.style.setProperty(
+        "--shieldBackColor",
+        selectedShield.shieldBackColor,
+      );
+      modalPreviewImg.style.setProperty(
+        "--shieldBackRadius",
+        selectedShield.shieldBorderRadius + "px",
+      );
+    } else {
+      modalPreviewImg.style.removeProperty("--shieldBackColor");
+      modalPreviewImg.style.removeProperty("--shieldBackRadius");
+    }
   };
 
   const promptShield = function (currentValue, returnMethod = null) {
     const modal = document.querySelector("#shieldImgSelector");
     const holder = document.querySelector("#modalHolder");
     let eventListeners = [];
-    return new Promise((resolve, reject) => {
+
+    const trackListener = (element, type, handler) => {
+      if (element) {
+        element.addEventListener(type, handler);
+        eventListeners.push({ element, type, handler });
+      }
+    };
+
+    const cleanup = () => {
+      for (const item of eventListeners) {
+        item.element.removeEventListener(item.type, item.handler);
+      }
+      eventListeners = [];
+    };
+
+    return new Promise((resolve) => {
       let selectedShield = {
         shieldType: currentValue?.shieldType || "preset",
         shieldName: currentValue?.shieldName || "Interstate",
@@ -1150,87 +2281,24 @@ const formHandler = (() => {
         imageData: currentValue?.imageData || "",
       };
 
-      // Setup tabs
-      document.querySelector("#presetShields").addEventListener("click", () => {
-        document.querySelector(".shieldLibrary").dataset.tab =
-          "presetShieldList";
-        document.querySelector("#presetShields").className = "selected";
-        document.querySelector("#customShields").className = "";
-        selectedShield.shieldType = "preset";
-      });
-
-      document.querySelector("#customShields").addEventListener("click", () => {
-        document.querySelector(".shieldLibrary").dataset.tab = "uploadShield";
-        document.querySelector("#customShields").className = "selected";
-        document.querySelector("#presetShields").className = "";
-        selectedShield.shieldType = "custom";
-      });
-
       updateShieldModalVisual(selectedShield, true);
 
       holder.style.display = "flex";
       modal.style.display = "flex";
       modal.showModal();
 
-      // Setup close button
-      // Setup file upload
-      const fileInput = document.querySelector("#uploadCustomShield");
-      if (fileInput) {
-        fileInput.addEventListener("change", (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              selectedShield.shieldType = "custom";
-              selectedShield.imageType = "data";
-              selectedShield.imageData = e.target.result;
-              selectedShield.shieldName = file.name.split(".")[0];
-              updateShieldModalVisual(selectedShield, true);
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-      }
+      const closeBtn = document.querySelector("#shieldImgSelectorClose");
+      const handleCloseClick = () => {
+        holder.style.display = "none";
+        modal.style.display = "none";
+        modal.close();
 
-      // Setup tabs
-      document
-        .querySelector("#presetShields")
-        ?.addEventListener("click", () => {
-          document.querySelector(".shieldLibrary").dataset.tab =
-            "presetShieldList";
-          document.querySelector("#presetShields").className = "selected";
-          document.querySelector("#customShields").className = "";
-          selectedShield.shieldType = "preset";
-        });
+        cleanup();
 
-      document
-        .querySelector("#customShields")
-        ?.addEventListener("click", () => {
-          document.querySelector(".shieldLibrary").dataset.tab = "uploadShield";
-          document.querySelector("#customShields").className = "selected";
-          document.querySelector("#presetShields").className = "";
-          selectedShield.shieldType = "custom";
-        });
-
-      // Setup close button
-      document.querySelector("#shieldImgSelectorClose")?.addEventListener(
-        "click",
-        () => {
-          holder.style.display = "none";
-          modal.style.display = "none";
-          modal.close();
-
-          // Cleanup event listeners
-          for (const e of eventListeners) {
-            e.element.removeEventListener("click", e.handler);
-          }
-          eventListeners.length = 0;
-
-          if (returnMethod) returnMethod(null);
-          resolve(null);
-        },
-        { once: true },
-      );
+        if (returnMethod) returnMethod(null);
+        resolve(null);
+      };
+      trackListener(closeBtn, "click", handleCloseClick);
 
       const setShield = (event) => {
         let isDifferent =
@@ -1238,9 +2306,21 @@ const formHandler = (() => {
         selectedShield.shieldName =
           event.currentTarget.querySelector(".shieldItemName").textContent;
         selectedShield.shieldValue = event.currentTarget.dataset.name;
+
+        if (
+          document
+            .querySelector("#savedCustomShieldsList")
+            .contains(event.currentTarget)
+        ) {
+          selectedShield.shieldType = "custom";
+        } else {
+          selectedShield.shieldType = "preset";
+        }
+
         searchFromDir(
           Shield.prototype.shieldDirectory,
           document.querySelector("#presetShieldList"),
+          false,
         );
 
         if (
@@ -1259,48 +2339,49 @@ const formHandler = (() => {
 
       const searchFromDir = (dir, parentElem, createListeners) => {
         let hasAnything = false;
+        if (!parentElem) return hasAnything;
+
         for (const category in dir) {
+          if (category == "type") continue;
           const cat = dir[category];
-          if (category == "type") {
-            continue;
-          }
 
           if (cat.type == "category") {
             const childElem = parentElem.querySelector(
-              '.shieldCategory[data-category="' + category + '"]',
+              `.shieldCategory[data-category="${category}"]`,
             );
-            if (searchFromDir(cat, childElem, createListeners)) {
+            if (childElem && searchFromDir(cat, childElem, createListeners)) {
               hasAnything = true;
               if (selectedShield.name != "") {
                 childElem.classList.remove("open");
-                childElem.querySelector(".shieldCategoryHead").click();
+                childElem.querySelector(".shieldCategoryHead")?.click();
               }
             }
           } else if (cat.type == "shield") {
             const childElem = parentElem.querySelector(
-              '.shieldCategoryType[data-name="' + category + '"]',
+              `.shieldCategoryType[data-name="${category}"]`,
             );
+            if (!childElem) continue;
 
             if (cat.name == selectedShield.shieldName) {
               hasAnything = true;
               childElem.classList.add("selected");
-              childElem.querySelector(".shieldItemSelected").textContent =
-                "radio_button_checked";
+              const indicator = childElem.querySelector(".shieldItemSelected");
+              if (indicator) indicator.textContent = "radio_button_checked";
             } else {
               childElem.classList.remove("selected");
-              childElem.querySelector(".shieldItemSelected").textContent =
-                "radio_button_unchecked";
+              const indicator = childElem.querySelector(".shieldItemSelected");
+              if (indicator) indicator.textContent = "radio_button_unchecked";
             }
 
             if (createListeners) {
-              childElem.addEventListener("click", setShield);
-              eventListeners.push({ element: childElem, handler: setShield });
+              trackListener(childElem, "click", setShield);
             }
           }
         }
         return hasAnything;
       };
 
+      // Initial load of the shield directory item listeners
       searchFromDir(
         Shield.prototype.shieldDirectory,
         document.querySelector("#presetShieldList"),
@@ -1311,51 +2392,42 @@ const formHandler = (() => {
         selectedShield.variant = e.currentTarget.value;
         updateShieldModalVisual(selectedShield, false);
       };
-      document
-        .querySelector("#selectedShieldVariant")
-        .addEventListener("change", handleVariant);
-      eventListeners.push({
-        element: document.querySelector("#selectedShieldVariant"),
-        handler: handleVariant,
-      });
+      trackListener(
+        document.querySelector("#selectedShieldVariant"),
+        "change",
+        handleVariant,
+      );
 
       const handleBackColor = (e) => {
         selectedShield.shieldBackColor = e.currentTarget.value;
         updateShieldModalVisual(selectedShield, false);
       };
-      document
-        .querySelector("#selectedBackColor")
-        .addEventListener("change", handleBackColor);
-      eventListeners.push({
-        element: document.querySelector("#selectedBackColor"),
-        handler: handleBackColor,
-      });
+      trackListener(
+        document.querySelector("#selectedBackColor"),
+        "change",
+        handleBackColor,
+      );
 
       const handleBorderRadius = (e) => {
         selectedShield.shieldBorderRadius = parseInt(e.currentTarget.value);
         updateShieldModalVisual(selectedShield, false);
       };
-      document
-        .querySelector("#selectedBackRoudness")
-        .addEventListener("change", handleBorderRadius);
-      eventListeners.push({
-        element: document.querySelector("#selectedBackRoudness"),
-        handler: handleBorderRadius,
-      });
+      trackListener(
+        document.querySelector("#selectedBackRoudness"),
+        "change",
+        handleBorderRadius,
+      );
 
       const handleShieldBackCheckbox = (e) => {
         selectedShield.shieldBacks = e.currentTarget.checked;
         updateShieldModalVisual(selectedShield, false);
       };
-      document
-        .querySelector("#selectedShieldBacks")
-        .addEventListener("change", handleShieldBackCheckbox);
-      eventListeners.push({
-        element: document.querySelector("#selectedShieldBacks"),
-        handler: handleShieldBackCheckbox,
-      });
+      trackListener(
+        document.querySelector("#selectedShieldBacks"),
+        "change",
+        handleShieldBackCheckbox,
+      );
 
-      /*
       window.customShields.loadSavedShields((shield) => {
         selectedShield.shieldType = "custom";
         selectedShield.shieldName = shield.fileName;
@@ -1363,22 +2435,91 @@ const formHandler = (() => {
         selectedShield.imageData = shield.data;
         updateShieldModalVisual(selectedShield, true);
       });
-      */
 
-      document.querySelector("#setShield").addEventListener("click", () => {
+      const submitBtn = document.querySelector("#setShield");
+      const handleSubmitClick = () => {
         holder.style.display = "none";
         modal.style.display = "none";
         modal.close();
 
-        // Cleanup event listeners
-        for (const e of eventListeners) {
-          e.element.removeEventListener("click", e.handler);
-        }
-        eventListeners.length = 0;
+        cleanup();
 
         if (returnMethod) returnMethod(selectedShield);
         resolve(selectedShield);
+      };
+      trackListener(submitBtn, "click", handleSubmitClick);
+    });
+  };
+
+  const promptShieldLibrary = function () {
+    const modal = document.querySelector("#shieldImgLibrary");
+    const holder = document.querySelector("#modalHolder");
+
+    let eventListeners = [];
+
+    const trackListener = (element, type, handler) => {
+      if (element) {
+        element.addEventListener(type, handler);
+        eventListeners.push({ element, type, handler });
+      }
+    };
+
+    const cleanup = () => {
+      for (const item of eventListeners) {
+        item.element.removeEventListener(item.type, item.handler);
+      }
+      eventListeners = [];
+    };
+
+    document.querySelector("#shieldLibraryDelete").disabled = true;
+
+    return new Promise((resolve) => {
+      let selectedShield = null;
+
+      holder.style.display = "flex";
+      modal.style.display = "flex";
+      modal.showModal();
+
+      const closeBtn = document.querySelector("#shieldImgLibraryClose");
+      const handleCloseClick = () => {
+        holder.style.display = "none";
+        modal.style.display = "none";
+        modal.close();
+
+        cleanup();
+        resolve(null);
+      };
+      trackListener(closeBtn, "click", handleCloseClick);
+
+      window.shieldLibrary.loadShields((shield) => {
+        selectedShield = shield;
+        document.querySelector("#shieldLibraryDelete").disabled = false;
       });
+
+      const handleDeleteShield = () => {
+        if (selectedShield == null) {
+          return;
+        }
+
+        window.shieldLibrary.removeShield(selectedShield.shieldID);
+      };
+      trackListener(
+        document.querySelector("#shieldLibraryDelete"),
+        "click",
+        handleDeleteShield,
+      );
+
+      const submitBtn = document.querySelector("#shieldLibraryUse");
+      const handleSubmitClick = () => {
+        holder.style.display = "none";
+        modal.style.display = "none";
+        modal.close();
+
+        cleanup();
+
+        resolve(selectedShield);
+      };
+      trackListener(submitBtn, "click", handleSubmitClick);
     });
   };
 
@@ -1395,11 +2536,36 @@ const formHandler = (() => {
     App.recheckWidth();
   };
 
+  const removeExitTabHelper = () => {
+    if (app.vars.currentlySelectedExitTabIndex == -1) {
+      app.removeExitTabRow();
+    } else {
+      app.deleteExitTab();
+    }
+  };
+
+  const duplicateExitTabHelper = () => {
+    if (app.vars.currentlySelectedExitTabIndex == -1) {
+      app.duplicateExitTabRow();
+    } else {
+      app.duplicateExitTab();
+    }
+  };
+
   return {
     init: initialize,
     readForm,
     updateForm,
     updateShieldSubform,
+    updateExitTabSubform,
     zoom,
+    removeExitTabHelper,
+    duplicateExitTabHelper,
+    updateGuideArrowsSubform,
+    vars: {
+      get zoomLevel() {
+        return zoomLevel;
+      },
+    },
   };
 })();

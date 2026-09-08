@@ -1,532 +1,480 @@
 class ExitTab {
-  /**
-   * Creates a new ExitTab.
-   * @param {string} number - Number to display on the exit tab.
-   * @param {string} [position=null] - Position to display the exit tab relative to the sign.
-   * @param {string} [width=null] - Width of the exit tab (narrow or wide).
-   */
   constructor({
-    number = null,
-    position = null,
-    width = null,
-    color = null,
-    variant = "Default",
-    icon = null,
-    useTextBasedIcon = false,
-    fullBorder = false,
-    squareCorners = false,
-    topOffset = true,
-    showLeft = false,
+    // Content
+    textContent = "EXIT 1",
+    subTextContent = "",
+    shields = [],
+
+    // Appearance
+    backgroundColor = "inherit",
+    borderStyle = "round",
     borderThickness = 0.2,
-    minHeight = 2.25,
-    nestedExitTabs = [],
-    FHWAFont = false,
-    fontSize = 18,
-    tollLogoOnly = true,
-    tollLogoSquare = false,
-    tollLogoSize = null,
+    borderRadius = 0.5,
+    useFullBorder = true,
+
+    horizontalPadding = 0.5,
+    verticalPadding = 0,
+    minimumHeight = 2.25,
+    holderPadding = 0,
+
+    fontSize = 20,
+    lineHeight = 100,
+    enlargeNumerals = true,
+    enlargeNumeralsSize = 150,
+    spaceLettersNumerals = true,
+    numeralWordSpacing = 0.25,
+
+    offsetNonNumerals = false,
+    fontFamily = "Clearview 5WR",
+    numeralFontFamily = "Inherit",
+    letterSpacing = 0,
+    numeralLetterSpacing = 0,
+    useTrimFormat = false,
+
+    shieldsPosition = "start",
+    shieldsDirection = "horizontal",
+    shieldsGap = 0.5,
+
+    contentDirection = "horizontal",
+
+    // Positioning
+    alignment = "center",
+    width = "auto",
+    widthSize = 0,
+
+    // Variant
+    variant = "Normal",
+    variantSettings = {
+      icon: {
+        icon: "",
+        isTextBased: false,
+        showBackground: true,
+        addon: "none",
+        iconSize: 3,
+        isSquare: true,
+        isTollIcon: false,
+      },
+      partialLeft: {
+        separateRow: true,
+        horizontalPadding: 0.6,
+        verticalPadding: 0.3,
+        letterSpacing: 2,
+        minWidth: 7,
+        spacing: 1.8,
+      },
+      hovVariant1: {
+        height: 0,
+        width: 0,
+        verticalPadding: 0.125,
+        roundCorners: false,
+      },
+      hovVariant2: {
+        height: 0,
+        width: 0,
+        verticalPadding: 0.125,
+      },
+    },
   } = {}) {
-    this.number = number;
-    if (this.positions.includes(position)) {
-      this.position = position;
-    } else {
-      this.position = this.positions[1];
-    }
-    if (this.widths.includes(width)) {
-      this.width = width;
-    } else {
-      this.width = this.widths[0];
-    }
-    if (this.colors.includes(color)) {
-      this.color = color;
-    } else {
-      this.color = this.colors[0];
-    }
-
-    if (this.variants.includes(variant)) {
-      this.variant = variant;
-    } else {
-      this.variant = this.variants[0];
-    }
-
-    this.fullBorder = fullBorder;
-    this.squareCorners = squareCorners;
-    const parsedBorderThickness =
-      typeof borderThickness === "number"
-        ? borderThickness
-        : parseFloat(borderThickness);
-    const fallbackBorderThickness =
-      typeof ExitTab.prototype.defaultBorderThickness === "number"
-        ? ExitTab.prototype.defaultBorderThickness
-        : 0.2;
-    this.borderThickness = Number.isFinite(parsedBorderThickness)
-      ? Math.max(0, parsedBorderThickness)
-      : fallbackBorderThickness;
-    this.topOffset = topOffset;
-    this.minHeight = minHeight;
-    this.nestedExitTabs = nestedExitTabs;
-    this.FHWAFont = FHWAFont;
-    this.icon = icon;
-    this.showLeft = showLeft;
+    this.textContent = textContent;
+    this.subTextContent = subTextContent;
+    this.shields = shields;
+    this.backgroundColor = backgroundColor;
+    this.borderStyle = borderStyle;
+    this.borderThickness = borderThickness;
+    this.borderRadius = borderRadius;
+    this.useFullBorder = useFullBorder;
+    this.horizontalPadding = horizontalPadding;
+    this.verticalPadding = verticalPadding;
+    this.minimumHeight = minimumHeight;
     this.fontSize = fontSize;
-    const defaultTollLogoSize =
-      typeof ExitTab.prototype.defaultTollLogoSize === "number"
-        ? ExitTab.prototype.defaultTollLogoSize
-        : 3;
-    this.tollLogoOnly = !!tollLogoOnly;
-    this.tollLogoSquare = !!tollLogoSquare;
-    const parsedTollLogoSize =
-      typeof tollLogoSize === "number"
-        ? tollLogoSize
-        : parseFloat(tollLogoSize);
-    this.tollLogoSize =
-      Number.isFinite(parsedTollLogoSize) && parsedTollLogoSize > 0
-        ? parsedTollLogoSize
-        : defaultTollLogoSize;
+    this.lineHeight = lineHeight;
+    this.enlargeNumerals = enlargeNumerals;
+    this.enlargeNumeralsSize = enlargeNumeralsSize;
+    this.spaceLettersNumerals = spaceLettersNumerals;
+    this.numeralWordSpacing = numeralWordSpacing;
+    this.offsetNonNumerals = offsetNonNumerals;
+    this.fontFamily = fontFamily;
+    this.numeralFontFamily = numeralFontFamily;
+    this.letterSpacing = letterSpacing;
+    this.numeralLetterSpacing = numeralLetterSpacing;
+    this.shieldsPosition = shieldsPosition;
+    this.shieldsDirection = shieldsDirection;
+    this.shieldsGap = shieldsGap;
+    this.contentDirection = contentDirection;
+    this.alignment = alignment;
+    this.width = width;
+    this.widthSize = widthSize;
+    this.variant = variant;
+    this.variantSettings = variantSettings;
+    this.holderPadding = holderPadding;
+    this.useTrimFormat = useTrimFormat;
+  }
+
+  splitText(text) {
+    if (!this.enlargeNumerals) {
+      return text.split(/\s+/).filter(Boolean);
+    }
+
+    const tokens = text.match(/\d+[\w-]*|[^\s\d]+/g) || [];
+
+    if (this.spaceLettersNumerals) {
+      return tokens.map((token) => {
+        if (/^\d+[\w-]+$/.test(token)) {
+          const digits = token.match(/^\d+/)[0];
+          const letters = token.slice(digits.length);
+          return [digits, letters];
+        }
+        return token;
+      });
+    }
+
+    return tokens;
+  }
+
+  createElement() {
+    const exitTabHolder = document.createElement("div");
+    exitTabHolder.className = `ET-tabHolder ${this.alignment} ${this.width.replace(/\s/g, "-")}`;
+    exitTabHolder.style.setProperty(
+      "--width",
+      this.widthSize + (this.width == "custom percent" ? "%" : "rem"),
+    );
+    exitTabHolder.style.padding = this.holderPadding + "px";
+
+    const exitTabElement = document.createElement("div");
+    exitTabElement.className = `ET-tab ${this.useTrimFormat ? "useTrim" : ""} ${this.variant.toLowerCase().replace(/\s/g, "-")} ${this.borderStyle} ${this.useFullBorder ? "fullBorder" : ""}`;
+
+    if (this.backgroundColor != "inherit") {
+      exitTabHolder.style.setProperty(
+        "--backgroundColor",
+        lib.colors[
+          this.backgroundColor.replace(/\p{L}+/gu, (word) => {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          })
+        ] || this.backgroundColor.toLowerCase(),
+      );
+
+      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+        exitTabElement.style.color = "black";
+        exitTabElement.style.borderColor = "black";
+      }
+    }
+
+    exitTabElement.style.setProperty(
+      "--minimumHeight",
+      this.minimumHeight + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--horizontalPadding",
+      this.horizontalPadding + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--verticalPadding",
+      this.verticalPadding + "rem",
+    );
+
+    exitTabElement.style.setProperty(
+      "--direction",
+      this.contentDirection == "horizontal" ? "row" : "column",
+    );
+
+    exitTabElement.style.setProperty(
+      "--borderThickness",
+      this.borderThickness + "rem",
+    );
+    if (this.borderStyle == "round") {
+      exitTabElement.style.setProperty(
+        "--borderRadius",
+        this.borderRadius + "rem",
+      );
+    }
+
+    exitTabElement.style.setProperty(
+      "--letterSpacing",
+      this.letterSpacing + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--numeralLetterSpacing",
+      this.numeralLetterSpacing + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--fontFamily",
+      '"' + this.fontFamily + '"',
+    );
+    exitTabElement.style.setProperty(
+      "--numeralFontFamily",
+      '"' +
+        (this.numeralFontFamily == "Inherit"
+          ? this.fontFamily
+          : this.numeralFontFamily) +
+        '"',
+    );
+    exitTabElement.style.setProperty("--fontSize", this.fontSize + "px");
+    exitTabElement.style.setProperty("--lineHeight", this.lineHeight + "%");
+    exitTabElement.style.setProperty(
+      "--extraMarginLeft",
+      this.numeralWordSpacing + "rem",
+    );
+
+    if (this.enlargeNumerals) {
+      exitTabElement.style.setProperty(
+        "--enlargeNumeralPercent",
+        this.enlargeNumeralsSize / 100,
+      );
+    }
+
+    exitTabElement.style.gap = this.fontSize * 0.25 + "px";
+
+    if (this.variant == "FullLeft") {
+      let leftElement = document.createElement("div");
+      leftElement.className = "ET-FullLeftHolder";
+
+      let leftElementContent = document.createElement("div");
+      leftElementContent.textContent = "LEFT";
+      leftElementContent.className = "ET-FullLeft";
+
+      leftElement.appendChild(leftElementContent);
+      exitTabElement.appendChild(leftElement);
+    } else if (this.variant == "PartialLeft") {
+      let leftElement = document.createElement("div");
+      leftElement.textContent = "LEFT";
+      leftElement.className =
+        "ET-PartialLeft " +
+        (this.variantSettings.partialLeft.separateRow ? "separateRow" : "");
+      exitTabElement.style.minWidth =
+        this.variantSettings.partialLeft.minWidth + "rem";
+      leftElement.style.setProperty(
+        "--horizontalPadding",
+        this.variantSettings.partialLeft.horizontalPadding + "rem",
+      );
+      leftElement.style.setProperty(
+        "--verticalPadding",
+        this.variantSettings.partialLeft.verticalPadding + "rem",
+      );
+      leftElement.style.setProperty(
+        "--letterSpacing",
+        this.variantSettings.partialLeft.letterSpacing + "px",
+      );
+      exitTabElement.style.setProperty(
+        "--partialLeftSpacing",
+        this.variantSettings.partialLeft.spacing + "rem",
+      );
+      exitTabElement.appendChild(leftElement);
+    }
+
+    let textParentElement = exitTabElement;
+
+    if (["HOVVariant1", "HOVVariant2"].includes(this.variant)) {
+      const hovElement = document.createElement("img");
+      hovElement.className = "ET-HOV";
+      hovElement.src = "./assets/icons/HOV.svg";
+
+      if (
+        this.variantSettings[
+          this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+        ].width != 0
+      ) {
+        hovElement.style.width =
+          this.variantSettings[
+            this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].width + "rem";
+      }
+
+      if (
+        this.variantSettings[
+          this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+        ].height != 0
+      ) {
+        hovElement.style.height =
+          this.variantSettings[
+            this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].height + "rem";
+      }
+
+      hovElement.style.padding =
+        this.variantSettings[
+          this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+        ].verticalPadding + "rem";
+
+      exitTabElement.appendChild(hovElement);
+
+      if (this.variant == "HOVVariant2") {
+        const textElemHolder = document.createElement("div");
+        textElemHolder.className = "ET-TextHolder";
+        exitTabElement.appendChild(textElemHolder);
+        textParentElement = textElemHolder;
+      } else {
+        if (this.variantSettings.hovVariant1.roundCorners) {
+          hovElement.classList.add("roundCorners");
+        }
+      }
+    }
+
     if (
-      Array.isArray(this.nestedExitTabs) &&
-      ExitTab.prototype.maxNested != null &&
-      this.nestedExitTabs.length > ExitTab.prototype.maxNested
+      ["Normal", "PartialLeft", "FullLeft", "HOVVariant2"].includes(
+        this.variant,
+      )
     ) {
-      this.nestedExitTabs = this.nestedExitTabs.slice(
-        0,
-        ExitTab.prototype.maxNested
-      );
-    }
-  }
+      let splitText = this.splitText(this.textContent);
+      for (let i = 0; i < splitText.length; i++) {
+        let item = splitText[i];
+        if (Array.isArray(item)) {
+          const wordElem1 = document.createElement("span");
+          wordElem1.textContent = item[0];
+          wordElem1.className = "ET-numeral";
 
-  nestExitTab() {
-    if (this.nestedExitTabs.length >= ExitTab.prototype.maxNested) {
-      return null;
-    }
-    const exitTab = new ExitTab();
-    this.nestedExitTabs.push(exitTab);
-    return exitTab;
-  }
+          textParentElement.appendChild(wordElem1);
 
-  deleteNestExitTab(index) {
-    this.nestedExitTabs.splice(index, 1);
-  }
-
-  duplicateNestExitTab(index) {
-    if (this.nestedExitTabs.length >= ExitTab.prototype.maxNested) {
-      return null;
-    }
-    const exisitingTab = this.nestedExitTabs[index];
-    if (!exisitingTab) {
-      return null;
-    }
-    const exitTab = new ExitTab({
-      number: exisitingTab.number,
-      position: exisitingTab.position,
-      width: exisitingTab.width,
-      color: exisitingTab.color,
-      variant: exisitingTab.variant,
-      icon: exisitingTab.icon,
-      squareCorners: exisitingTab.squareCorners,
-      fullBorder: exisitingTab.fullBorder,
-      borderThickness: exisitingTab.borderThickness,
-      minHeight: exisitingTab.minHeight,
-      tollLogoOnly: exisitingTab.tollLogoOnly,
-      tollLogoSquare: exisitingTab.tollLogoSquare,
-      tollLogoSize: exisitingTab.tollLogoSize,
-    });
-
-    this.nestedExitTabs.push(exitTab);
-    return exitTab;
-  }
-
-  /**
-   * Render this exit tab and nested tabs to a container
-   * @param {HTMLElement} parentContainer - Parent container to render into
-   * @param {Object} options - Rendering options { post, panel, applyHighwayGothicStyling, FHWA_EXIT_TAB_FONT_SCALE }
-   */
-  renderTab(parentContainer, options = {}) {
-    const {
-      post = window.post,
-      panel,
-      applyHighwayGothicStyling,
-      FHWA_EXIT_TAB_FONT_SCALE = 1,
-    } = options;
-
-    // Create main container for this tab level
-    const exitTabCont = document.createElement("div");
-    exitTabCont.className = `exitTabContainer ${this.position.toLowerCase()} ${this.width.toLowerCase()}`;
-    parentContainer.appendChild(exitTabCont);
-
-    // Render primary tab and nested tabs
-    const nestedCount = this.nestedExitTabs.length;
-
-    for (let nestIndex = -1; nestIndex < nestedCount; nestIndex++) {
-      const currentTab =
-        nestIndex === -1 ? this : this.nestedExitTabs[nestIndex];
-
-      // Check if tab has content
-      const hasContent =
-        currentTab.number ||
-        currentTab.showLeft ||
-        currentTab.variant !== "Default";
-
-      const exitTabElmt = document.createElement("div");
-      exitTabElmt.className = `exitTab ${currentTab.position.toLowerCase()} ${currentTab.width.toLowerCase()}`;
-      if (currentTab.squareCorners) {
-        exitTabElmt.className += " squareCorners";
-      }
-
-      // Simplify border thickness logic
-      const borderThickness = currentTab.borderThickness || 0.2;
-      const isBorderless = borderThickness <= 0;
-      const borderThicknessRem = borderThickness.toString() + "rem";
-
-      if (isBorderless) {
-        exitTabElmt.classList.add("borderless");
-      }
-
-      const usesHighwayGothicFont =
-        currentTab.FHWAFont || post.fontType === true;
-
-      // Helper: register text styling
-      const registerText = (element) => {
-        if (!element) return element;
-        element.classList.add("exitTabText");
-        return element;
-      };
-
-      // Helper: render exit number
-      const renderNumber = (parentElmt, tabRef) => {
-        if (!parentElmt || !tabRef.number) return;
-
-        const normalizedText = String(tabRef.number).replace(/\\n/g, "\n");
-        const numberLines = normalizedText.split("\n");
-
-        const renderSegments = (targetElmt, lineText) => {
-          if (!targetElmt) return;
-
-          const safeText =
-            typeof lineText === "string" ? lineText : String(lineText || "");
-          const txtArr = safeText.toUpperCase().split(/(\d+\S*)/);
-
-          const divTextElmt = document.createElement("div");
-          registerText(divTextElmt);
-          if (usesHighwayGothicFont) {
-            divTextElmt.style.setProperty(
-              "--exitTabAdditionalOffset",
-              "-0.5px"
-            );
+          if (item[1] === "") {
+            continue;
           }
 
-          const leadingText = txtArr[0] || "";
-          divTextElmt.appendChild(
-            document.createTextNode(
-              leadingText.length > 0
-                ? leadingText
-                : safeText.length === 0
-                ? "\u00a0"
-                : ""
-            )
-          );
-          targetElmt.appendChild(divTextElmt);
+          const wordElem2 = document.createElement("span");
+          wordElem2.textContent = item[1];
+          wordElem2.className = "ET-trailing";
 
-          if (txtArr.length > 1) {
-            divTextElmt.classList.add("exitFormat");
-            if (leadingText && leadingText.trim().length > 0) {
-              const spacer = document.createElement("span");
-              spacer.textContent = " ";
-              spacer.classList.add("exitTabTextSpacer");
-              registerText(spacer);
-              targetElmt.appendChild(spacer);
-            }
-            const numeral = document.createElement("span");
-            numeral.className = "numeral";
-            registerText(numeral);
-            numeral.appendChild(document.createTextNode(txtArr[1]));
-            targetElmt.appendChild(numeral);
-
-            const trailing = txtArr.slice(2).join("");
-            if (trailing) {
-              const trailingSpan = document.createElement("span");
-              trailingSpan.textContent = trailing;
-              registerText(trailingSpan);
-              targetElmt.appendChild(trailingSpan);
-            }
-
-            if (tabRef.topOffset === false) {
-              divTextElmt.style.setProperty("--exitTabTextBaseOffset", "0rem");
-            }
-          }
-        };
-
-        if (numberLines.length <= 1) {
-          renderSegments(parentElmt, normalizedText);
-          return;
-        }
-
-        const multiContainer = document.createElement("div");
-        multiContainer.className = "exitTabNumberLinesContainer";
-        parentElmt.appendChild(multiContainer);
-
-        numberLines.forEach((line) => {
-          const lineWrapper = document.createElement("div");
-          lineWrapper.className = "exitTabNumberLine";
-          multiContainer.appendChild(lineWrapper);
-          renderSegments(lineWrapper, line || "");
-        });
-      };
-
-      // Create holder element
-      const exitTabHolderElmt = document.createElement("div");
-      exitTabHolderElmt.className = "exitTabHolder";
-      exitTabHolderElmt.appendChild(exitTabElmt);
-      exitTabCont.appendChild(exitTabHolderElmt);
-
-      // Set color
-      if (currentTab.color && currentTab.color !== "Panel Color") {
-        exitTabElmt.className += ` ${currentTab.color.toLowerCase()}`;
-        exitTabHolderElmt.className += ` ${currentTab.color.toLowerCase()}`;
-      } else if (panel) {
-        exitTabElmt.className += ` ${panel.color.toLowerCase()}`;
-        exitTabHolderElmt.className += ` ${panel.color.toLowerCase()}`;
-      }
-
-      // Apply Highway Gothic styling
-      if (usesHighwayGothicFont && applyHighwayGothicStyling) {
-        applyHighwayGothicStyling(exitTabElmt);
-        exitTabElmt.style.setProperty(
-          "--fhwaBaselineOffset",
-          "calc(var(--fhwaBaselineShift) + 1px)"
-        );
-        exitTabElmt.style.setProperty("--exitTabNumeralScale", "0.95");
-      }
-
-      // Render content based on variant
-      if (hasContent) {
-        if (currentTab.variant === "Default") {
-          if (currentTab.showLeft) {
-            const leftElmt = document.createElement("div");
-            leftElmt.classList.add("yellowElmt");
-            registerText(leftElmt);
-            leftElmt.appendChild(document.createTextNode("LEFT"));
-            exitTabElmt.appendChild(leftElmt);
-            exitTabElmt.style.display = "inline-block";
-
-            if (currentTab.number) {
-              leftElmt.style.marginRight = "0.4rem";
-            }
-          }
-
-          renderNumber(exitTabElmt, currentTab);
-        } else if (currentTab.variant === "Toll Logo") {
-          exitTabCont.classList.add("tollLogoExitTabContainer");
-          exitTabHolderElmt.classList.add("tollLogoExitHolder");
-
-          const tollLogoContainerElmt = document.createElement("div");
-          tollLogoContainerElmt.className = "tollLogoLogoWrapper";
-          const tollLogoHolderElmt = document.createElement("div");
-          tollLogoHolderElmt.className = "tollLogoImageHolder";
-          if (currentTab.tollLogoSquare) {
-            tollLogoHolderElmt.classList.add("squareIcon");
-          }
-
-          const tollLogoSize = parseFloat(currentTab.tollLogoSize) || 3;
-          exitTabElmt.style.setProperty(
-            "--tollLogoSize",
-            tollLogoSize.toString() + "rem"
-          );
-          tollLogoHolderElmt.style.setProperty(
-            "--tollLogoSize",
-            tollLogoSize.toString() + "rem"
-          );
-
-          const tollLogos =
-            typeof TollLogoElement !== "undefined" &&
-            TollLogoElement.prototype?.logos
-              ? TollLogoElement.prototype.logos
-              : null;
-          const tollLogoKey =
-            tollLogos && currentTab.icon && tollLogos[currentTab.icon]
-              ? currentTab.icon
-              : tollLogos && TollLogoElement.prototype?.defaultLogo
-              ? TollLogoElement.prototype.defaultLogo
-              : null;
-          const tollLogoDef =
-            tollLogos && tollLogoKey ? tollLogos[tollLogoKey] : null;
-
-          if (tollLogoDef) {
-            const tollLogoImgElmt = document.createElement("img");
-            tollLogoImgElmt.src = tollLogoDef.src;
-            tollLogoImgElmt.alt = tollLogoDef.label || "Toll logo";
-            tollLogoImgElmt.className = "tollLogoImage";
-            tollLogoImgElmt.loading = "lazy";
-            tollLogoImgElmt.decoding = "async";
-            tollLogoHolderElmt.appendChild(tollLogoImgElmt);
-          } else if (currentTab.icon) {
-            const fallbackLogoElmt = document.createElement("span");
-            fallbackLogoElmt.textContent = currentTab.icon.toUpperCase();
-            registerText(fallbackLogoElmt);
-            tollLogoHolderElmt.appendChild(fallbackLogoElmt);
-          }
-
-          tollLogoContainerElmt.appendChild(tollLogoHolderElmt);
-          exitTabElmt.appendChild(tollLogoContainerElmt);
-          exitTabElmt.classList.add("tollLogoExitTab");
-
-          if (currentTab.tollLogoOnly) {
-            exitTabElmt.classList.add("logoOnly");
-            exitTabHolderElmt.classList.add("logoOnly");
-            exitTabCont.classList.add("logoOnly");
-          } else {
-            const tollLogoNumberWrapperElmt = document.createElement("div");
-            tollLogoNumberWrapperElmt.className = "tollLogoNumberWrapper";
-            renderNumber(tollLogoNumberWrapperElmt, currentTab);
-            exitTabElmt.appendChild(tollLogoNumberWrapperElmt);
-          }
-        } else if (currentTab.variant === "Icon") {
-          // Icon variant handling
-        } else if (currentTab.variant === "Full Left") {
-          exitTabElmt.classList.add("fullLeft");
-          const bannerElmt = document.createElement("div");
-          bannerElmt.className = "fullLeftBanner";
-          registerText(bannerElmt);
-          bannerElmt.appendChild(document.createTextNode("LEFT"));
-          exitTabElmt.appendChild(bannerElmt);
-
-          const numberWrapperElmt = document.createElement("div");
-          numberWrapperElmt.className = "fullLeftNumber";
-          exitTabElmt.appendChild(numberWrapperElmt);
-          renderNumber(numberWrapperElmt, currentTab);
-        } else if (currentTab.variant === "HOV 1") {
-          exitTabCont.classList.add("hovExitTabContainer");
-          exitTabHolderElmt.classList.add("hovExitTabHolder");
-          exitTabElmt.classList.add("hovExitTab");
-
-          const hovIconColumnElmt = document.createElement("div");
-          hovIconColumnElmt.className = "hovIconColumn";
-          const hovIconImgElmt = document.createElement("img");
-          hovIconImgElmt.className = "hovIcon";
-          hovIconImgElmt.src = "assets/icons/HOV.png";
-          hovIconImgElmt.alt = "HOV symbol";
-          hovIconColumnElmt.appendChild(hovIconImgElmt);
-
-          const hovContentColumnElmt = document.createElement("div");
-          hovContentColumnElmt.className = "hovContentColumn";
-
-          const hovTextRowElmt = document.createElement("div");
-          hovTextRowElmt.className = "hovTextRow";
-          const hovTextElmt = document.createElement("span");
-          registerText(hovTextElmt);
-          const hovExitNumber =
-            typeof currentTab.number === "string"
-              ? currentTab.number.trim().toUpperCase()
-              : "";
-          hovTextElmt.textContent = hovExitNumber
-            ? `HOV EXIT ${hovExitNumber}`
-            : "HOV EXIT";
-          hovTextRowElmt.appendChild(hovTextElmt);
-          hovContentColumnElmt.appendChild(hovTextRowElmt);
-
-          const hovBottomBarElmt = document.createElement("div");
-          hovBottomBarElmt.className = "hovBottomBar";
-          hovContentColumnElmt.appendChild(hovBottomBarElmt);
-
-          exitTabElmt.appendChild(hovIconColumnElmt);
-          exitTabElmt.appendChild(hovContentColumnElmt);
-        } else if (currentTab.variant === "HOV 2") {
-          // HOV 2 variant handling
-        }
-
-        // Set visibility and borders
-        exitTabElmt.style.visibility = "visible";
-        exitTabCont.className += " tabVisible";
-
-        const cornerRadius = currentTab.squareCorners ? "0.25rem" : "0.5rem";
-
-        if (currentTab.fullBorder === true) {
-          exitTabElmt.style.borderBottomWidth = borderThicknessRem;
-          exitTabElmt.style.borderBottomStyle = isBorderless ? "" : "solid";
-          exitTabElmt.style.borderRadius = isBorderless ? "0" : cornerRadius;
+          textParentElement.appendChild(wordElem2);
         } else {
-          exitTabElmt.style.borderBottomWidth = "";
-          exitTabElmt.style.borderBottomStyle = "";
-          exitTabElmt.style.borderRadius = "";
-        }
+          const wordElem = document.createElement("span");
+          wordElem.textContent = item;
 
-        exitTabElmt.style.borderTopWidth = borderThicknessRem;
-        exitTabElmt.style.borderLeftWidth = borderThicknessRem;
-        exitTabElmt.style.borderRightWidth = borderThicknessRem;
+          if (/\d/.test(item)) {
+            wordElem.className = "ET-numeral";
+          } else {
+            wordElem.className = "ET-word";
+          }
 
-        // Set font size
-        let fontSize = currentTab.fontSize || 0;
-        if (typeof fontSize === "string") {
-          fontSize = parseFloat(fontSize);
-        }
-        if (!Number.isFinite(fontSize)) {
-          fontSize = 0;
-        }
-        if (usesHighwayGothicFont) {
-          fontSize *= FHWA_EXIT_TAB_FONT_SCALE;
-        }
-        exitTabElmt.style.fontSize = fontSize.toString() + "px";
+          if (wordElem.className == "ET-word" && this.offsetNonNumerals) {
+            wordElem.style.bottom = "calc(var(--fontSize) / 4)";
+          }
 
-        // Set min height
-        exitTabElmt.style.minHeight = currentTab.minHeight.toString() + "rem";
-        if (currentTab.variant === "Toll Logo" && currentTab.tollLogoOnly) {
-          exitTabElmt.style.minHeight = "0";
+          if (
+            i == 0 &&
+            (this.subTextContent != "") & (wordElem.className == "ET-word")
+          ) {
+            wordElem.textContent = item + "\n" + this.subTextContent;
+            wordElem.style.textAlign = "left";
+          }
+
+          textParentElement.appendChild(wordElem);
         }
       }
     }
 
-    // Hide container if no tabs have content (primary or nested)
-    const hasAnyContent =
-      this.number ||
-      this.showLeft ||
-      this.variant !== "Default" ||
-      this.nestedExitTabs.some(
-        (tab) => tab.number || tab.showLeft || tab.variant !== "Default"
-      );
-    if (!hasAnyContent) {
-      exitTabCont.style.display = "none";
-    }
-
-    return exitTabCont;
+    exitTabHolder.appendChild(exitTabElement);
+    return exitTabHolder;
   }
 }
-
-ExitTab.prototype.positions = ["Left", "Center", "Right"];
+ExitTab.prototype.backgroundColor = ["Inherit"].concat(Object.keys(lib.colors));
+ExitTab.prototype.borderStyle = ["Round", "Square"];
+ExitTab.prototype.fontFamily = TextElement.prototype.fontFamily;
+ExitTab.prototype.numeralFontFamily = ["Inherit"].concat(
+  ExitTab.prototype.fontFamily,
+);
+ExitTab.prototype.shieldsDirection = ["Horizontal", "Vertical"];
+ExitTab.prototype.contentDirection = ["Horizontal", "Vertical"];
+ExitTab.prototype.shieldsPosition = ["Start", "End"];
+ExitTab.prototype.alignment = ["Left", "Center", "Right"];
+ExitTab.prototype.widthPresets = [
+  "Auto",
+  "Full",
+  "Custom Percent",
+  "Custom Size",
+];
 ExitTab.prototype.variants = [
-  "Default",
-  "Toll Logo",
+  "Normal",
   "Icon",
-  "Full Left",
-  "HOV 1",
-  "HOV 2",
+  "PartialLeft",
+  "FullLeft",
+  "HOVVariant1",
+  "HOVVariant2",
 ];
-ExitTab.prototype.widths = ["Narrow", "Wide", "Full", "Edge", "Out"];
-ExitTab.prototype.defaultBorderThickness = 0.2;
-ExitTab.prototype.defaultTollLogoSize = 3;
-ExitTab.prototype.colors = (() => {
-  const colors = ["Panel Color"];
-  if (typeof lib !== "undefined" && lib?.colors) {
-    colors.push(...Object.keys(lib.colors));
-  } else {
-    colors.push(
-      "Green",
-      "Blue",
-      "Brown",
-      "Yellow",
-      "White",
-      "Black",
-      "Purple",
-      "Orange",
-      "Red",
-      "Fluorescent Pink",
-      "Fluorescent Yellow-Green"
-    );
+
+ExitTab.prototype.iconVariant_addons = [
+  "None",
+  "Only",
+  "Pay by Mail 1",
+  "Pay By Mail 2",
+];
+
+class ExitTabRow {
+  constructor({
+    exitTabs = [],
+    gap = 0,
+    panelEdgeType = "separate",
+    position = "top",
+    marginBottom = 0.3,
+  } = {}) {
+    this.exitTabs = exitTabs;
+    this.gap = gap;
+    this.panelEdgeType = panelEdgeType;
+    this.position = position;
+    this.marginBottom = marginBottom;
   }
-  return colors;
-})();
-ExitTab.prototype.icons = [
-  "Hazardous Materials:HM.png:var(--white):var(--white)",
-  "No Hazardous Materials:NO-HM.png:var(--white):var(--white)",
-  "Hospital:H.png:var(--blue):var(--white)",
+
+  createElement() {
+    const exitTabHolder = document.createElement("div");
+    exitTabHolder.className =
+      "ET-row " + this.panelEdgeType.toLowerCase().replace(/\s/g, "-");
+    exitTabHolder.style.setProperty("--spacing", this.gap + "rem");
+    exitTabHolder.style.setProperty(
+      "--marginBottom",
+      this.marginBottom + "rem",
+    );
+
+    const leftAlignment = document.createElement("div");
+    leftAlignment.className = "ET-alignment left";
+
+    const centerAlignment = document.createElement("div");
+    centerAlignment.className = "ET-alignment center";
+
+    const rightAlignment = document.createElement("div");
+    rightAlignment.className = "ET-alignment right";
+
+    for (let i = 0; i < this.exitTabs.length; i++) {
+      const exitTab = this.exitTabs[i];
+      const elem = exitTab.createElement();
+
+      if (exitTab.alignment == "left") {
+        leftAlignment.appendChild(elem);
+      } else if (exitTab.alignment == "center") {
+        centerAlignment.appendChild(elem);
+      } else if (exitTab.alignment == "right") {
+        rightAlignment.appendChild(elem);
+      }
+    }
+
+    exitTabHolder.appendChild(leftAlignment);
+    exitTabHolder.appendChild(centerAlignment);
+    exitTabHolder.appendChild(rightAlignment);
+
+    return exitTabHolder;
+  }
+
+  newExitTab(alignment = "center") {
+    const exitTab = new ExitTab();
+    exitTab.alignment = alignment;
+    this.exitTabs.push(exitTab);
+
+    return exitTab;
+  }
+
+  duplicateExitTab(index) {
+    const exitTab = this.exitTabs[index];
+    const cloneExitTab = Object.assign(exitTab.constructor.prototype, exitTab);
+
+    this.exitTabs.splice(index + 1, 0, cloneExitTab);
+    return cloneExitTab;
+  }
+
+  deleteExitTab(index) {
+    this.exitTabs.splice(index, 1);
+  }
+}
+ExitTabRow.prototype.panelEdgeType = ["Separate", "Extend", "Meet Corners"];
+ExitTabRow.prototype.position = [
+  "Top",
+  "Bottom",
+  "Left",
+  "Right",
+  "Within Panel",
 ];
-ExitTab.prototype.maxNested = 999;

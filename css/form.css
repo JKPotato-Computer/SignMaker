@@ -1,6 +1,5 @@
 .sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
   font-size: 1rem;
-  top: 2px;
   position: relative;
 }
 
@@ -323,12 +322,30 @@ label span.toolTip,
   height: 100%;
 }
 
+fieldset {
+  background-color: rgb(var(--baseColor), 0.3);
+  border: 1px solid rgb(var(--baseColor));
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+#sMExitTabProperties > fieldset:last-child {
+  margin-bottom: 0rem;
+}
+
+#sMET_subTextContent,
+#sMET_textContent {
+  width: 40%;
+  margin-bottom: 1rem;
+}
+
 legend {
-  font-family: "Overpass" !important;
-  text-align: center;
-  width: max-content !important;
+  font-family: "Overpass";
+  font-weight: 700;
+  text-align: left;
   padding: 0 0.5rem;
-  font-size: 16px;
+  font-size: 20px;
+  background-color: rgb(var(--baseColor));
 }
 
 nav.sMModalBar {
@@ -372,6 +389,7 @@ div.sMModalTitle {
   padding: 0.25rem 0.75rem;
   gap: 0.25rem;
   margin-right: 0.5rem;
+  height: stretch;
 }
 
 a.sMModalTab {
@@ -395,8 +413,7 @@ div.sMModalTitle {
 
 div#sMPanelPadding,
 div#sMExitTabSetting,
-div#sMSPSettings,
-div#sMAPL {
+div#sMSPSettings {
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -407,6 +424,10 @@ div#sMAPL {
 input[type="number"] {
   border: 0;
   margin: 0.25rem;
+}
+
+input:disabled {
+  background-color: rgb(var(--baseColorInv),.4);
 }
 
 .listNav {
@@ -467,10 +488,11 @@ div#modalHolder {
   top: 0;
   width: 100%;
   height: 100%;
-  z-index: 2;
+  z-index: 99;
   display: none;
-  justify-content: center;
-  align-items: center;
+  overflow-y: auto;
+  flex-direction: column;
+  padding: 0.5rem;
 }
 
 ::backdrop {
@@ -484,10 +506,22 @@ dialog {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+  inset: auto;
+  margin: auto;
+  background: var(--hotbarColor);
+  color: rgb(var(--baseColorInv));
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
 }
 
 #welcomeToSignMaker {
   width: 70%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #welcomeToSignMaker img {
@@ -538,14 +572,14 @@ div.options a {
 
 /* OLD - TO CONFIGURE */
 
-.active,
+:not(.exitTabGroup).active,
 .exitTabButton.active,
 .exitTabNestedButton.active {
   background-color: rgb(200, 200, 200);
 }
 
-:root[data-theme="dark"] .active,
-:root[data-theme="dark"] .exitTabSelect.active {
+:root[data-theme="dark"] .active:not(.exitTabGroup),
+:root[data-theme="dark"] .exitTabButton.active {
   background-color: rgb(0, 0, 175);
 }
 
@@ -573,6 +607,11 @@ label {
   width: 7.5rem;
   text-align: right;
   display: inline-block;
+}
+
+label:has(input),
+label:has(select) {
+  width: auto;
 }
 
 label.noLabelAlignment {
@@ -834,6 +873,9 @@ textarea {
   justify-content: center;
   gap: 1rem;
   height: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #downloadContents {
@@ -911,7 +953,7 @@ textarea {
   flex: 0 0 auto;
 }
 
-.exitTabGroup:not(:has(.active)) .exitTabNestedButton {
+.exitTabGroup:not(.active) .exitTabNestedButton {
   display: none;
 }
 
@@ -1018,6 +1060,26 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   width: 100%;
 }
 
+#smSPShieldHeader {
+  flex-direction: column;
+  padding: 0;
+}
+
+#smSPShieldHeader > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+}
+
+#smSPShieldHeader > div:nth-child(2) {
+  background-color: rgb(var(--baseColor), 0.3);
+  margin-top: -0.5rem;
+  width: 100%;
+}
+
 #smPShieldGroupSelector {
   flex-direction: column;
 }
@@ -1026,6 +1088,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 #smPShieldGroupSelector > div:nth-child(1) > span {
@@ -1042,6 +1106,10 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 
 #shieldGroupList > button {
   padding: 0.5rem;
+}
+
+#shieldGroupList > button.selected {
+  background-color: rgb(var(--baseColor));
 }
 
 #smSPElement,
@@ -1158,7 +1226,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .smSPShieldVisual {
@@ -1169,6 +1237,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .smSPShieldLargeVisual {
   height: 90px;
   width: auto;
+  background-color: var(--shieldBackColor);
+  border-radius: var(--shieldBackRadius);
 }
 
 .smSPShieldRow,
@@ -1180,6 +1250,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   align-items: center;
   background-color: rgb(var(--baseColor), 0.5);
   cursor: pointer;
+  font-size: 1rem;
 }
 
 .smSPShieldRow:hover {
@@ -1229,6 +1300,12 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background: none;
 }
 
+.dragIndicator > span {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
 .dragIndicator:hover {
   background-color: rgb(0, 0, 0, 0.2) !important;
 }
@@ -1240,6 +1317,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 
 #smSPShieldList {
   flex-direction: column;
+}
+
+#smSPShieldImgPreview {
+  color: white;
+  font-size: 20px;
 }
 
 #smSPShieldImgConfig {
@@ -1290,8 +1372,12 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background: none;
   padding: 0;
   flex-direction: row;
-  width: 50%;
-  height: 80%;
+  height: 100%;
+  min-width: max-content;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 70%;
 }
 
 #shieldImgSelector > div {
@@ -1299,7 +1385,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 }
 
 #shieldImgSelector > div {
-  background: canvas;
+  background: var(--hotbarColor);
 }
 
 .shieldLibrary {
@@ -1316,13 +1402,24 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   align-items: center;
 }
 
-#shieldImgSelectorClose {
+#shieldImgSelectorClose,
+#shieldImgLibraryClose,
+#diagrammicDrawingClose,
+button[data-diagram-modal-close] {
   font-size: 20px;
   padding: 0.125rem 1rem;
   background-color: rgb(255, 0, 0, 0.2);
 }
 
-#shieldImgSelectorClose:hover {
+.redButton {
+  background-color: rgb(255, 0, 0, 0.2);
+}
+
+#shieldImgSelectorClose:hover,
+#shieldImgLibraryClose:hover,
+#diagrammicDrawingClose:hover,
+button[data-diagram-modal-close]:hover,
+.redButton:hover {
   background-color: rgb(255, 0, 0, 0.6);
 }
 
@@ -1435,7 +1532,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(0, 0, 255, 0.2) !important;
 }
 
-#presetShieldSearch {
+#presetShieldSearch,
+#shieldLibrarySearch {
   width: 100%;
   border: 1px solid black;
   padding: 0.75rem;
@@ -1510,6 +1608,8 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   font-size: 12px;
   padding: 0.25rem;
   color: rgb(100, 100, 100);
+  overflow-wrap: break-word;
+  width: 25rem;
 }
 
 #linkUpload {
@@ -1532,7 +1632,12 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 }
 
 .deleteCustomShieldBtn {
-  background: none;
+  background: rgb(255, 0, 0, 0.3);
+  padding: 0.5rem;
+}
+
+.deleteCustomShieldBtn:hover {
+  background: rgb(255, 0, 0, 0.8) !important;
 }
 
 #uploadShield h3 {
@@ -1565,7 +1670,7 @@ dialog:not([open]) {
   left: 0.75rem;
   top: 0.75rem;
   background-color: var(--hotbarColor);
-  padding: 0.25rem 0.25rem;
+  padding: 0.4rem;
   width: max-content;
   gap: 0.25rem;
   opacity: 0.4;
@@ -1592,7 +1697,7 @@ dialog:not([open]) {
 }
 
 #zoomControl > span:nth-child(1) {
-  font-size: 12px;
+  font-size: 16px;
   width: 3rem;
 }
 
@@ -1600,7 +1705,7 @@ div#subPanelList {
   padding: 0.25rem;
 }
 
-div#smSPBlockProperties > div {
+#smSPBlockProperties > div {
   width: 49%;
   display: inline-flex;
   flex-direction: column;
@@ -1625,6 +1730,8 @@ button#sdShieldGroup_OpenShieldEditor {
   align-items: center;
   width: 100%;
   gap: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.5);
+  padding: 0.5rem;
 }
 
 .smSPShieldBannerController > button {
@@ -1639,7 +1746,7 @@ button#sdShieldGroup_OpenShieldEditor {
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background-color: rgb(255, 255, 255, 0.25);
+  background-color: rgb(var(--baseColor), 0.25);
 }
 
 .smSP_bannerEditor {
@@ -1655,7 +1762,7 @@ button#sdShieldGroup_OpenShieldEditor {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: rgb(255, 255, 255, 0.5);
+  background-color: rgb(var(--baseColor), 0.5);
   padding: 0.5rem;
   gap: 0.5rem;
 }
@@ -1709,6 +1816,853 @@ button#sdShieldGroup_OpenShieldEditor {
   background-color: rgb(255, 0, 0, 1) !important;
 }
 
-input.halfSizeInput {
+.halfSizeInput {
   width: 3rem;
+}
+
+#smSPShieldStyleOptions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+#smSPShieldStyleOptions > button {
+  flex-grow: 1;
+}
+
+.smSPBanner_alignmentHeader {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor));
+}
+
+#shieldImgLibrary {
+  display: none;
+  width: 70%;
+  height: 70%;
+  color: var(--textColor);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.shieldimgLibraryholder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.shieldImgLibraryHolder > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#shieldLibraryListHolder {
+  width: 100%;
+  flex-grow: 1;
+  background-color: rgb(var(--baseColorInv), 0.025);
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: start;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  height: -webkit-fill-available;
+  overflow: auto;
+}
+
+#shieldLibraryListHolder > button {
+  aspect-ratio: 1 / 1;
+  width: 20vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: 1px solid black;
+}
+
+#shieldLibraryListHolder > button.selected {
+  background-color: rgb(var(--baseColor));
+}
+
+#shieldLibraryListHolder > button.selected > span {
+  font-weight: 700;
+}
+
+#shieldLibraryListHolder > button > span {
+  width: 100%;
+  height: 20%;
+  background-color: rgb(0, 0, 255, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#shieldLibraryListHolder > button > div {
+  height: 80%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 20px;
+}
+
+div#shieldLibraryListOptions {
+  display: flex;
+  justify-content: right;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: auto;
+}
+
+div#shieldLibraryListOptions > button {
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.smSPBanner_alignmentHeaderText {
+  font-weight: 700;
+}
+
+button#sdIcon_openSelectPanel {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  min-width: 10rem;
+  cursor: pointer;
+}
+
+button#sdIcon_openSelectPanel .sdIcon_selectedLabel {
+  flex: 1;
+  text-align: left;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+  max-width: 7rem;
+}
+
+div#sdIcon_selectPanel {
+  position: fixed;
+  background-color: rgb(var(--baseColor));
+  z-index: 99;
+  width: 18rem;
+  max-width: min(90vw, 18rem);
+  padding: 0.3rem;
+  border: 1px solid #c7c7c7;
+}
+
+#sdIcon_iconSearch {
+  width: 100%;
+  margin: 0 0;
+  padding: 0.5rem;
+}
+
+button.sdIcon_iconListButton {
+  width: 100%;
+  height: max-content;
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+}
+
+button.sdIcon_iconListButton:not(.selected):hover {
+  background-color: rgb(var(--baseColorInv), 0.05) !important;
+}
+
+button.sdIcon_iconListButton.selected,
+button.sdIcon_iconListButton.selected:hover {
+  background-color: rgb(var(--baseColorInv), 0.1) !important;
+}
+
+.sdIcon_iconImage {
+  height: 3rem;
+  object-fit: contain;
+  flex-shrink: 0;
+  background-color: black;
+  aspect-ratio: 1 / 1;
+}
+
+.sdIcon_iconLabel {
+  font-size: 0.95rem;
+  flex-grow: 1;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.sdIcon_iconList {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  gap: 0.2rem;
+}
+
+#sdIcon_selectedImg {
+  aspect-ratio: 1 / 1;
+  height: 20px;
+  background-color: black;
+}
+
+div.sMET_typeSelect,
+div.sMA_typeSelect {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: left;
+  gap: 0.75rem;
+  width: 80vh;
+  flex-wrap: wrap;
+}
+
+div.sMET_typeSelect {
+  justify-content: center;
+}
+
+.div.sMA_typeSelect {
+  width: 100%;
+}
+
+div.sMET_typeSelect > button,
+div.sMA_typeSelect > button {
+  height: 5.5rem;
+  width: max-content;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+div.sMET_typeSelect > button.selected > span,
+div.sMA_typeSelect > button.selected > span {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+img.sMET_typeVisual,
+img.sMA_typeVisual {
+  height: 100%;
+}
+
+.smET_typeLabel,
+.smA_typeLabel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.5rem;
+  color: white;
+  z-index: 2;
+  background-color: rgb(0, 0, 255, 0.8);
+}
+
+.diagrammicDrawingHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: max-content;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.diagrammicDrawingHolder {
+  flex-grow: 1;
+  display: flex;
+  height: auto;
+  flex-direction: column;
+}
+
+#diagrammicDrawing header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.diagrammicDrawingHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.diagramModalLink {
+  padding: 0.25rem;
+  color: rgb(var(--baseColorInv));
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.diagramSubModal {
+  width: max-content;
+  max-width: 80%;
+  max-height: 85vh;
+  padding: 1rem;
+  background-color: var(--hotbarColor);
+  inset: 50%;
+  transform: translate(-50%);
+  position: fixed;
+  color: var(--textColor);
+}
+
+#diagramPresets {
+  width: 80%;
+}
+
+.diagramSubModal::backdrop {
+  background-color: rgb(0, 0, 0, 0.45);
+}
+
+.diagramSubModal header {
+  margin-bottom: 1rem;
+}
+
+.diagramSubModal h3 {
+  margin: 0;
+}
+
+.diagramShortcutList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.diagramShortcutList li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.diagramShortcutList li span {
+  margin-left: 0.25rem;
+}
+
+kbd {
+  padding: 0.15rem 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+#diagramPresetGallery {
+  display: flex;
+  gap: 0.75rem;
+  max-height: 55vh;
+  overflow-y: auto;
+  flex-wrap: wrap;
+}
+
+.diagramPresetCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(var(--baseColorInv), 1);
+  cursor: pointer;
+  outline: none;
+  background: var(--green);
+}
+
+.diagramPresetCard.selected {
+  background: rgb(var(--baseColorInv), 0.3);
+}
+
+.diagramPresetCard.selected .diagramPresetLabel {
+  .diagramPresetCard.selected {
+    background: rgb(var(--baseColorInv), 0.3);
+  }
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.diagramPresetLabel {
+  width: 100%;
+  background-color: rgb(0, 0, 255, 0.8);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  color: White;
+  font-size: 0.8rem;
+}
+
+.diagramPresetCard input {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.diagramPresetCard img {
+  display: block;
+  width: 10rem;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--green);
+}
+
+.diagramPresetActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.diagramPresetActions > button {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+}
+
+#diagramCanvas {
+  background-color: var(--green);
+  height: 100%;
+  width: 100%;
+}
+
+.canvasBackground {
+  height: 35rem;
+  justify-content: center;
+  align-items: start;
+  display: flex;
+  aspect-ratio: 1;
+  flex-direction: column;
+  flex: 0 0 35rem;
+  position: relative;
+}
+
+#diagrammicDrawing {
+  width: 100%;
+  overflow-y: scroll;
+  scrollbar-color: rgb(var(--baseColorInv), 0.3) transparent;
+}
+
+.diagramEditor {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-grow: 1;
+  width: 100%;
+  align-items: start;
+  padding: 0 1rem;
+  justify-content: center;
+}
+
+.diagramEditorCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: stretch;
+  min-width: 0;
+}
+
+.diagramEditorCol:nth-child(1) {
+  flex: 1 0 calc((100% - 35rem) * 0.35);
+}
+
+.diagramEditorCol:nth-child(3) {
+  flex: 1 0 calc((100% - 35rem) * 0.65);
+  background-color: rgb(var(--baseColor), 0.4);
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.diagramEditorCol:nth-child(1) > div {
+  background-color: rgb(var(--baseColor), 0.4);
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.diagramObjectList,
+.diagramObjectProperties {
+  flex-grow: 1;
+  position: relative;
+}
+
+.diagramObjectList {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.diagramObjectList > span {
+  text-align: center;
+}
+
+.diagramObjList {
+  flex-grow: 1;
+  max-height: 20rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+.diagramObjList:has(.moving)
+  .diagramObjectButton:not(.diagramObjectAddButton):hover {
+  text-decoration: underline;
+}
+
+.diagramObjectButton {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.diagramObjectButton.selected {
+  background-color: rgb(var(--baseColor), 1);
+  text-decoration: underline;
+}
+
+.diagramObjectButton.selected.moving {
+  background-color: rgb(var(--baseColorInv), 0.1);
+  border: 3px dashed black;
+  font-weight: 600;
+}
+
+.diagramObjectAddButton {
+  font-size: 0.8rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  color: white;
+  padding: 0.25rem 0.5rem;
+}
+
+.diagramObjectAddButton:hover {
+  background-color: rgb(0, 0, 255, 1) !important;
+}
+
+.objectRoadType {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0rem 0rem 0.5rem;
+}
+
+.objectRoadType > button {
+  width: calc(33% - 0.5rem);
+  height: 100%;
+  padding: 1rem;
+}
+
+.objectRoadType > button.selected {
+  text-decoration: underline;
+  background-color: rgb(var(--baseColor));
+}
+
+.diagrammicDrawingHolder > footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.diagrammicDrawingHolder > footer > div {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.diagrammicDrawingHolder > footer button {
+  padding: 0.5rem;
+  font-size: 24px;
+}
+
+.objectGroupManager {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.objectGroupManager > button {
+  padding: 0.5rem;
+  font-size: 16px;
+  width: calc(50% - 0.5rem);
+}
+
+.objectNameLabel {
+  float: right;
+}
+
+div#debugEditor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20%;
+  font-size: 0.5rem;
+  color: black;
+  background-color: rgb(255, 255, 255, 0.85);
+  padding: 0.25rem;
+}
+
+.objectRoadOptions {
+  display: flex;
+  width: 100%;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: auto;
+}
+
+.objectRoadOptions > button {
+  width: 33%;
+  padding: 0.5rem;
+}
+
+#diagrammicDrawing h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diagramProperties {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.diagramProperties > label {
+  width: auto;
+}
+
+#sMDiagrammic > div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#sMDiagrammic > div > button {
+  font-size: 1rem;
+  width: 50%;
+  padding: 0.5rem;
+}
+
+label[for="diagramFileName"] {
+  height: max-content;
+  width: auto;
+  margin-right: -1rem;
+}
+
+#diagramFileName {
+  width: 10rem;
+}
+
+.smAPLCat_container {
+  background-color: rgb(var(--baseColor), 0.1);
+  padding: 1rem;
+}
+
+.smAPLCat_aplList {
+  display: flex;
+  flex-direction: column;
+}
+
+div#sMAPL_APLCat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.smAPLCat_aplRow1,
+.smAPLCat_aplRow2,
+.smAPLCat_aplRow3 {
+  font-size: 16px;
+}
+
+.smAPLCat_aplRow1,
+.smAPLCat_aplRow2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  gap: 0.5rem;
+}
+
+.smAPLCat_apl:nth-child(even) {
+  background-color: rgb(var(--baseColor), 0.2);
+  padding: 1rem;
+}
+
+.smAPLCat_apl:nth-child(odd) {
+  background-color: rgb(var(--baseColor), 0.1);
+  padding: 1rem;
+}
+
+.smAPLCat_aplSelect {
+  display: none;
+}
+
+.smAPLCat_aplSelectHolder {
+  position: relative;
+  flex-grow: 1;
+}
+
+.smAPLCat_aplSelectButton {
+  width: 100%;
+  min-height: 3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 24px;
+}
+
+.smAPL_arrowImage,
+.smAPL_arrowOptionImage {
+  width: 3rem;
+  height: 3rem;
+  padding: 0.5rem;
+  background-color: black;
+}
+
+.smAPL_arrowImage.flipped,
+.smAPL_arrowOptionImage.flipped {
+  transform: scaleX(-1);
+}
+
+.smAPL_arrowLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.smAPLCat_aplSelectPanel {
+  position: fixed;
+  width: 18rem;
+  max-width: min(80vw, 18rem);
+  padding: 0.3rem;
+  background-color: rgb(var(--baseColor));
+  z-index: 3;
+}
+
+.smAPL_arrowSearch {
+  width: 100%;
+  margin: 0 0 0.3rem;
+  padding: 0.5rem;
+}
+
+.smAPL_arrowList {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  gap: 0.2rem;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+}
+
+.smAPL_arrowOption {
+  width: 100%;
+  min-height: 3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+  text-align: left;
+  font-size: 24px;
+}
+
+.smAPL_arrowOption:hover {
+  background-color: rgb(var(--baseColorInv), 0.05) !important;
+}
+
+.smAPL_arrowOption.selected,
+.smAPL_arrowOption.selected:hover {
+  background-color: rgb(var(--baseColorInv), 0.1) !important;
+}
+
+.smAPL_arrowOption span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.smAPLCat_aplRow1 > button {
+  height: stretch;
+  padding: 0.5rem 1rem;
+}
+
+.smAPLCat_aplDragger {
+  aspect-ratio: 1 / 1;
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.smAPLCat_addArrow {
+  padding: 0.5rem 2rem;
+  font-size: 1rem;
+  margin: 0.5rem;
+}
+
+.smAPLCat_title {
+  font-weight: 700;
+}
+
+.smAPLCat_options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 16px;
+}
+
+.sMET_Presets {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.2);
+}
+
+.smET_Presets button {
+  font-size: 18px;
+}
+
+.smET_Presets select {
+  font-size: 20px;
+  width: 10rem;
+}
+
+select#sMDiagrammicPreset {
+  width: 20rem;
+}
+
+option.presetExitTab {
+  color: white;
+  background-color: var(--green);
+}
+
+option.presetExitTab:hover {
+  background-color: rgb(0, 154, 126);
 }

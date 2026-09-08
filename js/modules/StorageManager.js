@@ -1,10 +1,8 @@
 const StorageManager = (() => {
-  let localStorageAvailable;
-  let localStorageWarningLogged = false;
-
   const STORAGE_KEYS = {
     post: "signMaker.postConfig",
     textElement: "signMaker.textElementConfig",
+    exitTabs: "signMaker.exitTabConfig",
   };
 
   const getItem = (key) => {

@@ -13,12 +13,13 @@ const FormNavigation = (() => {
     setupTooltips();
     setupAdvancedMenu();
     setupHorizontalScroll();
-    setupResetButtons();
+    //setupResetButtons();
     setupPostOptions();
     setupPanelOptions();
     setupExitTabOptions();
     setupControlSignElements();
     setupShields();
+    setupGuideArrows();
     setupLimonEasterEgg();
   };
 
@@ -46,6 +47,12 @@ const FormNavigation = (() => {
       document.querySelector("#modalHolder").style.display = "flex";
       document.querySelector("#welcomeToSignMaker").showModal();
     }
+
+    document.querySelector("#closeWelcome").addEventListener("click", () => {
+      localStorage.setItem("closedWelcome", true);
+      document.querySelector("#modalHolder").style.display = "none";
+      document.querySelector("#welcomeToSignMaker").close();
+    });
   };
 
   const setupNavigation = () => {
@@ -75,9 +82,7 @@ const FormNavigation = (() => {
         document.querySelector("#smRender").classList.contains("wide")
       ) {
         document
-          .querySelector(
-            "#panel" + App.exposeToFormHandler.vars.currentlySelectedPanelIndex,
-          )
+          .querySelector("#panel" + App.vars.currentlySelectedPanelIndex)
           .scrollIntoView({
             behavior: "smooth", // or 'auto'
             block: "nearest", // Prevents vertical scroll
@@ -403,15 +408,6 @@ const FormNavigation = (() => {
       });
     }
 
-    // Shield position
-    const shieldPositionsSelectElmt =
-      document.querySelector("#shieldsPosition");
-    for (const position of Sign.prototype.shieldPositions) {
-      lib.appendOption(shieldPositionsSelectElmt, position, {
-        selected: position == "Above",
-      });
-    }
-
     // Guide arrow options
     const guideArrowSelectElmt = document.querySelector("#guideArrow");
     for (const guideArrow of Sign.prototype.guideArrows) {
@@ -439,79 +435,235 @@ const FormNavigation = (() => {
     }
   };
 
-  // ============================================================================
-  // EXIT TAB OPTIONS SETUP
-  // ============================================================================
-
   const setupExitTabOptions = () => {
-    // Exit tab position
-    const exitTabPositionSelectElmt =
-      document.querySelector("#exitTabPosition");
-    for (const position of ExitTab.prototype.positions) {
-      lib.appendOption(exitTabPositionSelectElmt, position, {
-        selected: position == "Right",
-      });
-    }
-
-    // Exit tab width
-    const exitTabWidthSelectElmt = document.querySelector("#exitTabWidth");
-    for (const width of ExitTab.prototype.widths) {
-      lib.appendOption(exitTabWidthSelectElmt, width, {
-        selected: width == "Narrow",
-      });
-    }
-
-    // Exit color
-    const exitColorSelectElement = document.querySelector("#exitColor");
-    for (const exitColor of ExitTab.prototype.colors) {
-      lib.appendOption(exitColorSelectElement, exitColor);
-    }
-
-    // Exit variant
-    const exitVariantSelectElmt = document.querySelector("#exitVariant");
-    for (const exitVariant of ExitTab.prototype.variants) {
-      lib.appendOption(exitVariantSelectElmt, exitVariant);
-    }
-    exitVariantSelectElmt.addEventListener("change", (event) => {
-      const exitTollLogoOptions = document.getElementById(
-        "exitTollLogoOptions",
+    for (const position of ExitTabRow.prototype.position) {
+      lib.appendOption(
+        document.querySelector("#sMET_Position"),
+        position.toLowerCase(),
+        { text: position },
       );
-      if (event.target.value === "Toll Logo") {
-        exitTollLogoOptions.classList.remove("hidden");
-      } else {
-        exitTollLogoOptions.classList.add("hidden");
-      }
-      formHandler.updateForm();
-    });
-
-    // Initial toll logo visibility
-    const exitTollLogoOptions = document.querySelector("#exitTollLogoOptions");
-    if (exitVariantSelectElmt.value === "Toll Logo") {
-      exitTollLogoOptions.classList.remove("hidden");
-    } else {
-      exitTollLogoOptions.classList.add("hidden");
     }
 
-    // Toll logo selection
-    const exitTollLogoSelectElmt = document.querySelector(
-      "#exitTollLogoSelect",
-    );
-    for (const [logoKey, logoDef] of Object.entries(
-      TollLogoElement.prototype.logos,
-    )) {
-      lib.appendOption(exitTollLogoSelectElmt, logoKey, {
-        text: logoDef.label,
-        selected: logoKey == TollLogoElement.prototype.defaultLogo,
+    for (const edgeType of ExitTabRow.prototype.panelEdgeType) {
+      lib.appendOption(
+        document.querySelector("#sMET_PanelEdgeType"),
+        edgeType.toLowerCase(),
+        { text: edgeType },
+      );
+    }
+
+    for (const backgroundColor of ExitTab.prototype.backgroundColor) {
+      lib.appendOption(
+        document.querySelector("#sMET_backgroundColor"),
+        backgroundColor.toLowerCase(),
+        { text: backgroundColor },
+      );
+    }
+
+    for (const borderStyle of ExitTab.prototype.borderStyle) {
+      lib.appendOption(
+        document.querySelector("#sMET_borderStyle"),
+        borderStyle.toLowerCase(),
+        { text: borderStyle },
+      );
+    }
+
+    for (const fontFamily of ExitTab.prototype.fontFamily) {
+      lib.appendOption(document.querySelector("#sMET_fontFamily"), fontFamily, {
+        text: fontFamily,
       });
     }
 
-    /*
-    // Exit icons
-    const iconSelectSelectElmt = document.querySelector("#iconSelect");
-    for (const icons of ExitTab.prototype.icons) {
-      lib.appendOption(iconSelectSelectElmt, icons.split(":")[0]);
+    for (const fontFamily of ExitTab.prototype.numeralFontFamily) {
+      lib.appendOption(
+        document.querySelector("#sMET_numeralFontFamily"),
+        fontFamily,
+        { text: fontFamily },
+      );
     }
-      */
+
+    for (const direction of ExitTab.prototype.contentDirection) {
+      lib.appendOption(
+        document.querySelector("#sMET_contentDirection"),
+        direction.toLowerCase(),
+        { text: direction },
+      );
+    }
+
+    for (const alignment of ExitTab.prototype.alignment) {
+      lib.appendOption(
+        document.querySelector("#sMET_alignment"),
+        alignment.toLowerCase(),
+        { text: alignment },
+      );
+    }
+
+    for (const widthPreset of ExitTab.prototype.widthPresets) {
+      lib.appendOption(
+        document.querySelector("#sMET_width"),
+        widthPreset.toLowerCase(),
+        { text: widthPreset },
+      );
+    }
+
+    for (const addon of ExitTab.prototype.iconVariant_addons) {
+      lib.appendOption(
+        document.querySelector("#sMET_variantAddon"),
+        addon.toLowerCase(),
+        { text: addon },
+      );
+    }
+
+    for (const element of document.querySelectorAll(
+      ".sMET_typeSelect > button",
+    )) {
+      element.addEventListener("click", () => {
+        for (const e of document.querySelectorAll(
+          ".sMET_typeSelect > button",
+        )) {
+          if (e === element) {
+            e.classList.add("selected");
+          } else {
+            e.classList.remove("selected");
+          }
+        }
+        formHandler.readForm();
+      });
+    }
+
+    document
+      .querySelector("#smET_saveAsPreset")
+      .addEventListener("click", () => {
+        let currentExitTab =
+          App.getCurrentPanel().exitTabs[
+            App.vars.currentlySelectedExitTabRowIndex
+          ].exitTabs[App.vars.currentlySelectedExitTabIndex];
+        if (!currentExitTab) {
+          return;
+        }
+
+        let dataToSave = {};
+        for (const key in currentExitTab) {
+          if (["textContent", "subTextContext", "shields"].includes(key)) {
+            continue;
+          }
+
+          dataToSave[key] = currentExitTab[key];
+        }
+
+        let presetName = prompt("Enter a name for the preset:");
+        let presetsLibrary =
+          StorageManager.getItem(StorageManager.STORAGE_KEYS.exitTabs) || {};
+
+        if (!presetsLibrary[currentExitTab.variant]) {
+          presetsLibrary[currentExitTab.variant] = {};
+        }
+
+        if (presetName.trim() === "" || presetName == undefined) {
+          return;
+        }
+
+        if (
+          exitTabPresets[currentExitTab.variant] &&
+          exitTabPresets[currentExitTab.variant][presetName]
+        ) {
+          alert("Built-in preset already uses that name!");
+          return;
+        }
+
+        if (
+          (presetsLibrary[currentExitTab.variant][presetName] &&
+            confirm("Preset already exists. Overwrite?")) ||
+          !presetsLibrary[currentExitTab.variant][presetName]
+        ) {
+          presetsLibrary[currentExitTab.variant][presetName] = dataToSave;
+        }
+
+        StorageManager.setItem(
+          StorageManager.STORAGE_KEYS.exitTabs,
+          presetsLibrary,
+        );
+
+        formHandler.updateExitTabSubform();
+      });
+
+    document
+      .querySelector("#smET_deletePreset")
+      .addEventListener("click", () => {
+        let currentExitTab =
+          App.getCurrentPanel().exitTabs[
+            App.vars.currentlySelectedExitTabRowIndex
+          ].exitTabs[App.vars.currentlySelectedExitTabIndex];
+        if (!currentExitTab) {
+          return;
+        }
+
+        let selectedPreset = document.querySelector("#smET_presetSelect").value;
+        let presetsLibrary =
+          StorageManager.getItem(StorageManager.STORAGE_KEYS.exitTabs) || {};
+
+        if (
+          !presetsLibrary[currentExitTab.variant] ||
+          (presetsLibrary[currentExitTab.variant] &&
+            !presetsLibrary[currentExitTab.variant][selectedPreset])
+        ) {
+          return;
+        }
+
+        if (confirm("Are you sure you want to delete this preset?")) {
+          delete presetsLibrary[currentExitTab.variant][selectedPreset];
+        }
+
+        StorageManager.setItem(
+          StorageManager.STORAGE_KEYS.exitTabs,
+          presetsLibrary,
+        );
+
+        formHandler.updateExitTabSubform();
+      });
+
+    document.querySelector("#smET_loadPreset").addEventListener("click", () => {
+      let currentExitTab =
+        App.getCurrentPanel().exitTabs[
+          App.vars.currentlySelectedExitTabRowIndex
+        ].exitTabs[App.vars.currentlySelectedExitTabIndex];
+      if (!currentExitTab) {
+        return;
+      }
+
+      let selectedPreset = document.querySelector("#smET_presetSelect").value;
+      let presetsLibrary =
+        StorageManager.getItem(StorageManager.STORAGE_KEYS.exitTabs) || {};
+
+      let isInPresetsLibrary =
+        presetsLibrary[currentExitTab.variant] &&
+        presetsLibrary[currentExitTab.variant][selectedPreset];
+      let isInPrebuiltLibrary =
+        exitTabPresets[currentExitTab.variant] &&
+        exitTabPresets[currentExitTab.variant][selectedPreset];
+
+      if (!isInPresetsLibrary && !isInPrebuiltLibrary) {
+        return;
+      }
+
+      for (const key in isInPresetsLibrary
+        ? presetsLibrary[currentExitTab.variant][selectedPreset]
+        : exitTabPresets[currentExitTab.variant][selectedPreset]) {
+        currentExitTab[key] = isInPresetsLibrary
+          ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
+          : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+      }
+
+      formHandler.updateExitTabSubform();
+      App.redraw();
+    });
+  };
+
+  const setupControlSignElements = () => {
+    // subpanel alignment
+    for (const alignment of SubPanels.prototype.verticalAlign) {
+      lib.appendOption(document.querySelector("#subpanelAlign"), alignment);
+    }
 
     // Element list
     const sMSPElementSelect = document.querySelector("#sMSPElementSelect");
@@ -521,14 +673,7 @@ const FormNavigation = (() => {
         text: Control.prototype.blockElements[element],
       });
     }
-  };
 
-  // ============================================================================
-  // CONTROL SIGN ELEMENTS SETUP
-  // ============================================================================
-
-  const setupControlSignElements = () => {
-    // Font families
     let textElem_fontFamilySelects = [
       document.querySelector("#sdCtrlText_fontFamily"),
       document.querySelector("#sdAdvisory_fontFamily"),
@@ -551,6 +696,9 @@ const FormNavigation = (() => {
       document.querySelector("#sdBeacon_alignment"),
       document.querySelector("#sdArrow_alignment"),
       document.querySelector("#sdShieldGroup_alignment"),
+      document.querySelector("#sdCtrlText_textAlign"),
+      document.querySelector("#sdActionMessage_textAlign"),
+      document.querySelector("#sdAdvisory_textAlign"),
     ];
     for (const elem of textElem_alignmentSelects) {
       for (const alignment of TextElement.prototype.alignment) {
@@ -651,10 +799,102 @@ const FormNavigation = (() => {
     }
 
     // Icons
-    const iconElem_iconsSelect = document.querySelector("#sdIcon_icon");
-    for (const icon of IconElement.prototype.icons) {
-      lib.appendOption(iconElem_iconsSelect, icon);
+    const iconSearchInput = document.querySelector("#sdIcon_iconSearch");
+    const iconOpenButton = document.querySelector("#sdIcon_openSelectPanel");
+    const iconSelectPanel = document.querySelector("#sdIcon_selectPanel");
+    const iconList = document.querySelector(".sdIcon_iconList");
+    const iconSelectedLabel = document.querySelector(
+      "#sdIcon_openSelectPanel .sdIcon_selectedLabel",
+    );
+
+    const normalizeIconSearch = (value = "") =>
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const updateIconButtonSelection = (selectedIcon = "") => {
+      iconSelectedLabel.textContent = selectedIcon;
+      iconSearchInput.value = selectedIcon;
+      iconSelectPanel.dataset.selectedIcon = selectedIcon;
+
+      iconList.querySelectorAll(".sdIcon_iconListButton").forEach((button) => {
+        const isSelected = button.dataset.icon === selectedIcon;
+        button.classList.toggle("selected", isSelected);
+        button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      });
+    };
+
+    iconList.innerHTML = "";
+    for (const [iconKey, iconPath] of Object.entries(
+      IconElement.prototype.icons,
+    )) {
+      const iconButton = document.createElement("button");
+      iconButton.type = "button";
+      iconButton.className = "sdIcon_iconListButton";
+      iconButton.dataset.icon = iconKey;
+      iconButton.innerHTML = `
+          <img class="sdIcon_iconImage" loading="lazy" src="./assets/icons/${iconPath}" alt="${iconKey}" />
+          <span class="sdIcon_iconLabel">${iconKey.replace(/_/g, " ")}</span>
+        `;
+      iconButton.addEventListener("click", (event) => {
+        updateIconButtonSelection(iconKey);
+        iconSelectPanel.classList.add("hidden");
+        formHandler.readForm();
+      });
+      iconList.appendChild(iconButton);
     }
+
+    iconOpenButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (iconSelectPanel.classList.contains("hidden")) {
+        iconSelectPanel.classList.remove("hidden");
+        iconSearchInput.focus();
+        iconSearchInput.select();
+        iconSelectPanel.style.left = iconOpenButton.offsetLeft + "px";
+        iconSelectPanel.style.top =
+          iconOpenButton.getBoundingClientRect().top +
+          iconOpenButton.getBoundingClientRect().height +
+          5 +
+          "px";
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        iconSelectPanel.classList.contains("hidden") ||
+        iconOpenButton.contains(event.target) ||
+        iconSelectPanel.contains(event.target) ||
+        iconSearchInput.contains(event.target)
+      ) {
+        return;
+      }
+      iconSelectPanel.classList.add("hidden");
+    });
+
+    iconSearchInput.addEventListener("input", (event) => {
+      const query = normalizeIconSearch(iconSearchInput.value);
+      iconList.querySelectorAll(".sdIcon_iconListButton").forEach((button) => {
+        const matches =
+          !query ||
+          normalizeIconSearch(button.dataset.icon || "").includes(query);
+        button.style.display = matches ? "flex" : "none";
+      });
+    });
+
+    iconSearchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const visibleButtons = Array.from(
+          iconList.querySelectorAll(".sdIcon_iconListButton"),
+        ).filter((button) => button.style.display !== "none");
+        if (visibleButtons.length === 1) {
+          const selectedIcon = visibleButtons[0].dataset.icon;
+          updateIconButtonSelection(selectedIcon);
+          formHandler.readForm();
+        }
+      }
+    });
 
     // Arrows
     const arrowElemSelect = document.querySelector("#sdArrow_arrow");
@@ -754,9 +994,175 @@ const FormNavigation = (() => {
     }
   };
 
-  // ============================================================================
-  // LIMON EASTER EGG SETUP
-  // ============================================================================
+  const setupGuideArrows = () => {
+    for (const element of document.querySelectorAll(
+      ".sMA_typeSelect > button",
+    )) {
+      element.addEventListener("click", () => {
+        for (const e of document.querySelectorAll(".sMA_typeSelect > button")) {
+          if (e === element) {
+            e.classList.add("selected");
+          } else {
+            e.classList.remove("selected");
+          }
+        }
+        formHandler.readForm();
+      });
+    }
+
+    const aplArrowTemplate = document.querySelector(
+      "#sMAPL_templateAPLItem",
+    ).content;
+    const aplArrowSelect = aplArrowTemplate.querySelector(
+      ".smAPLCat_aplSelect",
+    );
+    const aplArrowList = aplArrowTemplate.querySelector(".smAPL_arrowList");
+
+    for (const [arrow, definition] of Object.entries(
+      APLArrow.prototype.arrowTypes,
+    )) {
+      lib.appendOption(aplArrowSelect, arrow);
+
+      const arrowButton = document.createElement("button");
+      arrowButton.type = "button";
+      arrowButton.className = "smAPL_arrowOption";
+      arrowButton.dataset.arrow = arrow;
+      arrowButton.innerHTML = `
+        <img class="smAPL_arrowOptionImage" src="assets/arrow/${definition.asset}" alt="" />
+        <span>${arrow}</span>
+      `;
+      if (definition.flipped) {
+        arrowButton.querySelector("img").classList.add("flipped");
+      }
+      aplArrowList.appendChild(arrowButton);
+    }
+
+    const updateAPLArrowButton = (holder, arrow) => {
+      const definition = APLArrow.prototype.arrowTypes[arrow];
+      const image = holder.querySelector(".smAPL_arrowImage");
+      const label = holder.querySelector(".smAPL_arrowLabel");
+
+      if (!definition) {
+        return;
+      }
+
+      image.src = `assets/arrow/${definition.asset}`;
+      image.classList.toggle("flipped", definition.flipped);
+      label.textContent = arrow;
+      holder.querySelectorAll(".smAPL_arrowOption").forEach((option) => {
+        option.classList.toggle("selected", option.dataset.arrow === arrow);
+      });
+    };
+
+    document.addEventListener("click", (event) => {
+      const selectButton = event.target.closest(".smAPLCat_aplSelectButton");
+      const arrowOption = event.target.closest(".smAPL_arrowOption");
+
+      if (arrowOption) {
+        const holder = arrowOption.closest(".smAPLCat_aplSelectHolder");
+        const select = holder.querySelector(".smAPLCat_aplSelect");
+        select.value = arrowOption.dataset.arrow;
+        updateAPLArrowButton(holder, select.value);
+        holder
+          .querySelector(".smAPLCat_aplSelectPanel")
+          .classList.add("hidden");
+
+        formHandler.readForm();
+        return;
+      }
+
+      if (selectButton) {
+        const holder = selectButton.closest(".smAPLCat_aplSelectHolder");
+        const panel = holder.querySelector(".smAPLCat_aplSelectPanel");
+        const isHidden = panel.classList.toggle("hidden");
+        if (!isHidden) {
+          const search = holder.querySelector(".smAPL_arrowSearch");
+          search.value = "";
+          holder.querySelectorAll(".smAPL_arrowOption").forEach((option) => {
+            option.style.display = "flex";
+          });
+          panel.style.left = selectButton.getBoundingClientRect().left + "px";
+          panel.style.top =
+            selectButton.getBoundingClientRect().top +
+            selectButton.getBoundingClientRect().height +
+            5 +
+            "px";
+          search.focus();
+        }
+        return;
+      }
+
+      document
+        .querySelectorAll(".smAPLCat_aplSelectPanel:not(.hidden)")
+        .forEach((panel) => {
+          if (!panel.parentElement.contains(event.target)) {
+            panel.classList.add("hidden");
+          }
+        });
+    });
+
+    document.addEventListener("input", (event) => {
+      if (!event.target.matches(".smAPL_arrowSearch")) {
+        return;
+      }
+
+      const query = event.target.value.toLowerCase().trim();
+      event.target
+        .closest(".smAPLCat_aplSelectHolder")
+        .querySelectorAll(".smAPL_arrowOption")
+        .forEach((option) => {
+          option.style.display = option.dataset.arrow
+            .toLowerCase()
+            .includes(query)
+            ? "flex"
+            : "none";
+        });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (
+        event.key !== "Enter" ||
+        !event.target.matches(".smAPL_arrowSearch")
+      ) {
+        return;
+      }
+
+      const visibleOption = Array.from(
+        event.target
+          .closest(".smAPLCat_aplSelectHolder")
+          .querySelectorAll(".smAPL_arrowOption"),
+      ).find((option) => option.style.display !== "none");
+      visibleOption?.click();
+    });
+
+    for (const color of APLArrow.prototype.backgroundColors) {
+      lib.appendOption(
+        document
+          .querySelector("#sMAPL_templateAPLItem")
+          .content.querySelector(".smAPL_bgColor"),
+        color,
+      );
+    }
+
+    for (const font of TextElement.prototype.fontFamily) {
+      lib.appendOption(
+        document
+          .querySelector("#sMAPL_templateAPLItem")
+          .content.querySelector(".smAPL_font"),
+        font,
+      );
+    }
+
+    for (const justify of APLArrow.prototype.justifyAPLs) {
+      lib.appendOption(
+        document
+          .querySelector("#smAPL_templateAPLContainer")
+          .content.querySelector(".smAPLCat_justifyAPLs"),
+        justify.toLowerCase(),
+        { text: justify },
+      );
+    }
+  };
 
   const setupLimonEasterEgg = () => {
     const isTextInputElement = (element) => {
@@ -832,6 +1238,22 @@ const FormNavigation = (() => {
   };
 
   const setupShields = () => {
+    const shieldRouteFontSelect = document.querySelector(
+      "#spShield_routeFontFamily",
+    );
+    lib.appendOption(shieldRouteFontSelect, "");
+    for (const fontFamily of TextElement.prototype.fontFamily) {
+      lib.appendOption(shieldRouteFontSelect, fontFamily);
+    }
+
+    const shieldDesignationFontSelect = document.querySelector(
+      "#spShield_designationFontFamily",
+    );
+    lib.appendOption(shieldDesignationFontSelect, "");
+    for (const fontFamily of TextElement.prototype.fontFamily) {
+      lib.appendOption(shieldDesignationFontSelect, fontFamily);
+    }
+
     const presetShieldList = document.querySelector("#presetShieldList");
 
     const createShieldRow = (name, properties) => {
@@ -845,6 +1267,7 @@ const FormNavigation = (() => {
       shieldItemSeleted.className =
         "shieldItemSelected material-symbols-outlined";
 
+      shieldCategoryImg.loading = "lazy";
       shieldCategoryImg.src = Shield.prototype.getDirectoryFromShield(
         name,
         properties.variants[0] || "",
@@ -976,6 +1399,65 @@ const FormNavigation = (() => {
         };
         searchFromDir(Shield.prototype.shieldDirectory, presetShieldList);
       });
+
+    // Shield Library Search
+    document
+      .querySelector("#shieldLibrarySearch")
+      .addEventListener("input", () => {
+        const query = document
+          .querySelector("#shieldLibrarySearch")
+          .value.toLowerCase()
+          .trim();
+        const shieldLibrary = document.querySelector(
+          "#shieldLibraryListHolder",
+        );
+        const shieldLibraryItems = shieldLibrary.querySelectorAll(
+          ".shieldLibraryButton",
+        );
+
+        shieldLibraryItems.forEach((item) => {
+          const shieldName = item.name.toLowerCase().trim();
+          if (shieldName.includes(query)) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
+          }
+        });
+      });
+
+    for (const color in lib.colors) {
+      lib.appendOption(document.querySelector("#selectedBackColor"), color);
+    }
+
+    const bgColorElem = document
+      .querySelector("#smSP_templateBannerElement")
+      .content.querySelector(".smSPBanner_bgColor");
+    for (const color of TextElement.prototype.backgroundColor) {
+      lib.appendOption(bgColorElem, color);
+    }
+
+    const bannerPosiitonsElem = document
+      .querySelector("#smSP_templateBannerElement")
+      .content.querySelector(".smSPBanner_position");
+    for (const banner of Shield.prototype.bannerPositions) {
+      lib.appendOption(bannerPosiitonsElem, banner.toLowerCase(), {
+        text: banner,
+      });
+      lib.appendOption(
+        document.querySelector("#smSPShieldBannerAlignment"),
+        banner.toLowerCase(),
+        {
+          text: banner,
+        },
+      );
+    }
+
+    const fontFamilyElem = document
+      .querySelector("#smSP_templateBannerElement")
+      .content.querySelector(".smSPBanner_fontFamily");
+    for (const font of TextElement.prototype.fontFamily) {
+      lib.appendOption(fontFamilyElem, font);
+    }
   };
 
   return {

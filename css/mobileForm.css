@@ -1,0 +1,160 @@
+@media (max-width: 768px) {
+  .diagramEditor {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  #diagrammicDrawing {
+    width: max-content;
+  }
+
+  .diagrammicDrawingHolder {
+    flex-direction: column;
+  }
+
+  .sMModal {
+    width: 100%;
+  }
+
+  .diagramEditorCol:nth-child(1) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+
+  #modalHolder {
+    padding: 0 !important;
+  }
+
+  .canvasBackground {
+    width: 100%;
+    height: auto;
+    flex: 0 0 100%;
+  }
+
+  .diagramObjectList {
+    height: stretch;
+  }
+
+  .diagramObjList {
+    max-height: 10rem;
+  }
+
+  #diagrammicDrawing h2 {
+    font-size: 1rem;
+  }
+
+  .diagrammicDrawingHolder > footer {
+    flex-direction: column;
+  }
+
+  #diagramKeyboardShortcutsOpen {
+    display: none;
+  }
+
+  .diagrammicDrawingHolder > footer > div {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .diagrammicDrawingHolder > footer > div > button {
+    width: calc(33% - .5rem);
+    height: 3rem;
+    font-size: 1rem;
+  }
+
+  .diagrammicDrawingHolder > footer > div > label {
+    margin: 0;
+  }
+
+  #diagramUse {
+    width: 100%;
+    margin-top: .5rem;
+  }
+
+  #diagramPresetGallery {
+    justify-content: center;
+  }
+
+  .diagramPresetCard > img {
+    width: 8rem;
+  }
+
+  .diagramPresetActions {
+    justify-content: space-between;
+  }
+
+  .diagramPresetActions > button {
+    width: 33%;
+    font-size: 1.25rem;
+  }
+
+  #shieldImgSelectorClose,
+  #shieldImgLibraryClose,
+  #diagrammicDrawingClose,
+  button[data-diagram-modal-close] {
+    font-size: 30px;
+  }
+
+  .shieldLibraryButton {
+    width: 16vh !important;
+  }
+
+  #shieldImgSelector {
+    flex-direction: column;
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .shieldLibrary {
+    height: 40%;
+  }
+
+}
+
+
+@media (max-width: 768px) {
+  .modals {
+    inset: auto;
+    bottom: 5.5rem;
+    width: 100vw;
+    overflow: overlay;
+    max-height: calc(70% - 6rem);
+  }
+
+  body > form {
+    position: relative;
+  }
+
+  #sMConfigBar.invisible {
+    width: max-content !important;
+  }
+
+  #sMConfigBar {
+    inset: auto;
+    left: 0 !important;
+    transform: none !important;
+    height: 5.5rem !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    overflow: overlay;
+  }
+
+  .sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
+    font-size: 18px !important;
+    top: 0 !important;
+    position: static;
+  }
+
+  .sMConfigOption {
+    flex-direction: column !important;
+    height: stretch !important;
+    gap: .3rem;
+    line-height: unset !important;
+    text-wrap: nowrap;
+    width: max-content !important;
+  }
+}

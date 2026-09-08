@@ -1,47 +1,12 @@
 class SM_Database {
-  constructor({
-    storeName = "",
-    dbName = "SignMakerDB",
-    version = 1,
-    keyPath = null,
-    database = null,
-  } = {}) {
+  constructor(storeName, dbConnectionPromise) {
     this.storeName = storeName;
-    this.dbName = dbName;
-    this.version = version;
-    this.keyPath = keyPath;
-    this.database = null;
-    this.initialized = this.initialize();
-  }
-
-  initialize() {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(this.dbName, this.version);
-
-      req.onerror = (event) => reject(event.target.error);
-
-      req.onsuccess = (event) => {
-        this.database = event.target.result;
-        resolve(this.database);
-      };
-
-      req.onupgradeneeded = (event) => {
-        const db = event.target.result;
-
-        if (!db.objectStoreNames.contains(this.storeName)) {
-          const options =
-            this.keyPath == null
-              ? { autoIncrement: true }
-              : { keyPath: this.keyPath };
-          db.createObjectStore(this.storeName, options);
-        }
-      };
-    });
+    this.dbConnectionPromise = dbConnectionPromise;
   }
 
   async getStore(mode = "readonly") {
-    await this.initialized;
-    const transaction = this.database.transaction([this.storeName], mode);
+    const db = await this.dbConnectionPromise;
+    const transaction = db.transaction([this.storeName], mode);
     return transaction.objectStore(this.storeName);
   }
 
@@ -82,25 +47,54 @@ class SM_Database {
   }
 }
 
-const activeDatastores = {};
-
 const IndexDBManager = (() => {
-  const getDatastore = (storeName, options = {}) => {
-    const dbName = options.dbName || "SignMakerDB";
-    const registryKey = `${dbName}:${storeName}`;
+  const databaseName = "SignMakerDB";
+  const databaseVersion = 16;
 
-    if (activeDatastores[registryKey]) {
-      return activeDatastores[registryKey];
+  const schema = {
+    shieldLibrary: { keyPath: "shieldId" },
+    customShields: { keyPath: "fileName" },
+    diagrammicLibrary: { keyPath: "diagramName" },
+  };
+
+  const activeDatastores = {};
+
+  const dbConnectionPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(databaseName, databaseVersion);
+
+    req.onerror = (event) => reject(event.target.error);
+
+    req.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      for (const [storeName, options] of Object.entries(schema)) {
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName, options);
+        }
+      }
+    };
+
+    req.onsuccess = (event) => {
+      const db = event.target.result;
+
+      db.onversionchange = () => {
+        db.close();
+      };
+
+      resolve(db);
+    };
+  });
+
+  const getDatastore = (storeName) => {
+    if (activeDatastores[storeName]) {
+      return activeDatastores[storeName];
     }
 
-    activeDatastores[registryKey] = new SM_Database({
+    activeDatastores[storeName] = new SM_Database(
       storeName,
-      dbName,
-      version: options.version || 1,
-      keyPath: options.keyPath,
-    });
-
-    return activeDatastores[registryKey];
+      dbConnectionPromise,
+    );
+    return activeDatastores[storeName];
   };
 
   return {

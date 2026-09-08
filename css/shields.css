@@ -1,8 +1,8 @@
 .shield.I .routeNumber,
 .shield.I-BUS .routeNumber {
   color: var(--white);
-  top: 0.16em;
-  font-size: 2em;
+  top: 0.2em;
+  font-size: 1.5em;
 }
 
 .shield.I.OneDigit .routeNumber,
@@ -23,11 +23,11 @@
 .shield.I-BUS .designation {
   top: 2.25em;
   font-family: "Series D";
-  font-size: .45em;
+  font-size: 0.45em;
 }
 .shield.I:has(.designation) .routeNumber,
 .shield.I-BUS:has(.designation) .routeNumber {
-  top: .525em;
+  top: 0.25em;
 }
 
 .shield.US .routeNumber,
@@ -38,9 +38,9 @@
 .shield.rec .routeNumber,
 .shield.rec2 .routeNumber {
   color: var(--black);
-  font-size: 2.2em;
+  font-size: 2.4em;
   font-family: "Series D";
-  top: 0em;
+  top: .06em;
 }
 
 .shield.C .routeNumber {
@@ -501,7 +501,10 @@
 .shield.OK .routeNumber {
   color: var(--black);
   font-family: "Series D";
-  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
     1px 1px 0 #fff;
   top: 0.35em;
   font-size: 1.4em;
@@ -612,8 +615,6 @@
 .shield.TXLOOP.TwoDigit .routeNumber,
 .shield.TXSPUR.OneDigit .routeNumber,
 .shield.TXSPUR.TwoDigit .routeNumber,
-.shield.TXEXPRESS.OneDigit .routeNumber,
-.shield.TXEXPRESS.TwoDigit .routeNumber,
 .shield.TXFM.OneDigit .routeNumber,
 .shield.TXFM.TwoDigit .routeNumber,
 .shield.TXPARK.OneDigit .routeNumber,
@@ -623,7 +624,7 @@
 .shield.TXBELTWAY.OneDigit .routeNumber,
 .shield.TXBELTWAY.TwoDigit .routeNumber {
   font-family: "Series D";
-  top :.45em;
+  top: 0.45em;
 }
 .shield.TX.ThreeDigit .routeNumber,
 .shield.TXLOOP.ThreeDigit .routeNumber,
@@ -634,25 +635,24 @@
 .shield.TXRM.ThreeDigit .routeNumber,
 .shield.TXBELTWAY.ThreeDigit .routeNumber {
   font-family: "Series D";
-  top: .45em;
+  top: .25em;
 }
 
 .shield.TXTOLL.ThreeDigit .routeNumber {
-  font-family: "Series D";
-  left: 0rem;
-  font-size: 1.8em;
-  letter-spacing: 0;
-  top: -0.2rem;
+  font-family: "Series E";
+  font-size: 2em;
+  letter-spacing: -2px;
+  top: -0.4rem;
 }
 
 .shield.TXTOLL .designation {
-  top: .8em;
+  top: 0.9em;
 }
 
 .shield.TXTOLL:has(.designation) .routeNumber,
 .shield.TXTOLL:has(.designation) .routeNumber {
-  top: -.25em;
-  font-size: 1.75em;
+  top: -0.12em;
+  font-size: 1.6em;
 }
 
 .shield.TXTOLL.FourDigit .routeNumber {
@@ -664,15 +664,17 @@
 
 .shield.TXTOLL .routeNumber {
   color: var(--white);
-  top: -0.45rem;
+  top: -0.35rem;
   font-size: 2.2em;
   font-family: "Series E";
 }
 
 .shield.TXEXPRESS .routeNumber {
   color: var(--white);
-  top: 0.1em;
-  font-size: 2rem;
+  top: 0.075em;
+  font-size: 2.1rem;
+  font-family: "Series D";
+  letter-spacing: -1px;
 }
 
 .shield.UT .routeNumber {

@@ -9,7 +9,7 @@ class Post {
     variant = "Standard",
     panelSpacing = 0,
     thickness = 1,
-    spacing = 5
+    spacing = 5,
   ) {
     if (this.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
@@ -54,10 +54,7 @@ class Post {
     const newSign = new Sign();
     newSign.newSubPanel();
 
-    const newPanel = new Panel(newSign, undefined);
-    const exitTab = new ExitTab();
-    newPanel.exitTabs.push(exitTab);
-
+    const newPanel = new Panel({ sign: newSign });
     this.panels.push(newPanel);
   }
 
@@ -77,7 +74,7 @@ class Post {
       const clonedTab = Object.assign(new ExitTab(), tab);
       if (Array.isArray(tab?.nestedExitTabs)) {
         clonedTab.nestedExitTabs = tab.nestedExitTabs.map((nested) =>
-          cloneExitTab(nested)
+          cloneExitTab(nested),
         );
       } else {
         clonedTab.nestedExitTabs = [];
@@ -124,7 +121,7 @@ class Post {
       panelIndex - 1,
       2,
       this.panels[panelIndex],
-      this.panels[panelIndex - 1]
+      this.panels[panelIndex - 1],
     );
     return panelIndex - 1;
   }
@@ -143,7 +140,7 @@ class Post {
       panelIndex,
       2,
       this.panels[panelIndex + 1],
-      this.panels[panelIndex]
+      this.panels[panelIndex],
     );
     return panelIndex + 1;
   }
@@ -189,15 +186,15 @@ class Post {
     postContainerElmt.className = `polePosition${this.polePosition} postColor${this.color} postVariant${variantClass}`;
     postContainerElmt.style.setProperty(
       "--postThickness",
-      this.thickness + "rem"
+      this.thickness + "rem",
     );
     postContainerElmt.style.setProperty(
       "--postCornerRadius",
-      this.cornerRadius + "%"
+      this.cornerRadius + "%",
     );
     postContainerElmt.style.setProperty(
       "--postOffset",
-      this.offsetPost ? "1rem" : ""
+      this.offsetPost ? "1rem" : "",
     );
     // Set curved post specific CSS variables
     const cornerRadVar = this.cornerRadius;
@@ -209,7 +206,7 @@ class Post {
     const spacingMultiplier = (this.spacing || 1) - 1;
     postContainerElmt.style.setProperty(
       "--spacingMultiplier",
-      spacingMultiplier.toString()
+      spacingMultiplier.toString(),
     );
 
     switch (this.polePosition) {

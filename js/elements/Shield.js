@@ -12,23 +12,45 @@ class Shield {
     imageType = "",
     imageData = "",
 
-    banners = { top: [new Banner()] },
+    banners = {},
+    bannerSettings = {
+      top: {
+        alignment: "start",
+        gap: 0,
+      },
+      left: {
+        alignment: "start",
+        gap: 0,
+      },
+      right: {
+        alignment: "start",
+        gap: 0,
+      },
+      bottom: {
+        alignment: "end",
+        gap: 0,
+      },
+    },
     group = 0,
 
-    designation = "TEXAS",
+    designation = "",
     routeNumber = "1",
 
     scale = 100,
+    horizMargin = 8,
+    vertMargin = 8,
 
     customShields = {
       route_scale: 100,
       route_xOffset: 0,
       route_yOffset: 0,
+      route_letterSpacing: 0,
       route_fontFamily: "",
 
       designation_scale: 100,
       designation_xOffset: 0,
       designation_yOffset: 0,
+      designation_letterSpacing: 0,
       designation_fontFamily: "",
     },
   } = {}) {
@@ -48,11 +70,39 @@ class Shield {
 
     // Banner
     this.banners = banners;
+    this.bannerSettings = bannerSettings;
 
     // Shield Groups
     this.group = group;
 
-    this.customShields = customShields;
+    this.customShields = {
+      route_scale: 100,
+      route_xOffset: 0,
+      route_yOffset: 0,
+      route_letterSpacing: 0,
+      route_fontFamily: "",
+
+      designation_scale: 100,
+      designation_xOffset: 0,
+      designation_yOffset: 0,
+      designation_letterSpacing: 0,
+      designation_fontFamily: "",
+      ...customShields,
+    };
+
+    this.horizMargin = horizMargin;
+    this.vertMargin = vertMargin;
+  }
+
+  getImageData() {
+    if (this.shieldType === "custom" && this.imageData) {
+      return this.imageData;
+    } else {
+      return Shield.prototype.getDirectoryFromShield(
+        this.shieldValue,
+        this.variant,
+      );
+    }
   }
 
   createBannerShieldElement(isGrouped) {
@@ -64,6 +114,14 @@ class Shield {
       const bannerGroupElem = document.createElement("div");
       bannerGroupElem.className =
         "bannerGroupElem " + bannerAlignment.toLowerCase();
+      bannerGroupElem.style.setProperty(
+        "--bannerJustifyContent",
+        this.bannerSettings[bannerAlignment].alignment,
+      );
+      bannerGroupElem.style.setProperty(
+        "--bannerGap",
+        this.bannerSettings[bannerAlignment].gap + "rem",
+      );
 
       for (const banner of bannerGroup) {
         bannerGroupElem.appendChild(banner.createElement());
@@ -87,6 +145,11 @@ class Shield {
     const shieldElmt = document.createElement("div");
     shieldElmt.className = "shield";
     shieldElmt.style.setProperty("--shieldScale", this.scale / 100);
+    shieldElmt.style.setProperty(
+      "--horizShieldMargin",
+      this.horizMargin + "px",
+    );
+    shieldElmt.style.setProperty("--vertShieldMargin", this.vertMargin + "px");
 
     const shieldImgElmt = document.createElement("img");
     shieldImgElmt.className = "shieldImg";
@@ -96,18 +159,23 @@ class Shield {
 
     routeNumberElmt.style.setProperty(
       "--routeScale",
-      this.customShields.route_scale / 100
+      this.customShields.route_scale / 100,
     );
     routeNumberElmt.style.setProperty(
       "--routeXOffset",
-      this.customShields.route_xOffset + "%"
+      this.customShields.route_xOffset + "%",
     );
     routeNumberElmt.style.setProperty(
       "--routeYOffset",
-      this.customShields.route_yOffset + "%"
+      this.customShields.route_yOffset + "%",
     );
+    if (this.customShields.route_letterSpacing != 0) {
+      routeNumberElmt.style.letterSpacing =
+        this.customShields.route_letterSpacing + "px";
+    }
     if (this.customShields.route_fontFamily != "") {
-      routeNumberElmt.style.fontFamily = this.customShields.route_fontFamily;
+      routeNumberElmt.style.fontFamily =
+        '"' + this.customShields.route_fontFamily + '"';
     }
 
     if (this.designation != "") {
@@ -115,19 +183,23 @@ class Shield {
       designationElmt.className = "designation";
       designationElmt.style.setProperty(
         "--designationScale",
-        this.customShields.designation_scale / 100
+        this.customShields.designation_scale / 100,
       );
       designationElmt.style.setProperty(
         "--designationXOffset",
-        this.customShields.designation_xOffset + "%"
+        this.customShields.designation_xOffset + "%",
       );
       designationElmt.style.setProperty(
         "--designationYOffset",
-        this.customShields.designation_yOffset + "%"
+        this.customShields.designation_yOffset + "%",
       );
+      if (this.customShields.designation_letterSpacing != 0) {
+        designationElmt.style.letterSpacing =
+          this.customShields.designation_letterSpacing + "px";
+      }
       if (this.customShields.designation_fontFamily != "") {
         designationElmt.style.fontFamily =
-          this.customShields.designation_fontFamily;
+          '"' + this.customShields.designation_fontFamily + '"';
       }
 
       designationElmt.textContent = this.designation;
@@ -142,15 +214,21 @@ class Shield {
         3: "Three",
         4: "Four",
         " ": "",
+        "": "",
       };
 
       shieldElmt.classList.add(this.shieldValue);
-      shieldElmt.classList.add(
-        this.variant.replace(/ |\d/g, (matched) => classMap[matched])
+
+      let classVal = this.variant.replace(
+        / |\d/g,
+        (matched) => classMap[matched],
       );
+      if (classVal != "") {
+        shieldElmt.classList.add(classVal);
+      }
       shieldImgElmt.src = Shield.prototype.getDirectoryFromShield(
         this.shieldValue,
-        this.variant
+        this.variant,
       );
     } else {
       shieldImgElmt.src = this.imageData;
@@ -160,11 +238,13 @@ class Shield {
       shieldImgElmt.classList.add("shieldBacks");
       shieldImgElmt.style.setProperty(
         "--sbColor",
-        (lib.colors[this.backgroundColor] || this.backgroundColor).toLowerCase()
+        (
+          lib.colors[this.shieldBackColor] || this.shieldBackColor
+        ).toLowerCase(),
       );
       shieldImgElmt.style.setProperty(
         "--sbRadius",
-        this.shieldBackRadius + "px"
+        this.shieldBackRadius + "px",
       );
     }
 
@@ -180,6 +260,7 @@ class Shield {
 
     const newBanner = new Banner();
     this.banners[alignment].push(newBanner);
+    return newBanner;
   }
 
   removeBanner(alignment, bannerIndex) {
@@ -193,19 +274,35 @@ class Shield {
       delete this.banners[alignment];
     }
   }
+
+  moveBanner(oldAlignment, bannerIndex, newAlignment) {
+    if (this.banners[oldAlignment] == undefined) {
+      return;
+    }
+
+    const banner = this.banners[oldAlignment].splice(bannerIndex, 1)[0];
+    if (this.banners[oldAlignment].length == 0) {
+      delete this.banners[oldAlignment];
+    }
+
+    if (this.banners[newAlignment] == undefined) {
+      this.banners[newAlignment] = [];
+    }
+    this.banners[newAlignment].push(banner);
+    return banner;
+  }
 }
 
 class Banner {
   constructor({
-    textContent = "North",
+    textContent = "NORTH",
     firstLetterSize = 125,
     fontSize = 1,
-    backgroundColor = "Panel Color",
+    backgroundColor = "Inherit",
     horizontalPadding = 0,
     verticalPadding = 0,
-    horziontalMargin = 0,
+    horizontalMargin = 0,
     verticalMargin = 0,
-    lineHeight = 100,
     borderRadius = 4,
     fontFamily = "Clearview 5WR",
   } = {}) {
@@ -215,10 +312,9 @@ class Banner {
     this.backgroundColor = backgroundColor;
     this.horizontalPadding = horizontalPadding;
     this.verticalPadding = verticalPadding;
-    this.lineHeight = lineHeight;
     this.borderRadius = borderRadius;
     this.fontFamily = fontFamily;
-    this.horziontalMargin = horziontalMargin;
+    this.horizontalMargin = horizontalMargin;
     this.verticalMargin = verticalMargin;
   }
 
@@ -227,41 +323,63 @@ class Banner {
     bannerElmt.className = "bannerElmt";
     bannerElmt.style.setProperty(
       "--bgColor",
-      this.backgroundColor == "Panel Color"
+      this.backgroundColor == "Inherit"
         ? "transparent"
         : (
             lib.colors[this.backgroundColor] || this.backgroundColor
-          ).toLowerCase()
+          ).toLowerCase(),
     );
     bannerElmt.style.setProperty("--fontSize", this.fontSize + "rem");
     bannerElmt.style.setProperty(
       "--horizontalPadding",
-      this.horizontalPadding + "px"
+      this.horizontalPadding + "px",
     );
     bannerElmt.style.setProperty(
       "--verticalPadding",
-      this.verticalPadding + "px"
+      this.verticalPadding + "px",
     );
-    bannerElmt.style.setProperty("--lineHeight", this.lineHeight + "%");
     bannerElmt.style.setProperty("--borderRadius", this.borderRadius + "px");
     bannerElmt.style.setProperty("--fontFamily", '"' + this.fontFamily + '"');
     bannerElmt.style.setProperty(
       "--firstLetterSize",
-      this.firstLetterSize / 100
+      this.firstLetterSize / 100,
     );
     bannerElmt.style.setProperty(
       "--horizontalMargin",
-      this.horizontalMargin + "px"
+      this.horizontalMargin + "px",
     );
     bannerElmt.style.setProperty(
       "--verticalMargin",
-      this.verticalMargin + "px"
+      this.verticalMargin + "px",
     );
+
+    if (
+      lib.checkForContrast(
+        this.backgroundColor == "Inherit"
+          ? "transparent"
+          : this.backgroundColor.toLowerCase(),
+      )
+    ) {
+      bannerElmt.style.color = "black";
+    }
 
     bannerElmt.textContent = this.textContent;
     return bannerElmt;
   }
 }
+
+Shield.prototype.getImageData = (shieldData) => {
+  if (typeof shieldData === "object") {
+    if (shieldData.shieldType === "custom" && shieldData.imageData) {
+      return shieldData.imageData;
+    } else {
+      return Shield.prototype.getDirectoryFromShield(
+        shieldData.shieldValue,
+        shieldData.variant,
+      );
+    }
+  }
+};
 
 Shield.prototype.getDirectoryFromShield = (name, variant) => {
   variant = variant.replace(/\s/g, "");
@@ -277,9 +395,9 @@ Shield.prototype.getDirectoryFromShield = (name, variant) => {
         }
       } else if (cat.type == "shield" && category == name) {
         if (cat.variants.length > 0 && variant) {
-          str += name + "-" + variant + ".svg";
+          str += name + "-" + variant + (cat.extension || ".svg");
         } else {
-          str += name + ".svg";
+          str += name + (cat.extension || ".svg");
         }
         return str;
       }
@@ -308,6 +426,852 @@ Shield.prototype.getPropertiesFromName = (name) => {
   return search(Shield.prototype.shieldDirectory, "", "");
 };
 
+Shield.prototype.shieldDirectory = {
+  Australia: {
+    type: "category",
+    ALPHANUM: {
+      type: "shield",
+      name: "Australian Alphanumeric",
+      variants: ["2 Digit", "3 Digit", "4 Digit"],
+    },
+    FNSW: {
+      type: "shield",
+      name: "New South Wales Freeway",
+      variants: ["2 Digit"],
+    },
+    MR: {
+      type: "shield",
+      name: "Metropolitan Route",
+      variants: ["1 Digit", "2 Digit"],
+    },
+    NAT: {
+      type: "shield",
+      name: "National Route",
+      variants: ["1 Digit", "2 Digit", "3 Digit"],
+    },
+    NR: { type: "shield", name: "National Route (NR)", variants: ["2 Digit"] },
+    SR: { type: "shield", name: "State Route (SR)", variants: ["2 Digit"] },
+    TD: {
+      type: "shield",
+      name: "Tourist Drive",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    TOLLBLUE: {
+      type: "shield",
+      name: "Australian Toll",
+      variants: ["2 Digit", "3 Digit", "4 Digit"],
+    },
+  },
+  Canada: {
+    type: "category",
+    Alberta: {
+      type: "category",
+      AB: { type: "shield", name: "Alberta", variants: ["2 Digit", "3 Digit"] },
+      AB2: {
+        type: "shield",
+        name: "Alberta (alt)",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      ABTC: {
+        type: "shield",
+        name: "Alberta Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    "British Columbia": {
+      type: "category",
+      BC: {
+        type: "shield",
+        name: "British Columbia",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      BCTC: {
+        type: "shield",
+        name: "British Columbia Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      BCYH: {
+        type: "shield",
+        name: "British Columbia Yellowhead",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Manitoba: {
+      type: "category",
+      MB: {
+        type: "shield",
+        name: "Manitoba",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      MB2: {
+        type: "shield",
+        name: "Manitoba (alt)",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      MBTC: {
+        type: "shield",
+        name: "Manitoba Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    "New Brunswick": {
+      type: "category",
+      NB: {
+        type: "shield",
+        name: "New Brunswick",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      NBCONN: {
+        type: "shield",
+        name: "New Brunswick Connector",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      NBLOCAL: {
+        type: "shield",
+        name: "New Brunswick Local",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      NBTC: {
+        type: "shield",
+        name: "New Brunswick Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    "Newfoundland and Labrador": {
+      type: "category",
+      NL: {
+        type: "shield",
+        name: "Newfoundland and Labrador",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      NLTC: {
+        type: "shield",
+        name: "Newfoundland and Labrador Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    "Nova Scotia": {
+      type: "category",
+      NS: {
+        type: "shield",
+        name: "Nova Scotia",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      NSCONN: {
+        type: "shield",
+        name: "Nova Scotia Connector",
+        variants: ["2 Digit"],
+      },
+      NSTC: {
+        type: "shield",
+        name: "Nova Scotia Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Ontario: {
+      type: "category",
+      ON: { type: "shield", name: "Ontario", variants: ["2 Digit", "3 Digit"] },
+      ON2: {
+        type: "shield",
+        name: "Ontario (alt)",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      ON3: {
+        type: "shield",
+        name: "Ontario (third)",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      ONTC: {
+        type: "shield",
+        name: "Ontario Trunk",
+        variants: ["2 Digit", "3 Digit", "COR", "GBR", "LSR", "NOR", "OVR"],
+      },
+      "ON-DVP": {
+        type: "shield",
+        name: "Don Valley Parkway",
+        variants: [],
+        extension: ".png",
+      },
+      "ON-GAR": {
+        type: "shield",
+        name: "Gardiner Expressway",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    "Prince Edward Island": {
+      type: "category",
+      PEI: {
+        type: "shield",
+        name: "Prince Edward Island",
+        variants: ["2 Digit"],
+      },
+    },
+    Quebec: {
+      type: "category",
+      QC: { type: "shield", name: "Quebec", variants: ["2 Digit", "3 Digit"] },
+      QC2: {
+        type: "shield",
+        name: "Quebec (alt)",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      QCTC: {
+        type: "shield",
+        name: "Quebec Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Saskatchewan: {
+      type: "category",
+      SK: {
+        type: "shield",
+        name: "Saskatchewan",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      SK2: {
+        type: "shield",
+        name: "Saskatchewan (alt)",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      SKTC: {
+        type: "shield",
+        name: "Saskatchewan Trunk",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    TCH: {
+      type: "shield",
+      name: "Trans-Canada Highway",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    TCHLeaf: {
+      type: "shield",
+      name: "Trans-Canada Highway (leaf)",
+      variants: ["2 Digit", "3 Digit"],
+    },
+  },
+  "New Zealand": {
+    type: "category",
+    SH: {
+      type: "shield",
+      name: "State Highway",
+      variants: ["1 Digit", "2 Digit"],
+    },
+  },
+  "United States": {
+    type: "category",
+    Arizona: {
+      type: "category",
+      AZ: {
+        type: "shield",
+        name: "Arizona State Route",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      AZLOOP: {
+        type: "shield",
+        name: "Arizona Loop",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Florida: {
+      type: "category",
+      FL: {
+        type: "shield",
+        name: "Florida",
+        variants: ["2 Digit", "3 Digit", "No Outline"],
+      },
+      FL_TURNPIKE_TOLL: {
+        type: "shield",
+        name: "Florida's Turnpike Toll",
+        variants: [],
+      },
+      FLCFXToll: {
+        type: "shield",
+        name: "Florida CFX Toll",
+        variants: ["Current", "Old"],
+      },
+      FLToll: {
+        type: "shield",
+        name: "Florida Toll",
+        variants: ["Current", "Old"],
+      },
+      FLTP: { type: "shield", name: "Florida's Turnpike", variants: [] },
+    },
+    Georgia: {
+      type: "category",
+      GA: { type: "shield", name: "Georgia", variants: ["2 Digit", "3 Digit"] },
+      GAALT: {
+        type: "shield",
+        name: "Georgia Alternate",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      GABYP: {
+        type: "shield",
+        name: "Georgia Bypass",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      GACONN: {
+        type: "shield",
+        name: "Georgia Connector",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      GALOOP: {
+        type: "shield",
+        name: "Georgia Loop",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      GASPUR: {
+        type: "shield",
+        name: "Georgia Spur",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Indiana: {
+      type: "category",
+      IN: { type: "shield", name: "Indiana", variants: ["2 Digit", "3 Digit"] },
+      INTR: {
+        type: "shield",
+        name: "Indiana Toll Road",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    "Interstate Routes": {
+      type: "category",
+      I: {
+        type: "shield",
+        name: "Interstate",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "I-BL": {
+        type: "shield",
+        name: "Interstate Business Loop",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "I-BS": {
+        type: "shield",
+        name: "Interstate Business Spur",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "I-BUS": {
+        type: "shield",
+        name: "Interstate Business",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "I-DL": {
+        type: "shield",
+        name: "Interstate Directional Loop",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "I-DS": {
+        type: "shield",
+        name: "Interstate Directional Spur",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "I-F": {
+        type: "shield",
+        name: "Interstate Future",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Kansas: {
+      type: "category",
+      KS: { type: "shield", name: "Kansas", variants: ["2 Digit", "3 Digit"] },
+      KSTP: {
+        type: "shield",
+        name: "Kansas Turnpike",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    Kentucky: {
+      type: "category",
+      KY: {
+        type: "shield",
+        name: "Kentucky",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      LA: { type: "shield", name: "Louisiana", variants: ["3 Digit"] },
+      KYAA: {
+        type: "shield",
+        name: "Kentucky Appalachian Access",
+        variants: [],
+        extension: ".png",
+      },
+      KYAU: {
+        type: "shield",
+        name: "Kentucky Audubon",
+        variants: [],
+        extension: ".png",
+      },
+      KYBG: {
+        type: "shield",
+        name: "Kentucky Bluegrass",
+        variants: [],
+        extension: ".png",
+      },
+      KYCM: {
+        type: "shield",
+        name: "Kentucky Cumberland",
+        variants: [],
+        extension: ".png",
+      },
+      KYHR: {
+        type: "shield",
+        name: "Kentucky Hal Rogers",
+        variants: [],
+        extension: ".png",
+      },
+      KYMT: {
+        type: "shield",
+        name: "Kentucky Mountain Parkway",
+        variants: [],
+        extension: ".png",
+      },
+      KYPR: {
+        type: "shield",
+        name: "Kentucky Purchase Parkway",
+        variants: [],
+        extension: ".png",
+      },
+      KYPU: {
+        type: "shield",
+        name: "Kentucky Parkway",
+        variants: [],
+        extension: ".png",
+      },
+      KYWK: {
+        type: "shield",
+        name: "Kentucky Western Kentucky Parkway",
+        variants: [],
+        extension: ".png",
+      },
+      KYWN: {
+        type: "shield",
+        name: "Kentucky William H. Natcher Parkway",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    Massachusetts: {
+      type: "category",
+      MA: {
+        type: "shield",
+        name: "Massachusetts",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      MATP: {
+        type: "shield",
+        name: "Massachusetts Turnpike",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    Maine: {
+      type: "category",
+      ME: { type: "shield", name: "Maine", variants: ["2 Digit", "3 Digit"] },
+      METP: {
+        type: "shield",
+        name: "Maine Turnpike",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    Minnesota: {
+      type: "category",
+      MN: { type: "shield", name: "Minnesota", variants: ["2 Digit"] },
+      MNBUS: {
+        type: "shield",
+        name: "Minnesota Business",
+        variants: ["2 Digit"],
+      },
+    },
+    Nebraska: {
+      type: "category",
+      NE: {
+        type: "shield",
+        name: "Nebraska",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      NELINK: { type: "shield", name: "Nebraska Link", variants: ["2 Digit"] },
+      NESPUR: { type: "shield", name: "Nebraska Spur", variants: ["2 Digit"] },
+    },
+    "New Jersey": {
+      type: "category",
+      NJ: {
+        type: "shield",
+        name: "New Jersey",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      GSP: {
+        type: "shield",
+        name: "Garden State Parkway",
+        variants: [],
+        extension: ".png",
+      },
+      NJTP: {
+        type: "shield",
+        name: "New Jersey Turnpike",
+        variants: [],
+        extension: ".png",
+      },
+      PIP: {
+        type: "shield",
+        name: "Palisades Interstate Parkway",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    "New York": {
+      type: "category",
+      NY: {
+        type: "shield",
+        name: "New York",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      B: { type: "shield", name: "B", variants: [], extension: ".png" },
+      BMP: { type: "shield", name: "BMP", variants: [], extension: ".png" },
+      BP: { type: "shield", name: "BP", variants: [], extension: ".png" },
+      BR: { type: "shield", name: "BR", variants: [], extension: ".png" },
+      BRP: { type: "shield", name: "BRP", variants: [], extension: ".png" },
+      CCP: { type: "shield", name: "CCP", variants: [], extension: ".png" },
+      CI: { type: "shield", name: "CI", variants: [], extension: ".png" },
+      FDR: { type: "shield", name: "FDR", variants: [], extension: ".png" },
+      GCP: { type: "shield", name: "GCP", variants: [], extension: ".png" },
+      H: { type: "shield", name: "H", variants: [], extension: ".png" },
+      HH: { type: "shield", name: "HH", variants: [], extension: ".png" },
+      HR: { type: "shield", name: "HR", variants: [], extension: ".png" },
+      HRD: { type: "shield", name: "HRD", variants: [], extension: ".png" },
+      HRP: { type: "shield", name: "HRP", variants: [], extension: ".png" },
+      JR: { type: "shield", name: "JR", variants: [], extension: ".png" },
+      KWV: { type: "shield", name: "KWV", variants: [], extension: ".png" },
+      LOSP: { type: "shield", name: "LOSP", variants: [], extension: ".png" },
+      M: { type: "shield", name: "M", variants: [], extension: ".png" },
+      MP: { type: "shield", name: "MP", variants: [], extension: ".png" },
+      N: { type: "shield", name: "N", variants: [], extension: ".png" },
+      NSP: { type: "shield", name: "NSP", variants: [], extension: ".png" },
+      O: { type: "shield", name: "O", variants: [], extension: ".png" },
+      Pe: { type: "shield", name: "Pe", variants: [], extension: ".png" },
+      PIP: { type: "shield", name: "PIP", variants: [], extension: ".png" },
+      RM: { type: "shield", name: "RM", variants: [], extension: ".png" },
+      SA: { type: "shield", name: "SA", variants: [], extension: ".png" },
+      SBP: { type: "shield", name: "SBP", variants: [], extension: ".png" },
+      SM: { type: "shield", name: "SM", variants: [], extension: ".png" },
+      SMP: { type: "shield", name: "SMP", variants: [], extension: ".png" },
+      SO: { type: "shield", name: "SO", variants: [], extension: ".png" },
+      NYST: {
+        type: "shield",
+        name: "New York State Thruway",
+        variants: [],
+        extension: ".png",
+      },
+      TSP: { type: "shield", name: "TSP", variants: [], extension: ".png" },
+      W: { type: "shield", name: "W", variants: [], extension: ".png" },
+    },
+    Ohio: {
+      type: "category",
+      OH: { type: "shield", name: "Ohio", variants: ["2 Digit", "3 Digit"] },
+      OHTP: {
+        type: "shield",
+        name: "Ohio Turnpike",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    Oklahoma: {
+      type: "category",
+      OK: {
+        type: "shield",
+        name: "Oklahoma",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      OKCH: {
+        type: "shield",
+        name: "Oklahoma CH Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKCR: {
+        type: "shield",
+        name: "Oklahoma CR Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKHB: {
+        type: "shield",
+        name: "Oklahoma HB Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKIN: {
+        type: "shield",
+        name: "Oklahoma IN Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKKC: {
+        type: "shield",
+        name: "Oklahoma KC Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKKL: {
+        type: "shield",
+        name: "Oklahoma KL Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKMS: {
+        type: "shield",
+        name: "Oklahoma MS Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKTU: {
+        type: "shield",
+        name: "Oklahoma TU Route",
+        variants: [],
+        extension: ".png",
+      },
+      OKWR: {
+        type: "shield",
+        name: "Oklahoma WR Route",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    Pennsylvania: {
+      type: "category",
+      PA: {
+        type: "shield",
+        name: "Pennsylvania",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      PATP: {
+        type: "shield",
+        name: "Pennsylvania Turnpike",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Texas: {
+      type: "category",
+      TX: { type: "shield", name: "Texas", variants: ["2 Digit", "3 Digit"] },
+      TXBELTWAY: {
+        type: "shield",
+        name: "Texas Beltway",
+        variants: ["2 Digit"],
+      },
+      TXEXPRESS: {
+        type: "shield",
+        name: "Texas Express",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      TXFM: {
+        type: "shield",
+        name: "Texas FM",
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
+      },
+      TXLOOP: {
+        type: "shield",
+        name: "Texas Loop",
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
+      },
+      TXPARK: {
+        type: "shield",
+        name: "Texas Park",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      TXRM: {
+        type: "shield",
+        name: "Texas RM",
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
+      },
+      TXSPUR: {
+        type: "shield",
+        name: "Texas Spur",
+        variants: ["2 Digit", "3 Digit", "4 Digit"],
+      },
+      TXTOLL: {
+        type: "shield",
+        name: "Texas Toll",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      TXTollCTRMA: { type: "shield", name: "Texas CTRMA Toll", variants: [] },
+      TXTollNTTA: { type: "shield", name: "Texas NTTA Toll", variants: [] },
+      HTR: {
+        type: "shield",
+        name: "Hardy Toll Road",
+        variants: [],
+        extension: ".png",
+      },
+      SHT: {
+        type: "shield",
+        name: "Sam Houston Tollway",
+        variants: [],
+        extension: ".png",
+      },
+      TXTollFBTR: {
+        type: "shield",
+        name: "Fort Bend Tollway",
+        variants: [],
+        extension: ".png",
+      },
+      WPT: {
+        type: "shield",
+        name: "Westpark Tollway",
+        variants: [],
+        extension: ".png",
+      },
+    },
+    "US Routes": {
+      type: "category",
+      US: {
+        type: "shield",
+        name: "US Route",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      "US-CA": {
+        type: "shield",
+        name: "US Route California Alternate",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    Wisconsin: {
+      type: "category",
+      WI: {
+        type: "shield",
+        name: "Wisconsin State Route",
+        variants: ["2 Digit", "3 Digit"],
+      },
+      WICo: {
+        type: "shield",
+        name: "Wisconsin County",
+        variants: ["2 Digit", "3 Digit"],
+      },
+    },
+    AK: { type: "shield", name: "Alaska", variants: ["2 Digit", "3 Digit"] },
+    AL: { type: "shield", name: "Alabama", variants: ["2 Digit", "3 Digit"] },
+    AR: { type: "shield", name: "Arkansas", variants: ["2 Digit", "3 Digit"] },
+    C: { type: "shield", name: "County", variants: ["2 Digit", "3 Digit"] },
+    CA: {
+      type: "shield",
+      name: "California",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    cir: { type: "shield", name: "Circle", variants: ["2 Digit", "3 Digit"] },
+    CO: { type: "shield", name: "Colorado", variants: ["2 Digit", "3 Digit"] },
+    CT: {
+      type: "shield",
+      name: "Connecticut",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    DC: {
+      type: "shield",
+      name: "District of Columbia",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    DE: { type: "shield", name: "Delaware", variants: ["2 Digit", "3 Digit"] },
+    elp: { type: "shield", name: "El Paso", variants: ["2 Digit", "3 Digit"] },
+    HI: { type: "shield", name: "Hawaii", variants: ["2 Digit", "3 Digit"] },
+    IA: { type: "shield", name: "Iowa", variants: ["2 Digit", "3 Digit"] },
+    ID: { type: "shield", name: "Idaho", variants: ["2 Digit", "3 Digit"] },
+    IL: { type: "shield", name: "Illinois", variants: ["2 Digit", "3 Digit"] },
+    LA: { type: "shield", name: "Louisiana", variants: ["2 Digit", "3 Digit"] },
+    MD: { type: "shield", name: "Maryland", variants: ["2 Digit", "3 Digit"] },
+    MI: { type: "shield", name: "Michigan", variants: ["2 Digit", "3 Digit"] },
+    MO: { type: "shield", name: "Missouri", variants: ["2 Digit", "3 Digit"] },
+    MS: {
+      type: "shield",
+      name: "Mississippi",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    MT: { type: "shield", name: "Montana", variants: ["2 Digit", "3 Digit"] },
+    MT2: {
+      type: "shield",
+      name: "Montana (2nd)",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    NC: {
+      type: "shield",
+      name: "North Carolina",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    ND: {
+      type: "shield",
+      name: "North Dakota",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    NH: {
+      type: "shield",
+      name: "New Hampshire",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    NM: {
+      type: "shield",
+      name: "New Mexico",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    NV: { type: "shield", name: "Nevada", variants: ["2 Digit", "3 Digit"] },
+    OR: { type: "shield", name: "Oregon", variants: ["2 Digit", "3 Digit"] },
+    rec: {
+      type: "shield",
+      name: "Recreational",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    rec2: {
+      type: "shield",
+      name: "Recreational (2nd)",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    RI: {
+      type: "shield",
+      name: "Rhode Island",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    SC: {
+      type: "shield",
+      name: "South Carolina",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    SD: {
+      type: "shield",
+      name: "South Dakota",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    TN: { type: "shield", name: "Tennessee", variants: ["2 Digit", "3 Digit"] },
+    TN2: {
+      type: "shield",
+      name: "Tennessee (2nd)",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    UT: { type: "shield", name: "Utah", variants: ["2 Digit", "3 Digit"] },
+    VA: { type: "shield", name: "Virginia", variants: ["2 Digit", "3 Digit"] },
+    VA2: {
+      type: "shield",
+      name: "Virginia (2nd)",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    VT: { type: "shield", name: "Vermont", variants: ["2 Digit", "3 Digit"] },
+    VT2: {
+      type: "shield",
+      name: "Vermont (2nd)",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    WA: {
+      type: "shield",
+      name: "Washington",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    WV: {
+      type: "shield",
+      name: "West Virginia",
+      variants: ["2 Digit", "3 Digit"],
+    },
+    WY: { type: "shield", name: "Wyoming", variants: ["2 Digit", "3 Digit"] },
+  },
+};
+
+/*
 Shield.prototype.shieldDirectory = {
   "United States": {
     type: "category",
@@ -620,6 +1584,7 @@ Shield.prototype.shieldDirectory = {
     },
   },
 };
+*/
 
 Shield.prototype.bannerTypes = [
   "None",
@@ -648,4 +1613,6 @@ Shield.prototype.bannerTypes = [
   "Conn",
   "To",
 ];
-Shield.prototype.bannerPositions = ["Above", "Right", "Left"];
+
+Shield.prototype.bannerPositions = ["Top", "Bottom", "Left", "Right"];
+Shield.prototype.bannerAlignments = ["Center", "Start", "End"];

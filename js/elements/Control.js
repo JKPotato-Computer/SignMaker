@@ -33,6 +33,7 @@ class TextElement {
     useNumeralFormatting = false,
     numeralFormattingSize = 150,
     alignment = "Center",
+    textAlign = "Center",
     lineHeight = 100,
   } = {}) {
     this.textContent = textContent;
@@ -46,26 +47,26 @@ class TextElement {
     this.bannerFirstLetterSize = bannerFirstLetterSize;
     this.alignment = alignment;
     this.lineHeight = lineHeight;
+    this.textAlign = textAlign;
   }
 
-  splitString() {
-    let result = [this.textContent];
+  splitString(text) {
+    let result = [text];
     let tagged = [];
 
-    // Define the banner types to split by if useBannerFormating is true
     const numeralPattern = /(\d+\S*)|([\u00BC-\u00BE]+\S*)/;
     const lightNumeralPattern = new RegExp(
       numeralPattern.source + "|" + Object.values(fractionMap).join("|"),
-      "g"
+      "g",
     );
 
     const bannerPattern = new RegExp(
       `(\\s*)(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)(\\s*)`,
-      "gi"
+      "gi",
     );
     const lightBannerPattern = new RegExp(
       `(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)`,
-      "gi"
+      "gi",
     );
 
     if (this.useBannerFormatting) {
@@ -79,7 +80,7 @@ class TextElement {
           .split(numeralPattern)
           .filter(Boolean)
           .map((val) =>
-            val.replace(fractionRegex, (match) => fractionMap[match])
+            val.replace(fractionRegex, (match) => fractionMap[match]),
           );
         newResult = newResult.concat(currentResult);
       }
@@ -87,7 +88,7 @@ class TextElement {
     }
 
     result = result.map((val) =>
-      val.replace(/\\t/g, "\t").replace(/\\n/g, "\n")
+      val.replace(/\\t/g, "\t").replace(/\\n/g, "\n"),
     );
     for (let i = 0; i < result.length; i++) {
       let r = result[i];
@@ -103,18 +104,17 @@ class TextElement {
     return tagged;
   }
 
-  createElement(panel) {
+  createElement() {
     const newText = document.createElement("div");
     newText.className = "bE-textElement";
     const usesHighwayGothic =
       typeof this.fontFamily === "string" &&
       this.fontFamily.toLowerCase().includes("series");
 
-    // Set custom CSS properties here based off the this. properties
     newText.style.setProperty("--fontFamily", '"' + this.fontFamily + '"');
     newText.style.setProperty(
       "--fontSize",
-      1.75 * (this.fontSize / 100) + "rem"
+      1.75 * (this.fontSize / 100) + "rem",
     );
     newText.style.setProperty(
       "--blockBgColor",
@@ -122,20 +122,21 @@ class TextElement {
         ? ""
         : (
             lib.colors[this.backgroundColor] || this.backgroundColor
-          ).toLowerCase()
+          ).toLowerCase(),
     );
     newText.style.setProperty("--alignment", this.alignment);
+    newText.style.setProperty("--textAlign", this.textAlign);
     newText.style.setProperty("--numeralSize", this.numeralFormattingSize);
     newText.style.setProperty("--bannerSize", this.bannerFormattingSize);
     newText.style.setProperty(
       "--bannerFirstLetterSize",
-      this.bannerFirstLetterSize
+      this.bannerFirstLetterSize,
     );
     newText.style.setProperty("--lineHeight", this.lineHeight);
     if (usesHighwayGothic) {
       newText.style.setProperty(
         "--fhwaBaselineOffset",
-        "var(--fhwaBaselineShift)"
+        "var(--fhwaBaselineShift)",
       );
     }
 
@@ -150,14 +151,21 @@ class TextElement {
       newText.style.color = "white";
     }
 
-    let splitTextContent = this.splitString();
-    for (let i = 0; i < splitTextContent.length; i++) {
-      let text = splitTextContent[i];
-      const newTextFragment = document.createElement("span");
-      newTextFragment.className = "bE-" + text.type;
-      newTextFragment.textContent = text.value;
+    for (const text of this.textContent.split("\\n")) {
+      const lineElement = document.createElement("div");
+      lineElement.className = "lineElement";
 
-      newText.appendChild(newTextFragment);
+      let splitTextContent = this.splitString(text);
+
+      for (let i = 0; i < splitTextContent.length; i++) {
+        let text = splitTextContent[i];
+        const newTextFragment = document.createElement("span");
+        newTextFragment.className = "bE-" + text.type;
+        newTextFragment.textContent = text.value;
+
+        lineElement.appendChild(newTextFragment);
+      }
+      newText.appendChild(lineElement);
     }
 
     return newText;
@@ -177,12 +185,12 @@ TextElement.prototype.fontFamily = [
   "Clearivew 5W",
   "Clearview 5WR",
   "Clearview 6B",
-  "Series A",
   "Series B",
   "Series C",
   "Series D",
   "Series E",
   "Series EM",
+  "Series EEM",
   "Series F",
   "Arial",
   "Arial Bold",
@@ -192,24 +200,21 @@ TextElement.prototype.fontFamily = [
 TextElement.prototype.alignment = ["Left", "Center", "Right"];
 
 TextElement.prototype.backgroundColor = ["Inherit"].concat(
-  Object.keys(lib.colors)
+  Object.keys(lib.colors),
 );
 
 class ControlTextElement extends TextElement {
   constructor({
-    spacing = 0,
     smallCapitals = false,
     fontFamily = ControlTextElement.defaultFont,
   } = {}) {
     super();
     this.fontFamily = fontFamily;
-    this.spacing = spacing;
     this.smallCapitals = smallCapitals;
   }
 
-  createElement(panel) {
-    const newText = super.createElement(panel);
-    newText.style.setProperty("--spacing", this.spacing + "rem");
+  createElement() {
+    const newText = super.createElement();
     newText.style.fontVariant = this.smallCapitals ? "small-caps" : "normal";
     newText.classList.add("bE-controlTextElement");
     return newText;
@@ -244,16 +249,12 @@ class AdvisoryMessageElement extends TextElement {
     this.vertPadding = vertPadding;
   }
 
-  createElement(panel) {
-    const newText = super.createElement(panel);
+  createElement() {
+    const newText = super.createElement();
     newText.style.setProperty("--borderRadius", this.borderRadius + "px");
     newText.style.setProperty("--horizPadding", this.horizPadding);
     newText.style.setProperty("--vertPadding", this.vertPadding);
     newText.className = "bE-textElement bE-advisoryMessage";
-
-    if (this.fontFamily.includes("Series")) {
-      newText.classList.add("hgFix");
-    }
 
     return newText;
   }
@@ -283,23 +284,16 @@ class ElectronicSignElement extends TextElement {
     newText.className = "bE-textElement bE-electronicSign";
     newText.style.setProperty(
       "--textColor",
-      (lib.colors[this.textColor] || this.textColor).toLowerCase()
+      (lib.colors[this.textColor] || this.textColor).toLowerCase(),
     );
     newText.style.setProperty("--padding", this.padding + "rem");
     newText.style.setProperty(
       "--textShadow",
       this.glow
         ? "0 0 0.25rem var(--textColor), 0 0 0.25rem var(--textColor)"
-        : ""
+        : "",
     );
     newText.style.width = this.setWidth != 0 ? this.setWidth + "rem" : "";
-
-    if (
-      this.fontFamily.includes("Series") ||
-      this.fontFamily.includes("Electronic")
-    ) {
-      newText.classList.add("hgFix");
-    }
 
     return newText;
   }
@@ -314,30 +308,9 @@ ElectronicSignElement.prototype.textColors = [
 ];
 
 class ShieldGroupElement {
+  f;
   constructor({
-    shields = [
-      new Shield({ group: 1 }),
-      new Shield({ group: 1, routeNumber: "44", variant: "3Digit" }),
-      new Shield({ group: 0, routeNumber: "69", shieldValue: "US" }),
-      new Shield({
-        group: 0,
-        routeNumber: "45",
-        shieldValue: "TXTOLL",
-        variant: "2Digit",
-      }),
-      new Shield({
-        group: 1,
-        routeNumber: "288",
-        shieldValue: "TX",
-        variant: "3Digit",
-      }),
-      new Shield({
-        group: 1,
-        routeNumber: "1",
-        shieldValue: "TXLOOP",
-        variant: "2Digit",
-      }),
-    ],
+    shields = [],
     alignment = "Center",
     direction = "Horizontal",
     gap = 0.5,
@@ -362,7 +335,10 @@ class ShieldGroupElement {
   duplicateShield(index) {
     if (index >= 0 && index < this.shields.length) {
       const shieldToDuplicate = this.shields[index];
-      const duplicatedShield = Object.assign(shieldToDuplicate.constructor.prototype, shieldToDuplicate);
+      const duplicatedShield = Object.assign(
+        shieldToDuplicate.constructor.prototype,
+        shieldToDuplicate,
+      );
       this.shields.splice(index + 1, 0, duplicatedShield);
     }
   }
@@ -431,7 +407,7 @@ class DividerElement {
     newDivider.style.visibility = this.visible ? "visible" : "hidden";
     newDivider.style.setProperty(
       "--dividerWidth",
-      this.dividerWidth + this.dividerMeasurement
+      this.dividerWidth + this.dividerMeasurement,
     );
     newDivider.style.setProperty("--dividerHeight", this.dividerHeight + "rem");
     newDivider.style.marginTop = "0";
@@ -487,7 +463,7 @@ DividerElement.prototype.dividerColors = [
 
 class IconElement {
   constructor({
-    icon = "Airplane",
+    icon = "AIRPORT",
     iconSize = 100,
     backgroundColor = "Inherit",
     border = false,
@@ -503,9 +479,164 @@ class IconElement {
     this.borderColor = borderColor;
     this.spacing = spacing;
   }
+
+  createElement() {
+    const iconHolder = document.createElement("div");
+    iconHolder.className = "bE-iconElement";
+
+    iconHolder.style.setProperty("--iconSize", this.iconSize);
+    iconHolder.style.setProperty("--iconPadding", this.spacing + "px");
+
+    if (this.border) {
+      iconHolder.style.setProperty(
+        "--iconBorderRadius",
+        this.borderRadius + "px",
+      );
+      iconHolder.style.setProperty(
+        "--iconBorderColor",
+        lib.colors[this.borderColor] || this.borderColor,
+      );
+    }
+
+    iconHolder.style.setProperty(
+      "--iconBackgroundColor",
+      lib.colors[this.backgroundColor] || this.backgroundColor,
+    );
+
+    const iconElement = document.createElement("img");
+    iconElement.src = `./assets/icons/${this.icons[this.icon]}`;
+    iconElement.alt = this.icon;
+    iconElement.className = "bE-iconImage";
+
+    if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+      iconElement.style.filter = "invert(1)";
+    }
+
+    iconHolder.appendChild(iconElement);
+    return iconHolder;
+  }
 }
 
-IconElement.prototype.icons = ["Airplane"];
+IconElement.prototype.icons = {
+  511: "511.svg",
+  AIRPORT: "AIRPORT.svg",
+  ALLTERRAIN_TRAIL: "ALLTERRAIN_TRAIL.svg",
+  ALTERNATIVE_FUEL_COMPRESSED_NATURAL_GAS:
+    "ALTERNATIVE_FUEL_COMPRESSED_NATURAL_GAS.svg",
+  ALTERNATIVE_FUEL_ETHANOL: "ALTERNATIVE_FUEL_ETHANOL.svg",
+  ARCHERY: "ARCHERY.svg",
+  BASEBALL: "BASEBALL.svg",
+  BEACH: "BEACH.svg",
+  BEAR_VIEWING_AREA: "BEAR_VIEWING_AREA.svg",
+  BIKE: "BIKE.svg",
+  BIOFUEL: "BIOFUEL.svg",
+  BOAT_RAMP: "BOAT_RAMP.svg",
+  BUS_STATION: "BUS_STATION.svg",
+  BUS_STOP: "BUS_STOP.svg",
+  CAMPFIRES: "CAMPFIRES.svg",
+  CAMPING: "CAMPING.svg",
+  CANOEING: "CANOEING.svg",
+  CHAIR_LIFTSKI_LIFT: "CHAIR_LIFTSKI_LIFT.svg",
+  CLIMBING: "CLIMBING.svg",
+  CONE: "CONE.png",
+  CROSS_COUNTRY_SKIING: "CROSS_COUNTRY_SKIING.svg",
+  DEER_VIEWING_AREA: "DEER_VIEWING_AREA.svg",
+  DIESEL_FUEL: "DIESEL_FUEL.svg",
+  DOG_SLEDDING: "DOG_SLEDDING.svg",
+  DONT_WALK: "DONT_WALK.svg",
+  ELECTRICAL_HOOKUP: "ELECTRICAL_HOOKUP.svg",
+  ELECTRIC_VEHICLE_CHARGING: "ELECTRIC_VEHICLE_CHARGING.svg",
+  EMERGENCY_MEDICAL_SERVICES: "EMERGENCY_MEDICAL_SERVICES.svg",
+  EXIT_INSERT: "EXIT_INSERT.png",
+  FIRE_EXTINGUISHER: "FIRE_EXTINGUISHER.svg",
+  FIRST_AID: "FIRST_AID.svg",
+  FISHING_AREA: "FISHING_AREA.svg",
+  FOOD: "FOOD.svg",
+  GAS: "GAS.svg",
+  GOLFING: "GOLFING.svg",
+  HOSPITAL: "H.png",
+  HAND_LAUNCHSMALL_BOAT_LAUNCH: "HAND_LAUNCHSMALL_BOAT_LAUNCH.svg",
+  HIKING_TRAIL: "HIKING_TRAIL.svg",
+  "HAZARDOUS MATERIALS": "HM.png",
+  HORSE_TRAIL: "HORSE_TRAIL.svg",
+  HOSPITAL: "HOSPITAL.svg",
+  HOV: "HOV.svg",
+  "HOV TRANSPARENT": "HOVTransparent.svg",
+  "HOV Car": "HOVCarBlank.png",
+  "2+ HOV Car": "HOVCar2Plus.png",
+  "3+ HOV Car": "HOVCar3Plus.png",
+  HYDROGEN_FUEL: "HYDROGEN_FUEL.svg",
+  INLINE_SKATING: "INLINE_SKATING.svg",
+  INTERNATIONAL_SYMBOL_OF_ACCESSIBILITY:
+    "INTERNATIONAL_SYMBOL_OF_ACCESSIBILITY.svg",
+  JET_SKIPERSONAL_WATERCRAFT: "JET_SKIPERSONAL_WATERCRAFT.svg",
+  LAUNDROMAT: "LAUNDROMAT.svg",
+  LIBRARY: "LIBRARY.svg",
+  LIGHTHOUSE: "LIGHTHOUSE.svg",
+  LIGHT_RAIL_TRANSIT_STATION: "LIGHT_RAIL_TRANSIT_STATION.svg",
+  LIQUEFIED_NATURAL_GAS: "LIQUEFIED_NATURAL_GAS.svg",
+  LIQUEFIED_PETROLEUM_GAS: "LIQUEFIED_PETROLEUM_GAS.svg",
+  LITTER_CONTAINER: "LITTER_CONTAINER.svg",
+  LODGING: "LODGING.svg",
+  LOOKOUT_TOWER: "LOOKOUT_TOWER.svg",
+  MARINA: "MARINA.svg",
+  MENS_RESTROOM: "MENS_RESTROOM.svg",
+  MOTORBOATING: "MOTORBOATING.svg",
+  NATURE_STUDY_AREA: "NATURE_STUDY_AREA.svg",
+  "NO HAZARDOUS MATERIALS": "NO-HM.png",
+  orange_county: "orange_county.svg",
+  PARKING: "PARKING.svg",
+  PASSENGERS_ONLY_FERRY_TERMINAL: "PASSENGERS_ONLY_FERRY_TERMINAL.svg",
+  PEDESTRIAN: "PEDESTRIAN.svg",
+  PHARMACY: "PHARMACY.svg",
+  PICKUP_TRUCKS: "PICKUP_TRUCKS.svg",
+  PICNIC_SHELTER: "PICNIC_SHELTER.svg",
+  PICNIC_SITE: "PICNIC_SITE.svg",
+  POLICE: "POLICE.svg",
+  POST_OFFICE: "POST_OFFICE.svg",
+  RECREATIONAL_VEHICLE_SITE: "RECREATIONAL_VEHICLE_SITE.svg",
+  RECYCLING: "RECYCLING.svg",
+  RESTROOMS: "RESTROOMS.svg",
+  RV_SANITARY_STATION: "RV_SANITARY_STATION.svg",
+  SCHOOL_BUS: "SCHOOL_BUS.svg",
+  SCHOOL_CROSSING: "SCHOOL_CROSSING.svg",
+  SCUBA_DIVING: "SCUBA_DIVING.svg",
+  SEAL_VIEWING: "SEAL_VIEWING.svg",
+  SEATBELT: "SEATBELT.png",
+  SEA_PLANE: "SEA_PLANE.svg",
+  SHOWERS: "SHOWERS.svg",
+  SKATEBOARDING: "SKATEBOARDING.svg",
+  SLEDDING: "SLEDDING.svg",
+  SLEEPING_SHELTER: "SLEEPING_SHELTER.svg",
+  SMOKING: "SMOKING.svg",
+  SNOWSHOEING: "SNOWSHOEING.svg",
+  SNOW_TUBING: "SNOW_TUBING.svg",
+  SPELUNKINGCAVES: "SPELUNKINGCAVES.svg",
+  STOP: "STOP.svg",
+  SWIMMING: "SWIMMING.svg",
+  TECHNICAL_ROCK_CLIMBING: "TECHNICAL_ROCK_CLIMBING.svg",
+  TELECOMMUNICATIONS_DEVICE_FOR_THE_DEAF:
+    "TELECOMMUNICATIONS_DEVICE_FOR_THE_DEAF.svg",
+  TELEPHONE: "TELEPHONE.svg",
+  TENNIS: "TENNIS.svg",
+  TOURIST_INFORMATION: "TOURIST_INFORMATION.svg",
+  TRAILER_SITE: "TRAILER_SITE.svg",
+  TRAIN_STATION: "TRAIN_STATION.svg",
+  TRAMWAY: "TRAMWAY.svg",
+  TRASH_DUMPSTER: "TRASH_DUMPSTER.svg",
+  TRUCK_EXTERNAL_POWER: "TRUCK_EXTERNAL_POWER.svg",
+  TRUCK_PARKING: "TRUCK_PARKING.svg",
+  TUNNEL: "TUNNEL.svg",
+  VEHICLE_FERRY_STATION: "VEHICLE_FERRY_STATION.svg",
+  VIEWING_AREA: "VIEWING_AREA.svg",
+  WATERSKIING: "WATERSKIING.svg",
+  WHALE_VIEWING: "WHALE_VIEWING.svg",
+  WILDLIFE_VIEWING: "WILDLIFE_VIEWING.svg",
+  WINTER_RECREATIONAL_AREA: "WINTER_RECREATIONAL_AREA.svg",
+  WIRELESS_INTERNET: "WIRELESS_INTERNET.svg",
+  WOMENS_RESTROOM: "WOMENS_RESTROOM.svg",
+  YIELD: "YIELD.svg",
+};
 
 class BeaconElement {
   constructor({
@@ -558,22 +689,22 @@ class BeaconElement {
     container.className = "bE-beaconElement";
     container.style.setProperty(
       "--beaconSize",
-      Math.max(beaconSize, 0.5) + "rem"
+      Math.max(beaconSize, 0.5) + "rem",
     );
     container.style.setProperty("--beaconFlashDuration", flashDuration + "s");
     const resolvedColor =
       (lib?.colors && lib.colors[this.color]) || this.color || "Yellow";
     container.style.setProperty(
       "--beaconBulbColor",
-      typeof resolvedColor === "string" ? resolvedColor : "Yellow"
+      typeof resolvedColor === "string" ? resolvedColor : "Yellow",
     );
     container.style.setProperty(
       "--beaconBackplateThickness",
-      BeaconElement.prototype.backplateThicknessRem + "rem"
+      BeaconElement.prototype.backplateThicknessRem + "rem",
     );
     container.style.setProperty(
       "--beaconBackplateRadius",
-      BeaconElement.prototype.backplateCornerRadiusRem + "rem"
+      BeaconElement.prototype.backplateCornerRadiusRem + "rem",
     );
     const backplateColorReference = BeaconElement.prototype.backplateColor;
     const resolvedBackplateColor =
@@ -582,7 +713,7 @@ class BeaconElement {
       backplateColorReference;
     container.style.setProperty(
       "--beaconBackplateColor",
-      resolvedBackplateColor
+      resolvedBackplateColor,
     );
     if (this.backplate) {
       container.classList.add("hasBackplate");
@@ -654,13 +785,13 @@ class ArrowElement {
       paddingHorizontal !== null && paddingHorizontal !== undefined
         ? paddingHorizontal
         : fallbackPadding,
-      0
+      0,
     );
     this.paddingVertical = normalizeNumber(
       paddingVertical !== null && paddingVertical !== undefined
         ? paddingVertical
         : fallbackPadding,
-      0
+      0,
     );
   }
 
@@ -688,26 +819,26 @@ class ArrowElement {
     if (!isNaN(parsedSize)) {
       container.style.setProperty(
         "--arrowSize",
-        Math.max(parsedSize, 0) + "rem"
+        Math.max(parsedSize, 0) + "rem",
       );
     }
 
     const horizontalPadding = parseFloat(
       this.paddingHorizontal !== undefined
         ? this.paddingHorizontal
-        : this.padding
+        : this.padding,
     );
     const verticalPadding = parseFloat(
-      this.paddingVertical !== undefined ? this.paddingVertical : this.padding
+      this.paddingVertical !== undefined ? this.paddingVertical : this.padding,
     );
 
     container.style.setProperty(
       "--arrowPaddingHorizontal",
-      Math.max(isNaN(horizontalPadding) ? 0 : horizontalPadding, 0) + "rem"
+      Math.max(isNaN(horizontalPadding) ? 0 : horizontalPadding, 0) + "rem",
     );
     container.style.setProperty(
       "--arrowPaddingVertical",
-      Math.max(isNaN(verticalPadding) ? 0 : verticalPadding, 0) + "rem"
+      Math.max(isNaN(verticalPadding) ? 0 : verticalPadding, 0) + "rem",
     );
 
     container.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
@@ -760,9 +891,7 @@ class TollLogoElement {
     borderRadius = 8,
     hasOnlyBlock = false,
   } = {}) {
-    this.logo = TollLogoElement.prototype.logos[logo]
-      ? logo
-      : TollLogoElement.prototype.defaultLogo;
+    this.logo = logo;
     this.logoHeight = logoHeight;
     this.spacing = spacing;
     this.background = background;
@@ -772,10 +901,7 @@ class TollLogoElement {
     this.horizontalPadding = horizontalPadding;
     this.verticalPadding = verticalPadding;
     this.hasOnlyBlock = hasOnlyBlock;
-    const validAlignments = Array.isArray(TextElement.prototype.alignment)
-      ? TextElement.prototype.alignment
-      : [];
-    this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
+    this.alignment = alignment;
   }
 
   createElement() {
@@ -787,12 +913,12 @@ class TollLogoElement {
     container.style.setProperty("--spacing", spacing + "rem");
     container.style.setProperty(
       "--tollBgColor",
-      lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase()
+      lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase(),
     );
     container.style.setProperty("--borderRadius", this.borderRadius + "px");
     container.style.setProperty(
       "--horizPadding",
-      this.horizontalPadding + "rem"
+      this.horizontalPadding + "rem",
     );
     container.style.setProperty("--vertPadding", this.verticalPadding + "rem");
     container.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
@@ -957,8 +1083,8 @@ class Control {
       newRows.push(
         Object.assign(
           new Control.prototype.blockToClassElems[blockElemType](),
-          e
-        )
+          e,
+        ),
       );
     }
     this.rows.splice(row + 1, 0, newRows);
@@ -1054,7 +1180,7 @@ class Control {
             ).toLowerCase();
       flexRow.style.setProperty(
         "--masterBlockBgColor",
-        resolvedBackgroundColor
+        resolvedBackgroundColor,
       );
 
       const usesLightBleedBackground =

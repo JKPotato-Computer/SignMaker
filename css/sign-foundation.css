@@ -20,6 +20,7 @@ main#smRender.wide #postContainer {
   justify-content: center;
   align-items: center;
   gap: 0rem;
+  width: 100%;
 }
 
 .blockElementRow {
@@ -57,8 +58,15 @@ main#smRender.wide #postContainer {
   );
 }
 
+.lineElement {
+  display: flex;
+  flex-direction: row;
+  justify-content: var(--textAlign);
+  align-items: center;
+  width: 100%;
+}
+
 .bE-textElement {
-  --fhwaBaselineOffset: 0px;
   font-family: var(--fontFamily), "Series EM";
   font-size: var(--fontSize);
   background-color: var(--blockBgColor);
@@ -68,11 +76,11 @@ main#smRender.wide #postContainer {
   margin: 0 var(--spacing);
   white-space: pre;
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100) + 0.2));
+  flex-direction: column;
 }
 
 .bE-textElement > span {
   position: relative;
-  top: var(--fhwaBaselineOffset);
 }
 
 .bE-advisoryMessage {
@@ -84,8 +92,9 @@ main#smRender.wide #postContainer {
   align-items: center;
 }
 
-.bE-advisoryMessage.hgFix {
-  line-height: calc(var(--fontSize) * (var(--lineHeight) / 100) * 0.75);
+.bE-advisoryMessage span {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .bE-electronicSign * {
@@ -96,10 +105,6 @@ main#smRender.wide #postContainer {
 .bE-electronicSign {
   padding: 0.2rem var(--padding);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100)));
-}
-
-.bE-electronicSign.hgFix {
-  padding: 0.4rem var(--padding) 0.2rem var(--padding);
 }
 
 .bE-numeral {
@@ -394,30 +399,33 @@ main#smRender.wide #postContainer {
 .bannerGroupElem {
   display: flex;
   flex-direction: column;
+  gap: var(--bannerGap);
 }
 
 .bannerGroupElem.top {
   grid-area: topBanners;
-  justify-content: end;
+  justify-content: var(--bannerJustifyContent);
   align-items: center;
 }
 
 .bannerGroupElem.bottom {
   grid-area: bottomBanners;
-  justify-content: start;
+  justify-content: var(--bannerJustifyContent);
   align-items: center;
 }
 
 .bannerGroupElem.left {
   grid-area: leftBanners;
   align-items: end;
-  justify-content: center;
+  justify-content: var(--bannerJustifyContent);
+  height: 100%;
 }
 
 .bannerGroupElem.right {
   grid-area: rightBanners;
   align-items: start;
-  justify-content: center;
+  justify-content: var(--bannerJustifyContent);
+  height: 100%;
 }
 
 .shield,
@@ -426,8 +434,9 @@ main#smRender.wide #postContainer {
 }
 
 .shield {
-  margin: 0.15rem;
+  margin: var(--vertShieldMargin) var(--horizShieldMargin);
   position: relative;
+  scale: var(--shieldScale);
 }
 
 .shield::before {
@@ -435,16 +444,16 @@ main#smRender.wide #postContainer {
   position: absolute;
   inset: 0;
   anchor-name: --routeNumberAnchor;
-  pointer-events: none; /* Keep it non-interactive */
+  pointer-events: none;
 }
 
 .shieldImg.shieldBacks {
-  background-color: var(--sColor);
+  background-color: var(--sbColor);
   border-radius: var(--sbRadius);
 }
 
 .shieldImg {
-  height: calc(3rem * var(--shieldScale));
+  height: 3rem;
 }
 
 .routeNumber {
@@ -455,6 +464,9 @@ main#smRender.wide #postContainer {
   line-height: 0;
   scale: var(--routeScale, 1);
   transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .designation {
@@ -468,6 +480,7 @@ main#smRender.wide #postContainer {
     var(--designationXOffset, 0%),
     var(--designationYOffset, 0%)
   );
+  scale: var(--designationScale);
 }
 
 .shieldGroupContainer {
@@ -480,16 +493,674 @@ main#smRender.wide #postContainer {
 .bannerElmt {
   border-radius: var(--borderRadius);
   font-size: var(--fontSize);
-  text-transform: uppercase;
   font-family: var(--fontFamily);
   margin-bottom: auto;
   position: relative;
-  top: var(--fhwaBaselineOffset);
   background-color: var(--bgColor);
   padding: var(--verticalPadding) var(--horizontalPadding);
   margin: var(--verticalMargin) var(--horizontalMargin);
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .bannerElmt:first-letter {
   font-size: calc(var(--fontSize) * var(--firstLetterSize)) !important;
+}
+
+.bE-iconElement {
+  aspect-ratio: 1 / 1;
+  height: calc(3rem * var(--iconSize) / 100);
+  border: 4px solid var(--iconBorderColor);
+  border-radius: var(--iconBorderRadius);
+  background-color: var(--iconBackgroundColor);
+  padding: var(--iconPadding);
+}
+
+.be-iconImage {
+  height: 100%;
+  width: 100%;
+}
+
+.signContainer {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    ". exitTabTop ."
+    "exitTabLeft sign exitTabRight"
+    "exitTabLeft guideSigns exitTabRight"
+    ". exitTabBottom .";
+}
+
+.sign {
+  grid-area: sign;
+}
+
+.guideArrowsHolder {
+  grid-area: guideSigns;
+}
+
+.guideArrowsHolder:has(.diagrammic) {
+  display: none;
+}
+
+.exitTabContainer.within {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+  min-width: 100%;
+}
+
+.exitTabContainer.within .ET-tabHolder {
+  background: none;
+}
+
+.exitTabContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.exitTabContainer.top .ET-row .ET-alignment {
+  align-items: end;
+}
+.exitTabContainer.bottom .ET-row .ET-aligment,
+.exitTabContainer.within .ET-row .ET-alignment {
+  align-items: start;
+}
+
+.exitTabContainer.top {
+  grid-area: exitTabTop;
+}
+
+.exitTabContainer.left {
+  grid-area: exitTabLeft;
+}
+
+.exitTabContainer.right {
+  grid-area: exitTabRight;
+}
+
+.exitTabContainer.bottom {
+  grid-area: exitTabBottom;
+}
+
+.ET-row {
+  display: flex;
+  gap: var(--spacing);
+  width: 100%;
+}
+
+.ET-alignment {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.ET-alignment.left {
+  justify-content: left;
+}
+
+.ET-alignment.center {
+  justify-content: center;
+}
+
+.ET-alignment.right {
+  justify-content: right;
+}
+
+.ET-alignment:empty {
+  flex-grow: 0;
+}
+
+.ET-numeral,
+.ET-trailing {
+  margin-left: var(--extraMarginLeft);
+  font-size: calc(var(--fontSize) * var(--enlargeNumeralPercent));
+  font-family: var(--numeralFontFamily);
+  letter-spacing: var(--numeralLetterSpacing);
+}
+
+.Et-trailing {
+  margin-left: 0;
+}
+
+.ET-tab.useTrim .ET-word {
+  text-box-edge: cap alphabetic;
+  text-box-trim: trim-both;
+}
+
+.ET-word {
+  letter-spacing: var(--letterSpacing);
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.ET-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSize);
+  color: white;
+  background-color: var(--backgroundColor);
+  min-height: var(--minimumHeight);
+  padding: var(--verticalPadding) var(--horizontalPadding);
+  line-height: var(--lineHeight);
+  flex-direction: var(--direction);
+  position: relative;
+}
+
+.ET-tab:has(.ET-fullLeft) {
+  padding-top: calc(1.25rem + var(--fontSize) + var(--verticalPadding));
+  padding-bottom: calc(0.25rem + var(--verticalPadding));
+}
+
+.ET-row.extend .ET-tab:has(.ET-fullLeft) {
+  padding-top: calc(
+    0.8rem + var(--fontSize) + var(--verticalPadding)
+  ) !important;
+  padding-bottom: calc(0.25rem + var(--verticalPadding));
+}
+
+.ET-FullLeftHolder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% + var(--borderThickness) * 2);
+  height: max-content;
+  margin: calc(-1 * var(--borderThickness)) calc(-1 * var(--borderThickness)) 0
+    calc(-1 * var(--borderThickness));
+}
+
+.panel.round .ET-FullLeftholder {
+  background-color: none;
+}
+
+.panel.sharp .ET-FullLeftHolder {
+  background-color: var(--yellow);
+}
+
+.ET-FullLeft {
+  background-color: var(--yellow);
+  border: var(--borderThickness) solid var(--black);
+  border-radius: var(--borderRadius);
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  color: black;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+  font-size: calc(var(--fontSize) * 1.5);
+  font-family: "Series E";
+  width: 100%;
+  height: 100%;
+}
+
+.ET-PartialLeft {
+  background-color: var(--yellow);
+  padding: var(--verticalPadding) var(--horizontalPadding);
+  border-radius: calc(var(--borderRadius) / 2);
+  color: black;
+  font-family: "Series E";
+  line-height: 100%;
+  font-size: calc(var(--fontSize) * 1.1);
+  letter-spacing: var(--letterSpacing);
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+.ET-Tab:has(.ET-PartialLeft.separateRow) {
+  padding-top: calc(
+    var(--partialLeftSpacing) + var(--fontSize) + var(--verticalPadding)
+  );
+  padding-bottom: calc(0.5rem + var(--verticalPadding));
+  justify-content: right !important;
+}
+
+.ET-row.extend .ET-Tab:has(.ET-PartialLeft.separateRow) {
+  padding-top: calc(
+    0.6rem + var(--fontSize) + var(--verticalPadding)
+  ) !important;
+  padding-bottom: calc(0.5rem + var(--verticalPadding));
+  justify-content: right !important;
+}
+
+.ET-PartialLeft.separateRow {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.ET-tab:not(.fullBorder) {
+  border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+  border-top-style: solid;
+  border-top-width: var(--borderThickness);
+  border-right-style: solid;
+  border-right-width: var(--borderThickness);
+  border-bottom: none;
+  border-left-style: solid;
+  border-left-width: var(--borderThickness);
+}
+
+.exitTabContainer.within .ET-Tab.HOVVariant1 {
+  padding: 0.2rem;
+  margin: 0 !important;
+  border: none !important;
+  background: none !important;
+  align-items: start;
+}
+
+.exitTabContainer.top .ET-Tab.HOVVariant1,
+.exitTabContainer.bottom .ET-Tab.HOVVariant1 {
+  padding: 0.3rem !important;
+}
+
+.exitTabContainer.top .ET-Tab.HOVVariant1,
+.exitTabContainer.top .ET-TabHolder:has(.ET-Tab.HOVVariant1),
+.exitTabContainer.bottom .ET-Tab.HOVVariant1,
+.exitTabContainer.bottom .ET-TabHolder:has(.ET-Tab.HOVVariant1) {
+  background: black !important;
+}
+
+.exitTabContainer.top .ET-tab.HOVVariant1 .ET-HOV,
+.exitTabContainer.bottom .ET-tab.HOVVariant1 .ET-HOV {
+  border-radius: var(--borderRadius);
+}
+
+.ET-HOV {
+  height: calc(var(--fontSize) * 2);
+  object-fit: contain;
+  width: 2rem;
+  background-color: black;
+  padding: 0.125rem;
+}
+
+.exitTabContainer.bottom .ET-tab:not(.fullBorder) {
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom: var(--borderThickness) solid;
+  border-bottom-left-radius: var(--borderRadius);
+  border-bottom-right-radius: var(--borderRadius);
+}
+
+.ET-tabHolder {
+  background-color: var(--backgroundColor);
+}
+
+.ET-tabHolder.auto {
+  width: max-content;
+}
+
+.ET-tabHolder.full {
+  width: 100%;
+}
+
+.ET-tabHolder.custom-percent,
+.ET-tabHolder.custom-size {
+  width: var(--width);
+}
+
+.ET-alignment.left .ET-tab {
+  justify-content: left;
+}
+
+.ET-alignment.center .ET-tab {
+  justify-content: center;
+}
+.ET-alignment.right .ET-tab {
+  justify-content: right;
+}
+
+.ET-tab.fullBorder {
+  border: var(--borderThickness) solid;
+  border-radius: var(--borderRadius);
+}
+
+.ET-tab.square {
+  border-radius: .25rem;
+  padding: var(--verticalPadding) calc(1.3rem + var(--horizontalPadding));
+}
+
+.signCorner {
+  position: absolute;
+  height: 50%;
+  width: 50%;
+  z-index: 0;
+}
+
+.signCorner.topLeft {
+  top: 0;
+  left: 0;
+}
+
+.signCorner.topRight {
+  top: 0;
+  right: 0;
+}
+
+.signCorner.bottomLeft {
+  bottom: 0;
+  left: 0;
+}
+
+.signCorner.bottomRight {
+  bottom: 0;
+  right: 0;
+}
+
+.exitTabContainer.top .ET-row.extend {
+  margin-bottom: calc(-1 * var(--marginBottom));
+}
+
+.exitTabContainer.top .ET-row.extend .ET-tab {
+  padding-bottom: calc(var(--verticalPadding) + var(--marginBottom) / 2);
+}
+
+.exitTabContainer.bottom .ET-row.extend {
+  margin-top: -0.6rem;
+}
+
+.exitTabContainer.bottom .ET-row.extend .ET-tab {
+  padding-top: calc(var(--verticalPadding) / 2 + 1.2rem);
+  padding-bottom: calc(var(--verticalPadding) / 2 + 0.6rem);
+}
+
+.exitTabContainer.within .ET-row.meet-corners .ET-alignment.left .ET-tab {
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.exitTabContainer.within .ET-row.meet-corners .ET-alignment.right .ET-tab {
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.exitTabContainer.within .ET-row.meet-corners .ET-alignment.center .ET-tab {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.signContainer:has(
+    .exitTabContainer.top .ET-row.extend:last-child .left:not(:empty)
+  )
+  .signCorner.topLeft {
+  display: none;
+}
+
+.signContainer:has(
+    .exitTabContainer.top .ET-row.extend:last-child .right:not(:empty)
+  )
+  .signCorner.topRight {
+  display: none;
+}
+
+.signContainer:has(
+    .exitTabContainer.top .ET-row.extend:last-child .ET-tabHolder.full
+  )
+  .signCorner.topRight,
+.signContainer:has(
+    .exitTabContainer.top .ET-row.extend:last-child .ET-tabHolder.full
+  )
+  .signCorner.topLeft {
+  display: none;
+}
+
+.signContainer:has(
+    .exitTabContainer.bottom .ET-row.extend:last-child .left:not(:empty)
+  ):has(.guideArrows:not(.exit_only))
+  .signCorner.bottomLeft {
+  display: none;
+}
+
+.signContainer:has(
+    .exitTabContainer.bottom .ET-row.extend:last-child .right:not(:empty)
+  ):has(.guideArrows:not(.exit_only))
+  .signCorner.bottomRight {
+  display: none;
+}
+
+.signContainer:has(
+    .exitTabContainer.bottom .ET-row.extend:last-child .ET-tabHolder.full
+  ):has(.guideArrows:not(.exit_only))
+  .signCorner.bottomRight,
+.signContainer:has(
+    .exitTabContainer.bottom .ET-row.extend:last-child .ET-tabHolder.full
+  ):has(.guideArrows:not(.exit_only))
+  .signCorner.bottomLeft {
+  display: none;
+}
+
+.exitTabContainer.top .ET-row.meet-corners .ET-alignment.left .ET-tab {
+  border-bottom-left-radius: 0;
+}
+
+.exitTabContainer.top .ET-row.meet-corners .ET-alignment.right .ET-tab {
+  border-bottom-right-radius: 0;
+}
+
+.signContainer:has(
+    .exitTabContainer.top .ET-row.meet-corners:last-child .left:not(:empty)
+  )
+  .signHolder {
+  border-top-left-radius: 0;
+}
+
+.signContainer:has(
+    .exitTabContainer.top .ET-row.meet-corners:last-child .center:not(:empty)
+  )
+  .signHolder,
+.signContainer:has(
+    .exitTabContainer.top
+      .ET-row.meet-corners:last-child
+      .right
+      .ET-tabHolder.full
+  )
+  .signHolder,
+.signContainer:has(
+    .exitTabContainer.top
+      .ET-row.meet-corners:last-child
+      .left
+      .ET-tabHolder.full
+  )
+  .signHolder {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.signContainer:has(
+    .exitTabContainer.top .ET-row.meet-corners:last-child .right:not(:empty)
+  )
+  .signHolder {
+  border-top-right-radius: 0;
+}
+
+.signContainer:has(
+    .exitTabContainer.within
+      .right
+      .ET-Tab.HOVVariant1
+      :not(.ET-HOV.roundCorners)
+  )
+  .signHolder {
+  border-top-right-radius: 0;
+}
+
+.signContainer:has(
+    .exitTabContainer.within
+      .left
+      .ET-Tab.HOVVariant1
+      :not(.ET-HOV.roundCorners)
+  )
+  .signHolder {
+  border-top-left-radius: 0;
+}
+
+.ET-alignment.left .ET-HOV.roundCorners {
+  border-top-left-radius: var(--borderRadius);
+}
+
+.ET-alignment.right .ET-HOV.roundCorners {
+  border-top-right-radius: var(--borderRadius);
+}
+
+.ET-Tab.HOVVariant2 .ET-HOV {
+  margin-left: calc(-1 * var(--horizontalPadding));
+  height: calc(var(--fontSize) * 1.75);
+  margin-right: auto;
+  width: auto;
+  aspect-ratio: 1 / 1.27;
+  padding: 0.3rem 0rem;
+  border-top-left-radius: calc(var(--borderRadius) / 2);
+  border-bottom-left-radius: calc(var(--borderRadius) / 2);
+}
+
+.ET-Tab.HOVVariant2:not(.fullBorder) .ET-HOV,
+.ET-Row.meetCorners .ET-alignment.left .ET-HOV {
+  border-bottom-left-radius: 0;
+}
+
+.ET-tab div.ET-TextHolder {
+  display: flex;
+  gap: inherit;
+  flex-direction: inherit;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+  margin-right: calc(-1 * var(--horizontalPadding) + (var(--fontSize) * 0.25));
+}
+
+.signContainer:has(
+    .exitTabContainer.top
+      .ET-tabHolder.full
+      .ET-Tab.HOVVariant2:not(.fullBorder)
+  )
+  .signHolder {
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.signcontainer:has(.guideArrows.apl) .signHolder, .signcontainer:has(.guideArrows:not(.none,.diagrammic)) .signHolder {
+  border-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.guideArrows.apl {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: var(--verticalTopPadding) var(--horizontalPadding)
+    var(--verticalBottomPadding);
+  height: max-content;
+}
+
+.sMGA_APLHolder {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  gap: var(--arrowGap);
+}
+
+.sMGA_APLHolder.auto {
+  justify-content: space-between;
+  gap: unset;
+}
+
+.sMGA_APLHolder.auto.right {
+  flex-direction: row-reverse;
+}
+
+.sMGA_APLHolder.center {
+  justify-content: center;
+}
+
+.sMGA_APLHolder.right:not(.auto) {
+  justify-content: right;
+}
+
+.sMGA_APLArrow {
+  height: var(--arrowSize);
+  aspect-ratio: 1 / 1;
+  margin: 0 calc(var(--arrowSize) * -0.3);
+  transform: translateX(var(--arrowOffset));
+}
+
+.sMGA_APLHolder:first-child .sMGA_APLArrow:first-child {
+  margin-left: 0;
+}
+
+.sMGA_APLHolder:last-child .sMGA_APLArrow:last-child {
+  margin-right: 0;
+}
+
+.sMGA_APLArrow.left-choice-arrow {
+  margin: 0 0 0 calc(var(--arrowSize) * -0.5);
+}
+
+.sMGA_APLArrow.cfx-left-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.1) 0 calc(var(--arrowSize) * -0.4);
+}
+
+.sMGA_APLArrow.cfx-right-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.4) 0 calc(var(--arrowSize) * -0.1);
+}
+
+.sMGA_APLArrow.right-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.5) 0 0;
+}
+
+.sMGA_APLArrow.left-arrow {
+  margin: 0 0 0 calc(var(--arrowSize) * -0.6);
+}
+
+.sMGA_APLArrow.right-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.6) 0 0;
+}
+
+.sMGA_APLArrow.cfx-left-arrow {
+  margin: 0 calc(var(--arrowSize) * 0.1) 0 calc(var(--arrowSize) * -0.5);
+}
+
+.sMGA_APLArrow.cfx-right-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.5) 0 calc(var(--arrowSize) * 0.1);
+}
+
+.sMGA_APLArrow.dual-turn {
+  margin-bottom: calc(var(--arrowSize) * -0.1);
+}
+
+.sMGA_APLArrow.flipped {
+  transform: scaleX(-1);
+}
+
+.sMGA_APLArrow_exitText {
+  background-color: var(--exitBGColor);
+  border-radius: var(--exitTextRoundness);
+  font-family: var(--fontFamily);
+  padding: 4px var(--exitTextHorizontalPadding);
+  font-size: var(--exitTextSize);
+  line-height: var(--exitTextLineHeight);
+  transform: translateX(var(--arrowOffset));
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+.sMGA_APLArrow_exitText.left {
+  margin-right: var(--exitTextMargin);
+}
+
+.sMGA_APLArrow_exitText.right {
+  margin-left: var(--exitTextMargin);
+}
+
+.sMGA_APLArrowHolder {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: end;
 }
