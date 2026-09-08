@@ -1,0 +1,1753 @@
+// Constants
+const App = (() => {
+  let post = {};
+  let currentlySelectedPanelIndex = -1;
+  let currentlySelectedSubPanelIndex = 0;
+
+  let currentlySelectedExitTabRowIndex = -1;
+  let currentlySelectedExitTabIndex = -1;
+
+  let currentlySelectedRowIndex = 0,
+    currentlySelectedBlockIndex = 0;
+
+  let currentlySelectedShieldGroupId = -1;
+  let currentlySelectedShieldIndex = -1;
+
+  // Glboal Acessor Methods
+  const getCurrentPanel = () => {
+    return post.panels[currentlySelectedPanelIndex];
+  };
+
+  const getCurrentSubPanel = () => {
+    return getCurrentPanel().sign.subPanels[currentlySelectedSubPanelIndex];
+  };
+
+  const getCurrentBlockRows = () => {
+    return getCurrentSubPanel().blockElements.rows[currentlySelectedRowIndex];
+  };
+
+  const getCurrentBlockElem = () => {
+    return getCurrentBlockRows()[currentlySelectedBlockIndex];
+  };
+
+  const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
+
+  const init = async () => {
+    post = new Post(Post.prototype.polePositions[0]);
+    formHandler.init(App);
+    DiagramDrawing.init(App);
+
+    window.customShields = new CustomShields();
+    await window.customShields.initialized;
+
+    window.shieldLibrary = ShieldLibrary;
+    await window.shieldLibrary.init();
+
+    window.diagramLibrary = DiagrammicLibrary;
+    await window.diagramLibrary.init();
+
+    newPanel();
+  };
+
+  // Panels
+  const newPanel = () => {
+    post.newPanel();
+    currentlySelectedPanelIndex = post.panels.length - 1;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const duplicatePanel = () => {
+    post.duplicatePanel(currentlySelectedPanelIndex);
+    currentlySelectedPanelIndex++;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const deletePanel = () => {
+    post.deletePanel(currentlySelectedPanelIndex);
+    if (currentlySelectedPanelIndex > 0) {
+      currentlySelectedPanelIndex--;
+    }
+    if (post.panels.length == 0) {
+      newPanel();
+    } else {
+      formHandler.updateForm();
+      redraw();
+    }
+  };
+
+  const changeEditingPanel = (panelNumber) => {
+    currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1);
+    currentlySelectedSubPanelIndex = 0;
+    formHandler.updateForm();
+  };
+
+  const addSubPanel = () => {
+    const sign = getCurrentPanel().sign;
+    sign.newSubPanel();
+    currentlySelectedSubPanelIndex++;
+
+    currentlySelectedRowIndex = clamp(
+      currentlySelectedRowIndex,
+      0,
+      getCurrentSubPanel().blockElements.rows.length - 1,
+    );
+    currentlySelectedBlockIndex = clamp(
+      currentlySelectedBlockIndex,
+      0,
+      getCurrentBlockRows().length - 1,
+    );
+    currentlySelectedShieldIndex = -1;
+    currentlySelectedShieldGroupId = -1;
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const removeSubPanel = () => {
+    const sign = getCurrentPanel().sign;
+    if (sign.subPanels.length > 1) {
+      sign.deleteSubPanel(sign.subPanels.length - 1);
+      currentlySelectedSubPanelIndex--;
+
+      currentlySelectedRowIndex = clamp(
+        currentlySelectedRowIndex,
+        0,
+        getCurrentSubPanel().blockElements.rows.length - 1,
+      );
+      currentlySelectedBlockIndex = clamp(
+        currentlySelectedBlockIndex,
+        0,
+        getCurrentBlockRows().length - 1,
+      );
+      currentlySelectedShieldIndex = -1;
+      currentlySelectedShieldGroupId = -1;
+
+      formHandler.updateForm();
+      redraw();
+    }
+  };
+
+  const duplicateSubPanel = () => {
+    const sign = getCurrentPanel().sign;
+    sign.duplicateSubPanel(currentlySelectedSubPanelIndex);
+    currentlySelectedSubPanelIndex++;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const changeEditingSubPanel = (subPanelNumber) => {
+    currentlySelectedSubPanelIndex = clamp(
+      subPanelNumber,
+      0,
+      getCurrentPanel().sign.subPanels.length - 1,
+    );
+    currentlySelectedRowIndex = clamp(
+      currentlySelectedRowIndex,
+      0,
+      getCurrentSubPanel().blockElements.rows.length - 1,
+    );
+    currentlySelectedBlockIndex = clamp(
+      currentlySelectedBlockIndex,
+      0,
+      getCurrentBlockRows().length - 1,
+    );
+    currentlySelectedShieldIndex = -1;
+    currentlySelectedShieldGroupId = -1;
+
+    formHandler.updateForm();
+  };
+
+  // Exit Tabs
+  const newExitTabRow = () => {
+    const panel = getCurrentPanel();
+    panel.newExitTabRow();
+
+    currentlySelectedExitTabRowIndex = panel.exitTabs.length - 1;
+    currentlySelectedExitTabIndex = -1;
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const duplicateExitTabRow = () => {
+    const panel = getCurrentPanel();
+    panel.duplicateExitTabRow(currentlySelectedExitTabRowIndex);
+    currentlySelectedExitTabRowIndex++;
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const removeExitTabRow = () => {
+    const panel = getCurrentPanel();
+    panel.deleteExitTabRow(currentlySelectedExitTabRowIndex);
+    currentlySelectedExitTabRowIndex = Math.max(
+      -1,
+      currentlySelectedExitTabRowIndex - 1,
+    );
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const changeEditingExitTabRow = (index) => {
+    currentlySelectedExitTabRowIndex = clamp(
+      index,
+      0,
+      getCurrentPanel().exitTabs.length - 1,
+    );
+    currentlySelectedExitTabIndex = -1;
+
+    formHandler.updateForm();
+  };
+
+  const newExitTab = () => {
+    const panel = getCurrentPanel();
+    const exitTabRow = panel.exitTabs[currentlySelectedExitTabRowIndex];
+    exitTabRow.newExitTab("right");
+
+    currentlySelectedExitTabIndex = exitTabRow.exitTabs.length - 1;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const deleteExitTab = () => {
+    const panel = getCurrentPanel();
+    const exitTabRow = panel.exitTabs[currentlySelectedExitTabRowIndex];
+    exitTabRow.deleteExitTab(currentlySelectedExitTabIndex);
+
+    currentlySelectedExitTabIndex = Math.max(
+      -1,
+      currentlySelectedExitTabIndex - 1,
+    );
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const duplicateExitTab = () => {
+    const panel = getCurrentPanel();
+    const exitTabRow = panel.exitTabs[currentlySelectedExitTabRowIndex];
+    exitTabRow.duplicateExitTab(currentlySelectedExitTabIndex);
+
+    currentlySelectedExitTabIndex++;
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const changeEditingExitTab = (index) => {
+    currentlySelectedExitTabIndex = clamp(
+      index,
+      0,
+      getCurrentPanel().exitTabs[currentlySelectedExitTabRowIndex].exitTabs
+        .length,
+    );
+
+    formHandler.updateForm();
+  };
+
+  // Rows
+  const newRow = (selectedBlock) => {
+    const blockElems = getCurrentSubPanel().blockElements;
+    currentlySelectedBlockIndex = 0;
+    blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const dupRow = () => {
+    const blockElems = getCurrentSubPanel().blockElements;
+    blockElems.duplicateRow(currentlySelectedRowIndex++);
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const delRow = () => {
+    const blockElems = getCurrentSubPanel().blockElements;
+    if (blockElems.rows.length == 1) {
+      return;
+    }
+
+    blockElems.deleteRow(currentlySelectedRowIndex);
+    currentlySelectedRowIndex = Math.max(currentlySelectedRowIndex - 1, 0);
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setSelectedRow = (row) => {
+    currentlySelectedRowIndex = clamp(
+      row,
+      0,
+      getCurrentSubPanel().blockElements.rows.length - 1,
+    );
+
+    formHandler.updateForm();
+  };
+
+  const newControlElem = (selectedElem) => {
+    const blockElems = getCurrentSubPanel().blockElements;
+    blockElems.addElement(
+      Control.prototype.blockToClassElems[selectedElem],
+      {},
+      currentlySelectedRowIndex,
+      ++currentlySelectedBlockIndex,
+    );
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const delControlElem = () => {
+    const blockElems = getCurrentSubPanel().blockElements;
+    if (
+      blockElems.removeElement(
+        currentlySelectedRowIndex,
+        currentlySelectedBlockIndex,
+      )
+    ) {
+      currentlySelectedRowIndex--;
+      currentlySelectedBlockIndex = getCurrentBlockRows().length - 1;
+    } else {
+      currentlySelectedBlockIndex--;
+    }
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setSelectedControlElem = (block) => {
+    currentlySelectedBlockIndex = clamp(
+      block,
+      0,
+      getCurrentBlockRows().length - 1,
+    );
+
+    formHandler.updateForm();
+  };
+
+  // Shield Groups
+  const newShieldGroup = () => {
+    const panel = getCurrentPanel();
+    const sign = panel.sign.subPanels[currentlySelectedSubPanelIndex];
+
+    const firstRow = sign.blockElements.rows[0];
+    const hasOnlyShieldGroups =
+      firstRow &&
+      firstRow.every(
+        (block) => block.constructor.name === "ShieldGroupElement",
+      );
+
+    if (!firstRow || !hasOnlyShieldGroups) {
+      const blockElems = getCurrentSubPanel().blockElements;
+      currentlySelectedBlockIndex = 0;
+      currentlySelectedRowIndex = 0;
+      blockElems.addRow(0, "ShieldGroupElement");
+    } else if (firstRow && hasOnlyShieldGroups) {
+      getCurrentSubPanel().blockElements.addElement(
+        Control.prototype.blockToClassElems["ShieldGroupElement"],
+        {},
+        0,
+        firstRow.length + 1,
+      );
+      currentlySelectedBlockIndex = firstRow.length - 1;
+      currentlySelectedRowIndex = 0;
+    }
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const setSelectedShieldId = (shieldIndex) => {
+    const currentlySelectedElement = getCurrentBlockElem();
+    if (currentlySelectedElement.constructor.name !== "ShieldGroupElement") {
+      return;
+    }
+
+    currentlySelectedShieldIndex = clamp(
+      shieldIndex,
+      -1,
+      currentlySelectedElement.shields.length,
+    );
+
+    formHandler.updateForm();
+  };
+
+  const changeCurrentlyEditingShieldGroup = (newId) => {
+    currentlySelectedShieldGroupId = newId;
+    currentlySelectedShieldIndex = -1;
+
+    let id = 0;
+    const blockElems = getCurrentSubPanel().blockElements;
+    for (let i = 0; i < blockElems.rows.length; i++) {
+      for (let j = 0; j < blockElems.rows[i].length; j++) {
+        const block = blockElems.rows[i][j];
+        if (block.constructor.name === "ShieldGroupElement" && id == newId) {
+          console.log(i, j, id);
+          currentlySelectedRowIndex = i;
+          currentlySelectedBlockIndex = j;
+          break;
+        } else if (block.constructor.name === "ShieldGroupElement") {
+          id++;
+        }
+      }
+    }
+
+    formHandler.updateForm();
+  };
+
+  const newShield = () => {
+    const selectedShieldGroup = getCurrentBlockElem();
+    if (
+      selectedShieldGroup &&
+      selectedShieldGroup.constructor?.name === "ShieldGroupElement"
+    ) {
+      selectedShieldGroup.newShield();
+      currentlySelectedShieldIndex = selectedShieldGroup.shields.length - 1;
+
+      formHandler.updateShieldSubform();
+      redraw();
+    }
+  };
+
+  const deleteShield = (shieldIndex) => {
+    const selectedShieldGroup = getCurrentBlockElem();
+    if (
+      selectedShieldGroup &&
+      selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
+      shieldIndex >= 0
+    ) {
+      selectedShieldGroup.deleteShield(shieldIndex);
+      currentlySelectedShieldIndex = Math.max(0, shieldIndex - 1);
+      formHandler.updateShieldSubform();
+
+      let lastShieldNum = -1;
+      let shieldlist = [];
+      for (const s of selectedShieldGroup.shields) {
+        if (s.group != 0) {
+          if (s.group != lastShieldNum) {
+            shieldlist.push(s);
+            lastShieldNum = s.group;
+          } else {
+            shieldlist.push(s);
+          }
+        } else {
+          if (shieldlist.length == 1) {
+            shieldlist[0].group = 0;
+            shiedlist = [];
+          }
+        }
+      }
+
+      if (shieldlist.length == 1) {
+        shieldlist[0].group = 0;
+        shiedlist = [];
+      }
+
+      redraw();
+    }
+  };
+
+  const duplicateShield = (shieldIndex) => {
+    const selectedShieldGroup = getCurrentBlockElem();
+    if (
+      selectedShieldGroup &&
+      selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
+      shieldIndex >= 0
+    ) {
+      selectedShieldGroup.duplicateShield(shieldIndex);
+      currentlySelectedShieldIndex = shieldIndex + 1;
+      formHandler.updateShieldSubform();
+      redraw();
+    }
+  };
+
+  const groupShields = (shieldIndex, nextShieldIndex) => {
+    const selectedShieldGroup = getCurrentBlockElem();
+    if (
+      selectedShieldGroup &&
+      selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
+      shieldIndex >= 0 &&
+      shieldIndex < selectedShieldGroup.shields.length &&
+      nextShieldIndex >= 0 &&
+      nextShieldIndex < selectedShieldGroup.shields.length
+    ) {
+      const shield = selectedShieldGroup.shields[shieldIndex];
+      const nextShield = selectedShieldGroup.shields[nextShieldIndex];
+
+      let groupNumber;
+      if (shield.group != 0) {
+        groupNumber = shield.group;
+      } else {
+        groupNumber = 0;
+        for (const s of selectedShieldGroup.shields) {
+          if (s.group > groupNumber) {
+            groupNumber = s.group;
+          }
+        }
+        groupNumber++;
+      }
+
+      shield.group = groupNumber;
+      if (nextShield) {
+        nextShield.group = groupNumber;
+      }
+    }
+    formHandler.updateShieldSubform();
+    redraw();
+  };
+
+  const removeShieldFromGroup = (shieldIndex) => {
+    const selectedShieldGroup = getCurrentBlockElem();
+    if (
+      selectedShieldGroup &&
+      selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
+      shieldIndex >= 0 &&
+      shieldIndex < selectedShieldGroup.shields.length
+    ) {
+      const shield = selectedShieldGroup.shields[shieldIndex];
+
+      let previousGroup = shield.group;
+      let groupList = [];
+
+      shield.group = 0;
+
+      for (let i = 0; i < selectedShieldGroup.shields.length; i++) {
+        const s = selectedShieldGroup.shields[i];
+        if (s.group == previousGroup) {
+          groupList.push(s);
+        } else if (s.group == 0) {
+          if (groupList.length == 1) {
+            groupList[0].group = 0;
+            groupList = [];
+          }
+          if (i != shieldIndex) {
+            break;
+          }
+        }
+      }
+    }
+    formHandler.updateShieldSubform();
+    redraw();
+  };
+
+  const removeShieldGroup = (shieldIndex) => {
+    const selectedShieldGroup = getCurrentBlockElem();
+    if (
+      selectedShieldGroup &&
+      selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
+      shieldIndex >= 0 &&
+      shieldIndex < selectedShieldGroup.shields.length
+    ) {
+      let groupNumber = selectedShieldGroup.shields[shieldIndex].group;
+      for (let i = 0; i < selectedShieldGroup.shields.length; i++) {
+        const s = selectedShieldGroup.shields[i];
+        if (s.group == groupNumber) {
+          s.group = 0;
+        }
+      }
+    }
+    formHandler.updateShieldSubform();
+    redraw();
+  };
+
+  // APL
+  const addAPLArrow = (subpanelIndex) => {
+    const arrow = getCurrentPanel().sign.arrows;
+    if (arrow.arrowMode != "apl") {
+      return;
+    }
+
+    getCurrentPanel().sign.newAPL(subpanelIndex);
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const removeAPLArrow = (subpanelIndex, aplIndex) => {
+    const arrow = getCurrentPanel().sign.arrows;
+    if (arrow.arrowMode != "apl") {
+      return;
+    }
+
+    getCurrentPanel().sign.deleteAPL(subpanelIndex, aplIndex);
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const resetPadding = () => {
+    getCurrentPanel().sign.padding = "0.3rem 0.75rem 0.3rem 0.75rem";
+
+    document.getElementById("paddingTop").value = 0.3;
+    document.getElementById("paddingRight").value = 0.75;
+    document.getElementById("paddingBottom").value = 0.3;
+    document.getElementById("paddingLeft").value = 0.75;
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  // Redraw Methods
+  const redrawExitTabs = (
+    panel,
+    exitTabContainerTop,
+    exitTabContainerBottom,
+    exitTabContainerWithin,
+    exitTabContainerLeft,
+    exitTabContainerRight,
+  ) => {
+    for (let rowIndex = panel.exitTabs.length - 1; rowIndex >= 0; rowIndex--) {
+      const exitTabRow = panel.exitTabs[rowIndex];
+      const exitTabRowElement = exitTabRow.createElement();
+      exitTabRowElement.style.setProperty(
+        "--backgroundColor",
+        lib.colors[panel.color] || panel.color.toLowerCase(),
+      );
+
+      if (exitTabRow.position == "top") {
+        exitTabContainerTop.appendChild(exitTabRowElement);
+      } else if (exitTabRow.position == "bottom") {
+        exitTabContainerBottom.appendChild(exitTabRowElement);
+      } else if (exitTabRow.position == "left") {
+        exitTabContainerLeft.appendChild(exitTabRowElement);
+      } else if (exitTabRow.position == "right") {
+        exitTabContainerRight.appendChild(exitTabRowElement);
+      } else {
+        exitTabContainerWithin.appendChild(exitTabRowElement);
+      }
+    }
+  };
+
+  const redrawSubPanels = (panel, signHolderElmt) => {
+    const subpanelList = [];
+
+    for (
+      let subPanelIndex = 0;
+      subPanelIndex < panel.sign.subPanels.length;
+      subPanelIndex++
+    ) {
+      const subPanel = panel.sign.subPanels[subPanelIndex];
+
+      if (subPanelIndex > 0) {
+        const subDivider = document.createElement("div");
+        subDivider.className = "subDivider";
+        if (subPanel.height) {
+          subDivider.style.height = subPanel.height;
+        } else {
+          subDivider.style.removeProperty("height");
+        }
+
+        if (
+          panel.sign.arrows.arrowMode == "apl" &&
+          panel.sign.lanePanelSize > 0 &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5] &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5].length > 0
+        ) {
+          subDivider.style.margin = `0 ${panel.sign.lanePanelSize / 2}px`;
+        }
+
+        signHolderElmt.appendChild(subDivider);
+      }
+
+      const signContentContainerElmt = document.createElement("div");
+      signContentContainerElmt.className = `signContentContainer`;
+      signHolderElmt.appendChild(signContentContainerElmt);
+
+      if (
+        panel.sign.arrows.arrowMode != "diagrammic" &&
+        subPanel.laneWidth > 0 &&
+        panel.sign.lanePanelSize > 0
+      ) {
+        signContentContainerElmt.style.width =
+          panel.sign.lanePanelSize * subPanel.laneWidth + "px";
+      }
+
+      const blockElement = subPanel.blockElements.createElement(
+        panel,
+        subPanel,
+      );
+      blockElement.style.justifyContent = subPanel.verticalAlign.toLowerCase();
+      signContentContainerElmt.appendChild(blockElement);
+      signContentContainerElmt.style.padding = panel.sign.padding;
+      subpanelList.push(signContentContainerElmt);
+    }
+
+    return subpanelList;
+  };
+
+  const redrawPanel = (panel, panelContainerElmt, index) => {
+    const panelElmt = document.createElement("div");
+    panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
+    panelElmt.style.setProperty(
+      "--signBorderRadius",
+      panel.borderRadius + "rem",
+    );
+    panelElmt.id = "panel" + index;
+    panelContainerElmt.appendChild(panelElmt);
+
+    const exitTabContainerTop = document.createElement("div");
+    exitTabContainerTop.className = "exitTabContainer top";
+
+    const exitTabContainerBottom = document.createElement("div");
+    exitTabContainerBottom.className = "exitTabContainer bottom";
+
+    const exitTabContainerLeft = document.createElement("div");
+    exitTabContainerLeft.className = "exitTabContainer left";
+
+    const exitTabContainerRight = document.createElement("div");
+    exitTabContainerRight.className = "exitTabContainer right";
+
+    const exitTabContainerWithin = document.createElement("div");
+    exitTabContainerWithin.className = "exitTabContainer within";
+
+    redrawExitTabs(
+      panel,
+      exitTabContainerTop,
+      exitTabContainerBottom,
+      exitTabContainerWithin,
+      exitTabContainerLeft,
+      exitTabContainerRight,
+    );
+
+    const signCont = document.createElement("div");
+    signCont.className = `signContainer`;
+    panelElmt.appendChild(signCont);
+
+    const signElmt = document.createElement("div");
+    signElmt.className = `sign`;
+
+    const topLeftSignCorner = document.createElement("div");
+    topLeftSignCorner.className = "signCorner topLeft";
+    signElmt.appendChild(topLeftSignCorner);
+
+    const topRightSignCorner = document.createElement("div");
+    topRightSignCorner.className = "signCorner topRight";
+    signElmt.appendChild(topRightSignCorner);
+
+    const bottomLeftSignCorner = document.createElement("div");
+    bottomLeftSignCorner.className = "signCorner bottomLeft";
+    signElmt.appendChild(bottomLeftSignCorner);
+
+    const bottomRightSignCorner = document.createElement("div");
+    bottomRightSignCorner.className = "signCorner bottomright";
+    signElmt.appendChild(bottomRightSignCorner);
+
+    const signHolderElmt = document.createElement("div");
+    signHolderElmt.className = `signHolder ${panel.sign.arrows.arrowMode == "diagrammic" ? "diagrammic" : ""}`;
+    signElmt.appendChild(signHolderElmt);
+    signElmt.appendChild(exitTabContainerWithin);
+
+    const guideArrowsHolderElmt = document.createElement("div");
+    guideArrowsHolderElmt.className = "guideArrowsHolder";
+
+    const guideArrowsElmt = document.createElement("div");
+    /*guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow
+        .replace("/", "-")
+        .replace(" ", "_")
+        .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
+      */
+
+    guideArrowsElmt.className = `guideArrows ${panel.sign.arrows.arrowMode.toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()} ${
+      panel.sign.arrows.arrowMode.toLowerCase() == "standard"
+        ? panel.sign.guideArrow
+            .toLowerCase()
+            .replace("/", "-")
+            .replace(" ", "_")
+            .toLowerCase()
+        : ""
+    }`;
+    guideArrowsHolderElmt.appendChild(guideArrowsElmt);
+
+    const sideLeftArrowElmt = document.createElement("img");
+    sideLeftArrowElmt.className = "sideLeftArrow";
+    sideLeftArrowElmt.src = "assets/arrows/A-4.svg";
+    signHolderElmt.appendChild(sideLeftArrowElmt);
+
+    const sideRightArrowElmt = document.createElement("img");
+    sideRightArrowElmt.className = "sideRightArrow";
+    sideRightArrowElmt.src = "assets/arrows/A-4.svg";
+
+    signCont.appendChild(exitTabContainerTop);
+    signCont.appendChild(exitTabContainerLeft);
+    signCont.appendChild(exitTabContainerRight);
+    signCont.appendChild(signElmt);
+    signCont.appendChild(guideArrowsHolderElmt);
+    signCont.appendChild(exitTabContainerBottom);
+
+    if (exitTabContainerWithin.innerHTML != "") {
+      signHolderElmt.style.paddingTop =
+        exitTabContainerWithin.offsetHeight + "px";
+      signHolderElmt.style.minWidth = exitTabContainerWithin.offsetWidth + "px";
+    }
+
+    const subpanelList = redrawSubPanels(panel, signHolderElmt);
+
+    signHolderElmt.appendChild(sideRightArrowElmt);
+
+    // Guide arrows
+    const arrows = panel.sign.arrows;
+    const arrowVariant = arrows[arrows.arrowMode];
+
+    if (
+      arrows.arrowMode == "diagrammic" &&
+      Object.keys(arrowVariant.diagramData).length != 0
+    ) {
+      let diagramData = arrowVariant.diagramData;
+      const diagrammicImage = document.createElement("img");
+      diagrammicImage.className = "diagrammicImage";
+      diagrammicImage.style.height = 15 * (arrowVariant.scale / 100) + "rem";
+      diagrammicImage.style.width = 15 * (arrowVariant.scale / 100) + "rem";
+
+      DiagramDrawing.diagramDataToImage(diagramData, false, false)
+        .then((url) => {
+          diagrammicImage.src = url;
+        })
+        .catch((error) => {
+          alert(error);
+        });
+
+      signHolderElmt.appendChild(diagrammicImage);
+
+      // aligning subpanels
+      const canvasSize = diagramData.canvasProperties.canvasWidth;
+      const diagramClientRect = diagrammicImage.getBoundingClientRect();
+
+      const zoomScale = formHandler.vars.zoomLevel;
+      const diagramHeightScaled = diagramClientRect.height / zoomScale;
+
+      let queue = [diagramData.roadData];
+      let subpanelNumbersUsed = {};
+
+      while (queue.length > 0) {
+        let nextNode = queue.pop();
+        queue.push(...nextNode.children);
+
+        if (
+          !nextNode.subpanel.enabled ||
+          !subpanelList[nextNode.subpanel.subpanelNumber]
+        ) {
+          continue;
+        }
+
+        let subpanel = subpanelList[nextNode.subpanel.subpanelNumber];
+
+        let position = [
+          (nextNode.subpanel.x / canvasSize) * diagramHeightScaled,
+          (nextNode.subpanel.y / canvasSize) * diagramHeightScaled,
+        ];
+
+        if (nextNode.subpanel.direction == "left") {
+          position[0] -= subpanel.getBoundingClientRect().width / zoomScale;
+        } else if (nextNode.subpanel.direction == "top") {
+          position[1] -= subpanel.getBoundingClientRect().height / zoomScale;
+        }
+
+        if (
+          nextNode.subpanel.direction == "left" ||
+          nextNode.subpanel.direction == "right"
+        ) {
+          position[1] -=
+            subpanel.getBoundingClientRect().height / zoomScale / 2;
+        } else if (
+          nextNode.subpanel.direction == "top" ||
+          nextNode.subpanel.direction == "bottom"
+        ) {
+          position[0] -= subpanel.getBoundingClientRect().width / zoomScale / 2;
+        }
+
+        subpanelNumbersUsed[nextNode.subpanel.subpanelNumber] = {
+          position: position,
+          direction: nextNode.subpanel.direction,
+        };
+        subpanel.style.setProperty("--leftTransform", position[0]);
+        subpanel.style.setProperty("--topTransform", position[1]);
+      }
+
+      for (let i = 0; i < subpanelList.length; i++) {
+        if (!subpanelNumbersUsed[i]) {
+          subpanelList[i].style.display = "none";
+        }
+      }
+
+      let minLeft = 0;
+      let maxRight = diagramHeightScaled;
+
+      let minTop = 0;
+      let maxBottom = diagramHeightScaled;
+
+      for (const key in subpanelNumbersUsed) {
+        const { position, _ } = subpanelNumbersUsed[key];
+        const [posX, posY] = position;
+        const subpanel = subpanelList[key];
+
+        const subpanelRect = subpanel.getBoundingClientRect();
+        const normWidth = subpanelRect.width / zoomScale;
+        const normHeight = subpanelRect.height / zoomScale;
+
+        if (posX < minLeft) {
+          minLeft = posX;
+        }
+        if (posX + normWidth > maxRight) {
+          maxRight = posX + normWidth;
+        }
+        if (posY < minTop) {
+          minTop = posY;
+        }
+        if (posY + normHeight > maxBottom) {
+          maxBottom = posY + normHeight;
+        }
+      }
+
+      const leftOverhang = Math.abs(Math.min(0, minLeft));
+      const topOverhang = Math.abs(Math.min(0, minTop));
+
+      signHolderElmt.style.width = `${maxRight - minLeft}px`;
+      signHolderElmt.style.height = `${maxBottom - minTop}px`;
+
+      diagrammicImage.style.left = `${leftOverhang}px`;
+      diagrammicImage.style.top = `${topOverhang}px`;
+
+      for (const key in subpanelNumbersUsed) {
+        const subpanel = subpanelList[key];
+        const { position } = subpanelNumbersUsed[key];
+
+        subpanel.style.setProperty(
+          "--leftTransform",
+          `${position[0] + leftOverhang}`,
+        );
+        subpanel.style.setProperty(
+          "--topTransform",
+          `${position[1] + topOverhang}`,
+        );
+      }
+    }
+
+    if (arrows.arrowMode == "apl") {
+      let autoJustify = panel.sign.lanePanelSize == 0;
+
+      guideArrowsElmt.style.setProperty(
+        "--horizontalPadding",
+        arrowVariant.horizontalPadding + "rem",
+      );
+      guideArrowsElmt.style.setProperty(
+        "--verticalTopPadding",
+        arrowVariant.verticalTopPadding + "rem",
+      );
+      guideArrowsElmt.style.setProperty(
+        "--verticalBottomPadding",
+        arrowVariant.verticalBottomPadding + "rem",
+      );
+
+      let dividerElements = [];
+      let arrowElements = [];
+
+      for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
+        let aplArrows = arrowVariant.subpanels[i] || [];
+        let subpanel = i % 1 == 0 && subpanelList[i];
+        const aplHolder = document.createElement("div");
+        if (i % 1 == 0) {
+          aplHolder.className =
+            "sMGA_APLHolder " +
+            ((arrowVariant.subpanelConfigs[i] &&
+              arrowVariant.subpanelConfigs[i].justify) ||
+              "left") +
+            " " +
+            (autoJustify && i % 1 == 0 ? "auto" : "");
+        } else {
+          aplHolder.className =
+            "sMGA_APLHolder center " +
+            (autoJustify && i % 1 == 0 ? "auto" : "");
+        }
+
+        let pair = [];
+        let ind = 0;
+        for (const arrow of aplArrows) {
+          const arrowElmt = arrow.createElement();
+          if (!autoJustify) {
+            arrowElmt.style.width = panel.sign.lanePanelSize + "px";
+          }
+
+          aplHolder.appendChild(arrowElmt);
+
+          pair[ind++] = arrowElmt;
+          if (ind == 2) {
+            arrowElements.push(pair);
+            pair = [];
+            ind = 0;
+          }
+        }
+
+        if (subpanel) {
+          aplHolder.style.width = `max-content`;
+          aplHolder.style.minWidth = `${subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+        } else {
+          if (autoJustify && aplArrows.length > 0) {
+            dividerElements.push(aplHolder);
+          } else if (aplArrows.length > 0) {
+            aplHolder.style.width = panel.sign.lanePanelSize + "px";
+          }
+        }
+        guideArrowsElmt.appendChild(aplHolder);
+
+        let avg = 0,
+          total = 0;
+        for (const [arrow1, arrow2] of arrowElements) {
+          avg +=
+            (arrow2.getBoundingClientRect().left -
+              arrow1.getBoundingClientRect().left) /
+            formHandler.vars.zoomLevel;
+          total += 1;
+        }
+        for (const holder of dividerElements) {
+          if (autoJustify) {
+            holder.style.width = `${(avg / total) * 1.5}px`;
+          }
+        }
+      }
+    }
+
+    if (arrows.arrowMode == "standard") {
+      const ExitKeys = ["EA", "EB", "EC"];
+      const MainKeys = ["A", "B", "C", "D", "E"];
+      let path;
+
+      const otherSymbolsElmt = document.createElement("div");
+      otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol
+        .replace("/", "-")
+        .replace(" ", "_")
+        .toLowerCase()}`;
+      guideArrowsElmt.appendChild(otherSymbolsElmt);
+
+      const oSNumElmt = document.createElement("div");
+      oSNumElmt.className = `oSNum`;
+      otherSymbolsElmt.appendChild(oSNumElmt);
+
+      const arrowContElmt = document.createElement("div");
+      arrowContElmt.className = `arrowContainer`;
+      guideArrowsElmt.appendChild(arrowContElmt);
+
+      const createArrowElmt = (key, dir, name, extra) => {
+        if (dir == "MainArrows!ExitOnly") {
+          key = key.split("/")[1];
+        } else {
+          key = key.split("/")[0];
+        }
+
+        if (
+          ExitKeys.includes(key.split("-")[0]) ||
+          MainKeys.includes(key.split("-")[0])
+        ) {
+          const downArrowElmt = document.createElement("img");
+          downArrowElmt.className = name || "exitOnlyArrow ";
+
+          if (extra) {
+            downArrowElmt.className += " " + extra;
+          }
+
+          if (ExitKeys.includes(key.split("-")[0])) {
+            key = key.split("-")[0].split("")[1] + "-" + key.split("-")[1];
+            downArrowElmt.style.filter = "invert(1)";
+          }
+
+          const shouldUseCanadianDownArrow =
+            panel.sign.useCanadianDownArrows && key === "C-1";
+
+          if (shouldUseCanadianDownArrow) {
+            downArrowElmt.src = "assets/arrowBlocks/DOWN_CA.svg";
+            downArrowElmt.classList.add("canadianDownArrow");
+          } else {
+            downArrowElmt.src = "assets/arrows/" + key + ".svg";
+          }
+
+          return downArrowElmt;
+        }
+      };
+
+      if (
+        panel.sign.arrowPosition == "Left" &&
+        panel.sign.guideArrow != "Exit Only" &&
+        panel.sign.guideArrow != "Side Left" &&
+        panel.sign.guideArrow != "Side Right" &&
+        panel.sign.guideArrow != "Half Exit Only"
+      ) {
+        arrowContElmt.style.justifyContent = "left";
+      } else if (panel.sign.arrowPosition == "Middle") {
+        arrowContElmt.style.cssFloat = "none";
+      } else if (
+        panel.sign.arrowPosition == "Right" &&
+        panel.sign.guideArrow != "Exit Only" &&
+        panel.sign.guideArrow != "Side Left" &&
+        panel.sign.guideArrow != "Side Right" &&
+        panel.sign.guideArrow != "Half Exit Only"
+      ) {
+        arrowContElmt.style.justifyContent = "right";
+      }
+
+      if (panel.sign.guideArrow.includes("Exit Only")) {
+        const borderWidthValue = "0.2rem";
+        const exitOnlyBorderModes = Sign.prototype.exitOnlyBorderModes;
+        const resolvedExitOnlyBorderMode = exitOnlyBorderModes.includes(
+          panel.sign.exitOnlyBorderMode,
+        )
+          ? panel.sign.exitOnlyBorderMode
+          : exitOnlyBorderModes[0];
+        const hideExitOnlyArrows = panel.sign.hideExitArrow === true;
+        arrowContElmt.classList.toggle(
+          "hideExitOnlyArrows",
+          hideExitOnlyArrows,
+        );
+        if (
+          !post.secondExitOnly &&
+          panel.sign.guideArrow != "Split Exit Only" &&
+          panel.sign.guideArrow != "Half Exit Only"
+        ) {
+          guideArrowsElmt.style.padding = panel.sign.exitOnlyPadding + "rem";
+        }
+
+        if (panel.sign.guideArrow == "Exit Only" && !post.secondExitOnly) {
+          guideArrowsElmt.style.borderTopWidth =
+            resolvedExitOnlyBorderMode === "edge" ? borderWidthValue : "0";
+        }
+
+        if (panel.sign.guideArrow == "Half Exit Only") {
+          const secondaryContainer = document.createElement("div");
+          secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow
+            .replace("/", "-")
+            .replace(" ", "_")
+            .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
+
+          guideArrowsElmt.className += post.secondExitOnly
+            ? " new2"
+            : " default";
+          guideArrowsElmt.classList.remove("halfExitNoBorder");
+
+          if (!post.secondExitOnly) {
+            const borderMode = resolvedExitOnlyBorderMode;
+            const arrowPos = panel.sign.arrowPosition.toLowerCase();
+            const overlap = `-${borderWidthValue}`;
+            const touchesLeftEdge =
+              arrowPos === "left" || arrowPos === "middle";
+            const touchesRightEdge =
+              arrowPos === "right" || arrowPos === "middle";
+
+            secondaryContainer.style.backgroundColor = "var(--yellow)";
+            secondaryContainer.style.color = "var(--black)";
+            secondaryContainer.style.borderStyle = "solid";
+            secondaryContainer.style.borderColor = "var(--black)";
+            secondaryContainer.style.borderTopWidth = "0";
+            secondaryContainer.style.borderRightWidth = "0";
+            secondaryContainer.style.borderBottomWidth = "0";
+            secondaryContainer.style.borderLeftWidth = "0";
+            secondaryContainer.style.marginBottom = "0";
+            secondaryContainer.style.marginLeft = "0";
+            secondaryContainer.style.marginRight = "0";
+
+            if (borderMode !== "none") {
+              const edges = {
+                top: borderMode === "edge",
+                right: borderMode === "edge",
+                bottom: true,
+                left: borderMode === "edge",
+              };
+
+              if (borderMode === "white-edge") {
+                edges.top = false;
+                edges.left = touchesLeftEdge;
+                edges.right = touchesRightEdge;
+              }
+
+              secondaryContainer.style.borderTopWidth = edges.top
+                ? borderWidthValue
+                : "0";
+              secondaryContainer.style.borderRightWidth = edges.right
+                ? borderWidthValue
+                : "0";
+              secondaryContainer.style.borderBottomWidth = edges.bottom
+                ? borderWidthValue
+                : "0";
+              secondaryContainer.style.borderLeftWidth = edges.left
+                ? borderWidthValue
+                : "0";
+
+              if (edges.bottom) {
+                secondaryContainer.style.marginBottom = overlap;
+              }
+              if (edges.left) {
+                secondaryContainer.style.marginLeft = overlap;
+              }
+              if (edges.right) {
+                secondaryContainer.style.marginRight = overlap;
+              }
+            } else {
+              secondaryContainer.style.borderStyle = "none";
+              const sideOverlap = "-0.02rem";
+              if (touchesLeftEdge) {
+                secondaryContainer.style.marginLeft = sideOverlap;
+              }
+              if (touchesRightEdge) {
+                secondaryContainer.style.marginRight = sideOverlap;
+              }
+              secondaryContainer.style.marginBottom = overlap;
+            }
+
+            const leftRadius =
+              touchesLeftEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
+            const rightRadius =
+              touchesRightEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
+            secondaryContainer.style.borderBottomLeftRadius = touchesLeftEdge
+              ? leftRadius
+              : "0";
+            secondaryContainer.style.borderBottomRightRadius = touchesRightEdge
+              ? rightRadius
+              : "0";
+
+            if (borderMode === "none") {
+              secondaryContainer.style.zIndex = "0";
+            } else {
+              secondaryContainer.style.removeProperty("z-index");
+            }
+          }
+
+          guideArrowsElmt.classList.remove("halfExitNoBorder");
+          path = secondaryContainer;
+
+          const arrow = createArrowElmt(
+            panel.sign.exitguideArrows.split(":")[1],
+            "MainArrows!ExitOnly",
+            "halfarrow",
+            panel.sign.arrowPosition.toLowerCase(),
+          );
+
+          if (panel.sign.arrowPosition.toLowerCase() == "left") {
+            arrowContElmt.appendChild(secondaryContainer);
+            arrowContElmt.appendChild(arrow);
+
+            if (panel.sign.guideArrowLanes > 1) {
+              let marginLeft = 4;
+
+              for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
+                if (i % 2 == 0) {
+                  marginLeft += 12;
+                } else {
+                  marginLeft += 4;
+                }
+              }
+            }
+          } else {
+            arrowContElmt.appendChild(arrow);
+            arrowContElmt.appendChild(secondaryContainer);
+
+            if (panel.sign.guideArrowLanes > 1) {
+              let marginLeft = 11;
+
+              for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
+                if (i % 2 == 0) {
+                  marginLeft += 12;
+                } else {
+                  marginLeft += 4;
+                }
+              }
+            }
+          }
+
+          path.style.padding = panel.sign.exitOnlyPadding + "rem";
+        } else {
+          path = arrowContElmt;
+        }
+      }
+
+      if ("Side Left" == panel.sign.guideArrow) {
+        sideLeftArrowElmt.style.display = "block";
+      } else if ("Side Right" == panel.sign.guideArrow) {
+        sideRightArrowElmt.style.display = "block";
+      } else if ("None" != panel.sign.guideArrow) {
+        signElmt.style.borderBottomLeftRadius = "0";
+        signElmt.style.borderBottomRightRadius = "0";
+        signElmt.style.borderBottomWidth = "0";
+        signElmt.style.width = "100%";
+        guideArrowsElmt.style.display = "block";
+        guideArrowsElmt.style.visibility = "visible";
+        if (
+          "Exit Only" == panel.sign.guideArrow ||
+          "Split Exit Only" == panel.sign.guideArrow ||
+          "Half Exit Only" == panel.sign.guideArrow
+        ) {
+          if (
+            post.secondExitOnly == true ||
+            panel.sign.guideArrow == "Half Exit Only"
+          ) {
+            if (panel.sign.guideArrow == "Exit Only") {
+              guideArrowsElmt.className += " new";
+              arrowContElmt.className += " new";
+            }
+            if (panel.sign.guideArrow == "Half Exit Only") {
+              path.className += " new2";
+              arrowContElmt.className += " new2";
+              const arrowPositionSetting =
+                typeof panel.sign.arrowPosition === "string"
+                  ? panel.sign.arrowPosition.toLowerCase()
+                  : "middle";
+              let justifyContent = "center";
+              if (arrowPositionSetting === "left") {
+                justifyContent = "flex-start";
+              } else if (arrowPositionSetting === "right") {
+                justifyContent = "flex-end";
+              }
+              arrowContElmt.style.justifyContent = justifyContent;
+              arrowContElmt.style.gap = "5rem";
+              arrowContElmt.style.width = "100%";
+            }
+            guideArrowsElmt.style.display = "flex";
+          }
+
+          if (post.secondExitOnly && panel.sign.guideArrow == "Exit Only") {
+            path.style.padding = panel.sign.exitOnlyPadding + "rem";
+          }
+
+          /*
+
+						if (panel.sign.advisoryMessage) {
+							actionMessageElmt.style.fontFamily = "Series E";
+						}
+					
+					*/
+
+          // Interlase arrows and the words EXIT and ONLY, ensuring
+          //   EXIT ONLY is centered between all the arrows.
+          if (
+            panel.sign.guideArrowLanes == 0 &&
+            panel.sign.advisoryMessage == true
+          ) {
+            const actionMessage = document.createElement("span");
+            actionMessage.className = "exitOnlyText";
+            actionMessage.appendChild(
+              document.createTextNode(panel.sign.advisoryText),
+            );
+            path.appendChild(actionMessage);
+          } else {
+            const resolveExitOnlyText = (text, fallback) =>
+              typeof text === "string" ? text : fallback;
+            const exitOnlyLabelLeft = resolveExitOnlyText(
+              panel.sign.exitOnlyLeftText,
+              "EXIT",
+            ).trim();
+            const exitOnlyLabelRight = resolveExitOnlyText(
+              panel.sign.exitOnlyRightText,
+              "ONLY",
+            ).trim();
+            const exitOnlyLabelFull = [exitOnlyLabelLeft, exitOnlyLabelRight]
+              .filter((text) => text && text.length > 0)
+              .join(" ")
+              .trim();
+            const isSplitExitOnly = panel.sign.guideArrow == "Split Exit Only";
+            const shouldRenderLabel = (text) =>
+              !(
+                panel.sign.showExitOnly == false &&
+                isSplitExitOnly &&
+                (!text || text.length === 0)
+              );
+            for (
+              let arrowIndex = 0, length = panel.sign.guideArrowLanes;
+              arrowIndex < length;
+              arrowIndex++
+            ) {
+              // Evens
+              if (length % 2 == 0) {
+                if (arrowIndex == Math.floor(length / 2)) {
+                  if (shouldRenderLabel(exitOnlyLabelFull)) {
+                    const textExitOnlySpanElmt = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      textExitOnlySpanElmt.appendChild(
+                        document.createTextNode(exitOnlyLabelFull),
+                      );
+
+                      let bonus = "";
+
+                      if (panel.sign.guideArrow == "Split Exit Only") {
+                        bonus = " yellowElmt";
+                      }
+
+                      textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
+                    } else {
+                      textExitOnlySpanElmt.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀"),
+                      );
+                      textExitOnlySpanElmt.className = "exitOnlyText";
+                    }
+                    path.appendChild(textExitOnlySpanElmt);
+                  }
+
+                  if (panel.sign.guideArrow == "Split Exit Only") {
+                    path.appendChild(
+                      createArrowElmt(
+                        panel.sign.exitguideArrows.split(":")[1],
+                        "MainArrows!ExitOnly",
+                      ),
+                    );
+                  } else {
+                    path.appendChild(
+                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
+                    );
+                  }
+
+                  if (arrowIndex + 1 < length && length != 2) {
+                    const space = document.createElement("span");
+                    space.className = "exitOnlySpace";
+                    path.appendChild(space);
+                  }
+                } else {
+                  if (panel.sign.guideArrow == "Split Exit Only") {
+                    path.appendChild(
+                      createArrowElmt(
+                        panel.sign.exitguideArrows.split(":")[1],
+                        "MainArrows!ExitOnly",
+                      ),
+                    );
+                  } else {
+                    path.appendChild(
+                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
+                    );
+                  }
+
+                  if (
+                    arrowIndex + 1 < length &&
+                    arrowIndex + 1 != Math.ceil(length / 2) &&
+                    length != 2
+                  ) {
+                    const space = document.createElement("span");
+                    space.className = "exitOnlySpace";
+                    path.appendChild(space);
+                  }
+                }
+              } else {
+                // Odds
+                if (arrowIndex == Math.floor(length / 2)) {
+                  if (shouldRenderLabel(exitOnlyLabelLeft)) {
+                    const textExitSpanElmt = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      textExitSpanElmt.appendChild(
+                        document.createTextNode(exitOnlyLabelLeft),
+                      );
+
+                      let bonus = "";
+
+                      if (panel.sign.guideArrow == "Split Exit Only") {
+                        bonus = " yellowElmt";
+                      }
+
+                      textExitSpanElmt.className = "exitOnlyText" + bonus;
+                    } else {
+                      textExitSpanElmt.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀"),
+                      );
+                      textExitSpanElmt.className = "exitOnlyText";
+                    }
+
+                    path.appendChild(textExitSpanElmt);
+                  }
+
+                  if (panel.sign.guideArrow == "Split Exit Only") {
+                    path.appendChild(
+                      createArrowElmt(
+                        panel.sign.exitguideArrows.split(":")[1],
+                        "MainArrows!ExitOnly",
+                      ),
+                    );
+                  } else {
+                    path.appendChild(
+                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
+                    );
+                  }
+
+                  if (shouldRenderLabel(exitOnlyLabelRight)) {
+                    const textOnlySpanElmt = document.createElement("span");
+                    if (panel.sign.showExitOnly == false) {
+                      textOnlySpanElmt.appendChild(
+                        document.createTextNode(exitOnlyLabelRight),
+                      );
+
+                      let bonus = "";
+
+                      if (panel.sign.guideArrow == "Split Exit Only") {
+                        bonus = " yellowElmt";
+                      }
+
+                      textOnlySpanElmt.className = "exitOnlyText" + bonus;
+                    } else {
+                      textOnlySpanElmt.appendChild(
+                        document.createTextNode("⠀⠀⠀⠀"),
+                      );
+                      textOnlySpanElmt.className = "exitOnlyText";
+                    }
+                    path.appendChild(textOnlySpanElmt);
+                  }
+                } else if (arrowIndex == Math.ceil(length / 2)) {
+                  if (panel.sign.guideArrow == "Split Exit Only") {
+                    path.appendChild(
+                      createArrowElmt(
+                        panel.sign.exitguideArrows.split(":")[1],
+                        "MainArrows!ExitOnly",
+                      ),
+                    );
+                  } else {
+                    path.appendChild(
+                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
+                    );
+                  }
+
+                  if (
+                    arrowIndex + 1 < length &&
+                    arrowIndex + 1 != Math.floor(length / 2) &&
+                    length != 2
+                  ) {
+                    const space = document.createElement("span");
+                    space.className = "exitOnlySpace";
+                    path.appendChild(space);
+                  }
+                } else {
+                  if (panel.sign.guideArrow == "Split Exit Only") {
+                    path.appendChild(
+                      createArrowElmt(
+                        panel.sign.exitguideArrows.split(":")[1],
+                        "MainArrows!ExitOnly",
+                      ),
+                    );
+                  } else {
+                    path.appendChild(
+                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
+                    );
+                  }
+
+                  if (
+                    arrowIndex + 1 < length &&
+                    arrowIndex + 1 != Math.floor(length / 2) &&
+                    length != 2
+                  ) {
+                    const space = document.createElement("span");
+                    space.className = "exitOnlySpace";
+                    path.appendChild(space);
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          arrowContElmt.classList.remove("hideExitOnlyArrows");
+          for (
+            let arrowIndex = 0, length = panel.sign.guideArrowLanes;
+            arrowIndex < length;
+            arrowIndex++
+          ) {
+            if (arrowIndex % 2 == 0) {
+              arrowContElmt.insertBefore(
+                createArrowElmt(
+                  panel.sign.guideArrow.split(":")[1],
+                  "MainArrows",
+                  "arrow",
+                  panel.sign.guideArrow
+                    .split(":")[0]
+                    .toLowerCase()
+                    .replace(/ /g, ""),
+                ),
+                arrowContElmt.childNodes[0],
+              );
+            } else {
+              arrowContElmt.appendChild(
+                createArrowElmt(
+                  panel.sign.guideArrow.split(":")[1],
+                  "MainArrows",
+                  "arrow",
+                  panel.sign.guideArrow.split(":")[0],
+                ),
+              );
+            }
+          }
+        }
+      }
+
+      // Bottom Symbols
+
+      if (panel.sign.oSNum != "" && panel.sign.otherSymbol != "None") {
+        signElmt.style.borderBottomLeftRadius = "0";
+        signElmt.style.borderBottomRightRadius = "0";
+        signElmt.style.borderBottomWidth = "0";
+        guideArrowsElmt.style.display = "block";
+        guideArrowsElmt.style.visibility = "visible";
+        oSNumElmt.style.visibility = "visible";
+        oSNumElmt.className = `oSNum`;
+        oSNumElmt.appendChild(document.createTextNode(panel.sign.oSNum));
+        switch (panel.sign.oSNum.length) {
+          case 1:
+            oSNumElmt.className += " short";
+            break;
+          case 2:
+            oSNumElmt.className += " short";
+            break;
+          case 3:
+            oSNumElmt.className += " three";
+            break;
+          case 5:
+            oSNumElmt.className += " five";
+            break;
+          default:
+            oSNumElmt.className += " three";
+            break;
+        }
+      } else {
+        otherSymbolsElmt.style.display = "none";
+      }
+
+      switch (panel.sign.otherSymbol) {
+        case "Quebec-Style Exit Marker": //Fallthrough
+        case "Quebec-Left":
+          const markerElmt = document.createElement("object");
+          markerElmt.className = "markerImg";
+          markerElmt.type = "image/svg+xml";
+          markerElmt.data = "assets/other-symbols/QC-Exit.svg";
+          if (panel.sign.otherSymbol == "Quebec-Left") {
+            otherSymbolsElmt.className += " left";
+          }
+          otherSymbolsElmt.appendChild(markerElmt);
+        default:
+      }
+    }
+  };
+
+  const redraw = () => {
+    const panelContainerElmt = document.getElementById("panelContainer");
+
+    post.renderPost(
+      document.querySelector("#postContainer"),
+      document.querySelector("#panelContainer"),
+      document.querySelectorAll(".post"),
+    );
+
+    lib.clearChildren(panelContainerElmt);
+    panelContainerElmt.style.setProperty(
+      "--panelSpacing",
+      post.panelSpacing + "rem",
+    );
+
+    let ind = 0;
+    for (const panel of post.panels) {
+      redrawPanel(panel, panelContainerElmt, ind++);
+    }
+
+    recheckWidth();
+    document
+      .querySelector("#panel" + currentlySelectedPanelIndex)
+      .scrollIntoView({
+        behavior: "auto",
+        block: "nearest",
+        inline: "end",
+      });
+  };
+
+  const recheckWidth = () => {
+    if (
+      document.querySelector("#smRender").scrollWidth >
+      document.documentElement.clientWidth
+    ) {
+      document.querySelector("#smRender").classList.add("wide");
+    } else {
+      document.querySelector("#smRender").classList.remove("wide");
+    }
+  };
+
+  const getPost = () => {
+    return post;
+  };
+
+  const setPost = (newPost) => {
+    post = newPost;
+    if (!post) {
+      return;
+    }
+
+    currentlySelectedPanelIndex = 0;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  return {
+    init,
+    newPanel,
+    duplicatePanel,
+    deletePanel,
+    changeEditingPanel,
+    newShield,
+    duplicateShield,
+    deleteShield,
+    groupShields,
+    removeShieldFromGroup,
+    removeShieldGroup,
+    addSubPanel,
+    removeSubPanel,
+    changeEditingSubPanel,
+    duplicateSubPanel,
+    resetPadding,
+    newExitTabRow,
+    removeExitTabRow,
+    duplicateExitTabRow,
+    newExitTab,
+    deleteExitTab,
+    duplicateExitTab,
+    changeEditingExitTabRow,
+    changeEditingExitTab,
+    getPost,
+    setPost,
+
+    newRow,
+    dupRow,
+    delRow,
+    newControlElem,
+    delControlElem,
+
+    recheckWidth,
+    newShieldGroup,
+    setSelectedControlElem,
+    setSelectedRow,
+
+    getCurrentPanel,
+    getCurrentSubPanel,
+    getCurrentBlockRows,
+    getCurrentBlockElem,
+    changeCurrentlyEditingShieldGroup,
+    setSelectedShieldId,
+    redraw,
+
+    addAPLArrow,
+    removeAPLArrow,
+
+    vars: {
+      get currentlySelectedPanelIndex() {
+        return currentlySelectedPanelIndex;
+      },
+      get currentlySelectedSubPanelIndex() {
+        return currentlySelectedSubPanelIndex;
+      },
+      get currentlySelectedExitTabRowIndex() {
+        return currentlySelectedExitTabRowIndex;
+      },
+      get currentlySelectedExitTabIndex() {
+        return currentlySelectedExitTabIndex;
+      },
+      get currentlySelectedRowIndex() {
+        return currentlySelectedRowIndex;
+      },
+      get currentlySelectedBlockIndex() {
+        return currentlySelectedBlockIndex;
+      },
+      get currentlySelectedShieldGroupId() {
+        return currentlySelectedShieldGroupId;
+      },
+      get currentlySelectedShieldIndex() {
+        return currentlySelectedShieldIndex;
+      },
+    },
+  };
+})();

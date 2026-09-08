@@ -1,16 +1,53 @@
 #postContainer {
   display: flex;
   flex-direction: row;
-  height: 30rem;
+  height: max-content;
+  position: relative;
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  --postThickness: 1rem;
+  --postGradient: linear-gradient(
+    90deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+}
+
+#postContainer.postColorSilver {
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+}
+
+#postContainer.postColorBlack {
+  --post-color-mid: rgb(74, 74, 74);
+  --post-color-light: rgb(120, 120, 120);
+  --post-color-dark: rgb(20, 20, 20);
+}
+
+#postContainer.postColorBrown {
+  --post-color-mid: rgb(124, 86, 52);
+  --post-color-light: rgb(171, 124, 82);
+  --post-color-dark: rgb(86, 55, 28);
+}
+
+#postContainer.postColorRed {
+  --post-color-mid: rgb(193, 38, 38);
+  --post-color-light: rgb(235, 110, 110);
+  --post-color-dark: rgb(120, 16, 16);
 }
 
 #postContainer.polePositionOverhead .post {
   visibility: visible;
 }
 #postContainer.polePositionLeft .post:last-child,
-#postContainer.polePositionRight .post:first-child,
-#postContainer.polePositionRural .post,
-#postContainer.polePositionCenter .post {
+#postContainer.polePositionRight .post:first-child {
+  visibility: hidden;
+}
+#postContainer.postVariantRural .post,
+#postContainer.postVariantCenter .post {
   visibility: hidden;
 }
 
@@ -19,58 +56,67 @@
 #postContainer.polePositionOverhead #panelContainer {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 47%,
-    rgba(191, 191, 191, 1) 47%,
-    rgba(240, 240, 240, 1) 49%,
-    rgba(128, 128, 128, 1) 52%,
-    rgba(255, 255, 255, 0) 52%,
-    rgba(255, 255, 255, 0) 64%,
-    rgba(191, 191, 191, 1) 64%,
-    rgba(240, 240, 240, 1) 66%,
-    rgba(128, 128, 128, 1) 69%,
-    rgba(255, 255, 255, 0) 69%
+    var(--post-color-mid) 0,
+    var(--post-color-light) calc(var(--postThickness) / 2),
+    var(--post-color-dark) calc(var(--postThickness)),
+    transparent calc(var(--postThickness)),
+    transparent calc(100% - var(--postThickness)),
+    var(--post-color-mid) calc(100% - var(--postThickness)),
+    var(--post-color-light)
+      calc(100% - var(--postThickness) + calc(var(--postThickness) / 2)),
+    var(--post-color-dark)
+      calc(100% - var(--postThickness) + var(--postThickness))
   );
-  height: 15rem;
+  height: calc(var(--spacingMultiplier) * var(--postThickness));
+  margin-top: var(--postOffset);
 }
-#postContainer.polePositionRural #panelContainer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 20%,
-    rgba(191, 191, 191, 1) 20%,
-    rgba(240, 240, 240, 1) 22%,
-    rgba(128, 128, 128, 1) 25%,
-    rgba(255, 255, 255, 0) 25%,
-    rgba(255, 255, 255, 0) 75%,
-    rgba(191, 191, 191, 1) 75%,
-    rgba(240, 240, 240, 1) 77%,
-    rgba(128, 128, 128, 1) 80%,
-    rgba(255, 255, 255, 0) 80%
-  );
+
+#postContainer.postVariantRural #panelContainer {
+  position: relative;
+  background-image:
+    linear-gradient(
+      90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%
+    ),
+    linear-gradient(
+      90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%
+    );
+  background-repeat: no-repeat;
+  background-size:
+    var(--postThickness, 1rem) 24rem,
+    var(--postThickness, 1rem) 24rem;
+  background-position:
+    left 1rem bottom,
+    right 1rem bottom;
   margin-top: 20rem;
+  height: 10rem;
 }
-#postContainer.polePositionCenter #panelContainer {
-  background: linear-gradient(
+#postContainer.postVariantRural .panel {
+  margin-bottom: -1rem;
+}
+
+#postContainer.postVariantCenter #panelContainer {
+  position: relative;
+  background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 45%,
-    rgba(191, 191, 191, 1) 45%,
-    rgba(240, 240, 240, 1) 49%,
-    rgba(128, 128, 128, 1) 55%,
-    rgba(255, 255, 255, 0) 55%
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
   );
-  margin-top: 7.5rem;
+  background-repeat: no-repeat;
+  background-size: var(--postThickness, 1rem) 24rem;
+  background-position: center bottom;
+  height: 30rem;
 }
 
 .post {
-  background: linear-gradient(
-    90deg,
-    rgb(191, 191, 191) 0%,
-    rgb(240, 240, 240) 40%,
-    rgb(128, 128, 128) 100%
-  );
-  width: 1rem;
+  background: var(--postGradient);
+  width: var(--postThickness, 1rem);
   height: 24rem;
 
   align-self: flex-end;
@@ -89,9 +135,11 @@
   width: -moz-max-content;
   width: -webkit-max-content;
   width: intrinsic;
+  gap: var(--panelSpacing, 0rem);
 }
 
 .panel {
+  --signBorderRadius: 0.75rem;
   text-align: center;
   display: block;
   padding: 0rem;
@@ -105,308 +153,129 @@
   padding-right: 1rem;
 }
 
-#postContainer.polePositionRural .panel {
+#postContainer.postVariantRural .panel {
   margin-top: -10rem;
 }
-#postContainer.polePositionCenter .panel {
-  margin-top: -22.5rem;
+#postContainer.postVariantCenter .panel {
+  margin-top: -20rem;
 }
-#postContainer.polePositionRural .panel:not(:first-child),
-#postContainer.polePositionCenter .panel:not(:first-child) {
+#postContainer.postVariantRural .panel:not(:first-child),
+#postContainer.postVariantCenter .panel:not(:first-child) {
   display: none;
 }
 
-.panel.orange .sign {
-  background-color: var(--orange);
+.panel.green {
+  --bg-color: var(--green);
+  --fg-color: var(--white);
+}
+.panel.blue {
+  --bg-color: var(--blue);
+  --fg-color: var(--white);
+}
+.panel.brown {
+  --bg-color: var(--brown);
+  --fg-color: var(--white);
+}
+.panel.black {
+  --bg-color: var(--black);
+  --fg-color: var(--white);
+}
+.panel.red {
+  --bg-color: var(--red);
+  --fg-color: var(--white);
+}
+.panel.purple {
+  --bg-color: var(--purple);
+  --fg-color: var(--white);
 }
 
-.panel.green .sign,
-.panel.blue .sign,
-.panel.brown .sign,
-.panel.black .sign,
-.panel.green .guideArrows,
-.panel.blue .guideArrows,
-.panel.brown .guideArrows,
-.panel.black .guideArrows {
-  color: var(--white);
-  border-color: var(--white);
+.panel.white {
+  --bg-color: var(--white);
+  --fg-color: var(--black);
+}
+.panel.yellow {
+  --bg-color: var(--yellow);
+  --fg-color: var(--black);
+}
+.panel.orange {
+  --bg-color: var(--orange);
+  --fg-color: var(--black);
+}
+.panel.fluorescent.pink {
+  --bg-color: var(--fluorescent-pink);
+  --fg-color: var(--black);
+}
+.panel.fluorescent.yellow-green {
+  --bg-color: var(--fluorescent-yellow-green);
+  --fg-color: var(--black);
 }
 
-.panel.white .sign,
-.panel.yellow .sign,
-.panel.white .guideArrows,
-.panel.yellow .guideArrows,
-.panel.orange .sign,
-.panel.orange .guideArrows {
-  color: var(--black);
-  border-color: var(--black);
+.panel :is(.signCorner, .signHolder, .guideArrows) {
+  background-color: var(--bg-color);
 }
 
-.panel.green .sign,
-.panel.green .signContainer,
-.panel.green .exitTabContainer,
-.panel.green .guideArrows {
-  background-color: var(--green);
+.panel.round .signCorner,
+.panel.round .guideArrowsHolder {
+  background-color: transparent;
 }
 
-.panel.blue .sign,
-.panel.blue .signContainer,
-.panel.blue .exitTabContainer,
-.panel.blue .guideArrows {
-  background-color: var(--blue);
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.apl) {
+  background-color: var(--bg-color);
 }
 
-.panel.brown .sign,
-.panel.brown .signContainer,
-.panel.brown .exitTabContainer,
-.panel.brown .guideArrows {
-  background-color: var(--brown);
+.panel :is(.sign, .ET-tab, .guideArrows) {
+  color: var(--fg-color);
+  border-color: var(--fg-color);
 }
 
-.panel.yellow .sign,
-.panel.yellow .signContainer,
-.panel.yellow .exitTabContainer,
-.panel.yellow .guideArrows {
-  background-color: var(--yellow);
-}
-
-.panel.white .sign,
-.panel.white .signContainer,
-.panel.white .exitTabContainer,
-.panel.white .guideArrows {
-  background-color: var(--white);
-}
-
-.panel.black .sign,
-.panel.black .signContainer,
-.panel.black .exitTabContainer,
-.panel.black .guideArrows {
-  background-color: var(--black);
-}
-
-.panel.purple .sign,
-.panel.purple .signContainer,
-.panel.purple .exitTabContainer,
-.panel.purple .guideArrows {
-  background-color: var(--purple);
-  border-color: rgb(255, 255, 255);
-  color: rgb(255, 255, 255);
-}
-
-.panel.orange .sign,
-.panel.orange .signContainer,
-.panel.orange .exitTabContainer,
-.panel.orange .guideArrows {
-  background-color: var(--orange);
-  border-color: var(--black);
-  color: var(--black);
-}
-
-.panel.white .dividerElement,
-.panel.orange .dividerElement,
-.panel.yellow .dividerElement {
+.panel:is(.white, .orange, .yellow, .fluorescent) .dividerElement {
   background-color: black;
 }
-
-.panel.orange .arrow {
+.panel.orange .arrow,
+.panel.fluorescent.yellow-green .arrow,
+.panel.fluorescent.pink .arrow {
   filter: invert(100%);
   -webkit-filter: invert(100%);
 }
 
-.exitTab.green,
-.exitTabHolder.green {
-  background-color: var(--green);
-  border-color: var(--white);
-  color: var(--white);
+.panel:not(.sharp) .sign {
+  background-color: transparent;
 }
 
-.exitTab.blue,
-.exitTabHolder.blue {
-  background-color: var(--blue);
-  border-color: var(--white);
-  color: var(--white);
-}
-
-.exitTab.brown,
-.exitTabHolder.brown {
-  background-color: var(--brown);
-  border-color: var(--white);
-  color: var(--white);
-}
-
-.exitTab.yellow,
-.exitTabHolder.yellow {
-  background-color: var(--yellow);
-  border-color: var(--black);
-  color: var(--black);
-  padding: 1px;
-}
-
-.exitTab.white,
-.exitTabHolder.white {
-  background-color: var(--white);
-  border-color: var(--black);
-  color: var(--black);
-}
-
-.exitTab.black,
-.exitTabHolder.black {
-  background-color: var(--black);
-  border-color: var(--white);
-  color: var(--white);
-}
-
-.exitTab.purple,
-.exitTabHolder.purple {
-  background-color: var(--purple);
-  border-color: var(--white);
-  color: var(--white);
-}
-
-.exitTabHolder {
-  flex-grow: 1;
-}
-
-.exitTab {
-  border-radius: 0.5rem 0.5rem 0 0;
-  border-top-style: solid;
-  border-top-width: 0.2rem;
-  border-right-style: solid;
-  border-right-width: 0.2rem;
-  border-bottom: none;
-  border-left-style: solid;
-  border-left-width: 0.2rem;
-  font-size: 1rem;
-  visibility: hidden; /* hides exitTab by default when loading page */
-  float: none;
-  min-height: 2.25rem;
-  padding: 0 0.5rem;
-}
-
-.exitTab.out {
-  width: -moz-max-content;
-  width: -webkit-max-content;
-  width: intrinsic;
-  width: max-content;
-  border-bottom-width: 0.2rem;
-  border-bottom-style: solid;
-  border-radius: 0.5rem;
-}
-
-.out.center {
-  margin: auto;
-  margin-bottom: 0.25rem;
-}
-
-.exitTab.narrow,
-.exitTab.edge {
-  width: -moz-max-content;
-  width: -webkit-max-content;
-  width: intrinsic;
-  width: max-content;
-}
-
-.exitTabContainer.out.left {
-  float: left;
-}
-
-.exitTabContainer.out {
-  margin-bottom: 0.25rem;
-  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-  margin-left: 0.75rem; /* curved corners of the panel below */
-}
-
-.exitTabContainer.out.right {
-  float: right;
-}
-
-.exitTabContainer.wide,
-.exitTabContainer.narrow {
-  margin-right: 0.75rem; /* Margin keeps the edge of the tab from going above the */
-  margin-left: 0.75rem; /* curved corners of the panel below */
-}
-.exitTabContainer.edge.right {
-  margin-right: 0rem;
-}
-.exitTabContainer.edge.left {
-  margin-left: 0rem;
-}
-.narrow.center,
-.edge.center {
-  margin: auto;
-}
-.exitTabContainer,
-.signContainer {
-  z-index: 2;
-}
-
-.signContainer,
-.exitTabContainer.narrow,
-.exitTabContainer.edge {
-  width: max-content;
-}
-.exitTabContainer.narrow.left,
-.exitTabContainer.edge.left {
-  margin-right: auto;
-}
-.exitTabContainer.narrow.right,
-.exitTabContainer.edge.right {
-  margin-left: auto;
-}
-.exitTab.wide.left,
-.exitTab.full.left {
-  justify-content: flex-start;
-}
-.exitTab.wide.center,
-.exitTab.full.center {
-  justify-content: center;
-}
-.exitTab.wide.right,
-.exitTab.full.right {
-  justify-content: flex-end;
-}
-.exitTab.full {
-  width: 100%;
-  border-radius: 0.75rem 0.75rem 0 0;
-}
-.sign.full.tabVisible {
-  border-radius: 0 0 0.75rem 0.75rem;
-}
-.sign.edge.right.tabVisible {
-  border-radius: 0.75rem 0 0.75rem 0.75rem;
-}
-.sign.edge.left.tabVisible {
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
-}
-
-.panel.round .exitTabContainer,
-.panel.round .signContainer {
-  visibility: hidden;
+.panel:not(.sharp) .ET-tabHolder {
+  background-color: transparent;
 }
 
 .sign {
-  border-radius: 0.75rem;
-  border-style: solid;
-  border-width: 0.2rem;
+  z-index: 3;
+}
+
+.exitTabContainer {
+  z-index: 2;
+}
+
+.signContainer {
+  width: max-content;
+}
+
+.sign {
   display: block;
-  clear: both;
-  visibility: visible;
+  position: relative;
 }
 
 .signHolder {
   display: flex;
   clear: both;
-  flex-direction: row;
+  border-radius: var(--signBorderRadius, 0.75rem);
+  border-style: solid;
+  border-width: 0.2rem;
+  clear: both;
+  visibility: visible;
+  overflow: hidden;
+  z-index: 2;
+  position: relative;
 }
 
-.panel.round .exitTabContainer,
-.panel.round .signContainer {
-  visibility: hidden;
-}
-
-.panel .exitTabContainer {
-  visibility: hidden;
-}
 .panel .tabVisible {
   visibility: visible;
 }
@@ -430,79 +299,7 @@
 .signContentContainer {
   display: flex;
   width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 0.75rem;
-}
-.signContentContainer.shieldPositionLeft {
-  flex-direction: row;
-  align-items: center;
-}
-.signContentContainer.shieldPositionAbove {
-  flex-direction: column;
-  justify-content: center;
-}
-.signContentContainer.shieldPositionRight {
-  flex-direction: row-reverse;
-  align-items: center;
-}
-
-.shieldsContainer {
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.to {
-  display: none;
-  margin: auto 0 auto auto;
-  padding-left: 0.25rem;
-  font-family: "Clearview 5WR";
-  margin-bottom: 1.8rem;
-  margin-right: 1.8rem;
-  font-size: 1.5rem;
-}
-
-.bannerShieldContainer {
-  display: flex;
-  flex-direction: column;
-  /* margin-right: auto; */
-  /* margin-left: auto; */
-  padding: 0.1rem;
-}
-.bannerShieldContainer.bannerPositionLeft {
-  flex-direction: row;
-}
-.bannerShieldContainer.bannerPositionAbove {
-  flex-direction: column;
-}
-.bannerShieldContainer.bannerPositionRight {
-  flex-direction: row-reverse;
-}
-
-.bannerA,
-.bannerB {
-  border-radius: 0.1rem;
-  font-size: var(--fontSize);
-  text-transform: uppercase;
-  font-family: "Clearview 5WR";
-  margin-bottom: auto;
-}
-.bannerA:not(.TOLL, .noIndent):first-letter,
-.bannerB:not(.TOLL, .noIndent):first-letter {
-  font-size: calc(var(--fontSize) + 0.3rem);
-  /* margin-right: -0.1rem; */
-}
-
-.shield {
-  margin: 0.15rem;
-  position: relative;
-}
-
-.shieldImg {
-  /* width:max-content; */
-  height: 3rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.75rem;
 }
 
 .markerImg {
@@ -548,13 +345,6 @@
   top: 0.29rem;
   font-size: 1.2em;
 }
-.routeNumber {
-  font-size: 1.5rem;
-
-  width: 100%;
-
-  position: absolute;
-}
 
 .streetName {
   border: solid var(--white) 0.15rem;
@@ -573,18 +363,33 @@
   white-space: pre-wrap;
 }
 
+.controlText {
+  --fhwaBaselineOffset: 0px;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
+}
+
 .guideArrows {
   border-style: solid;
   border-width: 0.2rem;
   border-top-width: 0;
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem);
+  z-index: 3;
+}
 
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only) {
+  background-color: var(--yellow);
+}
+
+.guideArrowsHolder:has(.guideArrows.none) {
   display: none;
 }
+
 .guideArrows.exit_only {
-  background-color: var(--yellow) !important;
-  border-color: var(--black) !important;
-  color: var(--black) !important;
+  border-color: var(--black);
+  color: var(--black);
+  background-color: var(--yellow);
 }
 
 .guideArrows.new,
@@ -608,10 +413,31 @@
 
 .guideArrows.half_exit.only.default {
   padding: 0;
+  position: relative;
+  overflow: visible;
 }
 
 .guideArrows.half_exit.only {
   color: black !important;
+}
+
+.guideArrows.half_exit.only.default.halfExitNoBorder::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.25rem;
+  height: 0.35rem;
+  background: var(--white);
+  border-bottom-left-radius: 0.9rem;
+  border-bottom-right-radius: 0.9rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.guideArrows.half_exit.only.default .arrowContainer {
+  position: relative;
+  z-index: 1;
 }
 
 .halfarrow {
@@ -621,38 +447,24 @@
 }
 
 .specialExitOnly {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   color: var(--black);
   background-color: var(--yellow);
   font-family: "Series EM";
   border-radius: 0.2rem;
   border-width: 0rem;
   padding: 0.1rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .otherSymbols + .actionMessage {
   padding-right: 0.2rem;
 }
 
-.exitTab {
-  display: flex;
-  align-items: center;
-  font-family: "Clearview 4W";
-  font-size: 18px;
-}
-
-.action_message {
-  display: inline-flex;
-  align-items: center;
-  font-family: "Clearview 5WR";
-}
-.action_message {
-  justify-content: center;
-}
-
 .exitFormat {
   display: inline;
-  position: relative;
-  top: -0.1rem;
+  --exitTabTextBaseOffset: -0.1rem;
 }
 
 .exitOnlyArrow {
@@ -664,18 +476,25 @@
 
   padding: 2px;
 }
+.arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
+.arrowContainer.hideExitOnlyArrows .halfarrow {
+  opacity: 0;
+}
 
 .exitOnlyText {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   font-family: "Series E";
   padding: 0px 10px 0 10px;
   padding-top: 0.18rem;
-  font-size: 1.55rem;
-  word-spacing: 0.3rem;
-  letter-spacing: 0.03rem;
+  font-size: 1rem;
+  /* letter-spacing: 0.03rem; */
   margin: -1rem 0rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitOnlyText.split {
+  --fhwaBaselineOffset: var(--fhwaBaselineShift);
   background-color: var(--yellow);
   color: var(--black);
   border-radius: 0.1rem;
@@ -686,6 +505,8 @@
   margin-top: 0.5rem;
   font-family: "Series EM";
   height: 1.15rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .exitOnlySpace {
@@ -748,7 +569,10 @@
 }
 
 .actionMessage {
+  --fhwaBaselineOffset: 0px;
   font-size: 1.2rem;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
 }
 
 .numeral {
@@ -793,13 +617,15 @@
   color: var(--black);
   border-radius: 5px;
   font-family: "Series E";
-  padding: 0.15rem 0.7rem;
+  padding: 0.3rem 0.7rem;
   width: max-content;
   width: -webkit-max-content;
   width: -moz-max-content;
-  font-size: 1.3rem;
+  font-size: 1rem;
   line-height: 1.2rem;
-  margin: 0.4rem 0rem;
+  margin: 0.2rem 0rem;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .exitOnlyText.yellowElmt,
@@ -812,8 +638,9 @@
 }
 
 .subDivider {
-  width: 8px;
+  width: 4px;
   background-color: var(--white);
+  min-width: 4px;
 }
 
 .arrowContainer.new {
@@ -859,6 +686,27 @@ img.exitOnlyArrow:last-child {
   gap: 0.4rem;
 }
 
-.signContainer:has(.guideArrows.exit_only) {
-  /* background: linear-gradient(180deg, var(--green), var(--yellow)); */
+img.diagrammicImage {
+  height: 15rem;
+  aspect-ratio: 1 / 1;
+  width: 15rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.signHolder.diagrammic > .signContentContainer {
+  position: absolute;
+  width: max-content;
+  left: calc(var(--leftTransform) * 1px);
+  top: calc(var(--topTransform) * 1px);
+}
+
+.signHolder.diagrammic {
+  min-height: 15rem;
+  min-width: 15rem;
+}
+
+.signHolder.diagrammic .subDivider {
+  display: none;
 }

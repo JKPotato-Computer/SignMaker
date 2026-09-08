@@ -1,0 +1,480 @@
+class ExitTab {
+  constructor({
+    // Content
+    textContent = "EXIT 1",
+    subTextContent = "",
+    shields = [],
+
+    // Appearance
+    backgroundColor = "inherit",
+    borderStyle = "round",
+    borderThickness = 0.2,
+    borderRadius = 0.5,
+    useFullBorder = true,
+
+    horizontalPadding = 0.5,
+    verticalPadding = 0,
+    minimumHeight = 2.25,
+    holderPadding = 0,
+
+    fontSize = 20,
+    lineHeight = 100,
+    enlargeNumerals = true,
+    enlargeNumeralsSize = 150,
+    spaceLettersNumerals = true,
+    numeralWordSpacing = 0.25,
+
+    offsetNonNumerals = false,
+    fontFamily = "Clearview 5WR",
+    numeralFontFamily = "Inherit",
+    letterSpacing = 0,
+    numeralLetterSpacing = 0,
+    useTrimFormat = false,
+
+    shieldsPosition = "start",
+    shieldsDirection = "horizontal",
+    shieldsGap = 0.5,
+
+    contentDirection = "horizontal",
+
+    // Positioning
+    alignment = "center",
+    width = "auto",
+    widthSize = 0,
+
+    // Variant
+    variant = "Normal",
+    variantSettings = {
+      icon: {
+        icon: "",
+        isTextBased: false,
+        showBackground: true,
+        addon: "none",
+        iconSize: 3,
+        isSquare: true,
+        isTollIcon: false,
+      },
+      partialLeft: {
+        separateRow: true,
+        horizontalPadding: 0.6,
+        verticalPadding: 0.3,
+        letterSpacing: 2,
+        minWidth: 7,
+        spacing: 1.8,
+      },
+      hovVariant1: {
+        height: 0,
+        width: 0,
+        verticalPadding: 0.125,
+        roundCorners: false,
+      },
+      hovVariant2: {
+        height: 0,
+        width: 0,
+        verticalPadding: 0.125,
+      },
+    },
+  } = {}) {
+    this.textContent = textContent;
+    this.subTextContent = subTextContent;
+    this.shields = shields;
+    this.backgroundColor = backgroundColor;
+    this.borderStyle = borderStyle;
+    this.borderThickness = borderThickness;
+    this.borderRadius = borderRadius;
+    this.useFullBorder = useFullBorder;
+    this.horizontalPadding = horizontalPadding;
+    this.verticalPadding = verticalPadding;
+    this.minimumHeight = minimumHeight;
+    this.fontSize = fontSize;
+    this.lineHeight = lineHeight;
+    this.enlargeNumerals = enlargeNumerals;
+    this.enlargeNumeralsSize = enlargeNumeralsSize;
+    this.spaceLettersNumerals = spaceLettersNumerals;
+    this.numeralWordSpacing = numeralWordSpacing;
+    this.offsetNonNumerals = offsetNonNumerals;
+    this.fontFamily = fontFamily;
+    this.numeralFontFamily = numeralFontFamily;
+    this.letterSpacing = letterSpacing;
+    this.numeralLetterSpacing = numeralLetterSpacing;
+    this.shieldsPosition = shieldsPosition;
+    this.shieldsDirection = shieldsDirection;
+    this.shieldsGap = shieldsGap;
+    this.contentDirection = contentDirection;
+    this.alignment = alignment;
+    this.width = width;
+    this.widthSize = widthSize;
+    this.variant = variant;
+    this.variantSettings = variantSettings;
+    this.holderPadding = holderPadding;
+    this.useTrimFormat = useTrimFormat;
+  }
+
+  splitText(text) {
+    if (!this.enlargeNumerals) {
+      return text.split(/\s+/).filter(Boolean);
+    }
+
+    const tokens = text.match(/\d+[\w-]*|[^\s\d]+/g) || [];
+
+    if (this.spaceLettersNumerals) {
+      return tokens.map((token) => {
+        if (/^\d+[\w-]+$/.test(token)) {
+          const digits = token.match(/^\d+/)[0];
+          const letters = token.slice(digits.length);
+          return [digits, letters];
+        }
+        return token;
+      });
+    }
+
+    return tokens;
+  }
+
+  createElement() {
+    const exitTabHolder = document.createElement("div");
+    exitTabHolder.className = `ET-tabHolder ${this.alignment} ${this.width.replace(/\s/g, "-")}`;
+    exitTabHolder.style.setProperty(
+      "--width",
+      this.widthSize + (this.width == "custom percent" ? "%" : "rem"),
+    );
+    exitTabHolder.style.padding = this.holderPadding + "px";
+
+    const exitTabElement = document.createElement("div");
+    exitTabElement.className = `ET-tab ${this.useTrimFormat ? "useTrim" : ""} ${this.variant.toLowerCase().replace(/\s/g, "-")} ${this.borderStyle} ${this.useFullBorder ? "fullBorder" : ""}`;
+
+    if (this.backgroundColor != "inherit") {
+      exitTabHolder.style.setProperty(
+        "--backgroundColor",
+        lib.colors[
+          this.backgroundColor.replace(/\p{L}+/gu, (word) => {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          })
+        ] || this.backgroundColor.toLowerCase(),
+      );
+
+      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+        exitTabElement.style.color = "black";
+        exitTabElement.style.borderColor = "black";
+      }
+    }
+
+    exitTabElement.style.setProperty(
+      "--minimumHeight",
+      this.minimumHeight + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--horizontalPadding",
+      this.horizontalPadding + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--verticalPadding",
+      this.verticalPadding + "rem",
+    );
+
+    exitTabElement.style.setProperty(
+      "--direction",
+      this.contentDirection == "horizontal" ? "row" : "column",
+    );
+
+    exitTabElement.style.setProperty(
+      "--borderThickness",
+      this.borderThickness + "rem",
+    );
+    if (this.borderStyle == "round") {
+      exitTabElement.style.setProperty(
+        "--borderRadius",
+        this.borderRadius + "rem",
+      );
+    }
+
+    exitTabElement.style.setProperty(
+      "--letterSpacing",
+      this.letterSpacing + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--numeralLetterSpacing",
+      this.numeralLetterSpacing + "rem",
+    );
+    exitTabElement.style.setProperty(
+      "--fontFamily",
+      '"' + this.fontFamily + '"',
+    );
+    exitTabElement.style.setProperty(
+      "--numeralFontFamily",
+      '"' +
+        (this.numeralFontFamily == "Inherit"
+          ? this.fontFamily
+          : this.numeralFontFamily) +
+        '"',
+    );
+    exitTabElement.style.setProperty("--fontSize", this.fontSize + "px");
+    exitTabElement.style.setProperty("--lineHeight", this.lineHeight + "%");
+    exitTabElement.style.setProperty(
+      "--extraMarginLeft",
+      this.numeralWordSpacing + "rem",
+    );
+
+    if (this.enlargeNumerals) {
+      exitTabElement.style.setProperty(
+        "--enlargeNumeralPercent",
+        this.enlargeNumeralsSize / 100,
+      );
+    }
+
+    exitTabElement.style.gap = this.fontSize * 0.25 + "px";
+
+    if (this.variant == "FullLeft") {
+      let leftElement = document.createElement("div");
+      leftElement.className = "ET-FullLeftHolder";
+
+      let leftElementContent = document.createElement("div");
+      leftElementContent.textContent = "LEFT";
+      leftElementContent.className = "ET-FullLeft";
+
+      leftElement.appendChild(leftElementContent);
+      exitTabElement.appendChild(leftElement);
+    } else if (this.variant == "PartialLeft") {
+      let leftElement = document.createElement("div");
+      leftElement.textContent = "LEFT";
+      leftElement.className =
+        "ET-PartialLeft " +
+        (this.variantSettings.partialLeft.separateRow ? "separateRow" : "");
+      exitTabElement.style.minWidth =
+        this.variantSettings.partialLeft.minWidth + "rem";
+      leftElement.style.setProperty(
+        "--horizontalPadding",
+        this.variantSettings.partialLeft.horizontalPadding + "rem",
+      );
+      leftElement.style.setProperty(
+        "--verticalPadding",
+        this.variantSettings.partialLeft.verticalPadding + "rem",
+      );
+      leftElement.style.setProperty(
+        "--letterSpacing",
+        this.variantSettings.partialLeft.letterSpacing + "px",
+      );
+      exitTabElement.style.setProperty(
+        "--partialLeftSpacing",
+        this.variantSettings.partialLeft.spacing + "rem",
+      );
+      exitTabElement.appendChild(leftElement);
+    }
+
+    let textParentElement = exitTabElement;
+
+    if (["HOVVariant1", "HOVVariant2"].includes(this.variant)) {
+      const hovElement = document.createElement("img");
+      hovElement.className = "ET-HOV";
+      hovElement.src = "./assets/icons/HOV.svg";
+
+      if (
+        this.variantSettings[
+          this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+        ].width != 0
+      ) {
+        hovElement.style.width =
+          this.variantSettings[
+            this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].width + "rem";
+      }
+
+      if (
+        this.variantSettings[
+          this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+        ].height != 0
+      ) {
+        hovElement.style.height =
+          this.variantSettings[
+            this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+          ].height + "rem";
+      }
+
+      hovElement.style.padding =
+        this.variantSettings[
+          this.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
+        ].verticalPadding + "rem";
+
+      exitTabElement.appendChild(hovElement);
+
+      if (this.variant == "HOVVariant2") {
+        const textElemHolder = document.createElement("div");
+        textElemHolder.className = "ET-TextHolder";
+        exitTabElement.appendChild(textElemHolder);
+        textParentElement = textElemHolder;
+      } else {
+        if (this.variantSettings.hovVariant1.roundCorners) {
+          hovElement.classList.add("roundCorners");
+        }
+      }
+    }
+
+    if (
+      ["Normal", "PartialLeft", "FullLeft", "HOVVariant2"].includes(
+        this.variant,
+      )
+    ) {
+      let splitText = this.splitText(this.textContent);
+      for (let i = 0; i < splitText.length; i++) {
+        let item = splitText[i];
+        if (Array.isArray(item)) {
+          const wordElem1 = document.createElement("span");
+          wordElem1.textContent = item[0];
+          wordElem1.className = "ET-numeral";
+
+          textParentElement.appendChild(wordElem1);
+
+          if (item[1] === "") {
+            continue;
+          }
+
+          const wordElem2 = document.createElement("span");
+          wordElem2.textContent = item[1];
+          wordElem2.className = "ET-trailing";
+
+          textParentElement.appendChild(wordElem2);
+        } else {
+          const wordElem = document.createElement("span");
+          wordElem.textContent = item;
+
+          if (/\d/.test(item)) {
+            wordElem.className = "ET-numeral";
+          } else {
+            wordElem.className = "ET-word";
+          }
+
+          if (wordElem.className == "ET-word" && this.offsetNonNumerals) {
+            wordElem.style.bottom = "calc(var(--fontSize) / 4)";
+          }
+
+          if (
+            i == 0 &&
+            (this.subTextContent != "") & (wordElem.className == "ET-word")
+          ) {
+            wordElem.textContent = item + "\n" + this.subTextContent;
+            wordElem.style.textAlign = "left";
+          }
+
+          textParentElement.appendChild(wordElem);
+        }
+      }
+    }
+
+    exitTabHolder.appendChild(exitTabElement);
+    return exitTabHolder;
+  }
+}
+ExitTab.prototype.backgroundColor = ["Inherit"].concat(Object.keys(lib.colors));
+ExitTab.prototype.borderStyle = ["Round", "Square"];
+ExitTab.prototype.fontFamily = TextElement.prototype.fontFamily;
+ExitTab.prototype.numeralFontFamily = ["Inherit"].concat(
+  ExitTab.prototype.fontFamily,
+);
+ExitTab.prototype.shieldsDirection = ["Horizontal", "Vertical"];
+ExitTab.prototype.contentDirection = ["Horizontal", "Vertical"];
+ExitTab.prototype.shieldsPosition = ["Start", "End"];
+ExitTab.prototype.alignment = ["Left", "Center", "Right"];
+ExitTab.prototype.widthPresets = [
+  "Auto",
+  "Full",
+  "Custom Percent",
+  "Custom Size",
+];
+ExitTab.prototype.variants = [
+  "Normal",
+  "Icon",
+  "PartialLeft",
+  "FullLeft",
+  "HOVVariant1",
+  "HOVVariant2",
+];
+
+ExitTab.prototype.iconVariant_addons = [
+  "None",
+  "Only",
+  "Pay by Mail 1",
+  "Pay By Mail 2",
+];
+
+class ExitTabRow {
+  constructor({
+    exitTabs = [],
+    gap = 0,
+    panelEdgeType = "separate",
+    position = "top",
+    marginBottom = 0.3,
+  } = {}) {
+    this.exitTabs = exitTabs;
+    this.gap = gap;
+    this.panelEdgeType = panelEdgeType;
+    this.position = position;
+    this.marginBottom = marginBottom;
+  }
+
+  createElement() {
+    const exitTabHolder = document.createElement("div");
+    exitTabHolder.className =
+      "ET-row " + this.panelEdgeType.toLowerCase().replace(/\s/g, "-");
+    exitTabHolder.style.setProperty("--spacing", this.gap + "rem");
+    exitTabHolder.style.setProperty(
+      "--marginBottom",
+      this.marginBottom + "rem",
+    );
+
+    const leftAlignment = document.createElement("div");
+    leftAlignment.className = "ET-alignment left";
+
+    const centerAlignment = document.createElement("div");
+    centerAlignment.className = "ET-alignment center";
+
+    const rightAlignment = document.createElement("div");
+    rightAlignment.className = "ET-alignment right";
+
+    for (let i = 0; i < this.exitTabs.length; i++) {
+      const exitTab = this.exitTabs[i];
+      const elem = exitTab.createElement();
+
+      if (exitTab.alignment == "left") {
+        leftAlignment.appendChild(elem);
+      } else if (exitTab.alignment == "center") {
+        centerAlignment.appendChild(elem);
+      } else if (exitTab.alignment == "right") {
+        rightAlignment.appendChild(elem);
+      }
+    }
+
+    exitTabHolder.appendChild(leftAlignment);
+    exitTabHolder.appendChild(centerAlignment);
+    exitTabHolder.appendChild(rightAlignment);
+
+    return exitTabHolder;
+  }
+
+  newExitTab(alignment = "center") {
+    const exitTab = new ExitTab();
+    exitTab.alignment = alignment;
+    this.exitTabs.push(exitTab);
+
+    return exitTab;
+  }
+
+  duplicateExitTab(index) {
+    const exitTab = this.exitTabs[index];
+    const cloneExitTab = Object.assign(exitTab.constructor.prototype, exitTab);
+
+    this.exitTabs.splice(index + 1, 0, cloneExitTab);
+    return cloneExitTab;
+  }
+
+  deleteExitTab(index) {
+    this.exitTabs.splice(index, 1);
+  }
+}
+ExitTabRow.prototype.panelEdgeType = ["Separate", "Extend", "Meet Corners"];
+ExitTabRow.prototype.position = [
+  "Top",
+  "Bottom",
+  "Left",
+  "Right",
+  "Within Panel",
+];
