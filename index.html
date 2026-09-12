@@ -1048,12 +1048,51 @@
               <fieldset id="smET_IconVariant" class="hidden">
                 <legend>Icon / Toll Variant</legend>
                 <label for="sMET_variantIcon">Icon:</label>
-                <input
-                  type="text"
-                  id="sMET_variantIcon"
-                  name="sMET_variantIcon"
-                  onchange="formHandler.readForm()"
-                />
+
+                <div
+                  id="sMET_variantRegularIcon"
+                  class="smDropdownInputElement"
+                >
+                  <button class="smDropdownSelectedButton" type="button">
+                    <img class="smDropdownSelectedImage" alt="" />
+                    <span class="sdIcon_selectedLabel smDropdownSelectedLabel"
+                      >AIRPORT</span
+                    >
+                    <span class="material-symbols-outlined smDropdownArrow"
+                      >arrow_drop_down</span
+                    >
+                  </button>
+                  <div class="hidden smDropdownHolder">
+                    <input
+                      type="search"
+                      class="smDropdownSearch"
+                      placeholder="Search icons"
+                      autocomplete="off"
+                    />
+                    <div class="smDropdownList"></div>
+                  </div>
+                </div>
+                <div id="sMET_variantTollIcon" class="smDropdownInputElement">
+                  <button class="smDropdownSelectedButton" type="button">
+                    <img class="smDropdownSelectedImage" alt="" />
+                    <span class="sdIcon_selectedLabel smDropdownSelectedLabel"
+                      >AIRPORT</span
+                    >
+                    <span class="material-symbols-outlined smDropdownArrow"
+                      >arrow_drop_down</span
+                    >
+                  </button>
+                  <div class="hidden smDropdownHolder">
+                    <input
+                      type="search"
+                      class="smDropdownSearch"
+                      placeholder="Search icons"
+                      autocomplete="off"
+                    />
+                    <div class="smDropdownList"></div>
+                  </div>
+                </div>
+
                 <label for="sMET_variantAddon">Addon:</label>
                 <select
                   id="sMET_variantAddon"
@@ -1123,6 +1162,44 @@
                     onchange="formHandler.readForm()"
                   />
                   Toll Icon
+                </label>
+                <label for="sMET_variantOnlyHorizontalPadding">
+                  ONLY Padding (rem):</label
+                >
+                <input
+                  type="number"
+                  id="sMET_variantOnlyHorizontalPadding"
+                  name="sMET_variantOnlyHorizontalPadding"
+                  min="0"
+                  step="0.05"
+                  value="0.25"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="sMET_variantPbmPadding">Pay by Mail Padding (rem):</label>
+                <input
+                  type="number"
+                  id="sMET_variantPbmPadding"
+                  name="sMET_variantPbmPadding"
+                  min="0"
+                  step="0.05"
+                  value="0.25"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="sMET_variantFontFamily">Addon Font:</label>
+                <select
+                  id="sMET_variantFontFamily"
+                  name="sMET_variantFontFamily"
+                  onchange="formHandler.readForm()"
+                >
+                </select>
+                <label for="sMET_variantUnderline" class="checkboxLabel">
+                  <input
+                    type="checkbox"
+                    id="sMET_variantUnderline"
+                    name="sMET_variantUnderline"
+                    onchange="formHandler.readForm()"
+                  />
+                  Underline
                 </label>
               </fieldset>
               <fieldset id="smET_PartialLeftVariant" class="hidden">
@@ -2569,23 +2646,40 @@
 
                   <div data-property="sdIcon" class="hidden">
                     <label for="sdIcon_icon">Icon: </label>
-                    <button id="sdIcon_openSelectPanel" type="button">
-                      <img id="sdIcon_selectedImg" />
-                      <span class="sdIcon_selectedLabel">AIRPORT</span>
-                      <span class="material-symbols-outlined"
-                        >arrow_drop_down</span
+                    <div class="sdIconDropdown smDropdownInputElement">
+                      <button
+                        id="sdIcon_openSelectPanel"
+                        class="smDropdownSelectedButton"
+                        type="button"
                       >
-                      <div id="sdIcon_selectPanel" class="hidden">
+                        <img
+                          id="sdIcon_selectedImg"
+                          class="smDropdownSelectedImage"
+                          alt=""
+                        />
+                        <span
+                          class="sdIcon_selectedLabel smDropdownSelectedLabel"
+                          >AIRPORT</span
+                        >
+                        <span class="material-symbols-outlined smDropdownArrow"
+                          >arrow_drop_down</span
+                        >
+                      </button>
+                      <div
+                        id="sdIcon_selectPanel"
+                        class="hidden smDropdownHolder"
+                      >
                         <input
-                          type="text"
+                          type="search"
                           id="sdIcon_iconSearch"
+                          class="smDropdownSearch"
                           placeholder="Search icons"
                           autocomplete="off"
                         />
-                        <div class="sdIcon_iconList"></div>
+                        <div class="smDropdownList"></div>
                       </div>
-                    </button>
-
+                    </div>
+                    <br />
                     <label for="sdIcon_iconSize">Size (%): </label>
                     <input
                       type="number"
@@ -3193,7 +3287,7 @@
                 <button id="sMA_typeDiagrammic">
                   <img
                     class="sMA_typeVisual"
-                    src="./assets/form/exitTabVariants/Normal.png"
+                    src="./assets/form/arrowVariants/Diagrammic.png"
                   />
                   <span class="sMA_typeLabel">Diagrammic</span>
                 </button>
@@ -3558,21 +3652,25 @@
       <div class="smAPLCat_apl">
         <div class="smAPLCat_aplRow1">
           <button class="smAPLCat_aplDragger">::</button>
-          <div class="smAPLCat_aplSelectHolder">
-            <select class="smAPLCat_aplSelect"></select>
-            <button type="button" class="smAPLCat_aplSelectButton">
-              <img class="smAPL_arrowImage" alt="" />
-              <span class="smAPL_arrowLabel"></span>
-              <span class="material-symbols-outlined">arrow_drop_down</span>
+          <div class="smAPLCat_aplSelectHolder smDropdownInputElement">
+            <button
+              type="button"
+              class="smAPLCat_aplSelectButton smDropdownSelectedButton"
+            >
+              <img class="smAPL_arrowImage smDropdownSelectedImage" alt="" />
+              <span class="smAPL_arrowLabel smDropdownSelectedLabel"></span>
+              <span class="material-symbols-outlined smDropdownArrow"
+                >arrow_drop_down</span
+              >
             </button>
-            <div class="smAPLCat_aplSelectPanel hidden">
+            <div class="smAPLCat_aplSelectPanel hidden smDropdownHolder">
               <input
                 type="search"
-                class="smAPL_arrowSearch"
+                class="smAPL_arrowSearch smDropdownSearch"
                 placeholder="Search arrows"
                 autocomplete="off"
               />
-              <div class="smAPL_arrowList"></div>
+              <div class="smDropdownList"></div>
             </div>
           </div>
           <button class="smAPL_Delete redButton">Delete</button>

@@ -1,5 +1,4 @@
 const FormNavigation = (() => {
-  let exposed;
   let post;
   let scrollCooldown = false;
   let isFooterVisible = false;
@@ -13,7 +12,6 @@ const FormNavigation = (() => {
     setupTooltips();
     setupAdvancedMenu();
     setupHorizontalScroll();
-    //setupResetButtons();
     setupPostOptions();
     setupPanelOptions();
     setupExitTabOptions();
@@ -21,9 +19,9 @@ const FormNavigation = (() => {
     setupShields();
     setupGuideArrows();
     setupLimonEasterEgg();
+    setupDropdownElements();
   };
 
-  // Theme and Welcome Modal
   const setupThemeAndWelcome = () => {
     const applyTheme = (theme) => {
       document.documentElement.dataset.theme = theme;
@@ -206,7 +204,6 @@ const FormNavigation = (() => {
       };
   };
 
-  // Tooltips
   const setupTooltips = () => {
     const sMConfigBar = document.querySelector("#sMConfigBar");
     const tooltip = document.createElement("span");
@@ -287,7 +284,6 @@ const FormNavigation = (() => {
     }, 1000);
   };
 
-  // Advanced Menu Toggle
   const setupAdvancedMenu = () => {
     document
       .querySelector("#smSPShieldAdvanced")
@@ -302,7 +298,6 @@ const FormNavigation = (() => {
       });
   };
 
-  // Horizontal Scroll on Wheel
   const setupHorizontalScroll = () => {
     const horizontalScrollOnWheel = document.querySelectorAll(
       ".horizontal-scroll-on-wheel",
@@ -330,42 +325,6 @@ const FormNavigation = (() => {
       document.querySelector("#signMakerFooter").style.left = scrollLeft + "px";
     });
   };
-
-  // Reset Buttons
-  const setupResetButtons = () => {
-    const borderReset = document.querySelector("#borderReset");
-    const minimumReset = document.querySelector("#minimumReset");
-    const sizeReset = document.querySelector("#sizeReset");
-    const paddingReset = document.querySelector("#paddingReset");
-
-    borderReset.onclick = function () {
-      document.querySelector("#borderThickness").value = 0.2;
-      document.querySelector("#borderValue").textContent = 0.2;
-      formHandler.readForm();
-    };
-
-    minimumReset.onclick = function () {
-      document.querySelector("#minHeight").value = 2.25;
-      document.querySelector("#minValue").textContent = 2.25;
-      formHandler.readForm();
-    };
-
-    sizeReset.onclick = function () {
-      document.querySelector("#fontSize").value = 16;
-      document.querySelector("#fontValue").textContent = 16;
-      formHandler.readForm();
-    };
-
-    paddingReset.onclick = function () {
-      document.querySelector("#exitOnlyPadding").value = 0.25;
-      document.querySelector("#paddingValue").textContent = 0.25;
-      formHandler.readForm();
-    };
-  };
-
-  // ============================================================================
-  // POST OPTIONS SETUP
-  // ============================================================================
 
   const setupPostOptions = () => {
     // Post position
@@ -678,6 +637,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdCtrlText_fontFamily"),
       document.querySelector("#sdAdvisory_fontFamily"),
       document.querySelector("#sdActionMessage_fontFamily"),
+      document.querySelector("#sMET_variantFontFamily"),
     ];
     for (const elem of textElem_fontFamilySelects) {
       for (const fontFamily of TextElement.prototype.fontFamily) {
@@ -798,104 +758,6 @@ const FormNavigation = (() => {
       lib.appendOption(shield_shieldBase, shieldType);
     }
 
-    // Icons
-    const iconSearchInput = document.querySelector("#sdIcon_iconSearch");
-    const iconOpenButton = document.querySelector("#sdIcon_openSelectPanel");
-    const iconSelectPanel = document.querySelector("#sdIcon_selectPanel");
-    const iconList = document.querySelector(".sdIcon_iconList");
-    const iconSelectedLabel = document.querySelector(
-      "#sdIcon_openSelectPanel .sdIcon_selectedLabel",
-    );
-
-    const normalizeIconSearch = (value = "") =>
-      value
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-
-    const updateIconButtonSelection = (selectedIcon = "") => {
-      iconSelectedLabel.textContent = selectedIcon;
-      iconSearchInput.value = selectedIcon;
-      iconSelectPanel.dataset.selectedIcon = selectedIcon;
-
-      iconList.querySelectorAll(".sdIcon_iconListButton").forEach((button) => {
-        const isSelected = button.dataset.icon === selectedIcon;
-        button.classList.toggle("selected", isSelected);
-        button.setAttribute("aria-pressed", isSelected ? "true" : "false");
-      });
-    };
-
-    iconList.innerHTML = "";
-    for (const [iconKey, iconPath] of Object.entries(
-      IconElement.prototype.icons,
-    )) {
-      const iconButton = document.createElement("button");
-      iconButton.type = "button";
-      iconButton.className = "sdIcon_iconListButton";
-      iconButton.dataset.icon = iconKey;
-      iconButton.innerHTML = `
-          <img class="sdIcon_iconImage" loading="lazy" src="./assets/icons/${iconPath}" alt="${iconKey}" />
-          <span class="sdIcon_iconLabel">${iconKey.replace(/_/g, " ")}</span>
-        `;
-      iconButton.addEventListener("click", (event) => {
-        updateIconButtonSelection(iconKey);
-        iconSelectPanel.classList.add("hidden");
-        formHandler.readForm();
-      });
-      iconList.appendChild(iconButton);
-    }
-
-    iconOpenButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      if (iconSelectPanel.classList.contains("hidden")) {
-        iconSelectPanel.classList.remove("hidden");
-        iconSearchInput.focus();
-        iconSearchInput.select();
-        iconSelectPanel.style.left = iconOpenButton.offsetLeft + "px";
-        iconSelectPanel.style.top =
-          iconOpenButton.getBoundingClientRect().top +
-          iconOpenButton.getBoundingClientRect().height +
-          5 +
-          "px";
-      }
-    });
-
-    document.addEventListener("click", (event) => {
-      if (
-        iconSelectPanel.classList.contains("hidden") ||
-        iconOpenButton.contains(event.target) ||
-        iconSelectPanel.contains(event.target) ||
-        iconSearchInput.contains(event.target)
-      ) {
-        return;
-      }
-      iconSelectPanel.classList.add("hidden");
-    });
-
-    iconSearchInput.addEventListener("input", (event) => {
-      const query = normalizeIconSearch(iconSearchInput.value);
-      iconList.querySelectorAll(".sdIcon_iconListButton").forEach((button) => {
-        const matches =
-          !query ||
-          normalizeIconSearch(button.dataset.icon || "").includes(query);
-        button.style.display = matches ? "flex" : "none";
-      });
-    });
-
-    iconSearchInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        const visibleButtons = Array.from(
-          iconList.querySelectorAll(".sdIcon_iconListButton"),
-        ).filter((button) => button.style.display !== "none");
-        if (visibleButtons.length === 1) {
-          const selectedIcon = visibleButtons[0].dataset.icon;
-          updateIconButtonSelection(selectedIcon);
-          formHandler.readForm();
-        }
-      }
-    });
-
     // Arrows
     const arrowElemSelect = document.querySelector("#sdArrow_arrow");
     const arrowSizeInput = document.querySelector("#sdArrow_size");
@@ -1010,131 +872,6 @@ const FormNavigation = (() => {
       });
     }
 
-    const aplArrowTemplate = document.querySelector(
-      "#sMAPL_templateAPLItem",
-    ).content;
-    const aplArrowSelect = aplArrowTemplate.querySelector(
-      ".smAPLCat_aplSelect",
-    );
-    const aplArrowList = aplArrowTemplate.querySelector(".smAPL_arrowList");
-
-    for (const [arrow, definition] of Object.entries(
-      APLArrow.prototype.arrowTypes,
-    )) {
-      lib.appendOption(aplArrowSelect, arrow);
-
-      const arrowButton = document.createElement("button");
-      arrowButton.type = "button";
-      arrowButton.className = "smAPL_arrowOption";
-      arrowButton.dataset.arrow = arrow;
-      arrowButton.innerHTML = `
-        <img class="smAPL_arrowOptionImage" src="assets/arrow/${definition.asset}" alt="" />
-        <span>${arrow}</span>
-      `;
-      if (definition.flipped) {
-        arrowButton.querySelector("img").classList.add("flipped");
-      }
-      aplArrowList.appendChild(arrowButton);
-    }
-
-    const updateAPLArrowButton = (holder, arrow) => {
-      const definition = APLArrow.prototype.arrowTypes[arrow];
-      const image = holder.querySelector(".smAPL_arrowImage");
-      const label = holder.querySelector(".smAPL_arrowLabel");
-
-      if (!definition) {
-        return;
-      }
-
-      image.src = `assets/arrow/${definition.asset}`;
-      image.classList.toggle("flipped", definition.flipped);
-      label.textContent = arrow;
-      holder.querySelectorAll(".smAPL_arrowOption").forEach((option) => {
-        option.classList.toggle("selected", option.dataset.arrow === arrow);
-      });
-    };
-
-    document.addEventListener("click", (event) => {
-      const selectButton = event.target.closest(".smAPLCat_aplSelectButton");
-      const arrowOption = event.target.closest(".smAPL_arrowOption");
-
-      if (arrowOption) {
-        const holder = arrowOption.closest(".smAPLCat_aplSelectHolder");
-        const select = holder.querySelector(".smAPLCat_aplSelect");
-        select.value = arrowOption.dataset.arrow;
-        updateAPLArrowButton(holder, select.value);
-        holder
-          .querySelector(".smAPLCat_aplSelectPanel")
-          .classList.add("hidden");
-
-        formHandler.readForm();
-        return;
-      }
-
-      if (selectButton) {
-        const holder = selectButton.closest(".smAPLCat_aplSelectHolder");
-        const panel = holder.querySelector(".smAPLCat_aplSelectPanel");
-        const isHidden = panel.classList.toggle("hidden");
-        if (!isHidden) {
-          const search = holder.querySelector(".smAPL_arrowSearch");
-          search.value = "";
-          holder.querySelectorAll(".smAPL_arrowOption").forEach((option) => {
-            option.style.display = "flex";
-          });
-          panel.style.left = selectButton.getBoundingClientRect().left + "px";
-          panel.style.top =
-            selectButton.getBoundingClientRect().top +
-            selectButton.getBoundingClientRect().height +
-            5 +
-            "px";
-          search.focus();
-        }
-        return;
-      }
-
-      document
-        .querySelectorAll(".smAPLCat_aplSelectPanel:not(.hidden)")
-        .forEach((panel) => {
-          if (!panel.parentElement.contains(event.target)) {
-            panel.classList.add("hidden");
-          }
-        });
-    });
-
-    document.addEventListener("input", (event) => {
-      if (!event.target.matches(".smAPL_arrowSearch")) {
-        return;
-      }
-
-      const query = event.target.value.toLowerCase().trim();
-      event.target
-        .closest(".smAPLCat_aplSelectHolder")
-        .querySelectorAll(".smAPL_arrowOption")
-        .forEach((option) => {
-          option.style.display = option.dataset.arrow
-            .toLowerCase()
-            .includes(query)
-            ? "flex"
-            : "none";
-        });
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (
-        event.key !== "Enter" ||
-        !event.target.matches(".smAPL_arrowSearch")
-      ) {
-        return;
-      }
-
-      const visibleOption = Array.from(
-        event.target
-          .closest(".smAPLCat_aplSelectHolder")
-          .querySelectorAll(".smAPL_arrowOption"),
-      ).find((option) => option.style.display !== "none");
-      visibleOption?.click();
-    });
-
     for (const color of APLArrow.prototype.backgroundColors) {
       lib.appendOption(
         document
@@ -1235,6 +972,256 @@ const FormNavigation = (() => {
     };
 
     document.addEventListener("input", handleLimonInput, true);
+  };
+
+  const setupDropdownElements = () => {
+    document.addEventListener("click", (event) => {
+      const dropdownButton = event.target.closest(".smDropdownOption");
+
+      if (dropdownButton) {
+        const dropdownElement = dropdownButton.closest(
+          ".smDropdownInputElement",
+        );
+        dropdownElement.dataset.selectedOption = dropdownButton.dataset.value;
+        formHandler.readForm();
+        return;
+      }
+
+      const selectedButton = event.target.closest(".smDropdownSelectedButton");
+
+      if (selectedButton) {
+        const dropdownElement = selectedButton.closest(
+          ".smDropdownInputElement",
+        );
+        const selectedArrow = selectedButton.querySelector(".smDropdownArrow");
+        const dropdownHolder =
+          dropdownElement.querySelector(".smDropdownHolder");
+        const dropdownSearch =
+          dropdownHolder.querySelector(".smDropdownSearch");
+
+        if (!dropdownHolder.classList.toggle("hidden")) {
+          dropdownSearch.value = "";
+          dropdownHolder.style.left =
+            selectedButton.getBoundingClientRect().left + "px";
+          dropdownHolder.style.top =
+            selectedButton.getBoundingClientRect().top +
+            selectedButton.getBoundingClientRect().height +
+            5 +
+            "px";
+          dropdownSearch.focus();
+          selectedArrow.style.rotate = "180deg";
+        }
+      }
+    });
+
+    document.addEventListener("input", (event) => {
+      if (!event.target.matches(".smDropdownSearch")) {
+        return;
+      }
+
+      const dropdownHolder = event.target.closest(".smDropdownHolder");
+      const dropdownList = dropdownHolder.querySelector(".smDropdownList");
+
+      const query = event.target.value.toLowerCase().trim();
+      for (const option of dropdownList.querySelectorAll(".smDropdownOption")) {
+        option.style.display = option.dataset.value
+          .replace(/_/g, " ")
+          .toLowerCase()
+          .trim()
+          .includes(query)
+          ? "flex"
+          : "none";
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key == "Enter" && event.target.matches(".smDropdownSearch")) {
+        const dropdownList = event.target
+          .closest(".smDropdownHolder")
+          .querySelector(".smDropdownList");
+        const firstOption = Array.from(
+          dropdownList.querySelectorAll(".smDropdownOption"),
+        ).find((option) => option.style.display !== "none");
+        event.preventDefault();
+        firstOption?.click();
+        return;
+      }
+
+      if (event.key != "Escape") {
+        return;
+      }
+
+      document
+        .querySelectorAll(".smDropdownHolder:not(.hidden)")
+        .forEach((dropdownHolder) => {
+          dropdownHolder.classList.add("hidden");
+          dropdownHolder
+            .closest(".smDropdownInputElement")
+            .querySelector(".smDropdownArrow").style.rotate = "";
+        });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        !event.target.closest(".smDropdownHolder") &&
+        !event.target.closest(".smDropdownSelectedButton")
+      ) {
+        document
+          .querySelectorAll(".smDropdownHolder:not(.hidden)")
+          .forEach((dropdownHolder) => {
+            dropdownHolder.classList.add("hidden");
+            dropdownHolder
+              .closest(".smDropdownInputElement")
+              .querySelector(".smDropdownArrow").style.rotate = "";
+          });
+      }
+    });
+
+    const setupDropdownElement = (
+      dropdownElement,
+      basePrototype,
+      baseValue,
+      imageFunction,
+      textFunction,
+    ) => {
+      const selectedButton = dropdownElement.querySelector(
+        ".smDropdownSelectedButton",
+      );
+      const selectedLabel = selectedButton.querySelector(
+        ".smDropdownSelectedLabel",
+      );
+      const selectedImage = selectedButton.querySelector(
+        ".smDropdownSelectedImage",
+      );
+
+      const dropdownHolder = dropdownElement.querySelector(".smDropdownHolder");
+      const dropdownList = dropdownHolder.querySelector(".smDropdownList");
+
+      dropdownElement.dataset.selectedOption = baseValue;
+      imageFunction(selectedImage, baseValue);
+      textFunction(selectedLabel, baseValue);
+
+      // loading
+      for (const [key, _] of Object.entries(basePrototype)) {
+        const dropdownButton = document.createElement("button");
+        const dropdownImage = imageFunction(document.createElement("img"), key);
+        const dropdownLabel = textFunction(document.createElement("span"), key);
+
+        dropdownButton.className = "smDropdownOption";
+        dropdownButton.dataset.value = key;
+        dropdownImage.classList.add("smDropdownImage");
+        dropdownLabel.classList.add("smDropdownLabel");
+
+        dropdownButton.appendChild(dropdownImage);
+        dropdownButton.appendChild(dropdownLabel);
+
+        dropdownList.appendChild(dropdownButton);
+      }
+
+      // searching
+      console.log(selectedButton);
+
+      const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (
+            mutation.type !== "attributes" ||
+            mutation.attributeName != "data-selected-option"
+          ) {
+            continue;
+          }
+
+          imageFunction(selectedImage, dropdownElement.dataset.selectedOption);
+          textFunction(selectedLabel, dropdownElement.dataset.selectedOption);
+
+          for (const element of dropdownList.querySelectorAll(
+            ".smDropdownOption",
+          )) {
+            if (
+              element.dataset.value === dropdownElement.dataset.selectedOption
+            ) {
+              element.classList.add("selected");
+            } else {
+              element.classList.remove("selected");
+            }
+          }
+        }
+      });
+
+      observer.observe(dropdownElement, {
+        attributes: true,
+        attributeFilter: ["data-selected-option"],
+      });
+    };
+
+    setupDropdownElement(
+      document
+        .querySelector("#sMAPL_templateAPLItem")
+        .content.querySelector(".smAPLCat_aplSelectHolder"),
+      APLArrow.prototype.arrowTypes,
+      "Up Arrow",
+      (image, value) => {
+        if (APLArrow.prototype.arrowTypes[value].flipped) {
+          image.classList.add("flipped");
+        }
+
+        image.classList.add("smAPL_arrowImage");
+
+        image.loading = "lazy";
+        image.src = `assets/arrow/${APLArrow.prototype.arrowTypes[value].asset}`;
+
+        return image;
+      },
+      (text, value) => {
+        text.textContent = value;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector(".sdIconDropdown"),
+      IconElement.prototype.icons,
+      "AIRPORT",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = `./assets/icons/${IconElement.prototype.icons[value]}`;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = value.replace(/_/g, " ");
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#sMET_variantRegularIcon"),
+      IconElement.prototype.icons,
+      "AIRPORT",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = `./assets/icons/${IconElement.prototype.icons[value]}`;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = value.replace(/_/g, " ");
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#sMET_variantTollIcon"),
+      TollLogoElement.prototype.logos,
+      "EZPass",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = `${TollLogoElement.prototype.logos[value].src}`;
+        image.classList.add("smWhiteDropdownImage");
+        return image;
+      },
+      (text, value) => {
+        text.textContent = TollLogoElement.prototype.logos[value].label;
+        return text;
+      },
+    );
   };
 
   const setupShields = () => {

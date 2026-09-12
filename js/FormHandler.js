@@ -227,21 +227,28 @@ const formHandler = (() => {
             form["smET_HOV1RoundCorners"].checked;
         }
 
-        /*
-        exitTab.variantSettings.icon.icon = form["sMET_variantIcon"].value;
-        exitTab.variantSettings.icon.isTextBased =
-          form["sMET_variantIsTextBased"].checked;
-        exitTab.variantSettings.icon.showBackground =
+        const iconSettings = exitTab.variantSettings.icon;
+        iconSettings.icon =
+          document.querySelector("#sMET_variantRegularIcon").dataset
+            .selectedOption || iconSettings.icon;
+        iconSettings.tollIcon =
+          document.querySelector("#sMET_variantTollIcon").dataset
+            .selectedOption || iconSettings.tollIcon;
+        iconSettings.isTextBased = form["sMET_variantIsTextBased"].checked;
+        iconSettings.showBackground =
           form["sMET_variantShowBackground"].checked;
-        exitTab.variantSettings.icon.addon = form["sMET_variantAddon"].value;
-        exitTab.variantSettings.icon.iconSize = parseFloat(
-          form["sMET_variantIconSize"].value,
+        iconSettings.addon = form["sMET_variantAddon"].value;
+        iconSettings.iconSize = parseFloat(form["sMET_variantIconSize"].value);
+        iconSettings.isSquare = form["sMET_variantIsSquare"].checked;
+        iconSettings.isTollIcon = form["sMET_variantIsTollIcon"].checked;
+        iconSettings.onlyHorizontalPadding = parseFloat(
+          form["sMET_variantOnlyHorizontalPadding"].value,
         );
-        exitTab.variantSettings.icon.isSquare =
-          form["sMET_variantIsSquare"].checked;
-        exitTab.variantSettings.icon.isTollIcon =
-          form["sMET_variantIsTollIcon"].checked;
-        */
+        iconSettings.pbmPadding = parseFloat(
+          form["sMET_variantPbmPadding"].value,
+        );
+        iconSettings.fontFamily = form["sMET_variantFontFamily"].value;
+        iconSettings.underline = form["sMET_variantUnderline"].checked;
       }
     }
 
@@ -422,7 +429,7 @@ const formHandler = (() => {
 
     if (currentBlockElem.constructor.name === "IconElement") {
       currentBlockElem.icon =
-        document.querySelector("#sdIcon_selectPanel").dataset.selectedIcon ||
+        document.querySelector(".sdIconDropdown").dataset.selectedOption ||
         currentBlockElem.icon;
     }
 
@@ -593,8 +600,8 @@ const formHandler = (() => {
           }
 
           arrow.arrowVariant = arrowElement.querySelector(
-            ".smAPLCat_aplSelect",
-          ).value;
+            ".smAPLCat_aplSelectHolder",
+          ).dataset.selectedOption;
           arrow.size = parseFloat(
             arrowElement.querySelector(".sMAPL_size").value,
           );
@@ -815,24 +822,9 @@ const formHandler = (() => {
 
     // Icons
     if (app.getCurrentBlockElem().constructor.name === "IconElement") {
-      const iconFieldInput = document.getElementById("sdIcon_iconSearch");
-      const iconLabel = document.querySelector(
-        "#sdIcon_openSelectPanel .sdIcon_selectedLabel",
-      );
-      const iconList = document.querySelector(".sdIcon_iconList");
       const currentIcon = app.getCurrentBlockElem().icon;
-
-      iconFieldInput.value = currentIcon.replace(/_/g, " ");
-      iconLabel.textContent = currentIcon.replace(/_/g, " ");
-      document.querySelector("#sdIcon_selectedImg").src = `./assets/icons/${
-        IconElement.prototype.icons[currentIcon]
-      }`;
-
-      iconList.querySelectorAll(".sdIcon_iconListButton").forEach((button) => {
-        const isSelected = button.dataset.icon === currentIcon;
-        button.classList.toggle("selected", isSelected);
-        button.setAttribute("aria-pressed", isSelected ? "true" : "false");
-      });
+      document.querySelector(".sdIconDropdown").dataset.selectedOption =
+        currentIcon;
     }
 
     // Control Text Revision
@@ -1470,10 +1462,11 @@ const formHandler = (() => {
         currentExitTab.variantSettings.hovVariant1.roundCorners;
     }
 
-    /*
     const variantIconSettings = currentExitTab.variantSettings?.icon || {};
-    document.querySelector("#sMET_variantIcon").value =
-      variantIconSettings.icon || "";
+    document.querySelector("#sMET_variantRegularIcon").dataset.selectedOption =
+      variantIconSettings.icon;
+    document.querySelector("#sMET_variantTollIcon").dataset.selectedOption =
+      variantIconSettings.tollIcon;
     document.querySelector("#sMET_variantAddon").value =
       variantIconSettings.addon || "none";
     document.querySelector("#sMET_variantIconSize").value =
@@ -1488,7 +1481,26 @@ const formHandler = (() => {
       variantIconSettings.isSquare !== false;
     document.querySelector("#sMET_variantIsTollIcon").checked =
       variantIconSettings.isTollIcon || false;
-    */
+    document.querySelector("#sMET_variantOnlyHorizontalPadding").value =
+      variantIconSettings.onlyHorizontalPadding;
+    document.querySelector("#sMET_variantPbmPadding").value =
+      variantIconSettings.pbmPadding;
+    document.querySelector("#sMET_variantFontFamily").value =
+      variantIconSettings.fontFamily;
+    document.querySelector("#sMET_variantUnderline").checked =
+      variantIconSettings.underline;
+
+    const iconAddon = (variantIconSettings.addon || "none").toLowerCase();
+    document.querySelector("#sMET_variantOnlyHorizontalPadding").disabled =
+      iconAddon != "only";
+    document.querySelector("#sMET_variantPbmPadding").disabled =
+      iconAddon != "pay by mail 1";
+    document.querySelector("#sMET_variantUnderline").disabled =
+      iconAddon != "none";
+    document.querySelector("#sMET_variantFontFamily").disabled = ![
+      "only",
+      "pay by mail 1",
+    ].includes(iconAddon);
   };
 
   const updateShieldSubform = () => {
@@ -2070,8 +2082,9 @@ const formHandler = (() => {
             .content.cloneNode(true);
           const aplHolder = aplTemplate.querySelector(".smAPLCat_apl");
 
-          aplHolder.querySelector(".smAPLCat_aplSelect").value =
-            arrow.arrowVariant;
+          aplHolder.querySelector(
+            ".smAPLCat_aplSelectHolder",
+          ).dataset.selectedOption = arrow.arrowVariant;
           const arrowSelectImage = aplHolder.querySelector(".smAPL_arrowImage");
           const arrowSelectLabel = aplHolder.querySelector(".smAPL_arrowLabel");
           const arrowDefinition =

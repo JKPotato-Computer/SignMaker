@@ -427,7 +427,7 @@ input[type="number"] {
 }
 
 input:disabled {
-  background-color: rgb(var(--baseColorInv),.4);
+  background-color: rgb(var(--baseColorInv), 0.4);
 }
 
 .listNav {
@@ -1931,25 +1931,28 @@ div#shieldLibraryListOptions > button {
   font-weight: 700;
 }
 
-button#sdIcon_openSelectPanel {
+.smDropdownInputElement {
+  position: relative;
+  flex-grow: 1;
+}
+
+.smDropdownSelectedButton {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
   position: relative;
-  min-width: 10rem;
+  width: 100%;
   cursor: pointer;
 }
 
-button#sdIcon_openSelectPanel .sdIcon_selectedLabel {
+.smDropdownSelectedLabel {
   flex: 1;
   text-align: left;
-  text-transform: uppercase;
   overflow-wrap: break-word;
-  max-width: 7rem;
 }
 
-div#sdIcon_selectPanel {
+.smDropdownHolder {
   position: fixed;
   background-color: rgb(var(--baseColor));
   z-index: 99;
@@ -1959,47 +1962,13 @@ div#sdIcon_selectPanel {
   border: 1px solid #c7c7c7;
 }
 
-#sdIcon_iconSearch {
+.smDropdownSearch {
   width: 100%;
   margin: 0 0;
   padding: 0.5rem;
 }
 
-button.sdIcon_iconListButton {
-  width: 100%;
-  height: max-content;
-  display: flex;
-  align-items: center;
-  padding: 0.35rem 0.4rem;
-  border: 1px solid transparent;
-  background-color: transparent;
-}
-
-button.sdIcon_iconListButton:not(.selected):hover {
-  background-color: rgb(var(--baseColorInv), 0.05) !important;
-}
-
-button.sdIcon_iconListButton.selected,
-button.sdIcon_iconListButton.selected:hover {
-  background-color: rgb(var(--baseColorInv), 0.1) !important;
-}
-
-.sdIcon_iconImage {
-  height: 3rem;
-  object-fit: contain;
-  flex-shrink: 0;
-  background-color: black;
-  aspect-ratio: 1 / 1;
-}
-
-.sdIcon_iconLabel {
-  font-size: 0.95rem;
-  flex-grow: 1;
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-
-.sdIcon_iconList {
+.smDropdownList {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -2010,10 +1979,45 @@ button.sdIcon_iconListButton.selected:hover {
   gap: 0.2rem;
 }
 
-#sdIcon_selectedImg {
+button.smDropdownOption {
+  width: 100%;
+  height: max-content;
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+}
+
+button.smDropdownOption:not(.selected):hover {
+  background-color: rgb(var(--baseColorInv), 0.05) !important;
+}
+
+button.smDropdownOption.selected,
+button.smDropdownOption.selected:hover {
+  background-color: rgb(var(--baseColorInv), 0.1) !important;
+}
+
+.smDropdownImage {
+  height: 3rem;
+  object-fit: contain;
+  flex-shrink: 0;
+  background-color: black;
+  aspect-ratio: 1 / 1;
+}
+
+.smDropdownLabel {
+  font-size: 0.95rem;
+  flex-grow: 1;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.smDropdownSelectedImage {
   aspect-ratio: 1 / 1;
   height: 20px;
   background-color: black;
+  object-fit: contain;
 }
 
 div.sMET_typeSelect,
@@ -2042,6 +2046,11 @@ div.sMA_typeSelect > button {
   position: relative;
   padding: 0;
   margin: 0;
+}
+
+div.sMA_typeSelect > button {
+  height: 9rem;
+  font-size: 1rem;
 }
 
 div.sMET_typeSelect > button.selected > span,
@@ -2665,4 +2674,23 @@ option.presetExitTab {
 
 option.presetExitTab:hover {
   background-color: rgb(0, 154, 126);
+}
+
+.sdIconDropdown.smDropdownInputElement,
+#sMET_variantTollIcon,
+#sMET_variantRegularIcon {
+  width: 15rem;
+  display: inline-block;
+}
+
+.exitTabConfig:has(#sMET_variantIsTollIcon:checked) #sMET_variantRegularIcon {
+  display: none;
+}
+
+.exitTabConfig:has(#sMET_variantIsTollIcon:not(:checked)) #sMET_variantTollIcon {
+  display: none;
+}
+
+.smWhiteDropdownImage {
+  background-color: rgb(255, 255, 255);
 }

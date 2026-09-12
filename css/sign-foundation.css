@@ -651,6 +651,60 @@ main#smRender.wide #postContainer {
   position: relative;
 }
 
+.ET-tab.iconVariant {
+  background-color: var(--iconBackgroundColor);
+  padding: var(--iconVerticalPadding) var(--iconHorizontalPadding);
+}
+
+.ET-iconNoneContent,
+.ET-iconAddonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--iconGap, 0.4rem);
+}
+
+.ET-iconNoneContent {
+  flex-direction: column;
+}
+
+.ET-iconImage {
+  width: var(--iconSize);
+  height: var(--iconImageHeight);
+  object-fit: contain;
+}
+
+.ET-iconText,
+.ET-iconPayByMail,
+.ET-iconOnly,
+.ET-iconOr {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+.ET-iconText {
+  white-space: pre-wrap;
+  text-align: center;
+  text-decoration: var(--iconUnderline);
+}
+
+.ET-iconOnly {
+  background-color: white;
+  color: black;
+  font-family: var(--iconFontFamily);
+  padding: 0 var(--onlyHorizontalPadding);
+}
+
+.ET-iconOr {
+  font-family: var(--iconFontFamily);
+}
+
+.ET-iconPayByMail {
+  border: none;
+  padding: 0 var(--pbmPadding);
+  font-family: var(--iconFontFamily);
+}
+
 .ET-tab:has(.ET-fullLeft) {
   padding-top: calc(1.25rem + var(--fontSize) + var(--verticalPadding));
   padding-bottom: calc(0.25rem + var(--verticalPadding));
