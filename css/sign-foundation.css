@@ -481,6 +481,8 @@ main#smRender.wide #postContainer {
     var(--designationYOffset, 0%)
   );
   scale: var(--designationScale);
+  text-wrap: nowrap;
+  word-spacing: -0.2rem;
 }
 
 .shieldGroupContainer {
@@ -651,21 +653,29 @@ main#smRender.wide #postContainer {
   position: relative;
 }
 
-.ET-tab.iconVariant {
+.ET-tab.icon {
   background-color: var(--iconBackgroundColor);
   padding: var(--iconVerticalPadding) var(--iconHorizontalPadding);
 }
 
-.ET-iconNoneContent,
-.ET-iconAddonContent {
+.ET-tab.icon.none {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--iconGap, 0.4rem);
 }
 
-.ET-iconNoneContent {
+.ET-tab.icon.none {
   flex-direction: column;
+}
+
+.ET-tab.icon.only {
+  gap: 1rem;
+}
+
+.ET-iconDivider {
+  height: var(--borderThickness);
+  width: 100%;
+  background: white;
 }
 
 .ET-iconImage {
@@ -682,17 +692,28 @@ main#smRender.wide #postContainer {
   text-box-edge: cap alphabetic;
 }
 
+.ET-tab.icon.none .ET-iconText {
+  var(--verticalPadding) var(--horizontalPadding);
+}
+
+.ET-tab.icon.only:has(.ET-iconText) {
+  gap: 0.5rem;
+}
+
+.ET-tab.icon.only .ET-iconText {
+  font-size: calc(var(--fontSize) + .25rem);
+}
+
 .ET-iconText {
   white-space: pre-wrap;
   text-align: center;
-  text-decoration: var(--iconUnderline);
 }
 
 .ET-iconOnly {
   background-color: white;
   color: black;
   font-family: var(--iconFontFamily);
-  padding: 0 var(--onlyHorizontalPadding);
+  padding: 0.25rem var(--onlyHorizontalPadding);
 }
 
 .ET-iconOr {
@@ -875,7 +896,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab.square {
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   padding: var(--verticalPadding) calc(1.3rem + var(--horizontalPadding));
 }
 
@@ -1098,7 +1119,8 @@ main#smRender.wide #postContainer {
   border-top-right-radius: 0;
 }
 
-.signcontainer:has(.guideArrows.apl) .signHolder, .signcontainer:has(.guideArrows:not(.none,.diagrammic)) .signHolder {
+.signcontainer:has(.guideArrows.apl) .signHolder,
+.signcontainer:has(.guideArrows:not(.none, .diagrammic)) .signHolder {
   border-bottom: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;

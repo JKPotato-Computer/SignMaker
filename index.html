@@ -1048,7 +1048,6 @@
               <fieldset id="smET_IconVariant" class="hidden">
                 <legend>Icon / Toll Variant</legend>
                 <label for="sMET_variantIcon">Icon:</label>
-
                 <div
                   id="sMET_variantRegularIcon"
                   class="smDropdownInputElement"
@@ -1073,7 +1072,7 @@
                   </div>
                 </div>
                 <div id="sMET_variantTollIcon" class="smDropdownInputElement">
-                  <button class="smDropdownSelectedButton" type="button">
+                  <buttonsMET_variantShowBackgroundlectedButton" type="button">
                     <img class="smDropdownSelectedImage" alt="" />
                     <span class="sdIcon_selectedLabel smDropdownSelectedLabel"
                       >AIRPORT</span
@@ -1092,6 +1091,16 @@
                     <div class="smDropdownList"></div>
                   </div>
                 </div>
+                <label for="sMET_variantIsTollIcon" class="checkboxLabel">
+                  <input
+                    type="checkbox"
+                    id="sMET_variantIsTollIcon"
+                    name="sMET_variantIsTollIcon"
+                    onchange="formHandler.readForm()"
+                  />
+                  Toll Icon
+                </label>
+                <br />
 
                 <label for="sMET_variantAddon">Addon:</label>
                 <select
@@ -1123,26 +1132,6 @@
                   value="3"
                   step="0.1"
                 />
-                <label for="sMET_variantIsTextBased" class="checkboxLabel">
-                  <input
-                    type="checkbox"
-                    id="sMET_variantIsTextBased"
-                    name="sMET_variantIsTextBased"
-                    onchange="formHandler.readForm()"
-                  />
-                  Text Based
-                </label>
-                <br />
-                <label for="sMET_variantShowBackground" class="checkboxLabel">
-                  <input
-                    type="checkbox"
-                    id="sMET_variantShowBackground"
-                    name="sMET_variantShowBackground"
-                    checked=""
-                    onchange="formHandler.readForm()"
-                  />
-                  Show Background
-                </label>
                 <label for="sMET_variantIsSquare" class="checkboxLabel">
                   <input
                     type="checkbox"
@@ -1154,14 +1143,39 @@
                   Square Icon
                 </label>
                 <br />
-                <label for="sMET_variantIsTollIcon" class="checkboxLabel">
+                <label for="sMET_variantShowBackground" class="checkboxLabel">
                   <input
                     type="checkbox"
-                    id="sMET_variantIsTollIcon"
-                    name="sMET_variantIsTollIcon"
+                    id="sMET_variantShowBackground"
+                    name="sMET_variantShowBackground"
+                    checked=""
                     onchange="formHandler.readForm()"
                   />
-                  Toll Icon
+                  Exit Tab BG
+                </label>
+                <label for="smET_iconBackground" class="checkboxLabel">
+                  Icon BG:
+                </label>
+                <select for="smET_iconBackground"></select>
+                <br />
+                <div id="smET_iconBackgroundConfigurations">
+                  <label for="smET_iconBackgroundHorizPadding">Horizontal Padding (rem):</label>
+                  <input type="number" id="smET_iconBackgroundHorizPadding" value="0.25" min="0" step="0.05" onchange="formHandler.readForm()" />
+                  <label for="smET_iconBackgroundVertPadding">Vertical Padding (rem):</label>
+                  <input type="number" id="smET_iconBackgroundVertPadding" value="0.25" min="0" step="0.05" onchange="formHandler.readForm()" />
+                  <br />
+                  <label for="smET_iconBackgroundBorderRadius">Border Radius (px):</label>
+                  <input type="number" id="smET_iconBackgroundBorderRadius" value="0" min="0" step="1" onchange="formHandler.readForm()" />
+                </div>
+                <br />
+                <label for="sMET_variantIsTextBased" class="checkboxLabel">
+                  <input
+                    type="checkbox"
+                    id="sMET_variantIsTextBased"
+                    name="sMET_variantIsTextBased"
+                    onchange="formHandler.readForm()"
+                  />
+                  Text Based
                 </label>
                 <label for="sMET_variantOnlyHorizontalPadding">
                   ONLY Padding (rem):</label
@@ -1175,7 +1189,9 @@
                   value="0.25"
                   onchange="formHandler.readForm()"
                 />
-                <label for="sMET_variantPbmPadding">Pay by Mail Padding (rem):</label>
+                <label for="sMET_variantPbmPadding"
+                  >Pay by Mail Padding (rem):</label
+                >
                 <input
                   type="number"
                   id="sMET_variantPbmPadding"
@@ -1190,8 +1206,7 @@
                   id="sMET_variantFontFamily"
                   name="sMET_variantFontFamily"
                   onchange="formHandler.readForm()"
-                >
-                </select>
+                ></select>
                 <label for="sMET_variantUnderline" class="checkboxLabel">
                   <input
                     type="checkbox"

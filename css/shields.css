@@ -24,6 +24,7 @@
   top: 2.25em;
   font-family: "Series D";
   font-size: 0.45em;
+  word-spacing: -.2rem;
 }
 .shield.I:has(.designation) .routeNumber,
 .shield.I-BUS:has(.designation) .routeNumber {
@@ -647,6 +648,7 @@
 
 .shield.TXTOLL .designation {
   top: 0.9em;
+  font-size: 0.35rem;
 }
 
 .shield.TXTOLL:has(.designation) .routeNumber,

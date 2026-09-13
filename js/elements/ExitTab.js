@@ -47,7 +47,7 @@ class ExitTab {
     variantSettings = {
       icon: {
         icon: "AIRPORT",
-        tollIcon: "EZ-PASS",
+        tollIcon: "EZPass",
         isTextBased: false,
         showBackground: true,
         addon: "none",
@@ -375,6 +375,11 @@ class ExitTab {
           iconSettings.isTollIcon ? iconSettings.tollIcon : iconSettings.icon
         ];
 
+      if (!iconSettings.showBackground) {
+        exitTabHolder.style.background = "none";
+        exitTabElement.style.border = "none";
+      }
+
       exitTabElement.style.setProperty(
         "--iconSize",
         iconSettings.iconSize + "rem",
@@ -395,10 +400,7 @@ class ExitTab {
         "--pbmPadding",
         iconSettings.pbmPadding + "rem",
       );
-      exitTabElement.style.setProperty(
-        "--iconBackgroundColor",
-        iconSettings.showBackground ? "var(--backgroundColor)" : "transparent",
-      );
+
       exitTabElement.style.setProperty(
         "--iconHorizontalPadding",
         iconSettings.showBackground ? "var(--horizontalPadding)" : "0rem",
@@ -407,43 +409,36 @@ class ExitTab {
         "--iconVerticalPadding",
         iconSettings.showBackground ? "var(--verticalPadding)" : "0rem",
       );
-      exitTabElement.style.setProperty(
-        "--iconUnderline",
-        iconSettings.underline ? "underline" : "none",
-      );
-      exitTabElement.classList.add("iconVariant");
-
-      const textElement = document.createElement("span");
-      textElement.className = "ET-iconText";
-      textElement.textContent = this.textContent;
-      if (this.subTextContent) {
-        textElement.textContent += "\n" + this.subTextContent;
-      }
+      exitTabElement.classList.add(iconSettings.addon.toLowerCase());
 
       const imageElement = document.createElement("img");
       imageElement.className = "ET-iconImage";
-      if (iconDefinition) {
-        imageElement.src = iconSettings.isTollIcon
-          ? iconDefinition.src
-          : `./assets/icons/${iconDefinition}`;
-      }
+      imageElement.src = iconSettings.isTollIcon
+        ? iconDefinition.src
+        : `./assets/icons/${iconDefinition}`;
 
-      const appendTextOrImage = (parentElement) => {
-        parentElement.appendChild(
-          iconSettings.isTextBased ? textElement.cloneNode(true) : imageElement,
-        );
-      };
+      exitTabElement.style.padding = "0";
+      exitTabElement.style.gap = "";
 
       if (iconSettings.addon.toLowerCase() == "only") {
-        const contentElement = document.createElement("div");
-        contentElement.className = "ET-iconAddonContent";
-        appendTextOrImage(contentElement);
+        if (iconSettings.isTextBased) {
+          const textElement = document.createElement("span");
+          textElement.className = "ET-iconText ";
+          textElement.textContent = this.textContent;
+          if (this.subTextContent) {
+            textElement.textContent += "\n" + this.subTextContent;
+          }
+          exitTabElement.appendChild(textElement);
+        } else {
+          exitTabElement.appendChild(imageElement);
+        }
 
         const onlyElement = document.createElement("span");
         onlyElement.className = "ET-iconOnly";
         onlyElement.textContent = "ONLY";
-        contentElement.appendChild(onlyElement);
-        exitTabElement.appendChild(contentElement);
+        exitTabElement.appendChild(onlyElement);
+
+        exitTabElement.style.padding = "";
       } else if (iconSettings.addon.toLowerCase() == "pay by mail 1") {
         const contentElement = document.createElement("div");
         contentElement.className = "ET-iconAddonContent";
@@ -462,14 +457,25 @@ class ExitTab {
         contentElement.appendChild(payByMailElement);
         exitTabElement.appendChild(contentElement);
       } else {
-        const contentElement = document.createElement("div");
-        contentElement.className = "ET-iconNoneContent";
-        if (iconSettings.isTextBased) {
-          contentElement.appendChild(textElement);
-        } else {
-          appendTextOrImage(contentElement);
+        const textElement = document.createElement("span");
+        textElement.className = "ET-iconText ";
+        textElement.textContent = this.textContent;
+        if (this.subTextContent) {
+          textElement.textContent += "\n" + this.subTextContent;
         }
-        exitTabElement.appendChild(contentElement);
+
+        exitTabElement.appendChild(textElement);
+
+        if (
+          iconSettings.underline &&
+          (this.textContent != "" || this.subTextContent != "")
+        ) {
+          const divider = document.createElement("div");
+          divider.className = "ET-iconDivider";
+          exitTabElement.appendChild(divider);
+        }
+
+        exitTabElement.appendChild(imageElement);
       }
     }
 
@@ -503,6 +509,9 @@ ExitTab.prototype.variants = [
 ];
 
 ExitTab.prototype.iconVariant_addons = ["None", "Only", "Pay by Mail 1"];
+ExitTab.prototype.tollIconBackgrounds = ["Transparent"].concat(
+  Object.keys(lib.colors),
+);
 
 class ExitTabRow {
   constructor({

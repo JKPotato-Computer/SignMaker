@@ -1468,19 +1468,19 @@ const formHandler = (() => {
     document.querySelector("#sMET_variantTollIcon").dataset.selectedOption =
       variantIconSettings.tollIcon;
     document.querySelector("#sMET_variantAddon").value =
-      variantIconSettings.addon || "none";
+      variantIconSettings.addon;
     document.querySelector("#sMET_variantIconSize").value =
-      variantIconSettings.iconSize || 3;
+      variantIconSettings.iconSize;
     document.querySelector("#sMET_variantIconSizeVal").value =
-      variantIconSettings.iconSize || 3;
+      variantIconSettings.iconSize;
     document.querySelector("#sMET_variantIsTextBased").checked =
-      variantIconSettings.isTextBased || false;
-    document.querySelector("#sMET_variantShowBackground").checked =
-      variantIconSettings.showBackground !== false;
+      variantIconSettings.isTextBased;
+    document.querySelector("#smET_iconBackground").value =
+      variantIconSettings.showBackground;
     document.querySelector("#sMET_variantIsSquare").checked =
-      variantIconSettings.isSquare !== false;
+      variantIconSettings.isSquare;
     document.querySelector("#sMET_variantIsTollIcon").checked =
-      variantIconSettings.isTollIcon || false;
+      variantIconSettings.isTollIcon;
     document.querySelector("#sMET_variantOnlyHorizontalPadding").value =
       variantIconSettings.onlyHorizontalPadding;
     document.querySelector("#sMET_variantPbmPadding").value =

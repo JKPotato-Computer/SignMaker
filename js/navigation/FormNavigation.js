@@ -616,6 +616,10 @@ const FormNavigation = (() => {
       formHandler.updateExitTabSubform();
       App.redraw();
     });
+
+    for (const color of ExitTab.prototype.tollIconBackgrounds) {
+      lib.appendOption(document.querySelector("#smET_iconBackground"), color);
+    }
   };
 
   const setupControlSignElements = () => {

@@ -2694,3 +2694,7 @@ option.presetExitTab:hover {
 .smWhiteDropdownImage {
   background-color: rgb(255, 255, 255);
 }
+
+#sMET_variantAddon {
+  width: 10rem;
+}
