@@ -117,10 +117,6 @@ const formHandler = (() => {
         const exitTab =
           exitTabRow.exitTabs[app.vars.currentlySelectedExitTabIndex];
 
-        exitTab.variant = document
-          .querySelector("div.sMET_typeSelect > button.selected")
-          .id.split("sMET_type")[1];
-
         exitTab.textContent = form["sMET_textContent"].value;
         exitTab.subTextContent = form["sMET_subTextContent"].value;
 
@@ -227,28 +223,55 @@ const formHandler = (() => {
             form["smET_HOV1RoundCorners"].checked;
         }
 
-        const iconSettings = exitTab.variantSettings.icon;
-        iconSettings.icon =
-          document.querySelector("#sMET_variantRegularIcon").dataset
-            .selectedOption || iconSettings.icon;
-        iconSettings.tollIcon =
-          document.querySelector("#sMET_variantTollIcon").dataset
-            .selectedOption || iconSettings.tollIcon;
-        iconSettings.isTextBased = form["sMET_variantIsTextBased"].checked;
-        iconSettings.showBackground =
-          form["sMET_variantShowBackground"].checked;
-        iconSettings.addon = form["sMET_variantAddon"].value;
-        iconSettings.iconSize = parseFloat(form["sMET_variantIconSize"].value);
-        iconSettings.isSquare = form["sMET_variantIsSquare"].checked;
-        iconSettings.isTollIcon = form["sMET_variantIsTollIcon"].checked;
-        iconSettings.onlyHorizontalPadding = parseFloat(
-          form["sMET_variantOnlyHorizontalPadding"].value,
-        );
-        iconSettings.pbmPadding = parseFloat(
-          form["sMET_variantPbmPadding"].value,
-        );
-        iconSettings.fontFamily = form["sMET_variantFontFamily"].value;
-        iconSettings.underline = form["sMET_variantUnderline"].checked;
+        if (exitTab.variant == "Icon") {
+          exitTab.variantSettings.icon.icon = document.querySelector(
+            "#sMET_variantRegularIcon",
+          ).dataset.selectedOption;
+          exitTab.variantSettings.icon.tollIcon = document.querySelector(
+            "#sMET_variantTollIcon",
+          ).dataset.selectedOption;
+
+          exitTab.variantSettings.icon.isTextBased =
+            form["sMET_variantIsTextBased"].checked;
+
+          exitTab.variantSettings.icon.showBackground =
+            form["smET_showBackground"].checked;
+
+          exitTab.variantSettings.icon.iconBackgroundConfiguration.backgroundColor =
+            form["smET_iconBackground"].value;
+          exitTab.variantSettings.icon.iconBackgroundConfiguration.horizontalPadding =
+            parseFloat(form["smET_iconBackgroundHorizPadding"].value);
+          exitTab.variantSettings.icon.iconBackgroundConfiguration.verticalPadding =
+            parseFloat(form["smET_iconBackgroundVertPadding"].value);
+          exitTab.variantSettings.icon.iconBackgroundConfiguration.borderRadius =
+            parseFloat(form["smET_iconBackgroundBorderRadius"].value);
+
+          exitTab.variantSettings.icon.addon = form["sMET_variantAddon"].value;
+          exitTab.variantSettings.icon.iconSize = parseFloat(
+            form["sMET_variantIconSize"].value,
+          );
+          exitTab.variantSettings.icon.isSquare =
+            form["sMET_variantIsSquare"].checked;
+          exitTab.variantSettings.icon.isTollIcon =
+            form["sMET_variantIsTollIcon"].checked;
+          exitTab.variantSettings.icon.onlyHorizontalPadding = parseFloat(
+            form["sMET_variantOnlyHorizontalPadding"].value,
+          );
+          exitTab.variantSettings.icon.pbmPadding = parseFloat(
+            form["sMET_variantPbmPadding"].value,
+          );
+          exitTab.variantSettings.icon.pbmIsSquare =
+            form["smET_variantIsSquare"].checked;
+
+          exitTab.variantSettings.icon.fontFamily =
+            form["sMET_variantFontFamily"].value;
+          exitTab.variantSettings.icon.underline =
+            form["sMET_variantUnderline"].checked;
+        }
+
+        exitTab.variant = document
+          .querySelector("div.sMET_typeSelect > button.selected")
+          .id.split("sMET_type")[1];
       }
     }
 
@@ -729,7 +752,6 @@ const formHandler = (() => {
 
       subPanelButton.addEventListener("click", () => {
         app.changeEditingSubPanel(subPanelIndex);
-        console.log(subPanelIndex, app.vars.currentlySelectedSubPanelIndex);
         subPanelButton.className = "active";
       });
 
@@ -1462,45 +1484,106 @@ const formHandler = (() => {
         currentExitTab.variantSettings.hovVariant1.roundCorners;
     }
 
-    const variantIconSettings = currentExitTab.variantSettings?.icon || {};
-    document.querySelector("#sMET_variantRegularIcon").dataset.selectedOption =
-      variantIconSettings.icon;
-    document.querySelector("#sMET_variantTollIcon").dataset.selectedOption =
-      variantIconSettings.tollIcon;
-    document.querySelector("#sMET_variantAddon").value =
-      variantIconSettings.addon;
-    document.querySelector("#sMET_variantIconSize").value =
-      variantIconSettings.iconSize;
-    document.querySelector("#sMET_variantIconSizeVal").value =
-      variantIconSettings.iconSize;
-    document.querySelector("#sMET_variantIsTextBased").checked =
-      variantIconSettings.isTextBased;
-    document.querySelector("#smET_iconBackground").value =
-      variantIconSettings.showBackground;
-    document.querySelector("#sMET_variantIsSquare").checked =
-      variantIconSettings.isSquare;
-    document.querySelector("#sMET_variantIsTollIcon").checked =
-      variantIconSettings.isTollIcon;
-    document.querySelector("#sMET_variantOnlyHorizontalPadding").value =
-      variantIconSettings.onlyHorizontalPadding;
-    document.querySelector("#sMET_variantPbmPadding").value =
-      variantIconSettings.pbmPadding;
-    document.querySelector("#sMET_variantFontFamily").value =
-      variantIconSettings.fontFamily;
-    document.querySelector("#sMET_variantUnderline").checked =
-      variantIconSettings.underline;
+    if (currentExitTab.variant == "Icon") {
+      document.querySelector(
+        "#sMET_variantRegularIcon",
+      ).dataset.selectedOption = currentExitTab.variantSettings.icon.icon;
+      document.querySelector("#sMET_variantTollIcon").dataset.selectedOption =
+        currentExitTab.variantSettings.icon.tollIcon;
 
-    const iconAddon = (variantIconSettings.addon || "none").toLowerCase();
-    document.querySelector("#sMET_variantOnlyHorizontalPadding").disabled =
-      iconAddon != "only";
-    document.querySelector("#sMET_variantPbmPadding").disabled =
-      iconAddon != "pay by mail 1";
-    document.querySelector("#sMET_variantUnderline").disabled =
-      iconAddon != "none";
-    document.querySelector("#sMET_variantFontFamily").disabled = ![
-      "only",
-      "pay by mail 1",
-    ].includes(iconAddon);
+      document.querySelector("#sMET_variantAddon").value =
+        currentExitTab.variantSettings.icon.addon;
+
+      document.querySelector("#sMET_variantIconSize").value =
+        currentExitTab.variantSettings.icon.iconSize;
+      document.querySelector("#sMET_variantIconSizeVal").value =
+        currentExitTab.variantSettings.icon.iconSize;
+      document.querySelector(
+        'label[for="sMET_variantIsTextBased"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
+      document.querySelector("#sMET_variantIsTextBased").checked =
+        currentExitTab.variantSettings.icon.isTextBased;
+      document.querySelector("#smET_showBackground").value =
+        currentExitTab.variantSettings.icon.showBackground;
+      document.querySelector("#smET_iconBackground").value =
+        currentExitTab.variantSettings.icon.iconBackgroundConfiguration.backgroundColor;
+
+      document.querySelector(
+        "#smET_iconBackgroundConfigurations",
+      ).style.display =
+        currentExitTab.variantSettings.icon.iconBackgroundConfiguration
+          .backgroundColor == "Transparent"
+          ? "none"
+          : "";
+
+      document.querySelector("#smET_iconBackgroundHorizPadding").value =
+        currentExitTab.variantSettings.icon.iconBackgroundConfiguration.horizontalPadding;
+      document.querySelector("#smET_iconBackgroundVertPadding").value =
+        currentExitTab.variantSettings.icon.iconBackgroundConfiguration.verticalPadding;
+      document.querySelector("#smET_iconBackgroundBorderRadius").value =
+        currentExitTab.variantSettings.icon.iconBackgroundConfiguration.borderRadius;
+
+      document.querySelector("#sMET_variantIsSquare").checked =
+        currentExitTab.variantSettings.icon.isSquare;
+      document.querySelector("#sMET_variantIsTollIcon").checked =
+        currentExitTab.variantSettings.icon.isTollIcon;
+
+      document.querySelector(
+        "#sMET_variantOnlyHorizontalPadding",
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
+      document.querySelector("#sMET_variantPbmPadding").style.display =
+        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
+          ? ""
+          : "none";
+      document.querySelector("#sMET_variantUnderline").style.display =
+        currentExitTab.variantSettings.icon.addon == "none" ? "" : "none";
+      document.querySelector("#smET_variantIsSquare").style.display =
+        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
+          ? ""
+          : "none";
+
+      document.querySelector(
+        'label[for="sMET_variantOnlyHorizontalPadding"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
+      document.querySelector(
+        'label[for="sMET_variantPbmPadding"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
+          ? ""
+          : "none";
+      document.querySelector(
+        'label[for="sMET_variantUnderline"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "none" ? "" : "none";
+      document.querySelector(
+        'label[for="smET_variantIsSquare"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
+          ? ""
+          : "none";
+
+      document.querySelector("#sMET_variantOnlyHorizontalPadding").value =
+        currentExitTab.variantSettings.icon.onlyHorizontalPadding;
+      document.querySelector("#sMET_variantPbmPadding").value =
+        currentExitTab.variantSettings.icon.pbmPadding;
+      document.querySelector("#smET_variantIsSquare").value =
+        currentExitTab.variantSettings.icon.pbmIsSquare;
+
+      document.querySelector(
+        'label[for="sMET_variantFontFamily"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon != "none" ? "" : "none";
+      document.querySelector("#sMET_variantFontFamily").style.display =
+        currentExitTab.variantSettings.icon.addon != "none" ? "" : "none";
+
+      document.querySelector("#sMET_variantFontFamily").value =
+        currentExitTab.variantSettings.icon.fontFamily;
+      document.querySelector("#sMET_variantUnderline").checked =
+        currentExitTab.variantSettings.icon.underline;
+    }
   };
 
   const updateShieldSubform = () => {

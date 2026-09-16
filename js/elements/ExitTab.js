@@ -49,13 +49,20 @@ class ExitTab {
         icon: "AIRPORT",
         tollIcon: "EZPass",
         isTextBased: false,
-        showBackground: true,
+        iconBackgroundConfiguration: {
+          backgroundColor: "Transparent",
+          horizontalPadding: 0,
+          verticalPadding: 0,
+          borderRadius: 0,
+        },
         addon: "none",
         iconSize: 3,
         isSquare: true,
         isTollIcon: false,
+        showBackground: true,
         onlyHorizontalPadding: 0.25,
         pbmPadding: 0.25,
+        pbmIsSquare: true,
         fontFamily: "Series E",
         underline: false,
       },
@@ -384,10 +391,7 @@ class ExitTab {
         "--iconSize",
         iconSettings.iconSize + "rem",
       );
-      exitTabElement.style.setProperty(
-        "--iconImageHeight",
-        iconSettings.isSquare ? iconSettings.iconSize + "rem" : "auto",
-      );
+
       exitTabElement.style.setProperty(
         "--iconFontFamily",
         '"' + iconSettings.fontFamily + '"',
@@ -409,13 +413,54 @@ class ExitTab {
         "--iconVerticalPadding",
         iconSettings.showBackground ? "var(--verticalPadding)" : "0rem",
       );
-      exitTabElement.classList.add(iconSettings.addon.toLowerCase());
+      exitTabElement.classList.add(
+        iconSettings.addon.toLowerCase().replace(/\s/g, "-"),
+      );
+
+      const imageHolder = document.createElement("div");
+      imageHolder.className = "ET-iconImageHolder";
 
       const imageElement = document.createElement("img");
-      imageElement.className = "ET-iconImage";
+      imageElement.className =
+        "ET-iconImage " + (iconSettings.isSquare ? "square" : "");
       imageElement.src = iconSettings.isTollIcon
         ? iconDefinition.src
         : `./assets/icons/${iconDefinition}`;
+      imageHolder.appendChild(imageElement);
+
+      if (
+        iconSettings.iconBackgroundConfiguration.backgroundColor !=
+        "Transparent"
+      ) {
+        imageHolder.style.setProperty(
+          "--iconBackgroundColor",
+          lib.colors[
+            iconSettings.iconBackgroundConfiguration.backgroundColor
+          ] ||
+            iconSettings.iconBackgroundConfiguration.backgroundColor.toLowerCase(),
+        );
+        imageHolder.style.setProperty(
+          "--iconBackgroundHorizontalPadding",
+          iconSettings.iconBackgroundConfiguration.horizontalPadding + "rem",
+        );
+        imageHolder.style.setProperty(
+          "--iconBackgroundVerticalPadding",
+          iconSettings.iconBackgroundConfiguration.verticalPadding + "rem",
+        );
+        imageHolder.style.setProperty(
+          "--iconBackgroundBorderRadius",
+          iconSettings.iconBackgroundConfiguration.borderRadius + "px",
+        );
+
+        if (
+          lib.checkForContrast(
+            iconSettings.iconBackgroundConfiguration.backgroundColor.toLowerCase(),
+          ) &&
+          !iconSettings.isTollIcon
+        ) {
+          imageElement.style.filter = "invert(1)";
+        }
+      }
 
       exitTabElement.style.padding = "0";
       exitTabElement.style.gap = "";
@@ -430,7 +475,7 @@ class ExitTab {
           }
           exitTabElement.appendChild(textElement);
         } else {
-          exitTabElement.appendChild(imageElement);
+          exitTabElement.appendChild(imageHolder);
         }
 
         const onlyElement = document.createElement("span");
@@ -440,22 +485,19 @@ class ExitTab {
 
         exitTabElement.style.padding = "";
       } else if (iconSettings.addon.toLowerCase() == "pay by mail 1") {
-        const contentElement = document.createElement("div");
-        contentElement.className = "ET-iconAddonContent";
-        if (!iconSettings.isTextBased) {
-          contentElement.appendChild(imageElement);
-        }
+        exitTabElement.appendChild(imageHolder);
 
         const orElement = document.createElement("span");
         orElement.className = "ET-iconOr";
         orElement.textContent = "OR";
-        contentElement.appendChild(orElement);
+        exitTabElement.appendChild(orElement);
 
         const payByMailElement = document.createElement("span");
-        payByMailElement.className = "ET-iconPayByMail";
+        payByMailElement.className =
+          "ET-iconPayByMail ET-iconImage " +
+          (iconSettings.pbmIsSquare ? "square" : "");
         payByMailElement.textContent = this.textContent;
-        contentElement.appendChild(payByMailElement);
-        exitTabElement.appendChild(contentElement);
+        exitTabElement.appendChild(payByMailElement);
       } else {
         const textElement = document.createElement("span");
         textElement.className = "ET-iconText ";
@@ -475,7 +517,7 @@ class ExitTab {
           exitTabElement.appendChild(divider);
         }
 
-        exitTabElement.appendChild(imageElement);
+        exitTabElement.appendChild(imageHolder);
       }
     }
 

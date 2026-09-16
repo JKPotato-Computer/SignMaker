@@ -672,6 +672,10 @@ main#smRender.wide #postContainer {
   gap: 1rem;
 }
 
+.ET-tab.icon.pay-by-mail-1 {
+  gap: .5rem;
+}
+
 .ET-iconDivider {
   height: var(--borderThickness);
   width: 100%;
@@ -679,9 +683,21 @@ main#smRender.wide #postContainer {
 }
 
 .ET-iconImage {
-  width: var(--iconSize);
-  height: var(--iconImageHeight);
+  width: calc(var(--iconSize) + var(--iconHorizontalPadding) * 2);
+  height: calc(var(--iconImageHeight) + var(--iconVerticalPadding) * 2);
   object-fit: contain;
+}
+
+.ET-iconImageHolder {
+  background-color: var(--iconBackgroundColor);
+  padding: var(--iconBackgroundVerticalPadding)
+    var(--iconBackgroundHorizontalPadding);
+  border-radius: var(--iconBackgroundBorderRadius);
+}
+
+.ET-iconImage.square {
+  aspect-ratio: 1 / 1;
+  width: calc(var(--iconSize) + var(--pbmPadding) * 2);
 }
 
 .ET-iconText,
@@ -693,7 +709,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab.icon.none .ET-iconText {
-  var(--verticalPadding) var(--horizontalPadding);
+  padding: var(--verticalPadding) var(--horizontalPadding);
 }
 
 .ET-tab.icon.only:has(.ET-iconText) {
@@ -701,7 +717,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab.icon.only .ET-iconText {
-  font-size: calc(var(--fontSize) + .25rem);
+  font-size: calc(var(--fontSize) + 0.25rem);
 }
 
 .ET-iconText {
@@ -721,9 +737,14 @@ main#smRender.wide #postContainer {
 }
 
 .ET-iconPayByMail {
+  justify-content: center;
   border: none;
-  padding: 0 var(--pbmPadding);
+  padding: var(--pbmPadding);
   font-family: var(--iconFontFamily);
+  display: flex;
+  align-items: center;
+  white-space: pre-line;
+  width: auto;
 }
 
 .ET-tab:has(.ET-fullLeft) {

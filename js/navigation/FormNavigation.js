@@ -1123,8 +1123,6 @@ const FormNavigation = (() => {
       }
 
       // searching
-      console.log(selectedButton);
-
       const observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
           if (
