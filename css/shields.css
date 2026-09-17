@@ -763,3 +763,111 @@
 .shield.WY.ThreeDigit .routeNumber {
   font-family: "Series C";
 }
+
+/*
+  Australian Road Signs =====================================================
+*/
+.shield.ALPHANUM .routeNumber {
+  color: #ffa709;
+  font-size: 2.2em;
+  font-family: "Series EM";
+  top: 0.0em;
+}
+
+.shield.NAT .routeNumber {
+  color: var(--yellow);
+  font-size: 2em;
+  font-family: "Series D";
+  top: 0.15em;
+}
+
+.shield.NAT.TwoDigit .routeNumber {
+  color: var(--yellow);
+  font-size: 1.75em;
+  font-family: "Series EM";
+  top: 0.15em;
+}
+
+.shield.NAT.ThreeDigit .routeNumber {
+  color: var(--yellow);
+  font-size: 1.75em;
+  font-family: "Series C";
+  top: 0.1em;
+}
+
+.shield.TOLLBLUE .routeNumber {
+  color: var(--yellow);
+  font-size: 2.2em;
+  font-family: "Series EM";
+  top: 0.0em;
+}
+
+.shield.SR .routeNumber {
+  color: white;
+  font-size: 2em;
+  font-family: "Series C";
+  top: -0.05em;
+}
+
+.shield.SR.OneDigit .routeNumber {
+  color: white;
+  font-size: 2.5em;
+  font-family: "Series EM";
+  top: -0.10em;
+}
+/* NR NEEDS TO BE FIXED*/
+.shield.NR .routeNumber {
+  color: black;
+  font-size: 2.25em;
+  font-family: "Series C";
+  top: 0.0em;
+}
+
+.shield.NR.OneDigit .routeNumber {
+  color: black;
+  font-size: 2.25em;
+  font-family: "Series EM";
+  top: -0.10em;
+}
+
+.shield.MR .routeNumber {
+  color: rgb(0, 67, 123);
+  font-size: 1.8em;
+  font-family: "Series D";
+  top: 0.05em;
+}
+
+.shield.MR.OneDigit .routeNumber {
+  color: rgb(0, 67, 123);
+  font-size: 2em;
+  font-family: "Series EM";
+  top: 0.05em;
+}
+
+.shield.TD .routeNumber {
+  color: rgb(255, 255, 255);
+  font-size: 1.8em;
+  font-family: "Series D";
+  top: 0.15em;
+}
+
+.shield.TD.ThreeDigit .routeNumber {
+  color: rgb(255, 255, 255);
+  font-size: 1.8em;
+  font-family: "Series B";
+  top: 0.15em;
+}
+
+.shield.FNSW .routeNumber {
+  color: rgb(255, 255, 255);
+  font-size: 2.1em;
+  font-family: "Series C";
+  top: 0.15em;
+}
+
+.shield.SH .routeNumber {
+  color: rgb(255, 255, 255);
+  font-size: 2.4em;
+  font-family: "Series D";
+  top: -0.15em;
+}
