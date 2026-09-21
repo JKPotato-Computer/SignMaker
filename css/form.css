@@ -1368,23 +1368,23 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.2);
 }
 
-#shieldImgSelector {
+#shieldEditorModal {
   background: none;
   padding: 0;
   flex-direction: row;
-  height: 100%;
-  min-width: max-content;
+  height: 90%;
+  width: 70%;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  max-width: 70%;
+  justify-content: center;
 }
 
-#shieldImgSelector > div {
+#shieldEditorModal > div {
   padding: 1rem;
 }
 
-#shieldImgSelector > div {
+#shieldEditorModal > div {
   background: var(--hotbarColor);
 }
 
@@ -1395,14 +1395,21 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   gap: 0.5rem;
 }
 
-.shieldLibrary > header {
+.shieldEditorPane {
+  flex-grow: 1;
+  overflow: auto;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+}
+
+.shieldEditorPane > header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.5rem;
 }
 
-#shieldImgSelectorClose,
+#shieldEditorClose,
 #shieldImgLibraryClose,
 #diagrammicDrawingClose,
 button[data-diagram-modal-close] {
@@ -1415,7 +1422,7 @@ button[data-diagram-modal-close] {
   background-color: rgb(255, 0, 0, 0.2);
 }
 
-#shieldImgSelectorClose:hover,
+#shieldEditorClose:hover,
 #shieldImgLibraryClose:hover,
 #diagrammicDrawingClose:hover,
 button[data-diagram-modal-close]:hover,
@@ -1434,6 +1441,7 @@ button[data-diagram-modal-close]:hover,
 .shieldLibrary > nav button {
   font-size: 24px;
   padding: 0.5rem 2rem;
+  width: stretch;
 }
 
 .shieldLibrary > nav button.selected {
@@ -1480,7 +1488,7 @@ button[data-diagram-modal-close]:hover,
 }
 
 .shieldCategoryType.selected,
-.customShieldItem.selected {
+.custoamShieldItem.selected {
   background-color: rgb(0, 0, 255, 0.1);
 }
 
@@ -1546,10 +1554,12 @@ button[data-diagram-modal-close]:hover,
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 30%;
+  gap: 0.5rem;
 }
 
 .selectedShieldPreview {
-  height: 164px;
+  height: 7rem;
   background-color: var(--shieldBackColor, rgb(0, 0, 255, 0.8));
   border-radius: var(--shieldBackRadius);
 }
@@ -1557,15 +1567,32 @@ button[data-diagram-modal-close]:hover,
 .selectedShieldName {
   font-size: 24px;
   font-weight: 600;
+  width: 8rem;
+  text-align: center;
 }
 
 .shieldPreview > footer {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.shieldPreview > footer > button {
+  font-size: 20px;
+  padding: 0.25rem 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 #setShield {
-  font-size: 24px;
-  padding: 0.25rem 2rem;
+  justify-content: center;
 }
 
 #uploadShield {
@@ -1609,7 +1636,7 @@ button[data-diagram-modal-close]:hover,
   padding: 0.25rem;
   color: rgb(100, 100, 100);
   overflow-wrap: break-word;
-  width: 25rem;
+  /* width: 25rem; */
 }
 
 #linkUpload {
@@ -2687,7 +2714,8 @@ option.presetExitTab:hover {
   display: none;
 }
 
-.exitTabConfig:has(#sMET_variantIsTollIcon:not(:checked)) #sMET_variantTollIcon {
+.exitTabConfig:has(#sMET_variantIsTollIcon:not(:checked))
+  #sMET_variantTollIcon {
   display: none;
 }
 
@@ -2697,4 +2725,120 @@ option.presetExitTab:hover {
 
 #sMET_variantAddon {
   width: 10rem;
+}
+
+small {
+  font-size: 10px;
+}
+
+.shieldEditorPane > details[open]:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+summary {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  color: white;
+  cursor: pointer;
+  font-family: "Overpass";
+  font-weight: 500;
+  font-size: 1.25rem;
+  transition: 0.25s ease-in-out;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+details[open] > summary {
+  background-color: rgb(0, 0, 255);
+}
+
+summary::before {
+  font-family: "Material Symbols Outlined";
+  content: "arrow_drop_down";
+  font-size: 2rem;
+  line-height: 0;
+}
+
+summary::after {
+  content: " (Expand)";
+}
+
+details[open] > summary::after {
+  content: " (Collapse)";
+}
+
+details[open] > summary::before {
+  content: "arrow_drop_up";
+}
+
+summary:hover {
+  background-color: rgb(0, 0, 255, 0.75);
+}
+
+.shieldEditorImagePreview {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  gap: 1rem;
+}
+
+.shieldEditorImagePreview > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shieldEditorImagePreview > div:nth-child(2) {
+  flex-grow: 1;
+}
+
+#spShield_routeNumber,
+#spShield_designation {
+  width: calc(100% - 14rem);
+}
+
+#shieldPreviewImage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.25);
+  aspect-ratio: 1 / 1;
+  color: white;
+}
+
+#scaleOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+#scaleOptions > button {
+  width: 100%;
+  font-size: 20px;
+}
+
+#scaleOptions > button.selected {
+  background-color: rgb(0, 0, 255, 0.9);
+  color: white;
+}
+
+#shieldBaseName {
+  text-wrap: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
 }

@@ -100,6 +100,8 @@ main#smRender.wide #postContainer {
 .bE-electronicSign * {
   color: var(--textColor);
   text-shadow: var(--textShadow);
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .bE-electronicSign {
@@ -436,7 +438,6 @@ main#smRender.wide #postContainer {
 .shield {
   margin: var(--vertShieldMargin) var(--horizShieldMargin);
   position: relative;
-  scale: var(--shieldScale);
 }
 
 .shield::before {
@@ -453,7 +454,7 @@ main#smRender.wide #postContainer {
 }
 
 .shieldImg {
-  height: 3rem;
+  height: calc(3rem * var(--shieldScale));
 }
 
 .routeNumber {
@@ -627,7 +628,9 @@ main#smRender.wide #postContainer {
   margin-left: 0;
 }
 
-.ET-tab.useTrim .ET-word {
+.ET-tab.useTrim .ET-word,
+.ET-tab.useTrim .ET-numeral,
+.ET-tab.useTrim .ET-trailing {
   text-box-edge: cap alphabetic;
   text-box-trim: trim-both;
 }
@@ -737,12 +740,9 @@ main#smRender.wide #postContainer {
 }
 
 .ET-iconPayByMail {
-  justify-content: center;
   border: none;
   padding: var(--pbmPadding);
   font-family: var(--iconFontFamily);
-  display: flex;
-  align-items: center;
   white-space: pre-line;
   width: auto;
 }

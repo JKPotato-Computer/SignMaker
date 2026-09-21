@@ -46,12 +46,14 @@ class Shield {
       route_yOffset: 0,
       route_letterSpacing: 0,
       route_fontFamily: "",
+      route_color: "",
 
       designation_scale: 100,
       designation_xOffset: 0,
       designation_yOffset: 0,
       designation_letterSpacing: 0,
       designation_fontFamily: "",
+      designation_color: "",
     },
   } = {}) {
     // Shield Image
@@ -81,12 +83,14 @@ class Shield {
       route_yOffset: 0,
       route_letterSpacing: 0,
       route_fontFamily: "",
+      route_color: "",
 
       designation_scale: 100,
       designation_xOffset: 0,
       designation_yOffset: 0,
       designation_letterSpacing: 0,
       designation_fontFamily: "",
+      designation_color: "",
       ...customShields,
     };
 
@@ -149,6 +153,7 @@ class Shield {
       "--horizShieldMargin",
       this.horizMargin + "px",
     );
+    shieldElmt.style.fontSize = this.scale / 100 + "rem";
     shieldElmt.style.setProperty("--vertShieldMargin", this.vertMargin + "px");
 
     const shieldImgElmt = document.createElement("img");
@@ -169,6 +174,15 @@ class Shield {
       "--routeYOffset",
       this.customShields.route_yOffset + "%",
     );
+
+    if (this.customShields.route_color != null) {
+      routeNumberElmt.style.setProperty(
+        "--routeColor",
+        lib.colors[this.customShields.route_color] ||
+          this.customShields.route_color.toLowerCase(),
+      );
+    }
+
     if (this.customShields.route_letterSpacing != 0) {
       routeNumberElmt.style.letterSpacing =
         this.customShields.route_letterSpacing + "px";
@@ -193,6 +207,15 @@ class Shield {
         "--designationYOffset",
         this.customShields.designation_yOffset + "%",
       );
+
+      if (this.customShields.designation_color != null) {
+        designationElmt.style.setProperty(
+          "--designationColor",
+          lib.colors[this.customShields.designation_color] ||
+            this.customShields.designation_color.toLowerCase(),
+        );
+      }
+
       if (this.customShields.designation_letterSpacing != 0) {
         designationElmt.style.letterSpacing =
           this.customShields.designation_letterSpacing + "px";

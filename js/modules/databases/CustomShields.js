@@ -122,7 +122,7 @@ class CustomShields {
       this.savedShieldsList.innerHTML = "";
 
       shields.forEach((shield) => {
-        const shieldElement = document.createElement("div");
+        const shieldElement = document.createElement("button");
         shieldElement.className = "customShieldItem";
         shieldElement.innerHTML = `
                     <img src="${shield.data}" class="shieldItemImg">

@@ -10,7 +10,6 @@ const FormNavigation = (() => {
     setupThemeAndWelcome();
     setupNavigation();
     setupTooltips();
-    setupAdvancedMenu();
     setupHorizontalScroll();
     setupPostOptions();
     setupPanelOptions();
@@ -282,20 +281,6 @@ const FormNavigation = (() => {
     setTimeout(() => {
       scrollObserver.observe(document.querySelector("#signMakerFooter"));
     }, 1000);
-  };
-
-  const setupAdvancedMenu = () => {
-    document
-      .querySelector("#smSPShieldAdvanced")
-      .addEventListener("click", () => {
-        if (
-          document.querySelector("#advancedMenu").classList.contains("hidden")
-        ) {
-          document.querySelector("#advancedMenu").classList.remove("hidden");
-        } else {
-          document.querySelector("#advancedMenu").classList.add("hidden");
-        }
-      });
   };
 
   const setupHorizontalScroll = () => {
@@ -1227,20 +1212,26 @@ const FormNavigation = (() => {
   };
 
   const setupShields = () => {
-    const shieldRouteFontSelect = document.querySelector(
-      "#spShield_routeFontFamily",
-    );
-    lib.appendOption(shieldRouteFontSelect, "");
-    for (const fontFamily of TextElement.prototype.fontFamily) {
-      lib.appendOption(shieldRouteFontSelect, fontFamily);
+    const shieldFontSelect = [
+      document.querySelector("#spShield_routeFontFamily"),
+      document.querySelector("#spShield_designationFontFamily"),
+    ];
+    for (const select of shieldFontSelect) {
+      lib.appendOption(select, "");
+      for (const fontFamily of TextElement.prototype.fontFamily) {
+        lib.appendOption(select, fontFamily);
+      }
     }
 
-    const shieldDesignationFontSelect = document.querySelector(
-      "#spShield_designationFontFamily",
-    );
-    lib.appendOption(shieldDesignationFontSelect, "");
-    for (const fontFamily of TextElement.prototype.fontFamily) {
-      lib.appendOption(shieldDesignationFontSelect, fontFamily);
+    const shieldColorSelect = [
+      document.querySelector("#spShield_routeColor"),
+      document.querySelector("#spShield_designationColor"),
+    ];
+    for (const select of shieldColorSelect) {
+      lib.appendOption(select, "");
+      for (const color in lib.colors) {
+        lib.appendOption(select, color);
+      }
     }
 
     const presetShieldList = document.querySelector("#presetShieldList");

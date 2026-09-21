@@ -284,6 +284,7 @@ const formHandler = (() => {
           app.vars.currentlySelectedShieldIndex
         ];
 
+      /*
       currentShield.routeNumber = form["spShield_routeNumber"].value;
       currentShield.designation = form["spShield_designation"].value;
       currentShield.scale = parseFloat(form["spShield_scale"].value);
@@ -320,6 +321,7 @@ const formHandler = (() => {
 
       currentShield.horizMargin = form["spShield_horizMargins"].value;
       currentShield.vertMargin = form["spShield_vertMargins"].value;
+      */
 
       const bannerElements = document.querySelectorAll(".smSP_bannerElement");
       let domIndex = bannerElements.length - 1;
@@ -1785,6 +1787,7 @@ const formHandler = (() => {
     const designationField = document.getElementById("spShield_designation");
     designationField.value = currentShield.designation;
 
+    /*
     const shieldScaleField = document.getElementById("spShield_scale");
     const shieldScaleValueField = document.getElementById("spShield_scaleVal");
     shieldScaleField.value = currentShield.scale;
@@ -1824,6 +1827,7 @@ const formHandler = (() => {
       currentShield.horizMargin;
     document.getElementById("spShield_vertMargins").value =
       currentShield.vertMargin;
+    */
 
     document.querySelector("#smSPShieldImgPreview").innerHTML = "";
     let shieldElem = currentShield.createElement();
@@ -1832,30 +1836,32 @@ const formHandler = (() => {
 
     document.querySelector("#smSPShieldImgPreview").appendChild(shieldElem);
 
-    // Shield Image
-    const changeImageButton = document.getElementById("changeImgBtn");
-    const newButton = changeImageButton.cloneNode(true);
-    changeImageButton.parentNode.replaceChild(newButton, changeImageButton);
-    newButton.addEventListener("click", async () => {
-      const selectedShield = await promptShield(currentShield);
-      if (!selectedShield) {
-        return;
-      }
+    const editShieldClone = document
+      .querySelector("#editShieldBtn")
+      .cloneNode(true);
+    document
+      .querySelector("#editShieldBtn")
+      .parentNode.replaceChild(
+        editShieldClone,
+        document.querySelector("#editShieldBtn"),
+      );
 
-      currentShield.shieldType = selectedShield.shieldType;
-      currentShield.shieldName = selectedShield.shieldName;
-      currentShield.shieldValue = selectedShield.shieldValue;
-      currentShield.variant = selectedShield.variant;
-      currentShield.shieldBacks = selectedShield.shieldBacks;
-      currentShield.shieldBackColor = selectedShield.shieldBackColor;
-      currentShield.shieldBackRadius = selectedShield.shieldBorderRadius;
-      currentShield.imageType = selectedShield.imageType;
-      currentShield.imageData = selectedShield.imageData;
+    editShieldClone.addEventListener("click", () => {
+      ShieldEditor.promptEditShield(currentShield, (updatedShield) => {
+        for (const key in updatedShield) {
+          if (["banners", "bannerSettings", "group"].includes(key)) {
+            continue;
+          }
 
-      updateShieldSubform();
-      app.redraw();
+          currentShield[key] = updatedShield[key];
+        }
+
+        updateShieldSubform();
+        app.redraw();
+      });
     });
 
+    /*
     const shieldScaleInputField = document.getElementById("spShield_scale");
     shieldScaleInputField.addEventListener("input", (event) => {
       document.getElementById("spShield_scale").value =
@@ -1872,40 +1878,7 @@ const formHandler = (() => {
       document.getElementById("spShield_scaleVal").value =
         event.currentTarget.value;
     });
-
-    // Shield Library
-    const saveButton = document.querySelector("#smSPShieldSave");
-    const cloneSaveButton = saveButton.cloneNode(true);
-    saveButton.parentNode.replaceChild(cloneSaveButton, saveButton);
-    cloneSaveButton.innerHTML = `<span class="material-symbols-outlined">file_save</span>Save to Library`;
-
-    cloneSaveButton.addEventListener(
-      "click",
-      async () => {
-        if (await ShieldLibrary.addShield(currentShield)) {
-          cloneSaveButton.innerHTML = `<span class="material-symbols-outlined">check</span>Saved!`;
-        }
-      },
-      { once: true },
-    );
-
-    const useUserShields = document.querySelector("#useUserShields");
-    const cloneUseUserShields = useUserShields.cloneNode(true);
-    useUserShields.parentNode.replaceChild(cloneUseUserShields, useUserShields);
-
-    cloneUseUserShields.addEventListener("click", async () => {
-      const shield = await promptShieldLibrary();
-      if (!shield) {
-        return;
-      }
-
-      for (const key of Object.keys(shield)) {
-        currentShield[key] = shield[key];
-      }
-
-      updateShieldSubform();
-      app.redraw();
-    });
+    */
 
     // Banners
     document.querySelector("#smSP_bannerMaster").innerHTML = "";
@@ -1915,7 +1888,6 @@ const formHandler = (() => {
         "No banners found";
     }
 
-    // check if the shield is the first of its own group
     const isFirstInGroup =
       shieldGroup.shields.findIndex(
         (shield) => shield.group === currentShield.group,
@@ -2294,329 +2266,6 @@ const formHandler = (() => {
       document.querySelector("#sMDiagrammicScale").value = arrows.scale;
       return;
     }
-  };
-
-  const updateShieldModalVisual = (selectedShield, isDifferent = true) => {
-    const modalPreviewImg = document.querySelector(".selectedShieldPreview");
-    const modalPreviewName = document.querySelector(".selectedShieldName");
-    const variantSelect = document.querySelector("#selectedShieldVariant");
-    const backColorSelect = document.querySelector("#selectedBackColor");
-    const backCheckbox = document.querySelector("#selectedShieldBacks");
-    const borderRadiusInput = document.querySelector("#selectedBackRoudness");
-
-    const properties = Shield.prototype.getPropertiesFromName(
-      selectedShield.shieldValue,
-    );
-
-    if (isDifferent) {
-      variantSelect.innerHTML = "";
-      for (const variant of properties.variants) {
-        lib.appendOption(variantSelect, variant, {
-          selected: selectedShield.variant === variant,
-        });
-      }
-    }
-
-    backColorSelect.value = selectedShield.shieldBackColor;
-    backCheckbox.checked = selectedShield.shieldBacks;
-    borderRadiusInput.value = selectedShield.shieldBackRadius || 4;
-
-    modalPreviewName.textContent = selectedShield.shieldName || properties.name;
-
-    let imageSrc = Shield.prototype.getImageData(selectedShield);
-    modalPreviewImg.src = imageSrc;
-
-    modalPreviewImg.alt = selectedShield.shieldValue || "shield";
-
-    if (selectedShield.shieldBacks) {
-      modalPreviewImg.style.setProperty(
-        "--shieldBackColor",
-        selectedShield.shieldBackColor,
-      );
-      modalPreviewImg.style.setProperty(
-        "--shieldBackRadius",
-        selectedShield.shieldBorderRadius + "px",
-      );
-    } else {
-      modalPreviewImg.style.removeProperty("--shieldBackColor");
-      modalPreviewImg.style.removeProperty("--shieldBackRadius");
-    }
-  };
-
-  const promptShield = function (currentValue, returnMethod = null) {
-    const modal = document.querySelector("#shieldImgSelector");
-    const holder = document.querySelector("#modalHolder");
-    let eventListeners = [];
-
-    const trackListener = (element, type, handler) => {
-      if (element) {
-        element.addEventListener(type, handler);
-        eventListeners.push({ element, type, handler });
-      }
-    };
-
-    const cleanup = () => {
-      for (const item of eventListeners) {
-        item.element.removeEventListener(item.type, item.handler);
-      }
-      eventListeners = [];
-    };
-
-    return new Promise((resolve) => {
-      let selectedShield = {
-        shieldType: currentValue?.shieldType || "preset",
-        shieldName: currentValue?.shieldName || "Interstate",
-        shieldValue: currentValue?.shieldValue || "I",
-        variant: currentValue?.variant || "2 Digit",
-
-        shieldBacks: currentValue?.shieldBacks || false,
-        shieldBackColor: currentValue?.shieldBackColor || "Black",
-        shieldBorderRadius: currentValue?.shieldBorderRadius || 4,
-
-        imageType: currentValue?.imageType || "file",
-        imageData: currentValue?.imageData || "",
-      };
-
-      updateShieldModalVisual(selectedShield, true);
-
-      holder.style.display = "flex";
-      modal.style.display = "flex";
-      modal.showModal();
-
-      const closeBtn = document.querySelector("#shieldImgSelectorClose");
-      const handleCloseClick = () => {
-        holder.style.display = "none";
-        modal.style.display = "none";
-        modal.close();
-
-        cleanup();
-
-        if (returnMethod) returnMethod(null);
-        resolve(null);
-      };
-      trackListener(closeBtn, "click", handleCloseClick);
-
-      const setShield = (event) => {
-        let isDifferent =
-          selectedShield.shieldValue != event.currentTarget.dataset.name;
-        selectedShield.shieldName =
-          event.currentTarget.querySelector(".shieldItemName").textContent;
-        selectedShield.shieldValue = event.currentTarget.dataset.name;
-
-        if (
-          document
-            .querySelector("#savedCustomShieldsList")
-            .contains(event.currentTarget)
-        ) {
-          selectedShield.shieldType = "custom";
-        } else {
-          selectedShield.shieldType = "preset";
-        }
-
-        searchFromDir(
-          Shield.prototype.shieldDirectory,
-          document.querySelector("#presetShieldList"),
-          false,
-        );
-
-        if (
-          isDifferent &&
-          !Shield.prototype
-            .getPropertiesFromName(selectedShield.shieldValue)
-            .variants.includes(selectedShield.variant)
-        ) {
-          selectedShield.variant =
-            Shield.prototype.getPropertiesFromName(selectedShield.shieldValue)
-              .variants[0] || "";
-        }
-
-        updateShieldModalVisual(selectedShield, isDifferent);
-      };
-
-      const searchFromDir = (dir, parentElem, createListeners) => {
-        let hasAnything = false;
-        if (!parentElem) return hasAnything;
-
-        for (const category in dir) {
-          if (category == "type") continue;
-          const cat = dir[category];
-
-          if (cat.type == "category") {
-            const childElem = parentElem.querySelector(
-              `.shieldCategory[data-category="${category}"]`,
-            );
-            if (childElem && searchFromDir(cat, childElem, createListeners)) {
-              hasAnything = true;
-              if (selectedShield.name != "") {
-                childElem.classList.remove("open");
-                childElem.querySelector(".shieldCategoryHead")?.click();
-              }
-            }
-          } else if (cat.type == "shield") {
-            const childElem = parentElem.querySelector(
-              `.shieldCategoryType[data-name="${category}"]`,
-            );
-            if (!childElem) continue;
-
-            if (cat.name == selectedShield.shieldName) {
-              hasAnything = true;
-              childElem.classList.add("selected");
-              const indicator = childElem.querySelector(".shieldItemSelected");
-              if (indicator) indicator.textContent = "radio_button_checked";
-            } else {
-              childElem.classList.remove("selected");
-              const indicator = childElem.querySelector(".shieldItemSelected");
-              if (indicator) indicator.textContent = "radio_button_unchecked";
-            }
-
-            if (createListeners) {
-              trackListener(childElem, "click", setShield);
-            }
-          }
-        }
-        return hasAnything;
-      };
-
-      // Initial load of the shield directory item listeners
-      searchFromDir(
-        Shield.prototype.shieldDirectory,
-        document.querySelector("#presetShieldList"),
-        true,
-      );
-
-      const handleVariant = (e) => {
-        selectedShield.variant = e.currentTarget.value;
-        updateShieldModalVisual(selectedShield, false);
-      };
-      trackListener(
-        document.querySelector("#selectedShieldVariant"),
-        "change",
-        handleVariant,
-      );
-
-      const handleBackColor = (e) => {
-        selectedShield.shieldBackColor = e.currentTarget.value;
-        updateShieldModalVisual(selectedShield, false);
-      };
-      trackListener(
-        document.querySelector("#selectedBackColor"),
-        "change",
-        handleBackColor,
-      );
-
-      const handleBorderRadius = (e) => {
-        selectedShield.shieldBorderRadius = parseInt(e.currentTarget.value);
-        updateShieldModalVisual(selectedShield, false);
-      };
-      trackListener(
-        document.querySelector("#selectedBackRoudness"),
-        "change",
-        handleBorderRadius,
-      );
-
-      const handleShieldBackCheckbox = (e) => {
-        selectedShield.shieldBacks = e.currentTarget.checked;
-        updateShieldModalVisual(selectedShield, false);
-      };
-      trackListener(
-        document.querySelector("#selectedShieldBacks"),
-        "change",
-        handleShieldBackCheckbox,
-      );
-
-      window.customShields.loadSavedShields((shield) => {
-        selectedShield.shieldType = "custom";
-        selectedShield.shieldName = shield.fileName;
-        selectedShield.imageType = "data";
-        selectedShield.imageData = shield.data;
-        updateShieldModalVisual(selectedShield, true);
-      });
-
-      const submitBtn = document.querySelector("#setShield");
-      const handleSubmitClick = () => {
-        holder.style.display = "none";
-        modal.style.display = "none";
-        modal.close();
-
-        cleanup();
-
-        if (returnMethod) returnMethod(selectedShield);
-        resolve(selectedShield);
-      };
-      trackListener(submitBtn, "click", handleSubmitClick);
-    });
-  };
-
-  const promptShieldLibrary = function () {
-    const modal = document.querySelector("#shieldImgLibrary");
-    const holder = document.querySelector("#modalHolder");
-
-    let eventListeners = [];
-
-    const trackListener = (element, type, handler) => {
-      if (element) {
-        element.addEventListener(type, handler);
-        eventListeners.push({ element, type, handler });
-      }
-    };
-
-    const cleanup = () => {
-      for (const item of eventListeners) {
-        item.element.removeEventListener(item.type, item.handler);
-      }
-      eventListeners = [];
-    };
-
-    document.querySelector("#shieldLibraryDelete").disabled = true;
-
-    return new Promise((resolve) => {
-      let selectedShield = null;
-
-      holder.style.display = "flex";
-      modal.style.display = "flex";
-      modal.showModal();
-
-      const closeBtn = document.querySelector("#shieldImgLibraryClose");
-      const handleCloseClick = () => {
-        holder.style.display = "none";
-        modal.style.display = "none";
-        modal.close();
-
-        cleanup();
-        resolve(null);
-      };
-      trackListener(closeBtn, "click", handleCloseClick);
-
-      window.shieldLibrary.loadShields((shield) => {
-        selectedShield = shield;
-        document.querySelector("#shieldLibraryDelete").disabled = false;
-      });
-
-      const handleDeleteShield = () => {
-        if (selectedShield == null) {
-          return;
-        }
-
-        window.shieldLibrary.removeShield(selectedShield.shieldID);
-      };
-      trackListener(
-        document.querySelector("#shieldLibraryDelete"),
-        "click",
-        handleDeleteShield,
-      );
-
-      const submitBtn = document.querySelector("#shieldLibraryUse");
-      const handleSubmitClick = () => {
-        holder.style.display = "none";
-        modal.style.display = "none";
-        modal.close();
-
-        cleanup();
-
-        resolve(selectedShield);
-      };
-      trackListener(submitBtn, "click", handleSubmitClick);
-    });
   };
 
   const zoom = (val) => {

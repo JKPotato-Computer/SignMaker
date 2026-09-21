@@ -9,7 +9,12 @@
       content="The ULTIMATE Sign Maker for highways, expressways, and everything!"
     />
     <title>Highway Sign Maker</title>
-    <link rel="icon" type="image/x-icon" href="assets/other-symbols/icon.png" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      r
+      href="assets/other-symbols/SignMakerFavicon.png"
+    />
     <!-- CSS Links -->
     <link href="css/fonts.css" rel="stylesheet" type="text/css" />
     <link href="css/page.css" rel="stylesheet" type="text/css" />
@@ -36,7 +41,12 @@
     <script src="js/elements/ExitTab.js" type="text/javascript"></script>
     <script src="js/elements/SubPanels.js" type="text/javascript"></script>
     <script
-      src="js/modules//DiagramDrawing.js"
+      src="js/modules/DiagramDrawing.js"
+      type="text/javascript"
+      defer
+    ></script>
+    <script
+      src="js/modules/ShieldEditor.js"
       type="text/javascript"
       defer
     ></script>
@@ -177,110 +187,393 @@
         </div>
         <div id="downloadPreview"></div>
       </dialog>
-      <dialog id="shieldImgSelector">
-        <div class="shieldLibrary" data-tab="presetShieldList">
+      <dialog id="shieldEditorModal">
+        <div class="shieldEditorPane">
           <header>
             <h2>
               <span class="material-symbols-outlined">shield</span>
-              Shield Selector
+              Shield Editor
             </h2>
-            <button id="shieldImgSelectorClose">Close</button>
+            <button id="shieldEditorClose">Close</button>
           </header>
-          <nav>
-            <button id="presetShields" class="selected">Presets</button>
-            <button id="customShields">Custom</button>
-          </nav>
-          <input
-            type="search"
-            id="presetShieldSearch"
-            placeholder="Search for presets"
-          />
-          <div id="presetShieldList"></div>
-          <div id="uploadShield">
-            <div id="shieldUploadField">
-              <span class="material-symbols-outlined">attach_file</span>
-              <span>Drag and drop a file or click to upload</span>
-              <input type="file" id="uploadCustomShield" />
+          <details open>
+            <summary>Image</summary>
+            <div class="shieldLibrary" data-tab="presetShieldList">
+              <div class="shieldEditorImagePreview">
+                <div>
+                  <span class="selectedShieldName">Interstate</span>
+                  <img
+                    class="selectedShieldPreview"
+                    src="assets/shields/United States/Interstate Routes/I-2Digit.svg"
+                  />
+                </div>
+                <div>
+                  <label for="selectedShieldVariant" class="noLabelAlignment"
+                    >Variant:</label
+                  >
+                  <select
+                    id="selectedShieldVariant"
+                    onchange="ShieldEditor.readForm()"
+                  ></select>
+                  <label for="selectedShieldBacks" class="noLabelAlignment"
+                    >Shield Backs:</label
+                  >
+                  <input
+                    type="checkbox"
+                    id="selectedShieldBacks"
+                    onchange="ShieldEditor.readForm()"
+                  />
+                  <br />
+                  <div id="shieldBackOptions">
+                    <label for="selectedBackColor" class="noLabelAlignment"
+                      >Color:</label
+                    >
+                    <select
+                      id="selectedBackColor"
+                      onchange="ShieldEditor.readForm()"
+                    ></select>
+                    <br />
+                    <label for="selectedBackRoundness" class="noLabelAlignment"
+                      >Roundness (px):</label
+                    >
+                    <input
+                      type="number"
+                      id="selectedBackRoudness"
+                      min="0"
+                      step="1"
+                      placeholder="4"
+                      onchange="ShieldEditor.readForm()"
+                    />
+                  </div>
+                </div>
+              </div>
+              <nav>
+                <button id="presetShields" class="selected">Presets</button>
+                <button id="customShields">Custom</button>
+              </nav>
+              <input
+                type="search"
+                id="presetShieldSearch"
+                placeholder="Search for presets"
+              />
+              <div id="presetShieldList"></div>
+              <div id="uploadShield">
+                <div id="shieldUploadField">
+                  <span class="material-symbols-outlined">attach_file</span>
+                  <span>Drag and drop a file or click to upload</span>
+                  <input type="file" id="uploadCustomShield" />
+                </div>
+                <div class="shieldUploadDisclaimer">
+                  Files are only saved <b>on the client side</b> using
+                  IndexedDB.
+                  <b
+                    >No files whatsoever are sent over the server. (and neither
+                    is anything really lol)</b
+                  >
+                </div>
+                <label for="linkUpload" class="noLabelAlignment"
+                  >OR Image URL:</label
+                >
+                <input type="text" id="linkUpload" placeholder="Image URL" />
+                <hr />
+                <h3>Saved Images</h3>
+                <div id="savedCustomShieldsList"></div>
+              </div>
             </div>
-            <div class="shieldUploadDisclaimer">
-              Files are only saved <b>on the client side</b> using IndexedDB.
-              <b
-                >No files whatsoever are sent over the server. (and neither is
-                anything really lol)</b
-              >
-            </div>
-            <label for="linkUpload" class="noLabelAlignment"
-              >OR Image URL:</label
-            >
-            <input type="text" id="linkUpload" placeholder="Image URL" />
-            <hr />
-            <h3>Saved Images</h3>
-            <div id="savedCustomShieldsList"></div>
-          </div>
-        </div>
-        <div class="shieldPreview">
-          <img class="selectedShieldPreview" />
-          <br />
-          <span class="selectedShieldName">Interstate</span>
-          <br />
-          <div>
-            <label for="selectedShieldVariant" class="noLabelAlignment"
-              >Variant:</label
-            >
-            <select id="selectedShieldVariant">
-              <option>2 Digit</option>
-            </select>
-          </div>
-          <br />
-          <div>
-            <label for="selectedShieldBacks" class="noLabelAlignment"
-              >Shield Backs:</label
-            >
-            <input type="checkbox" id="selectedShieldBacks" />
-          </div>
-          <br />
-          <div id="shieldBackOptions">
-            <label for="selectedBackColor" class="noLabelAlignment"
-              >Color:</label
-            >
-            <select id="selectedBackColor"></select>
+          </details>
+          <details>
+            <summary>Text</summary>
+            <label for="spShield_routeNumber">Route Number:</label>
+            <input
+              type="text"
+              placeholder="0"
+              id="spShield_routeNumber"
+              oninput="ShieldEditor.readForm()"
+            />
             <br />
-            <label for="selectedBackRoundness" class="noLabelAlignment"
-              >Roundness (px):</label
+            <label for="spShield_routeFontFamily">Font:</label>
+            <select
+              id="spShield_routeFontFamily"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <label for="spShield_routeColor">Color:</label>
+            <select
+              id="spShield_routeColor"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <br />
+            <label for="spShield_routeSpacing">Letter Spacing (px):</label>
+            <input
+              type="number"
+              id="spShield_routeSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_routeWordSpacing">Word Spacing (px):</label>
+            <input
+              type="number"
+              id="spShield_routeWordSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designation">Designation:</label>
+            <input
+              type="text"
+              placeholder=""
+              id="spShield_designation"
+              oninput="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designationFontFamily">Font:</label>
+            <select
+              id="spShield_designationFontFamily"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <label for="spShield_designationColor">Color:</label>
+            <select
+              id="spShield_designationColor"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <br />
+            <label for="spShield_designationSpacing"
+              >Letter Spacing (px):</label
             >
             <input
               type="number"
-              id="selectedBackRoudness"
-              min="0"
+              id="spShield_designationSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
               step="1"
-              placeholder="4"
+              value="0"
+              onchange="ShieldEditor.readForm()"
             />
+            <label for="spShield_designationWordSpacing"
+              >Word Spacing (px):</label
+            >
+            <input
+              type="number"
+              id="spShield_designationWordSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+          </details>
+          <details>
+            <summary>Position</summary>
+            <label for="spShield_scale">Shield Scale (%):</label>
+            <input
+              type="range"
+              min="0"
+              max="300"
+              step="1"
+              value="100"
+              id="spShield_scale"
+              oninput="ShieldEditor.readForm()"
+            />
+            <input
+              id="spShield_scaleVal"
+              class="smallVal"
+              type="number"
+              value="100"
+              step="1"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_routeXOffset">Route X (%):</label>
+            <input
+              type="number"
+              id="spShield_routeXOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_routeYOffset">Route Y (%):</label>
+            <input
+              type="number"
+              id="spShield_routeYOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_routeScale">Route Number Scale (%):</label>
+            <input
+              type="number"
+              id="spShield_routeScale"
+              placeholder="100"
+              min="0"
+              max="200"
+              step="1"
+              value="100"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_routeRotation"
+              >Route Number Rotation (deg):</label
+            >
+            <input
+              type="number"
+              id="spShield_routeRotation"
+              placeholder="0"
+              min="-360"
+              max="360"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designationXOffset">Designation X (%):</label>
+            <input
+              type="number"
+              id="spShield_designationXOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_designationYOffset">Designation Y (%):</label>
+            <input
+              type="number"
+              id="spShield_designationYOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designationScale"
+              >Designation Scale (%):</label
+            >
+            <input
+              type="number"
+              id="spShield_designationScale"
+              placeholder="100"
+              min="0"
+              max="200"
+              step="1"
+              value="100"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_designationRotation"
+              >Designation Rotation (deg):</label
+            >
+            <input
+              type="number"
+              id="spShield_designationRotation"
+              placeholder="0"
+              min="-360"
+              max="360"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_horizMargins"
+              >Horizontal Shield Padding (px):</label
+            >
+            <input
+              id="spShield_horizMargins"
+              class="smallVal"
+              type="number"
+              value="8"
+              onchange="ShieldEditor.readForm()"
+              step="1"
+            />
+            <label for="spShield_vertMargins"
+              >Vertical Shield Padding (px):</label
+            >
+            <input
+              id="spShield_vertMargins"
+              class="smallVal"
+              type="number"
+              value="8"
+              onchange="ShieldEditor.readForm()"
+              step="1"
+            />
+          </details>
+        </div>
+        <div class="shieldPreview">
+          <span id="shieldBaseName">INTERSTATE-1</span>
+          <div id="shieldPreviewImage">
+            <div
+              class="shield I TwoDigit"
+              style="
+                --shieldScale: 1;
+                --horizShieldMargin: 8px;
+                --vertShieldMargin: 8px;
+                margin: 0px;
+                scale: 1;
+              "
+            >
+              <span
+                class="routeNumber"
+                style="--routeScale: 1; --routeXOffset: 0%; --routeYOffset: 0%"
+                >1</span
+              ><img
+                class="shieldImg"
+                src="assets/shields/United States/Interstate Routes/I-2Digit.svg"
+              />
+            </div>
+          </div>
+          <div id="scaleOptions">
+            <button id="shieldFullSize" class="selected">Actual Size</button>
+            <button id="shieldFitSize">Fit Size</button>
           </div>
           <footer>
+            <button id="saveToShieldLibrary">
+              <span class="material-symbols-outlined">file_save</span>Save to
+              Library
+            </button>
+            <button id="openShieldLibrary">
+              <span class="material-symbols-outlined">filter</span>Shield
+              Library
+            </button>
             <button id="setShield">Set Shield</button>
           </footer>
         </div>
-      </dialog>
-      <dialog id="shieldImgLibrary">
-        <div class="shieldImgLibraryHolder">
-          <header>
-            <h2>
-              <span class="material-symbols-outlined">shield</span>
-              Shield Library
-            </h2>
-            <button id="shieldImgLibraryClose">Close</button>
-          </header>
-          <input
-            type="search"
-            id="shieldLibrarySearch"
-            placeholder="Search shields in library"
-          />
-          <div id="shieldLibraryListHolder"></div>
-          <div id="shieldLibraryListOptions">
-            <button id="shieldLibraryDelete" disabled>Delete Shield</button>
-            <button id="shieldLibraryUse">Use Shield</button>
+        <dialog id="shieldImgLibrary">
+          <div class="shieldImgLibraryHolder">
+            <header>
+              <h2>
+                <span class="material-symbols-outlined">shield</span>
+                Shield Library
+              </h2>
+              <button id="shieldImgLibraryClose">Close</button>
+            </header>
+            <input
+              type="search"
+              id="shieldLibrarySearch"
+              placeholder="Search shields in library"
+            />
+            <div id="shieldLibraryListHolder"></div>
+            <div id="shieldLibraryListOptions">
+              <button id="shieldLibraryDelete" disabled>Delete Shield</button>
+              <button id="shieldLibraryUse">Use Shield</button>
+            </div>
           </div>
-        </div>
+        </dialog>
       </dialog>
       <dialog id="diagrammicDrawing">
         <header>
@@ -1010,7 +1303,7 @@
                 <button id="sMET_typeIcon">
                   <img
                     class="sMET_typeVisual"
-                    src="https://placehold.co/600x400/000000/FFFFFF/png"
+                    src="./assets/form/exitTabVariants/TollIcon.png"
                   />
                   <span class="sMET_typeLabel">Toll / Regular Icon</span>
                 </button>
@@ -2128,219 +2421,11 @@
 
                 <div id="smSPShieldProperties">
                   <div id="smSPShieldImgConfig">
-                    <div>
-                      <div id="smSPShieldImgPreview"></div>
-                      <button id="changeImgBtn">
-                        <span class="material-symbols-outlined">image</span
-                        >Change Image
-                      </button>
-                      <button id="useUserShields">
-                        <span class="material-symbols-outlined"
-                          >photo_album</span
-                        >Shield Library
-                      </button>
-                    </div>
-                    <div>
-                      <label for="spShield_routeNumber">Route Number: </label>
-                      <input
-                        type="string"
-                        placeholder="0"
-                        id="spShield_routeNumber"
-                        oninput="formHandler.readForm()"
-                      />
-                      <br />
-                      <label for="spShield_designation">Designation: </label>
-                      <input
-                        type="string"
-                        placeholder=""
-                        id="spShield_designation"
-                        oninput="formHandler.readForm()"
-                      />
-                      <br />
-                      <label for="spShield_scale">Scale: </label>
-                      <input
-                        type="range"
-                        min="0"
-                        value="100"
-                        step="1"
-                        ,
-                        max="300"
-                        id="spShield_scale"
-                        oninput="formHandler.readForm()"
-                      />
-                      <input
-                        id="spShield_scaleVal"
-                        class="smallVal"
-                        type="number"
-                        value="1"
-                        step="1"
-                        oninput="formHandler.readForm()"
-                      />
-                      <br />
-                      <label for="spShield_horizMargins"
-                        >Horiz / Vert Padding: (px)</label
-                      >
-                      <input
-                        id="spShield_horizMargins"
-                        class="smallVal"
-                        type="number"
-                        value="8"
-                        step="1"
-                        oninput="formHandler.readForm()"
-                      />
-                      <span>/</span>
-                      <input
-                        id="spShield_vertMargins"
-                        class="smallVal"
-                        type="number"
-                        value="8"
-                        step="1"
-                        oninput="formHandler.readForm()"
-                      />
-                      <br />
-                      <br />
-                      <div id="smSPShieldStyleOptions">
-                        <button id="smSPShieldAdvanced">
-                          <span class="material-symbols-outlined"
-                            >expand_content</span
-                          >
-                          Custom Shields
-                        </button>
-                        <button id="smSPShieldSave">
-                          <span class="material-symbols-outlined"
-                            >file_save</span
-                          >
-                          Save to Library
-                        </button>
-                      </div>
-                      <div id="advancedMenu" class="hidden">
-                        <h5>Route Number</h5>
-                        <label for="spShield_routeScale">Scale (%): </label>
-                        <input
-                          type="number"
-                          id="spShield_routeScale"
-                          placeholder="100"
-                          min="0"
-                          max="200"
-                          step="1"
-                          value="100"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeXOffset"
-                          >X Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_routeXOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeYOffset"
-                          >Y Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_routeYOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeSpacing"
-                          >Letter Spacing (px):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_routeSpacing"
-                          placeholder="0"
-                          min="-10"
-                          max="10"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeFontFamily">Font:</label>
-                        <select
-                          id="spShield_routeFontFamily"
-                          onchange="formHandler.readForm()"
-                        ></select>
-                        <hr />
-                        <h5>Designation</h5>
-                        <label for="spShield_designationScale"
-                          >Scale (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationScale"
-                          placeholder="100"
-                          min="0"
-                          max="200"
-                          step="1"
-                          value="100"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationXOffset"
-                          >X Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationXOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationYOffset"
-                          >Y Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationYOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationSpacing"
-                          >Letter Spacing (px):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationSpacing"
-                          placeholder="0"
-                          min="-10"
-                          max="10"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationFontFamily"
-                          >Font:</label
-                        >
-                        <select
-                          id="spShield_designationFontFamily"
-                          onchange="formHandler.readForm()"
-                        ></select>
-                      </div>
-                    </div>
+                    <div id="smSPShieldImgPreview"></div>
+                    <button id="editShieldBtn">
+                      <span class="material-symbols-outlined">edit</span>
+                      Edit Shield
+                    </button>
                   </div>
                   <div id="smSPShieldBannerConfig">
                     <div id="smSP_bannerMaster"></div>
@@ -3676,15 +3761,18 @@
     </form>
     <footer id="signMakerFooter">
       <div>
-        <img src="assets/other-symbols/icon.png" />
+        <img src="assets/other-symbols/SignMakerIconRotated.png" />
         <div>
           <h3>Highway Sign Maker (v2.2)</h3>
-          <p>made by JK_Potato/Computer the community</p>
+          <p>made by JK_Potato/Computer & the community*</p>
           <p>
             forked from
             <a href="https://github.com/dki-os/SignMaker" target="_blank"
               >dki-os/SignMaker</a
             >
+          </p>
+          <p>
+            <small>*built with love and human ingenuity, <b>not</b> ai.</small>
           </p>
         </div>
       </div>
