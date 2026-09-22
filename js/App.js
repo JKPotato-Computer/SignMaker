@@ -311,8 +311,8 @@ const App = (() => {
         currentlySelectedBlockIndex,
       )
     ) {
-      currentlySelectedRowIndex--;
-      currentlySelectedBlockIndex = getCurrentBlockRows().length - 1;
+      currentlySelectedRowIndex = Math.max(0,currentlySelectedRowIndex - 1);
+      currentlySelectedBlockIndex = Math.max(0,getCurrentBlockRows().length - 1);
     } else {
       currentlySelectedBlockIndex--;
     }

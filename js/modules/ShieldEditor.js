@@ -170,6 +170,9 @@ const ShieldEditor = (() => {
         document.querySelector("#saveToShieldLibrary"),
       );
 
+    cloneNode.innerHTML =
+      '<span class="material-symbols-outlined">file_save</span>Save to Library';
+
     cloneNode.addEventListener("click", async () => {
       if (await ShieldLibrary.addShield(baseShield)) {
         cloneNode.innerHTML =
@@ -346,12 +349,13 @@ const ShieldEditor = (() => {
         true,
       );
 
-      window.customShields.loadSavedShields(() => {
+      window.customShields.loadSavedShields((shield) => {
         baseShield.shieldType = "custom";
         baseShield.shieldName = shield.fileName;
         baseShield.imageType = "data";
         baseShield.imageData = shield.data;
         updateForm();
+        redrawShield();
       });
 
       holder.style.display = "flex";

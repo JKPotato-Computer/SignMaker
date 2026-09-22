@@ -1558,8 +1558,14 @@ button[data-diagram-modal-close]:hover,
   gap: 0.5rem;
 }
 
+#editShieldBtn {
+  padding: 0.25rem 1rem;
+  font-size: 24px;
+  gap: 0.5rem;
+}
+
 .selectedShieldPreview {
-  height: 7rem;
+  height: 3rem;
   background-color: var(--shieldBackColor, rgb(0, 0, 255, 0.8));
   border-radius: var(--shieldBackRadius);
 }
@@ -1567,8 +1573,11 @@ button[data-diagram-modal-close]:hover,
 .selectedShieldName {
   font-size: 24px;
   font-weight: 600;
-  width: 8rem;
   text-align: center;
+  max-width: 8rem;
+  overflow: scroll;
+  scrollbar-color: rgb(var(--baseColorInv), 0.25) transparent;
+  text-wrap: nowrap;
 }
 
 .shieldPreview > footer {
@@ -1656,6 +1665,7 @@ button[data-diagram-modal-close]:hover,
   align-items: center;
   cursor: pointer;
   padding: 0.5rem;
+  width: 100%;
 }
 
 .deleteCustomShieldBtn {
@@ -2812,6 +2822,7 @@ summary:hover {
   background-color: rgb(var(--baseColor), 0.25);
   aspect-ratio: 1 / 1;
   color: white;
+  overflow: hidden;
 }
 
 #scaleOptions {
@@ -2836,9 +2847,52 @@ summary:hover {
 #shieldBaseName {
   text-wrap: nowrap;
   width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: auto;
   font-size: 24px;
   font-weight: 700;
   text-align: center;
+}
+
+.smET_shieldListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: rgb(var(--baseColor), 0.65);
+  padding: 0.25rem;
+}
+
+#smET_shieldList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.smET_shieldListItemImage {
+  height: 2rem;
+  aspect-ratio: 1 / 1;
+  margin-right: 0;
+}
+
+.smET_shieldListItemText {
+  margin-right: auto;
+}
+
+.sMET_shieldListItemEdit {
+  font-size: 20px;
+  padding: 0.25rem 1rem;
+}
+
+.sMET_shieldListItemCategory {
+  height: stretch;
+  margin: 0;
+}
+
+#smET_addShield {
+  font-size: 20px;
+  padding: 0.25rem 1rem;
+  margin-bottom: 0.5rem;
 }

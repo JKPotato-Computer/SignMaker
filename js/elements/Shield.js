@@ -176,11 +176,9 @@ class Shield {
     );
 
     if (this.customShields.route_color != null) {
-      routeNumberElmt.style.setProperty(
-        "--routeColor",
+      routeNumberElmt.style.color =
         lib.colors[this.customShields.route_color] ||
-          this.customShields.route_color.toLowerCase(),
-      );
+        this.customShields.route_color.toLowerCase();
     }
 
     if (this.customShields.route_letterSpacing != 0) {
@@ -209,11 +207,9 @@ class Shield {
       );
 
       if (this.customShields.designation_color != null) {
-        designationElmt.style.setProperty(
-          "--designationColor",
+        designationElmt.style.color =
           lib.colors[this.customShields.designation_color] ||
-            this.customShields.designation_color.toLowerCase(),
-        );
+          this.customShields.designation_color.toLowerCase();
       }
 
       if (this.customShields.designation_letterSpacing != 0) {

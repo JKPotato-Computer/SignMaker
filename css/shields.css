@@ -1,7 +1,7 @@
 .shield.I .routeNumber,
 .shield.I-BUS .routeNumber {
   color: var(--white);
-  top: 0.2em;
+  top: .175em;
   font-size: 1.5em;
 }
 
@@ -28,7 +28,7 @@
 }
 .shield.I:has(.designation) .routeNumber,
 .shield.I-BUS:has(.designation) .routeNumber {
-  top: 0.25em;
+  top: 0.325em;
 }
 
 .shield.US .routeNumber,
@@ -39,9 +39,9 @@
 .shield.rec .routeNumber,
 .shield.rec2 .routeNumber {
   color: var(--black);
-  font-size: 2.4em;
+  font-size: 1.8em;
   font-family: "Series D";
-  top: .06em;
+  top: .08em;
 }
 
 .shield.C .routeNumber {

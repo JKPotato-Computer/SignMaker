@@ -676,7 +676,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab.icon.pay-by-mail-1 {
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 .ET-iconDivider {
@@ -1260,4 +1260,10 @@ main#smRender.wide #postContainer {
   flex-direction: row;
   justify-content: center;
   align-items: end;
+}
+
+.ET-shieldHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

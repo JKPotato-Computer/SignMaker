@@ -157,6 +157,9 @@ const formHandler = (() => {
         exitTab.alignment = form["sMET_alignment"].value;
         exitTab.width = form["sMET_width"].value;
         exitTab.holderPadding = form["smET_containerHolderPadding"].value;
+        exitTab.shieldsGap = parseFloat(form["smET_shieldGap"].value);
+        exitTab.shieldsDirection = form["smET_shieldsDirection"].value;
+        exitTab.shieldWordSpacing = form["smET_shieldWordSpacing"].value;
 
         if (exitTab.width.toLowerCase().includes("percent")) {
           exitTab.widthSize = Math.min(
@@ -284,44 +287,12 @@ const formHandler = (() => {
           app.vars.currentlySelectedShieldIndex
         ];
 
-      /*
-      currentShield.routeNumber = form["spShield_routeNumber"].value;
-      currentShield.designation = form["spShield_designation"].value;
-      currentShield.scale = parseFloat(form["spShield_scale"].value);
+      currentShield.routeNumber = form["spShieldQuick_routeNumber"].value;
+      currentShield.designation = form["spShieldQuick_designation"].value;
+      currentShield.scale = parseFloat(form["spShieldQuick_scale"].value);
 
-      currentShield.customShields.route_scale = parseFloat(
-        form["spShield_routeScale"].value,
-      );
-      currentShield.customShields.route_xOffset = parseFloat(
-        form["spShield_routeXOffset"].value,
-      );
-      currentShield.customShields.route_yOffset = parseFloat(
-        form["spShield_routeYOffset"].value,
-      );
-      currentShield.customShields.route_letterSpacing = parseFloat(
-        form["spShield_routeSpacing"].value,
-      );
-      currentShield.customShields.route_fontFamily =
-        form["spShield_routeFontFamily"].value;
-
-      currentShield.customShields.designation_scale = parseFloat(
-        form["spShield_designationScale"].value,
-      );
-      currentShield.customShields.designation_xOffset = parseFloat(
-        form["spShield_designationXOffset"].value,
-      );
-      currentShield.customShields.designation_yOffset = parseFloat(
-        form["spShield_designationYOffset"].value,
-      );
-      currentShield.customShields.designation_letterSpacing = parseFloat(
-        form["spShield_designationSpacing"].value,
-      );
-      currentShield.customShields.designation_fontFamily =
-        form["spShield_designationFontFamily"].value;
-
-      currentShield.horizMargin = form["spShield_horizMargins"].value;
-      currentShield.vertMargin = form["spShield_vertMargins"].value;
-      */
+      currentShield.horizMargin = form["spShieldQuick_horizMargins"].value;
+      currentShield.vertMargin = form["spShieldQuick_vertMargins"].value;
 
       const bannerElements = document.querySelectorAll(".smSP_bannerElement");
       let domIndex = bannerElements.length - 1;
@@ -1272,29 +1243,108 @@ const formHandler = (() => {
       }
     }
 
-    if (false) {
-      document.querySelector("#sMET_textContent").style.display = "none";
-      document.querySelector("#sMET_subTextContent").style.display = "none";
-      document.querySelector('label[for="sMET_textContent"]').style.display =
-        "none";
-      document.querySelector('label[for="sMET_subTextContent"]').style.display =
-        "none";
-      for (const e of document.querySelectorAll(
-        "#sMExitTabProperties > fieldset",
-      )) {
-        e.style.display = "none";
-      }
-    } else {
-      document.querySelector("#sMET_textContent").style.display = "";
-      document.querySelector("#sMET_subTextContent").style.display = "";
-      document.querySelector('label[for="sMET_textContent"]').style.display =
-        "";
-      document.querySelector('label[for="sMET_subTextContent"]').style.display =
-        "";
-      for (const e of document.querySelectorAll(
-        "#sMExitTabProperties > fieldset",
-      )) {
-        e.style.display = "";
+    document.querySelector("#smET_shieldList").innerHTML = "";
+    const cloneAddShieldNode = document
+      .querySelector("#smET_addShield")
+      .cloneNode(true);
+    document
+      .querySelector("#smET_addShield")
+      .parentNode.replaceChild(
+        cloneAddShieldNode,
+        document.querySelector("#smET_addShield"),
+      );
+
+    cloneAddShieldNode.addEventListener("click", () => {
+      const shield = new Shield({ scale: 60, horizMargin: 0, vertMargin: 0 });
+      currentExitTab.shields.left.push(shield);
+
+      updateExitTabSubform();
+      app.redraw();
+    });
+
+    for (const shieldDirection in currentExitTab.shields) {
+      for (const shield of currentExitTab.shields[shieldDirection]) {
+        const shieldListItem = document.createElement("div");
+        shieldListItem.className = "sMET_shieldListItem";
+
+        const shieldListItemImage = document.createElement("img");
+        shieldListItemImage.src = Shield.prototype.getImageData(shield);
+        shieldListItemImage.className = "sMET_shieldListItemImage";
+        shieldListItem.appendChild(shieldListItemImage);
+
+        const shieldListItemText = document.createElement("span");
+        shieldListItemText.className = "sMET_shieldListItemText";
+        shieldListItemText.textContent = `${
+          shield.shieldType == "custom"
+            ? shield.shieldName.replace(/\.\w+/g, "")
+            : Shield.prototype
+                .getPropertiesFromName(shield.shieldValue)
+                .name.toUpperCase()
+        }-${shield.routeNumber}`;
+        shieldListItem.appendChild(shieldListItemText);
+
+        const shieldListItemEdit = document.createElement("button");
+        shieldListItemEdit.className = "sMET_shieldListItemEdit";
+        shieldListItemEdit.textContent = "Edit Shield";
+        shieldListItem.appendChild(shieldListItemEdit);
+
+        shieldListItemEdit.addEventListener("click", () => {
+          ShieldEditor.promptEditShield(shield, (updatedShield) => {
+            if (!updatedShield) {
+              return;
+            }
+
+            for (const key in updatedShield) {
+              if (["banners", "bannerSettings", "group"].includes(key)) {
+                continue;
+              }
+
+              shield[key] = updatedShield[key];
+            }
+
+            updateExitTabSubform();
+            app.redraw();
+          });
+        });
+
+        const shieldListItemCategory = document.createElement("select");
+        shieldListItemCategory.className = "sMET_shieldListItemCategory";
+        for (const category of ["Left", "Right"]) {
+          lib.appendOption(shieldListItemCategory, category.toLowerCase(), {
+            selected: shieldDirection == category.toLowerCase(),
+            text: category,
+          });
+        }
+        shieldListItemCategory.addEventListener("change", () => {
+          const newDirection = shieldListItemCategory.value;
+          if (newDirection !== shieldDirection) {
+            const shieldIndex =
+              currentExitTab.shields[shieldDirection].indexOf(shield);
+            if (shieldIndex !== -1) {
+              currentExitTab.shields[shieldDirection].splice(shieldIndex, 1);
+              currentExitTab.shields[newDirection].push(shield);
+              updateExitTabSubform();
+              app.redraw();
+            }
+          }
+        });
+        shieldListItem.appendChild(shieldListItemCategory);
+
+        const shieldListItemDelete = document.createElement("button");
+        shieldListItemDelete.className = "sMET_shieldListItemDelete redButton";
+        shieldListItemDelete.innerHTML = `<span class="material-symbols-outlined">delete</span>`;
+        shieldListItem.appendChild(shieldListItemDelete);
+
+        shieldListItemDelete.addEventListener("click", () => {
+          const shieldIndex =
+            currentExitTab.shields[shieldDirection].indexOf(shield);
+          if (shieldIndex !== -1) {
+            currentExitTab.shields[shieldDirection].splice(shieldIndex, 1);
+            readForm();
+          }
+        });
+
+        document.querySelector("#smET_shieldList").appendChild(shieldListItem);
       }
     }
 
@@ -1370,6 +1420,11 @@ const formHandler = (() => {
     document.querySelector("#sMET_width").value = currentExitTab.width;
     document.querySelector("#smET_containerHolderPadding").value =
       currentExitTab.holderPadding;
+    document.querySelector("#smET_shieldGap").value = currentExitTab.shieldsGap;
+    document.querySelector("#sMET_shieldsDirection").value =
+      currentExitTab.shieldsDirection;
+    document.querySelector("#smET_shieldWordSpacing").value =
+      currentExitTab.shieldWordSpacing;
 
     if (currentExitTab.width.toLowerCase().includes("custom")) {
       if (currentExitTab.width.toLowerCase().includes("percent")) {
@@ -1781,58 +1836,22 @@ const formHandler = (() => {
     document.querySelector("#smSPShieldSelectLabel").textContent =
       `Selected: Shield ${selectedShieldIndex + 1}`;
 
-    const shieldField = document.getElementById("spShield_routeNumber");
-    shieldField.value = currentShield.routeNumber;
-
-    const designationField = document.getElementById("spShield_designation");
-    designationField.value = currentShield.designation;
-
-    /*
-    const shieldScaleField = document.getElementById("spShield_scale");
-    const shieldScaleValueField = document.getElementById("spShield_scaleVal");
-    shieldScaleField.value = currentShield.scale;
-    shieldScaleValueField.value = currentShield.scale;
-
-    document.getElementById("spShield_routeScale").value =
-      currentShield.customShields.route_scale;
-
-    document.getElementById("spShield_routeXOffset").value =
-      currentShield.customShields.route_xOffset;
-
-    document.getElementById("spShield_routeYOffset").value =
-      currentShield.customShields.route_yOffset;
-
-    document.getElementById("spShield_routeSpacing").value =
-      currentShield.customShields.route_letterSpacing;
-
-    document.getElementById("spShield_routeFontFamily").value =
-      currentShield.customShields.route_fontFamily || "";
-
-    document.getElementById("spShield_designationScale").value =
-      currentShield.customShields.designation_scale;
-
-    document.getElementById("spShield_designationXOffset").value =
-      currentShield.customShields.designation_xOffset;
-
-    document.getElementById("spShield_designationYOffset").value =
-      currentShield.customShields.designation_yOffset;
-
-    document.getElementById("spShield_designationSpacing").value =
-      currentShield.customShields.designation_letterSpacing;
-
-    document.getElementById("spShield_designationFontFamily").value =
-      currentShield.customShields.designation_fontFamily || "";
-
-    document.getElementById("spShield_horizMargins").value =
+    document.getElementById("spShieldQuick_routeNumber").value =
+      currentShield.routeNumber;
+    document.getElementById("spShieldQuick_designation").value =
+      currentShield.designation;
+    document.getElementById("spShieldQuick_scale").value = currentShield.scale;
+    document.getElementById("spShieldQuick_scaleVal").value =
+      currentShield.scale;
+    document.getElementById("spShieldQuick_horizMargins").value =
       currentShield.horizMargin;
-    document.getElementById("spShield_vertMargins").value =
+    document.getElementById("spShieldQuick_vertMargins").value =
       currentShield.vertMargin;
-    */
 
     document.querySelector("#smSPShieldImgPreview").innerHTML = "";
     let shieldElem = currentShield.createElement();
-    shieldElem.style.margin = "0";
-    shieldElem.style.scale = "1";
+    shieldElem.style.setProperty("--shieldScale", 1);
+    shieldElem.style.fontSize = "1rem";
 
     document.querySelector("#smSPShieldImgPreview").appendChild(shieldElem);
 
@@ -1860,26 +1879,6 @@ const formHandler = (() => {
         app.redraw();
       });
     });
-
-    /*
-    const shieldScaleInputField = document.getElementById("spShield_scale");
-    shieldScaleInputField.addEventListener("input", (event) => {
-      document.getElementById("spShield_scale").value =
-        event.currentTarget.value;
-      document.getElementById("spShield_scaleVal").value =
-        event.currentTarget.value;
-    });
-
-    const shieldScaleValueInputField =
-      document.getElementById("spShield_scaleVal");
-    shieldScaleValueInputField.addEventListener("input", (event) => {
-      document.getElementById("spShield_scale").value =
-        event.currentTarget.value;
-      document.getElementById("spShield_scaleVal").value =
-        event.currentTarget.value;
-    });
-    */
-
     // Banners
     document.querySelector("#smSP_bannerMaster").innerHTML = "";
 

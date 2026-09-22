@@ -458,6 +458,16 @@ const FormNavigation = (() => {
       );
     }
 
+    for (const alignment of ExitTab.prototype.shieldsDirection) {
+      lib.appendOption(
+        document.querySelector("#sMET_shieldsDirection"),
+        alignment.toLowerCase(),
+        {
+          text: alignment,
+        },
+      );
+    }
+
     for (const element of document.querySelectorAll(
       ".sMET_typeSelect > button",
     )) {

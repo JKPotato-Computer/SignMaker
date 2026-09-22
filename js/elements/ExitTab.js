@@ -3,7 +3,10 @@ class ExitTab {
     // Content
     textContent = "EXIT 1",
     subTextContent = "",
-    shields = [],
+    shields = {
+      left: [],
+      right: [],
+    },
 
     // Appearance
     backgroundColor = "inherit",
@@ -31,9 +34,9 @@ class ExitTab {
     numeralLetterSpacing = 0,
     useTrimFormat = false,
 
-    shieldsPosition = "start",
     shieldsDirection = "horizontal",
     shieldsGap = 0.5,
+    shieldWordSpacing = 0.25,
 
     contentDirection = "horizontal",
 
@@ -109,9 +112,9 @@ class ExitTab {
     this.numeralFontFamily = numeralFontFamily;
     this.letterSpacing = letterSpacing;
     this.numeralLetterSpacing = numeralLetterSpacing;
-    this.shieldsPosition = shieldsPosition;
     this.shieldsDirection = shieldsDirection;
     this.shieldsGap = shieldsGap;
+    this.shieldWordSpacing = shieldWordSpacing;
     this.contentDirection = contentDirection;
     this.alignment = alignment;
     this.width = width;
@@ -326,6 +329,40 @@ class ExitTab {
         this.variant,
       )
     ) {
+      let afterShieldElems = null;
+
+      for (const shieldDirection of ["left", "right"]) {
+        if (
+          !this.shields[shieldDirection] ||
+          this.shields[shieldDirection].length === 0
+        ) {
+          continue;
+        }
+
+        const shieldHolder = document.createElement("div");
+        shieldHolder.className = `ET-shieldHolder ${shieldDirection} ${this.shieldsDirection}`;
+        shieldHolder.style.gap = this.shieldsGap + "rem";
+        shieldHolder.style.flexDirection =
+          this.shieldsDirection == "horizontal" ? "row" : "column";
+
+        if (shieldDirection == "left") {
+          shieldHolder.style.marginRight = this.shieldWordSpacing + "rem";
+        } else {
+          shieldHolder.style.marginLeft = this.shieldWordSpacing + "rem";
+        }
+
+        for (const shield of this.shields[shieldDirection]) {
+          const shieldElement = shield.createElement();
+          shieldHolder.appendChild(shieldElement);
+        }
+
+        if (shieldDirection == "left") {
+          exitTabElement.appendChild(shieldHolder);
+        } else {
+          afterShieldElems = shieldHolder;
+        }
+      }
+
       let splitText = this.splitText(this.textContent);
       for (let i = 0; i < splitText.length; i++) {
         let item = splitText[i];
@@ -369,6 +406,10 @@ class ExitTab {
 
           textParentElement.appendChild(wordElem);
         }
+      }
+
+      if (afterShieldElems) {
+        exitTabElement.appendChild(afterShieldElems);
       }
     }
 

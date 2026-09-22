@@ -2,6 +2,7 @@ const ShieldLibrary = (() => {
   const db = IndexDBManager.getDatastore("shieldLibrary", {
     keyPath: "shieldID",
   });
+  const listOfShields = [];
 
   let hasInit = false;
   const init = async () => {
@@ -12,6 +13,59 @@ const ShieldLibrary = (() => {
   };
   const holder = document.getElementById("shieldLibraryListHolder");
   let returnMethod = null;
+
+  const addFolder = async (folderName) => {
+    const folderID = crypto.randomUUID();
+
+    let folderNameExists = false;
+    try {
+      const shields = await db.getAll();
+      folderNameExists = shields.some(
+        (shield) => shield.shieldName === folderName,
+      );
+    } catch (err) {
+      alert("Failed to check for existing folder names: " + err);
+      return false;
+    }
+
+    if (
+      folderNameExists &&
+      !confirm(
+        "A folder with this name already exists. Do you want to continue?",
+      )
+    ) {
+      return false;
+    }
+
+    const folderData = {
+      shieldID: folderID,
+      folderName: folderName,
+      isFolder: true,
+      contentList: [],
+    };
+
+    try {
+      await db.put(folderData);
+      await loadShields();
+      return true;
+    } catch (err) {
+      alert("Failed to add folder: " + err);
+      return false;
+    }
+  };
+
+  const addShieldToFolder = async (shieldID, folderName) => {
+    try {
+      const shield = await db.get(shieldID);
+      if (!shield) {
+        alert("Shield not found.");
+        return false;
+      }
+    } catch (err) {
+      alert("Failed to retrieve shield: " + err);
+      return false;
+    }
+  };
 
   const addShield = async (shieldElement) => {
     let dataToSave = structuredClone(shieldElement);
@@ -71,42 +125,82 @@ const ShieldLibrary = (() => {
       returnMethod = retMethod;
     }
 
+    listOfShields.length = 0;
+
     try {
       const shields = await db.getAll();
       holder.innerHTML = "";
 
-      shields.forEach((shield) => {
-        const buttonTemplate = document.createElement("button");
-        buttonTemplate.className = "shieldLibraryButton";
-        buttonTemplate.name = shield.shieldName;
+      const handleShieldFolder = async (element, isFirstOrder, directory) => {
+        if (element.isFolder) {
+          // TODO: folder
+          const buttonTemplate = document.createElement("button");
+          buttonTemplate.className = "shieldLibraryButton shieldLibraryFolder";
+          buttonTemplate.dataset.folderDirectory = directory;
+          buttonTemplate.style.display = isFirstOrder ? "" : "none";
+          buttonTemplate.name = element.folderName;
 
-        const labelElement = document.createElement("span");
-        labelElement.className = "shieldLibraryLabel";
-        labelElement.textContent = shield.shieldName;
+          const labelElement = document.createElement("span");
+          labelElement.className = "shieldLibraryLabel";
+          labelElement.textContent = element.folderName;
 
-        const visualElement = document.createElement("div");
-        visualElement.className = "shieldLibraryVisual";
+          const visualElement = document.createElement("div");
+          visualElement.className = "shieldLibraryVisual";
+          visualElement.textContent = "folder";
 
-        const shieldElement = new Shield(shield).createElement();
+          buttonTemplate.appendChild(labelElement);
+          buttonTemplate.appendChild(visualElement);
 
-        visualElement.appendChild(shieldElement);
-        buttonTemplate.appendChild(labelElement);
-        buttonTemplate.appendChild(visualElement);
+          holder.appendChild(buttonTemplate);
 
-        holder.appendChild(buttonTemplate);
-        buttonTemplate.addEventListener("click", () => {
-          for (const sElem of document.querySelectorAll(
-            ".shieldLibraryButton",
-          )) {
-            if (sElem !== buttonTemplate) {
-              sElem.classList.remove("selected");
-            } else {
-              sElem.classList.add("selected");
-            }
+          for (const shield of element.contentList) {
+            handleShieldFolder(
+              shield,
+              false,
+              directory + element.folderName + "/",
+            );
           }
+        } else {
+          listOfShields.push(element);
 
-          retMethod(shield);
-        });
+          const shield = element;
+
+          const buttonTemplate = document.createElement("button");
+          buttonTemplate.className = "shieldLibraryButton";
+          buttonTemplate.name = shield.shieldName;
+
+          const labelElement = document.createElement("span");
+          labelElement.className = "shieldLibraryLabel";
+          labelElement.textContent = shield.shieldName;
+
+          const visualElement = document.createElement("div");
+          visualElement.className = "shieldLibraryVisual";
+
+          const shieldElement = new Shield(shield).createElement();
+
+          visualElement.appendChild(shieldElement);
+          buttonTemplate.appendChild(labelElement);
+          buttonTemplate.appendChild(visualElement);
+
+          holder.appendChild(buttonTemplate);
+          buttonTemplate.addEventListener("click", () => {
+            for (const sElem of document.querySelectorAll(
+              ".shieldLibraryButton",
+            )) {
+              if (sElem !== buttonTemplate) {
+                sElem.classList.remove("selected");
+              } else {
+                sElem.classList.add("selected");
+              }
+            }
+
+            retMethod(shield);
+          });
+        }
+      };
+
+      shields.forEach((shield) => {
+        handleShieldFolder(shield, "/");
       });
     } catch (err) {
       alert("Failed to load shields: " + err);

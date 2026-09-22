@@ -389,7 +389,10 @@
               type="number"
               value="100"
               step="1"
-              onchange="ShieldEditor.readForm()"
+              onchange="
+                document.querySelector('#spShield_scale').value = this.value;
+                ShieldEditor.readForm();
+              "
             />
             <br />
             <label for="spShield_routeXOffset">Route X (%):</label>
@@ -516,27 +519,7 @@
         </div>
         <div class="shieldPreview">
           <span id="shieldBaseName">INTERSTATE-1</span>
-          <div id="shieldPreviewImage">
-            <div
-              class="shield I TwoDigit"
-              style="
-                --shieldScale: 1;
-                --horizShieldMargin: 8px;
-                --vertShieldMargin: 8px;
-                margin: 0px;
-                scale: 1;
-              "
-            >
-              <span
-                class="routeNumber"
-                style="--routeScale: 1; --routeXOffset: 0%; --routeYOffset: 0%"
-                >1</span
-              ><img
-                class="shieldImg"
-                src="assets/shields/United States/Interstate Routes/I-2Digit.svg"
-              />
-            </div>
-          </div>
+          <div id="shieldPreviewImage"></div>
           <div id="scaleOptions">
             <button id="shieldFullSize" class="selected">Actual Size</button>
             <button id="shieldFitSize">Fit Size</button>
@@ -1793,6 +1776,41 @@
               />
 
               <fieldset>
+                <legend>Shields</legend>
+                <button id="smET_addShield">Add New Shield</button>
+                <div id="smET_shieldList"></div>
+                <label for="smET_shieldGap">Shield Spacing (rem):</label>
+                <input
+                  type="number"
+                  id="smET_shieldGap"
+                  name="smET_shieldGap"
+                  value="0.25"
+                  min="0"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_shieldsDirection">Shield Direction:</label>
+                <select
+                  id="smET_shieldsDirection"
+                  name="smET_shieldsDirection"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <br />
+                <label for="smET_shieldWordSpacing"
+                  >Shield Word Spacing (rem):</label
+                >
+                <input
+                  type="number"
+                  id="smET_shieldWordSpacing"
+                  name="smET_shieldWordSpacing"
+                  value="0.25"
+                  min="0"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+              </fieldset>
+
+              <fieldset>
                 <legend>Container</legend>
 
                 <label for="sMET_backgroundColor">Background Color:</label>
@@ -1964,7 +1982,6 @@
                 />
               </fieldset>
 
-              <!-- Border Section -->
               <fieldset>
                 <legend>Border</legend>
 
@@ -2333,11 +2350,7 @@
                       Shield Group
                     </button>
                   </div>
-                  <div id="shieldGroupList">
-                    <button class="selected">Shield Group 1 (Row 1)</button>
-                    <button>Shield Group 2 (Row 1)</button>
-                    <button>Shield Group 3 (Row 2)</button>
-                  </div>
+                  <div id="shieldGroupList"></div>
                 </div>
                 <div id="smSPShieldHeader">
                   <div>
@@ -2421,11 +2434,81 @@
 
                 <div id="smSPShieldProperties">
                   <div id="smSPShieldImgConfig">
-                    <div id="smSPShieldImgPreview"></div>
-                    <button id="editShieldBtn">
-                      <span class="material-symbols-outlined">edit</span>
-                      Edit Shield
-                    </button>
+                    <div>
+                      <div id="smSPShieldImgPreview"></div>
+                      <button id="editShieldBtn">
+                        <span class="material-symbols-outlined">edit</span>
+                        Edit Shield
+                      </button>
+                    </div>
+                    <div>
+                      <span>Quick Edits</span>
+                      <br />
+                      <label for="spShieldQuick_routeNumber"
+                        >Route Number:
+                      </label>
+                      <input
+                        type="string"
+                        placeholder="0"
+                        id="spShieldQuick_routeNumber"
+                        oninput="formHandler.readForm()"
+                      />
+                      <br />
+                      <label for="spShieldQuick_designation"
+                        >Designation:
+                      </label>
+                      <input
+                        type="string"
+                        placeholder=""
+                        id="spShieldQuick_designation"
+                        oninput="formHandler.readForm()"
+                      />
+                      <br />
+                      <label for="spShieldQuick_scale">Scale: </label>
+                      <input
+                        type="range"
+                        min="0"
+                        value="100"
+                        step="1"
+                        ,
+                        max="300"
+                        id="spShieldQuick_scale"
+                        oninput="formHandler.readForm()"
+                      />
+                      <input
+                        id="spShieldQuick_scaleVal"
+                        class="smallVal"
+                        type="number"
+                        value="1"
+                        step="1"
+                        oninput="
+                          document.querySelector('#spShieldQuick_scale').value =
+                            this.value;
+                          formHandler.readForm();
+                        "
+                      />
+                      <br />
+                      <label for="spShieldQuick_horizMargins"
+                        >Horiz / Vert Padding: (px)</label
+                      >
+                      <input
+                        id="spShieldQuick_horizMargins"
+                        class="smallVal"
+                        type="number"
+                        value="8"
+                        step="1"
+                        oninput="formHandler.readForm()"
+                      />
+                      <span>/</span>
+                      <input
+                        id="spShieldQuick_vertMargins"
+                        class="smallVal"
+                        type="number"
+                        value="8"
+                        step="1"
+                        oninput="formHandler.readForm()"
+                      />
+                    </div>
                   </div>
                   <div id="smSPShieldBannerConfig">
                     <div id="smSP_bannerMaster"></div>
