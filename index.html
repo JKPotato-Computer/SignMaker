@@ -1273,6 +1273,13 @@
                 max="2"
                 step=".05"
               />
+              <br />
+              <label for="smET_independentWidth"> Ignore Width: </label>
+              <input
+                type="checkbox"
+                id="smET_independentWidth"
+                onchange="formHandler.readForm()"
+              />
             </div>
             <div id="sMExitTabVariant" class="tabHidden">
               <div class="sMET_typeSelect">
@@ -1408,8 +1415,8 @@
                   type="range"
                   id="sMET_variantIconSize"
                   name="sMET_variantIconSize"
-                  min="1"
-                  max="6"
+                  min="0"
+                  max="10"
                   step="0.1"
                   value="3"
                   oninput="
@@ -1426,11 +1433,11 @@
                   value="3"
                   step="0.1"
                 />
-                <label for="sMET_variantIsSquare" class="checkboxLabel">
+                <label for="sMET_variantIsSquareIcon" class="checkboxLabel">
                   <input
                     type="checkbox"
-                    id="sMET_variantIsSquare"
-                    name="sMET_variantIsSquare"
+                    id="sMET_variantIsSquareIcon"
+                    name="sMET_variantIsSquareIcon"
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -1494,7 +1501,6 @@
                     onchange="formHandler.readForm()"
                   />
                 </div>
-                <br />
                 <label for="sMET_variantOnlyHorizontalPadding">
                   ONLY Padding (rem):</label
                 >
@@ -1528,6 +1534,17 @@
                   />
                   Square Text
                 </label>
+                <label for="smET_variantFontSize">Font Size (rem):</label>
+                <input
+                  type="number"
+                  id="smET_variantFontSize"
+                  name="smET_variantFontSize"
+                  value="0"
+                  min="0"
+                  step="0.05"
+                  data-tooltip="Set to 0 for auto"
+                  onchange="formHandler.readForm()"
+                />
                 <label for="sMET_variantUnderline" class="checkboxLabel">
                   <input
                     type="checkbox"
@@ -1538,12 +1555,60 @@
                   Underline
                 </label>
               </fieldset>
+              <fieldset id="smET_FullLeftVariant" class="hidden">
+                <legend>Full Left</legend>
+                <label for="smET_fullLeftMinimumWidth"
+                  >Minimum Width (rem):</label
+                >
+                <input
+                  type="number"
+                  id="smET_fullLeftMinimumWidth"
+                  name="smET_fullLeftMinimumWidth"
+                  value="7"
+                  min="0"
+                  max="20"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_fullLeftFontFamily">Font Family:</label>
+                <select
+                  id="smET_fullLeftFontFamily"
+                  name="smET_fullLeftFontFamily"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <br />
+                <label for="smET_fullLeftLetterSpacing"
+                  >Letter Spacing (px):</label
+                >
+                <input
+                  type="number"
+                  id="smET_fullLeftLetterSpacing"
+                  name="smET_fullLeftLetterSpacing"
+                  value="1"
+                  min="0"
+                  max="50"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_fullLeftBottomSpacing">Offset (rem): </label>
+                <input
+                  type="number"
+                  id="smET_fullLeftBottomSpacing"
+                  name="smET_fullLeftBottomSpacing"
+                  value="1.25"
+                  min="0"
+                  max="20"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+              </fieldset>
               <fieldset id="smET_PartialLeftVariant" class="hidden">
                 <legend>Partial Left</legend>
                 <label for="smET_partialLeftCheckbox">
                   <input
                     type="checkbox"
                     id="smET_partialLeftCheckbox"
+                    name="smET_partialLeftCheckbox"
                     onchange="formHandler.readForm()"
                     checked
                   />
@@ -1555,16 +1620,18 @@
                 <input
                   type="number"
                   id="smET_partialLeftMinWidth"
+                  name="smET_partialLeftMinWidth"
                   value="7"
                   min="0"
                   max="20"
                   step=".01"
                   onchange="formHandler.readForm()"
                 />
-                <label for="smET_partialLeftSpacing">Spacing (rem):</label>
+                <label for="smET_partialLeftSpacing">Offset (rem):</label>
                 <input
                   type="number"
                   id="smET_partialLeftSpacing"
+                  name="smET_partialLeftSpacing"
                   value="1.5"
                   min="0"
                   max="20"
@@ -1593,6 +1660,7 @@
                 <input
                   type="number"
                   id="smET_partialLeftHorizontalPaddingVal"
+                  name="smET_partialLeftHorizontalPaddingVal"
                   min="0"
                   max="5"
                   value="0.6"
@@ -1614,6 +1682,7 @@
                   value="0.3"
                   step=".01"
                   id="smET_partialLeftVerticalPadding"
+                  name="smET_partialLeftVerticalPadding"
                   oninput="
                     document.querySelector(
                       '#smET_partialLeftVerticalPaddingVal',
@@ -1623,6 +1692,7 @@
                 />
                 <input
                   type="number"
+                  name="smET_partialLeftVerticalPaddingVal"
                   id="smET_partialLeftVerticalPaddingVal"
                   min="0"
                   max="5"
@@ -1642,9 +1712,30 @@
                 <input
                   type="number"
                   id="smET_partialLeftLetterSpacing"
+                  name="smET_partialLeftLetterSpacing"
                   value="0"
                   min="0"
                   max="20"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_partialLeftFontFamily"> Font Family: </label>
+                <select
+                  id="smET_partialLeftFontFamily"
+                  name="smET_partialLeftFontFamily"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <br />
+                <label for="smET_partialLeftBorderRadius"
+                  >Border Radius (px):
+                </label>
+                <input
+                  type="number"
+                  id="smET_partialLeftBorderRadius"
+                  name="smET_partialLeftBorderRadius"
+                  value="4"
+                  min="0"
+                  max="50"
                   step="1"
                   onchange="formHandler.readForm()"
                 />
@@ -1654,7 +1745,7 @@
                 <label
                   for="smET_HOV1Height"
                   data-toolTip="Set height to 0 to automatically size it by font size"
-                  >Height (rem):</label
+                  >Image Height (rem):</label
                 >
                 <input
                   type="number"
@@ -1668,7 +1759,7 @@
                 <label
                   for="smET_HOV1Width"
                   data-toolTip="Set width to 0 to automatically size it by an aspect ratio"
-                  >Width (rem):</label
+                  >Image Width (rem):</label
                 >
                 <input
                   type="number"
@@ -1762,7 +1853,7 @@
                 id="sMET_textContent"
                 name="sMET_textContent"
                 placeholder="Text Content"
-                onchange="formHandler.readForm()"
+                oninput="formHandler.readForm()"
               />
               <label for="sMET_subTextContent" class="noLabelAlignment"
                 >Sub Text:</label
@@ -1772,7 +1863,7 @@
                 id="sMET_subTextContent"
                 name="sMET_subTextContent"
                 placeholder="Sub Text Content"
-                onchange="formHandler.readForm()"
+                oninput="formHandler.readForm()"
               />
 
               <fieldset>
@@ -2550,10 +2641,19 @@
                 </div>
                 <div id="sMSPTextList"></div>
                 <div id="sMSPElement">
-                  <span id="SMSPElementLabel">Selected: Block 1</span>
                   <div class="SMSPNewElementHolder">
-                    <span>New: </span>
                     <select id="sMSPElementSelect" style="width: 30%"></select>
+                    <button
+                      id="sMSPReplaceElement"
+                      onclick="
+                        App.replaceControlElem(
+                          document.querySelector('#sMSPElementSelect').value,
+                        )
+                      "
+                    >
+                      <span class="material-symbols-outlined">swap_horiz</span>
+                      Replace
+                    </button>
                     <button
                       id="sMSPCreateElement"
                       onclick="
@@ -2562,7 +2662,7 @@
                         )
                       "
                     >
-                      <span class="material-symbols-outlined">add</span> Add
+                      <span class="material-symbols-outlined">add</span> New
                     </button>
                     <button
                       id="sMSPDeleteSelectedBlock"

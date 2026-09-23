@@ -686,6 +686,7 @@ input[type="button"]:not(
 button:disabled,
 input[type="button"]:disabled {
   cursor: default;
+  background-color: rgb(var(--baseColorInv),.2);
 }
 
 .textEditorBlock {
@@ -1565,7 +1566,7 @@ button[data-diagram-modal-close]:hover,
 }
 
 .selectedShieldPreview {
-  height: 3rem;
+  height: 5rem;
   background-color: var(--shieldBackColor, rgb(0, 0, 255, 0.8));
   border-radius: var(--shieldBackRadius);
 }
@@ -2076,9 +2077,13 @@ div.sMET_typeSelect {
   width: 100%;
 }
 
+div.sMET_typeSelect > button {
+  flex: 1 1 calc(33.333% - .75rem); 
+}
+
 div.sMET_typeSelect > button,
 div.sMA_typeSelect > button {
-  height: 5.5rem;
+  height: max-content;
   width: max-content;
   position: relative;
   padding: 0;
@@ -2086,8 +2091,8 @@ div.sMA_typeSelect > button {
 }
 
 div.sMA_typeSelect > button {
-  height: 9rem;
   font-size: 1rem;
+  flex: 1 1 calc(33.333% - .75rem);
 }
 
 div.sMET_typeSelect > button.selected > span,
@@ -2098,7 +2103,7 @@ div.sMA_typeSelect > button.selected > span {
 
 img.sMET_typeVisual,
 img.sMA_typeVisual {
-  height: 100%;
+  width: 100%;
 }
 
 .smET_typeLabel,
@@ -2889,6 +2894,11 @@ summary:hover {
 .sMET_shieldListItemCategory {
   height: stretch;
   margin: 0;
+}
+
+.sMET_shieldListItemDelete {
+  height: stretch;
+  aspect-ratio: 1 / 1;
 }
 
 #smET_addShield {

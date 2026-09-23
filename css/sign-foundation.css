@@ -701,6 +701,10 @@ main#smRender.wide #postContainer {
 .ET-iconImage.square {
   aspect-ratio: 1 / 1;
   width: calc(var(--iconSize) + var(--pbmPadding) * 2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5cqh;
 }
 
 .ET-iconText,
@@ -748,8 +752,8 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab:has(.ET-fullLeft) {
-  padding-top: calc(1.25rem + var(--fontSize) + var(--verticalPadding));
-  padding-bottom: calc(0.25rem + var(--verticalPadding));
+  padding-top: calc(var(--bottomSpacing) + var(--fontSize) + var(--verticalPadding));
+  padding-bottom: calc(.66rem + var(--verticalPadding));
 }
 
 .ET-row.extend .ET-tab:has(.ET-fullLeft) {
@@ -788,19 +792,22 @@ main#smRender.wide #postContainer {
   display: flex;
   justify-content: left;
   align-items: center;
-  padding: 0.5rem 0.5rem 0.25rem 0.5rem;
-  font-size: calc(var(--fontSize) * 1.5);
-  font-family: "Series E";
+  padding: .33rem .5rem;
+  font-size: calc(var(--fontSize));
+  font-family: var(--fontFamily);
+  letter-spacing: var(--letterSpacing);
   width: 100%;
   height: 100%;
+  text-box-edge: cap alphabetic;
+  text-box-trim: trim-both;
 }
 
 .ET-PartialLeft {
   background-color: var(--yellow);
   padding: var(--verticalPadding) var(--horizontalPadding);
-  border-radius: calc(var(--borderRadius) / 2);
+  border-radius: var(--partialLeftBorderRadius);
   color: black;
-  font-family: "Series E";
+  font-family: var(--fontFamily);
   line-height: 100%;
   font-size: calc(var(--fontSize) * 1.1);
   letter-spacing: var(--letterSpacing);

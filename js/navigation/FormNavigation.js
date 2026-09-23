@@ -637,6 +637,8 @@ const FormNavigation = (() => {
       document.querySelector("#sdAdvisory_fontFamily"),
       document.querySelector("#sdActionMessage_fontFamily"),
       document.querySelector("#sMET_variantFontFamily"),
+      document.querySelector("#smET_fullLeftFontFamily"),
+      document.querySelector("#smET_partialLeftFontFamily"),
     ];
     for (const elem of textElem_fontFamilySelects) {
       for (const fontFamily of TextElement.prototype.fontFamily) {

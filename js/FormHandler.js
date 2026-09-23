@@ -113,6 +113,7 @@ const formHandler = (() => {
         exitTabRow.panelEdgeType = form["sMET_PanelEdgeType"].value;
         exitTabRow.position = form["sMET_Position"].value;
         exitTabRow.marginBottom = parseFloat(form["smET_marginBottom"].value);
+        exitTabRow.independentWidth = form["smET_independentWidth"].checked;
       } else {
         const exitTab =
           exitTabRow.exitTabs[app.vars.currentlySelectedExitTabIndex];
@@ -186,6 +187,10 @@ const formHandler = (() => {
             form["smET_partialLeftLetterSpacing"].value;
           exitTab.variantSettings.partialLeft.spacing =
             form["smET_partialLeftSpacing"].value;
+          exitTab.variantSettings.partialLeft.fontFamily =
+            form["smET_partialLeftFontFamily"].value;
+          exitTab.variantSettings.partialLeft.borderRadius =
+            form["smET_partialLeftBorderRadius"].value;
         }
 
         if (
@@ -254,7 +259,7 @@ const formHandler = (() => {
             form["sMET_variantIconSize"].value,
           );
           exitTab.variantSettings.icon.isSquare =
-            form["sMET_variantIsSquare"].checked;
+            form["sMET_variantIsSquareIcon"].checked;
           exitTab.variantSettings.icon.isTollIcon =
             form["sMET_variantIsTollIcon"].checked;
           exitTab.variantSettings.icon.onlyHorizontalPadding = parseFloat(
@@ -265,11 +270,24 @@ const formHandler = (() => {
           );
           exitTab.variantSettings.icon.pbmIsSquare =
             form["smET_variantIsSquare"].checked;
-
           exitTab.variantSettings.icon.fontFamily =
             form["sMET_variantFontFamily"].value;
           exitTab.variantSettings.icon.underline =
             form["sMET_variantUnderline"].checked;
+          exitTab.variantSettings.icon.fontSize = parseFloat(
+            form["smET_variantFontSize"].value,
+          );
+        }
+
+        if (exitTab.variant == "FullLeft") {
+          exitTab.variantSettings.fullLeft.minimumWidth =
+            form["smET_fullLeftMinimumWidth"].value;
+          exitTab.variantSettings.fullLeft.fontFamily =
+            form["smET_fullLeftFontFamily"].value;
+          exitTab.variantSettings.fullLeft.letterSpacing =
+            form["smET_fullLeftLetterSpacing"].value;
+          exitTab.variantSettings.fullLeft.bottomSpacing =
+            form["smET_fullLeftBottomSpacing"].value;
         }
 
         exitTab.variant = document
@@ -826,9 +844,12 @@ const formHandler = (() => {
     const sMSPTextList = document.querySelector("#sMSPTextList");
     sMSPTextList.innerHTML = "";
     document.querySelector("#SMSPSelectLabel").textContent =
-      "Selected: Row " + (app.vars.currentlySelectedRowIndex + 1);
-    document.querySelector("#SMSPElementLabel").textContent =
-      "Selected: Block " + (app.vars.currentlySelectedBlockIndex + 1);
+      "Selected: Row " +
+      (app.vars.currentlySelectedRowIndex + 1) +
+      "; Block " +
+      (app.vars.currentlySelectedBlockIndex + 1);
+    document.querySelector("#sMSPElementSelect").value =
+      app.getCurrentBlockElem().constructor.name;
     document.querySelector("#sMSPDeleteSelectedRow").disabled =
       app.getCurrentSubPanel().blockElements.rows.length == 1;
     document.querySelector("#smSPDeleteSelectedBlock").disabled =
@@ -1143,7 +1164,11 @@ const formHandler = (() => {
       panel.exitTabs[app.vars.currentlySelectedExitTabRowIndex];
 
     if (!currentExitTabRow) {
+      document.querySelector("#sMExitTabGroupProperties").style.display =
+        "none";
       return;
+    } else {
+      document.querySelector("#sMExitTabGroupProperties").style.display = "";
     }
 
     if (app.vars.currentlySelectedExitTabIndex == -1) {
@@ -1173,6 +1198,24 @@ const formHandler = (() => {
         currentExitTabRow.panelEdgeType == "extend" ? "" : "none";
       document.querySelector("label[for='smET_marginBottom']").style.display =
         currentExitTabRow.panelEdgeType == "extend" ? "" : "none";
+
+      document.querySelector("#smET_independentWidth").checked =
+        currentExitTabRow.independentWidth;
+
+      document.querySelector("#smET_independentWidth").style.display = [
+        "within",
+        "left",
+        "right",
+      ].includes(currentExitTabRow.position)
+        ? "none"
+        : "";
+      document.querySelector(
+        'label[for="smET_independentWidth"]',
+      ).style.display = ["within", "left", "right"].includes(
+        currentExitTabRow.position,
+      )
+        ? "none"
+        : "";
 
       return;
     }
@@ -1416,6 +1459,8 @@ const formHandler = (() => {
       currentExitTab.numeralLetterSpacing;
     document.querySelector("#sMET_contentDirection").value =
       currentExitTab.contentDirection;
+    document.querySelector("#sMET_alignment").disabled =
+      currentExitTabRow.independentWidth;
     document.querySelector("#sMET_alignment").value = currentExitTab.alignment;
     document.querySelector("#sMET_width").value = currentExitTab.width;
     document.querySelector("#smET_containerHolderPadding").value =
@@ -1478,9 +1523,25 @@ const formHandler = (() => {
       }
     }
 
-    if (currentExitTab.variant == "partialLeft") {
+    if (currentExitTab.variant == "PartialLeft") {
       document.querySelector("#smET_partialLeftCheckbox").checked =
         currentExitTab.variantSettings.partialLeft.separateRow;
+
+      document.querySelector("#smET_partialLeftSpacing").style.display =
+        !currentExitTab.variantSettings.partialLeft.separateRow ? "none" : "";
+      document.querySelector(
+        'label[for="smET_partialLeftSpacing"]',
+      ).style.display = !currentExitTab.variantSettings.partialLeft.separateRow
+        ? "none"
+        : "";
+      document.querySelector("#smET_partialLeftMinWidth").style.display =
+        !currentExitTab.variantSettings.partialLeft.separateRow ? "none" : "";
+      document.querySelector(
+        'label[for="smET_partialLeftMinWidth"]',
+      ).style.display = !currentExitTab.variantSettings.partialLeft.separateRow
+        ? "none"
+        : "";
+
       document.querySelector("#smET_partialLeftHorizontalPadding").value =
         currentExitTab.variantSettings.partialLeft.horizontalPadding;
       document.querySelector("#smET_partialLeftVerticalPadding").value =
@@ -1495,6 +1556,10 @@ const formHandler = (() => {
         currentExitTab.variantSettings.partialLeft.letterSpacing;
       document.querySelector("#smET_partialLeftSpacing").value =
         currentExitTab.variantSettings.partialLeft.spacing;
+      document.querySelector("#smET_partialLeftFontFamily").value =
+        currentExitTab.variantSettings.partialLeft.fontFamily;
+      document.querySelector("#smET_partialLeftBorderRadius").value =
+        currentExitTab.variantSettings.partialLeft.borderRadius;
     }
 
     if (
@@ -1581,7 +1646,7 @@ const formHandler = (() => {
       document.querySelector("#smET_iconBackgroundBorderRadius").value =
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration.borderRadius;
 
-      document.querySelector("#sMET_variantIsSquare").checked =
+      document.querySelector("#sMET_variantIsSquareIcon").checked =
         currentExitTab.variantSettings.icon.isSquare;
       document.querySelector("#sMET_variantIsTollIcon").checked =
         currentExitTab.variantSettings.icon.isTollIcon;
@@ -1600,6 +1665,19 @@ const formHandler = (() => {
         currentExitTab.variantSettings.icon.addon == "pay by mail 1"
           ? ""
           : "none";
+      document.querySelector("#smET_variantFontSize").style.display =
+        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
+          ? ""
+          : "none";
+      document.querySelector(
+        'label[for="smET_variantFontSize"]',
+      ).style.display =
+        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
+          ? ""
+          : "none";
+
+      document.querySelector("#smET_variantFontSize").value =
+        currentExitTab.variantSettings.icon.fontSize;
 
       document.querySelector(
         'label[for="sMET_variantOnlyHorizontalPadding"]',
@@ -1640,6 +1718,17 @@ const formHandler = (() => {
         currentExitTab.variantSettings.icon.fontFamily;
       document.querySelector("#sMET_variantUnderline").checked =
         currentExitTab.variantSettings.icon.underline;
+    }
+
+    if (currentExitTab.variant == "FullLeft") {
+      document.querySelector("#smET_fullLeftMinimumWidth").value =
+        currentExitTab.variantSettings.fullLeft.minimumWidth;
+      document.querySelector("#smET_fullLeftFontFamily").value =
+        currentExitTab.variantSettings.fullLeft.fontFamily;
+      document.querySelector("#smET_fullLeftLetterSpacing").value =
+        currentExitTab.variantSettings.fullLeft.letterSpacing;
+      document.querySelector("#smET_fullLeftBottomSpacing").value =
+        currentExitTab.variantSettings.fullLeft.bottomSpacing;
     }
   };
 

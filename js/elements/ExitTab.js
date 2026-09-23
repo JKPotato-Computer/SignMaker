@@ -68,6 +68,13 @@ class ExitTab {
         pbmIsSquare: true,
         fontFamily: "Series E",
         underline: false,
+        fontSize: 0,
+      },
+      fullLeft: {
+        minimumWidth: 7,
+        fontFamily: "Series E",
+        letterSpacing: 0,
+        bottomSpacing: 1.25,
       },
       partialLeft: {
         separateRow: true,
@@ -75,7 +82,9 @@ class ExitTab {
         verticalPadding: 0.3,
         letterSpacing: 2,
         minWidth: 7,
-        spacing: 1.8,
+        spacing: 1.5,
+        fontFamily: "Series E",
+        borderRadius: 4,
       },
       hovVariant1: {
         height: 0,
@@ -247,6 +256,21 @@ class ExitTab {
       leftElementContent.textContent = "LEFT";
       leftElementContent.className = "ET-FullLeft";
 
+      exitTabElement.style.minWidth =
+        this.variantSettings.fullLeft.minimumWidth + "rem";
+      leftElementContent.style.setProperty(
+        "--fontFamily",
+        '"' + this.variantSettings.fullLeft.fontFamily + '"',
+      );
+      leftElementContent.style.setProperty(
+        "--letterSpacing",
+        this.variantSettings.fullLeft.letterSpacing + "px",
+      );
+      exitTabElement.style.setProperty(
+        "--bottomSpacing",
+        this.variantSettings.fullLeft.bottomSpacing + "rem",
+      );
+
       leftElement.appendChild(leftElementContent);
       exitTabElement.appendChild(leftElement);
     } else if (this.variant == "PartialLeft") {
@@ -273,6 +297,15 @@ class ExitTab {
         "--partialLeftSpacing",
         this.variantSettings.partialLeft.spacing + "rem",
       );
+      leftElement.style.setProperty(
+        "--fontFamily",
+        '"' + this.variantSettings.partialLeft.fontFamily + '"',
+      );
+      leftElement.style.setProperty(
+        "--partialLeftBorderRadius",
+        this.variantSettings.partialLeft.borderRadius + "px",
+      );
+
       exitTabElement.appendChild(leftElement);
     }
 
@@ -357,7 +390,14 @@ class ExitTab {
         }
 
         if (shieldDirection == "left") {
-          exitTabElement.appendChild(shieldHolder);
+          if (this.variant == "HOVVariant2") {
+            textParentElement.insertBefore(
+              shieldHolder,
+              textParentElement.firstChild,
+            );
+          } else {
+            textParentElement.appendChild(shieldHolder);
+          }
         } else {
           afterShieldElems = shieldHolder;
         }
@@ -409,7 +449,7 @@ class ExitTab {
       }
 
       if (afterShieldElems) {
-        exitTabElement.appendChild(afterShieldElems);
+        textParentElement.appendChild(afterShieldElems);
       }
     }
 
@@ -538,6 +578,11 @@ class ExitTab {
           "ET-iconPayByMail ET-iconImage " +
           (iconSettings.pbmIsSquare ? "square" : "");
         payByMailElement.textContent = this.textContent;
+
+        if (iconSettings.fontSize > 0) {
+          payByMailElement.style.fontSize = iconSettings.fontSize + "rem";
+        }
+
         exitTabElement.appendChild(payByMailElement);
       } else {
         const textElement = document.createElement("span");
@@ -603,12 +648,14 @@ class ExitTabRow {
     panelEdgeType = "separate",
     position = "top",
     marginBottom = 0.3,
+    independentWidth = false,
   } = {}) {
     this.exitTabs = exitTabs;
     this.gap = gap;
     this.panelEdgeType = panelEdgeType;
     this.position = position;
     this.marginBottom = marginBottom;
+    this.independentWidth = independentWidth;
   }
 
   createElement() {

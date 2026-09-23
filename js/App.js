@@ -303,6 +303,18 @@ const App = (() => {
     redraw();
   };
 
+  const replaceControlElem = (selectedElem) => {
+    const blockElems = getCurrentSubPanel().blockElements;
+    blockElems.replaceElement(
+      Control.prototype.blockToClassElems[selectedElem],
+      currentlySelectedRowIndex,
+      currentlySelectedBlockIndex,
+    );
+
+    formHandler.updateForm();
+    redraw();
+  };
+
   const delControlElem = () => {
     const blockElems = getCurrentSubPanel().blockElements;
     if (
@@ -311,8 +323,11 @@ const App = (() => {
         currentlySelectedBlockIndex,
       )
     ) {
-      currentlySelectedRowIndex = Math.max(0,currentlySelectedRowIndex - 1);
-      currentlySelectedBlockIndex = Math.max(0,getCurrentBlockRows().length - 1);
+      currentlySelectedRowIndex = Math.max(0, currentlySelectedRowIndex - 1);
+      currentlySelectedBlockIndex = Math.max(
+        0,
+        getCurrentBlockRows().length - 1,
+      );
     } else {
       currentlySelectedBlockIndex--;
     }
@@ -600,6 +615,8 @@ const App = (() => {
     exitTabContainerLeft,
     exitTabContainerRight,
   ) => {
+    let determineWidth = new Map();
+
     for (let rowIndex = panel.exitTabs.length - 1; rowIndex >= 0; rowIndex--) {
       const exitTabRow = panel.exitTabs[rowIndex];
       const exitTabRowElement = exitTabRow.createElement();
@@ -609,8 +626,16 @@ const App = (() => {
       );
 
       if (exitTabRow.position == "top") {
+        if (exitTabRow.independentWidth) {
+          determineWidth.set(exitTabContainerTop, true);
+        }
+
         exitTabContainerTop.appendChild(exitTabRowElement);
       } else if (exitTabRow.position == "bottom") {
+        if (exitTabRow.independentWidth) {
+          determineWidth.set(exitTabContainerBottom, true);
+        }
+
         exitTabContainerBottom.appendChild(exitTabRowElement);
       } else if (exitTabRow.position == "left") {
         exitTabContainerLeft.appendChild(exitTabRowElement);
@@ -620,6 +645,8 @@ const App = (() => {
         exitTabContainerWithin.appendChild(exitTabRowElement);
       }
     }
+
+    return determineWidth;
   };
 
   const redrawSubPanels = (panel, signHolderElmt) => {
@@ -704,7 +731,7 @@ const App = (() => {
     const exitTabContainerWithin = document.createElement("div");
     exitTabContainerWithin.className = "exitTabContainer within";
 
-    redrawExitTabs(
+    let considerWidth = redrawExitTabs(
       panel,
       exitTabContainerTop,
       exitTabContainerBottom,
@@ -1615,6 +1642,16 @@ const App = (() => {
         default:
       }
     }
+
+    // redraw exit tab widths
+    for (const container of considerWidth.keys()) {
+      let width =
+        container.getBoundingClientRect().width / formHandler.vars.zoomLevel;
+      container.style.left = `-${width / 2}px`;
+      container.style.width = "0";
+      container.style.position = "relative";
+      container.style.transform = `translateX(${signHolderElmt.getBoundingClientRect().width / 2 / formHandler.vars.zoomLevel}px)`;
+    }
   };
 
   const redraw = () => {
@@ -1706,6 +1743,7 @@ const App = (() => {
     delRow,
     newControlElem,
     delControlElem,
+    replaceControlElem,
 
     recheckWidth,
     newShieldGroup,

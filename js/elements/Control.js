@@ -176,13 +176,13 @@ TextElement.prototype.fontFamily = [
   "Clearview 1B",
   "Clearview 1W",
   "Clearview 2B",
-  "Clearivew 2W",
+  "Clearview 2W",
   "Clearview 3B",
   "Clearview 3W",
   "Clearview 4B",
   "Clearview 4W",
-  "Clearivew 5B",
-  "Clearivew 5W",
+  "Clearview 5B",
+  "Clearview 5W",
   "Clearview 5WR",
   "Clearview 6B",
   "Series B",
@@ -1054,6 +1054,21 @@ class Control {
     }
   }
 
+  replaceElement(element, row, column) {
+    let exisitngElement = this.rows[row][column];
+    if (!exisitngElement) {
+      return;
+    }
+
+    let newElement = new element();
+    for (const key in exisitngElement) {
+      if (exisitngElement.hasOwnProperty(key)) {
+        newElement[key] = exisitngElement[key];
+      }
+    }
+    this.rows[row][column] = newElement;
+  }
+
   removeElement(row, column) {
     if (row == null || column == null) {
       return;
@@ -1080,12 +1095,13 @@ class Control {
     let newRows = [];
     for (const e of this.rows[row]) {
       const blockElemType = Control.prototype.blockToClassElems.getElem(e);
-      newRows.push(
-        Object.assign(
-          new Control.prototype.blockToClassElems[blockElemType](),
-          e,
-        ),
+      let newObject = structuredClone(e);
+      newObject = Object.setPrototypeOf(
+        newObject,
+        Control.prototype.blockToClassElems[blockElemType].prototype,
       );
+
+      newRows.push(newObject);
     }
     this.rows.splice(row + 1, 0, newRows);
     this.blockProperties.splice(row + 1, 0, new Block());
