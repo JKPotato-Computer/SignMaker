@@ -46,6 +46,144 @@ const App = (() => {
     window.diagramLibrary = DiagrammicLibrary;
     await window.diagramLibrary.init();
 
+    // Attach Drag Systems
+    DragSystem.attachDrag(
+      document.querySelector("#sMSPTextList"),
+      ".sMControlRow",
+      "vertical",
+      (oldRowIndex, newRowIndex, oldBlockIndex, newBlockIndex) => {
+        if (oldBlockIndex == null) {
+          let currentBlockRows = getCurrentSubPanel().blockElements.rows;
+          currentBlockRows.splice(
+            newRowIndex,
+            0,
+            currentBlockRows.splice(oldRowIndex, 1)[0],
+          );
+
+          currentlySelectedRowIndex = Math.max(newRowIndex, 0);
+        } else {
+          let currentBlockRows = getCurrentSubPanel().blockElements.rows;
+          let block = currentBlockRows[oldRowIndex].splice(oldBlockIndex, 1)[0];
+
+          currentBlockRows[newRowIndex].splice(newBlockIndex, 0, block);
+          currentlySelectedRowIndex = Math.max(newRowIndex, 0);
+          currentlySelectedBlockIndex = Math.max(newBlockIndex, 0);
+
+          if (currentBlockRows[oldRowIndex].length == 0) {
+            currentBlockRows.splice(oldRowIndex, 1);
+            currentlySelectedRowIndex =
+              oldRowIndex > newRowIndex ? newRowIndex : newRowIndex - 1;
+          }
+        }
+
+        formHandler.updateForm();
+        redraw();
+      },
+      { innerElement: ".textEditorBlock", innerDirection: "horizontal" },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#exitTabList"),
+      ".exitTabGroup",
+      "horizontal",
+      (oldGroupIndex, newGroupIndex, oldTabIndex, newTabIndex) => {
+        let currentExitTabs = getCurrentPanel().exitTabs;
+        if (oldTabIndex != null) {
+          let tab = currentExitTabs[oldGroupIndex].exitTabs.splice(
+            oldTabIndex,
+            1,
+          )[0];
+          currentExitTabs[newGroupIndex].exitTabs.splice(newTabIndex, 0, tab);
+          currentlySelectedExitTabRowIndex = Math.max(newGroupIndex, 0);
+        } else {
+          currentExitTabs.splice(
+            newGroupIndex,
+            0,
+            currentExitTabs.splice(oldGroupIndex, 1)[0],
+          );
+
+          currentlySelectedExitTabRowIndex = Math.max(newGroupIndex, 0);
+        }
+
+        formHandler.updateForm();
+        redraw();
+      },
+      {
+        attachElement: ".exitTabButton",
+        innerElement: ".exitTabNestedButton",
+        innerDirection: "horizontal",
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#subPanelList"),
+      ".smSubPanelBtn",
+      "horizontal",
+      (oldPanelIndex, newPanelIndex) => {
+        let currentSubPanels = getCurrentPanel().sign.subPanels;
+        currentSubPanels.splice(
+          newPanelIndex,
+          0,
+          currentSubPanels.splice(oldPanelIndex, 1)[0],
+        );
+        currentlySelectedSubPanelIndex = Math.max(newPanelIndex, 0);
+
+        formHandler.updateForm();
+        redraw();
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#panelList"),
+      ".panelListButton",
+      "vertical",
+      (oldPanelIndex, newPanelIndex) => {
+        post.panels.splice(
+          newPanelIndex,
+          0,
+          post.panels.splice(oldPanelIndex, 1)[0],
+        );
+        currentlySelectedPanelIndex = Math.max(newPanelIndex, 0);
+
+        formHandler.updateForm();
+        redraw();
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#sMAPL_APLCat"),
+      ".smAPLCat_container",
+      "vertical",
+      (oldPanelIndex, newPanelIndex, oldAPLIndex, newAPLIndex) => {
+        if (oldAPLIndex == null) {
+          return;
+        }
+
+        let apl = getCurrentPanel().sign.arrows.apl;
+        oldPanelIndex /= 2;
+        newPanelIndex /= 2;
+
+        let arrow = apl.subpanels[oldPanelIndex].splice(oldAPLIndex, 1)[0];
+
+        if (!apl.subpanels[newPanelIndex]) {
+          apl.subpanels[newPanelIndex] = [];
+        }
+
+        apl.subpanels[newPanelIndex].splice(newAPLIndex, 0, arrow);
+
+        formHandler.updateForm();
+        redraw();
+      },
+      {
+        attachElement: ".smAPLCat_aplDragger",
+        innerElement: ".smAPLCat_apl",
+        innerDirection: "vertical",
+        useAttachForInner: true,
+        ignoreOuterDragging: true,
+        innerTargetContainer: ".smAPLCat_aplList",
+      },
+    );
+
     newPanel();
   };
 
@@ -651,6 +789,7 @@ const App = (() => {
 
   const redrawSubPanels = (panel, signHolderElmt) => {
     const subpanelList = [];
+    const dividerList = [];
 
     for (
       let subPanelIndex = 0;
@@ -667,6 +806,7 @@ const App = (() => {
         } else {
           subDivider.style.removeProperty("height");
         }
+        dividerList.push(subDivider);
 
         if (
           panel.sign.arrows.arrowMode == "apl" &&
@@ -703,7 +843,7 @@ const App = (() => {
       subpanelList.push(signContentContainerElmt);
     }
 
-    return subpanelList;
+    return [subpanelList, dividerList];
   };
 
   const redrawPanel = (panel, panelContainerElmt, index) => {
@@ -811,7 +951,7 @@ const App = (() => {
       signHolderElmt.style.minWidth = exitTabContainerWithin.offsetWidth + "px";
     }
 
-    const subpanelList = redrawSubPanels(panel, signHolderElmt);
+    const [subpanelList, dividerList] = redrawSubPanels(panel, signHolderElmt);
 
     signHolderElmt.appendChild(sideRightArrowElmt);
 
@@ -988,6 +1128,7 @@ const App = (() => {
           aplHolder.className =
             "sMGA_APLHolder center " +
             (autoJustify && i % 1 == 0 ? "auto" : "");
+          aplHolder.style.width = "0";
         }
 
         let pair = [];
@@ -1019,21 +1160,12 @@ const App = (() => {
           }
         }
         guideArrowsElmt.appendChild(aplHolder);
+      }
 
-        let avg = 0,
-          total = 0;
-        for (const [arrow1, arrow2] of arrowElements) {
-          avg +=
-            (arrow2.getBoundingClientRect().left -
-              arrow1.getBoundingClientRect().left) /
-            formHandler.vars.zoomLevel;
-          total += 1;
-        }
-        for (const holder of dividerElements) {
-          if (autoJustify) {
-            holder.style.width = `${(avg / total) * 1.5}px`;
-          }
-        }
+      for (let i = 0; i < dividerElements.length; i++) {
+        const holder = dividerElements[i];
+        const divider = dividerList[i];
+        holder.style.marginLeft = `${(divider.getBoundingClientRect().left - holder.getBoundingClientRect().left) / formHandler.vars.zoomLevel}px`;
       }
     }
 

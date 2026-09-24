@@ -599,7 +599,7 @@ const formHandler = (() => {
           continue;
         }
 
-        if (i % 1 == 0) {
+        if (i % 1 == 0 && apl.subpanelConfigs[i]) {
           apl.subpanelConfigs[i].justify = aplContainer.querySelector(
             ".smAPLCat_justifyAPLs",
           ).value;
@@ -737,13 +737,14 @@ const formHandler = (() => {
       const subPanelButton = document.createElement("button");
       subPanelButton.textContent = subPanelIndex + 1;
       subPanelButton.className =
-        app.vars.currentlySelectedSubPanelIndex == subPanelIndex
+        "smSubPanelBtn " +
+        (app.vars.currentlySelectedSubPanelIndex == subPanelIndex
           ? "active"
-          : "";
+          : "");
 
       subPanelButton.addEventListener("click", () => {
         app.changeEditingSubPanel(subPanelIndex);
-        subPanelButton.className = "active";
+        subPanelButton.className = "smSubPanelBtn active";
       });
 
       subPanelList.appendChild(subPanelButton);

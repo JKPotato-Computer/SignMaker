@@ -136,7 +136,7 @@ label span.toolTip,
   align-items: stretch;
   width: 12rem;
   height: 11rem;
-  position: absolute;
+  position: fixed;
   background-color: var(--hotbarColor);
   top: -12rem;
   left: 0;
@@ -181,6 +181,7 @@ label span.toolTip,
   overflow-y: auto;
   padding-right: 0.15rem;
   height: 100%;
+  position: relative;
 }
 
 .panelListButton {
@@ -686,7 +687,7 @@ input[type="button"]:not(
 button:disabled,
 input[type="button"]:disabled {
   cursor: default;
-  background-color: rgb(var(--baseColorInv),.2);
+  background-color: rgb(var(--baseColorInv), 0.2);
 }
 
 .textEditorBlock {
@@ -1144,7 +1145,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.15);
   padding: 0.25rem;
   width: 100%;
-  height: m;
+  min-height: 32px;
 }
 
 :root[data-theme="dark"] .smControlRow.selected {
@@ -2078,7 +2079,7 @@ div.sMET_typeSelect {
 }
 
 div.sMET_typeSelect > button {
-  flex: 1 1 calc(33.333% - .75rem); 
+  flex: 1 1 calc(33.333% - 0.75rem);
 }
 
 div.sMET_typeSelect > button,
@@ -2092,7 +2093,7 @@ div.sMA_typeSelect > button {
 
 div.sMA_typeSelect > button {
   font-size: 1rem;
-  flex: 1 1 calc(33.333% - .75rem);
+  flex: 1 1 calc(33.333% - 0.75rem);
 }
 
 div.sMET_typeSelect > button.selected > span,
@@ -2905,4 +2906,9 @@ summary:hover {
   font-size: 20px;
   padding: 0.25rem 1rem;
   margin-bottom: 0.5rem;
+}
+
+.visual-box {
+  background-color: rgb(var(--baseColorInv), 0.25);
+  border: 3px dashed rgb(var(--baseColorInv));
 }

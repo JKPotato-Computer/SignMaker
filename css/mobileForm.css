@@ -157,4 +157,15 @@
     text-wrap: nowrap;
     width: max-content !important;
   }
+
+  #panelSelect {
+    bottom: 6rem;
+    top: auto;
+    left: 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  .panelPopoverHint {
+    top: -1.5rem;
+  }
 }
