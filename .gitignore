@@ -6,3 +6,4 @@
 Thumbs.db
 .vscode/
 css/.well-known/appspecific/com.chrome.devtools.json
+.vite/
