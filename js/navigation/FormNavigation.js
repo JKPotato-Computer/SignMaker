@@ -54,23 +54,22 @@ const FormNavigation = (() => {
 
   const setupNavigation = () => {
     const reDisplay = () => {
+      let isModalOpen = false;
       for (const holder of document.querySelectorAll(".sMModal")) {
         if (holder.classList.contains(sMConfigBar.dataset.currentMenu)) {
           holder.style.display = "block";
+
+          let width = holder.getBoundingClientRect().width;
+          document.querySelector("#smRender").style.transform =
+            `translateX(${width / 4}px)`;
+          isModalOpen = true;
         } else {
           holder.style.display = "";
         }
       }
 
-      if (
-        sMConfigBar.dataset.currentMenu != "" &&
-        sMConfigBar.dataset.currentMenu != "panelSelector" &&
-        !document.querySelector("#smRender").classList.contains("wide") &&
-        App.getPost().panels.length <= 2
-      ) {
-        document.querySelector("#smRender").classList.add("modalOpen");
-      } else {
-        document.querySelector("#smRender").classList.remove("modalOpen");
+      if (!isModalOpen) {
+        document.querySelector("#smRender").style.transform = "";
       }
 
       if (

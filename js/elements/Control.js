@@ -140,12 +140,7 @@ class TextElement {
       );
     }
 
-    if (
-      this.backgroundColor == "Orange" ||
-      this.backgroundColor == "White" ||
-      this.backgroundColor == "Yellow" ||
-      this.backgroundColor == "Fluorescent Yellow-Green"
-    ) {
+    if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
       newText.style.color = "black";
     } else if (this.backgroundColor != "Inherit") {
       newText.style.color = "white";
@@ -277,6 +272,10 @@ class ElectronicSignElement extends TextElement {
     this.padding = padding;
     this.glow = glow;
     this.setWidth = setWidth;
+  }
+
+  get backgroundColor() {
+    return "Black";
   }
 
   createElement(panel) {
@@ -799,15 +798,9 @@ class ArrowElement {
     const container = document.createElement("div");
     container.className = "bE-arrowElement";
 
-    const arrowDefinition =
-      ArrowElement.prototype.arrows[this.arrow] ||
-      ArrowElement.prototype.arrows[ArrowElement.prototype.defaultArrow];
     const img = document.createElement("img");
-    img.src = arrowDefinition.src;
-    img.alt = arrowDefinition.label;
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.draggable = false;
+    img.src = ArrowElement.prototype.arrows[this.arrow].src;
+
     container.appendChild(img);
 
     const parsedRotation = parseFloat(this.rotation);
@@ -908,9 +901,11 @@ class TollLogoElement {
     const container = document.createElement("div");
     container.className = "bE-tollLogoElement";
 
-    const parsedSpacing = parseFloat(this.spacing);
-    const spacing = isNaN(parsedSpacing) ? 0 : parsedSpacing;
-    container.style.setProperty("--spacing", spacing + "rem");
+    const img = document.createElement("img");
+    img.src = TollLogoElement.prototype.logos[this.logo].src;
+    container.appendChild(img);
+
+    container.style.setProperty("--spacing", this.spacing + "rem");
     container.style.setProperty(
       "--tollBgColor",
       lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase(),
@@ -928,23 +923,7 @@ class TollLogoElement {
     }
 
     if (this.squareIcon) {
-      container.style.aspectRatio = "1 / 1";
-    }
-
-    const logoDefinition =
-      TollLogoElement.prototype.logos[this.logo] ||
-      TollLogoElement.prototype.logos[TollLogoElement.prototype.defaultLogo];
-
-    if (logoDefinition) {
-      const img = document.createElement("img");
-      img.src = logoDefinition.src;
-      img.alt = logoDefinition.label;
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.draggable = false;
-      container.appendChild(img);
-    } else {
-      container.textContent = "Toll logo unavailable";
+      img.style.aspectRatio = "1 / 1";
     }
 
     if (this.hasOnlyBlock) {
@@ -954,12 +933,7 @@ class TollLogoElement {
       container.appendChild(onlyBlock);
       container.classList.add("hasOnlyBlock");
 
-      if (
-        this.backgroundColor.toLowerCase() == "white" ||
-        this.backgroundColor.toLowerCase() == "yellow" ||
-        this.backgroundColor.toLowerCase() == "fluorescent yellow-green" ||
-        this.backgroundColor.toLowerCase() == "orange"
-      ) {
+      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
         container.classList.add("inverseColor");
       }
     }

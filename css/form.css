@@ -558,19 +558,6 @@ div.options a {
   flex-grow: 1;
 }
 
-.SMSPNewElementHolder {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: rgb(var(--baseColor), 0.4);
-}
-
-.SMSPNewElementHolder > span {
-  font-size: 0.7rem;
-}
-
 /* OLD - TO CONFIGURE */
 
 :not(.exitTabGroup).active,
