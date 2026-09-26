@@ -8,3 +8,4 @@ Thumbs.db
 css/.well-known/appspecific/com.chrome.devtools.json
 .vite/
 vite.config.js
+node_modules/
