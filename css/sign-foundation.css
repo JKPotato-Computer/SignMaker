@@ -105,7 +105,7 @@ main#smRender.wide #postContainer {
 }
 
 .bE-electronicSign {
-  padding: 0.2rem var(--padding);
+  padding: var(--vertPadding) var(--horizPadding);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100)));
 }
 

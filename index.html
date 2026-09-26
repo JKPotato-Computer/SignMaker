@@ -25,6 +25,19 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
+     <script type="module">
+        import terminal from 'virtual:terminal';
+
+        // Catch standard runtime errors
+        window.addEventListener('error', (event) => {
+          terminal.error(`[Browser Error] ${event.message} at ${event.filename}:${event.lineno}`);
+        });
+
+        // Catch unhandled promise rejections (async/await errors)
+        window.addEventListener('unhandledrejection', (event) => {
+          terminal.error(`[Browser Promise Rejection] ${event.reason}`);
+        });
+      </script>
     <script src="https://cdn.jsdelivr.net/gh/peterhry/CircleType@2.3.1/dist/circletype.min.js"></script>
     <script src="js/packages/HtmlToImage.js" type="text/javascript"></script>
 
@@ -3404,44 +3417,44 @@
                     <br />
                     <label for="sdElectronicSign_textColor">Text Color:</label>
                     <select id="sdElectronicSign_textColor"></select>
-                    <label for="sdElectronicSign_lineHeight"
-                      >Line Height (%):
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="300"
-                      value="100"
-                      step="1"
-                      id="sdElectronicSign_lineHeight"
-                    />
-                    <input
-                      id="sdElectronicSign_lineHeightVal"
-                      class="smallVal"
-                      type="number"
-                      value="100"
-                      step="1"
-                    />
-                    <br />
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
-                    <label for="sdElectronicSign_padding"
-                      >Padding (rem):
+                    <br />
+                    <label for="sdElectronicSign_vertPadding"
+                      >Vertical Padding (rem):
                     </label>
                     <input
                       type="range"
                       min="0"
-                      max="3"
+                      max="10"
                       value=".5"
-                      step=".1"
-                      id="sdElectronicSign_padding"
+                      step=".01"
+                      id="sdElectronicSign_vertPadding"
                     />
                     <input
-                      id="sdElectronicSign_paddingVal"
+                      id="sdElectronicSign_vertPaddingVal"
                       class="smallVal"
                       type="number"
                       value=".5"
-                      step="0.1"
+                      step=".01"
+                    />
+                    <label for="sdElectronicSign_horizPadding"
+                      >Horizontal Padding (rem):
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      value=".5"
+                      step=".01"
+                      id="sdElectronicSign_horizPadding"
+                    />
+                    <input
+                      id="sdElectronicSign_horizPaddingVal"
+                      class="smallVal"
+                      type="number"
+                      value=".5"
+                      step="0.01"
                     />
                     <br />
                     <label

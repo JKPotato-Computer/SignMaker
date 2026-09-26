@@ -233,7 +233,7 @@ class AdvisoryMessageElement extends TextElement {
     borderRadius = 4,
     useNumeralFormatting = true,
     horizPadding = 0.3,
-    vertPadding = 0.3,
+    vertPadding = 0.2,
   } = {}) {
     super();
     this.backgroundColor = backgroundColor;
@@ -259,19 +259,26 @@ class ElectronicSignElement extends TextElement {
   constructor({
     fontFamily = "Electronic Highway Sign",
     textColor = "Orange",
-    padding = 0.5,
+    horizPadding = 0.5,
+    vertPadding = 0.5,
     glow = true,
     setWidth = 0,
   } = {}) {
     super();
     this.fontFamily = fontFamily;
     this.textColor = textColor;
-    this.backgroundColor = "Black";
     this.useNumeralFormatting = false;
     this.useBannerFormatting = false;
-    this.padding = padding;
+    this.horizPadding = horizPadding;
+    this.vertPadding = vertPadding;
     this.glow = glow;
     this.setWidth = setWidth;
+    Object.defineProperty(this, "backgroundColor", {
+      get: function () {
+        return "Black"
+      },
+      set: function () {}
+    });
   }
 
   get backgroundColor() {
@@ -285,7 +292,8 @@ class ElectronicSignElement extends TextElement {
       "--textColor",
       (lib.colors[this.textColor] || this.textColor).toLowerCase(),
     );
-    newText.style.setProperty("--padding", this.padding + "rem");
+    newText.style.setProperty("--horizPadding", this.horizPadding + "rem");
+    newText.style.setProperty("--vertPadding", this.vertPadding + "rem");
     newText.style.setProperty(
       "--textShadow",
       this.glow
@@ -298,7 +306,7 @@ class ElectronicSignElement extends TextElement {
   }
 }
 ElectronicSignElement.prototype.fontFamily =
-  TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
+  TextElement.prototype.fontFamily.concat(["Electronic Highway Sign","VCR Mono"]);
 ElectronicSignElement.prototype.textColors = [
   "Orange",
   "White",
