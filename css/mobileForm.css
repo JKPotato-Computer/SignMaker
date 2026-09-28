@@ -112,9 +112,29 @@
   .shieldLibrary {
     height: 40%;
   }
-
 }
 
+@media (max-width: 768px) {
+  input {
+    padding: .75rem;
+  }
+
+  select {
+    padding: .75rem;
+  }
+
+  button, input[type="button"] {
+    padding: .5rem;
+  }
+
+  #signMakerFooter {
+    flex-direction: column;
+  }
+
+  body > footer > div:nth-child(2) {
+    flex-direction: row;
+  }
+}
 
 @media (max-width: 768px) {
   .modals {
@@ -155,7 +175,8 @@
     gap: .3rem;
     line-height: unset !important;
     text-wrap: nowrap;
-    width: max-content !important;
+    width: auto !important;
+    aspect-ratio: 1 / 1;
   }
 
   #panelSelect {

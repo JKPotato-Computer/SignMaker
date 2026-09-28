@@ -51,6 +51,12 @@ const DragSystem = (() => {
             return;
           }
 
+          const targetHandle = event.target;
+          targetHandle.setPointerCapture(event.pointerId);
+
+          dragElement.style.touchAction = "none";
+          dragElement.style.pointerEvents = "none";
+
           startX = event.clientX;
           startY = event.clientY;
 
@@ -73,6 +79,7 @@ const DragSystem = (() => {
 
           dragElement.style.transition = "none";
           dragElement.style.position = "fixed";
+          dragElement.style.touchAction = "none";
           dragElement.style.zIndex = "100";
           dragElement.style.pointerEvents = "none";
           dragElement.style.userSelect = "none";
@@ -217,9 +224,18 @@ const DragSystem = (() => {
           }
         });
 
-        document.addEventListener("pointerup", (event) => {
+        const pointerUp = (event) => {
           if (currentlyDragging != dragElement) {
             return;
+          }
+
+          const targetHandle =
+            parameters && parameters.attachElement
+              ? dragElement.querySelector(parameters.attachElement)
+              : dragElement;
+
+          if (targetHandle) {
+            targetHandle.releasePointerCapture(event.pointerId);
           }
 
           if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5) {
@@ -234,6 +250,7 @@ const DragSystem = (() => {
           dragElement.style.position = "";
           dragElement.style.zIndex = "";
           dragElement.style.pointerEvents = "";
+          dragElement.style.touchAction = "";
           dragElement.style.userSelect = "";
           dragElement.style.cursor = "";
           dragElement.style.left = "";
@@ -293,6 +310,8 @@ const DragSystem = (() => {
               }
             }
 
+            let lastActiveBox = activeVisualBox;
+
             if (activeVisualBox) {
               activeVisualBox.remove();
               activeVisualBox = null;
@@ -302,7 +321,17 @@ const DragSystem = (() => {
             lastClosestElement = null;
             lastAlignment = null;
 
-            callback(oldRowIndex, newRowIndex, oldColIndex, newColIndex);
+            if (parameters && parameters.callbackElements) {
+              callback(
+                oldRowIndex,
+                newRowIndex,
+                oldColIndex,
+                newColIndex,
+                parameters.callbackElements(dragElement, lastActiveBox),
+              );
+            } else {
+              callback(oldRowIndex, newRowIndex, oldColIndex, newColIndex);
+            }
           } else {
             let oldIndex = -1,
               newIndex = -1;
@@ -327,6 +356,8 @@ const DragSystem = (() => {
               }
             }
 
+            let lastActiveBox = activeVisualBox;
+
             if (activeVisualBox) {
               activeVisualBox.remove();
               activeVisualBox = null;
@@ -336,9 +367,20 @@ const DragSystem = (() => {
             lastClosestElement = null;
             lastAlignment = null;
 
-            callback(oldIndex, newIndex);
+            if (parameters && parameters.callbackElements) {
+              callback(
+                oldIndex,
+                newIndex,
+                parameters.callbackElements(dragElement, lastActiveBox),
+              );
+            } else {
+              callback(oldIndex, newIndex);
+            }
           }
-        });
+        };
+
+        document.addEventListener("pointerup", pointerUp);
+        document.addEventListener("pointercancel", pointerUp);
       }
 
       if (innerElement) {

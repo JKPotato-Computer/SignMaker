@@ -86,6 +86,11 @@ const ShieldEditor = (() => {
         selected: baseShield.variant === variant,
       });
     }
+    if (baseShield.shieldType === "preset" && properties.supportsAuto) {
+      lib.appendOption(variantSelect, "Auto", {
+        selected: baseShield.variant === "Auto",
+      });
+    }
 
     document.querySelector(".selectedShieldName").textContent =
       baseShield.shieldName;
@@ -324,7 +329,14 @@ const ShieldEditor = (() => {
                 baseShield.shieldName =
                   item.querySelector(".shieldItemName").textContent;
                 baseShield.shieldValue = item.dataset.name;
-                if (!properties.variants.includes(baseShield.variant)) {
+                if (
+                  !properties.variants.includes(baseShield.variant) &&
+                  !(
+                    baseShield.variant === "Auto" &&
+                    Shield.prototype.getPropertiesFromName(item.dataset.name)
+                      .supportsAuto
+                  )
+                ) {
                   baseShield.variant = properties.variants[0] || "";
                 }
 

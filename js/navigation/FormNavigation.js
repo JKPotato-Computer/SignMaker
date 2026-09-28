@@ -59,10 +59,12 @@ const FormNavigation = (() => {
         if (holder.classList.contains(sMConfigBar.dataset.currentMenu)) {
           holder.style.display = "block";
 
-          let width = holder.getBoundingClientRect().width;
-          document.querySelector("#smRender").style.transform =
-            `translateX(${width / 4}px)`;
-          isModalOpen = true;
+          if (window.innerWidth > 768) {
+            let width = holder.getBoundingClientRect().width;
+            document.querySelector("#smRender").style.transform =
+              `translateX(${width / 4}px)`;
+            isModalOpen = true;
+          }
         } else {
           holder.style.display = "";
         }
@@ -219,7 +221,6 @@ const FormNavigation = (() => {
           "px";
         tooltip.style.top = boundingRect.top - tooltip.offsetHeight - 10 + "px";
         tooltip.style.opacity = 1;
-        tooltip.style.transform = "translateX(-50%)";
 
         if (sMConfigBar.contains(element)) {
           tooltip.style.fontFamily = "Overpass";
@@ -233,7 +234,6 @@ const FormNavigation = (() => {
         tooltip.style.left = "-100px";
         tooltip.style.top = 0;
         tooltip.textContent = "";
-        tooltip.style.transform = "";
       });
     };
 
@@ -263,6 +263,12 @@ const FormNavigation = (() => {
 
     const scrollObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
+        if (window.innerWidth <= 768) {
+          document.querySelector("#sMConfigBar").style.display = "";
+          document.querySelector("#sMConfigBar").style.opacity = "1";
+          return;
+        }
+
         isFooterVisible = entry.isIntersecting;
         if (entry.isIntersecting) {
           setTimeout(() => {
@@ -375,6 +381,13 @@ const FormNavigation = (() => {
     const otherSymbolSelectElement = document.querySelector("#otherSymbol");
     for (const otherSymbol of Sign.prototype.otherSymbols) {
       lib.appendOption(otherSymbolSelectElement, otherSymbol);
+    }
+
+    for (const unit of SubPanels.prototype.dividerHeightUnits) {
+      lib.appendOption(
+        document.querySelector("#subpanelDividerHeightUnit"),
+        unit,
+      );
     }
   };
 
@@ -645,6 +658,13 @@ const FormNavigation = (() => {
       }
     }
 
+    for (const fontFamily of TextElement.prototype.fontFamily) {
+      lib.appendOption(
+        document.querySelector("#sdTollLogo_fontFamily"),
+        fontFamily,
+      );
+    }
+
     // Text alignment
     let textElem_alignmentSelects = [
       document.querySelector("#sdCtrlText_alignment"),
@@ -666,6 +686,13 @@ const FormNavigation = (() => {
       }
     }
 
+    for (const direction in TollLogoElement.prototype.direction) {
+      lib.appendOption(
+        document.querySelector("#sdTollLogo_onlyBlockDirection"),
+        direction,
+      );
+    }
+
     // Background colors
     let textElem_bgColorSelects = [
       document.querySelector("#sdCtrlText_backgroundColor"),
@@ -675,6 +702,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdIcon_backgroundColor"),
       document.querySelector("#sdBlock_backgroundColor"),
       document.querySelector("#sdTollLogo_backgroundColor"),
+      document.querySelector("#sdTollLogo_containerBackgroundColor"),
     ];
     for (const elem of textElem_bgColorSelects) {
       for (const backgroundColor of TextElement.prototype.backgroundColor) {
@@ -844,16 +872,6 @@ const FormNavigation = (() => {
       };
       valEl.addEventListener("change", onChange);
     });
-
-    // Toll logo selector
-    const tollLogoSelectElmt = document.querySelector("#sdTollLogo_logo");
-    for (const logoKey in TollLogoElement.prototype.logos) {
-      const logoDef = TollLogoElement.prototype.logos[logoKey];
-      lib.appendOption(tollLogoSelectElmt, logoKey, {
-        text: logoDef.label,
-        selected: logoKey == TollLogoElement.prototype.defaultLogo,
-      });
-    }
   };
 
   const setupGuideArrows = () => {
@@ -1207,6 +1225,22 @@ const FormNavigation = (() => {
 
     setupDropdownElement(
       document.querySelector("#sMET_variantTollIcon"),
+      TollLogoElement.prototype.logos,
+      "EZPass",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = `${TollLogoElement.prototype.logos[value].src}`;
+        image.classList.add("smWhiteDropdownImage");
+        return image;
+      },
+      (text, value) => {
+        text.textContent = TollLogoElement.prototype.logos[value].label;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#sdTollLogoHolder"),
       TollLogoElement.prototype.logos,
       "EZPass",
       (image, value) => {

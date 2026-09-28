@@ -87,13 +87,12 @@ span.toolTip {
   padding: 0.2rem 0.5rem;
   font-size: 13px;
   opacity: 1;
-  transition:
-    0.25s ease-in-out transform,
-    0.25s ease-in-out opacity;
+  transition: 0.25s ease-in-out opacity;
   z-index: 10;
   font-family: "Inter";
   width: max-content;
   max-width: 200px;
+  transform: translateX(-50%);
 }
 
 label > .toolTip {
@@ -446,7 +445,8 @@ input:disabled {
   align-items: center;
   gap: 0.5rem;
   padding-right: 0.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: max-content;
 }
 
 .listNavOptions button,
@@ -471,7 +471,10 @@ input:disabled {
   flex-grow: 1;
   flex-direction: row;
   justify-content: left;
-  width: 10rem;
+  min-width: 10rem;
+  width: stretch;
+  max-width: 15rem;
+  scrollbar-color: rgb(var(--baseColorInv), .5) transparent;
 }
 
 .resetClass {
@@ -683,7 +686,6 @@ input[type="button"]:disabled {
   align-items: center;
   justify-content: center;
   padding: 0.3rem 0.65rem;
-  border-radius: 0.4rem;
   cursor: grab;
   user-select: none;
   transform-origin: center;
@@ -1240,6 +1242,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.5);
   cursor: pointer;
   font-size: 1rem;
+  padding: 0;
 }
 
 .smSPShieldRow:hover {
@@ -1285,8 +1288,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .dragIndicator {
   height: stretch;
   aspect-ratio: 1 / 1;
-  display: none;
   background: none;
+  width: auto;
+  flex-grow: 1;
+  font-size: 1.5rem;
+  font-family: "Material Symbols Outlined";
 }
 
 .dragIndicator > span {
@@ -2898,4 +2904,18 @@ summary:hover {
 .visual-box {
   background-color: rgb(var(--baseColorInv), 0.25);
   border: 3px dashed rgb(var(--baseColorInv));
+}
+
+#sdTollLogoHolder {
+  width: 50%;
+  display: inline-block;
+}
+
+#sdTollLogo_backgroundColor {
+  width: 70%;
+}
+
+#objectSubpanelAdd {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
 }

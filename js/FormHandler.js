@@ -114,6 +114,8 @@ const formHandler = (() => {
         exitTabRow.position = form["sMET_Position"].value;
         exitTabRow.marginBottom = parseFloat(form["smET_marginBottom"].value);
         exitTabRow.independentWidth = form["smET_independentWidth"].checked;
+        exitTabRow.hideTopBorder = form["smET_hideTopBorder"].checked;
+        exitTabRow.hideBottomBorder = form["smET_hideBottomBorder"].checked;
       } else {
         const exitTab =
           exitTabRow.exitTabs[app.vars.currentlySelectedExitTabIndex];
@@ -288,6 +290,8 @@ const formHandler = (() => {
             form["smET_fullLeftLetterSpacing"].value;
           exitTab.variantSettings.fullLeft.bottomSpacing =
             form["smET_fullLeftBottomSpacing"].value;
+          exitTab.variantSettings.fullLeft.flipJustify =
+            form["smET_fullLeftFlipJustify"].checked;
         }
 
         exitTab.variant = document
@@ -332,10 +336,15 @@ const formHandler = (() => {
 
         currentShield.bannerSettings[alignment].alignment =
           bannerAlignmentElem.querySelector(".smSPShieldBannerJustify").value;
-        currentShield.bannerSettings[alignment].gap =
-          parseFloat(
-            bannerAlignmentElem.querySelector(".smSPShieldBannerGap").value,
-          ) || 0;
+        currentShield.bannerSettings[alignment].gap = parseFloat(
+          bannerAlignmentElem.querySelector(".smSPShieldBannerGap").value,
+        );
+
+        if (alignment == "left" || alignment == "right") {
+          currentShield.bannerSettings[alignment].inset = parseFloat(
+            bannerAlignmentElem.querySelector(".smSPShieldBannerInset").value,
+          );
+        }
 
         for (let i = currentShield.banners[alignment].length - 1; i >= 0; i--) {
           if (indexToSkip[alignment] === i) {
@@ -445,6 +454,10 @@ const formHandler = (() => {
       currentBlockElem.icon =
         document.querySelector(".sdIconDropdown").dataset.selectedOption ||
         currentBlockElem.icon;
+    } else if (currentBlockElem.constructor.name === "TollLogoElement") {
+      currentBlockElem.logo =
+        document.querySelector("#sdTollLogoHolder").dataset.selectedOption ||
+        currentBlockElem.logo;
     }
 
     subPanel.blockElements.blockProperties[
@@ -478,6 +491,14 @@ const formHandler = (() => {
 
     subPanel.laneWidth = parseInt(form["subPanelLength"].value);
     subPanel.verticalAlign = form["subpanelAlign"].value;
+    if (
+      app.vars.currentlySelectedSubPanelIndex !=
+        app.getCurrentPanel().sign.subPanels.length - 1 &&
+      app.getCurrentPanel().sign.subPanels.length >= 2
+    ) {
+      subPanel.dividerHeight = form["subpanelDividerHeight"].value;
+      subPanel.dividerHeightUnit = form["subpanelDividerHeightUnit"].value;
+    }
 
     if (app.vars.currentlySelectedSubPanelIndex != 0) {
       //subPanel.height = form["subPanelHeight"].value;
@@ -831,6 +852,29 @@ const formHandler = (() => {
     document.getElementById("subpanelAlign").value =
       app.getCurrentSubPanel().verticalAlign;
 
+    if (
+      app.vars.currentlySelectedSubPanelIndex !=
+        app.getCurrentPanel().sign.subPanels.length - 1 &&
+      app.getCurrentPanel().sign.subPanels.length >= 2
+    ) {
+      document.getElementById("subpanelDividerHeight").value =
+        app.getCurrentSubPanel().dividerHeight;
+      document.getElementById("subpanelDividerHeightUnit").value =
+        app.getCurrentSubPanel().dividerHeightUnit;
+      document.getElementById("subpanelDividerHeight").style.display = "";
+      document.getElementById("subpanelDividerHeightUnit").style.display = "";
+      document.querySelector(
+        'label[for="subpanelDividerHeight"]',
+      ).style.display = "";
+    } else {
+      document.getElementById("subpanelDividerHeight").style.display = "none";
+      document.getElementById("subpanelDividerHeightUnit").style.display =
+        "none";
+      document.querySelector(
+        'label[for="subpanelDividerHeight"]',
+      ).style.display = "none";
+    }
+
     // Shields
     updateShieldSubform();
 
@@ -839,6 +883,12 @@ const formHandler = (() => {
       const currentIcon = app.getCurrentBlockElem().icon;
       document.querySelector(".sdIconDropdown").dataset.selectedOption =
         currentIcon;
+    } else if (
+      app.getCurrentBlockElem().constructor.name === "TollLogoElement"
+    ) {
+      const currentLogo = app.getCurrentBlockElem().logo;
+      document.querySelector("#sdTollLogoHolder").dataset.selectedOption =
+        currentLogo;
     }
 
     // Control Text Revision
@@ -1148,11 +1198,10 @@ const formHandler = (() => {
       document.querySelector("#sdIcon_borderRadius"),
     ]);
     toggleVisibility(document.querySelector("#sdTollLogo_background"), [
-      document.querySelector("#sdTollLogo_backgroundColor"),
-      document.querySelector("#sdTollLogo_borderRadius"),
-      document.querySelector("#sdTollLogo_horizontalPadding"),
-      document.querySelector("#sdTollLogo_verticalPadding"),
-      document.querySelector("#sdTollLogo_hasOnlyBlock"),
+      document.querySelector(".sdTollLogo_background"),
+    ]);
+    toggleVisibility(document.querySelector("#sdTollLogo_showOnlyBlock"), [
+      document.querySelector(".sdTollLogo_showOnlyBlock"),
     ]);
     toggleVisibility(document.querySelector("#sMET_enlargeNumerals"), [
       document.querySelector("#sMET_enlargeNumeralsSize"),
@@ -1217,6 +1266,32 @@ const formHandler = (() => {
       )
         ? "none"
         : "";
+
+      // if it is the first exit tab group of bottom or top
+      let isFirst = false;
+      for (const exitTab of panel.exitTabs) {
+        if (
+          exitTab == currentExitTabRow &&
+          (exitTab.position == "top" || exitTab.position == "bottom")
+        ) {
+          isFirst = true;
+        } else if (exitTab.position == "top" || exitTab.position == "bottom") {
+          break;
+        }
+      }
+
+      document.querySelector('label[for="smET_hideTopBorder"]').style.display =
+        !isFirst || currentExitTabRow.position != "top" ? "none" : "";
+
+      document.querySelector(
+        'label[for="smET_hideBottomBorder"]',
+      ).style.display =
+        !isFirst || currentExitTabRow.position != "bottom" ? "none" : "";
+
+      document.querySelector("#smET_hideTopBorder").value =
+        currentExitTabRow.hideTopBorder;
+      document.querySelector("#smET_hideBottomBorder").value =
+        currentExitTabRow.hideBottomBorder;
 
       return;
     }
@@ -1657,25 +1732,17 @@ const formHandler = (() => {
       ).style.display =
         currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
       document.querySelector("#sMET_variantPbmPadding").style.display =
-        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
-          ? ""
-          : "none";
+        currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
       document.querySelector("#sMET_variantUnderline").style.display =
         currentExitTab.variantSettings.icon.addon == "none" ? "" : "none";
       document.querySelector("#smET_variantIsSquare").style.display =
-        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
-          ? ""
-          : "none";
+        currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
       document.querySelector("#smET_variantFontSize").style.display =
-        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
-          ? ""
-          : "none";
+        currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
       document.querySelector(
         'label[for="smET_variantFontSize"]',
       ).style.display =
-        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
-          ? ""
-          : "none";
+        currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
 
       document.querySelector("#smET_variantFontSize").value =
         currentExitTab.variantSettings.icon.fontSize;
@@ -1687,9 +1754,7 @@ const formHandler = (() => {
       document.querySelector(
         'label[for="sMET_variantPbmPadding"]',
       ).style.display =
-        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
-          ? ""
-          : "none";
+        currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
       document.querySelector(
         'label[for="sMET_variantUnderline"]',
       ).style.display =
@@ -1697,9 +1762,7 @@ const formHandler = (() => {
       document.querySelector(
         'label[for="smET_variantIsSquare"]',
       ).style.display =
-        currentExitTab.variantSettings.icon.addon == "pay by mail 1"
-          ? ""
-          : "none";
+        currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
 
       document.querySelector("#sMET_variantOnlyHorizontalPadding").value =
         currentExitTab.variantSettings.icon.onlyHorizontalPadding;
@@ -1730,6 +1793,8 @@ const formHandler = (() => {
         currentExitTab.variantSettings.fullLeft.letterSpacing;
       document.querySelector("#smET_fullLeftBottomSpacing").value =
         currentExitTab.variantSettings.fullLeft.bottomSpacing;
+      document.querySelector("#smET_fullLeftFlipJustify").checked =
+        currentExitTab.variantSettings.fullLeft.flipJustify;
     }
   };
 
@@ -1780,7 +1845,7 @@ const formHandler = (() => {
     }
 
     // Shield List
-    const createShieldRow = (shield, shieldIndex) => {
+    const createShieldRow = (shield, shieldIndex, noDrag) => {
       const shieldRow = document.createElement("button");
       shieldRow.type = "button";
       shieldRow.className = "smSPShieldRow";
@@ -1788,11 +1853,12 @@ const formHandler = (() => {
         shieldRow.classList.add("selected");
       }
 
-      const dragButton = document.createElement("span");
-      dragButton.className = "dragIndicator";
-      dragButton.innerHTML =
-        '<span class="material-symbols-outlined">drag_indicator</span>';
-      shieldRow.appendChild(dragButton);
+      if (!noDrag) {
+        const dragButton = document.createElement("button");
+        dragButton.className = "dragIndicator";
+        dragButton.innerHTML = "drag_indicator";
+        shieldRow.appendChild(dragButton);
+      }
 
       const shieldBlock = document.createElement("span");
       shieldBlock.className = "smSPShieldBlock";
@@ -1803,7 +1869,9 @@ const formHandler = (() => {
         shield.shieldType === "preset"
           ? Shield.prototype.getDirectoryFromShield(
               shield.shieldValue,
-              shield.variant,
+              shield.variant == "Auto"
+                ? Shield.prototype.getPreviewVariant()
+                : shield.variant,
             )
           : shield.imageData;
       shieldImg.alt = `${shield.shieldValue}-${shield.routeNumber}`;
@@ -1876,10 +1944,8 @@ const formHandler = (() => {
         }
 
         const groupDragButton = document.createElement("button");
-        groupDragButton.type = "button";
         groupDragButton.className = "dragIndicator";
-        groupDragButton.innerHTML =
-          '<span class="material-symbols-outlined">drag_indicator</span>';
+        groupDragButton.innerHTML = "drag_indicator";
         groupWrapper.appendChild(groupDragButton);
 
         groupHolder = document.createElement("div");
@@ -1893,7 +1959,7 @@ const formHandler = (() => {
         groupHolder.className = "smSPShieldGroupHolder";
       }
 
-      groupHolder.appendChild(createShieldRow(shield, shieldIndex));
+      groupHolder.appendChild(createShieldRow(shield, shieldIndex, true));
     }
 
     document.getElementById("smSPShieldProperties").style.display =
@@ -2036,6 +2102,21 @@ const formHandler = (() => {
       gapInput.className = "smSPShieldBannerGap";
       gapInput.addEventListener("change", readForm);
       labelForGap.appendChild(gapInput);
+
+      if (alignment == "left" || alignment == "right") {
+        const inset = document.createElement("label");
+        inset.textContent = "Inset: (rem)";
+        alignmentHeader.appendChild(inset);
+
+        const insetInput = document.createElement("input");
+        insetInput.type = "number";
+        insetInput.min = "0";
+        insetInput.step = "0.1";
+        insetInput.value = currentShield.bannerSettings[alignment].inset || 0;
+        insetInput.className = "smSPShieldBannerInset";
+        insetInput.addEventListener("change", readForm);
+        inset.appendChild(insetInput);
+      }
 
       alignmentHeader.className = "smSPBanner_alignmentHeader " + alignment;
       document.querySelector("#smSP_bannerMaster").appendChild(alignmentHeader);

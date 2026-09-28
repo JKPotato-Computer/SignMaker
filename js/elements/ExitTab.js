@@ -75,6 +75,7 @@ class ExitTab {
         fontFamily: "Series E",
         letterSpacing: 0,
         bottomSpacing: 1.25,
+        flipJustify: false,
       },
       partialLeft: {
         separateRow: true,
@@ -270,6 +271,15 @@ class ExitTab {
         "--bottomSpacing",
         this.variantSettings.fullLeft.bottomSpacing + "rem",
       );
+
+      if (this.variantSettings.fullLeft.flipJustify) {
+        exitTabElement.style.justifyContent =
+          this.alignment == "left"
+            ? "right"
+            : this.alignment == "right"
+              ? "left"
+              : "center";
+      }
 
       leftElement.appendChild(leftElementContent);
       exitTabElement.appendChild(leftElement);
@@ -543,7 +553,6 @@ class ExitTab {
         }
       }
 
-      exitTabElement.style.padding = "0";
       exitTabElement.style.gap = "";
 
       if (iconSettings.addon.toLowerCase() == "only") {
@@ -565,7 +574,7 @@ class ExitTab {
         exitTabElement.appendChild(onlyElement);
 
         exitTabElement.style.padding = "";
-      } else if (iconSettings.addon.toLowerCase() == "pay by mail 1") {
+      } else if (iconSettings.addon.toLowerCase() == "or variant") {
         exitTabElement.appendChild(imageHolder);
 
         const orElement = document.createElement("span");
@@ -583,11 +592,12 @@ class ExitTab {
           payByMailElement.style.fontSize = iconSettings.fontSize + "rem";
         }
 
+        exitTabElement.style.padding = "";
         exitTabElement.appendChild(payByMailElement);
       } else {
         const textElement = document.createElement("span");
         textElement.className = "ET-iconText ";
-        textElement.textContent = this.textContent;
+        textElement.textContent = this.textContent.replace(/\\t/g, "\t").replace(/\\n/g, "\n");;
         if (this.subTextContent) {
           textElement.textContent += "\n" + this.subTextContent;
         }
@@ -603,6 +613,7 @@ class ExitTab {
           exitTabElement.appendChild(divider);
         }
 
+        exitTabElement.style.padding = "0";
         exitTabElement.appendChild(imageHolder);
       }
     }
@@ -636,7 +647,7 @@ ExitTab.prototype.variants = [
   "HOVVariant2",
 ];
 
-ExitTab.prototype.iconVariant_addons = ["None", "Only", "Pay by Mail 1"];
+ExitTab.prototype.iconVariant_addons = ["None", "Only", "Or Variant"];
 ExitTab.prototype.tollIconBackgrounds = ["Transparent"].concat(
   Object.keys(lib.colors),
 );
@@ -649,6 +660,8 @@ class ExitTabRow {
     position = "top",
     marginBottom = 0.3,
     independentWidth = false,
+    hideTopBorder = false,
+    hideBottomBorder = false,
   } = {}) {
     this.exitTabs = exitTabs;
     this.gap = gap;
@@ -656,6 +669,8 @@ class ExitTabRow {
     this.position = position;
     this.marginBottom = marginBottom;
     this.independentWidth = independentWidth;
+    this.hideTopBorder = hideTopBorder;
+    this.hideBottomBorder = hideBottomBorder;
   }
 
   createElement() {

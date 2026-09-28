@@ -1,5 +1,11 @@
 class SubPanels {
-  constructor({ laneWidth = 0, blockElements, verticalAlign = "Start" } = {}) {
+  constructor({
+    laneWidth = 0,
+    blockElements,
+    verticalAlign = "Start",
+    dividerHeight = 50,
+    dividerHeightUnit = "%",
+  } = {}) {
     if (blockElements) {
       this.blockElements = blockElements;
     } else {
@@ -9,7 +15,10 @@ class SubPanels {
 
     this.laneWidth = laneWidth;
     this.verticalAlign = verticalAlign;
+    this.dividerHeight = dividerHeight;
+    this.dividerHeightUnit = dividerHeightUnit;
   }
 }
 
 SubPanels.prototype.verticalAlign = ["Start", "Center", "End"];
+SubPanels.prototype.dividerHeightUnits = ["%", "rem"];

@@ -25,19 +25,21 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
-     <script type="module">
-        import terminal from 'virtual:terminal';
+    <script type="module">
+      import terminal from "virtual:terminal";
 
-        // Catch standard runtime errors
-        window.addEventListener('error', (event) => {
-          terminal.error(`[Browser Error] ${event.message} at ${event.filename}:${event.lineno}`);
-        });
+      // Catch standard runtime errors
+      window.addEventListener("error", (event) => {
+        terminal.error(
+          `[Browser Error] ${event.message} at ${event.filename}:${event.lineno}`,
+        );
+      });
 
-        // Catch unhandled promise rejections (async/await errors)
-        window.addEventListener('unhandledrejection', (event) => {
-          terminal.error(`[Browser Promise Rejection] ${event.reason}`);
-        });
-      </script>
+      // Catch unhandled promise rejections (async/await errors)
+      window.addEventListener("unhandledrejection", (event) => {
+        terminal.error(`[Browser Promise Rejection] ${event.reason}`);
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/gh/peterhry/CircleType@2.3.1/dist/circletype.min.js"></script>
     <script src="js/packages/HtmlToImage.js" type="text/javascript"></script>
 
@@ -758,6 +760,12 @@
                     step="1"
                     onchange="DiagramDrawing.readForm()"
                   />
+                  <label for="roadwayShowLaneMarkings">Lane Markings:</label>
+                  <input
+                    type="checkbox"
+                    id="roadwayShowLaneMarkings"
+                    onchange="DiagramDrawing.readForm()"
+                  />
                   <br />
                   <label for="roadwayCurveIntensity">Curve Intensity:</label>
                   <input
@@ -827,7 +835,6 @@
                     step="1"
                     onchange="DiagramDrawing.readForm()"
                   />
-                  <br />
                   <label for="objectArrowRoundness"
                     >Arrow Roundness (px):</label
                   >
@@ -838,6 +845,13 @@
                     min="0"
                     max="100"
                     step="1"
+                    onchange="DiagramDrawing.readForm()"
+                  />
+                  <br />
+                  <label for="objectArrowPointedTip"> Pointed Tip:</label>
+                  <input
+                    type="checkbox"
+                    id="objectArrowPointedTip"
                     onchange="DiagramDrawing.readForm()"
                   />
                 </fieldset>
@@ -855,6 +869,16 @@
                     id="objectSubpanelNumber"
                     onchange="DiagramDrawing.readForm()"
                   ></select>
+                  <button
+                    id="objectSubpanelAdd"
+                    onclick="
+                      App.addSubPanel();
+                      DiagramDrawing.readForm();
+                    "
+                  >
+                    Add Subpanel
+                  </button>
+                  <br />
                   <label for="objectSubpanelDirection">Direction:</label>
                   <select
                     id="objectSubpanelDirection"
@@ -900,7 +924,12 @@
                 value=""
               />
             </div>
-            <button id="diagramUse">Use Diagram</button>
+
+            <div>
+              <button id="importDiagram">Import Diagram</button>
+              <button id="exportDiagram">Export Diagram</button>
+              <button id="diagramUse">Use Diagram</button>
+            </div>
           </footer>
         </div>
         <dialog id="diagramKeyboardShortcuts" class="diagramSubModal">
@@ -1294,6 +1323,24 @@
                 id="smET_independentWidth"
                 onchange="formHandler.readForm()"
               />
+              <label for="smET_hideTopBorder" class="checkboxLabel">
+                Hide Top Border:
+                <input
+                  type="checkbox"
+                  id="smET_hideTopBorder"
+                  name="smET_hideTopBorder"
+                  onchange="formHandler.readForm()"
+                />
+              </label>
+              <label for="smET_hideBottomBorder" class="checkboxLabel">
+                Hide Bottom Border:
+                <input
+                  type="checkbox"
+                  id="smET_hideBottomBorder"
+                  name="smET_hideBottomBorder"
+                  onchange="formHandler.readForm()"
+                />
+              </label>
             </div>
             <div id="sMExitTabVariant" class="tabHidden">
               <div class="sMET_typeSelect">
@@ -1527,9 +1574,7 @@
                   value="0.25"
                   onchange="formHandler.readForm()"
                 />
-                <label for="sMET_variantPbmPadding"
-                  >Pay by Mail Padding (rem):</label
-                >
+                <label for="sMET_variantPbmPadding">Text Padding (rem):</label>
                 <input
                   type="number"
                   id="sMET_variantPbmPadding"
@@ -1613,6 +1658,14 @@
                   min="0"
                   max="20"
                   step=".01"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="smET_fullLeftFlipJustify">Flip Justify:</label>
+                <input
+                  type="checkbox"
+                  id="smET_fullLeftFlipJustify"
+                  name="smET_fullLeftFlipJustify"
                   onchange="formHandler.readForm()"
                 />
               </fieldset>
@@ -2655,37 +2708,37 @@
                 </div>
                 <div id="sMSPTextList"></div>
                 <div id="sMSPElement">
-                    <select id="sMSPElementSelect" style="width: 30%"></select>
-                    <button
-                      id="sMSPReplaceElement"
-                      onclick="
-                        App.replaceControlElem(
-                          document.querySelector('#sMSPElementSelect').value,
-                        )
-                      "
+                  <select id="sMSPElementSelect" style="width: 30%"></select>
+                  <button
+                    id="sMSPReplaceElement"
+                    onclick="
+                      App.replaceControlElem(
+                        document.querySelector('#sMSPElementSelect').value,
+                      )
+                    "
+                  >
+                    <span class="material-symbols-outlined">swap_horiz</span>
+                    Replace
+                  </button>
+                  <button
+                    id="sMSPCreateElement"
+                    onclick="
+                      App.newControlElem(
+                        document.querySelector('#sMSPElementSelect').value,
+                      )
+                    "
+                  >
+                    <span class="material-symbols-outlined">add</span> New
+                  </button>
+                  <button
+                    id="sMSPDeleteSelectedBlock"
+                    onclick="App.delControlElem()"
+                  >
+                    <span class="material-symbols-outlined" disabled
+                      >delete</span
                     >
-                      <span class="material-symbols-outlined">swap_horiz</span>
-                      Replace
-                    </button>
-                    <button
-                      id="sMSPCreateElement"
-                      onclick="
-                        App.newControlElem(
-                          document.querySelector('#sMSPElementSelect').value,
-                        )
-                      "
-                    >
-                      <span class="material-symbols-outlined">add</span> New
-                    </button>
-                    <button
-                      id="sMSPDeleteSelectedBlock"
-                      onclick="App.delControlElem()"
-                    >
-                      <span class="material-symbols-outlined" disabled
-                        >delete</span
-                      >
-                      Selected
-                    </button>
+                    Selected
+                  </button>
                 </div>
                 <div id="smSPProperties">
                   <div data-property="sdCtrlText" class="">
@@ -2738,6 +2791,24 @@
                       type="number"
                       value="100"
                     />
+                    <label for="sdCtrlText_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdCtrlText_wordSpacing"
+                    />
+                    <input
+                      id="sdCtrlText_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
+                    />
                     <br />
                     <label for="sdCtrlText_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -2789,7 +2860,7 @@
                   </div>
 
                   <div data-property="sdBlocker" class="hidden">
-                    <label for="sdBlocker_dividerWidth">Divider Width: </label>
+                    <label for="sdBlocker_dividerWidth">Width: </label>
                     <input
                       type="number"
                       id="sdBlocker_dividerWidth"
@@ -2804,13 +2875,8 @@
                       data-toolTip="Unit (%/rem)"
                       class="sdTextEditorSmall"
                     ></select>
-                    <label for="sdBlocker_dividerColor">Color:</label>
-                    <select
-                      id="sdBlocker_dividerColor"
-                      class="sdTextEditorSmall"
-                    ></select>
                     <label for="sdBlocker_dividerHeight"
-                      >Divider Height (rem):
+                      >Height Height (rem):
                     </label>
                     <input
                       type="number"
@@ -2822,8 +2888,14 @@
                       step=".1"
                     />
                     <br />
+                    <label for="sdBlocker_dividerColor">Color:</label>
+                    <select
+                      id="sdBlocker_dividerColor"
+                      class="sdTextEditorSmall"
+                    ></select>
                     <label for="sdBlocker_alignment">Alignment: </label>
                     <select id="sdBlocker_alignment"></select>
+                    <br />
                     <label for="sdBlocker_fullBleed">Full Width:</label>
                     <input type="checkbox" id="sdBlocker_fullBleed" />
                     <label for="sdBlocker_visible">Visibility:</label>
@@ -2878,6 +2950,25 @@
                       min="50"
                       step="1"
                       value="100"
+                    />
+                    <br />
+                    <label for="sdAdvisory_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdAdvisory_wordSpacing"
+                    />
+                    <input
+                      id="sdAdvisory_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
                     />
                     <br />
                     <label for="sdAdvisory_borderRadius"
@@ -3213,8 +3304,29 @@
                   </div>
 
                   <div data-property="sdTollLogo" class="hidden">
-                    <label for="sdTollLogo_logo">Toll Logo:</label>
-                    <select id="sdTollLogo_logo"></select>
+                    <label for="sdTollLogoHolder">Toll Logo:</label>
+                    <div id="sdTollLogoHolder" class="smDropdownInputElement">
+                      <button class="smDropdownSelectedButton" type="button">
+                        <img class="smDropdownSelectedImage" alt="" />
+                        <span
+                          class="sdTollLogo_selectedLabel smDropdownSelectedLabel"
+                          >AIRPORT</span
+                        >
+                        <span class="material-symbols-outlined smDropdownArrow"
+                          >arrow_drop_down</span
+                        >
+                      </button>
+                      <div class="hidden smDropdownHolder">
+                        <input
+                          type="search"
+                          class="smDropdownSearch"
+                          placeholder="Search toll logos"
+                          autocomplete="off"
+                        />
+                        <div class="smDropdownList"></div>
+                      </div>
+                    </div>
+                    <br />
                     <label for="sdTollLogo_logoHeight">Size (rem):</label>
                     <input
                       type="number"
@@ -3225,7 +3337,6 @@
                       step="0.1"
                       value="3"
                     />
-                    <br />
                     <label for="sdTollLogo_spacing">Spacing (rem):</label>
                     <input
                       type="number"
@@ -3236,59 +3347,169 @@
                       step="0.1"
                       value="0"
                     />
+                    <br />
                     <label for="sdTollLogo_alignment">Alignment:</label>
                     <select id="sdTollLogo_alignment"></select>
-                    <br />
-                    <label for="sdTollLogo_background">Background:</label>
-                    <input type="checkbox" id="sdTollLogo_background" />
-                    <select
-                      id="sdTollLogo_backgroundColor"
-                      class="hidden"
-                      data-toolTip="Toll Logo Background Color"
-                    ></select>
                     <label for="sdTollLogo_squareIcon">Square Icon:</label>
                     <input type="checkbox" id="sdTollLogo_squareIcon" />
                     <br />
-                    <label for="sdTollLogo_hasOnlyBlock" class="hidden"
+                    <label for="sdTollLogo_background">Background:</label>
+                    <input type="checkbox" id="sdTollLogo_background" />
+                    <label for="sdTollLogo_showOnlyBlock"
                       >Show Only Block</label
                     >
-                    <input
-                      type="checkbox"
-                      id="sdTollLogo_hasOnlyBlock"
-                      class="hidden"
-                    />
-                    <label for="sdTollLogo_borderRadius" class="hidden"
-                      >Toll Logo Roundness (px)</label
-                    >
-                    <input
-                      type="number"
-                      id="sdTollLogo_borderRadius"
-                      class="hidden"
-                      min="0"
-                      max="100"
-                      step="1"
-                      value="8"
-                    />
-                    <label for="sdTollLogo_horizontalPadding" class="hidden"
-                      >Horizontal Background Padding (rem)</label
-                    >
-                    <input
-                      type="number"
-                      id="sdTollLogo_horizontalPadding"
-                      class="hidden"
-                      value=".2"
-                      step=".01"
-                    />
-                    <label for="sdTollLogo_verticalPadding" class="hidden"
-                      >Vertical Background Padding (rem)</label
-                    >
-                    <input
-                      type="number"
-                      id="sdTollLogo_verticalPadding"
-                      class="hidden"
-                      value=".05"
-                      step=".01"
-                    />
+                    <input type="checkbox" id="sdTollLogo_showOnlyBlock" />
+                    <br />
+                    <fieldset class="sdTollLogo_background">
+                      <legend>Background Settings</legend>
+                      <label for="sdTollLogo_backgroundColor"
+                        >Background Color:</label
+                      >
+                      <select id="sdTollLogo_backgroundColor"></select>
+                      <br />
+                      <label for="sdTollLogo_tollBorderRadius"
+                        >BG Roundness (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_tollBorderRadius"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="8"
+                      />
+                      <label for="sdTollLogo_border">Border Width (px):</label>
+                      <input
+                        type="number"
+                        id="sdTollLogo_border"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="1"
+                      />
+                      <br />
+                      <label for="sdTollLogo_horizontalPadding"
+                        >Horizontal Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_horizontalPadding"
+                        value=".2"
+                        step=".001"
+                      />
+                      <label for="sdTollLogo_verticalPadding"
+                        >Vertical Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_verticalPadding"
+                        value=".05"
+                        step=".001"
+                      />
+                    </fieldset>
+                    <fieldset class="sdTollLogo_showOnlyBlock">
+                      <legend>Only Block Settings</legend>
+                      <label for="sdTollLogo_onlyBlockDirection"
+                        >Direction:</label
+                      >
+                      <select id="sdTollLogo_onlyBlockDirection"></select>
+                      <label for="sdTollLogo_onlyBlockSpacing"
+                        >Spacing (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockSpacing"
+                        value=".2"
+                        step=".01"
+                      />
+                      <br />
+                      <label for="sdTollLogo_onlyBlockFontSize"
+                        >Font Size (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockFontSize"
+                        value="16"
+                        step="1"
+                      />
+                      <label for="sdTollLogo_fontFamily">Font Family:</label>
+                      <select id="sdTollLogo_fontFamily"></select>
+                      <br />
+                      <label for="sdTollLogo_onlyBlockHorizPadding"
+                        >Horizontal Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockHorizPadding"
+                        value=".2"
+                        step=".001"
+                      />
+                      <label for="sdTollLogo_onlyBlockVertPadding"
+                        >Vertical Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockVertPadding"
+                        value=".05"
+                        step=".001"
+                      />
+                      <hr />
+                      <label for="sdTollLogo_containerHorizontalPadding"
+                        >Container Horiz. Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerHorizontalPadding"
+                        value=".2"
+                        step=".01"
+                      />
+                      <label for="sdTollLogo_containerVerticalPadding"
+                        >Container Vert. Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerVerticalPadding"
+                        value=".05"
+                        step=".01"
+                      />
+                      <br />
+                      <label for="sdTollLogo_containerBackgroundColor"
+                        >Container BG Color:</label
+                      >
+                      <select id="sdTollLogo_containerBackgroundColor"></select>
+                      <label for="sdTollLogo_containerBorderWidth"
+                        >Border Width (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerBorderWidth"
+                        value="0"
+                        min="0"
+                        step="1"
+                      />
+                      <br />
+                      <label for="sdTollLogo_containerBorderRadius"
+                        >Container Roundness (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerBorderRadius"
+                        value="0"
+                        min="0"
+                        step="1"
+                      />
+                      <label for="sdTollLogo_onlyBorderRadius"
+                        >Only Roundness (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBorderRadius"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="8"
+                      />
+                    </fieldset>
                   </div>
 
                   <div data-property="sdActionMessage" class="hidden">
@@ -3339,6 +3560,25 @@
                       min="50"
                       step="1"
                       value="100"
+                    />
+                    <br />
+                    <label for="sdActionMessage_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdActionMessage_wordSpacing"
+                    />
+                    <input
+                      id="sdActionMessage_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
                     />
                     <br />
                     <label for="sdActionMessage_useNumeralFormatting"
@@ -3413,6 +3653,25 @@
                       min="50"
                       step="1"
                       value="100"
+                    />
+                    <br />
+                    <label for="sdElectronicSign_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdElectronicSign_wordSpacing"
+                    />
+                    <input
+                      id="sdElectronicSign_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
                     />
                     <br />
                     <label for="sdElectronicSign_textColor">Text Color:</label>
@@ -3579,7 +3838,26 @@
               />
               <br />
               <label for="subpanelAlign">Align Items:</label>
-              <select id="subpanelAlign"></select>
+              <select
+                id="subpanelAlign"
+                onchange="formHandler.readForm()"
+              ></select>
+              <br />
+              <label for="subpanelDividerHeight">Divider Height:</label>
+              <select
+                id="subpanelDividerHeightUnit"
+                name="subpanelDividerHeightUnit"
+                onchange="formHandler.readForm()"
+              ></select>
+              <input
+                id="subpanelDividerHeight"
+                name="subpanelDividerHeight"
+                type="number"
+                min="0"
+                step=".1"
+                value="50"
+                onchange="formHandler.readForm()"
+              />
             </div>
           </div>
         </div>

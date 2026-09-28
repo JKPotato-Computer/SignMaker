@@ -1,25 +1,4 @@
 // Control.js
-const fractionMap = {
-  "1/2": "½",
-  "1/3": "⅓",
-  "2/3": "⅔",
-  "1/4": "¼",
-  "3/4": "¾",
-  "1/5": "⅕",
-  "2/5": "⅖",
-  "3/5": "⅗",
-  "4/5": "⅘",
-  "1/6": "⅙",
-  "5/6": "⅚",
-  "1/7": "⅐",
-  "1/8": "⅛",
-  "3/8": "⅜",
-  "5/8": "⅝",
-  "7/8": "⅞",
-  "1/9": "⅑",
-  "1/10": "⅒",
-};
-const fractionRegex = new RegExp(Object.keys(fractionMap).join("|"), "g");
 
 class TextElement {
   constructor({
@@ -35,6 +14,7 @@ class TextElement {
     alignment = "Center",
     textAlign = "Center",
     lineHeight = 100,
+    wordSpacing = 0,
   } = {}) {
     this.textContent = textContent;
     this.fontFamily = fontFamily;
@@ -47,6 +27,7 @@ class TextElement {
     this.bannerFirstLetterSize = bannerFirstLetterSize;
     this.alignment = alignment;
     this.lineHeight = lineHeight;
+    this.wordSpacing = wordSpacing;
     this.textAlign = textAlign;
   }
 
@@ -54,11 +35,7 @@ class TextElement {
     let result = [text];
     let tagged = [];
 
-    const numeralPattern = /(\d+\S*)|([\u00BC-\u00BE]+\S*)/;
-    const lightNumeralPattern = new RegExp(
-      numeralPattern.source + "|" + Object.values(fractionMap).join("|"),
-      "g",
-    );
+    const numeralPattern = /(\d+\/\d+)|(\d\S*)/g;
 
     const bannerPattern = new RegExp(
       `(\\s*)(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)(\\s*)`,
@@ -79,9 +56,7 @@ class TextElement {
         let currentResult = result[i]
           .split(numeralPattern)
           .filter(Boolean)
-          .map((val) =>
-            val.replace(fractionRegex, (match) => fractionMap[match]),
-          );
+          .map((val) => val.replace(numeralPattern, (match) => match));
         newResult = newResult.concat(currentResult);
       }
       result = newResult;
@@ -92,7 +67,7 @@ class TextElement {
     );
     for (let i = 0; i < result.length; i++) {
       let r = result[i];
-      if (lightNumeralPattern.test(r) && this.useNumeralFormatting) {
+      if (numeralPattern.test(r) && this.useNumeralFormatting) {
         tagged[i] = { type: "numeral", value: r };
       } else if (lightBannerPattern.test(r) && this.useBannerFormatting) {
         tagged[i] = { type: "banner", value: r };
@@ -133,6 +108,7 @@ class TextElement {
       this.bannerFirstLetterSize,
     );
     newText.style.setProperty("--lineHeight", this.lineHeight);
+    newText.style.setProperty("--wordSpacing", this.wordSpacing + "rem");
     if (usesHighwayGothic) {
       newText.style.setProperty(
         "--fhwaBaselineOffset",
@@ -154,11 +130,36 @@ class TextElement {
 
       for (let i = 0; i < splitTextContent.length; i++) {
         let text = splitTextContent[i];
-        const newTextFragment = document.createElement("span");
-        newTextFragment.className = "bE-" + text.type;
-        newTextFragment.textContent = text.value;
+        if (/\d+\/\d+/g.test(text.value) && text.type == "numeral") {
+          let firstFrac = text.value.split("/")[0];
+          let secondFrac = text.value.split("/")[1];
 
-        lineElement.appendChild(newTextFragment);
+          const fractionHolder = document.createElement("div");
+          fractionHolder.className = "bE-fraction";
+
+          const numerator = document.createElement("span");
+          numerator.className = "bE-numerator";
+          numerator.textContent = firstFrac;
+
+          const denominator = document.createElement("span");
+          denominator.className = "bE-denominator";
+          denominator.textContent = secondFrac;
+
+          const slash = document.createElement("span");
+          slash.className = "bE-slash";
+          slash.textContent = "/";
+
+          fractionHolder.appendChild(numerator);
+          fractionHolder.appendChild(slash);
+          fractionHolder.appendChild(denominator);
+          lineElement.appendChild(fractionHolder);
+        } else {
+          const newTextFragment = document.createElement("span");
+          newTextFragment.className = "bE-" + text.type;
+          newTextFragment.textContent = text.value;
+
+          lineElement.appendChild(newTextFragment);
+        }
       }
       newText.appendChild(lineElement);
     }
@@ -199,13 +200,10 @@ TextElement.prototype.backgroundColor = ["Inherit"].concat(
 );
 
 class ControlTextElement extends TextElement {
-  constructor({
-    smallCapitals = false,
-    fontFamily = ControlTextElement.defaultFont,
-  } = {}) {
+  constructor({ smallCapitals = false, wordSpacing = 0 } = {}) {
     super();
-    this.fontFamily = fontFamily;
     this.smallCapitals = smallCapitals;
+    this.wordSpacing = wordSpacing;
   }
 
   createElement() {
@@ -216,13 +214,22 @@ class ControlTextElement extends TextElement {
   }
 }
 
-ControlTextElement.defaultFont = "Clearview 5WR";
-
 class ActionMessageElement extends TextElement {
-  constructor({ fontSize = 70, useNumeralFormatting = true } = {}) {
+  constructor({
+    fontSize = 70,
+    useNumeralFormatting = true,
+    wordSpacing = 0,
+  } = {}) {
     super();
     this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
+    this.wordSpacing = wordSpacing;
+  }
+
+  createElement() {
+    const newText = super.createElement();
+    newText.classList.add("bE-actionMessageElement");
+    return newText;
   }
 }
 
@@ -234,6 +241,7 @@ class AdvisoryMessageElement extends TextElement {
     useNumeralFormatting = true,
     horizPadding = 0.3,
     vertPadding = 0.2,
+    wordSpacing = 0,
   } = {}) {
     super();
     this.backgroundColor = backgroundColor;
@@ -242,6 +250,7 @@ class AdvisoryMessageElement extends TextElement {
     this.useNumeralFormatting = useNumeralFormatting;
     this.horizPadding = horizPadding;
     this.vertPadding = vertPadding;
+    this.wordSpacing = wordSpacing;
   }
 
   createElement() {
@@ -263,6 +272,7 @@ class ElectronicSignElement extends TextElement {
     vertPadding = 0.5,
     glow = true,
     setWidth = 0,
+    wordSpacing = 0,
   } = {}) {
     super();
     this.fontFamily = fontFamily;
@@ -273,16 +283,13 @@ class ElectronicSignElement extends TextElement {
     this.vertPadding = vertPadding;
     this.glow = glow;
     this.setWidth = setWidth;
+    this.wordSpacing = wordSpacing;
     Object.defineProperty(this, "backgroundColor", {
       get: function () {
-        return "Black"
+        return "Black";
       },
-      set: function () {}
+      set: function () {},
     });
-  }
-
-  get backgroundColor() {
-    return "Black";
   }
 
   createElement(panel) {
@@ -306,7 +313,10 @@ class ElectronicSignElement extends TextElement {
   }
 }
 ElectronicSignElement.prototype.fontFamily =
-  TextElement.prototype.fontFamily.concat(["Electronic Highway Sign","VCR Mono"]);
+  TextElement.prototype.fontFamily.concat([
+    "Electronic Highway Sign",
+    "VCR Mono",
+  ]);
 ElectronicSignElement.prototype.textColors = [
   "Orange",
   "White",
@@ -883,58 +893,157 @@ class TollLogoElement {
     logo = TollLogoElement.prototype.defaultLogo,
     logoHeight = 3,
     spacing = 0,
-    horizontalPadding = 0.2,
-    verticalPadding = 0.05,
+    horizontalPadding = 0.25,
+    verticalPadding = 0.25,
     background = false,
-    backgroundColor = "White",
+    backgroundColor = "Purple",
     alignment = "Center",
     squareIcon = false,
-    borderRadius = 8,
-    hasOnlyBlock = false,
+
+    containerBorderRadius = 8,
+    tollBorderRadius = 8,
+    onlyBorderRadius = 4,
+
+    border = 3,
+    showOnlyBlock = false,
+    onlyBlockDirection = "Horizontal",
+    onlyBlockSpacing = 0.25,
+    onlyBlockFontSize = 24,
+    fontFamily = "Series D",
+    onlyBlockHorizPadding = 0.2,
+    onlyBlockVertPadding = 0.25,
+    containerHorizontalPadding = 0.25,
+    containerVerticalPadding = 0.25,
+    containerBorderWidth = 0,
+    containerBackgroundColor = "Purple",
   } = {}) {
     this.logo = logo;
     this.logoHeight = logoHeight;
     this.spacing = spacing;
     this.background = background;
     this.squareIcon = squareIcon;
-    this.borderRadius = borderRadius;
+    this.tollBorderRadius = tollBorderRadius;
+    this.containerBorderRadius = containerBorderRadius;
+    this.onlyBorderRadius = onlyBorderRadius;
+    this.border = border;
     this.backgroundColor = backgroundColor;
     this.horizontalPadding = horizontalPadding;
     this.verticalPadding = verticalPadding;
-    this.hasOnlyBlock = hasOnlyBlock;
+    this.showOnlyBlock = showOnlyBlock;
+    this.onlyBlockDirection = onlyBlockDirection;
+    this.onlyBlockSpacing = onlyBlockSpacing;
+    this.onlyBlockFontSize = onlyBlockFontSize;
+    this.fontFamily = fontFamily;
+    this.onlyBlockHorizPadding = onlyBlockHorizPadding;
+    this.onlyBlockVertPadding = onlyBlockVertPadding;
+    this.containerHorizontalPadding = containerHorizontalPadding;
+    this.containerVerticalPadding = containerVerticalPadding;
+    this.containerBorderWidth = containerBorderWidth;
+    this.containerBackgroundColor = containerBackgroundColor;
     this.alignment = alignment;
   }
 
   createElement() {
     const container = document.createElement("div");
-    container.className = "bE-tollLogoElement";
+    container.className =
+      "bE-tollLogoElement" + (this.squareIcon ? " squareIcon" : "");
+
+    const imgHolder = document.createElement("div");
+    imgHolder.className = "bE-tollLogoImageHolder";
+    container.appendChild(imgHolder);
 
     const img = document.createElement("img");
     img.src = TollLogoElement.prototype.logos[this.logo].src;
-    container.appendChild(img);
+    imgHolder.appendChild(img);
 
-    container.style.setProperty("--spacing", this.spacing + "rem");
-    container.style.setProperty(
-      "--tollBgColor",
-      lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase(),
-    );
-    container.style.setProperty("--borderRadius", this.borderRadius + "px");
-    container.style.setProperty(
-      "--horizPadding",
-      this.horizontalPadding + "rem",
-    );
-    container.style.setProperty("--vertPadding", this.verticalPadding + "rem");
-    container.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
+    imgHolder.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
 
     if (this.background) {
-      container.classList.add("hasBackground");
+      imgHolder.classList.add("hasBackground");
+
+      if (this.backgroundColor != "Inherit") {
+        imgHolder.style.setProperty(
+          "--tollBgColor",
+          lib.colors[this.backgroundColor] ||
+            this.backgroundColor.toLowerCase(),
+        );
+      }
+
+      imgHolder.style.setProperty(
+        "--logoHorizontalPadding",
+        this.horizontalPadding + "rem",
+      );
+      imgHolder.style.setProperty(
+        "--logoVerticalPadding",
+        this.verticalPadding + "rem",
+      );
+      imgHolder.style.setProperty("--tollBorderWidth", this.border + "px");
+
+      imgHolder.style.setProperty(
+        "--tollBorderRadius",
+        this.tollBorderRadius + "px",
+      );
+
+      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+        imgHolder.style.borderColor = "black";
+      } else {
+        imgHolder.style.borderColor = "white";
+      }
     }
 
-    if (this.squareIcon) {
-      img.style.aspectRatio = "1 / 1";
-    }
+    container.style.setProperty("--spacing", this.spacing + "rem");
 
-    if (this.hasOnlyBlock) {
+    if (this.showOnlyBlock) {
+      container.style.setProperty(
+        "--onlyBlockDirection",
+        TollLogoElement.prototype.direction[this.onlyBlockDirection],
+      );
+      container.style.setProperty(
+        "--onlyBlockSpacing",
+        this.onlyBlockSpacing + "rem",
+      );
+      container.style.setProperty(
+        "--onlyBlockFontFamily",
+        '"' + this.fontFamily + '"',
+      );
+      container.style.setProperty(
+        "--onlyBlockFontSize",
+        this.onlyBlockFontSize + "px",
+      );
+      container.style.setProperty(
+        "--onlyBlockHorizPadding",
+        this.onlyBlockHorizPadding + "rem",
+      );
+      container.style.setProperty(
+        "--onlyBlockVertPadding",
+        this.onlyBlockVertPadding + "rem",
+      );
+      container.style.setProperty(
+        "--containerHorizontalPadding",
+        this.containerHorizontalPadding + "rem",
+      );
+      container.style.setProperty(
+        "--containerVerticalPadding",
+        this.containerVerticalPadding + "rem",
+      );
+      container.style.setProperty(
+        "--containerBorderWidth",
+        this.containerBorderWidth + "px",
+      );
+      container.style.setProperty(
+        "--containerBackgroundColor",
+        lib.colors[this.containerBackgroundColor] ||
+          this.containerBackgroundColor.toLowerCase(),
+      );
+      container.style.setProperty(
+        "--containerBorderRadius",
+        this.containerBorderRadius + "px",
+      );
+      container.style.setProperty(
+        "--onlyBorderRadius",
+        this.onlyBorderRadius + "px",
+      );
+
       const onlyBlock = document.createElement("div");
       onlyBlock.className = "bE-tollOnlyBlock";
       onlyBlock.textContent = "ONLY";
@@ -942,7 +1051,13 @@ class TollLogoElement {
       container.classList.add("hasOnlyBlock");
 
       if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
-        container.classList.add("inverseColor");
+        container.style.borderColor = "black";
+        onlyBlock.style.color = "white";
+        onlyBlock.style.backgroundColor = "black";
+      } else {
+        container.style.borderColor = "white";
+        onlyBlock.style.backgroundColor = "white";
+        onlyBlock.style.color = "black";
       }
     }
 
@@ -993,6 +1108,10 @@ TollLogoElement.prototype.logos = {
   MUTCD: { label: "MUTCD", src: "assets/tolls/MUTCD.svg" },
 };
 TollLogoElement.prototype.alignment = TextElement.prototype.alignment;
+TollLogoElement.prototype.direction = {
+  Horizontal: "row",
+  Vertical: "column",
+};
 
 class Block {
   constructor({

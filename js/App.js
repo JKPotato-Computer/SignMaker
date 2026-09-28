@@ -67,12 +67,21 @@ const App = (() => {
 
           currentBlockRows[newRowIndex].splice(newBlockIndex, 0, block);
           currentlySelectedRowIndex = Math.max(newRowIndex, 0);
-          currentlySelectedBlockIndex = Math.max(newBlockIndex, 0);
+          currentlySelectedBlockIndex = clamp(
+            newBlockIndex,
+            0,
+            currentBlockRows[newRowIndex].length - 1,
+          );
 
           if (currentBlockRows[oldRowIndex].length == 0) {
             currentBlockRows.splice(oldRowIndex, 1);
             currentlySelectedRowIndex =
               oldRowIndex > newRowIndex ? newRowIndex : newRowIndex - 1;
+            currentlySelectedBlockIndex = clamp(
+              newBlockIndex,
+              0,
+              currentBlockRows[newRowIndex].length - 1,
+            );
           }
         }
 
@@ -94,7 +103,10 @@ const App = (() => {
             1,
           )[0];
           currentExitTabs[newGroupIndex].exitTabs.splice(newTabIndex, 0, tab);
-          currentlySelectedExitTabRowIndex = Math.max(newGroupIndex, 0);
+          if (oldGroupIndex != newGroupIndex) {
+            changeEditingExitTabRow(newGroupIndex);
+          }
+          changeEditingExitTab(newTabIndex);
         } else {
           currentExitTabs.splice(
             newGroupIndex,
@@ -102,10 +114,8 @@ const App = (() => {
             currentExitTabs.splice(oldGroupIndex, 1)[0],
           );
 
-          currentlySelectedExitTabRowIndex = Math.max(newGroupIndex, 0);
+          changeEditingExitTabRow(newGroupIndex);
         }
-
-        formHandler.updateForm();
         redraw();
       },
       {
@@ -126,9 +136,7 @@ const App = (() => {
           0,
           currentSubPanels.splice(oldPanelIndex, 1)[0],
         );
-        currentlySelectedSubPanelIndex = Math.max(newPanelIndex, 0);
-
-        formHandler.updateForm();
+        changeEditingSubPanel(newPanelIndex);
         redraw();
       },
     );
@@ -181,6 +189,98 @@ const App = (() => {
         useAttachForInner: true,
         ignoreOuterDragging: true,
         innerTargetContainer: ".smAPLCat_aplList",
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#smSPShieldList"),
+      ".smSPShieldRow,:scope > .smSPShieldGroup",
+      "vertical",
+      (oldShieldIndex, newShieldIndex, callbackResults) => {
+        console.log(oldShieldIndex, newShieldIndex, callbackResults);
+        let currentShields = getCurrentBlockElem().shields;
+
+        let oldAdjustedShieldIndex = 0;
+        let lastShield = -1;
+        let isDragItemShieldGroup =
+          callbackResults.dragElement.classList.contains("smSPShieldGroup");
+        let isPreviousMove = newShieldIndex < oldShieldIndex;
+
+        for (let i = 0; i < currentShields.length; i++) {
+          const shield = currentShields[i];
+
+          if (
+            oldAdjustedShieldIndex == oldShieldIndex &&
+            (isDragItemShieldGroup || shield.group == 0)
+          ) {
+            oldShieldIndex = i;
+            break;
+          }
+
+          if (shield.group == 0) {
+            oldAdjustedShieldIndex += 1;
+            lastShield = -1;
+          } else if (shield.group != 0 && lastShield != shield.group) {
+            lastShield = shield.group;
+            oldAdjustedShieldIndex++;
+          }
+        }
+
+        let targetIndices = [0];
+        lastShield = -1;
+
+        for (let i = 0; i < currentShields.length; i++) {
+          const shield = currentShields[i];
+          const nextShield = currentShields[i + 1];
+
+          if (
+            !nextShield ||
+            shield.group == 0 ||
+            nextShield.group !== shield.group
+          ) {
+            targetIndices.push(i);
+          }
+        }
+
+        if (newShieldIndex == 0) {
+          newShieldIndex = targetIndices[0];
+        } else if (newShieldIndex < targetIndices.length) {
+          newShieldIndex =
+            targetIndices[
+              isPreviousMove ? newShieldIndex - 1 : newShieldIndex + 1
+            ];
+        } else {
+          newShieldIndex = currentShields.length;
+        }
+
+        console.log(oldShieldIndex, newShieldIndex);
+
+        let shield = currentShields[oldShieldIndex];
+        let shieldsToMove = [];
+        if (shield.group != 0) {
+          for (let i = oldShieldIndex; i < currentShields.length; i++) {
+            if (currentShields[i].group == shield.group) {
+              shieldsToMove.push(currentShields[i]);
+            } else {
+              break;
+            }
+          }
+          currentShields.splice(oldShieldIndex, shieldsToMove.length);
+        } else {
+          shieldsToMove.push(shield);
+          currentShields.splice(oldShieldIndex, 1);
+        }
+
+        currentShields.splice(newShieldIndex, 0, ...shieldsToMove);
+
+        formHandler.updateShieldSubform();
+        redraw();
+      },
+      {
+        attachElement: ".dragIndicator",
+        callbackElements: (dragElement, lastActiveBox) => {
+          return { dragElement: dragElement };
+        },
       },
     );
 
@@ -247,7 +347,7 @@ const App = (() => {
     const sign = getCurrentPanel().sign;
     if (sign.subPanels.length > 1) {
       sign.deleteSubPanel(sign.subPanels.length - 1);
-      currentlySelectedSubPanelIndex--;
+      currentlySelectedSubPanelIndex = Math.max(0, currentlySelectedSubPanelIndex - 1);
 
       currentlySelectedRowIndex = clamp(
         currentlySelectedRowIndex,
@@ -467,7 +567,10 @@ const App = (() => {
         getCurrentBlockRows().length - 1,
       );
     } else {
-      currentlySelectedBlockIndex--;
+      currentlySelectedBlockIndex = Math.max(
+        0,
+        currentlySelectedBlockIndex - 1,
+      );
     }
 
     formHandler.updateForm();
@@ -798,28 +901,6 @@ const App = (() => {
     ) {
       const subPanel = panel.sign.subPanels[subPanelIndex];
 
-      if (subPanelIndex > 0) {
-        const subDivider = document.createElement("div");
-        subDivider.className = "subDivider";
-        if (subPanel.height) {
-          subDivider.style.height = subPanel.height;
-        } else {
-          subDivider.style.removeProperty("height");
-        }
-        dividerList.push(subDivider);
-
-        if (
-          panel.sign.arrows.arrowMode == "apl" &&
-          panel.sign.lanePanelSize > 0 &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5].length > 0
-        ) {
-          subDivider.style.margin = `0 ${panel.sign.lanePanelSize / 2}px`;
-        }
-
-        signHolderElmt.appendChild(subDivider);
-      }
-
       const signContentContainerElmt = document.createElement("div");
       signContentContainerElmt.className = `signContentContainer`;
       signHolderElmt.appendChild(signContentContainerElmt);
@@ -841,6 +922,37 @@ const App = (() => {
       signContentContainerElmt.appendChild(blockElement);
       signContentContainerElmt.style.padding = panel.sign.padding;
       subpanelList.push(signContentContainerElmt);
+
+      if (subPanelIndex < panel.sign.subPanels.length - 1) {
+        const subDivider = document.createElement("div");
+        subDivider.className = "subDivider";
+        if (subPanel.dividerHeight && subPanel.dividerHeightUnit == "rem") {
+          subDivider.style.height =
+            subPanel.dividerHeight + subPanel.dividerHeightUnit;
+        } else if (
+          subPanel.dividerHeight &&
+          subPanel.dividerHeightUnit == "%"
+        ) {
+          subDivider.style.height = `${
+            (signContentContainerElmt.getBoundingClientRect().height /
+              formHandler.vars.zoomLevel) *
+            (subPanel.dividerHeight / 100)
+          }px`;
+        }
+
+        dividerList.push(subDivider);
+
+        if (
+          panel.sign.arrows.arrowMode == "apl" &&
+          panel.sign.lanePanelSize > 0 &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5] &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5].length > 0
+        ) {
+          subDivider.style.margin = `0 ${panel.sign.lanePanelSize / 2}px`;
+        }
+
+        signHolderElmt.appendChild(subDivider);
+      }
     }
 
     return [subpanelList, dividerList];
@@ -900,13 +1012,32 @@ const App = (() => {
     signElmt.appendChild(bottomLeftSignCorner);
 
     const bottomRightSignCorner = document.createElement("div");
-    bottomRightSignCorner.className = "signCorner bottomright";
+    bottomRightSignCorner.className = "signCorner bottomRight";
     signElmt.appendChild(bottomRightSignCorner);
 
     const signHolderElmt = document.createElement("div");
     signHolderElmt.className = `signHolder ${panel.sign.arrows.arrowMode == "diagrammic" ? "diagrammic" : ""}`;
     signElmt.appendChild(signHolderElmt);
     signElmt.appendChild(exitTabContainerWithin);
+
+    let hasFirstBottom = false,
+      hasFirstTop = false;
+    for (const exitTab of panel.exitTabs) {
+      if (exitTab.position == "bottom" && !hasFirstBottom) {
+        hasFirstBottom = true;
+
+        if (exitTab.hideBottomBorder) {
+          signHolderElmt.style.borderBottom = "none";
+        }
+      }
+      if (exitTab.position == "top" && !hasFirstTop) {
+        hasFirstTop = true;
+
+        if (exitTab.hideTopBorder) {
+          signHolderElmt.style.borderTop = "none";
+        }
+      }
+    }
 
     const guideArrowsHolderElmt = document.createElement("div");
     guideArrowsHolderElmt.className = "guideArrowsHolder";
