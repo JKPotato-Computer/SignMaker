@@ -85,14 +85,7 @@ class Post {
       newExitTabs.push(cloneExitTab(exitTab));
     }
 
-    const newSign = new Sign({
-      shieldPosition: existingPanel.sign.shieldPosition,
-      subPanels: newSubPanels,
-      sheildBacks: existingPanel.sign.sheildBacks,
-      guideArrow: existingPanel.sign.guideArrow,
-      guideArrowLanes: existingPanel.sign.guideArrowLanes,
-      useCanadianDownArrows: existingPanel.sign.useCanadianDownArrows,
-    });
+    const newSign = new Sign({});
     const newPanel = Object.assign(new Panel(), existingPanel);
     newPanel.sign = newSign;
     newPanel.exitTabs = newExitTabs;

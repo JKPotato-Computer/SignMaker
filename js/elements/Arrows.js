@@ -111,7 +111,6 @@ APLArrow.prototype.arrowTypes = {
   ["CFX Right Arrow"]: { asset: "APL_CFXTurn.svg", flipped: false },
   ["CFX Up Arrow"]: { asset: "APL_CFXUp.svg", flipped: false },
 };
-
 APLArrow.prototype.backgroundColors = [
   "Yellow",
   "White",
@@ -119,3 +118,67 @@ APLArrow.prototype.backgroundColors = [
   "Outline",
 ];
 APLArrow.prototype.justifyAPLs = ["Left", "Right", "Center"];
+
+class StandardArrow {
+  constructor({
+    arrow = "TYPE_A",
+    rotation = 0,
+    size = 1.75,
+    marginHorizontal = 0,
+    marginVertical = 0,
+    flip = false,
+  } = {}) {
+    this.arrow = arrow;
+    this.rotation = rotation;
+    this.size = size;
+    this.marginHorizontal = marginHorizontal;
+    this.marginVertical = marginVertical;
+    this.flip = flip;
+    this.createElement = () => {
+      const img = document.createElement("img");
+      img.className = "bE-arrowImage";
+      img.src = this.arrows[this.arrow].src;
+
+      img.style.setProperty("--arrowRotation", this.rotation + "deg");
+      img.style.setProperty("--arrowSize", this.size + "rem");
+      img.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
+      img.style.setProperty(
+        "--arrowMarginHorizontal",
+        this.marginHorizontal + "rem",
+      );
+      img.style.setProperty(
+        "--arrowMarginVertical",
+        this.marginVertical + "rem",
+      );
+
+      return img;
+    };
+  }
+}
+
+StandardArrow.prototype.arrows = {
+  TYPE_A: { label: "Type A", src: "assets/arrowBlocks/TYPE_A.svg" },
+  TYPE_A_EXTENDED: {
+    label: "Type A Extended",
+    src: "assets/arrowBlocks/TYPE_A_EXTENDED.svg",
+  },
+  TYPE_B: { label: "Type B", src: "assets/arrowBlocks/TYPE_B.svg" },
+  TYPE_C_45: { label: "Type C 45", src: "assets/arrowBlocks/TYPE_C_45.svg" },
+  TYPE_C_45_ALT: {
+    label: "Type C 45 (alt)",
+    src: "assets/arrowBlocks/TYPE_C_45_ALT.svg",
+  },
+  TYPE_C_90: { label: "Type C 90", src: "assets/arrowBlocks/TYPE_C_90.svg" },
+  TYPE_D: { label: "Type D", src: "assets/arrowBlocks/TYPE_D.svg" },
+  DOWN: {
+    label: "Down",
+    src: "assets/arrowBlocks/DOWN.svg",
+    defaultSize: 2.75,
+  },
+  DOWN_CA: {
+    label: "Down (CA)",
+    src: "assets/arrowBlocks/DOWN_CA.svg",
+    defaultSize: 2.75,
+  },
+  UK: { label: "UK", src: "assets/arrowBlocks/UK.svg" },
+};

@@ -3,7 +3,24 @@ class Sign {
     // arrow
     arrows = {
       arrowMode: "standard",
-      standard: {},
+      standard: {
+        variant: "None",
+        arrowList: [],
+        justify: "center",
+        exitOnlyConfigs: {
+          borderMode: "white-edge",
+          hideArrow: false,
+          showExitOnly: true,
+          exitOnlyText: "EXIT ONLY",
+          horizontalPadding: 0,
+          verticalPadding: 0,
+          fontFamily: "Series E",
+          fontSize: 16,
+          wordSpacing: 0,
+          letterSpacing: 0,
+          lineHeight: 100,
+        },
+      },
       apl: {
         horizontalPadding: 0,
         verticalTopPadding: 0,
@@ -18,17 +35,6 @@ class Sign {
       },
     },
 
-    guideArrow = "None",
-    guideArrowLanes = 1,
-    useCanadianDownArrows = false,
-    exitguideArrows = "Down Arrow",
-    exitOnlyPadding = 0,
-    exitOnlyBorderMode = "white-edge",
-    exitOnlyLeftText = "EXIT",
-    exitOnlyRightText = "ONLY",
-    exitOnlyLabelPreset = "EXIT ONLY",
-    hideExitArrow = false,
-
     // other
     otherSymbol = "None",
     oSNum = "",
@@ -42,20 +48,10 @@ class Sign {
     arrowPosition = "Middle",
   } = {}) {
     this.otherSymbol = otherSymbol;
-    this.guideArrow = guideArrow;
-    this.guideArrowLanes = guideArrowLanes;
-    this.useCanadianDownArrows = useCanadianDownArrows;
     this.oSNum = oSNum;
     this.subPanels = subPanels;
     this.padding = padding;
     this.arrowPosition = arrowPosition;
-    this.exitguideArrows = exitguideArrows;
-    this.exitOnlyPadding = exitOnlyPadding;
-    this.exitOnlyBorderMode = exitOnlyBorderMode;
-    this.exitOnlyLeftText = exitOnlyLeftText;
-    this.exitOnlyRightText = exitOnlyRightText;
-    this.exitOnlyLabelPreset = exitOnlyLabelPreset;
-    this.hideExitArrow = hideExitArrow;
     this.arrows = arrows;
     this.lanePanelSize = lanePanelSize;
   }
@@ -113,6 +109,21 @@ class Sign {
     this.arrows.apl.subpanels[subpanelNumber].splice(newAplIndex, 0, apl);
   }
 
+  // Guide Arrows
+  newStandardArrow(arrowProperties) {
+    const newArrow = new StandardArrow(arrowProperties);
+    this.arrows.standard.arrowList.push(newArrow);
+  }
+
+  deleteStandardArrow(arrowIndex) {
+    this.arrows.standard.arrowList.splice(arrowIndex, 1);
+  }
+
+  moveStandardArrow(arrowIndex, newArrowIndex) {
+    const arrow = this.arrows.standard.arrowList.splice(arrowIndex, 1)[0];
+    this.arrows.standard.arrowList.splice(newArrowIndex, 0, arrow);
+  }
+
   // subpanels
   newSubPanel() {
     const new_subPanel = new SubPanels();
@@ -145,20 +156,7 @@ Sign.prototype.guideArrows = [
   "Exit Only",
   "Split Exit Only",
   "Half Exit Only",
-  "Left/Down Arrow:A-3",
-  "Left Arrow:D-1",
-  "Left/Up Arrow:A-4",
-  "Right/Down Arrow:A-2",
-  "Right Arrow:D-2",
-  "Right/Up Arrow:A-1",
-  "Down Arrow:C-1",
-  "Up Arrow:C-2",
-  "alt. Left/Down Arrow:B-3",
-  "alt. Left/Up Arrow:B-4",
-  "alt. Right/Up Arrow:B-1",
-  "alt. Right/Down Arrow:B-2",
-  "Sharp Left:E-1",
-  "Sharp Right:E-2",
+  "Custom",
 ];
 Sign.prototype.exitguideArrows = [
   "Down Arrow:EC-1/C-1",

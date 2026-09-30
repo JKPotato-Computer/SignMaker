@@ -172,22 +172,22 @@ main#smRender.wide #postContainer {
 }
 
 .bE-arrowElement {
-  --arrowRotation: 0deg;
-  --arrowSize: 1.75rem;
   --arrowPaddingVertical: 0rem;
   --arrowPaddingHorizontal: 0rem;
-  --arrowFlip: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 0 auto;
   padding: var(--arrowPaddingVertical) var(--arrowPaddingHorizontal);
 }
 
-.bE-arrowElement img {
+.bE-arrowImage {
   display: block;
   width: var(--arrowSize);
   height: auto;
+  margin-left: var(--arrowMarginHorizontal);
+  margin-right: var(--arrowMarginHorizontal);
+  margin-top: var(--arrowMarginVertical);
+  margin-bottom: var(--arrowMarginVertical);
   transform: scaleX(var(--arrowFlip)) rotate(var(--arrowRotation));
   transform-origin: center;
 }

@@ -12,6 +12,7 @@ const App = (() => {
 
   let currentlySelectedShieldGroupId = -1;
   let currentlySelectedShieldIndex = -1;
+  let currentlySelectedStandardArrow = 0;
 
   // Glboal Acessor Methods
   const getCurrentPanel = () => {
@@ -835,6 +836,36 @@ const App = (() => {
     redraw();
   };
 
+  const setSelectedStandardArrow = (arrowIndex) => {
+    currentlySelectedStandardArrow = Math.max(arrowIndex, 0);
+  };
+
+  const addStandardArrow = () => {
+    const standardArrow = getCurrentPanel().sign.arrows.standard;
+    getCurrentPanel().sign.newStandardArrow();
+    currentlySelectedStandardArrow = standardArrow.arrowList.length - 1;
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const removeStandardArrow = () => {
+    const standardArrow = getCurrentPanel().sign.arrows.standard;
+    getCurrentPanel().sign.deleteStandardArrow(currentlySelectedStandardArrow);
+    currentlySelectedStandardArrow = Math.min(
+      currentlySelectedStandardArrow,
+      Math.max(standardArrow.arrowList.length - 1, 0),
+    );
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const moveStandardArrow = (oldIndex, newIndex) => {
+    getCurrentPanel().sign.moveStandardArrow(oldIndex, newIndex);
+    currentlySelectedStandardArrow = newIndex;
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
   const resetPadding = () => {
     getCurrentPanel().sign.padding = "0.3rem 0.75rem 0.3rem 0.75rem";
 
@@ -1043,15 +1074,10 @@ const App = (() => {
     guideArrowsHolderElmt.className = "guideArrowsHolder";
 
     const guideArrowsElmt = document.createElement("div");
-    /*guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow
-        .replace("/", "-")
-        .replace(" ", "_")
-        .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
-      */
 
     guideArrowsElmt.className = `guideArrows ${panel.sign.arrows.arrowMode.toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()} ${
       panel.sign.arrows.arrowMode.toLowerCase() == "standard"
-        ? panel.sign.guideArrow
+        ? panel.sign.arrows.standard.variant
             .toLowerCase()
             .replace("/", "-")
             .replace(" ", "_")
@@ -1301,6 +1327,9 @@ const App = (() => {
     }
 
     if (arrows.arrowMode == "standard") {
+      const standardArrowConfig = panel.sign.arrows.standard;
+      const standardVariant = standardArrowConfig.variant;
+      const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
       const ExitKeys = ["EA", "EB", "EC"];
       const MainKeys = ["A", "B", "C", "D", "E"];
       let path;
@@ -1320,542 +1349,112 @@ const App = (() => {
       arrowContElmt.className = `arrowContainer`;
       guideArrowsElmt.appendChild(arrowContElmt);
 
-      const createArrowElmt = (key, dir, name, extra) => {
-        if (dir == "MainArrows!ExitOnly") {
-          key = key.split("/")[1];
-        } else {
-          key = key.split("/")[0];
-        }
-
-        if (
-          ExitKeys.includes(key.split("-")[0]) ||
-          MainKeys.includes(key.split("-")[0])
-        ) {
-          const downArrowElmt = document.createElement("img");
-          downArrowElmt.className = name || "exitOnlyArrow ";
-
-          if (extra) {
-            downArrowElmt.className += " " + extra;
-          }
-
-          if (ExitKeys.includes(key.split("-")[0])) {
-            key = key.split("-")[0].split("")[1] + "-" + key.split("-")[1];
-            downArrowElmt.style.filter = "invert(1)";
-          }
-
-          const shouldUseCanadianDownArrow =
-            panel.sign.useCanadianDownArrows && key === "C-1";
-
-          if (shouldUseCanadianDownArrow) {
-            downArrowElmt.src = "assets/arrowBlocks/DOWN_CA.svg";
-            downArrowElmt.classList.add("canadianDownArrow");
-          } else {
-            downArrowElmt.src = "assets/arrows/" + key + ".svg";
-          }
-
-          return downArrowElmt;
-        }
+      const standardArrowList = panel.sign.arrows.standard.arrowList;
+      let standardArrowIndex = 0;
+      const createArrowElmt = () => {
+        const arrow = standardArrowList[standardArrowIndex++];
+        return arrow.createElement();
       };
 
       if (
         panel.sign.arrowPosition == "Left" &&
-        panel.sign.guideArrow != "Exit Only" &&
-        panel.sign.guideArrow != "Side Left" &&
-        panel.sign.guideArrow != "Side Right" &&
-        panel.sign.guideArrow != "Half Exit Only"
+        standardVariant !== "Exit Only" &&
+        standardVariant !== "Side Left" &&
+        standardVariant !== "Side Right" &&
+        standardVariant !== "Half Exit Only"
       ) {
         arrowContElmt.style.justifyContent = "left";
       } else if (panel.sign.arrowPosition == "Middle") {
         arrowContElmt.style.cssFloat = "none";
       } else if (
         panel.sign.arrowPosition == "Right" &&
-        panel.sign.guideArrow != "Exit Only" &&
-        panel.sign.guideArrow != "Side Left" &&
-        panel.sign.guideArrow != "Side Right" &&
-        panel.sign.guideArrow != "Half Exit Only"
+        standardVariant !== "Exit Only" &&
+        standardVariant !== "Side Left" &&
+        standardVariant !== "Side Right" &&
+        standardVariant !== "Half Exit Only"
       ) {
         arrowContElmt.style.justifyContent = "right";
       }
 
-      if (panel.sign.guideArrow.includes("Exit Only")) {
-        const borderWidthValue = "0.2rem";
-        const exitOnlyBorderModes = Sign.prototype.exitOnlyBorderModes;
-        const resolvedExitOnlyBorderMode = exitOnlyBorderModes.includes(
-          panel.sign.exitOnlyBorderMode,
-        )
-          ? panel.sign.exitOnlyBorderMode
-          : exitOnlyBorderModes[0];
-        const hideExitOnlyArrows = panel.sign.hideExitArrow === true;
-        arrowContElmt.classList.toggle(
-          "hideExitOnlyArrows",
-          hideExitOnlyArrows,
+      if (standardVariant.includes("Exit Only")) {
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyFontFamily",
+          `"${exitOnlyConfigs.fontFamily}"`,
         );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyFontSize",
+          exitOnlyConfigs.fontSize + "px",
+        );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyWordSpacing",
+          exitOnlyConfigs.wordSpacing + "rem",
+        );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyLetterSpacing",
+          exitOnlyConfigs.letterSpacing + "rem",
+        );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyLineHeight",
+          exitOnlyConfigs.lineHeight + "%",
+        );
+
+        const hideExitOnlyArrows = exitOnlyConfigs.hideArrow === true;
+        arrowContElmt.classList.toggle("hideExitOnlyArrows", hideExitOnlyArrows);
+
         if (
           !post.secondExitOnly &&
-          panel.sign.guideArrow != "Split Exit Only" &&
-          panel.sign.guideArrow != "Half Exit Only"
+          standardVariant !== "Split Exit Only" &&
+          standardVariant !== "Half Exit Only"
         ) {
-          guideArrowsElmt.style.padding = panel.sign.exitOnlyPadding + "rem";
+          guideArrowsElmt.style.padding = `${exitOnlyConfigs.verticalPadding}rem ${exitOnlyConfigs.horizontalPadding}rem`;
         }
 
-        if (panel.sign.guideArrow == "Exit Only" && !post.secondExitOnly) {
-          guideArrowsElmt.style.borderTopWidth =
-            resolvedExitOnlyBorderMode === "edge" ? borderWidthValue : "0";
-        }
+        const centerText = (exitOnlyConfigs.exitOnlyText || "EXIT ONLY").trim();
+        const centerIndex = Math.floor(standardArrowList.length / 2);
 
-        if (panel.sign.guideArrow == "Half Exit Only") {
-          const secondaryContainer = document.createElement("div");
-          secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow
-            .replace("/", "-")
-            .replace(" ", "_")
-            .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
-
-          guideArrowsElmt.className += post.secondExitOnly
-            ? " new2"
-            : " default";
-          guideArrowsElmt.classList.remove("halfExitNoBorder");
-
-          if (!post.secondExitOnly) {
-            const borderMode = resolvedExitOnlyBorderMode;
-            const arrowPos = panel.sign.arrowPosition.toLowerCase();
-            const overlap = `-${borderWidthValue}`;
-            const touchesLeftEdge =
-              arrowPos === "left" || arrowPos === "middle";
-            const touchesRightEdge =
-              arrowPos === "right" || arrowPos === "middle";
-
-            secondaryContainer.style.backgroundColor = "var(--yellow)";
-            secondaryContainer.style.color = "var(--black)";
-            secondaryContainer.style.borderStyle = "solid";
-            secondaryContainer.style.borderColor = "var(--black)";
-            secondaryContainer.style.borderTopWidth = "0";
-            secondaryContainer.style.borderRightWidth = "0";
-            secondaryContainer.style.borderBottomWidth = "0";
-            secondaryContainer.style.borderLeftWidth = "0";
-            secondaryContainer.style.marginBottom = "0";
-            secondaryContainer.style.marginLeft = "0";
-            secondaryContainer.style.marginRight = "0";
-
-            if (borderMode !== "none") {
-              const edges = {
-                top: borderMode === "edge",
-                right: borderMode === "edge",
-                bottom: true,
-                left: borderMode === "edge",
-              };
-
-              if (borderMode === "white-edge") {
-                edges.top = false;
-                edges.left = touchesLeftEdge;
-                edges.right = touchesRightEdge;
-              }
-
-              secondaryContainer.style.borderTopWidth = edges.top
-                ? borderWidthValue
-                : "0";
-              secondaryContainer.style.borderRightWidth = edges.right
-                ? borderWidthValue
-                : "0";
-              secondaryContainer.style.borderBottomWidth = edges.bottom
-                ? borderWidthValue
-                : "0";
-              secondaryContainer.style.borderLeftWidth = edges.left
-                ? borderWidthValue
-                : "0";
-
-              if (edges.bottom) {
-                secondaryContainer.style.marginBottom = overlap;
-              }
-              if (edges.left) {
-                secondaryContainer.style.marginLeft = overlap;
-              }
-              if (edges.right) {
-                secondaryContainer.style.marginRight = overlap;
-              }
-            } else {
-              secondaryContainer.style.borderStyle = "none";
-              const sideOverlap = "-0.02rem";
-              if (touchesLeftEdge) {
-                secondaryContainer.style.marginLeft = sideOverlap;
-              }
-              if (touchesRightEdge) {
-                secondaryContainer.style.marginRight = sideOverlap;
-              }
-              secondaryContainer.style.marginBottom = overlap;
-            }
-
-            const leftRadius =
-              touchesLeftEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
-            const rightRadius =
-              touchesRightEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
-            secondaryContainer.style.borderBottomLeftRadius = touchesLeftEdge
-              ? leftRadius
-              : "0";
-            secondaryContainer.style.borderBottomRightRadius = touchesRightEdge
-              ? rightRadius
-              : "0";
-
-            if (borderMode === "none") {
-              secondaryContainer.style.zIndex = "0";
-            } else {
-              secondaryContainer.style.removeProperty("z-index");
-            }
+        for (let arrowIndex = 0; arrowIndex < standardArrowList.length; arrowIndex++) {
+          if (
+            arrowIndex === centerIndex &&
+            standardArrowList.length % 2 !== 0 &&
+            centerText
+          ) {
+            const label = document.createElement("span");
+            label.className = "exitOnlyText";
+            label.textContent = centerText;
+            arrowContElmt.appendChild(label);
           }
 
-          guideArrowsElmt.classList.remove("halfExitNoBorder");
-          path = secondaryContainer;
-
-          const arrow = createArrowElmt(
-            panel.sign.exitguideArrows.split(":")[1],
-            "MainArrows!ExitOnly",
-            "halfarrow",
-            panel.sign.arrowPosition.toLowerCase(),
-          );
-
-          if (panel.sign.arrowPosition.toLowerCase() == "left") {
-            arrowContElmt.appendChild(secondaryContainer);
-            arrowContElmt.appendChild(arrow);
-
-            if (panel.sign.guideArrowLanes > 1) {
-              let marginLeft = 4;
-
-              for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
-                if (i % 2 == 0) {
-                  marginLeft += 12;
-                } else {
-                  marginLeft += 4;
-                }
-              }
-            }
-          } else {
-            arrowContElmt.appendChild(arrow);
-            arrowContElmt.appendChild(secondaryContainer);
-
-            if (panel.sign.guideArrowLanes > 1) {
-              let marginLeft = 11;
-
-              for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
-                if (i % 2 == 0) {
-                  marginLeft += 12;
-                } else {
-                  marginLeft += 4;
-                }
-              }
-            }
+          const arrowElement = createArrowElmt();
+          if (arrowElement) {
+            arrowContElmt.appendChild(arrowElement);
           }
 
-          path.style.padding = panel.sign.exitOnlyPadding + "rem";
-        } else {
-          path = arrowContElmt;
+          if (
+            arrowIndex === centerIndex &&
+            standardArrowList.length % 2 === 0 &&
+            centerText
+          ) {
+            const label = document.createElement("span");
+            label.className = "exitOnlyText";
+            label.textContent = centerText;
+            arrowContElmt.appendChild(label);
+          }
         }
-      }
-
-      if ("Side Left" == panel.sign.guideArrow) {
+      } else if (standardVariant === "Side Left") {
         sideLeftArrowElmt.style.display = "block";
-      } else if ("Side Right" == panel.sign.guideArrow) {
+      } else if (standardVariant === "Side Right") {
         sideRightArrowElmt.style.display = "block";
-      } else if ("None" != panel.sign.guideArrow) {
+      } else if (standardVariant !== "None") {
         signElmt.style.borderBottomLeftRadius = "0";
         signElmt.style.borderBottomRightRadius = "0";
         signElmt.style.borderBottomWidth = "0";
         signElmt.style.width = "100%";
         guideArrowsElmt.style.display = "block";
         guideArrowsElmt.style.visibility = "visible";
-        if (
-          "Exit Only" == panel.sign.guideArrow ||
-          "Split Exit Only" == panel.sign.guideArrow ||
-          "Half Exit Only" == panel.sign.guideArrow
-        ) {
-          if (
-            post.secondExitOnly == true ||
-            panel.sign.guideArrow == "Half Exit Only"
-          ) {
-            if (panel.sign.guideArrow == "Exit Only") {
-              guideArrowsElmt.className += " new";
-              arrowContElmt.className += " new";
-            }
-            if (panel.sign.guideArrow == "Half Exit Only") {
-              path.className += " new2";
-              arrowContElmt.className += " new2";
-              const arrowPositionSetting =
-                typeof panel.sign.arrowPosition === "string"
-                  ? panel.sign.arrowPosition.toLowerCase()
-                  : "middle";
-              let justifyContent = "center";
-              if (arrowPositionSetting === "left") {
-                justifyContent = "flex-start";
-              } else if (arrowPositionSetting === "right") {
-                justifyContent = "flex-end";
-              }
-              arrowContElmt.style.justifyContent = justifyContent;
-              arrowContElmt.style.gap = "5rem";
-              arrowContElmt.style.width = "100%";
-            }
-            guideArrowsElmt.style.display = "flex";
-          }
 
-          if (post.secondExitOnly && panel.sign.guideArrow == "Exit Only") {
-            path.style.padding = panel.sign.exitOnlyPadding + "rem";
-          }
-
-          /*
-
-						if (panel.sign.advisoryMessage) {
-							actionMessageElmt.style.fontFamily = "Series E";
-						}
-					
-					*/
-
-          // Interlase arrows and the words EXIT and ONLY, ensuring
-          //   EXIT ONLY is centered between all the arrows.
-          if (
-            panel.sign.guideArrowLanes == 0 &&
-            panel.sign.advisoryMessage == true
-          ) {
-            const actionMessage = document.createElement("span");
-            actionMessage.className = "exitOnlyText";
-            actionMessage.appendChild(
-              document.createTextNode(panel.sign.advisoryText),
-            );
-            path.appendChild(actionMessage);
-          } else {
-            const resolveExitOnlyText = (text, fallback) =>
-              typeof text === "string" ? text : fallback;
-            const exitOnlyLabelLeft = resolveExitOnlyText(
-              panel.sign.exitOnlyLeftText,
-              "EXIT",
-            ).trim();
-            const exitOnlyLabelRight = resolveExitOnlyText(
-              panel.sign.exitOnlyRightText,
-              "ONLY",
-            ).trim();
-            const exitOnlyLabelFull = [exitOnlyLabelLeft, exitOnlyLabelRight]
-              .filter((text) => text && text.length > 0)
-              .join(" ")
-              .trim();
-            const isSplitExitOnly = panel.sign.guideArrow == "Split Exit Only";
-            const shouldRenderLabel = (text) =>
-              !(
-                panel.sign.showExitOnly == false &&
-                isSplitExitOnly &&
-                (!text || text.length === 0)
-              );
-            for (
-              let arrowIndex = 0, length = panel.sign.guideArrowLanes;
-              arrowIndex < length;
-              arrowIndex++
-            ) {
-              // Evens
-              if (length % 2 == 0) {
-                if (arrowIndex == Math.floor(length / 2)) {
-                  if (shouldRenderLabel(exitOnlyLabelFull)) {
-                    const textExitOnlySpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textExitOnlySpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelFull),
-                      );
-
-                      let bonus = "";
-
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
-
-                      textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textExitOnlySpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀"),
-                      );
-                      textExitOnlySpanElmt.className = "exitOnlyText";
-                    }
-                    path.appendChild(textExitOnlySpanElmt);
-                  }
-
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (arrowIndex + 1 < length && length != 2) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
-                } else {
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (
-                    arrowIndex + 1 < length &&
-                    arrowIndex + 1 != Math.ceil(length / 2) &&
-                    length != 2
-                  ) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
-                }
-              } else {
-                // Odds
-                if (arrowIndex == Math.floor(length / 2)) {
-                  if (shouldRenderLabel(exitOnlyLabelLeft)) {
-                    const textExitSpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textExitSpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelLeft),
-                      );
-
-                      let bonus = "";
-
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
-
-                      textExitSpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textExitSpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀"),
-                      );
-                      textExitSpanElmt.className = "exitOnlyText";
-                    }
-
-                    path.appendChild(textExitSpanElmt);
-                  }
-
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (shouldRenderLabel(exitOnlyLabelRight)) {
-                    const textOnlySpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textOnlySpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelRight),
-                      );
-
-                      let bonus = "";
-
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
-
-                      textOnlySpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textOnlySpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀"),
-                      );
-                      textOnlySpanElmt.className = "exitOnlyText";
-                    }
-                    path.appendChild(textOnlySpanElmt);
-                  }
-                } else if (arrowIndex == Math.ceil(length / 2)) {
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (
-                    arrowIndex + 1 < length &&
-                    arrowIndex + 1 != Math.floor(length / 2) &&
-                    length != 2
-                  ) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
-                } else {
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (
-                    arrowIndex + 1 < length &&
-                    arrowIndex + 1 != Math.floor(length / 2) &&
-                    length != 2
-                  ) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
-                }
-              }
-            }
-          }
-        } else {
-          arrowContElmt.classList.remove("hideExitOnlyArrows");
-          for (
-            let arrowIndex = 0, length = panel.sign.guideArrowLanes;
-            arrowIndex < length;
-            arrowIndex++
-          ) {
-            if (arrowIndex % 2 == 0) {
-              arrowContElmt.insertBefore(
-                createArrowElmt(
-                  panel.sign.guideArrow.split(":")[1],
-                  "MainArrows",
-                  "arrow",
-                  panel.sign.guideArrow
-                    .split(":")[0]
-                    .toLowerCase()
-                    .replace(/ /g, ""),
-                ),
-                arrowContElmt.childNodes[0],
-              );
-            } else {
-              arrowContElmt.appendChild(
-                createArrowElmt(
-                  panel.sign.guideArrow.split(":")[1],
-                  "MainArrows",
-                  "arrow",
-                  panel.sign.guideArrow.split(":")[0],
-                ),
-              );
-            }
-          }
+        for (const arrow of standardArrowList) {
+          const arrowElement = arrow.createElement();
+          arrowContElmt.appendChild(arrowElement);
         }
       }
 
@@ -2023,6 +1622,10 @@ const App = (() => {
 
     addAPLArrow,
     removeAPLArrow,
+    setSelectedStandardArrow,
+    addStandardArrow,
+    removeStandardArrow,
+    moveStandardArrow,
 
     vars: {
       get currentlySelectedPanelIndex() {
@@ -2048,6 +1651,9 @@ const App = (() => {
       },
       get currentlySelectedShieldIndex() {
         return currentlySelectedShieldIndex;
+      },
+      get currentlySelectedStandardArrow() {
+        return currentlySelectedStandardArrow;
       },
     },
   };
