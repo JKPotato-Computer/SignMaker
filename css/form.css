@@ -1,6 +1,7 @@
 .sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
   font-size: 1rem;
   position: relative;
+  font-weight: 500;
 }
 
 nav#sMConfigBar {

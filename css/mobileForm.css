@@ -189,4 +189,29 @@
   .panelPopoverHint {
     top: -1.5rem;
   }
+
+  nav.sMModalBar *:not(.material-symbols-outlined, select, button, input) {
+    font-size: 20px;
+  }
+
+  input[type="range"] {
+    padding: 0rem;
+  }
+
+  input[type="checkbox"] {
+    height: 1rem;
+    width: 1rem;
+    position: relative;
+    top: .25rem;
+  }
+
+  .sMET_typeSelect {
+    flex-wrap: nowrap !important;
+    width: 100vw !important;
+    justify-content: left !important;
+  }
+
+  .sMET_typeSelect .sMET_typeVisual {
+    width: 10rem;
+  }
 }

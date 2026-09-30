@@ -1923,7 +1923,7 @@ const DiagramDrawing = (() => {
     editorProperties.points.shiftRight = null;
     editorProperties.points.subpanelPoint = null;
     document.querySelector("#diagramFileName").value = "";
-    document.body.style.cursor = "default";
+    document.body.style.cursor = "";
     ctx.clearRect(
       0,
       0,
@@ -2194,7 +2194,7 @@ const DiagramDrawing = (() => {
           ) {
             document.body.style.cursor = "pointer";
           } else {
-            document.body.style.cursor = "default";
+            document.body.style.cursor = "";
           }
 
           if (editorProperties.cursorState != "DRAG") {
