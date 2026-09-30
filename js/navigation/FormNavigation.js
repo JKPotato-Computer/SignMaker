@@ -377,6 +377,13 @@ const FormNavigation = (() => {
       lib.appendOption(arrowDirectionElmt, arrowDirection);
     }
 
+    for (const fontFamily of TextElement.prototype.fontFamily) {
+      lib.appendOption(
+        document.querySelector("#exitOnlyFontFamily"),
+        fontFamily,
+      );
+    }
+
     // Other symbols
     const otherSymbolSelectElement = document.querySelector("#otherSymbol");
     for (const otherSymbol of Sign.prototype.otherSymbols) {
@@ -786,33 +793,6 @@ const FormNavigation = (() => {
       lib.appendOption(shield_shieldBase, shieldType);
     }
 
-    // Arrows
-    const arrowElemSelect = document.querySelector("#sdArrow_arrow");
-    const arrowSizeInput = document.querySelector("#sdArrow_size");
-    const arrowKeys =
-      ArrowElement.prototype.arrowKeys ||
-      Object.keys(ArrowElement.prototype.arrows || {});
-    for (const arrowKey of arrowKeys) {
-      const arrowDefinition = ArrowElement.prototype.arrows[arrowKey] || {};
-      lib.appendOption(arrowElemSelect, arrowKey, {
-        text: arrowDefinition.label || arrowKey,
-        selected: arrowKey === ArrowElement.prototype.defaultArrow,
-      });
-    }
-
-    arrowElemSelect.addEventListener("change", () => {
-      const arrowDefinition =
-        ArrowElement.prototype.arrows[arrowElemSelect.value] || null;
-      const defaultSize =
-        arrowDefinition &&
-        typeof arrowDefinition.defaultSize === "number" &&
-        !isNaN(arrowDefinition.defaultSize)
-          ? arrowDefinition.defaultSize
-          : ArrowElement.prototype.defaultSize;
-      arrowSizeInput.value = defaultSize;
-      formHandler.readForm();
-    });
-
     // Arrow rotation slider
     const arrowRotationSlider = document.querySelector("#sdArrow_rotation");
     const arrowRotationVal = document.querySelector("#sdArrow_rotationVal");
@@ -1001,6 +981,12 @@ const FormNavigation = (() => {
           ".smDropdownInputElement",
         );
         dropdownElement.dataset.selectedOption = dropdownButton.dataset.value;
+        if (dropdownElement.id === "sdArrow_arrow") {
+          document.querySelector("#sdArrow_size").value =
+            StandardArrow.prototype.arrows[
+              dropdownElement.dataset.selectedOption
+            ].defaultSize || 1.75;
+        }
         formHandler.readForm();
         return;
       }
@@ -1189,6 +1175,36 @@ const FormNavigation = (() => {
       },
       (text, value) => {
         text.textContent = value;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#sdArrow_arrow"),
+      StandardArrow.prototype.arrows,
+      "TYPE_A",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = StandardArrow.prototype.arrows[value].src;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = StandardArrow.prototype.arrows[value].label;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#guideStandardArrow"),
+      StandardArrow.prototype.arrows,
+      "TYPE_A",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = StandardArrow.prototype.arrows[value].src;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = StandardArrow.prototype.arrows[value].label;
         return text;
       },
     );

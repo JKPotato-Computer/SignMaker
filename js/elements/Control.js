@@ -757,136 +757,49 @@ BeaconElement.prototype.backplateFallbackColor = "#ffd200";
 
 class ArrowElement {
   constructor({
-    arrow = ArrowElement.prototype.defaultArrow,
+    arrow = "TYPE_A",
     rotation = 0,
-    size = null,
-    padding = null,
-    paddingHorizontal = null,
-    paddingVertical = null,
+    size = 1.75,
+    marginHorizontal = 0,
+    marginVertical = 0,
     flip = false,
+    paddingHorizontal = 0,
+    paddingVertical = 0,
     alignment = "Center",
   } = {}) {
-    const resolveArrowKey = ArrowElement.prototype.arrows[arrow]
-      ? arrow
-      : ArrowElement.prototype.defaultArrow;
-    this.arrow = resolveArrowKey;
-    this.rotation = rotation;
-    this.flip =
-      flip === true ||
-      flip === "true" ||
-      flip === 1 ||
-      flip === "1" ||
-      flip === "on";
+    this.standardArrow = new StandardArrow({
+      arrow,
+      rotation,
+      size,
+      marginHorizontal,
+      marginVertical,
+      flip,
+    });
     this.alignment = alignment;
-
-    const arrowDefinition = ArrowElement.prototype.arrows[this.arrow] || {};
-    const defaultSize =
-      typeof arrowDefinition.defaultSize === "number"
-        ? arrowDefinition.defaultSize
-        : ArrowElement.prototype.defaultSize;
-
-    const normalizeNumber = (value, fallback = 0) => {
-      const parsed = parseFloat(value);
-      return isNaN(parsed) ? fallback : parsed;
-    };
-
-    if (size === null || size === undefined || size === "") {
-      this.size = defaultSize;
-    } else {
-      this.size = normalizeNumber(size, defaultSize);
-    }
-
-    const fallbackPadding =
-      padding !== null && padding !== undefined ? padding : 0;
-    this.paddingHorizontal = normalizeNumber(
-      paddingHorizontal !== null && paddingHorizontal !== undefined
-        ? paddingHorizontal
-        : fallbackPadding,
-      0,
-    );
-    this.paddingVertical = normalizeNumber(
-      paddingVertical !== null && paddingVertical !== undefined
-        ? paddingVertical
-        : fallbackPadding,
-      0,
-    );
+    this.paddingHorizontal = paddingHorizontal;
+    this.paddingVertical = paddingVertical;
+    this.marginHorizontal = marginHorizontal;
+    this.marginVertical = marginVertical;
   }
 
   createElement() {
     const container = document.createElement("div");
     container.className = "bE-arrowElement";
-
-    const img = document.createElement("img");
-    img.src = ArrowElement.prototype.arrows[this.arrow].src;
-
-    container.appendChild(img);
-
-    const parsedRotation = parseFloat(this.rotation);
-    if (!isNaN(parsedRotation)) {
-      container.style.setProperty("--arrowRotation", parsedRotation + "deg");
-    }
-
-    const parsedSize = parseFloat(this.size);
-    if (!isNaN(parsedSize)) {
-      container.style.setProperty(
-        "--arrowSize",
-        Math.max(parsedSize, 0) + "rem",
-      );
-    }
-
-    const horizontalPadding = parseFloat(
-      this.paddingHorizontal !== undefined
-        ? this.paddingHorizontal
-        : this.padding,
-    );
-    const verticalPadding = parseFloat(
-      this.paddingVertical !== undefined ? this.paddingVertical : this.padding,
-    );
-
     container.style.setProperty(
       "--arrowPaddingHorizontal",
-      Math.max(isNaN(horizontalPadding) ? 0 : horizontalPadding, 0) + "rem",
+      this.paddingHorizontal + "rem",
     );
     container.style.setProperty(
       "--arrowPaddingVertical",
-      Math.max(isNaN(verticalPadding) ? 0 : verticalPadding, 0) + "rem",
+      this.paddingVertical + "rem",
     );
 
-    container.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
+    const arrow = this.standardArrow.createElement();
+    container.appendChild(arrow);
 
     return container;
   }
 }
-
-ArrowElement.prototype.arrows = {
-  TYPE_A: { label: "Type A", src: "assets/arrowBlocks/TYPE_A.svg" },
-  TYPE_A_EXTENDED: {
-    label: "Type A Extended",
-    src: "assets/arrowBlocks/TYPE_A_EXTENDED.svg",
-  },
-  TYPE_B: { label: "Type B", src: "assets/arrowBlocks/TYPE_B.svg" },
-  TYPE_C_45: { label: "Type C 45", src: "assets/arrowBlocks/TYPE_C_45.svg" },
-  TYPE_C_45_ALT: {
-    label: "Type C 45 (alt)",
-    src: "assets/arrowBlocks/TYPE_C_45_ALT.svg",
-  },
-  TYPE_C_90: { label: "Type C 90", src: "assets/arrowBlocks/TYPE_C_90.svg" },
-  TYPE_D: { label: "Type D", src: "assets/arrowBlocks/TYPE_D.svg" },
-  DOWN: {
-    label: "Down",
-    src: "assets/arrowBlocks/DOWN.svg",
-    defaultSize: 2.75,
-  },
-  DOWN_CA: {
-    label: "Down (CA)",
-    src: "assets/arrowBlocks/DOWN_CA.svg",
-    defaultSize: 2.75,
-  },
-  UK: { label: "UK", src: "assets/arrowBlocks/UK.svg" },
-};
-ArrowElement.prototype.defaultArrow = "TYPE_A";
-ArrowElement.prototype.defaultSize = 1.75;
-ArrowElement.prototype.arrowKeys = Object.keys(ArrowElement.prototype.arrows);
 
 class TollLogoElement {
   constructor({

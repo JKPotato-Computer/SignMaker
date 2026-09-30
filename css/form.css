@@ -2920,3 +2920,8 @@ summary:hover {
   display: inline-block;
   padding: 0.25rem 0.5rem;
 }
+
+#sdArrow_arrow {
+  width: 60%;
+  display: inline-block;
+}

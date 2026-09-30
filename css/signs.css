@@ -483,11 +483,13 @@
 
 .exitOnlyText {
   --fhwaBaselineOffset: var(--fhwaBaselineShift);
-  font-family: "Series E";
+  font-family: var(--exitOnlyFontFamily, "Series E");
   padding: 0px 10px 0 10px;
   padding-top: 0.18rem;
-  font-size: 1rem;
-  /* letter-spacing: 0.03rem; */
+  font-size: var(--exitOnlyFontSize, 1rem);
+  letter-spacing: var(--exitOnlyLetterSpacing, 0rem);
+  word-spacing: var(--exitOnlyWordSpacing, 0rem);
+  line-height: var(--exitOnlyLineHeight, 100%);
   margin: -1rem 0rem;
   position: relative;
   top: var(--fhwaBaselineOffset);
