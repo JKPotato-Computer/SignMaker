@@ -205,36 +205,6 @@ label span.toolTip,
   background: rgba(var(--baseColor), 0.6);
 }
 
-.panelListButton.panelWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-}
-
-.panelListButton.dragging {
-  opacity: 0.5;
-  cursor: grabbing;
-  animation: none !important;
-}
-
-.panelListButton.dropBefore::before,
-.panelListButton.dropAfter::after {
-  content: "";
-  position: absolute;
-  left: 0.35rem;
-  right: 0.35rem;
-  height: 0.15rem;
-  background: var(--selectedColor);
-  border-radius: 0.15rem;
-  pointer-events: none;
-}
-
-.panelListButton.dropBefore::before {
-  top: -0.1rem;
-}
-
-.panelListButton.dropAfter::after {
-  bottom: -0.1rem;
-}
-
 .panelSpacingControl {
   display: flex;
   flex-direction: column;
@@ -475,7 +445,7 @@ input:disabled {
   min-width: 10rem;
   width: stretch;
   max-width: 15rem;
-  scrollbar-color: rgb(var(--baseColorInv), .5) transparent;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
 }
 
 .resetClass {
@@ -695,59 +665,8 @@ input[type="button"]:disabled {
     0.12s ease;
 }
 
-.textEditorBlock:active {
-  cursor: grabbing;
-}
-
-.textEditorBlock.blockWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-}
-
-.textEditorBlock.dragging {
-  opacity: 0.45;
-  cursor: grabbing;
-  animation: none;
-}
-
-.textEditorBlock.dropBefore::before,
-.textEditorBlock.dropAfter::after {
-  content: "";
-  position: absolute;
-  top: 15%;
-  bottom: 15%;
-  width: 0.2rem;
-  border-radius: 0.2rem;
-  background: var(--selectedColor);
-  pointer-events: none;
-}
-
-.textEditorBlock.dropBefore::before {
-  left: -0.2rem;
-}
-
-.textEditorBlock.dropAfter::after {
-  right: -0.2rem;
-}
-
-.sMControlRow.dropActive {
-  background-color: rgba(var(--baseColor), 0.35);
-}
-
-#sMSPCreateRow.dropActive {
-  outline: 2px dashed var(--selectedColor);
-  background-color: rgba(var(--baseColor), 0.45);
-}
-
-@keyframes textEditorBlockWiggle {
-  from {
-    transform: rotate(-2deg) scale(1.02);
-  }
-  to {
-    transform: rotate(2deg) scale(1.02);
-  }
-}
-
-.sdArrow_rotationButtons {
+.sdArrow_rotationButtons,
+.sdGuideArrows_rotationButtons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
@@ -755,16 +674,14 @@ input[type="button"]:disabled {
   justify-content: center;
 }
 
-.sdArrow_rotationButtons > * {
+.sdArrow_rotationButtons > *,
+.sdGuideArrows_rotationButtons > * {
   font-size: 20px;
   width: 10%;
 }
 
-#sdArrow_flipButton {
-  font-size: 24px;
-  margin-top: 0.5rem;
-  width: 10rem;
-  justify-self: center;
+.sdGuideArrows_rotationButtons > button.selected {
+  background-color: rgb(var(--baseColor));
 }
 
 .sMControlRow:hover {
@@ -986,35 +903,6 @@ textarea {
 :root[data-theme="dark"] .exitTabButton:hover,
 :root[data-theme="dark"] .exitTabNestedButton:hover {
   background: rgb(0, 0, 200) !important;
-}
-
-.exitTabButton.blockWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-}
-
-.exitTabButton.dragging {
-  opacity: 0.6;
-  animation: none;
-  cursor: grabbing;
-}
-
-.exitTabButton.dropBefore::before,
-.exitTabButton.dropAfter::after {
-  content: "";
-  position: absolute;
-  top: -0.25rem;
-  bottom: -0.25rem;
-  width: 0.2rem;
-  background: var(--selectedColor);
-  pointer-events: none;
-}
-
-.exitTabButton.dropBefore::before {
-  left: -0.25rem;
-}
-
-.exitTabButton.dropAfter::after {
-  right: -0.25rem;
 }
 
 nav#sMConfigBar.invisible {
@@ -2924,4 +2812,85 @@ summary:hover {
 #sdArrow_arrow {
   width: 60%;
   display: inline-block;
+}
+
+#guideArrow {
+  width: 15rem;
+}
+
+.standardArrow_selectHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  width: 100%;
+}
+
+.standardArrow_selectHeader > span {
+  font-size: 16px;
+}
+
+#standardArrowList {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  margin-top: 0.5rem;
+  max-height: 15rem;
+  min-height: 5rem;
+  overflow: auto;
+  gap: 0.25rem;
+}
+
+.standardArrowListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 100%;
+}
+
+.standardArrowListItem.selected {
+  background-color: rgb(var(--baseColor));
+}
+
+.standardArrowListItem > img {
+  height: 3rem;
+  background-color: black;
+  padding: 0.5rem;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
+.standardArrowListItem > .dragIndicator {
+  flex-grow: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 2rem;
+}
+
+.standardArrowListItem > span {
+  flex-grow: 1;
+  font-size: 24px;
+}
+
+#guideStandardArrow {
+  display: inline-block;
+  width: calc(100% - 8rem);
+}
+
+#standardArrowProperties {
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
 }

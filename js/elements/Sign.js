@@ -7,6 +7,13 @@ class Sign {
         variant: "None",
         arrowList: [],
         justify: "center",
+        customConfig: {
+          horizontalPadding: 0,
+          verticalTopPadding: 0,
+          verticalBottomPadding: 0,
+          gap: 1,
+          justify: "Space Between",
+        },
         exitOnlyConfigs: {
           borderMode: "white-edge",
           hideArrow: false,
@@ -111,7 +118,10 @@ class Sign {
 
   // Guide Arrows
   newStandardArrow(arrowProperties) {
-    const newArrow = new StandardArrow(arrowProperties);
+    const newArrow = new StandardArrow({
+      size: 2,
+      ...arrowProperties,
+    });
     this.arrows.standard.arrowList.push(newArrow);
   }
 
@@ -158,17 +168,10 @@ Sign.prototype.guideArrows = [
   "Half Exit Only",
   "Custom",
 ];
-Sign.prototype.exitguideArrows = [
-  "Down Arrow:EC-1/C-1",
-  "Left/Up Arrow:EB-4/B-4",
-  "alt. Left/Up Arrow:EA-4/A-4",
-  "Right/Up Arrow:EB-1/B-1",
-  "alt. Right/Up Arrow:EA-1/A-1",
-];
 
 Sign.prototype.exitOnlyBorderModes = ["edge", "white-edge"];
 
-Sign.prototype.arrowPositions = ["Middle", "Left", "Right"];
+Sign.prototype.justify = ["Left", "Middle", "Right", "Space Between"];
 
 Sign.prototype.otherSymbols = [
   "None",

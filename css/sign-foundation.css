@@ -182,8 +182,8 @@ main#smRender.wide #postContainer {
 
 .bE-arrowImage {
   display: block;
-  width: var(--arrowSize);
-  height: auto;
+  height: var(--arrowSize);
+  width: auto;
   margin-left: var(--arrowMarginHorizontal);
   margin-right: var(--arrowMarginHorizontal);
   margin-top: var(--arrowMarginVertical);
@@ -1148,8 +1148,7 @@ main#smRender.wide #postContainer {
   border-top-right-radius: 0;
 }
 
-.signcontainer:has(.guideArrows.apl) .signHolder,
-.signcontainer:has(.guideArrows:not(.none, .diagrammic)) .signHolder {
+.signcontainer:has(.guideArrows.apl) .signHolder, .signcontainer:has(.guideArrows:not(.none, .diagrammic, .side_left, .side_right)) .signHolder {
   border-bottom: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;

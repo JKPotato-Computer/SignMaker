@@ -12,7 +12,7 @@ const App = (() => {
 
   let currentlySelectedShieldGroupId = -1;
   let currentlySelectedShieldIndex = -1;
-  let currentlySelectedStandardArrow = 0;
+  let currentlySelectedStandardArrow = -1;
 
   // Glboal Acessor Methods
   const getCurrentPanel = () => {
@@ -279,10 +279,20 @@ const App = (() => {
       },
       {
         attachElement: ".dragIndicator",
-        callbackElements: (dragElement, lastActiveBox) => {
+        callbackElements: (dragElement) => {
           return { dragElement: dragElement };
         },
       },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#standardArrowList"),
+      ".standardArrowListItem",
+      "vertical",
+      (oldIndex, newIndex) => {
+        moveStandardArrow(oldIndex, newIndex);
+      },
+      { attachElement: ".dragIndicator" },
     );
 
     newPanel();
@@ -348,7 +358,10 @@ const App = (() => {
     const sign = getCurrentPanel().sign;
     if (sign.subPanels.length > 1) {
       sign.deleteSubPanel(sign.subPanels.length - 1);
-      currentlySelectedSubPanelIndex = Math.max(0, currentlySelectedSubPanelIndex - 1);
+      currentlySelectedSubPanelIndex = Math.max(
+        0,
+        currentlySelectedSubPanelIndex - 1,
+      );
 
       currentlySelectedRowIndex = clamp(
         currentlySelectedRowIndex,
@@ -837,7 +850,8 @@ const App = (() => {
   };
 
   const setSelectedStandardArrow = (arrowIndex) => {
-    currentlySelectedStandardArrow = Math.max(arrowIndex, 0);
+    currentlySelectedStandardArrow = Math.max(arrowIndex, -1);
+    formHandler.updateGuideArrowsSubform();
   };
 
   const addStandardArrow = () => {
@@ -851,9 +865,10 @@ const App = (() => {
   const removeStandardArrow = () => {
     const standardArrow = getCurrentPanel().sign.arrows.standard;
     getCurrentPanel().sign.deleteStandardArrow(currentlySelectedStandardArrow);
-    currentlySelectedStandardArrow = Math.min(
+    currentlySelectedStandardArrow = clamp(
       currentlySelectedStandardArrow,
-      Math.max(standardArrow.arrowList.length - 1, 0),
+      -1,
+      standardArrow.arrowList.length - 1,
     );
     formHandler.updateGuideArrowsSubform();
     redraw();
@@ -1399,7 +1414,10 @@ const App = (() => {
         );
 
         const hideExitOnlyArrows = exitOnlyConfigs.hideArrow === true;
-        arrowContElmt.classList.toggle("hideExitOnlyArrows", hideExitOnlyArrows);
+        arrowContElmt.classList.toggle(
+          "hideExitOnlyArrows",
+          hideExitOnlyArrows,
+        );
 
         if (
           !post.secondExitOnly &&
@@ -1412,7 +1430,11 @@ const App = (() => {
         const centerText = (exitOnlyConfigs.exitOnlyText || "EXIT ONLY").trim();
         const centerIndex = Math.floor(standardArrowList.length / 2);
 
-        for (let arrowIndex = 0; arrowIndex < standardArrowList.length; arrowIndex++) {
+        for (
+          let arrowIndex = 0;
+          arrowIndex < standardArrowList.length;
+          arrowIndex++
+        ) {
           if (
             arrowIndex === centerIndex &&
             standardArrowList.length % 2 !== 0 &&

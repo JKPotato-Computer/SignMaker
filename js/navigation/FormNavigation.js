@@ -364,30 +364,11 @@ const FormNavigation = (() => {
       lib.appendOption(guideArrowSelectElmt, display);
     }
 
-    // Exit-only guide arrow options
-    const exitOnlyDirectionElmt = document.querySelector("#exitOnlyDirection");
-    for (const exitguideArrows of Sign.prototype.exitguideArrows) {
-      const display = exitguideArrows.split(":")[0];
-      lib.appendOption(exitOnlyDirectionElmt, display);
-    }
-
-    // Arrow directions
-    const arrowDirectionElmt = document.querySelector("#arrowLocations");
-    for (const arrowDirection of Sign.prototype.arrowPositions) {
-      lib.appendOption(arrowDirectionElmt, arrowDirection);
-    }
-
     for (const fontFamily of TextElement.prototype.fontFamily) {
       lib.appendOption(
         document.querySelector("#exitOnlyFontFamily"),
         fontFamily,
       );
-    }
-
-    // Other symbols
-    const otherSymbolSelectElement = document.querySelector("#otherSymbol");
-    for (const otherSymbol of Sign.prototype.otherSymbols) {
-      lib.appendOption(otherSymbolSelectElement, otherSymbol);
     }
 
     for (const unit of SubPanels.prototype.dividerHeightUnits) {
@@ -815,22 +796,6 @@ const FormNavigation = (() => {
         formHandler.readForm();
       });
     }
-
-    // Arrow flip button
-    const arrowFlipInput = document.querySelector("#sdArrow_flip");
-    const arrowFlipButton = document.querySelector("#sdArrow_flipButton");
-    arrowFlipButton.addEventListener("click", () => {
-      const newValue = arrowFlipInput.value === "true" ? "false" : "true";
-      arrowFlipInput.value = newValue;
-      const isFlipped = newValue === "true";
-      arrowFlipButton.classList.toggle("activated", isFlipped);
-      arrowFlipButton.setAttribute(
-        "aria-pressed",
-        isFlipped ? "true" : "false",
-      );
-      arrowFlipButton.textContent = isFlipped ? "Unflip" : "Flip";
-      formHandler.readForm();
-    });
 
     // Small value inputs
     document.querySelectorAll(".smallVal").forEach((valEl) => {

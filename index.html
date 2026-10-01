@@ -3178,21 +3178,10 @@
 
                   <div data-property="sdArrow" class="hidden">
                     <label for="sdArrow_arrow">Arrow:</label>
-                    <div
-                      id="sdArrow_arrow"
-                      class="smDropdownInputElement"
-                    >
-                      <button
-                        class="smDropdownSelectedButton"
-                        type="button"
-                      >
-                        <img
-                          class="smDropdownSelectedImage"
-                          alt=""
-                        />
-                        <span
-                          class="smDropdownSelectedLabel"
-                        ></span>
+                    <div id="sdArrow_arrow" class="smDropdownInputElement">
+                      <button class="smDropdownSelectedButton" type="button">
+                        <img class="smDropdownSelectedImage" alt="" />
+                        <span class="smDropdownSelectedLabel"></span>
                         <span class="material-symbols-outlined smDropdownArrow"
                           >arrow_drop_down</span
                         >
@@ -3341,14 +3330,8 @@
                       step="0.1"
                     />
                     <br />
-                    <input type="hidden" id="sdArrow_flip" value="false" />
-                    <button
-                      type="button"
-                      id="sdArrow_flipButton"
-                      class="sdArrow_flipButton"
-                    >
-                      Flip
-                    </button>
+                    <label for="sdArrow_flip">Flip:</label>
+                    <input type="checkbox" id="sdArrow_flip" />
                   </div>
 
                   <div data-property="sdTollLogo" class="hidden">
@@ -3958,83 +3941,202 @@
               </div>
             </div>
             <div id="sMStandardArrows" class="tabHidden">
-              <div>
-                <label for="guideArrow">Variant:</label>
-                <select
-                  id="guideArrow"
-                  onchange="formHandler.readForm()"
-                ></select>
-                <br />
-                <button id="standardArrowAdd" type="button">Add Arrow</button>
-                <button id="standardArrowRemove" type="button">
-                  Remove Arrow
+              <label for="guideArrow">Variant:</label>
+              <select
+                id="guideArrow"
+                onchange="formHandler.readForm()"
+              ></select>
+              <br />
+              <div class="standardArrow_selectHeader">
+                <span id="standardArrowSelected">Selected: Arrow 1</span>
+                <button
+                  id="standardArrowAdd"
+                  onclick="App.addStandardArrow()"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">add</span> Add
                 </button>
-                <div id="standardArrowList"></div>
-                <div id="standardArrowProperties">
-                  <label for="guideStandardArrow">Arrow:</label>
-                  <div
-                    id="guideStandardArrow"
-                    class="smDropdownInputElement"
-                  >
-                    <button
-                      class="smDropdownSelectedButton"
-                      type="button"
+                <button
+                  id="standardArrowRemove"
+                  onclick="App.removeStandardArrow()"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">remove</span>Remove
+                </button>
+              </div>
+              <div id="standardArrowList"></div>
+              <div id="standardArrowProperties">
+                <label for="guideStandardArrow">Arrow:</label>
+                <div id="guideStandardArrow" class="smDropdownInputElement">
+                  <button class="smDropdownSelectedButton" type="button">
+                    <img class="smDropdownSelectedImage" alt="" />
+                    <span class="smDropdownSelectedLabel"></span>
+                    <span class="material-symbols-outlined smDropdownArrow"
+                      >arrow_drop_down</span
                     >
-                      <img class="smDropdownSelectedImage" alt="" />
-                      <span class="smDropdownSelectedLabel"></span>
-                      <span class="material-symbols-outlined smDropdownArrow"
-                        >arrow_drop_down</span
-                      >
-                    </button>
-                    <div class="hidden smDropdownHolder">
-                      <input
-                        type="search"
-                        class="smDropdownSearch"
-                        placeholder="Search arrows"
-                        autocomplete="off"
-                      />
-                      <div class="smDropdownList"></div>
-                    </div>
+                  </button>
+                  <div class="hidden smDropdownHolder">
+                    <input
+                      type="search"
+                      class="smDropdownSearch"
+                      placeholder="Search arrows"
+                      autocomplete="off"
+                    />
+                    <div class="smDropdownList"></div>
                   </div>
-                  <label for="guideStandardArrow_rotation">Rotation (deg):</label>
-                  <input
-                    type="number"
-                    id="guideStandardArrow_rotation"
-                    value="0"
-                    onchange="formHandler.readForm()"
-                  />
-                  <label for="guideStandardArrow_size">Size (rem):</label>
-                  <input
-                    type="number"
-                    id="guideStandardArrow_size"
-                    value="1.75"
-                    onchange="formHandler.readForm()"
-                  />
-                  <label for="guideStandardArrow_marginHorizontal"
-                    >Margin Horizontal (rem):</label
-                  >
-                  <input
-                    type="number"
-                    id="guideStandardArrow_marginHorizontal"
-                    value="0"
-                    onchange="formHandler.readForm()"
-                  />
-                  <label for="guideStandardArrow_marginVertical"
-                    >Margin Vertical (rem):</label
-                  >
-                  <input
-                    type="number"
-                    id="guideStandardArrow_marginVertical"
-                    value="0"
-                    onchange="formHandler.readForm()"
-                  />
-                  <label for="guideStandardArrow_flip">Flip:</label>
-                  <input
-                    type="checkbox"
-                    id="guideStandardArrow_flip"
-                    onchange="formHandler.readForm()"
-                  />
                 </div>
+                <br />
+                <label for="guideStandardArrow_rotation">Rotation (deg):</label>
+                <input
+                  type="number"
+                  id="guideStandardArrow_rotation"
+                  value="0"
+                  onchange="formHandler.readForm()"
+                />
+                 <label for="guideStandardArrow_size">Size (rem):</label>
+                <input
+                  type="number"
+                  id="guideStandardArrow_size"
+                  value="1.75"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <div class="sdGuideArrows_rotationButtons">
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="0"
+                  >
+                    0°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="45"
+                  >
+                    45°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="90"
+                  >
+                    90°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="135"
+                  >
+                    135°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="180"
+                  >
+                    180°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="225"
+                  >
+                    225°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="270"
+                  >
+                    270°
+                  </button>
+                  <button
+                    type="button"
+                    class="sdGuideArrows_rotationPreset"
+                    data-degrees="315"
+                  >
+                    315°
+                  </button>
+                </div>
+                <br />
+                <label for="guideStandardArrow_marginHorizontal"
+                  >Margin Horizontal (rem):</label
+                >
+                <input
+                  type="number"
+                  id="guideStandardArrow_marginHorizontal"
+                  value="0"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="guideStandardArrow_marginVertical"
+                  >Margin Vertical (rem):</label
+                >
+                <input
+                  type="number"
+                  id="guideStandardArrow_marginVertical"
+                  value="0"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="guideStandardArrow_flip">Flip:</label>
+                <input
+                  type="checkbox"
+                  id="guideStandardArrow_flip"
+                  onchange="formHandler.readForm()"
+                />
+              </div>
+              <label for="standardArrows_gap">Gap (rem):</label>
+              <input
+                type="number"
+                id="standardArrows_gap"
+                value="0"
+                step="0.01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <label for="standardArrows_justify">Align:</label>
+              <select
+                id="standardArrows_justify"
+                onchange="formHandler.readForm()"
+              >
+              </select>
+              <br />
+              <label for="standardArrows_horizontalPadding">Horizontal Padding:</label>
+              <input
+                type="number"
+                id="standardArrows_horizontalPadding"
+                value="0"
+                step="0.01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <label for="standardArrows_verticalPadding">Top/Bottom Padding:</label>
+              <input
+                type="number"
+                class="smallVal"
+                id="standardArrows_verticalTopPadding"
+                value="0"
+                step="0.01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <span>/</span>
+              <input
+                type="number"
+                class="smallVal"
+                id="standardArrows_verticalBottomPadding"
+                value="0"
+                step="0.01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <div style="display: none" id="tempHolderr">
                 <label id="arrowLocationLabel" for="arrowLocations"
                   >Arrow Location:</label
                 >
