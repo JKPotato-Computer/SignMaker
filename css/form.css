@@ -2894,3 +2894,7 @@ summary:hover {
   margin-top: 0.5rem;
   background-color: rgb(var(--baseColor), 0.25);
 }
+
+#standardArrowGeneralSettings {
+  margin-top: .5rem;
+}

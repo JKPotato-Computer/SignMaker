@@ -531,43 +531,66 @@ const formHandler = (() => {
       const standardArrowConfig = currentPanel.sign.arrows.standard;
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
       standardArrowConfig.variant = form["guideArrow"].value;
-      currentPanel.sign.arrowPosition = form["arrowLocations"].value;
-
-      if (standardArrowConfig.variant == "Half Exit Only") {
-        if (form["arrowLocations"].value == "Middle") {
-          while (form["arrowLocations"].firstChild) {
-            form["arrowLocations"].removeChild(
-              form["arrowLocations"].lastChild,
-            );
-          }
-
-          for (const arrowPosition of Sign.prototype.arrowPositions) {
-            if (arrowPosition != "Middle") {
-              lib.appendOption(form["arrowLocations"], arrowPosition);
-            }
-          }
-
-          form["arrowLocations"].value = "Left";
-          currentPanel.sign.arrowPosition = "Left";
-        } else {
-          currentPanel.sign.arrowPosition = form["arrowLocations"].value;
-
-          if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
-            lib.appendOption(form["arrowLocations"], "Middle");
-          }
+      standardArrowConfig.customConfig.gap = form["standardArrows_gap"].value;
+      standardArrowConfig.customConfig.justify = form["standardArrows_justify"].value;
+      standardArrowConfig.customConfig.verticalTopPadding = form[
+        "standardArrows_verticalTopPadding"
+      ].value;
+      standardArrowConfig.customConfig.verticalBottomPadding = form[
+        "standardArrows_verticalBottomPadding"
+      ].value;
+      standardArrowConfig.customConfig.horizontalPadding = form[
+        "standardArrows_horizontalPadding"
+      ].value;
+      const isExitOnly = [
+        "Exit Only",
+        "Split Exit Only",
+        "Half Exit Only",
+      ].includes(standardArrowConfig.variant);
+      const arrowLocations = form["arrowLocations"];
+      if (isExitOnly) {
+        const positions =
+          standardArrowConfig.variant === "Split Exit Only"
+            ? ["Left", "Center", "Right"]
+            : standardArrowConfig.variant === "Half Exit Only"
+              ? ["Left", "Right"]
+              : ["Middle"];
+        arrowLocations.replaceChildren();
+        positions.forEach((position) => lib.appendOption(arrowLocations, position));
+        if (!positions.includes(currentPanel.sign.arrowPosition)) {
+          currentPanel.sign.arrowPosition = positions[0];
         }
+        arrowLocations.value = currentPanel.sign.arrowPosition;
       } else {
-        currentPanel.sign.arrowPosition = form["arrowLocations"].value;
-
-        if (!form["arrowLocations"].querySelector("option[value=Middle]")) {
-          lib.appendOption(form["arrowLocations"], "Middle");
-        }
+        currentPanel.sign.arrowPosition = arrowLocations.value;
       }
 
-      exitOnlyConfigs.showExitOnly = form["showExitOnly"].checked;
-      exitOnlyConfigs.hideArrow = form["hideExitArrow"]
-        ? form["hideExitArrow"].checked
-        : false;
+      if (isExitOnly) {
+        const arrowCount = Math.max(
+          1,
+          parseInt(document.getElementById("exitOnlyArrowCount").value, 10) || 1,
+        );
+        while (standardArrowConfig.arrowList.length < arrowCount) {
+          currentPanel.sign.newStandardArrow();
+        }
+        standardArrowConfig.arrowList.length = arrowCount;
+
+        const arrowType = document.querySelector(
+          "#exitOnlyArrowType",
+        ).dataset.selectedOption;
+        const arrowSize = document.getElementById("exitOnlyArrowSize").value;
+        const arrowRotation = document.getElementById("exitOnlyArrowRotation").value;
+        const arrowFlip = document.getElementById("exitOnlyArrowFlip").checked;
+        standardArrowConfig.arrowList.forEach((arrow) => {
+          arrow.arrow = arrowType;
+          arrow.size = arrowSize;
+          arrow.rotation = arrowRotation;
+          arrow.flip = arrowFlip;
+          arrow.marginHorizontal = 0;
+          arrow.marginVertical = 0;
+        });
+      }
+
       const borderModeField = form["exitOnlyBorderMode"];
       if (borderModeField) {
         const selectedMode = borderModeField.value;
@@ -579,6 +602,8 @@ const formHandler = (() => {
         exitOnlyConfigs.borderMode = Sign.prototype.exitOnlyBorderModes[0];
       }
       exitOnlyConfigs.exitOnlyText = form["exitOnlyText"].value;
+      exitOnlyConfigs.exitOnlyTextPosition =
+        form["exitOnlyTextPosition"].value;
       exitOnlyConfigs.horizontalPadding =
         form["exitOnlyHorizontalPadding"].value;
       exitOnlyConfigs.verticalPadding = form["exitOnlyVerticalPadding"].value;
@@ -2209,38 +2234,64 @@ const formHandler = (() => {
         "Split Exit Only",
         "Half Exit Only",
       ].includes(standardArrowConfig.variant);
-      const isSplit = standardArrowConfig.variant === "Split Exit Only";
 
       const standardArrowList = document.getElementById("standardArrowList");
       const standardArrows = sign.arrows.standard.arrowList;
+      const isSimpleVariant = ["None", "Side Left", "Side Right"].includes(
+        standardArrowConfig.variant,
+      );
 
-      for (const elem of document.querySelectorAll(
-        '#smStandardArrows > *:not(#guideArrow, label[for="guideArrow"])',
-      )) {
-        elem.style.display = ["None", "Side Left", "Side Right"].includes(
-          standardArrowConfig.variant,
-        )
-          ? "none"
-          : "";
+      document.getElementById("standardArrowCustomSettings").style.display =
+        (standardArrowConfig.variant == "Custom") ? "" : "none";
+      document.getElementById("standardArrowExitOnlySettings").style.display =
+        isExitOnly ? "" : "none";
+      document.querySelector(".standardArrow_selectHeader").style.display =
+        (isExitOnly || isSimpleVariant) ? "none" : "";
+      document.getElementById("standardArrowGeneralSettings").style.display =
+        (isExitOnly || isSimpleVariant) ? "none" : "";
+      const exitPositionVisible = [
+        "Split Exit Only",
+        "Half Exit Only",
+      ].includes(standardArrowConfig.variant);
+      document.getElementById("arrowLocationLabel").style.display =
+        exitPositionVisible ? "" : "none";
+      document.getElementById("arrowLocations").style.display =
+        exitPositionVisible ? "" : "none";
+      const arrowLocationOptions =
+        standardArrowConfig.variant === "Split Exit Only"
+          ? ["Left", "Center", "Right"]
+          : standardArrowConfig.variant === "Half Exit Only"
+            ? ["Left", "Right"]
+            : ["Left", "Middle", "Right"];
+      const arrowLocations = document.getElementById("arrowLocations");
+      arrowLocations.replaceChildren();
+      arrowLocationOptions.forEach((position) =>
+        lib.appendOption(arrowLocations, position),
+      );
+      if (!arrowLocationOptions.includes(sign.arrowPosition)) {
+        sign.arrowPosition = arrowLocationOptions[0];
       }
-
-      if (
-        ["None", "Side Left", "Side Right"].includes(
-          standardArrowConfig.variant,
-        )
-      ) {
-        return;
-      }
-
-      document.querySelector("#standardArrowProperties").style.display =
-        app.vars.currentlySelectedStandardArrow != -1 ? "" : "none";
-      document.querySelector("#tempHolderr").style.display = "none";
+      arrowLocations.value = sign.arrowPosition;
+      document.getElementById("exitOnlyTextPositionLabel").style.display =
+        standardArrowConfig.arrowList.length === 1 ? "" : "none";
+      document.getElementById("exitOnlyTextPosition").style.display =
+        standardArrowConfig.arrowList.length === 1 ? "" : "none";
       document.querySelector("#standardArrowSelected").textContent =
         "Selected: " +
         (app.vars.currentlySelectedStandardArrow == -1
           ? "None"
           : "Arrow " + (app.vars.currentlySelectedStandardArrow + 1));
       document.getElementById("guideArrow").value = standardArrowConfig.variant;
+      document.getElementById("standardArrows_gap").value =
+        standardArrowConfig.customConfig.gap;
+      document.getElementById("standardArrows_justify").value =
+        standardArrowConfig.customConfig.justify;
+      document.getElementById("standardArrows_horizontalPadding").value =
+        standardArrowConfig.customConfig.horizontalPadding;
+      document.getElementById("standardArrows_verticalTopPadding").value =
+        standardArrowConfig.customConfig.verticalTopPadding;
+      document.getElementById("standardArrows_verticalBottomPadding").value =
+        standardArrowConfig.customConfig.verticalBottomPadding;
 
       standardArrowList.innerHTML = "";
       standardArrows.forEach((arrow, arrowIndex) => {
@@ -2317,38 +2368,6 @@ const formHandler = (() => {
           selectedStandardArrow.flip;
       }
 
-      // Toggle visibility for all Exit Only related elements
-      const exitOnlyElements = [
-        "showExitOnlyLabel",
-        "showExitOnly",
-        "hideExitArrowLabel",
-        "hideExitArrow",
-        "exitOnlyText",
-        "exitOnlyHorizontalPadding",
-        "exitOnlyVerticalPadding",
-        "exitOnlyFontFamily",
-        "exitOnlyFontSize",
-        "exitOnlyWordSpacing",
-        "exitOnlyLetterSpacing",
-        "exitOnlyLineHeight",
-      ];
-
-      for (const id of exitOnlyElements) {
-        const el = document.getElementById(id);
-        if (el) el.style.visibility = isExitOnly ? "visible" : "hidden";
-      }
-
-      const showPadding = isExitOnly && !isSplit;
-      document.getElementById("exitOnlyPaddingLabel").className = showPadding
-        ? ""
-        : "invisible";
-      document.getElementById("exitOnlyPadding").className = showPadding
-        ? ""
-        : "invisible";
-      document.getElementById("paddingValue").className = showPadding
-        ? ""
-        : "invisible";
-
       const shouldShowBorderMode =
         !post.secondExitOnly &&
         (standardArrowConfig.variant === "Half Exit Only" ||
@@ -2363,15 +2382,19 @@ const formHandler = (() => {
       // Text inputs
       document.getElementById("exitOnlyText").value =
         exitOnlyConfigs.exitOnlyText || "";
-      document.getElementById("showExitOnly").checked =
-        exitOnlyConfigs.showExitOnly;
-      document.getElementById("hideExitArrow").checked =
-        exitOnlyConfigs.hideArrow;
-      document.getElementById("exitOnlyPadding").value =
-        exitOnlyConfigs.verticalPadding;
-      document.getElementById("paddingValue").textContent =
-        exitOnlyConfigs.verticalPadding;
-
+      document.getElementById("exitOnlyTextPosition").value =
+        exitOnlyConfigs.exitOnlyTextPosition || "Center";
+      document.getElementById("exitOnlyArrowCount").value =
+        standardArrowConfig.arrowList.length || 1;
+      const exitOnlyArrow = standardArrowConfig.arrowList[0];
+      if (exitOnlyArrow) {
+        document.querySelector("#exitOnlyArrowType").dataset.selectedOption =
+          exitOnlyArrow.arrow;
+        document.getElementById("exitOnlyArrowSize").value = exitOnlyArrow.size;
+        document.getElementById("exitOnlyArrowRotation").value =
+          exitOnlyArrow.rotation;
+        document.getElementById("exitOnlyArrowFlip").checked = exitOnlyArrow.flip;
+      }
       document.getElementById("exitOnlyHorizontalPadding").value =
         exitOnlyConfigs.horizontalPadding;
       document.getElementById("exitOnlyVerticalPadding").value =

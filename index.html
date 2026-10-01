@@ -3965,6 +3965,7 @@
                 </button>
               </div>
               <div id="standardArrowList"></div>
+              <div id="standardArrowCustomSettings">
               <div id="standardArrowProperties">
                 <label for="guideStandardArrow">Arrow:</label>
                 <div id="guideStandardArrow" class="smDropdownInputElement">
@@ -4091,52 +4092,55 @@
                   onchange="formHandler.readForm()"
                 />
               </div>
-              <label for="standardArrows_gap">Gap (rem):</label>
-              <input
-                type="number"
-                id="standardArrows_gap"
-                value="0"
-                step="0.01"
-                min="0"
-                onchange="formHandler.readForm()"
-              />
-              <label for="standardArrows_justify">Align:</label>
-              <select
-                id="standardArrows_justify"
-                onchange="formHandler.readForm()"
-              >
-              </select>
-              <br />
-              <label for="standardArrows_horizontalPadding">Horizontal Padding:</label>
-              <input
-                type="number"
-                id="standardArrows_horizontalPadding"
-                value="0"
-                step="0.01"
-                min="0"
-                onchange="formHandler.readForm()"
-              />
-              <label for="standardArrows_verticalPadding">Top/Bottom Padding:</label>
-              <input
-                type="number"
-                class="smallVal"
-                id="standardArrows_verticalTopPadding"
-                value="0"
-                step="0.01"
-                min="0"
-                onchange="formHandler.readForm()"
-              />
-              <span>/</span>
-              <input
-                type="number"
-                class="smallVal"
-                id="standardArrows_verticalBottomPadding"
-                value="0"
-                step="0.01"
-                min="0"
-                onchange="formHandler.readForm()"
-              />
-              <div style="display: none" id="tempHolderr">
+              </div>
+              <div id="standardArrowGeneralSettings">
+                <label for="standardArrows_gap">Gap (rem):</label>
+                <input
+                  type="number"
+                  id="standardArrows_gap"
+                  value="1"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="standardArrows_justify">Align:</label>
+                <select
+                  id="standardArrows_justify"
+                  onchange="formHandler.readForm()"
+                >
+                </select>
+                <br />
+                <label for="standardArrows_horizontalPadding">Horizontal Padding (rem):</label>
+                <input
+                  type="number"
+                  id="standardArrows_horizontalPadding"
+                  value="1"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="standardArrows_verticalPadding">Top/Bottom Padding (rem):</label>
+                <input
+                  type="number"
+                  class="smallVal"
+                  id="standardArrows_verticalTopPadding"
+                  value=".5"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <span>/</span>
+                <input
+                  type="number"
+                  class="smallVal"
+                  id="standardArrows_verticalBottomPadding"
+                  value=".5"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+              </div>
+              <div id="standardArrowExitOnlySettings">
                 <label id="arrowLocationLabel" for="arrowLocations"
                   >Arrow Location:</label
                 >
@@ -4145,99 +4149,90 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label
-                  id="showExitOnlyLabel"
-                  for="showExitOnly"
-                  class="invisible"
-                  >Hide Label</label
-                >
+                <label for="exitOnlyArrowType">Arrow Type:</label>
+                <div id="exitOnlyArrowType" class="smDropdownInputElement">
+                  <button class="smDropdownSelectedButton" type="button">
+                    <img class="smDropdownSelectedImage" alt="" />
+                    <span class="smDropdownSelectedLabel"></span>
+                    <span class="material-symbols-outlined smDropdownArrow"
+                      >arrow_drop_down</span
+                    >
+                  </button>
+                  <div class="hidden smDropdownHolder">
+                    <input
+                      type="search"
+                      class="smDropdownSearch"
+                      placeholder="Search arrows"
+                      autocomplete="off"
+                    />
+                    <div class="smDropdownList"></div>
+                  </div>
+                </div>
+                <label for="exitOnlyArrowCount">Number of Arrows:</label>
                 <input
-                  type="checkbox"
-                  id="showExitOnly"
-                  name="showExitOnly"
+                  type="number"
+                  id="exitOnlyArrowCount"
+                  min="1"
+                  value="1"
                   onchange="formHandler.readForm()"
-                  class="invisible"
                 />
-                <label
-                  id="hideExitArrowLabel"
-                  for="hideExitArrow"
-                  class="invisible"
-                  >Hide Arrow</label
-                >
-                <input
-                  type="checkbox"
-                  id="hideExitArrow"
-                  name="hideExitArrow"
-                  onchange="formHandler.readForm()"
-                  class="invisible"
-                />
-                <label
-                  id="exitOnlyBorderModeLabel"
-                  for="exitOnlyBorderMode"
-                  class="invisible"
-                  >Exit Only Border:</label
-                >
-                <select
-                  id="exitOnlyBorderMode"
-                  class="invisible"
-                  onchange="formHandler.readForm()"
-                >
-                  <option value="edge">Full Black Border</option>
-                  <option value="white-edge">Partial Black Border</option>
-                </select>
-                <label
-                  id="exitOnlyLeftTextLabel"
-                  for="exitOnlyText"
-                  class="invisible"
-                  >Exit Only Text:</label
-                >
+                <br />
+                <label for="exitOnlyText">Exit Only Text:</label>
                 <input
                   type="text"
                   id="exitOnlyText"
                   name="exitOnlyText"
                   placeholder="EXIT ONLY"
-                  class="invisible"
                   oninput="formHandler.readForm()"
                 />
-                <br />
-                <label
-                  id="exitOnlyPaddingLabel"
-                  for="exitOnlyPadding"
-                  class="invisible"
-                  >Spacing:
-                  <input
-                    type="button"
-                    class="resetBtn clear"
-                    id="paddingReset"
-                    value="Reset"
-                  />
-                </label>
-                <input
-                  id="exitOnlyPadding"
-                  type="range"
-                  min="0"
-                  max="2"
-                  step="0.05"
-                  value="0.25"
-                  oninput="
-                    document.querySelector('#paddingValue').textContent =
-                      this.value
-                  "
+                <label for="exitOnlyTextPosition" id="exitOnlyTextPositionLabel"
+                  >Exit Text Position:</label
+                >
+                <select
+                  id="exitOnlyTextPosition"
                   onchange="formHandler.readForm()"
-                  class="invisible"
+                >
+                  <option>Left</option>
+                  <option selected>Center</option>
+                  <option>Right</option>
+                </select>
+                <br />
+                <label for="exitOnlyArrowSize">Arrow Size (rem):</label>
+                <input
+                  type="number"
+                  id="exitOnlyArrowSize"
+                  value="1.75"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="exitOnlyArrowRotation">Arrow Rotation (deg):</label>
+                <input
+                  type="number"
+                  id="exitOnlyArrowRotation"
+                  value="0"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="exitOnlyArrowFlip">Flip:</label>
+                <input
+                  type="checkbox"
+                  id="exitOnlyArrowFlip"
+                  onchange="formHandler.readForm()"
                 />
                 <label
-                  for="exitOnlyPadding"
-                  id="paddingValue"
-                  style="
-                    text-align: left;
-                    margin: 0;
-                    font-size: 2rem;
-                    width: auto;
-                  "
-                  class="invisible"
-                  >0.25</label
+                  id="exitOnlyBorderModeLabel"
+                  for="exitOnlyBorderMode"
+                  >Exit Only Border:</label
                 >
+                <select
+                  id="exitOnlyBorderMode"
+                  onchange="formHandler.readForm()"
+                >
+                  <option value="edge">Full Black Border</option>
+                  <option value="white-edge">Partial Black Border</option>
+                </select>
+                <br />
                 <label for="exitOnlyHorizontalPadding"
                   >Exit Only Horizontal Padding (rem):</label
                 >

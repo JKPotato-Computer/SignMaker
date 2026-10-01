@@ -1345,10 +1345,7 @@ const App = (() => {
       const standardArrowConfig = panel.sign.arrows.standard;
       const standardVariant = standardArrowConfig.variant;
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
-      const ExitKeys = ["EA", "EB", "EC"];
-      const MainKeys = ["A", "B", "C", "D", "E"];
-      let path;
-
+      /*
       const otherSymbolsElmt = document.createElement("div");
       otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol
         .replace("/", "-")
@@ -1359,6 +1356,7 @@ const App = (() => {
       const oSNumElmt = document.createElement("div");
       oSNumElmt.className = `oSNum`;
       otherSymbolsElmt.appendChild(oSNumElmt);
+      */
 
       const arrowContElmt = document.createElement("div");
       arrowContElmt.className = `arrowContainer`;
@@ -1366,10 +1364,9 @@ const App = (() => {
 
       const standardArrowList = panel.sign.arrows.standard.arrowList;
       let standardArrowIndex = 0;
-      const createArrowElmt = () => {
-        const arrow = standardArrowList[standardArrowIndex++];
-        return arrow.createElement();
-      };
+      arrowContElmt.style.setProperty("--arrowGap", standardArrowConfig.customConfig.gap + "rem");
+      arrowContElmt.style.justifyContent = standardArrowConfig.customConfig.justify.toLowerCase() == "space between" ? "space-between" : standardArrowConfig.customConfig.justify.toLowerCase() == "space around" ? "space-around" : standardArrowConfig.customConfig.justify.toLowerCase() == "space evenly" ? "space-evenly" : standardArrowConfig.customConfig.justify.toLowerCase() == "left" ? "flex-start" : standardArrowConfig.customConfig.justify.toLowerCase() == "right" ? "flex-end" : "center";
+      guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
 
       if (
         panel.sign.arrowPosition == "Left" &&
@@ -1390,6 +1387,7 @@ const App = (() => {
       ) {
         arrowContElmt.style.justifyContent = "right";
       }
+      arrowContElmt.style.setProperty("--arrowGap", standardArrowConfig.customConfig.gap + "rem");
 
       if (standardVariant.includes("Exit Only")) {
         guideArrowsElmt.style.setProperty(
@@ -1413,54 +1411,52 @@ const App = (() => {
           exitOnlyConfigs.lineHeight + "%",
         );
 
-        const hideExitOnlyArrows = exitOnlyConfigs.hideArrow === true;
-        arrowContElmt.classList.toggle(
-          "hideExitOnlyArrows",
-          hideExitOnlyArrows,
-        );
+
 
         if (
           !post.secondExitOnly &&
           standardVariant !== "Split Exit Only" &&
           standardVariant !== "Half Exit Only"
         ) {
-          guideArrowsElmt.style.padding = `${exitOnlyConfigs.verticalPadding}rem ${exitOnlyConfigs.horizontalPadding}rem`;
+          guideArrowsElmt.style.padding = `${exitOnlyConfigs.customConfig.verticalTopPadding}rem ${exitOnlyConfigs.customConfig.horizontalPadding}rem ${exitOnlyConfigs.customConfig.verticalBottomPadding}rem`;
         }
 
-        const centerText = (exitOnlyConfigs.exitOnlyText || "EXIT ONLY").trim();
-        const centerIndex = Math.floor(standardArrowList.length / 2);
+        const exitOnlyText = (exitOnlyConfigs.exitOnlyText).trim();
+        const textElement = document.createElement("span");
+        textElement.className = "exitOnlyText";
+        textElement.textContent = exitOnlyText;
 
-        for (
-          let arrowIndex = 0;
-          arrowIndex < standardArrowList.length;
-          arrowIndex++
-        ) {
-          if (
-            arrowIndex === centerIndex &&
-            standardArrowList.length % 2 !== 0 &&
-            centerText
-          ) {
-            const label = document.createElement("span");
-            label.className = "exitOnlyText";
-            label.textContent = centerText;
-            arrowContElmt.appendChild(label);
+        if (standardArrowList.length === 1) {
+          const textPosition = exitOnlyConfigs.exitOnlyTextPosition || "Center";
+          const position = ["Split Exit Only", "Half Exit Only"].includes(
+            standardVariant,
+          )
+            ? panel.sign.arrowPosition
+            : textPosition;
+          arrowContElmt.style.justifyContent =
+            position === "Left"
+              ? "flex-start"
+              : position === "Right"
+                ? "flex-end"
+                : "center";
+          arrowContElmt.appendChild(textElement);
+          arrowContElmt.appendChild(standardArrowList[standardArrowIndex++].createElement());
+        } else {
+          if (standardVariant === "Split Exit Only") {
+            arrowContElmt.style.justifyContent =
+              panel.sign.arrowPosition.toLowerCase() === "left"
+                ? "flex-start"
+                : panel.sign.arrowPosition.toLowerCase() === "right"
+                  ? "flex-end"
+                  : "center";
+          } else if (standardVariant === "Half Exit Only") {
+            arrowContElmt.style.justifyContent =
+              panel.sign.arrowPosition.toLowerCase() === "right"
+                ? "flex-end"
+                : "flex-start";
           }
-
-          const arrowElement = createArrowElmt();
-          if (arrowElement) {
-            arrowContElmt.appendChild(arrowElement);
-          }
-
-          if (
-            arrowIndex === centerIndex &&
-            standardArrowList.length % 2 === 0 &&
-            centerText
-          ) {
-            const label = document.createElement("span");
-            label.className = "exitOnlyText";
-            label.textContent = centerText;
-            arrowContElmt.appendChild(label);
-          }
+          standardArrowList.forEach(() => arrowContElmt.appendChild(standardArrowList[standardArrowIndex++].createElement()));
+          arrowContElmt.appendChild(textElement);
         }
       } else if (standardVariant === "Side Left") {
         sideLeftArrowElmt.style.display = "block";
@@ -1481,7 +1477,7 @@ const App = (() => {
       }
 
       // Bottom Symbols
-
+      /*
       if (panel.sign.oSNum != "" && panel.sign.otherSymbol != "None") {
         signElmt.style.borderBottomLeftRadius = "0";
         signElmt.style.borderBottomRightRadius = "0";
@@ -1525,6 +1521,7 @@ const App = (() => {
           otherSymbolsElmt.appendChild(markerElmt);
         default:
       }
+      */
     }
 
     // redraw exit tab widths

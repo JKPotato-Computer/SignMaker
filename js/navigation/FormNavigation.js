@@ -364,6 +364,11 @@ const FormNavigation = (() => {
       lib.appendOption(guideArrowSelectElmt, display);
     }
 
+    const arrowLocations = document.querySelector("#arrowLocations");
+    ["Left", "Middle", "Right"].forEach((position) =>
+      lib.appendOption(arrowLocations, position),
+    );
+
     for (const fontFamily of TextElement.prototype.fontFamily) {
       lib.appendOption(
         document.querySelector("#exitOnlyFontFamily"),
@@ -862,6 +867,13 @@ const FormNavigation = (() => {
         { text: justify },
       );
     }
+
+    for (const justify of Sign.prototype.standardArrowJustify) {
+      lib.appendOption(
+        document.querySelector("#standardArrows_justify"),
+        justify,
+      );
+    }
   };
 
   const setupLimonEasterEgg = () => {
@@ -1161,6 +1173,21 @@ const FormNavigation = (() => {
 
     setupDropdownElement(
       document.querySelector("#guideStandardArrow"),
+      StandardArrow.prototype.arrows,
+      "TYPE_A",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = StandardArrow.prototype.arrows[value].src;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = StandardArrow.prototype.arrows[value].label;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#exitOnlyArrowType"),
       StandardArrow.prototype.arrows,
       "TYPE_A",
       (image, value) => {

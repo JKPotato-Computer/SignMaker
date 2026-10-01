@@ -6,19 +6,17 @@ class Sign {
       standard: {
         variant: "None",
         arrowList: [],
-        justify: "center",
         customConfig: {
-          horizontalPadding: 0,
+          horizontalPadding: 1,
           verticalTopPadding: 0,
-          verticalBottomPadding: 0,
+          verticalBottomPadding: 1,
           gap: 1,
           justify: "Space Between",
         },
         exitOnlyConfigs: {
           borderMode: "white-edge",
-          hideArrow: false,
-          showExitOnly: true,
           exitOnlyText: "EXIT ONLY",
+          exitOnlyTextPosition: "Center",
           horizontalPadding: 0,
           verticalPadding: 0,
           fontFamily: "Series E",
@@ -171,7 +169,7 @@ Sign.prototype.guideArrows = [
 
 Sign.prototype.exitOnlyBorderModes = ["edge", "white-edge"];
 
-Sign.prototype.justify = ["Left", "Middle", "Right", "Space Between"];
+Sign.prototype.standardArrowJustify = ["Left", "Middle", "Right", "Space Between"];
 
 Sign.prototype.otherSymbols = [
   "None",

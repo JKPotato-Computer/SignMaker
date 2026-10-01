@@ -536,7 +536,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* gap: 3rem; */
+  gap: var(--arrowGap);
 }
 
 .arrow:first-child {
