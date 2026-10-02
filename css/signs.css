@@ -386,7 +386,7 @@
   background-color: var(--yellow);
 }
 
-.guideArrowsHolder:has(.guideArrows.none) {
+.guideArrowsHolder:has(.guideArrows.none, .guideArrows.side_left, .guideArrows.side_right) {
   display: none;
 }
 
