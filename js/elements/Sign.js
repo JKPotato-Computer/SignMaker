@@ -9,7 +9,7 @@ class Sign {
         customConfig: {
           horizontalPadding: 1,
           verticalTopPadding: 0,
-          verticalBottomPadding: 1,
+          verticalBottomPadding: .5,
           gap: 1,
           justify: "Space Between",
         },
@@ -170,6 +170,7 @@ Sign.prototype.guideArrows = [
 Sign.prototype.exitOnlyBorderModes = ["edge", "white-edge"];
 
 Sign.prototype.standardArrowJustify = ["Left", "Middle", "Right", "Space Between"];
+Sign.prototype.exitOnlyJustify = ["Left", "Center", "Right"];
 
 Sign.prototype.otherSymbols = [
   "None",
