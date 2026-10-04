@@ -666,7 +666,8 @@ input[type="button"]:disabled {
 }
 
 .sdArrow_rotationButtons,
-.sdGuideArrows_rotationButtons {
+.sdGuideArrows_rotationButtons,
+.sdExitOnlyGuide_rotationButtons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
@@ -675,12 +676,15 @@ input[type="button"]:disabled {
 }
 
 .sdArrow_rotationButtons > *,
-.sdGuideArrows_rotationButtons > * {
+.sdGuideArrows_rotationButtons > *,
+.sdExitOnlyGuide_rotationButtons > * {
   font-size: 20px;
   width: 10%;
 }
 
-.sdGuideArrows_rotationButtons > button.selected {
+.sdGuideArrows_rotationButtons > button.selected,
+.sdExitOnlyGuide_rotationButtons > button.selected,
+.sdArrow_rotationButtons > button.selected {
   background-color: rgb(var(--baseColor));
 }
 
@@ -821,14 +825,6 @@ textarea {
 
 #singularPanel {
   display: none;
-}
-
-:root[data-theme="light"] .activated {
-  background-color: rgb(200, 200, 200);
-}
-
-:root[data-theme="dark"] .activated {
-  background-color: rgb(100, 100, 100);
 }
 
 .close {
@@ -2862,10 +2858,14 @@ summary:hover {
   background-color: rgb(var(--baseColor));
 }
 
-.standardArrowListItem > img {
-  height: 3rem;
+.standardArrowListItem > .standardArrowListItem_imageHolder {
   background-color: black;
   padding: 0.5rem;
+  aspect-ratio: 1 / 1;
+}
+
+.standardArrowListItem_imageHolder > img {
+  height: 2rem;
   aspect-ratio: 1 / 1;
   object-fit: contain;
 }
@@ -2895,6 +2895,12 @@ summary:hover {
   background-color: rgb(var(--baseColor), 0.25);
 }
 
-#standardArrowGeneralSettings {
-  margin-top: .5rem;
+#standardArrowGeneralSettings,
+#standardArrowExitOnlySettings {
+  margin-top: 0.5rem;
+}
+
+#exitOnlyArrowType {
+  width: calc(100% - 8rem);
+  display: inline-block;
 }

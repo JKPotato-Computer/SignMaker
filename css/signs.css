@@ -382,18 +382,46 @@
   z-index: 3;
 }
 
-.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only) {
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only.white_border) {
+  background-color: var(--green);
+}
+
+.panel:not(.round)
+  .guideArrowsHolder:has(
+    .guideArrows.exit_only.partial_black_border,
+    .guideArrows.exit_only.full_black_border
+  ) {
   background-color: var(--yellow);
 }
 
-.guideArrowsHolder:has(.guideArrows.none, .guideArrows.side_left, .guideArrows.side_right) {
+.guideArrowsHolder:has(
+  .guideArrows.none,
+  .guideArrows.side_left,
+  .guideArrows.side_right
+) {
   display: none;
 }
 
-.guideArrows.exit_only {
+.guideArrows.exit_only.partial_black_border,
+.guideArrows.exit_only.full_black_border {
   border-color: var(--black);
   color: var(--black);
   background-color: var(--yellow);
+}
+
+.guideArrows.exit_only.full_black_border {
+  border-top: 0.2rem solid black;
+}
+
+.guideArrows.exit_only.white_border {
+  padding: 0 0.2rem 0.2rem 0.2rem;
+}
+
+.guideArrows.exit_only.white_border > .arrowContainer {
+  background-color: var(--yellow);
+  border-bottom-left-radius: calc(var(--signBorderRadius) / 2);
+  border-bottom-right-radius: calc(var(--signBorderRadius) / 2);
+  color: black;
 }
 
 .guideArrows.new,
@@ -534,9 +562,40 @@
 
 .arrowContainer {
   display: flex;
-  justify-content: center;
+  justify-content: var(--arrowJustify);
   align-items: center;
   gap: var(--arrowGap);
+}
+
+.arrowContainer:has(.arrowContainer.halfexitonly) {
+  justify-content: space-between;
+}
+
+.guideArrows.full_black_border .arrowContainer.halfExitOnly {
+  border: 0.2rem solid black;
+}
+
+.arrowContainer.halfExitOnly {
+  width: max-content;
+  height: stretch;
+  padding: var(--splitHorizontalPadding) var(--splitVerticalPadding);
+  flex-direction: row;
+  background-color: var(--yellow);
+  color: black;
+}
+
+.guideArrows.partial_black_border .arrowContainer.halfExitOnly {
+  border-right: 0.2rem solid black;
+  border-bottom: 0.2rem solid black;
+}
+
+.guideArrows.white_border .arrowContainer:has(.arrowContainer.halfexitonly) {
+  padding: 0 0.2rem 0.2rem 0.2rem;
+}
+
+.halfExitOnlyOutsideArrow {
+  top: 0.2rem;
+  position: relative;
 }
 
 .arrow:first-child {

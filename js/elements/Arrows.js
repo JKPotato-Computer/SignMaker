@@ -111,6 +111,7 @@ APLArrow.prototype.arrowTypes = {
   ["CFX Right Arrow"]: { asset: "APL_CFXTurn.svg", flipped: false },
   ["CFX Up Arrow"]: { asset: "APL_CFXUp.svg", flipped: false },
 };
+
 APLArrow.prototype.backgroundColors = [
   "Yellow",
   "White",
@@ -122,7 +123,7 @@ APLArrow.prototype.justifyAPLs = ["Left", "Right", "Center"];
 class StandardArrow {
   constructor({
     arrow = "TYPE_A",
-    rotation = 0,
+    rotation = 180,
     size = 1.75,
     marginHorizontal = 0,
     marginVertical = 0,

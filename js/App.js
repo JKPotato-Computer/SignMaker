@@ -874,6 +874,15 @@ const App = (() => {
     redraw();
   };
 
+  const duplicateStandardArrow = () => {
+    getCurrentPanel().sign.duplicateStandardArrow(
+      currentlySelectedStandardArrow,
+    );
+    currentlySelectedStandardArrow++;
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
   const moveStandardArrow = (oldIndex, newIndex) => {
     getCurrentPanel().sign.moveStandardArrow(oldIndex, newIndex);
     currentlySelectedStandardArrow = newIndex;
@@ -1094,8 +1103,8 @@ const App = (() => {
       panel.sign.arrows.arrowMode.toLowerCase() == "standard"
         ? panel.sign.arrows.standard.variant
             .toLowerCase()
-            .replace("/", "-")
-            .replace(" ", "_")
+            .replace(/\//g, "-")
+            .replace(/\s/g, "_")
             .toLowerCase()
         : ""
     }`;
@@ -1362,34 +1371,11 @@ const App = (() => {
       arrowContElmt.className = `arrowContainer`;
       guideArrowsElmt.appendChild(arrowContElmt);
 
-      const standardArrowList = panel.sign.arrows.standard.arrowList;
-      let standardArrowIndex = 0;
-      arrowContElmt.style.setProperty("--arrowGap", standardArrowConfig.customConfig.gap + "rem");
-      arrowContElmt.style.justifyContent = standardArrowConfig.customConfig.justify.toLowerCase() == "space between" ? "space-between" : standardArrowConfig.customConfig.justify.toLowerCase() == "space around" ? "space-around" : standardArrowConfig.customConfig.justify.toLowerCase() == "space evenly" ? "space-evenly" : standardArrowConfig.customConfig.justify.toLowerCase() == "left" ? "flex-start" : standardArrowConfig.customConfig.justify.toLowerCase() == "right" ? "flex-end" : "center";
-      guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
-
-      if (
-        panel.sign.arrowPosition == "Left" &&
-        standardVariant !== "Exit Only" &&
-        standardVariant !== "Side Left" &&
-        standardVariant !== "Side Right" &&
-        standardVariant !== "Half Exit Only"
-      ) {
-        arrowContElmt.style.justifyContent = "left";
-      } else if (panel.sign.arrowPosition == "Middle") {
-        arrowContElmt.style.cssFloat = "none";
-      } else if (
-        panel.sign.arrowPosition == "Right" &&
-        standardVariant !== "Exit Only" &&
-        standardVariant !== "Side Left" &&
-        standardVariant !== "Side Right" &&
-        standardVariant !== "Half Exit Only"
-      ) {
-        arrowContElmt.style.justifyContent = "right";
-      }
-      arrowContElmt.style.setProperty("--arrowGap", standardArrowConfig.customConfig.gap + "rem");
-
       if (standardVariant.includes("Exit Only")) {
+        guideArrowsElmt.classList.add(
+          exitOnlyConfigs.borderMode.replace(/\s/g, "_"),
+        );
+
         guideArrowsElmt.style.setProperty(
           "--exitOnlyFontFamily",
           `"${exitOnlyConfigs.fontFamily}"`,
@@ -1411,68 +1397,261 @@ const App = (() => {
           exitOnlyConfigs.lineHeight + "%",
         );
 
+        guideArrowsElmt.style.setProperty(
+          "--verticalPadding",
+          `${exitOnlyConfigs.verticalPadding}rem`,
+        );
+        guideArrowsElmt.style.setProperty(
+          "--horizontalPadding",
+          `${exitOnlyConfigs.horizontalPadding}rem`,
+        );
+      }
 
-
-        if (
-          !post.secondExitOnly &&
-          standardVariant !== "Split Exit Only" &&
-          standardVariant !== "Half Exit Only"
-        ) {
-          guideArrowsElmt.style.padding = `${exitOnlyConfigs.customConfig.verticalTopPadding}rem ${exitOnlyConfigs.customConfig.horizontalPadding}rem ${exitOnlyConfigs.customConfig.verticalBottomPadding}rem`;
+      let exitOnlyContainer = arrowContElmt;
+      switch (standardVariant) {
+        case "Side Left": {
+          sideLeftArrowElmt.style.display = "block";
+          break;
         }
+        case "Side Right": {
+          sideRightArrowElmt.style.display = "block";
+          break;
+        }
+        case "Custom": {
+          arrowContElmt.style.setProperty(
+            "--arrowGap",
+            standardArrowConfig.customConfig.gap + "rem",
+          );
+          arrowContElmt.style.setProperty(
+            "--arrowJustify",
+            standardArrowConfig.customConfig.justify.toLowerCase() ==
+              "space between"
+              ? "space-between"
+              : standardArrowConfig.customConfig.justify.toLowerCase(),
+          );
+          guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
+          arrowContElmt.style.setProperty(
+            "--arrowGap",
+            standardArrowConfig.customConfig.gap + "rem",
+          );
 
-        const exitOnlyText = (exitOnlyConfigs.exitOnlyText).trim();
-        const textElement = document.createElement("span");
-        textElement.className = "exitOnlyText";
-        textElement.textContent = exitOnlyText;
-
-        if (standardArrowList.length === 1) {
-          const textPosition = exitOnlyConfigs.exitOnlyTextPosition || "Center";
-          const position = ["Split Exit Only", "Half Exit Only"].includes(
-            standardVariant,
-          )
-            ? panel.sign.arrowPosition
-            : textPosition;
-          arrowContElmt.style.justifyContent =
-            position === "Left"
-              ? "flex-start"
-              : position === "Right"
-                ? "flex-end"
-                : "center";
-          arrowContElmt.appendChild(textElement);
-          arrowContElmt.appendChild(standardArrowList[standardArrowIndex++].createElement());
-        } else {
-          if (standardVariant === "Split Exit Only") {
-            arrowContElmt.style.justifyContent =
-              panel.sign.arrowPosition.toLowerCase() === "left"
-                ? "flex-start"
-                : panel.sign.arrowPosition.toLowerCase() === "right"
-                  ? "flex-end"
-                  : "center";
-          } else if (standardVariant === "Half Exit Only") {
-            arrowContElmt.style.justifyContent =
-              panel.sign.arrowPosition.toLowerCase() === "right"
-                ? "flex-end"
-                : "flex-start";
+          for (const arrow of standardArrowConfig.arrowList) {
+            const arrowElement = arrow.createElement();
+            arrowContElmt.appendChild(arrowElement);
           }
-          standardArrowList.forEach(() => arrowContElmt.appendChild(standardArrowList[standardArrowIndex++].createElement()));
-          arrowContElmt.appendChild(textElement);
+          break;
         }
-      } else if (standardVariant === "Side Left") {
-        sideLeftArrowElmt.style.display = "block";
-      } else if (standardVariant === "Side Right") {
-        sideRightArrowElmt.style.display = "block";
-      } else if (standardVariant !== "None") {
-        signElmt.style.borderBottomLeftRadius = "0";
-        signElmt.style.borderBottomRightRadius = "0";
-        signElmt.style.borderBottomWidth = "0";
-        signElmt.style.width = "100%";
-        guideArrowsElmt.style.display = "block";
-        guideArrowsElmt.style.visibility = "visible";
+        case "Half Exit Only": {
+          exitOnlyContainer = document.createElement("div");
+          exitOnlyContainer.className = "arrowContainer halfExitOnly";
+          arrowContElmt.appendChild(exitOnlyContainer);
 
-        for (const arrow of standardArrowList) {
-          const arrowElement = arrow.createElement();
-          arrowContElmt.appendChild(arrowElement);
+          const secondArrow =
+            standardArrowConfig.exitOnlyConfigs.arrow.createElement();
+          secondArrow.classList.add("halfExitOnlyOutsideArrow");
+          arrowContElmt.appendChild(secondArrow);
+        }
+        case "Split Exit Only":
+        case "Exit Only": {
+          const exitOnlyConfig = standardArrowConfig.exitOnlyConfigs;
+          const arrowElement = exitOnlyConfig.arrow.createElement();
+          arrowElement.style.filter =
+            standardVariant == "Split Exit Only" ? "" : "invert(1)";
+
+          if (
+            standardVariant == "Split Exit Only" ||
+            standardVariant == "Half Exit Only"
+          ) {
+            arrowContElmt.style.setProperty(
+              "--splitHorizontalPadding",
+              exitOnlyConfig.splitHorizontalPadding + "rem",
+            );
+            arrowContElmt.style.setProperty(
+              "--splitVerticalPadding",
+              exitOnlyConfig.splitVerticalPadding + "rem",
+            );
+            arrowContElmt.style.setProperty(
+              "--splitBorderRadius",
+              exitOnlyConfig.splitBorderRadius + "px",
+            );
+          }
+
+          if (standardVariant == "Split Exit Only") {
+            arrowContElmt.style.justifyContent =
+              exitOnlyConfig.arrowLocation.toLowerCase();
+          }
+
+          if (standardVariant == "Half Exit Only") {
+            arrowContElmt.style.flexDirection =
+              exitOnlyConfig.arrowLocation == "Left" ? "row" : "row-reverse";
+            arrowContElmt.style.gap = exitOnlyConfig.exitOnlyOutsideGap + "rem";
+
+            exitOnlyContainer.style.borderBottomLeftRadius =
+              exitOnlyConfig.arrowLocation == "Left"
+                ? "calc(var(--signBorderRadius)" +
+                  (exitOnlyConfig.borderMode == "white_border" ? " / 2)" : ")")
+                : 0;
+            exitOnlyContainer.style.borderBottomRightRadius =
+              exitOnlyConfig.arrowLocation == "Left"
+                ? 0
+                : "calc(var(--signBorderRadius)" +
+                  (exitOnlyConfig.borderMode == "White Border" ? " / 2)" : ")");
+
+            if (exitOnlyConfig.arrowLocation == "Left") {
+              arrowContElmt.style.paddingRight =
+                exitOnlyConfig.horizontalPadding + "rem";
+              if (exitOnlyConfig.borderMode != "White Border") {
+                exitOnlyContainer.style.borderLeft = ".2rem solid black";
+                exitOnlyContainer.style.marginLeft = "-.2rem";
+              }
+            } else {
+              arrowContElmt.style.paddingLeft =
+                exitOnlyConfig.horizontalPadding + "rem";
+              if (exitOnlyConfig.borderMode != "White Border") {
+                exitOnlyContainer.style.borderRight = ".2rem solid black";
+                exitOnlyContainer.style.marginRight = "-.2rem";
+              }
+            }
+
+            if (exitOnlyConfig.borderMode != "White Border") {
+              exitOnlyContainer.style.borderBottom = ".2rem solid black";
+              exitOnlyContainer.style.marginBottom = `${-0.2 + -exitOnlyConfig.verticalPadding}rem`;
+            }
+
+            arrowContElmt.style.paddingBottom =
+              exitOnlyConfig.verticalPadding + "rem";
+          }
+
+          exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
+          exitOnlyContainer.style.setProperty(
+            "--arrowGap",
+            exitOnlyConfig.gap + "rem",
+          );
+
+          let numArrows = exitOnlyConfig.numArrows;
+
+          const textElementBuilder = new TextElement({
+            textContent: exitOnlyConfig.exitOnlyText,
+            fontFamily: exitOnlyConfig.fontFamily,
+            wordSpacing: exitOnlyConfig.wordSpacing,
+            letterSpacing: exitOnlyConfig.letterSpacing,
+            lineHeight: exitOnlyConfig.lineHeight,
+            useNumeralFormatting: true,
+            numeralFormattingSize: 150,
+          });
+
+          if (numArrows === 0) {
+            const textElement = textElementBuilder.createElement();
+            textElement.style.setProperty(
+              "--fontSize",
+              exitOnlyConfig.fontSize + "px",
+            );
+            textElement.className = "SM-ExitOnlyTextElement";
+            exitOnlyContainer.appendChild(textElement);
+          } else if (
+            numArrows === 1 &&
+            exitOnlyConfig.exitOnlyTextPosition !== "Center"
+          ) {
+            // 1 off center
+            exitOnlyContainer.appendChild(arrowElement);
+
+            if (textElementBuilder.textContent != "") {
+              const textElement = textElementBuilder.createElement();
+              textElement.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement);
+            }
+
+            exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
+            exitOnlyContainer.style.flexDirection =
+              exitOnlyConfig.exitOnlyTextPosition === "Left"
+                ? "row"
+                : "row-reverse";
+          } else if (
+            numArrows === 1 &&
+            exitOnlyConfig.exitOnlyTextPosition === "Center"
+          ) {
+            // 1 center
+            const spaceIndex = exitOnlyConfig.exitOnlyText.indexOf(" ");
+            if (exitOnlyConfig.exitOnlyText != "") {
+              textElementBuilder.textContent =
+                exitOnlyConfig.exitOnlyText.substring(0, spaceIndex);
+              const textElement1 = textElementBuilder.createElement();
+              textElement1.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement1.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement1);
+            }
+
+            exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+
+            if (exitOnlyConfig.exitOnlyText != "") {
+              textElementBuilder.textContent =
+                exitOnlyConfig.exitOnlyText.substring(spaceIndex + 1);
+              const textElement2 = textElementBuilder.createElement();
+              textElement2.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement2.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement2);
+            }
+          } else {
+            if (numArrows % 2 == 0) {
+              for (let i = 0; i < numArrows; i++) {
+                if (
+                  i === Math.floor(numArrows / 2) &&
+                  exitOnlyConfig.exitOnlyText != ""
+                ) {
+                  textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
+
+                  const textElement = textElementBuilder.createElement();
+                  textElement.style.setProperty(
+                    "--fontSize",
+                    exitOnlyConfig.fontSize + "px",
+                  );
+                  textElement.className = "SM-ExitOnlyTextElement";
+                  exitOnlyContainer.appendChild(textElement);
+                }
+                exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+              }
+            } else {
+              for (let i = 0; i < numArrows; i++) {
+                if (
+                  (i === Math.floor(numArrows / 3) ||
+                    i === Math.floor((numArrows / 3) * 2)) &&
+                  exitOnlyConfig.exitOnlyText != ""
+                ) {
+                  const spaceIndex = exitOnlyConfig.exitOnlyText.indexOf(" ");
+
+                  textElementBuilder.textContent =
+                    i === Math.floor(numArrows / 3)
+                      ? exitOnlyConfig.exitOnlyText.substring(0, spaceIndex)
+                      : exitOnlyConfig.exitOnlyText.substring(spaceIndex + 1);
+
+                  const textElement = textElementBuilder.createElement();
+                  textElement.style.setProperty(
+                    "--fontSize",
+                    exitOnlyConfig.fontSize + "px",
+                  );
+
+                  textElement.className = "SM-ExitOnlyTextElement";
+                  exitOnlyContainer.appendChild(textElement);
+                }
+                exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+              }
+            }
+          }
+
+          break;
+        }
+        default: {
+          break;
         }
       }
 
@@ -1645,6 +1824,7 @@ const App = (() => {
     addStandardArrow,
     removeStandardArrow,
     moveStandardArrow,
+    duplicateStandardArrow,
 
     vars: {
       get currentlySelectedPanelIndex() {

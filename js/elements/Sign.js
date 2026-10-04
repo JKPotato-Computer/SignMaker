@@ -9,21 +9,33 @@ class Sign {
         customConfig: {
           horizontalPadding: 1,
           verticalTopPadding: 0,
-          verticalBottomPadding: .5,
+          verticalBottomPadding: 0.5,
           gap: 1,
           justify: "Space Between",
         },
         exitOnlyConfigs: {
-          borderMode: "white-edge",
+          borderMode: "Partial Black Border",
           exitOnlyText: "EXIT ONLY",
           exitOnlyTextPosition: "Center",
-          horizontalPadding: 0,
-          verticalPadding: 0,
+          horizontalPadding: 0.5,
+          verticalPadding: 0.5,
+
+          splitHorizontalPadding: 0.25,
+          splitVerticalPadding: 0.25,
+          splitBorderRadius: 4,
+
+          exitOnlyOutsideGap: 5,
+
           fontFamily: "Series E",
-          fontSize: 16,
+          fontSize: 20,
           wordSpacing: 0,
           letterSpacing: 0,
           lineHeight: 100,
+          arrowLocation: "Center", // Half Exit ("Left"/"Right"); Split Exit ("Left","Right","Center")
+
+          arrow: new StandardArrow({ type: "DOWN", size: 1.5 }),
+          numArrows: 0,
+          gap: 0.5,
         },
       },
       apl: {
@@ -132,6 +144,14 @@ class Sign {
     this.arrows.standard.arrowList.splice(newArrowIndex, 0, arrow);
   }
 
+  duplicateStandardArrow(arrowIndex) {
+    const existingArrow = this.arrows.standard.arrowList[arrowIndex];
+    const newArrow = new StandardArrow({
+      ...existingArrow,
+    });
+    this.arrows.standard.arrowList.splice(arrowIndex + 1, 0, newArrow);
+  }
+
   // subpanels
   newSubPanel() {
     const new_subPanel = new SubPanels();
@@ -167,13 +187,22 @@ Sign.prototype.guideArrows = [
   "Custom",
 ];
 
-Sign.prototype.exitOnlyBorderModes = ["edge", "white-edge"];
-
-Sign.prototype.standardArrowJustify = ["Left", "Middle", "Right", "Space Between"];
+Sign.prototype.standardArrowJustify = [
+  "Left",
+  "Center",
+  "Right",
+  "Space Between",
+];
 Sign.prototype.exitOnlyJustify = ["Left", "Center", "Right"];
 
 Sign.prototype.otherSymbols = [
   "None",
   "Quebec-Style Exit Marker",
   "Quebec-Left",
+];
+
+Sign.prototype.exitOnlyBorderTypes = [
+  "Full Black Border",
+  "Partial Black Border",
+  "White Border",
 ];

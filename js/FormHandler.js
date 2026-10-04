@@ -68,7 +68,6 @@ const formHandler = (() => {
     post.variant = form["postVariant"].value;
     post.color = form["postColor"].value;
     post.showPost = form["showPost"].checked;
-    post.secondExitOnly = form["secondExitOnly"].checked;
     post.thickness = form["postThicknessValue"].value;
     post.panelSpacing = form["panelSpacing"].value;
 
@@ -203,27 +202,27 @@ const formHandler = (() => {
             exitTab.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
           ].width = parseFloat(
             form[
-              exitTab.variant == "HOVVariant1" ?
-              "smET_HOV1Width" :
-              "smET_HOV2Width"
+              exitTab.variant == "HOVVariant1"
+                ? "smET_HOV1Width"
+                : "smET_HOV2Width"
             ].value,
           );
           exitTab.variantSettings[
             exitTab.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
           ].height = parseFloat(
             form[
-              exitTab.variant == "HOVVariant1" ?
-              "smET_HOV1Height" :
-              "smET_HOV2Height"
+              exitTab.variant == "HOVVariant1"
+                ? "smET_HOV1Height"
+                : "smET_HOV2Height"
             ].value,
           );
           exitTab.variantSettings[
             exitTab.variant == "HOVVariant1" ? "hovVariant1" : "hovVariant2"
           ].verticalPadding = parseFloat(
             form[
-              exitTab.variant == "HOVVariant1" ?
-              "smET_HOV1VerticalPadding" :
-              "smET_HOV2VerticalPadding"
+              exitTab.variant == "HOVVariant1"
+                ? "smET_HOV1VerticalPadding"
+                : "smET_HOV2VerticalPadding"
             ].value,
           );
         }
@@ -302,7 +301,8 @@ const formHandler = (() => {
 
     if (
       app.getCurrentBlockElem().constructor.name === "ShieldGroupElement" &&
-      app.vars.currentlySelectedShieldIndex != -1
+      app.vars.currentlySelectedShieldIndex != -1 &&
+      app.getCurrentBlockElem().shields[app.vars.currentlySelectedShieldIndex]
     ) {
       const currentShield =
         app.getCurrentBlockElem().shields[
@@ -389,7 +389,7 @@ const formHandler = (() => {
           banner.horizontalMargin =
             parseFloat(
               bannerElement.querySelector(".smSPBanner_horizontalMargins")
-              .value,
+                .value,
             ) || 0;
           banner.verticalMargin =
             parseFloat(
@@ -402,7 +402,7 @@ const formHandler = (() => {
           banner.horizontalPadding =
             parseFloat(
               bannerElement.querySelector(".smSPBanner_horizontalPadding")
-              .value,
+                .value,
             ) || 0;
           banner.verticalPadding =
             parseFloat(
@@ -456,9 +456,9 @@ const formHandler = (() => {
         if (element.type === "checkbox") {
           nextValue = element.checked;
         } else if (element.type === "radio") {
-          nextValue = element.checked ?
-            element.value :
-            currentBlockElem[propertyName];
+          nextValue = element.checked
+            ? element.value
+            : currentBlockElem[propertyName];
         } else if (element.tagName === "SELECT") {
           nextValue = element.value;
         }
@@ -510,15 +510,11 @@ const formHandler = (() => {
     subPanel.verticalAlign = form["subpanelAlign"].value;
     if (
       app.vars.currentlySelectedSubPanelIndex !=
-      app.getCurrentPanel().sign.subPanels.length - 1 &&
+        app.getCurrentPanel().sign.subPanels.length - 1 &&
       app.getCurrentPanel().sign.subPanels.length >= 2
     ) {
       subPanel.dividerHeight = form["subpanelDividerHeight"].value;
       subPanel.dividerHeightUnit = form["subpanelDividerHeightUnit"].value;
-    }
-
-    if (app.vars.currentlySelectedSubPanelIndex != 0) {
-      //subPanel.height = form["subPanelHeight"].value;
     }
 
     // guide arrows
@@ -530,114 +526,77 @@ const formHandler = (() => {
     if (currentPanel.sign.arrows.arrowMode == "standard") {
       const standardArrowConfig = currentPanel.sign.arrows.standard;
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
-      standardArrowConfig.variant = form["guideArrow"].value;
-      standardArrowConfig.customConfig.gap = form["standardArrows_gap"].value;
-      standardArrowConfig.customConfig.justify =
-        form["standardArrows_justify"].value;
-      standardArrowConfig.customConfig.verticalTopPadding =
-        form["standardArrows_verticalTopPadding"].value;
-      standardArrowConfig.customConfig.verticalBottomPadding =
-        form["standardArrows_verticalBottomPadding"].value;
-      standardArrowConfig.customConfig.horizontalPadding =
-        form["standardArrows_horizontalPadding"].value;
-      const isExitOnly = [
-        "Exit Only",
-        "Split Exit Only",
-        "Half Exit Only",
-      ].includes(standardArrowConfig.variant);
-      const arrowLocations = form["arrowLocations"];
-      if (isExitOnly) {
-        const positions =
-          standardArrowConfig.variant === "Split Exit Only" ?
-          ["Left", "Center", "Right"] :
-          standardArrowConfig.variant === "Half Exit Only" ?
-          ["Left", "Right"] :
-          ["Middle"];
-        arrowLocations.replaceChildren();
-        positions.forEach((position) =>
-          lib.appendOption(arrowLocations, position),
-        );
-        if (!positions.includes(currentPanel.sign.arrowPosition)) {
-          currentPanel.sign.arrowPosition = positions[0];
-        }
-        arrowLocations.value = currentPanel.sign.arrowPosition;
-      } else {
-        currentPanel.sign.arrowPosition = arrowLocations.value;
-      }
 
-      if (isExitOnly) {
-        const arrowCount = Math.max(
-          1,
-          parseInt(document.getElementById("exitOnlyArrowCount").value, 10) ||
-          1,
-        );
-        while (standardArrowConfig.arrowList.length < arrowCount) {
-          currentPanel.sign.newStandardArrow();
-        }
-        standardArrowConfig.arrowList.length = arrowCount;
+      if (standardArrowConfig.variant == "Custom") {
+        standardArrowConfig.customConfig.gap = form["standardArrows_gap"].value;
+        standardArrowConfig.customConfig.justify =
+          form["standardArrows_justify"].value;
+        standardArrowConfig.customConfig.verticalTopPadding =
+          form["standardArrows_verticalTopPadding"].value;
+        standardArrowConfig.customConfig.verticalBottomPadding =
+          form["standardArrows_verticalBottomPadding"].value;
+        standardArrowConfig.customConfig.horizontalPadding =
+          form["standardArrows_horizontalPadding"].value;
 
-        const arrowType =
+        const standardArrow =
+          currentPanel.sign.arrows.standard.arrowList[
+            app.vars.currentlySelectedStandardArrow
+          ];
+        if (standardArrow) {
+          standardArrow.arrow = document.querySelector(
+            "#guideStandardArrow",
+          ).dataset.selectedOption;
+          standardArrow.rotation = document.querySelector(
+            "#guideStandardArrow_rotation",
+          ).value;
+          standardArrow.size = document.querySelector(
+            "#guideStandardArrow_size",
+          ).value;
+          standardArrow.marginHorizontal = document.querySelector(
+            "#guideStandardArrow_marginHorizontal",
+          ).value;
+          standardArrow.marginVertical = document.querySelector(
+            "#guideStandardArrow_marginVertical",
+          ).value;
+          standardArrow.flip = document.querySelector(
+            "#guideStandardArrow_flip",
+          ).checked;
+        }
+      } else if (standardArrowConfig.variant.includes("Exit Only")) {
+        // set arrows
+        const exitOnlyArrow = exitOnlyConfigs.arrow;
+        exitOnlyArrow.arrow =
           document.querySelector("#exitOnlyArrowType").dataset.selectedOption;
-        const arrowSize = document.getElementById("exitOnlyArrowSize").value;
-        const arrowRotation = document.getElementById(
-          "exitOnlyArrowRotation",
-        ).value;
-        const arrowFlip = document.getElementById("exitOnlyArrowFlip").checked;
-        standardArrowConfig.arrowList.forEach((arrow) => {
-          arrow.arrow = arrowType;
-          arrow.size = arrowSize;
-          arrow.rotation = arrowRotation;
-          arrow.flip = arrowFlip;
-          arrow.marginHorizontal = 0;
-          arrow.marginVertical = 0;
-        });
+        exitOnlyArrow.size = form["exitOnlyArrowSize"].value;
+        exitOnlyArrow.rotation = form["exitOnlyArrowRotation"].value;
+        exitOnlyArrow.flip = form["exitOnlyArrowFlip"].checked;
+
+        // set exit only configs
+        exitOnlyConfigs.exitOnlyText = form["exitOnlyText"].value;
+        exitOnlyConfigs.exitOnlyTextPosition =
+          form["exitOnlyTextPosition"].value;
+        exitOnlyConfigs.horizontalPadding =
+          form["exitOnlyHorizontalPadding"].value;
+        exitOnlyConfigs.verticalPadding = form["exitOnlyVerticalPadding"].value;
+        exitOnlyConfigs.fontFamily = form["exitOnlyFontFamily"].value;
+        exitOnlyConfigs.fontSize = form["exitOnlyFontSize"].value;
+        exitOnlyConfigs.wordSpacing = form["exitOnlyWordSpacing"].value;
+        exitOnlyConfigs.letterSpacing = form["exitOnlyLetterSpacing"].value;
+        exitOnlyConfigs.borderMode = form["exitOnlyBorderMode"].value;
+        exitOnlyConfigs.arrowLocation = form["arrowLocations"].value;
+        exitOnlyConfigs.numArrows = parseInt(form["exitOnlyArrowCount"].value);
+        exitOnlyConfigs.gap = parseFloat(form["exitOnlyGap"].value);
+
+        exitOnlyConfigs.splitHorizontalPadding =
+          form["splitExitOnlyHorizPadding"].value;
+        exitOnlyConfigs.splitVerticalPadding =
+          form["splitExitOnlyVertPadding"].value;
+        exitOnlyConfigs.splitBorderRadius =
+          form["splitExitOnlyBorderRadius"].value;
+        exitOnlyConfigs.exitOnlyOutsideGap = parseFloat(form["exitOnlyOutsideGap"].value);
       }
 
-      const borderModeField = form["exitOnlyBorderMode"];
-      if (borderModeField) {
-        const selectedMode = borderModeField.value;
-        exitOnlyConfigs.borderMode =
-          Sign.prototype.exitOnlyBorderModes.includes(selectedMode) ?
-          selectedMode :
-          Sign.prototype.exitOnlyBorderModes[0];
-      } else {
-        exitOnlyConfigs.borderMode = Sign.prototype.exitOnlyBorderModes[0];
-      }
-      exitOnlyConfigs.exitOnlyText = form["exitOnlyText"].value;
-      exitOnlyConfigs.exitOnlyTextPosition = form["exitOnlyTextPosition"].value;
-      exitOnlyConfigs.horizontalPadding =
-        form["exitOnlyHorizontalPadding"].value;
-      exitOnlyConfigs.verticalPadding = form["exitOnlyVerticalPadding"].value;
-      exitOnlyConfigs.fontFamily = form["exitOnlyFontFamily"].value;
-      exitOnlyConfigs.fontSize = form["exitOnlyFontSize"].value;
-      exitOnlyConfigs.wordSpacing = form["exitOnlyWordSpacing"].value;
-      exitOnlyConfigs.letterSpacing = form["exitOnlyLetterSpacing"].value;
-      exitOnlyConfigs.lineHeight = form["exitOnlyLineHeight"].value;
-
-      const standardArrow =
-        currentPanel.sign.arrows.standard.arrowList[
-          app.vars.currentlySelectedStandardArrow
-        ];
-      if (standardArrow) {
-        standardArrow.arrow = document.querySelector(
-          "#guideStandardArrow",
-        ).dataset.selectedOption;
-        standardArrow.rotation = document.querySelector(
-          "#guideStandardArrow_rotation",
-        ).value;
-        standardArrow.size = document.querySelector(
-          "#guideStandardArrow_size",
-        ).value;
-        standardArrow.marginHorizontal = document.querySelector(
-          "#guideStandardArrow_marginHorizontal",
-        ).value;
-        standardArrow.marginVertical = document.querySelector(
-          "#guideStandardArrow_marginVertical",
-        ).value;
-        standardArrow.flip = document.querySelector(
-          "#guideStandardArrow_flip",
-        ).checked;
-      }
+      standardArrowConfig.variant = form["guideArrow"].value;
 
       // currentPanel.sign.otherSymbol = form["otherSymbol"].value;
       // currentPanel.sign.oSNum = form["oSNum"].value;
@@ -752,7 +711,6 @@ const formHandler = (() => {
     document.getElementById("postPosition").value = post.polePosition;
     document.getElementById("postColor").value = post.color;
     document.getElementById("showPost").checked = post.showPost;
-    document.getElementById("secondExitOnly").checked = post.secondExitOnly;
     document.getElementById("offsetPost").checked = post.offsetPost;
     document.getElementById("postCornerRadius").value = post.cornerRadius;
     document.getElementById("postSpacing").value = post.spacing || 1;
@@ -765,7 +723,9 @@ const formHandler = (() => {
     subPanelList.innerHTML = "";
 
     for (
-      let panelIndex = 0, panelsLength = post.panels.length; panelIndex < panelsLength; panelIndex++
+      let panelIndex = 0, panelsLength = post.panels.length;
+      panelIndex < panelsLength;
+      panelIndex++
     ) {
       const panelButton = document.createElement("button");
       panelButton.id = "edit" + (panelIndex + 1);
@@ -789,15 +749,17 @@ const formHandler = (() => {
     }
 
     for (
-      let subPanelIndex = 0, subPanelsLength = panel.sign.subPanels.length; subPanelIndex < subPanelsLength; subPanelIndex++
+      let subPanelIndex = 0, subPanelsLength = panel.sign.subPanels.length;
+      subPanelIndex < subPanelsLength;
+      subPanelIndex++
     ) {
       const subPanelButton = document.createElement("button");
       subPanelButton.textContent = subPanelIndex + 1;
       subPanelButton.className =
         "smSubPanelBtn " +
-        (app.vars.currentlySelectedSubPanelIndex == subPanelIndex ?
-          "active" :
-          "");
+        (app.vars.currentlySelectedSubPanelIndex == subPanelIndex
+          ? "active"
+          : "");
 
       subPanelButton.addEventListener("click", () => {
         app.changeEditingSubPanel(subPanelIndex);
@@ -808,7 +770,9 @@ const formHandler = (() => {
     }
 
     for (
-      let exitTabIndex = 0, exitTabLength = panel.exitTabs.length; exitTabIndex < exitTabLength; exitTabIndex++
+      let exitTabIndex = 0, exitTabLength = panel.exitTabs.length;
+      exitTabIndex < exitTabLength;
+      exitTabIndex++
     ) {
       const exitTabs = panel.exitTabs[exitTabIndex].exitTabs;
       const exitTabGroup = document.createElement("div");
@@ -818,9 +782,9 @@ const formHandler = (() => {
       exitTabButton.type = "button";
       exitTabButton.className = "exitTabButton";
       exitTabButton.textContent =
-        app.vars.currentlySelectedExitTabRowIndex == exitTabIndex ?
-        "Group " + (exitTabIndex + 1) :
-        "Group " + (exitTabIndex + 1) + " (" + exitTabs.length + ")";
+        app.vars.currentlySelectedExitTabRowIndex == exitTabIndex
+          ? "Group " + (exitTabIndex + 1)
+          : "Group " + (exitTabIndex + 1) + " (" + exitTabs.length + ")";
 
       if (app.vars.currentlySelectedExitTabRowIndex == exitTabIndex) {
         exitTabGroup.classList.add("active");
@@ -888,7 +852,7 @@ const formHandler = (() => {
 
     if (
       app.vars.currentlySelectedSubPanelIndex !=
-      app.getCurrentPanel().sign.subPanels.length - 1 &&
+        app.getCurrentPanel().sign.subPanels.length - 1 &&
       app.getCurrentPanel().sign.subPanels.length >= 2
     ) {
       document.getElementById("subpanelDividerHeight").value =
@@ -941,7 +905,9 @@ const formHandler = (() => {
       app.getCurrentSubPanel().blockElements.rows.length == 1 &&
       app.getCurrentBlockRows().length == 1;
     for (
-      let row = 0; row < Object.keys(sign.blockElements.rows).length; row++
+      let row = 0;
+      row < Object.keys(sign.blockElements.rows).length;
+      row++
     ) {
       const sMControlRow = document.createElement("div");
       sMControlRow.dataset.dataRow = row.toString();
@@ -959,9 +925,9 @@ const formHandler = (() => {
             blockElement.constructor.name
           ] +
           (item == app.vars.currentlySelectedBlockIndex &&
-            row == app.vars.currentlySelectedRowIndex ?
-            " selected" :
-            "");
+          row == app.vars.currentlySelectedRowIndex
+            ? " selected"
+            : "");
         textEditorBlock.dataset.row = row.toString();
         textEditorBlock.dataset.block = item.toString();
         textEditorBlock.textContent =
@@ -971,8 +937,9 @@ const formHandler = (() => {
           "click",
           () => {
             app.setSelectedControlElem(item);
-          }, {
-            once: true
+          },
+          {
+            once: true,
           },
         );
       }
@@ -982,15 +949,16 @@ const formHandler = (() => {
         "click",
         () => {
           app.setSelectedRow(row);
-        }, {
-          once: true
+        },
+        {
+          once: true,
         },
       );
     }
 
     for (const divConfig of document.querySelectorAll(
-        "#smSPProperties > div",
-      )) {
+      "#smSPProperties > div",
+    )) {
       if (
         divConfig.dataset.property ==
         Control.prototype.blockInternalElements[
@@ -1033,14 +1001,15 @@ const formHandler = (() => {
         }
         element.addEventListener(
           element.type === "range" ? "input" : "change",
-          readForm, {
-            once: true
+          readForm,
+          {
+            once: true,
           },
         );
       }
       document.querySelectorAll(".sdArrow_rotationPreset").forEach((button) => {
         button.classList.toggle(
-          "activated",
+          "selected",
           standardArrow.rotation === parseFloat(button.dataset.degrees),
         );
       });
@@ -1054,26 +1023,27 @@ const formHandler = (() => {
         if (element.type === "checkbox") {
           element.checked = currentBlockElem[propertyName];
           element.addEventListener("change", readForm, {
-            once: true
+            once: true,
           });
         } else if (element.type === "radio") {
           if (element.value === currentBlockElem[propertyName].toString()) {
             element.checked = true;
           }
           element.addEventListener("change", readForm, {
-            once: true
+            once: true,
           });
         } else if (element.tagName === "SELECT") {
           element.value = currentBlockElem[propertyName];
           element.addEventListener("blur", readForm, {
-            once: true
+            once: true,
           });
         } else {
           element.value = currentBlockElem[propertyName];
           element.addEventListener(
             element.type === "text" ? "input" : "change",
-            readForm, {
-              once: true
+            readForm,
+            {
+              once: true,
             },
           );
           if (element.type === "range" && displayElement) {
@@ -1081,8 +1051,9 @@ const formHandler = (() => {
               "input",
               () => {
                 displayElement.value = element.value;
-              }, {
-                once: true
+              },
+              {
+                once: true,
               },
             );
           }
@@ -1108,7 +1079,7 @@ const formHandler = (() => {
     document
       .querySelector("#sdBlock_topPadding")
       .addEventListener("change", readForm, {
-        once: true
+        once: true,
       });
 
     document.querySelector("#sdBlock_bottomPadding").value =
@@ -1118,7 +1089,7 @@ const formHandler = (() => {
     document
       .querySelector("#sdBlock_bottomPadding")
       .addEventListener("change", readForm, {
-        once: true
+        once: true,
       });
 
     document.querySelector("#sdBlock_topPaddingVal").value =
@@ -1147,7 +1118,7 @@ const formHandler = (() => {
     document
       .querySelector("#sdBlock_backgroundColor")
       .addEventListener("blur", readForm, {
-        once: true
+        once: true,
       });
 
     document.querySelector("#sdBlock_backgroundFullWidth").checked =
@@ -1167,13 +1138,13 @@ const formHandler = (() => {
     document
       .querySelector("#sdBlock_width")
       .addEventListener("change", readForm, {
-        once: true
+        once: true,
       });
 
     document
       .querySelector("#sdBlock_stretchLeft")
       .addEventListener("change", readForm, {
-        once: true
+        once: true,
       });
 
     document.querySelector("#sdBlock_stretchLeft").checked =
@@ -1184,7 +1155,7 @@ const formHandler = (() => {
     document
       .querySelector("#sdBlock_stretchCenter")
       .addEventListener("change", readForm, {
-        once: true
+        once: true,
       });
     document.querySelector("#sdBlock_stretchCenter").checked =
       sign.blockElements.blockProperties[
@@ -1194,7 +1165,7 @@ const formHandler = (() => {
     document
       .querySelector("#sdBlock_stretchRight")
       .addEventListener("change", readForm, {
-        once: true
+        once: true,
       });
     document.querySelector("#sdBlock_stretchRight").checked =
       sign.blockElements.blockProperties[
@@ -1305,19 +1276,19 @@ const formHandler = (() => {
         currentExitTabRow.independentWidth;
 
       document.querySelector("#smET_independentWidth").style.display = [
-          "within",
-          "left",
-          "right",
-        ].includes(currentExitTabRow.position) ?
-        "none" :
-        "";
+        "within",
+        "left",
+        "right",
+      ].includes(currentExitTabRow.position)
+        ? "none"
+        : "";
       document.querySelector(
-          'label[for="smET_independentWidth"]',
-        ).style.display = ["within", "left", "right"].includes(
-          currentExitTabRow.position,
-        ) ?
-        "none" :
-        "";
+        'label[for="smET_independentWidth"]',
+      ).style.display = ["within", "left", "right"].includes(
+        currentExitTabRow.position,
+      )
+        ? "none"
+        : "";
 
       let isFirst = false;
       for (const exitTab of panel.exitTabs) {
@@ -1331,11 +1302,13 @@ const formHandler = (() => {
         }
       }
 
-      document.querySelector('label[for="smET_hideTopBorder"]').style.display = !isFirst || currentExitTabRow.position != "top" ? "none" : "";
+      document.querySelector('label[for="smET_hideTopBorder"]').style.display =
+        !isFirst || currentExitTabRow.position != "top" ? "none" : "";
 
       document.querySelector(
         'label[for="smET_hideBottomBorder"]',
-      ).style.display = !isFirst || currentExitTabRow.position != "bottom" ? "none" : "";
+      ).style.display =
+        !isFirst || currentExitTabRow.position != "bottom" ? "none" : "";
 
       document.querySelector("#smET_hideTopBorder").value =
         currentExitTabRow.hideTopBorder;
@@ -1374,7 +1347,8 @@ const formHandler = (() => {
       for (const presetName in exitTabPresets[currentExitTab.variant] || {}) {
         let option = lib.appendOption(
           document.querySelector("#smET_presetSelect"),
-          presetName, {
+          presetName,
+          {
             selected: presetName == pastValue,
             text: "(Built-in) " + presetName,
           },
@@ -1385,8 +1359,9 @@ const formHandler = (() => {
       for (const presetName in presetsLibrary[currentExitTab.variant] || {}) {
         lib.appendOption(
           document.querySelector("#smET_presetSelect"),
-          presetName, {
-            selected: presetName == pastValue
+          presetName,
+          {
+            selected: presetName == pastValue,
           },
         );
       }
@@ -1397,8 +1372,8 @@ const formHandler = (() => {
 
     if (
       document
-      .querySelector('a[data-tab="sMExitTabGroupProperties"]')
-      .classList.contains("selected")
+        .querySelector('a[data-tab="sMExitTabGroupProperties"]')
+        .classList.contains("selected")
     ) {
       document.querySelector('a[data-tab="sMExitTabVariant"]').click();
     }
@@ -1426,7 +1401,7 @@ const formHandler = (() => {
       const shield = new Shield({
         scale: 60,
         horizMargin: 0,
-        vertMargin: 0
+        vertMargin: 0,
       });
       currentExitTab.shields.left.push(shield);
 
@@ -1643,8 +1618,8 @@ const formHandler = (() => {
     }
 
     for (const elem of document.querySelectorAll(
-        "#sMET_VariantProperties > fieldset",
-      )) {
+      "#sMET_VariantProperties > fieldset",
+    )) {
       if (elem.id.includes(currentExitTab.variant)) {
         elem.classList.remove("hidden");
       } else {
@@ -1656,18 +1631,20 @@ const formHandler = (() => {
       document.querySelector("#smET_partialLeftCheckbox").checked =
         currentExitTab.variantSettings.partialLeft.separateRow;
 
-      document.querySelector("#smET_partialLeftSpacing").style.display = !currentExitTab.variantSettings.partialLeft.separateRow ? "none" : "";
+      document.querySelector("#smET_partialLeftSpacing").style.display =
+        !currentExitTab.variantSettings.partialLeft.separateRow ? "none" : "";
       document.querySelector(
-          'label[for="smET_partialLeftSpacing"]',
-        ).style.display = !currentExitTab.variantSettings.partialLeft.separateRow ?
-        "none" :
-        "";
-      document.querySelector("#smET_partialLeftMinWidth").style.display = !currentExitTab.variantSettings.partialLeft.separateRow ? "none" : "";
+        'label[for="smET_partialLeftSpacing"]',
+      ).style.display = !currentExitTab.variantSettings.partialLeft.separateRow
+        ? "none"
+        : "";
+      document.querySelector("#smET_partialLeftMinWidth").style.display =
+        !currentExitTab.variantSettings.partialLeft.separateRow ? "none" : "";
       document.querySelector(
-          'label[for="smET_partialLeftMinWidth"]',
-        ).style.display = !currentExitTab.variantSettings.partialLeft.separateRow ?
-        "none" :
-        "";
+        'label[for="smET_partialLeftMinWidth"]',
+      ).style.display = !currentExitTab.variantSettings.partialLeft.separateRow
+        ? "none"
+        : "";
 
       document.querySelector("#smET_partialLeftHorizontalPadding").value =
         currentExitTab.variantSettings.partialLeft.horizontalPadding;
@@ -1694,37 +1671,37 @@ const formHandler = (() => {
       currentExitTab.variant == "HOVVariant2"
     ) {
       document.querySelector(
-          "#" +
-          (currentExitTab.variant == "HOVVariant1" ?
-            "smET_HOV1Width" :
-            "smET_HOV2Width"),
-        ).value =
+        "#" +
+          (currentExitTab.variant == "HOVVariant1"
+            ? "smET_HOV1Width"
+            : "smET_HOV2Width"),
+      ).value =
         currentExitTab.variantSettings[
-          currentExitTab.variant == "HOVVariant1" ?
-          "hovVariant1" :
-          "hovVariant2"
+          currentExitTab.variant == "HOVVariant1"
+            ? "hovVariant1"
+            : "hovVariant2"
         ].width;
       document.querySelector(
-          "#" +
-          (currentExitTab.variant == "HOVVariant1" ?
-            "smET_HOV1Height" :
-            "smET_HOV2Height"),
-        ).value =
+        "#" +
+          (currentExitTab.variant == "HOVVariant1"
+            ? "smET_HOV1Height"
+            : "smET_HOV2Height"),
+      ).value =
         currentExitTab.variantSettings[
-          currentExitTab.variant == "HOVVariant1" ?
-          "hovVariant1" :
-          "hovVariant2"
+          currentExitTab.variant == "HOVVariant1"
+            ? "hovVariant1"
+            : "hovVariant2"
         ].height;
       document.querySelector(
-          "#" +
-          (currentExitTab.variant == "HOVVariant1" ?
-            "smET_HOV1VerticalPadding" :
-            "smET_HOV2VerticalPadding"),
-        ).value =
+        "#" +
+          (currentExitTab.variant == "HOVVariant1"
+            ? "smET_HOV1VerticalPadding"
+            : "smET_HOV2VerticalPadding"),
+      ).value =
         currentExitTab.variantSettings[
-          currentExitTab.variant == "HOVVariant1" ?
-          "hovVariant1" :
-          "hovVariant2"
+          currentExitTab.variant == "HOVVariant1"
+            ? "hovVariant1"
+            : "hovVariant2"
         ].verticalPadding;
     }
 
@@ -1748,8 +1725,8 @@ const formHandler = (() => {
       document.querySelector("#sMET_variantIconSizeVal").value =
         currentExitTab.variantSettings.icon.iconSize;
       document.querySelector(
-          'label[for="sMET_variantIsTextBased"]',
-        ).style.display =
+        'label[for="sMET_variantIsTextBased"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
       document.querySelector("#sMET_variantIsTextBased").checked =
         currentExitTab.variantSettings.icon.isTextBased;
@@ -1759,12 +1736,12 @@ const formHandler = (() => {
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration.backgroundColor;
 
       document.querySelector(
-          "#smET_iconBackgroundConfigurations",
-        ).style.display =
+        "#smET_iconBackgroundConfigurations",
+      ).style.display =
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration
-        .backgroundColor == "Transparent" ?
-        "none" :
-        "";
+          .backgroundColor == "Transparent"
+          ? "none"
+          : "";
 
       document.querySelector("#smET_iconBackgroundHorizPadding").value =
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration.horizontalPadding;
@@ -1779,8 +1756,8 @@ const formHandler = (() => {
         currentExitTab.variantSettings.icon.isTollIcon;
 
       document.querySelector(
-          "#sMET_variantOnlyHorizontalPadding",
-        ).style.display =
+        "#sMET_variantOnlyHorizontalPadding",
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
       document.querySelector("#sMET_variantPbmPadding").style.display =
         currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
@@ -1791,28 +1768,28 @@ const formHandler = (() => {
       document.querySelector("#smET_variantFontSize").style.display =
         currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
       document.querySelector(
-          'label[for="smET_variantFontSize"]',
-        ).style.display =
+        'label[for="smET_variantFontSize"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
 
       document.querySelector("#smET_variantFontSize").value =
         currentExitTab.variantSettings.icon.fontSize;
 
       document.querySelector(
-          'label[for="sMET_variantOnlyHorizontalPadding"]',
-        ).style.display =
+        'label[for="sMET_variantOnlyHorizontalPadding"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "only" ? "" : "none";
       document.querySelector(
-          'label[for="sMET_variantPbmPadding"]',
-        ).style.display =
+        'label[for="sMET_variantPbmPadding"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
       document.querySelector(
-          'label[for="sMET_variantUnderline"]',
-        ).style.display =
+        'label[for="sMET_variantUnderline"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "none" ? "" : "none";
       document.querySelector(
-          'label[for="smET_variantIsSquare"]',
-        ).style.display =
+        'label[for="smET_variantIsSquare"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon == "or variant" ? "" : "none";
 
       document.querySelector("#sMET_variantOnlyHorizontalPadding").value =
@@ -1823,8 +1800,8 @@ const formHandler = (() => {
         currentExitTab.variantSettings.icon.pbmIsSquare;
 
       document.querySelector(
-          'label[for="sMET_variantFontFamily"]',
-        ).style.display =
+        'label[for="sMET_variantFontFamily"]',
+      ).style.display =
         currentExitTab.variantSettings.icon.addon != "none" ? "" : "none";
       document.querySelector("#sMET_variantFontFamily").style.display =
         currentExitTab.variantSettings.icon.addon != "none" ? "" : "none";
@@ -1917,14 +1894,14 @@ const formHandler = (() => {
       const shieldImg = document.createElement("img");
       shieldImg.className = "smSPShieldVisual";
       shieldImg.src =
-        shield.shieldType === "preset" ?
-        Shield.prototype.getDirectoryFromShield(
-          shield.shieldValue,
-          shield.variant == "Auto" ?
-          Shield.prototype.getPreviewVariant() :
-          shield.variant,
-        ) :
-        shield.imageData;
+        shield.shieldType === "preset"
+          ? Shield.prototype.getDirectoryFromShield(
+              shield.shieldValue,
+              shield.variant == "Auto"
+                ? Shield.prototype.getPreviewVariant()
+                : shield.variant,
+            )
+          : shield.imageData;
       shieldImg.alt = `${shield.shieldValue}-${shield.routeNumber}`;
       shieldBlock.appendChild(shieldImg);
 
@@ -1967,7 +1944,9 @@ const formHandler = (() => {
     smSPShieldList.innerHTML = "";
 
     for (
-      let shieldIndex = 0; shieldIndex < shieldGroup.shields.length; shieldIndex++
+      let shieldIndex = 0;
+      shieldIndex < shieldGroup.shields.length;
+      shieldIndex++
     ) {
       const shield = shieldGroup.shields[shieldIndex];
 
@@ -2129,7 +2108,8 @@ const formHandler = (() => {
 
       for (const justify of Shield.prototype.bannerAlignments) {
         lib.appendOption(justifySelect, justify.toLowerCase(), {
-          selected: currentShield.bannerSettings[alignment].alignment ===
+          selected:
+            currentShield.bannerSettings[alignment].alignment ===
             justify.toLowerCase(),
           text: justify,
         });
@@ -2246,8 +2226,14 @@ const formHandler = (() => {
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
       const variant = standardArrowConfig.variant;
 
-      const isExitOnly = ["Exit Only", "Split Exit Only", "Half Exit Only"].includes(variant);
-      const isSimpleVariant = ["None", "Side Left", "Side Right"].includes(variant);
+      const isExitOnly = [
+        "Exit Only",
+        "Split Exit Only",
+        "Half Exit Only",
+      ].includes(variant);
+      const isSimpleVariant = ["None", "Side Left", "Side Right"].includes(
+        variant,
+      );
       const selectedIndex = app.vars.currentlySelectedStandardArrow;
 
       document.querySelector("#standardArrowCustomSettings").style.display =
@@ -2263,37 +2249,53 @@ const formHandler = (() => {
 
       document.querySelector("#guideArrow").value = variant;
       document.querySelector("#standardArrowSelected").textContent =
-        "Selected: " + (selectedIndex === -1 ? "None" : "Arrow " + (selectedIndex + 1));
+        "Selected: " +
+        (selectedIndex === -1 ? "None" : "Arrow " + (selectedIndex + 1));
 
       if (isSimpleVariant) {
         return;
       }
 
       if (variant === "Custom") {
-        document.querySelector("#standardArrows_gap").value = standardArrowConfig.customConfig.gap;
-        document.querySelector("#standardArrows_justify").value = standardArrowConfig.customConfig.justify;
-        document.querySelector("#standardArrows_horizontalPadding").value = standardArrowConfig.customConfig.horizontalPadding;
-        document.querySelector("#standardArrows_verticalTopPadding").value = standardArrowConfig.customConfig.verticalTopPadding;
-        document.querySelector("#standardArrows_verticalBottomPadding").value = standardArrowConfig.customConfig.verticalBottomPadding;
+        document.querySelector("#standardArrows_gap").value =
+          standardArrowConfig.customConfig.gap;
+        document.querySelector("#standardArrows_justify").value =
+          standardArrowConfig.customConfig.justify;
+        document.querySelector("#standardArrows_horizontalPadding").value =
+          standardArrowConfig.customConfig.horizontalPadding;
+        document.querySelector("#standardArrows_verticalTopPadding").value =
+          standardArrowConfig.customConfig.verticalTopPadding;
+        document.querySelector("#standardArrows_verticalBottomPadding").value =
+          standardArrowConfig.customConfig.verticalBottomPadding;
 
         const standardArrowList = document.querySelector("#standardArrowList");
         standardArrowList.innerHTML = "";
 
         standardArrowConfig.arrowList.forEach((arrow, arrowIndex) => {
           const arrowButton = document.createElement("button");
-          arrowButton.className = "standardArrowListItem";
+          arrowButton.className =
+            "standardArrowListItem " +
+            (arrowIndex === selectedIndex ? "selected" : "");
 
           const dragIndicator = document.createElement("div");
           dragIndicator.className = "dragIndicator";
           dragIndicator.textContent = "drag_indicator";
           arrowButton.appendChild(dragIndicator);
 
+          const arrowImageHolder = document.createElement("div");
+          arrowImageHolder.className = "standardArrowListItem_imageHolder";
+          arrowButton.appendChild(arrowImageHolder);
+
           const arrowImage = document.createElement("img");
           arrowImage.src = StandardArrow.prototype.arrows[arrow.arrow].src;
-          arrowButton.appendChild(arrowImage);
+          arrowImage.style.transform =
+            (arrow.flip ? "scaleX(-1) " : "") +
+            ("rotate(" + arrow.rotation + "deg)");
+          arrowImageHolder.appendChild(arrowImage);
 
           const arrowLabel = document.createElement("span");
-          arrowLabel.textContent = StandardArrow.prototype.arrows[arrow.arrow].label;
+          arrowLabel.textContent =
+            StandardArrow.prototype.arrows[arrow.arrow].label;
           arrowButton.appendChild(arrowLabel);
 
           arrowButton.addEventListener("click", () => {
@@ -2307,77 +2309,171 @@ const formHandler = (() => {
           standardArrowList.appendChild(arrowButton);
         });
 
-        if (selectedIndex !== -1 && standardArrowConfig.arrowList[selectedIndex]) {
-          const selectedStandardArrow = standardArrowConfig.arrowList[selectedIndex];
+        if (
+          selectedIndex !== -1 &&
+          standardArrowConfig.arrowList[selectedIndex]
+        ) {
+          const selectedStandardArrow =
+            standardArrowConfig.arrowList[selectedIndex];
 
-          document.querySelector("#guideStandardArrow").dataset.selectedOption = selectedStandardArrow.arrow;
-          document.querySelector("#guideStandardArrow_rotation").value = selectedStandardArrow.rotation;
-          document.querySelector("#guideStandardArrow_size").value = selectedStandardArrow.size;
-          document.querySelector("#guideStandardArrow_marginHorizontal").value = selectedStandardArrow.marginHorizontal;
-          document.querySelector("#guideStandardArrow_marginVertical").value = selectedStandardArrow.marginVertical;
-          document.querySelector("#guideStandardArrow_flip").checked = selectedStandardArrow.flip;
+          document.querySelector("#guideStandardArrow").dataset.selectedOption =
+            selectedStandardArrow.arrow;
+          document.querySelector("#guideStandardArrow_rotation").value =
+            selectedStandardArrow.rotation;
+          document.querySelector("#guideStandardArrow_size").value =
+            selectedStandardArrow.size;
+          document.querySelector("#guideStandardArrow_marginHorizontal").value =
+            selectedStandardArrow.marginHorizontal;
+          document.querySelector("#guideStandardArrow_marginVertical").value =
+            selectedStandardArrow.marginVertical;
+          document.querySelector("#guideStandardArrow_flip").checked =
+            selectedStandardArrow.flip;
 
-          for (const element of document.querySelectorAll(".sdGuideArrows_rotationPreset")) {
-            if (element.dataset.setup !== "true") {
-              element.dataset.setup = "true";
-              element.addEventListener("click", () => {
-                document.querySelector("#guideStandardArrow_rotation").value = parseFloat(element.dataset.degrees);
-                readForm();
-              });
-            }
-          }
+          document
+            .querySelectorAll(".sdGuideArrows_rotationPreset")
+            .forEach((button) => {
+              button.classList.toggle(
+                "activated",
+                selectedStandardArrow.rotation ===
+                  parseFloat(button.dataset.degrees),
+              );
+            });
         }
 
         return;
       }
 
       if (isExitOnly) {
-        const exitPositionVisible = ["Split Exit Only", "Half Exit Only"].includes(variant);
-        document.querySelector("#arrowLocationLabel").style.display = exitPositionVisible ? "" : "none";
-        document.querySelector("#arrowLocations").style.display = exitPositionVisible ? "" : "none";
-
+        document.querySelector('label[for="arrowLocations"]').style.display = [
+          "Split Exit Only",
+          "Half Exit Only",
+        ].includes(variant)
+          ? ""
+          : "none";
+        document.querySelector("#arrowLocations").style.display = [
+          "Split Exit Only",
+          "Half Exit Only",
+        ].includes(variant)
+          ? ""
+          : "none";
 
         const arrowLocations = document.querySelector("#arrowLocations");
         arrowLocations.innerHTML = "";
 
         for (const alignment of Sign.prototype.exitOnlyJustify) {
-          if (variant == "Split Exit Only" && alignment == "center") {
+          if (variant == "Half Exit Only" && alignment == "center") {
             continue;
           }
 
-          lib.appendOption(arrowLocations, alignment, {selected: standardArrowConfig.exitOnlyConfigs.exitOnlyTextPosition === alignment});
+          lib.appendOption(arrowLocations, alignment, {
+            selected:
+              standardArrowConfig.exitOnlyConfigs.arrowLocation === alignment,
+          });
         }
 
-        arrowLocations.value = sign.arrowPosition;
+        document.querySelector("#exitOnlyTextPositionLabel").style.display =
+          standardArrowConfig.exitOnlyConfigs.numArrows == 1 ? "" : "none";
+        document.querySelector("#exitOnlyTextPosition").style.display =
+          standardArrowConfig.exitOnlyConfigs.numArrows == 1 ? "" : "none";
+        document.querySelector("#exitOnlyTextPosition").value =
+          exitOnlyConfigs.exitOnlyTextPosition;
 
-        const isSingleArrow = standardArrowConfig.arrowList.length === 1;
-        document.querySelector("#exitOnlyTextPositionLabel").style.display = isSingleArrow ? "" : "none";
-        document.querySelector("#exitOnlyTextPosition").style.display = isSingleArrow ? "" : "none";
+        document.querySelector("#exitOnlyBorderMode").value =
+          exitOnlyConfigs.borderMode;
 
-        const shouldShowBorderMode = !post.secondExitOnly && (variant === "Half Exit Only" || variant === "Exit Only");
-        document.querySelector("#exitOnlyBorderModeLabel").style.visibility = shouldShowBorderMode ? "visible" : "hidden";
-        document.querySelector("#exitOnlyBorderMode").style.visibility = shouldShowBorderMode ? "visible" : "hidden";
-        document.querySelector("#exitOnlyBorderMode").value = exitOnlyConfigs.borderMode;
+        document.querySelector("#splitExitOnlyHorizPadding").style.display = [
+          "Split Exit Only",
+          "Half Exit Only",
+        ].includes(variant)
+          ? ""
+          : "none";
+        document.querySelector("#splitExitOnlyVertPadding").style.display = [
+          "Split Exit Only",
+          "Half Exit Only",
+        ].includes(variant)
+          ? ""
+          : "none";
+        document.querySelector("#splitExitOnlyBorderRadius").style.display = [
+          "Split Exit Only",
+          "Half Exit Only",
+        ].includes(variant)
+          ? ""
+          : "none";
 
-        document.querySelector("#exitOnlyText").value = exitOnlyConfigs.exitOnlyText;
-        document.querySelector("#exitOnlyTextPosition").value = exitOnlyConfigs.exitOnlyTextPosition;
-        document.querySelector("#exitOnlyArrowCount").value = standardArrowConfig.arrowList.length;
+        document.querySelector(
+          'label[for="splitExitOnlyHorizPadding"]',
+        ).style.display = ["Split Exit Only", "Half Exit Only"].includes(
+          variant,
+        )
+          ? ""
+          : "none";
+        document.querySelector(
+          'label[for="splitExitOnlyVertPadding"]',
+        ).style.display = ["Split Exit Only", "Half Exit Only"].includes(
+          variant,
+        )
+          ? ""
+          : "none";
+        document.querySelector(
+          'label[for="splitExitOnlyBorderRadius"]',
+        ).style.display = ["Split Exit Only", "Half Exit Only"].includes(
+          variant,
+        )
+          ? ""
+          : "none";
 
-        const exitOnlyArrow = standardArrowConfig.arrowList[0];
-        if (exitOnlyArrow) {
-          document.querySelector("#exitOnlyArrowType").dataset.selectedOption = exitOnlyArrow.arrow;
-          document.querySelector("#exitOnlyArrowSize").value = exitOnlyArrow.size;
-          document.querySelector("#exitOnlyArrowRotation").value = exitOnlyArrow.rotation;
-          document.querySelector("#exitOnlyArrowFlip").checked = exitOnlyArrow.flip;
-        }
+        document.querySelector("#exitOnlyOutsideGap").style.display =
+          variant == "Half Exit Only" ? "" : "none";
+        document.querySelector(
+          'label[for="exitOnlyOutsideGap"]',
+        ).style.display = variant == "Half Exit Only" ? "" : "none";
+        document.querySelector("#exitOnlyOutsideGap").value =
+          exitOnlyConfigs.exitOnlyOutsideGap;
 
-        document.querySelector("#exitOnlyHorizontalPadding").value = exitOnlyConfigs.horizontalPadding;
-        document.querySelector("#exitOnlyVerticalPadding").value = exitOnlyConfigs.verticalPadding;
-        document.querySelector("#exitOnlyFontFamily").value = exitOnlyConfigs.fontFamily;
-        document.querySelector("#exitOnlyFontSize").value = exitOnlyConfigs.fontSize;
-        document.querySelector("#exitOnlyWordSpacing").value = exitOnlyConfigs.wordSpacing;
-        document.querySelector("#exitOnlyLetterSpacing").value = exitOnlyConfigs.letterSpacing;
-        document.querySelector("#exitOnlyLineHeight").value = exitOnlyConfigs.lineHeight;
+        document.querySelector("#splitExitOnlyHorizPadding").value =
+          exitOnlyConfigs.splitHorizontalPadding;
+        document.querySelector("#splitExitOnlyVertPadding").value =
+          exitOnlyConfigs.splitVerticalPadding;
+        document.querySelector("#splitExitOnlyBorderRadius").value =
+          exitOnlyConfigs.splitBorderRadius;
+
+        document.querySelector("#exitOnlyText").value =
+          exitOnlyConfigs.exitOnlyText;
+        document.querySelector("#exitOnlyArrowCount").value =
+          exitOnlyConfigs.numArrows;
+
+        const exitOnlyArrow = standardArrowConfig.exitOnlyConfigs.arrow;
+        document.querySelector("#exitOnlyArrowType").dataset.selectedOption =
+          exitOnlyArrow.arrow;
+        document.querySelector("#exitOnlyArrowSize").value = exitOnlyArrow.size;
+        document.querySelector("#exitOnlyArrowRotation").value =
+          exitOnlyArrow.rotation;
+        document.querySelector("#exitOnlyArrowFlip").checked =
+          exitOnlyArrow.flip;
+
+        document.querySelector("#exitOnlyHorizontalPadding").value =
+          exitOnlyConfigs.horizontalPadding;
+        document.querySelector("#exitOnlyVerticalPadding").value =
+          exitOnlyConfigs.verticalPadding;
+        document.querySelector("#exitOnlyFontFamily").value =
+          exitOnlyConfigs.fontFamily;
+        document.querySelector("#exitOnlyFontSize").value =
+          exitOnlyConfigs.fontSize;
+        document.querySelector("#exitOnlyWordSpacing").value =
+          exitOnlyConfigs.wordSpacing;
+        document.querySelector("#exitOnlyLetterSpacing").value =
+          exitOnlyConfigs.letterSpacing;
+
+        document.querySelector("#exitOnlyGap").value = exitOnlyConfigs.gap;
+
+        document
+          .querySelectorAll(".sdExitOnlyGuide_rotationPreset")
+          .forEach((button) => {
+            button.classList.toggle(
+              "activated",
+              exitOnlyArrow.rotation === parseFloat(button.dataset.degrees),
+            );
+          });
       }
 
       return;
@@ -2409,7 +2505,8 @@ const formHandler = (() => {
           aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
           aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
         } else {
-          aplContHolder.querySelector(".smAPLCat_justifyAPLs").disabled = !arrows.subpanelConfigs[i];
+          aplContHolder.querySelector(".smAPLCat_justifyAPLs").disabled =
+            !arrows.subpanelConfigs[i];
           if (arrows.subpanelConfigs[i]) {
             aplContHolder.querySelector(".smAPLCat_justifyAPLs").value =
               arrows.subpanelConfigs[i].justify;

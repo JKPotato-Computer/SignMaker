@@ -364,11 +364,6 @@ const FormNavigation = (() => {
       lib.appendOption(guideArrowSelectElmt, display);
     }
 
-    const arrowLocations = document.querySelector("#arrowLocations");
-    ["Left", "Middle", "Right"].forEach((position) =>
-      lib.appendOption(arrowLocations, position),
-    );
-
     for (const fontFamily of TextElement.prototype.fontFamily) {
       lib.appendOption(
         document.querySelector("#exitOnlyFontFamily"),
@@ -786,18 +781,14 @@ const FormNavigation = (() => {
       arrowRotationVal.value = arrowRotationSlider.value;
     });
 
-    // Arrow rotation presets
     const arrowRotationButtons = document.querySelectorAll(
       ".sdArrow_rotationPreset",
     );
     for (const button of arrowRotationButtons) {
       button.addEventListener("click", () => {
-        const degrees = parseFloat(button.dataset.degrees || "0") || 0;
+        const degrees = button.dataset.degrees;
         arrowRotationSlider.value = degrees.toString();
         arrowRotationVal.value = degrees.toString();
-        arrowRotationButtons.forEach((presetButton) => {
-          presetButton.classList.toggle("activated", presetButton === button);
-        });
         formHandler.readForm();
       });
     }
@@ -872,6 +863,44 @@ const FormNavigation = (() => {
       lib.appendOption(
         document.querySelector("#standardArrows_justify"),
         justify,
+        { selected: justify == "Space Between" },
+      );
+    }
+
+    for (const position of Sign.prototype.exitOnlyJustify) {
+      lib.appendOption(
+        document.querySelector("#exitOnlyTextPosition"),
+        position,
+        { selected: position == "Center" },
+      );
+    }
+
+    for (const element of document.querySelectorAll(
+      ".sdGuideArrows_rotationPreset",
+    )) {
+      element.addEventListener("click", () => {
+        document.querySelector("#guideStandardArrow_rotation").value =
+          parseFloat(element.dataset.degrees);
+        formHandler.readForm();
+      });
+    }
+
+    for (const element of document.querySelectorAll(
+      ".sdExitOnlyGuide_rotationPreset",
+    )) {
+      element.addEventListener("click", () => {
+        document.querySelector("#exitOnlyArrowRotation").value = parseFloat(
+          element.dataset.degrees,
+        );
+        formHandler.readForm();
+      });
+    }
+
+    for (const borderMode of Sign.prototype.exitOnlyBorderTypes) {
+      lib.appendOption(
+        document.querySelector("#exitOnlyBorderMode"),
+        borderMode,
+        { selected: borderMode == "Partial Black Border" },
       );
     }
   };
