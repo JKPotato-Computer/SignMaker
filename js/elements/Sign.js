@@ -33,9 +33,11 @@ class Sign {
           lineHeight: 100,
           arrowLocation: "Center", // Half Exit ("Left"/"Right"); Split Exit ("Left","Right","Center")
 
-          arrow: new StandardArrow({ type: "DOWN", size: 1.5 }),
+          arrow: new StandardArrow({ type: "DOWN", size: 1.5, rotation: 0 }),
           numArrows: 0,
           gap: 0.5,
+
+          displayOutsideArrow: true,
         },
       },
       apl: {

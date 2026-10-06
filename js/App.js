@@ -38,8 +38,10 @@ const App = (() => {
     formHandler.init(App);
     DiagramDrawing.init(App);
 
-    window.customShields = new CustomShields();
-    await window.customShields.initialized;
+    window.customImages = CustomImages;
+
+    window.customShields = CustomShields;
+    await window.customShields.init();
 
     window.shieldLibrary = ShieldLibrary;
     await window.shieldLibrary.init();
@@ -81,7 +83,7 @@ const App = (() => {
             currentlySelectedBlockIndex = clamp(
               newBlockIndex,
               0,
-              currentBlockRows[newRowIndex].length - 1,
+              currentBlockRows[currentlySelectedRowIndex].length - 1,
             );
           }
         }
@@ -1449,6 +1451,10 @@ const App = (() => {
           const secondArrow =
             standardArrowConfig.exitOnlyConfigs.arrow.createElement();
           secondArrow.classList.add("halfExitOnlyOutsideArrow");
+          secondArrow.style.visibility = standardArrowConfig.exitOnlyConfigs
+            .displayOutsideArrow
+            ? "visible"
+            : "hidden";
           arrowContElmt.appendChild(secondArrow);
         }
         case "Split Exit Only":
@@ -1457,70 +1463,6 @@ const App = (() => {
           const arrowElement = exitOnlyConfig.arrow.createElement();
           arrowElement.style.filter =
             standardVariant == "Split Exit Only" ? "" : "invert(1)";
-
-          if (
-            standardVariant == "Split Exit Only" ||
-            standardVariant == "Half Exit Only"
-          ) {
-            arrowContElmt.style.setProperty(
-              "--splitHorizontalPadding",
-              exitOnlyConfig.splitHorizontalPadding + "rem",
-            );
-            arrowContElmt.style.setProperty(
-              "--splitVerticalPadding",
-              exitOnlyConfig.splitVerticalPadding + "rem",
-            );
-            arrowContElmt.style.setProperty(
-              "--splitBorderRadius",
-              exitOnlyConfig.splitBorderRadius + "px",
-            );
-          }
-
-          if (standardVariant == "Split Exit Only") {
-            arrowContElmt.style.justifyContent =
-              exitOnlyConfig.arrowLocation.toLowerCase();
-          }
-
-          if (standardVariant == "Half Exit Only") {
-            arrowContElmt.style.flexDirection =
-              exitOnlyConfig.arrowLocation == "Left" ? "row" : "row-reverse";
-            arrowContElmt.style.gap = exitOnlyConfig.exitOnlyOutsideGap + "rem";
-
-            exitOnlyContainer.style.borderBottomLeftRadius =
-              exitOnlyConfig.arrowLocation == "Left"
-                ? "calc(var(--signBorderRadius)" +
-                  (exitOnlyConfig.borderMode == "white_border" ? " / 2)" : ")")
-                : 0;
-            exitOnlyContainer.style.borderBottomRightRadius =
-              exitOnlyConfig.arrowLocation == "Left"
-                ? 0
-                : "calc(var(--signBorderRadius)" +
-                  (exitOnlyConfig.borderMode == "White Border" ? " / 2)" : ")");
-
-            if (exitOnlyConfig.arrowLocation == "Left") {
-              arrowContElmt.style.paddingRight =
-                exitOnlyConfig.horizontalPadding + "rem";
-              if (exitOnlyConfig.borderMode != "White Border") {
-                exitOnlyContainer.style.borderLeft = ".2rem solid black";
-                exitOnlyContainer.style.marginLeft = "-.2rem";
-              }
-            } else {
-              arrowContElmt.style.paddingLeft =
-                exitOnlyConfig.horizontalPadding + "rem";
-              if (exitOnlyConfig.borderMode != "White Border") {
-                exitOnlyContainer.style.borderRight = ".2rem solid black";
-                exitOnlyContainer.style.marginRight = "-.2rem";
-              }
-            }
-
-            if (exitOnlyConfig.borderMode != "White Border") {
-              exitOnlyContainer.style.borderBottom = ".2rem solid black";
-              exitOnlyContainer.style.marginBottom = `${-0.2 + -exitOnlyConfig.verticalPadding}rem`;
-            }
-
-            arrowContElmt.style.paddingBottom =
-              exitOnlyConfig.verticalPadding + "rem";
-          }
 
           exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
           exitOnlyContainer.style.setProperty(
@@ -1645,6 +1587,103 @@ const App = (() => {
                 }
                 exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
               }
+            }
+          }
+
+          if (
+            standardVariant == "Split Exit Only" ||
+            standardVariant == "Half Exit Only"
+          ) {
+            arrowContElmt.style.setProperty(
+              "--splitHorizontalPadding",
+              exitOnlyConfig.splitHorizontalPadding + "rem",
+            );
+            arrowContElmt.style.setProperty(
+              "--splitVerticalPadding",
+              exitOnlyConfig.splitVerticalPadding + "rem",
+            );
+            arrowContElmt.style.setProperty(
+              "--splitBorderRadius",
+              exitOnlyConfig.splitBorderRadius + "px",
+            );
+          }
+
+          if (standardVariant == "Split Exit Only") {
+            arrowContElmt.style.justifyContent =
+              exitOnlyConfig.arrowLocation.toLowerCase();
+          }
+
+          if (standardVariant == "Half Exit Only") {
+            arrowContElmt.style.flexDirection =
+              exitOnlyConfig.arrowLocation == "Left" ? "row" : "row-reverse";
+            arrowContElmt.style.gap = exitOnlyConfig.exitOnlyOutsideGap + "rem";
+
+            exitOnlyContainer.style.borderBottomLeftRadius =
+              exitOnlyConfig.arrowLocation == "Left"
+                ? "calc(var(--signBorderRadius)" +
+                  (exitOnlyConfig.borderMode == "white_border" ? " / 2)" : ")")
+                : 0;
+            exitOnlyContainer.style.borderBottomRightRadius =
+              exitOnlyConfig.arrowLocation == "Left"
+                ? 0
+                : "calc(var(--signBorderRadius)" +
+                  (exitOnlyConfig.borderMode == "White Border" ? " / 2)" : ")");
+
+            if (exitOnlyConfig.arrowLocation == "Left") {
+              arrowContElmt.style.paddingRight =
+                exitOnlyConfig.horizontalPadding + "rem";
+              if (exitOnlyConfig.borderMode != "White Border") {
+                exitOnlyContainer.style.borderLeft = ".2rem solid black";
+                exitOnlyContainer.style.marginLeft = "-.2rem";
+              }
+
+              if (
+                panel.corner == "Sharp" &&
+                exitOnlyConfig.borderMode != "White Border"
+              ) {
+                guideArrowsHolderElmt.style.background = `linear-gradient(270deg, var(--${panel.color}) 0%, var(--${panel.color}) 49%, var(--yellow) 50%, var(--yellow) 100%)`;
+              }
+            } else {
+              arrowContElmt.style.paddingLeft =
+                exitOnlyConfig.horizontalPadding + "rem";
+              if (exitOnlyConfig.borderMode != "White Border") {
+                exitOnlyContainer.style.borderRight = ".2rem solid black";
+                exitOnlyContainer.style.marginRight = "-.2rem";
+              }
+
+              if (
+                panel.corner == "Sharp" &&
+                exitOnlyConfig.borderMode != "White Border"
+              ) {
+                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--yellow) 50%, var(--yellow) 100%)`;
+              }
+            }
+
+            if (exitOnlyConfig.borderMode != "White Border") {
+              exitOnlyContainer.style.borderBottom = ".2rem solid black";
+              exitOnlyContainer.style.marginBottom = `${-0.2 + -exitOnlyConfig.verticalPadding}rem`;
+              arrowContElmt.style.paddingBottom =
+                exitOnlyConfig.verticalPadding + "rem";
+            } else {
+              arrowContElmt.style.paddingTop =
+                exitOnlyConfig.verticalPadding + "rem";
+            }
+
+            if (
+              arrowContElmt.querySelector(".halfExitOnlyOutsideArrow") &&
+              exitOnlyContainer.querySelector(".BE-arrowImage")
+            ) {
+              const outsideArrow = arrowContElmt.querySelector(
+                ".halfExitOnlyOutsideArrow",
+              );
+              const innerArrows =
+                exitOnlyContainer.querySelector(".BE-arrowImage");
+              outsideArrow.style.top = `${
+                (innerArrows.getBoundingClientRect().top -
+                  outsideArrow.getBoundingClientRect().top) /
+                formHandler.vars.zoomLevel /
+                2
+              }px`;
             }
           }
 

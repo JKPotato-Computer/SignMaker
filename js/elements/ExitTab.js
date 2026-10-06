@@ -50,6 +50,8 @@ class ExitTab {
     variantSettings = {
       icon: {
         icon: "AIRPORT",
+        iconType: "preset",
+        iconData: "",
         tollIcon: "EZPass",
         isTextBased: false,
         iconBackgroundConfiguration: {
@@ -468,10 +470,9 @@ class ExitTab {
       const iconLibrary = iconSettings.isTollIcon
         ? TollLogoElement.prototype.logos
         : IconElement.prototype.icons;
-      const iconDefinition =
-        iconLibrary[
-          iconSettings.isTollIcon ? iconSettings.tollIcon : iconSettings.icon
-        ];
+      const iconDefinition = iconSettings.isTollIcon
+        ? iconLibrary[iconSettings.tollIcon]
+        : iconLibrary[iconSettings.icon];
 
       if (!iconSettings.showBackground) {
         exitTabHolder.style.background = "none";
@@ -516,7 +517,9 @@ class ExitTab {
         "ET-iconImage " + (iconSettings.isSquare ? "square" : "");
       imageElement.src = iconSettings.isTollIcon
         ? iconDefinition.src
-        : `./assets/icons/${iconDefinition}`;
+        : iconSettings.iconType === "custom"
+          ? iconSettings.iconData
+          : `./assets/icons/${iconDefinition}`;
       imageHolder.appendChild(imageElement);
 
       if (

@@ -238,15 +238,21 @@ class AdvisoryMessageElement extends TextElement {
     backgroundColor = "Yellow",
     fontFamily = "Series E",
     borderRadius = 4,
+    border = false,
+    borderWidth = 2,
+    borderColor = "White",
     useNumeralFormatting = true,
     horizPadding = 0.3,
     vertPadding = 0.2,
     wordSpacing = 0,
   } = {}) {
     super();
+    this.borderColor = borderColor;
     this.backgroundColor = backgroundColor;
     this.fontFamily = fontFamily;
     this.borderRadius = borderRadius;
+    this.border = border;
+    this.borderWidth = borderWidth;
     this.useNumeralFormatting = useNumeralFormatting;
     this.horizPadding = horizPadding;
     this.vertPadding = vertPadding;
@@ -258,6 +264,12 @@ class AdvisoryMessageElement extends TextElement {
     newText.style.setProperty("--borderRadius", this.borderRadius + "px");
     newText.style.setProperty("--horizPadding", this.horizPadding);
     newText.style.setProperty("--vertPadding", this.vertPadding);
+
+    if (this.border) {
+      newText.style.border = this.borderWidth + "px solid";
+      newText.style.borderColor = this.borderColor;
+    }
+
     newText.className = "bE-textElement bE-advisoryMessage";
 
     return newText;
@@ -481,6 +493,8 @@ DividerElement.prototype.dividerColors = [
 class IconElement {
   constructor({
     icon = "AIRPORT",
+    iconType = "preset",
+    iconData = "",
     iconSize = 100,
     backgroundColor = "Inherit",
     border = false,
@@ -489,6 +503,8 @@ class IconElement {
     spacing = 4,
   } = {}) {
     this.icon = icon;
+    this.iconType = iconType;
+    this.iconData = iconData;
     this.iconSize = iconSize;
     this.backgroundColor = backgroundColor;
     this.border = border;
@@ -515,13 +531,20 @@ class IconElement {
       );
     }
 
+    if (this.iconType == "custom") {
+      iconHolder.style.aspectRatio = "unset";
+    }
+
     iconHolder.style.setProperty(
       "--iconBackgroundColor",
       lib.colors[this.backgroundColor] || this.backgroundColor,
     );
 
     const iconElement = document.createElement("img");
-    iconElement.src = `./assets/icons/${this.icons[this.icon]}`;
+    iconElement.src =
+      this.iconType === "custom"
+        ? this.iconData
+        : `./assets/icons/${this.icons[this.icon]}`;
     iconElement.alt = this.icon;
     iconElement.className = "bE-iconImage";
 

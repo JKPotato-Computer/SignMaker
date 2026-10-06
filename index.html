@@ -75,6 +75,10 @@
       type="text/javascript"
     ></script>
     <script
+      src="js/modules/databases/CustomImages.js"
+      type="text/javascript"
+    ></script>
+    <script
       src="js/modules/databases/ShieldLibrary.js"
       type="text/javascript"
       defer
@@ -147,6 +151,26 @@
             <button id="viewTutorial">Guide / Tutorial</button>
           </a>
           <button id="closeWelcome">Get signing!</button>
+        </div>
+      </dialog>
+      <dialog id="customImagePicker">
+        <div class="customImagePickerContent">
+          <header>
+            <h2>Select Custom Image</h2>
+            <button id="customImagePickerClose" type="button">Close</button>
+          </header>
+          <div id="customImageUploadField">
+            <span class="material-symbols-outlined">attach_file</span>
+            <span>Drag and drop a file or click to upload</span>
+            <input id="customImageFile" type="file" accept="image/*" />
+          </div>
+          <div class="customImageUrlUpload">
+            <label for="customImageUrl">OR Image URL:</label>
+            <input id="customImageUrl" type="url" placeholder="Image URL" />
+          </div>
+          <hr />
+          <h3>Saved Images</h3>
+          <div id="customImageList"></div>
         </div>
       </dialog>
       <dialog id="downloadContent">
@@ -1411,6 +1435,9 @@
                       autocomplete="off"
                     />
                     <div class="smDropdownList"></div>
+                    <button id="smET_iconCustomBtn" class="iconsDropdownCustom">
+                      Select Custom Image
+                    </button>
                   </div>
                 </div>
                 <div id="sMET_variantTollIcon" class="smDropdownInputElement">
@@ -2968,6 +2995,8 @@
                       value="0"
                       step="0.01"
                     />
+                    <label for="sdAdvisory_textAlign">Text Alignment:</label>
+                    <select id="sdAdvisory_textAlign"></select>
                     <br />
                     <label for="sdAdvisory_borderRadius"
                       >Roundness (px):
@@ -2981,8 +3010,23 @@
                       step="1"
                       value="4"
                     />
-                    <label for="sdAdvisory_textAlign">Text Alignment:</label>
-                    <select id="sdAdvisory_textAlign"></select>
+                    <label for="sdAdvisory_border">Border: </label>
+                    <input type="checkbox" id="sdAdvisory_border" />
+                    <input
+                      type="number"
+                      id="sdAdvisory_borderWidth"
+                      data-toolTip="Border Width (px)"
+                      min="0"
+                      step="1"
+                      class="hidden"
+                    />
+                    <select
+                      id="sdAdvisory_borderColor"
+                      data-toolTip="Border Color (px)"
+                      min="0"
+                      step="1"
+                      class="hidden"
+                    ></select>
                     <br />
                     <label for="sdAdvisory_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -3104,6 +3148,12 @@
                           autocomplete="off"
                         />
                         <div class="smDropdownList"></div>
+                        <button
+                          id="sdIcon_customBtn"
+                          class="iconsDropdownCustom"
+                        >
+                          Select Custom Image
+                        </button>
                       </div>
                     </div>
                     <br />
@@ -3112,8 +3162,7 @@
                       type="number"
                       id="sdIcon_iconSize"
                       placeholder="100"
-                      min="50"
-                      max="150"
+                      min="0"
                       step="1"
                       value="100"
                     />
@@ -3142,13 +3191,12 @@
                     />
                     <br />
 
-                    <label for="sdIcon_spacing">Spacing:</label>
+                    <label for="sdIcon_spacing">Padding (px):</label>
                     <input
                       type="number"
                       id="sdIcon_spacing"
                       data-toolTip="Spacing"
                       min="0"
-                      max="8"
                       value="4"
                       placeholder="4"
                     />
@@ -3920,7 +3968,7 @@
                 <button id="sMA_typeStandard" class="selected">
                   <img
                     class="sMA_typeVisual"
-                    src="./assets/form/exitTabVariants/Normal.png"
+                    src="./assets/form/arrowVariants/StandardArrows.png"
                   />
                   <span class="sMA_typeLabel">Standard Arrows</span>
                 </button>
@@ -4366,8 +4414,7 @@
                 <select
                   id="exitOnlyBorderMode"
                   onchange="formHandler.readForm()"
-                >
-                </select>
+                ></select>
                 <label for="arrowLocations">Exit Only Position:</label>
                 <select
                   id="arrowLocations"
@@ -4413,6 +4460,14 @@
                   value="5"
                   min="0"
                   step=".05"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="exitOnlyDisplayOutsideArrow">Outer Arrow:</label>
+                <input
+                  type="checkbox"
+                  id="exitOnlyDisplayOutsideArrow"
+                  checked
                   onchange="formHandler.readForm()"
                 />
                 <!--

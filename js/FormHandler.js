@@ -233,9 +233,20 @@ const formHandler = (() => {
         }
 
         if (exitTab.variant == "Icon") {
-          exitTab.variantSettings.icon.icon = document.querySelector(
+          const regularIconDropdown = document.querySelector(
             "#sMET_variantRegularIcon",
-          ).dataset.selectedOption;
+          );
+          const selectedRegularIcon =
+            regularIconDropdown.dataset.selectedOption;
+          exitTab.variantSettings.icon.iconType =
+            selectedRegularIcon.startsWith("custom:") ? "custom" : "preset";
+          exitTab.variantSettings.icon.icon = selectedRegularIcon.startsWith(
+            "custom:",
+          )
+            ? selectedRegularIcon.slice("custom:".length)
+            : selectedRegularIcon;
+          exitTab.variantSettings.icon.iconData =
+            regularIconDropdown.dataset.customImageData || "";
           exitTab.variantSettings.icon.tollIcon = document.querySelector(
             "#sMET_variantTollIcon",
           ).dataset.selectedOption;
@@ -468,9 +479,17 @@ const formHandler = (() => {
     }
 
     if (currentBlockElem.constructor.name === "IconElement") {
-      currentBlockElem.icon =
-        document.querySelector(".sdIconDropdown").dataset.selectedOption ||
-        currentBlockElem.icon;
+      const iconDropdown = document.querySelector(".sdIconDropdown");
+      const selectedIcon = iconDropdown.dataset.selectedOption;
+      if (selectedIcon.startsWith("custom:")) {
+        currentBlockElem.iconType = "custom";
+        currentBlockElem.icon = selectedIcon.slice("custom:".length);
+        currentBlockElem.iconData = iconDropdown.dataset.customImageData;
+      } else {
+        currentBlockElem.iconType = "preset";
+        currentBlockElem.icon = selectedIcon || currentBlockElem.icon;
+        currentBlockElem.iconData = "";
+      }
     } else if (currentBlockElem.constructor.name === "TollLogoElement") {
       currentBlockElem.logo =
         document.querySelector("#sdTollLogoHolder").dataset.selectedOption ||
@@ -593,7 +612,11 @@ const formHandler = (() => {
           form["splitExitOnlyVertPadding"].value;
         exitOnlyConfigs.splitBorderRadius =
           form["splitExitOnlyBorderRadius"].value;
-        exitOnlyConfigs.exitOnlyOutsideGap = parseFloat(form["exitOnlyOutsideGap"].value);
+        exitOnlyConfigs.exitOnlyOutsideGap = parseFloat(
+          form["exitOnlyOutsideGap"].value,
+        );
+        exitOnlyConfigs.displayOutsideArrow =
+          form["exitOnlyDisplayOutsideArrow"].checked;
       }
 
       standardArrowConfig.variant = form["guideArrow"].value;
@@ -878,9 +901,13 @@ const formHandler = (() => {
 
     // Icons
     if (app.getCurrentBlockElem().constructor.name === "IconElement") {
-      const currentIcon = app.getCurrentBlockElem().icon;
-      document.querySelector(".sdIconDropdown").dataset.selectedOption =
-        currentIcon;
+      const currentIcon = app.getCurrentBlockElem();
+      const iconDropdown = document.querySelector(".sdIconDropdown");
+      iconDropdown.dataset.customImageData = currentIcon.iconData || "";
+      iconDropdown.dataset.selectedOption =
+        currentIcon.iconType === "custom"
+          ? `custom:${currentIcon.icon}`
+          : currentIcon.icon;
     } else if (
       app.getCurrentBlockElem().constructor.name === "TollLogoElement"
     ) {
@@ -1216,6 +1243,10 @@ const formHandler = (() => {
         document.querySelector("#sdAdvisory_bannerFirstLetterSize"),
       ],
     );
+    toggleVisibility(document.querySelector("#sdAdvisory_border"), [
+      document.querySelector("#sdAdvisory_borderWidth"),
+      document.querySelector("#sdAdvisory_borderColor"),
+    ]);
     toggleVisibility(document.querySelector("#sdIcon_border"), [
       document.querySelector("#sdIcon_borderColor"),
       document.querySelector("#sdIcon_borderRadius"),
@@ -1711,9 +1742,15 @@ const formHandler = (() => {
     }
 
     if (currentExitTab.variant == "Icon") {
-      document.querySelector(
+      const regularIconDropdown = document.querySelector(
         "#sMET_variantRegularIcon",
-      ).dataset.selectedOption = currentExitTab.variantSettings.icon.icon;
+      );
+      regularIconDropdown.dataset.customImageData =
+        currentExitTab.variantSettings.icon.iconData || "";
+      regularIconDropdown.dataset.selectedOption =
+        currentExitTab.variantSettings.icon.iconType === "custom"
+          ? `custom:${currentExitTab.variantSettings.icon.icon}`
+          : currentExitTab.variantSettings.icon.icon;
       document.querySelector("#sMET_variantTollIcon").dataset.selectedOption =
         currentExitTab.variantSettings.icon.tollIcon;
 
@@ -2361,7 +2398,11 @@ const formHandler = (() => {
         arrowLocations.innerHTML = "";
 
         for (const alignment of Sign.prototype.exitOnlyJustify) {
-          if (variant == "Half Exit Only" && alignment == "center") {
+          if (variant == "Half Exit Only" && alignment == "Center") {
+            if (standardArrowConfig.exitOnlyConfigs.arrowLocation == "Center") {
+              standardArrowConfig.exitOnlyConfigs.arrowLocation = "Right";
+            }
+
             continue;
           }
 
@@ -2429,6 +2470,14 @@ const formHandler = (() => {
         ).style.display = variant == "Half Exit Only" ? "" : "none";
         document.querySelector("#exitOnlyOutsideGap").value =
           exitOnlyConfigs.exitOnlyOutsideGap;
+
+        document.querySelector("#exitOnlyDisplayOutsideArrow").style.display =
+          variant == "Half Exit Only" ? "" : "none";
+        document.querySelector(
+          'label[for="exitOnlyDisplayOutsideArrow"]',
+        ).style.display = variant == "Half Exit Only" ? "" : "none";
+        document.querySelector("#exitOnlyDisplayOutsideArrow").checked =
+          exitOnlyConfigs.displayOutsideArrow;
 
         document.querySelector("#splitExitOnlyHorizPadding").value =
           exitOnlyConfigs.splitHorizontalPadding;
@@ -2681,6 +2730,126 @@ const formHandler = (() => {
     }
   };
 
+  const promptCustomIcon = () => {
+    const modal = document.querySelector("#customImagePicker");
+    const uploadField = document.querySelector("#customImageUploadField");
+    const fileInput = document.querySelector("#customImageFile");
+    const urlInput = document.querySelector("#customImageUrl");
+    const list = document.querySelector("#customImageList");
+    const modalHolder = document.querySelector("#modalHolder");
+    const eventListeners = [];
+
+    const trackListener = (element, type, handler) => {
+      element.addEventListener(type, handler);
+      eventListeners.push({ element, type, handler });
+    };
+
+    const cleanupListeners = () => {
+      for (const { element, type, handler } of eventListeners) {
+        element.removeEventListener(type, handler);
+      }
+      eventListeners.length = 0;
+    };
+
+    return new Promise(async (resolve) => {
+      let closed = false;
+
+      const close = (image) => {
+        if (closed) return;
+        closed = true;
+        cleanupListeners();
+        modalHolder.style.display = "none";
+        if (modal.open) modal.close();
+        resolve(image || null);
+      };
+
+      const renderList = async () => {
+        list.innerHTML = "";
+
+        for (const image of await window.customImages.getAllImages()) {
+          const item = document.createElement("button");
+          item.className = "customImageItem";
+
+          const preview = document.createElement("img");
+          preview.src = image.data;
+          preview.className = "shieldItemImg";
+          item.appendChild(preview);
+
+          const name = document.createElement("span");
+          name.className = "shieldItemName";
+          name.textContent = image.fileName;
+          item.appendChild(name);
+
+          trackListener(item, "click", () => close(image));
+
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "deleteCustomImage";
+          deleteButton.innerHTML =
+            '<span class="material-symbols-outlined">delete</span>';
+          trackListener(deleteButton, "click", async () => {
+            if (!confirm("Are you sure you want to delete this image?")) return;
+            await window.customImages.deleteImage(image.fileName);
+            await renderList();
+          });
+          item.appendChild(deleteButton);
+          list.appendChild(item);
+        }
+      };
+
+      const uploadFile = async () => {
+        if (!fileInput.files[0]) return;
+        await window.customImages.uploadFile(fileInput.files[0]);
+        fileInput.value = "";
+        await renderList();
+      };
+
+      const uploadUrl = async () => {
+        if (!urlInput.value) return;
+        await window.customImages.uploadUrl(urlInput.value);
+        urlInput.value = "";
+        await renderList();
+      };
+
+      trackListener(
+        document.querySelector("#customImagePickerClose"),
+        "click",
+        () => close(null),
+      );
+      trackListener(modal, "cancel", (event) => {
+        event.preventDefault();
+        close(null);
+      });
+      trackListener(modal, "close", () => close(null));
+      trackListener(uploadField, "click", () => fileInput.click());
+      trackListener(fileInput, "change", uploadFile);
+      trackListener(urlInput, "keypress", (event) => {
+        if (event.key === "Enter") uploadUrl();
+      });
+      trackListener(uploadField, "dragover", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        uploadField.classList.add("dragover");
+      });
+      trackListener(uploadField, "dragleave", () =>
+        uploadField.classList.remove("dragover"),
+      );
+      trackListener(uploadField, "drop", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        uploadField.classList.remove("dragover");
+        for (const file of event.dataTransfer.files) {
+          await window.customImages.uploadFile(file);
+        }
+        await renderList();
+      });
+
+      await renderList();
+      modalHolder.style.display = "block";
+      modal.showModal();
+    });
+  };
+
   return {
     init: initialize,
     readForm,
@@ -2690,6 +2859,7 @@ const formHandler = (() => {
     zoom,
     removeExitTabHelper,
     duplicateExitTabHelper,
+    promptCustomIcon,
     updateGuideArrowsSubform,
     vars: {
       get zoomLevel() {

@@ -1292,10 +1292,18 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 #shieldEditorClose,
 #shieldImgLibraryClose,
 #diagrammicDrawingClose,
+#customImagePickerClose,
 button[data-diagram-modal-close] {
   font-size: 20px;
   padding: 0.125rem 1rem;
   background-color: rgb(255, 0, 0, 0.2);
+}
+
+.customImagePickerContent > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
 .redButton {
@@ -1520,6 +1528,38 @@ button[data-diagram-modal-close]:hover,
   border-color: #4caf50;
 }
 
+#customImageUploadField {
+  background-color: rgb(0, 0, 0, 0.1);
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#customImageUploadField > span.material-symbols-outlined {
+  font-size: 64px;
+}
+
+#customImageUploadField:hover {
+  background-color: rgb(0, 0, 0, 0.2);
+  border-color: #666;
+}
+
+#customImageUploadField.dragover {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: #4caf50;
+}
+
+#customImageUploadField input[type="file"] {
+  display: none;
+}
+
 .shieldUploadDisclaimer {
   font-size: 12px;
   padding: 0.25rem;
@@ -1538,6 +1578,11 @@ button[data-diagram-modal-close]:hover,
   flex-direction: column;
 }
 
+#customImageList {
+  display: flex;
+  flex-direction: column;
+}
+
 .customShieldItem {
   display: flex;
   flex-direction: row;
@@ -1548,12 +1593,14 @@ button[data-diagram-modal-close]:hover,
   width: 100%;
 }
 
-.deleteCustomShieldBtn {
+.deleteCustomShieldBtn,
+.deleteCustomImage {
   background: rgb(255, 0, 0, 0.3);
   padding: 0.5rem;
 }
 
-.deleteCustomShieldBtn:hover {
+.deleteCustomShieldBtn:hover,
+.deleteCustomImage:hover {
   background: rgb(255, 0, 0, 0.8) !important;
 }
 
@@ -2903,4 +2950,48 @@ summary:hover {
 #exitOnlyArrowType {
   width: calc(100% - 8rem);
   display: inline-block;
+}
+
+.iconsDropdownCustom {
+  width: 100%;
+  padding: 0.25rem;
+  background-color: rgb(0, 0, 255, 0.75);
+  font-size: 24px;
+}
+
+.iconsDropdownCustom:hover {
+  background-color: rgb(0, 0, 255) !important;
+}
+
+.customImageItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  width: 100%;
+  background: rgb(var(--baseColor), 0.2);
+}
+
+.customImageUrlUpload {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#customImageUrlUpload {
+  padding: 0.25rem 1rem;
+}
+
+.customImageSelectButton {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  background: none;
 }

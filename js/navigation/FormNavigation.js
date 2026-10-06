@@ -691,6 +691,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdBlock_backgroundColor"),
       document.querySelector("#sdTollLogo_backgroundColor"),
       document.querySelector("#sdTollLogo_containerBackgroundColor"),
+      document.querySelector("#sdAdvisory_borderColor"),
     ];
     for (const elem of textElem_bgColorSelects) {
       for (const backgroundColor of TextElement.prototype.backgroundColor) {
@@ -1107,7 +1108,6 @@ const FormNavigation = (() => {
       const dropdownHolder = dropdownElement.querySelector(".smDropdownHolder");
       const dropdownList = dropdownHolder.querySelector(".smDropdownList");
 
-      dropdownElement.dataset.selectedOption = baseValue;
       imageFunction(selectedImage, baseValue);
       textFunction(selectedLabel, baseValue);
 
@@ -1159,6 +1159,8 @@ const FormNavigation = (() => {
         attributes: true,
         attributeFilter: ["data-selected-option"],
       });
+
+      dropdownElement.dataset.selectedOption = baseValue;
     };
 
     setupDropdownElement(
@@ -1218,7 +1220,7 @@ const FormNavigation = (() => {
     setupDropdownElement(
       document.querySelector("#exitOnlyArrowType"),
       StandardArrow.prototype.arrows,
-      "TYPE_A",
+      "DOWN",
       (image, value) => {
         image.loading = "lazy";
         image.src = StandardArrow.prototype.arrows[value].src;
@@ -1236,11 +1238,15 @@ const FormNavigation = (() => {
       "AIRPORT",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `./assets/icons/${IconElement.prototype.icons[value]}`;
+        image.src = value.startsWith("custom:")
+          ? image.closest(".smDropdownInputElement").dataset.customImageData
+          : `./assets/icons/${IconElement.prototype.icons[value]}`;
         return image;
       },
       (text, value) => {
-        text.textContent = value.replace(/_/g, " ");
+        text.textContent = value.startsWith("custom:")
+          ? value.slice("custom:".length)
+          : value.replace(/_/g, " ");
         return text;
       },
     );
@@ -1251,11 +1257,15 @@ const FormNavigation = (() => {
       "AIRPORT",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `./assets/icons/${IconElement.prototype.icons[value]}`;
+        image.src = value.startsWith("custom:")
+          ? image.closest(".smDropdownInputElement").dataset.customImageData
+          : `./assets/icons/${IconElement.prototype.icons[value]}`;
         return image;
       },
       (text, value) => {
-        text.textContent = value.replace(/_/g, " ");
+        text.textContent = value.startsWith("custom:")
+          ? value.slice("custom:".length)
+          : value.replace(/_/g, " ");
         return text;
       },
     );
@@ -1291,6 +1301,29 @@ const FormNavigation = (() => {
         return text;
       },
     );
+
+    document
+      .querySelector("#sdIcon_customBtn")
+      .addEventListener("click", async () => {
+        const image = await formHandler.promptCustomIcon();
+        if (!image) return;
+
+        const iconDropdown = document.querySelector(".sdIconDropdown");
+        iconDropdown.dataset.customImageData = image.data;
+        iconDropdown.dataset.selectedOption = `custom:${image.fileName}`;
+        formHandler.readForm();
+      });
+    document
+      .querySelector("#smET_iconCustomBtn")
+      .addEventListener("click", async () => {
+        const image = await formHandler.promptCustomIcon();
+        if (!image) return;
+
+        const iconDropdown = document.querySelector("#sMET_variantRegularIcon");
+        iconDropdown.dataset.customImageData = image.data;
+        iconDropdown.dataset.selectedOption = `custom:${image.fileName}`;
+        formHandler.readForm();
+      });
   };
 
   const setupShields = () => {
