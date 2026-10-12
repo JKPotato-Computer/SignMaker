@@ -403,6 +403,7 @@
     url("../fonts/FHWASeries/Roadgeek2014SeriesEEM.ttf") format("truetype");
   font-style: normal;
   font-display: swap;
+  size-adjust: 140%;
 }
 
 /* Clearview */

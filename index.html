@@ -116,9 +116,13 @@
     </a>
     <div id="zoomControl">
       <span>Zoom</span>
-      <button id="zoomOut" onclick="formHandler.zoom(-0.25)">-</button>
+      <button type="button" id="zoomOut" onclick="formHandler.zoom(-0.25)">
+        -
+      </button>
       <span id="zoomLevel">100%</span>
-      <button id="zoomIn" onclick="formHandler.zoom(0.25)">+</button>
+      <button type="button" id="zoomIn" onclick="formHandler.zoom(0.25)">
+        +
+      </button>
     </div>
     <main id="smRender">
       <div id="postContainer">
@@ -142,15 +146,15 @@
         </p>
         <div class="options">
           <a href="https://github.com/JKPotato-Computer/SignMaker/releases">
-            <button id="changelog">Changelog</button>
+            <button type="button" id="changelog">Changelog</button>
           </a>
           <a href="https://discord.gg/yJBWggf7p4">
-            <button id="joinDiscordServer">Discord Server</button>
+            <button type="button" id="joinDiscordServer">Discord Server</button>
           </a>
           <a href="https://github.com/JKPotato-Computer/SignMaker/wiki">
-            <button id="viewTutorial">Guide / Tutorial</button>
+            <button type="button" id="viewTutorial">Guide / Tutorial</button>
           </a>
-          <button id="closeWelcome">Get signing!</button>
+          <button type="button" id="closeWelcome">Get signing!</button>
         </div>
       </dialog>
       <dialog id="customImagePicker">
@@ -179,16 +183,27 @@
           <div id="fileTypeOptions">
             <label for="PNG" id="fileTypeLabel">Save As: </label>
             <button
+              type="button"
               id="PNG"
               class="activated"
               onclick="App.updateFileType(`png`)"
             >
               PNG
             </button>
-            <button id="SVG" class="" onclick="App.updateFileType(`png`)">
+            <button
+              type="button"
+              id="SVG"
+              class=""
+              onclick="App.updateFileType(`png`)"
+            >
               SVG
             </button>
-            <button id="JSON" class="" onclick="App.updateFileType(`json`)">
+            <button
+              type="button"
+              id="JSON"
+              class=""
+              onclick="App.updateFileType(`json`)"
+            >
               JSON
             </button>
           </div>
@@ -217,8 +232,12 @@
             <br />
           </div>
           <div class="options">
-            <button id="cancelDownload">Cancel</button>
-            <button id="download" onclick="ImportExport.downloadSign()">
+            <button type="button" id="cancelDownload">Cancel</button>
+            <button
+              type="button"
+              id="download"
+              onclick="ImportExport.downloadSign()"
+            >
               Download
             </button>
           </div>
@@ -232,7 +251,7 @@
               <span class="material-symbols-outlined">shield</span>
               Shield Editor
             </h2>
-            <button id="shieldEditorClose">Close</button>
+            <button type="button" id="shieldEditorClose">Close</button>
           </header>
           <details open>
             <summary>Image</summary>
@@ -286,8 +305,10 @@
                 </div>
               </div>
               <nav>
-                <button id="presetShields" class="selected">Presets</button>
-                <button id="customShields">Custom</button>
+                <button type="button" id="presetShields" class="selected">
+                  Presets
+                </button>
+                <button type="button" id="customShields">Custom</button>
               </nav>
               <input
                 type="search"
@@ -559,19 +580,21 @@
           <span id="shieldBaseName">INTERSTATE-1</span>
           <div id="shieldPreviewImage"></div>
           <div id="scaleOptions">
-            <button id="shieldFullSize" class="selected">Actual Size</button>
-            <button id="shieldFitSize">Fit Size</button>
+            <button type="button" id="shieldFullSize" class="selected">
+              Actual Size
+            </button>
+            <button type="button" id="shieldFitSize">Fit Size</button>
           </div>
           <footer>
-            <button id="saveToShieldLibrary">
+            <button type="button" id="saveToShieldLibrary">
               <span class="material-symbols-outlined">file_save</span>Save to
               Library
             </button>
-            <button id="openShieldLibrary">
+            <button type="button" id="openShieldLibrary">
               <span class="material-symbols-outlined">filter</span>Shield
               Library
             </button>
-            <button id="setShield">Set Shield</button>
+            <button type="button" id="setShield">Set Shield</button>
           </footer>
         </div>
         <dialog id="shieldImgLibrary">
@@ -581,7 +604,7 @@
                 <span class="material-symbols-outlined">shield</span>
                 Shield Library
               </h2>
-              <button id="shieldImgLibraryClose">Close</button>
+              <button type="button" id="shieldImgLibraryClose">Close</button>
             </header>
             <input
               type="search"
@@ -590,8 +613,10 @@
             />
             <div id="shieldLibraryListHolder"></div>
             <div id="shieldLibraryListOptions">
-              <button id="shieldLibraryDelete" disabled>Delete Shield</button>
-              <button id="shieldLibraryUse">Use Shield</button>
+              <button type="button" id="shieldLibraryDelete" disabled>
+                Delete Shield
+              </button>
+              <button type="button" id="shieldLibraryUse">Use Shield</button>
             </div>
           </div>
         </dialog>
@@ -610,7 +635,7 @@
             >
               Keyboard Shortcuts
             </button>
-            <button id="diagrammicDrawingClose">Close</button>
+            <button type="button" id="diagrammicDrawingClose">Close</button>
           </div>
         </header>
         <div class="diagrammicDrawingHolder">
@@ -892,6 +917,7 @@
                     onchange="DiagramDrawing.readForm()"
                   ></select>
                   <button
+                    type="button"
                     id="objectSubpanelAdd"
                     onclick="
                       App.addSubPanel();
@@ -936,8 +962,12 @@
               <button id="diagramLoadPresets" type="button">
                 Open Presets
               </button>
-              <button id="diagramSavePreset">Save as Preset</button>
-              <button id="diagramReset" class="redButton">Reset</button>
+              <button type="button" id="diagramSavePreset">
+                Save as Preset
+              </button>
+              <button type="button" id="diagramReset" class="redButton">
+                Reset
+              </button>
               <label for="diagramFileName">Name:</label>
               <input
                 type="text"
@@ -948,9 +978,9 @@
             </div>
 
             <div>
-              <button id="importDiagram">Import Diagram</button>
-              <button id="exportDiagram">Export Diagram</button>
-              <button id="diagramUse">Use Diagram</button>
+              <button type="button" id="importDiagram">Import Diagram</button>
+              <button type="button" id="exportDiagram">Export Diagram</button>
+              <button type="button" id="diagramUse">Use Diagram</button>
             </div>
           </footer>
         </div>
@@ -1188,60 +1218,63 @@
               </div>
             </div>
             <div id="sMPanelPadding" class="tabHidden">
-              <div>
-                <label for="paddingTop">Padding Top: </label>
-                <input
-                  type="number"
-                  id="paddingTop"
-                  value=".3"
-                  placeholder=".3"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <label for="paddingRight">Padding Right: </label>
-                <input
-                  type="number"
-                  id="paddingRight"
-                  value=".75"
-                  placeholder=".75"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <br />
-                <label for="paddingBottom">Padding Bottom: </label>
-                <input
-                  type="number"
-                  id="paddingBottom"
-                  value=".3"
-                  placeholder=".3"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <label for="paddingLeft">Padding Left: </label>
-                <input
-                  type="number"
-                  id="paddingLeft"
-                  value=".75"
-                  placeholder=".75"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <button
-                  id="resetPadding"
-                  class="resetClass"
-                  onclick="App.resetPadding()"
-                >
-                  Reset to Default
-                </button>
-              </div>
+              <label for="paddingTop">Padding Top: </label>
+              <input
+                type="number"
+                id="paddingTop"
+                value=".3"
+                placeholder=".3"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <label for="paddingRight">Padding Right: </label>
+              <input
+                type="number"
+                id="paddingRight"
+                value=".75"
+                placeholder=".75"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <br />
+              <label for="paddingBottom">Padding Bottom: </label>
+              <input
+                type="number"
+                id="paddingBottom"
+                value=".3"
+                placeholder=".3"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <label for="paddingLeft">Padding Left: </label>
+              <input
+                type="number"
+                id="paddingLeft"
+                value=".75"
+                placeholder=".75"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <button
+                id="resetPadding"
+                class="resetClass"
+                type="button"
+                onclick="
+                  console.log('Hello');
+                  App.getCurrentPanel().sign.paddingLeft = 0.75;
+                  App.getCurrentPanel().sign.paddingRight = 0.75;
+                  App.getCurrentPanel().sign.paddingBottom = 0.3;
+                  App.getCurrentPanel().sign.paddingTop = 0.3;
+                  formHandler.updateForm();
+                  App.redraw();
+                "
+              >
+                Reset to Default
+              </button>
             </div>
           </div>
         </div>
@@ -1253,14 +1286,20 @@
             <nav class="listNav">
               <div class="scrollMenu" id="exitTabList"></div>
               <div class="listNavOptions">
-                <button onclick="App.newExitTabRow()">
+                <button type="button" onclick="App.newExitTabRow()">
                   <span class="material-symbols-outlined">add</span>
                   Group
                 </button>
-                <button onclick="formHandler.removeExitTabHelper()">
+                <button
+                  type="button"
+                  onclick="formHandler.removeExitTabHelper()"
+                >
                   <span class="material-symbols-outlined">remove</span>
                 </button>
-                <button onclick="formHandler.duplicateExitTabHelper()">
+                <button
+                  type="button"
+                  onclick="formHandler.duplicateExitTabHelper()"
+                >
                   <span class="material-symbols-outlined">content_copy</span>
                 </button>
               </div>
@@ -1366,42 +1405,42 @@
             </div>
             <div id="sMExitTabVariant" class="tabHidden">
               <div class="sMET_typeSelect">
-                <button id="sMET_typeNormal" class="selected">
+                <button type="button" id="sMET_typeNormal" class="selected">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/Normal.png"
                   />
                   <span class="sMET_typeLabel">Normal Exit Tab</span>
                 </button>
-                <button id="sMET_typeIcon">
+                <button type="button" id="sMET_typeIcon">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/TollIcon.png"
                   />
                   <span class="sMET_typeLabel">Toll / Regular Icon</span>
                 </button>
-                <button id="sMET_typeFullLeft">
+                <button type="button" id="sMET_typeFullLeft">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/FullExitTab.png"
                   />
                   <span class="sMET_typeLabel">Full Left</span>
                 </button>
-                <button id="sMET_typePartialLeft">
+                <button type="button" id="sMET_typePartialLeft">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/PartialExitTab.png"
                   />
                   <span class="sMET_typeLabel">Partial Left</span>
                 </button>
-                <button id="sMET_typeHOVVariant1">
+                <button type="button" id="sMET_typeHOVVariant1">
                   <img
                     class="sMET_typeVisual"
                     src="./assets//form//exitTabVariants//HOVVariant1.png"
                   />
                   <span class="sMET_typeLabel">HOV Variant 1</span>
                 </button>
-                <button id="sMET_typeHOVVariant2">
+                <button type="button" id="sMET_typeHOVVariant2">
                   <img
                     class="sMET_typeVisual"
                     src="./assets//form//exitTabVariants//HOVVariant2.png"
@@ -1435,7 +1474,11 @@
                       autocomplete="off"
                     />
                     <div class="smDropdownList"></div>
-                    <button id="smET_iconCustomBtn" class="iconsDropdownCustom">
+                    <button
+                      type="button"
+                      id="smET_iconCustomBtn"
+                      class="iconsDropdownCustom"
+                    >
                       Select Custom Image
                     </button>
                   </div>
@@ -1518,6 +1561,7 @@
                   name="sMET_variantIconSizeVal"
                   value="3"
                   step="0.1"
+                  onchange="formHandler.readForm()"
                 />
                 <label for="sMET_variantIsSquareIcon" class="checkboxLabel">
                   <input
@@ -1932,9 +1976,13 @@
             <div id="sMExitTabProperties" class="tabHidden">
               <div class="sMET_Presets">
                 <select id="smET_presetSelect"></select>
-                <button id="smET_loadPreset">Load Preset</button>
-                <button id="smET_deletePreset">Delete Preset</button>
-                <button id="smET_saveAsPreset">Create New Preset</button>
+                <button type="button" id="smET_loadPreset">Load Preset</button>
+                <button type="button" id="smET_deletePreset">
+                  Delete Preset
+                </button>
+                <button type="button" id="smET_saveAsPreset">
+                  Create New Preset
+                </button>
               </div>
               <br />
               <label for="sMET_textContent" class="noLabelAlignment"
@@ -1960,7 +2008,9 @@
 
               <fieldset>
                 <legend>Shields</legend>
-                <button id="smET_addShield">Add New Shield</button>
+                <button type="button" id="smET_addShield">
+                  Add New Shield
+                </button>
                 <div id="smET_shieldList"></div>
                 <label for="smET_shieldGap">Shield Spacing (rem):</label>
                 <input
@@ -2481,13 +2531,13 @@
                 id="subPanelList"
               ></div>
               <div class="listNavOptions">
-                <button onclick="App.addSubPanel()">
+                <button type="button" onclick="App.addSubPanel()">
                   <span class="material-symbols-outlined">add</span>
                 </button>
-                <button onclick="App.removeSubPanel()">
+                <button type="button" onclick="App.removeSubPanel()">
                   <span class="material-symbols-outlined">remove</span>
                 </button>
-                <button onclick="App.duplicateSubPanel()">
+                <button type="button" onclick="App.duplicateSubPanel()">
                   <span class="material-symbols-outlined">content_copy</span>
                 </button>
               </div>
@@ -2528,7 +2578,7 @@
                       >Select a shield group from <b>Block Elements</b> to
                       modify:</span
                     >
-                    <button onclick="App.newShieldGroup()">
+                    <button type="button" onclick="App.newShieldGroup()">
                       <span class="material-symbols-outlined">add</span>New
                       Shield Group
                     </button>
@@ -2538,10 +2588,15 @@
                 <div id="smSPShieldHeader">
                   <div>
                     <span id="smSPShieldSelectLabel">Selected: Shield 1</span>
-                    <button id="smSPCreateShield" onclick="App.newShield()">
+                    <button
+                      type="button"
+                      id="smSPCreateShield"
+                      onclick="App.newShield()"
+                    >
                       <span class="material-symbols-outlined">add</span> New
                     </button>
                     <button
+                      type="button"
                       id="smSPDuplicateShield"
                       onclick="
                         App.duplicateShield(
@@ -2555,6 +2610,7 @@
                       Duplicate
                     </button>
                     <button
+                      type="button"
                       id="smSPDeleteShield"
                       onclick="
                         App.deleteShield(App.vars.currentlySelectedShieldIndex)
@@ -2567,6 +2623,7 @@
                   </div>
                   <div>
                     <button
+                      type="button"
                       id="smSPGroupShieldNext"
                       onclick="
                         App.groupShields(
@@ -2578,6 +2635,7 @@
                       Group Next Shield
                     </button>
                     <button
+                      type="button"
                       id="smSPGroupShieldPrev"
                       onclick="
                         App.groupShields(
@@ -2589,6 +2647,7 @@
                       Group Previous Shield
                     </button>
                     <button
+                      type="button"
                       id="smSPGroupShieldUngroup"
                       disabled
                       onclick="
@@ -2600,6 +2659,7 @@
                       Remove from Group
                     </button>
                     <button
+                      type="button"
                       id="smSPUngroupAllShields"
                       disabled
                       onclick="
@@ -2619,7 +2679,7 @@
                   <div id="smSPShieldImgConfig">
                     <div>
                       <div id="smSPShieldImgPreview"></div>
-                      <button id="editShieldBtn">
+                      <button type="button" id="editShieldBtn">
                         <span class="material-symbols-outlined">edit</span>
                         Edit Shield
                       </button>
@@ -2698,7 +2758,9 @@
                     <div class="smSPShieldBannerController">
                       <label for="smSPShieldBannerAlignment">Alignment:</label>
                       <select id="smSPShieldBannerAlignment"></select>
-                      <button id="smSPShieldAddBanner">Add Banner</button>
+                      <button type="button" id="smSPShieldAddBanner">
+                        Add Banner
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2707,8 +2769,9 @@
             <div id="sMSPBlocks" class="">
               <div id="sMSPTextEditor">
                 <div id="sMSPCreate">
-                  <span id="SMSPSelectLabel">Selected: Row 1</span>
+                  <span id="SMSPSelectLabel">Selected: Row 1; Block 1</span>
                   <button
+                    type="button"
                     id="sMSPCreateRow"
                     onclick="
                       App.newRow(
@@ -2718,11 +2781,16 @@
                   >
                     <span class="material-symbols-outlined">add</span> New
                   </button>
-                  <button id="sMSPDuplicateRow" onclick="App.dupRow()">
+                  <button
+                    type="button"
+                    id="sMSPDuplicateRow"
+                    onclick="App.dupRow()"
+                  >
                     <span class="material-symbols-outlined">content_copy</span>
                     Duplicate
                   </button>
                   <button
+                    type="button"
                     id="sMSPDeleteSelectedRow"
                     onclick="App.delRow()"
                     disabled
@@ -2730,11 +2798,30 @@
                     <span class="material-symbols-outlined">delete</span>
                     Selected
                   </button>
+                  <button
+                    type="button"
+                    class="redButton"
+                    id="smSPExitGroupedBlock"
+                    disabled
+                    onclick="
+                      let groupNum = App.getGroupNumFromElem(
+                        App.getParentOfSelectedBlockGroup(),
+                      );
+                      if (groupNum !== null) {
+                        App.setSelectedBlockGroup(groupNum);
+                      } else {
+                        App.setSelectedBlockGroup(-1);
+                      }
+                    "
+                  >
+                    Exit Group
+                  </button>
                 </div>
                 <div id="sMSPTextList"></div>
                 <div id="sMSPElement">
                   <select id="sMSPElementSelect" style="width: 30%"></select>
                   <button
+                    type="button"
                     id="sMSPReplaceElement"
                     onclick="
                       App.replaceControlElem(
@@ -2746,6 +2833,7 @@
                     Replace
                   </button>
                   <button
+                    type="button"
                     id="sMSPCreateElement"
                     onclick="
                       App.newControlElem(
@@ -2756,6 +2844,7 @@
                     <span class="material-symbols-outlined">add</span> New
                   </button>
                   <button
+                    type="button"
                     id="sMSPDeleteSelectedBlock"
                     onclick="App.delControlElem()"
                   >
@@ -2928,7 +3017,7 @@
                   </div>
 
                   <div data-property="sdShieldGroup" class="hidden">
-                    <button id="sdShieldGroup_OpenShieldEditor">
+                    <button type="button" id="sdShieldGroup_OpenShieldEditor">
                       Open Shield Editor
                     </button>
                     <label for="sdShieldGroup_alignment">Alignment: </label>
@@ -3149,6 +3238,7 @@
                         />
                         <div class="smDropdownList"></div>
                         <button
+                          type="button"
                           id="sdIcon_customBtn"
                           class="iconsDropdownCustom"
                         >
@@ -3812,11 +3902,28 @@
                     <label for="sdElectronicSign_alignment">Alignment: </label>
                     <select id="sdElectronicSign_alignment"></select>
                   </div>
+
+                  <div data-property="sdGroup" class="hidden">
+                    <button id="sdGroup_editGroup">Edit Block Elements</button>
+                    <label for="sdGroup_direction">Direction:</label>
+                    <select id="sdGroup_direction"></select>
+                    <label for="sdGroup_width" data-tooltip="Set to 0 for auto"
+                      >Width (rem):</label
+                    >
+                    <input
+                      type="number"
+                      id="sdGroup_width"
+                      placeholder="0"
+                      min="0"
+                      step=".01"
+                      value="0"
+                    />
+                  </div>
                 </div>
                 <fieldset id="smSPBlockProperties">
                   <legend>Block Properties</legend>
                   <div>
-                    <label for="sdBlock_topPadding" class="noLabelAlignment"
+                    <label for="sdBlock_topMargin" class="noLabelAlignment"
                       >Top Margin (rem):
                     </label>
                     <div>
@@ -3826,19 +3933,24 @@
                         max="3"
                         value="0"
                         step=".01"
-                        id="sdBlock_topPadding"
+                        id="sdBlock_topMargin"
+                        onchange="formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_topPaddingVal"
+                        id="sdBlock_topMarginVal"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
+                        oninput="
+                          document.querySelector('#sdBlock_topMargin').value =
+                            this.value
+                        "
                       />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_bottomPadding" class="noLabelAlignment"
+                    <label for="sdBlock_bottomMargin" class="noLabelAlignment"
                       >Bottom Margin (rem):
                     </label>
                     <div>
@@ -3848,7 +3960,64 @@
                         max="3"
                         value="0"
                         step=".01"
+                        id="sdBlock_bottomMargin"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_bottomMarginVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector(
+                            '#sdBlock_bottomMargin',
+                          ).value = this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <br />
+                  <div>
+                    <label for="sdBlock_topPadding" class="noLabelAlignment"
+                      >Top Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
+                        id="sdBlock_topPadding"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_topPaddingVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector('#sdBlock_topPadding').value =
+                            this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="sdBlock_bottomPadding" class="noLabelAlignment"
+                      >Bottom Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
                         id="sdBlock_bottomPadding"
+                        onchange="formHandler.readForm()"
                       />
                       <input
                         id="sdBlock_bottomPaddingVal"
@@ -3856,16 +4025,84 @@
                         type="number"
                         value="0"
                         step=".01"
+                        oninput="
+                          document.querySelector(
+                            '#sdBlock_bottomPadding',
+                          ).value = this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <br />
+                  <div>
+                    <label for="sdBlock_leftPadding" class="noLabelAlignment"
+                      >Left Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
+                        id="sdBlock_leftPadding"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_leftPaddingVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector('#sdBlock_leftPadding').value =
+                            this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="sdBlock_rightPadding" class="noLabelAlignment"
+                      >Right Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
+                        id="sdBlock_rightPadding"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_rightPaddingVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector(
+                            '#sdBlock_rightPadding',
+                          ).value = this.value
+                        "
                       />
                     </div>
                   </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
-                  <select id="sdBlock_backgroundColor"></select>
+                  <select
+                    id="sdBlock_backgroundColor"
+                    onchange="formHandler.readForm()"
+                  ></select>
                   <label for="sdBlock_backgroundFullWidth"
                     >BG Full Width:</label
                   >
-                  <input type="checkbox" id="sdBlock_backgroundFullWidth" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_backgroundFullWidth"
+                    onchange="formHandler.readForm()"
+                  />
                   <br />
                   <label
                     for="sdBlock_width"
@@ -3881,6 +4118,7 @@
                     min="0"
                     step=".05"
                     value="0"
+                    onchange="formHandler.readForm()"
                   />
                   <br />
                   <label
@@ -3888,15 +4126,27 @@
                     data-toolTip="Allow the alignment to take up the remaining space."
                     >Stretch:</label
                   >
-                  <input type="checkbox" id="sdBlock_stretchLeft" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_stretchLeft"
+                    onchange="formHandler.readForm()"
+                  />
                   <label for="sdBlock_stretchLeft" class="noLabelAlignment"
                     >Left
                   </label>
-                  <input type="checkbox" id="sdBlock_stretchCenter" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_stretchCenter"
+                    onchange="formHandler.readForm()"
+                  />
                   <label for="sdBlock_stretchCenter" class="noLabelAlignment"
                     >Center
                   </label>
-                  <input type="checkbox" id="sdBlock_stretchRight" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_stretchRight"
+                    onchange="formHandler.readForm()"
+                  />
                   <label for="sdBlock_stretchRight" class="noLabelAlignment"
                     >Right</label
                   >
@@ -3965,21 +4215,21 @@
           <div class="sMModalContent">
             <div id="sMArrowType">
               <div class="sMA_typeSelect">
-                <button id="sMA_typeStandard" class="selected">
+                <button type="button" id="sMA_typeStandard" class="selected">
                   <img
                     class="sMA_typeVisual"
                     src="./assets/form/arrowVariants/StandardArrows.png"
                   />
                   <span class="sMA_typeLabel">Standard Arrows</span>
                 </button>
-                <button id="sMA_typeAPL">
+                <button type="button" id="sMA_typeAPL">
                   <img
                     class="sMA_typeVisual"
                     src="./assets/form/arrowVariants/ArrowPerLane.png"
                   />
                   <span class="sMA_typeLabel">Arrow Per Lane</span>
                 </button>
-                <button id="sMA_typeDiagrammic">
+                <button type="button" id="sMA_typeDiagrammic">
                   <img
                     class="sMA_typeVisual"
                     src="./assets/form/arrowVariants/Diagrammic.png"
@@ -4327,7 +4577,7 @@
                     id="exitOnlyText"
                     name="exitOnlyText"
                     placeholder="EXIT ONLY"
-                    onchange="formHandler.readForm()"
+                    oninput="formHandler.readForm()"
                   />
                   <label
                     for="exitOnlyTextPosition"
@@ -4444,13 +4694,30 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
-                <label for="exitOnlyGap">Exit Only Gap (rem):</label>
+                <label for="exitOnlyGap">Arrow Gap (rem):</label>
                 <input
                   type="number"
                   id="exitOnlyGap"
                   value="0.5"
                   min="0"
                   step=".05"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="exitOnlyTextGap">Text-Arrow Gap (rem):</label>
+                <input
+                  type="number"
+                  id="exitOnlyTextGap"
+                  value="0.5"
+                  min="0"
+                  step=".05"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="exitOnlyDisplayOutsideArrow">Outer Arrow:</label>
+                <input
+                  type="checkbox"
+                  id="exitOnlyDisplayOutsideArrow"
+                  checked
                   onchange="formHandler.readForm()"
                 />
                 <label for="exitOnlyOutsideGap">Outside Arrow Gap (rem):</label>
@@ -4463,11 +4730,15 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
-                <label for="exitOnlyDisplayOutsideArrow">Outer Arrow:</label>
+                <label for="exitOnlyBGColor">Container BG Color:</label>
+                <select
+                  id="exitOnlyBGColor"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <label for="exitOnlyRoundCorners">Round All Corners:</label>
                 <input
                   type="checkbox"
-                  id="exitOnlyDisplayOutsideArrow"
-                  checked
+                  id="exitOnlyRoundCorners"
                   onchange="formHandler.readForm()"
                 />
                 <!--
@@ -4527,10 +4798,10 @@
             </div>
             <div id="sMDiagrammic" class="tabHidden">
               <div>
-                <button id="sMDiagrammicOpenEditor">
+                <button type="button" id="sMDiagrammicOpenEditor">
                   Open Diagrammic Drawing Editor
                 </button>
-                <button id="sMDiagrammicOpenEditorPresets">
+                <button type="button" id="sMDiagrammicOpenEditorPresets">
                   Edit Existing Presets
                 </button>
               </div>
@@ -4560,6 +4831,7 @@
       </div>
       <nav id="sMConfigBar" data-current-menu="">
         <button
+          type="button"
           id="postConfig"
           class="sMConfigOption"
           data-toolTip="Post Settings"
@@ -4573,9 +4845,13 @@
           <div id="panelSelect" class="panelSelector">
             <span class="panelPopoverHint">(Drag to reorder)</span>
             <div class="panelActions">
-              <button class="new" onclick="App.newPanel()">Add Panel</button>
-              <!--<button id="duplicatePanel" class="dup">Duplicate</button>-->
-              <button class="del" onclick="App.deletePanel()">Remove</button>
+              <button type="button" class="new" onclick="App.newPanel()">
+                Add Panel
+              </button>
+              <!--<button type="button" id="duplicatePanel" class="dup">Duplicate</button>-->
+              <button type="button" class="del" onclick="App.deletePanel()">
+                Remove
+              </button>
             </div>
             <div id="panelList" class="panelList"></div>
             <div class="panelSpacingControl">
@@ -4604,29 +4880,44 @@
             </div>
           </div>
         </div>
-        <button id="panelStyleConfig" class="sMConfigOption">
+        <button type="button" id="panelStyleConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> tune </span>
           <span>Panel Style</span>
         </button>
-        <button id="exitTabConfig" class="sMConfigOption">
+        <button type="button" id="exitTabConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> folder </span>
           <span>Exit Tabs</span>
         </button>
-        <button id="subPanelConfig" class="sMConfigOption">
+        <button type="button" id="subPanelConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> description </span>
           <span>Subpanels</span>
         </button>
-        <button id="guideArrowConfig" class="sMConfigOption">
+        <button type="button" id="guideArrowConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> explore </span>
           <span>Guide Arrows</span>
         </button>
-        <button id="export" class="sMConfigOption" data-toolTip="Export">
+        <button
+          type="button"
+          id="export"
+          class="sMConfigOption"
+          data-toolTip="Export"
+        >
           <span class="material-symbols-outlined"> download </span>
         </button>
-        <button id="nightMode" class="sMConfigOption" data-toolTip="Night Mode">
+        <button
+          type="button"
+          id="nightMode"
+          class="sMConfigOption"
+          data-toolTip="Night Mode"
+        >
           <span class="material-symbols-outlined"> dark_mode </span>
         </button>
-        <button id="hideConfig" class="sMConfigOption" data-toolTip="Hide">
+        <button
+          type="button"
+          id="hideConfig"
+          class="sMConfigOption"
+          data-toolTip="Hide"
+        >
           <span class="material-symbols-outlined"> hide </span>
         </button>
       </nav>
@@ -4669,7 +4960,7 @@
     <template id="sMAPL_templateAPLItem">
       <div class="smAPLCat_apl">
         <div class="smAPLCat_aplRow1">
-          <button class="smAPLCat_aplDragger">::</button>
+          <button type="button" class="smAPLCat_aplDragger">::</button>
           <div class="smAPLCat_aplSelectHolder smDropdownInputElement">
             <button
               type="button"
@@ -4691,7 +4982,7 @@
               <div class="smDropdownList"></div>
             </div>
           </div>
-          <button class="smAPL_Delete redButton">Delete</button>
+          <button type="button" class="smAPL_Delete redButton">Delete</button>
         </div>
         <div class="smAPLCat_aplRow2">
           <span>Size (rem):</span>
@@ -4803,7 +5094,7 @@
       <div class="smAPLCat_container">
         <span class="smAPLCat_title">Subpanel 1</span>
         <div class="smAPLCat_options">
-          <button class="smAPLCat_addArrow">Add Arrow</button>
+          <button type="button" class="smAPLCat_addArrow">Add Arrow</button>
           <span class="smAPLCat_justifyLabel">Justify:</span>
           <select
             class="smAPLCat_justifyAPLs"
@@ -4816,7 +5107,7 @@
 
     <template id="smSP_templateBannerElement">
       <div class="smSP_bannerElement">
-        <button class="smSP_deleteBanner">X</button>
+        <button type="button" class="smSP_deleteBanner">X</button>
         <div class="smSP_bannerEditor">
           <div>
             <input

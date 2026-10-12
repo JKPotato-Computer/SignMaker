@@ -9,6 +9,7 @@ const App = (() => {
 
   let currentlySelectedRowIndex = 0,
     currentlySelectedBlockIndex = 0;
+  let currentlySelectedGroupIndex = -1;
 
   let currentlySelectedShieldGroupId = -1;
   let currentlySelectedShieldIndex = -1;
@@ -23,12 +24,19 @@ const App = (() => {
     return getCurrentPanel().sign.subPanels[currentlySelectedSubPanelIndex];
   };
 
-  const getCurrentBlockRows = () => {
-    return getCurrentSubPanel().blockElements.rows[currentlySelectedRowIndex];
+  const getCurrentBlockElements = () => {
+    if (currentlySelectedGroupIndex >= 0) {
+      return getSelectedBlockGroup().blockElements;
+    }
+    return getCurrentSubPanel().blockElements;
+  };
+
+  const getCurrentBlockRow = () => {
+    return getCurrentBlockElements().rows[currentlySelectedRowIndex];
   };
 
   const getCurrentBlockElem = () => {
-    return getCurrentBlockRows()[currentlySelectedBlockIndex];
+    return getCurrentBlockRow()[currentlySelectedBlockIndex];
   };
 
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
@@ -56,7 +64,7 @@ const App = (() => {
       "vertical",
       (oldRowIndex, newRowIndex, oldBlockIndex, newBlockIndex) => {
         if (oldBlockIndex == null) {
-          let currentBlockRows = getCurrentSubPanel().blockElements.rows;
+          let currentBlockRows = getCurrentBlockElements().rows;
           currentBlockRows.splice(
             newRowIndex,
             0,
@@ -65,7 +73,7 @@ const App = (() => {
 
           currentlySelectedRowIndex = Math.max(newRowIndex, 0);
         } else {
-          let currentBlockRows = getCurrentSubPanel().blockElements.rows;
+          let currentBlockRows = getCurrentBlockElements().rows;
           let block = currentBlockRows[oldRowIndex].splice(oldBlockIndex, 1)[0];
 
           currentBlockRows[newRowIndex].splice(newBlockIndex, 0, block);
@@ -338,6 +346,7 @@ const App = (() => {
     const sign = getCurrentPanel().sign;
     sign.newSubPanel();
     currentlySelectedSubPanelIndex++;
+    currentlySelectedGroupIndex = -1;
 
     currentlySelectedRowIndex = clamp(
       currentlySelectedRowIndex,
@@ -347,7 +356,7 @@ const App = (() => {
     currentlySelectedBlockIndex = clamp(
       currentlySelectedBlockIndex,
       0,
-      getCurrentBlockRows().length - 1,
+      getCurrentBlockRow().length - 1,
     );
     currentlySelectedShieldIndex = -1;
     currentlySelectedShieldGroupId = -1;
@@ -373,10 +382,11 @@ const App = (() => {
       currentlySelectedBlockIndex = clamp(
         currentlySelectedBlockIndex,
         0,
-        getCurrentBlockRows().length - 1,
+        getCurrentBlockRow().length - 1,
       );
       currentlySelectedShieldIndex = -1;
       currentlySelectedShieldGroupId = -1;
+      currentlySelectedGroupIndex = -1;
 
       formHandler.updateForm();
       redraw();
@@ -405,10 +415,11 @@ const App = (() => {
     currentlySelectedBlockIndex = clamp(
       currentlySelectedBlockIndex,
       0,
-      getCurrentBlockRows().length - 1,
+      getCurrentBlockRow().length - 1,
     );
     currentlySelectedShieldIndex = -1;
     currentlySelectedShieldGroupId = -1;
+    currentlySelectedGroupIndex = -1;
 
     formHandler.updateForm();
   };
@@ -505,7 +516,8 @@ const App = (() => {
 
   // Rows
   const newRow = (selectedBlock) => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    let blockElems = getCurrentBlockElements();
+
     currentlySelectedBlockIndex = 0;
     blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
 
@@ -514,7 +526,8 @@ const App = (() => {
   };
 
   const dupRow = () => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    let blockElems = getCurrentBlockElements();
+
     blockElems.duplicateRow(currentlySelectedRowIndex++);
 
     formHandler.updateForm();
@@ -522,7 +535,8 @@ const App = (() => {
   };
 
   const delRow = () => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    let blockElems = getCurrentBlockElements();
+
     if (blockElems.rows.length == 1) {
       return;
     }
@@ -538,14 +552,19 @@ const App = (() => {
     currentlySelectedRowIndex = clamp(
       row,
       0,
-      getCurrentSubPanel().blockElements.rows.length - 1,
+      getCurrentBlockElements().rows.length - 1,
+    );
+    currentlySelectedBlockIndex = clamp(
+      currentlySelectedBlockIndex,
+      0,
+      getCurrentBlockRow().length - 1,
     );
 
     formHandler.updateForm();
   };
 
   const newControlElem = (selectedElem) => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     blockElems.addElement(
       Control.prototype.blockToClassElems[selectedElem],
       {},
@@ -558,7 +577,7 @@ const App = (() => {
   };
 
   const replaceControlElem = (selectedElem) => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     blockElems.replaceElement(
       Control.prototype.blockToClassElems[selectedElem],
       currentlySelectedRowIndex,
@@ -570,7 +589,7 @@ const App = (() => {
   };
 
   const delControlElem = () => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     if (
       blockElems.removeElement(
         currentlySelectedRowIndex,
@@ -580,7 +599,7 @@ const App = (() => {
       currentlySelectedRowIndex = Math.max(0, currentlySelectedRowIndex - 1);
       currentlySelectedBlockIndex = Math.max(
         0,
-        getCurrentBlockRows().length - 1,
+        getCurrentBlockElements().rows.length - 1,
       );
     } else {
       currentlySelectedBlockIndex = Math.max(
@@ -597,18 +616,104 @@ const App = (() => {
     currentlySelectedBlockIndex = clamp(
       block,
       0,
-      getCurrentBlockRows().length - 1,
+      getCurrentBlockRow().length - 1,
     );
 
     formHandler.updateForm();
   };
 
+  const getSelectedBlockGroup = () => {
+    let groupIndex = -1;
+    const rec = (blockElements) => {
+      for (let pRowInd = 0; pRowInd < blockElements.rows.length; pRowInd++) {
+        const row = blockElements.rows[pRowInd];
+        for (let pBlockInd = 0; pBlockInd < row.length; pBlockInd++) {
+          const block = row[pBlockInd];
+          if (block.constructor.name === "GroupElement") {
+            if (groupIndex + 1 === currentlySelectedGroupIndex) {
+              return block;
+            } else {
+              groupIndex++;
+              let hasReturnValue = rec(block.blockElements);
+
+              if (hasReturnValue) {
+                return hasReturnValue;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    let retVal =
+      rec(getCurrentSubPanel().blockElements) || getCurrentSubPanel();
+    return retVal;
+  };
+
+  const getParentOfSelectedBlockGroup = () => {
+    let groupIndex = -1;
+    const rec = (blockElements, parent = null) => {
+      for (let pRowInd = 0; pRowInd < blockElements.rows.length; pRowInd++) {
+        const row = blockElements.rows[pRowInd];
+        for (let pBlockInd = 0; pBlockInd < row.length; pBlockInd++) {
+          const block = row[pBlockInd];
+          if (block.constructor.name === "GroupElement") {
+            if (groupIndex + 1 === currentlySelectedGroupIndex) {
+              return parent;
+            } else {
+              groupIndex++;
+              let hasReturnValue = rec(block.blockElements, block);
+              if (hasReturnValue) {
+                return hasReturnValue;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    return rec(getCurrentSubPanel().blockElements, null);
+  };
+
+  const setSelectedBlockGroup = (group) => {
+    currentlySelectedGroupIndex = Math.max(group, -1);
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+
+    formHandler.updateForm();
+  };
+
+  const getGroupNumFromElem = (element) => {
+    let groupIndex = -1;
+    const rec = (blockElements) => {
+      for (let pRowInd = 0; pRowInd < blockElements.rows.length; pRowInd++) {
+        const rowElems = blockElements.rows[pRowInd];
+        for (let pBlockInd = 0; pBlockInd < rowElems.length; pBlockInd++) {
+          const block = rowElems[pBlockInd];
+          if (block.constructor.name === "GroupElement") {
+            if (block === element) {
+              return groupIndex + 1;
+            } else {
+              groupIndex++;
+              const nestedResult = rec(block.blockElements);
+              if (nestedResult !== null) {
+                return nestedResult;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    return rec(getCurrentSubPanel().blockElements);
+  };
+
   // Shield Groups
   const newShieldGroup = () => {
-    const panel = getCurrentPanel();
-    const sign = panel.sign.subPanels[currentlySelectedSubPanelIndex];
-
-    const firstRow = sign.blockElements.rows[0];
+    const firstRow = getCurrentBlockElements().rows[0];
     const hasOnlyShieldGroups =
       firstRow &&
       firstRow.every(
@@ -616,12 +721,12 @@ const App = (() => {
       );
 
     if (!firstRow || !hasOnlyShieldGroups) {
-      const blockElems = getCurrentSubPanel().blockElements;
+      const blockElems = getCurrentBlockElements();
       currentlySelectedBlockIndex = 0;
       currentlySelectedRowIndex = 0;
       blockElems.addRow(0, "ShieldGroupElement");
     } else if (firstRow && hasOnlyShieldGroups) {
-      getCurrentSubPanel().blockElements.addElement(
+      getCurrentBlockElements().addElement(
         Control.prototype.blockToClassElems["ShieldGroupElement"],
         {},
         0,
@@ -655,7 +760,7 @@ const App = (() => {
     currentlySelectedShieldIndex = -1;
 
     let id = 0;
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     for (let i = 0; i < blockElems.rows.length; i++) {
       for (let j = 0; j < blockElems.rows[i].length; j++) {
         const block = blockElems.rows[i][j];
@@ -892,18 +997,6 @@ const App = (() => {
     redraw();
   };
 
-  const resetPadding = () => {
-    getCurrentPanel().sign.padding = "0.3rem 0.75rem 0.3rem 0.75rem";
-
-    document.getElementById("paddingTop").value = 0.3;
-    document.getElementById("paddingRight").value = 0.75;
-    document.getElementById("paddingBottom").value = 0.3;
-    document.getElementById("paddingLeft").value = 0.75;
-
-    formHandler.updateForm();
-    redraw();
-  };
-
   // Redraw Methods
   const redrawExitTabs = (
     panel,
@@ -1015,6 +1108,252 @@ const App = (() => {
     return [subpanelList, dividerList];
   };
 
+  const setSubDividerSegments = (
+    divider,
+    leftSubpanel,
+    rightSubpanel,
+    panel,
+  ) => {
+    const rows = [
+      ...leftSubpanel.querySelectorAll(".blockElementRow.fullBleed"),
+    ];
+    const dividerRect = divider.getBoundingClientRect();
+    const boundaries = new Set([0, dividerRect.height]);
+
+    for (const row of rows) {
+      const rowRect = row.getBoundingClientRect();
+      const top = Math.max(
+        0,
+        Math.min(dividerRect.height, rowRect.top - dividerRect.top),
+      );
+      const bottom = Math.max(
+        0,
+        Math.min(dividerRect.height, rowRect.bottom - dividerRect.top),
+      );
+      boundaries.add(top);
+      boundaries.add(bottom);
+    }
+
+    const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+    divider.innerHTML = "";
+
+    for (let i = 0; i < sortedBoundaries.length - 1; i++) {
+      const top = sortedBoundaries[i];
+      const bottom = sortedBoundaries[i + 1];
+
+      if (bottom <= top) {
+        continue;
+      }
+
+      const midpoint = dividerRect.top + (top + bottom) / 2;
+      const adjacentRows = rows.filter((row) => {
+        const rowRect = row.getBoundingClientRect();
+        return rowRect.top <= midpoint && rowRect.bottom >= midpoint;
+      });
+
+      const adjacentRow = adjacentRows[adjacentRows.length - 1] || null;
+      const segment = document.createElement("div");
+      segment.className = "subDividerSegment";
+      segment.style.height = `${bottom - top}px`;
+
+      const targetColor = adjacentRow
+        ? adjacentRow.dataset.blockBorderColor ||
+          adjacentRow.dataset.blockBackgroundColor
+        : panel.color.toLowerCase();
+
+      if (targetColor == panel.color.toLowerCase()) {
+        segment.style.backgroundColor = lib.checkForContrast(targetColor)
+          ? "black"
+          : "white";
+      } else {
+        segment.style.backgroundColor = lib.checkForContrast(targetColor)
+          ? "white"
+          : "black";
+      }
+
+      divider.appendChild(segment);
+    }
+
+    // First segment: based on the very first row
+    if (rows.length > 0) {
+      const firstRow = rows[0];
+      const firstColor =
+        firstRow?.dataset.blockBorderColor ||
+        firstRow?.dataset.blockBackgroundColor ||
+        (lib.colors[panel.color] || panel.color).toLowerCase();
+
+      const firstSegment = document.createElement("div");
+      firstSegment.className = "subDividerSegment";
+      firstSegment.style.height = ".2rem";
+      firstSegment.style.width = ".2rem";
+      firstSegment.style.position = "absolute";
+      firstSegment.style.top = "-.2rem";
+      firstSegment.style.backgroundColor = lib.checkForContrast(firstColor)
+        ? "white"
+        : "black";
+      divider.appendChild(firstSegment);
+    }
+
+    // Final segment: based on the very last row
+    if (rows.length > 0) {
+      const lastRow = rows[rows.length - 1];
+      const lastColor =
+        lastRow?.dataset.blockBorderColor ||
+        lastRow?.dataset.blockBackgroundColor ||
+        (lib.colors[panel.color] || panel.color).toLowerCase();
+
+      const finalSegment = document.createElement("div");
+      finalSegment.className = "subDividerSegment";
+      finalSegment.style.height = ".2rem";
+      finalSegment.style.width = ".2rem";
+      finalSegment.style.position = "absolute";
+      finalSegment.style.bottom = "-.2rem";
+      finalSegment.style.backgroundColor = lib.checkForContrast(lastColor)
+        ? "white"
+        : "black";
+      divider.appendChild(finalSegment);
+    }
+  };
+
+  const updateSubpanelEdges = (
+    panel,
+    subpanelList,
+    dividerList,
+    signCorners,
+  ) => {
+    const blockMasters = subpanelList.map((subpanel) =>
+      subpanel.querySelector(".blockElementMaster"),
+    );
+    const masterRects = blockMasters.map((master) =>
+      master.getBoundingClientRect(),
+    );
+    const minLeft = Math.min(...masterRects.map((rect) => rect.left));
+    const maxRight = Math.max(...masterRects.map((rect) => rect.right));
+    const maxBottom = Math.max(...masterRects.map((rect) => rect.bottom));
+    const minTop = Math.min(...masterRects.map((rect) => rect.top));
+    const edgeTolerance = 1;
+
+    for (let i = 0; i < blockMasters.length; i++) {
+      const rows = Array.from(
+        subpanelList[i].querySelectorAll(".blockElementRow.fullBleed"),
+      );
+      const lastRow = rows[rows.length - 1];
+      const firstRow = rows[0];
+      const masterRect = masterRects[i];
+
+      for (const row of rows) {
+        const rowRect = row.getBoundingClientRect();
+        const leftBoundary =
+          i == 0 ? minLeft : dividerList[i - 1].getBoundingClientRect().right;
+        const rightBoundary =
+          i == blockMasters.length - 1
+            ? maxRight
+            : dividerList[i].getBoundingClientRect().left;
+        const touchesLeft = rowRect.left <= leftBoundary + edgeTolerance;
+        const touchesRight = rowRect.right >= rightBoundary - edgeTolerance;
+        const touchesTop =
+          row === firstRow && rowRect.top <= minTop + edgeTolerance;
+        const touchesBottom =
+          row === lastRow && rowRect.bottom >= maxBottom - edgeTolerance;
+
+        if (!touchesLeft) {
+          row.style.setProperty("--blockBleedLeft", "0rem");
+          row.style.setProperty("--blockBorderRadiusTopLeft", "0");
+          row.style.setProperty("--blockBorderRadiusBottomLeft", "0");
+          row.style.borderLeft = "none";
+        }
+
+        if (!touchesRight) {
+          row.style.setProperty("--blockBleedRight", "0rem");
+          row.style.setProperty("--blockBorderRadiusTopRight", "0");
+          row.style.setProperty("--blockBorderRadiusBottomRight", "0");
+          row.style.borderRight = "none";
+        }
+
+        if (!touchesTop) {
+          row.style.setProperty("--blockBleedTop", "0rem");
+          row.style.setProperty("--blockBorderRadiusTopLeft", "0");
+          row.style.setProperty("--blockBorderRadiusTopRight", "0");
+        }
+
+        if (!touchesBottom) {
+          row.style.setProperty("--blockBleedBottom", "0rem");
+          row.style.setProperty("--blockBorderRadiusBottomLeft", "0");
+          row.style.setProperty("--blockBorderRadiusBottomRight", "0");
+        }
+      }
+
+      if (
+        lastRow &&
+        (masterRect.bottom < maxBottom ||
+          lastRow.getBoundingClientRect().bottom < maxBottom)
+      ) {
+        lastRow.style.borderBottom = "none";
+        lastRow.style.setProperty("--blockBorderRadiusBottomLeft", "0");
+        lastRow.style.setProperty("--blockBorderRadiusBottomRight", "0");
+      }
+
+      if (
+        firstRow &&
+        (masterRect.top > minTop ||
+          firstRow.getBoundingClientRect().top > minTop)
+      ) {
+        firstRow.style.borderTop = "none";
+        firstRow.style.setProperty("--blockBorderRadiusTopLeft", "0");
+        firstRow.style.setProperty("--blockBorderRadiusTopRight", "0");
+      }
+    }
+
+    for (let i = 0; i < dividerList.length; i++) {
+      setSubDividerSegments(
+        dividerList[i],
+        subpanelList[i],
+        subpanelList[i + 1],
+        panel,
+      );
+    }
+
+    const parentColor = (lib.colors[panel.color] || panel.color).toLowerCase();
+    const cornerRows = [
+      Array.from(
+        subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
+      )[0],
+      Array.from(
+        subpanelList[subpanelList.length - 1].querySelectorAll(
+          ".blockElementRow.fullBleed",
+        ),
+      )[0],
+      Array.from(
+        subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
+      ).slice(-1)[0],
+      Array.from(
+        subpanelList[subpanelList.length - 1].querySelectorAll(
+          ".blockElementRow.fullBleed",
+        ),
+      ).slice(-1)[0],
+    ];
+    const cornerTouchesPanel = [
+      cornerRows[0] &&
+        masterRects[0].top <= minTop &&
+        cornerRows[0].getBoundingClientRect().top <= minTop,
+      cornerRows[1] &&
+        masterRects[masterRects.length - 1].top <= minTop &&
+        cornerRows[1].getBoundingClientRect().top <= minTop,
+      cornerRows[2] &&
+        masterRects[0].bottom >= maxBottom &&
+        cornerRows[2].getBoundingClientRect().bottom >= maxBottom,
+      cornerRows[3] &&
+        masterRects[masterRects.length - 1].bottom >= maxBottom &&
+        cornerRows[3].getBoundingClientRect().bottom >= maxBottom,
+    ];
+
+    for (let i = 0; i < signCorners.length; i++) {
+      signCorners[i].style.backgroundColor = cornerTouchesPanel[i]
+        ? cornerRows[i].dataset.blockBackgroundColor
+        : parentColor;
+    }
+  };
+
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
     panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
@@ -1101,7 +1440,7 @@ const App = (() => {
 
     const guideArrowsElmt = document.createElement("div");
 
-    guideArrowsElmt.className = `guideArrows ${panel.sign.arrows.arrowMode.toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()} ${
+    guideArrowsElmt.className = `guideArrows ${panel.sign.arrows.arrowMode.toLowerCase()} ${
       panel.sign.arrows.arrowMode.toLowerCase() == "standard"
         ? panel.sign.arrows.standard.variant
             .toLowerCase()
@@ -1135,6 +1474,12 @@ const App = (() => {
     }
 
     const [subpanelList, dividerList] = redrawSubPanels(panel, signHolderElmt);
+    updateSubpanelEdges(panel, subpanelList, dividerList, [
+      topLeftSignCorner,
+      topRightSignCorner,
+      bottomLeftSignCorner,
+      bottomRightSignCorner,
+    ]);
 
     signHolderElmt.appendChild(sideRightArrowElmt);
 
@@ -1395,11 +1740,6 @@ const App = (() => {
           exitOnlyConfigs.letterSpacing + "rem",
         );
         guideArrowsElmt.style.setProperty(
-          "--exitOnlyLineHeight",
-          exitOnlyConfigs.lineHeight + "%",
-        );
-
-        guideArrowsElmt.style.setProperty(
           "--verticalPadding",
           `${exitOnlyConfigs.verticalPadding}rem`,
         );
@@ -1461,14 +1801,43 @@ const App = (() => {
         case "Exit Only": {
           const exitOnlyConfig = standardArrowConfig.exitOnlyConfigs;
           const arrowElement = exitOnlyConfig.arrow.createElement();
-          arrowElement.style.filter =
-            standardVariant == "Split Exit Only" ? "" : "invert(1)";
 
           exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
           exitOnlyContainer.style.setProperty(
             "--arrowGap",
             exitOnlyConfig.gap + "rem",
           );
+          guideArrowsHolderElmt.style.setProperty(
+            "--bgColor",
+            "var(--" +
+              exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-") +
+              ")",
+          );
+          if (
+            !lib.checkForContrast(exitOnlyConfig.backgroundColor.toLowerCase())
+          ) {
+            guideArrowsHolderElmt.style.color = "white";
+            guideArrowsHolderElmt.style.borderColor = "white";
+            exitOnlyContainer.style.color = "white";
+          } else {
+            guideArrowsHolderElmt.style.color = "black";
+            guideArrowsHolderElmt.style.borderColor = "black";
+            exitOnlyContainer.style.color = "black";
+          }
+
+          if (standardVariant != "Split Exit Only") {
+            arrowElement.style.filter = lib.checkForContrast(
+              exitOnlyConfig.backgroundColor.toLowerCase(),
+            )
+              ? "invert(1)"
+              : "";
+          } else {
+            arrowElement.style.filter = lib.checkForContrast(
+              panel.color.toLowerCase(),
+            )
+              ? "invert(1)"
+              : "";
+          }
 
           let numArrows = exitOnlyConfig.numArrows;
 
@@ -1477,9 +1846,8 @@ const App = (() => {
             fontFamily: exitOnlyConfig.fontFamily,
             wordSpacing: exitOnlyConfig.wordSpacing,
             letterSpacing: exitOnlyConfig.letterSpacing,
-            lineHeight: exitOnlyConfig.lineHeight,
             useNumeralFormatting: true,
-            numeralFormattingSize: 150,
+            numeralFormattingSize: 140,
           });
 
           if (numArrows === 0) {
@@ -1544,11 +1912,30 @@ const App = (() => {
               exitOnlyContainer.appendChild(textElement2);
             }
           } else {
+            if (
+              standardVariant == "Split Exit Only" &&
+              exitOnlyConfig.exitOnlyTextPosition == "Left"
+            ) {
+              textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
+
+              const textElement = textElementBuilder.createElement();
+              textElement.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement.style.marginRight = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+              textElement.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement);
+            }
+
             if (numArrows % 2 == 0) {
               for (let i = 0; i < numArrows; i++) {
                 if (
                   i === Math.floor(numArrows / 2) &&
-                  exitOnlyConfig.exitOnlyText != ""
+                  exitOnlyConfig.exitOnlyText != "" &&
+                  (standardVariant == "Split Exit Only"
+                    ? exitOnlyConfig.exitOnlyTextPosition == "Center"
+                    : true)
                 ) {
                   textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
 
@@ -1557,6 +1944,10 @@ const App = (() => {
                     "--fontSize",
                     exitOnlyConfig.fontSize + "px",
                   );
+
+                  textElement.style.marginRight = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+                  textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+
                   textElement.className = "SM-ExitOnlyTextElement";
                   exitOnlyContainer.appendChild(textElement);
                 }
@@ -1565,14 +1956,17 @@ const App = (() => {
             } else {
               for (let i = 0; i < numArrows; i++) {
                 if (
-                  (i === Math.floor(numArrows / 3) ||
-                    i === Math.floor((numArrows / 3) * 2)) &&
-                  exitOnlyConfig.exitOnlyText != ""
+                  (i === Math.floor(numArrows / 2) ||
+                    i === Math.floor(numArrows / 2) + 1) &&
+                  exitOnlyConfig.exitOnlyText != "" &&
+                  (standardVariant == "Split Exit Only"
+                    ? exitOnlyConfig.exitOnlyTextPosition == "Center"
+                    : true)
                 ) {
                   const spaceIndex = exitOnlyConfig.exitOnlyText.indexOf(" ");
 
                   textElementBuilder.textContent =
-                    i === Math.floor(numArrows / 3)
+                    i === Math.floor(numArrows / 2)
                       ? exitOnlyConfig.exitOnlyText.substring(0, spaceIndex)
                       : exitOnlyConfig.exitOnlyText.substring(spaceIndex + 1);
 
@@ -1582,11 +1976,33 @@ const App = (() => {
                     exitOnlyConfig.fontSize + "px",
                   );
 
+                  if (i == Math.floor(numArrows / 2)) {
+                    textElement.style.marginRight = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+                  } else {
+                    textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+                  }
+
                   textElement.className = "SM-ExitOnlyTextElement";
                   exitOnlyContainer.appendChild(textElement);
                 }
                 exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
               }
+            }
+
+            if (
+              standardVariant == "Split Exit Only" &&
+              exitOnlyConfig.exitOnlyTextPosition == "Right"
+            ) {
+              textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
+
+              const textElement = textElementBuilder.createElement();
+              textElement.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+              textElement.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement);
             }
           }
 
@@ -1621,7 +2037,7 @@ const App = (() => {
             exitOnlyContainer.style.borderBottomLeftRadius =
               exitOnlyConfig.arrowLocation == "Left"
                 ? "calc(var(--signBorderRadius)" +
-                  (exitOnlyConfig.borderMode == "white_border" ? " / 2)" : ")")
+                  (exitOnlyConfig.borderMode == "White Border" ? " / 2)" : ")")
                 : 0;
             exitOnlyContainer.style.borderBottomRightRadius =
               exitOnlyConfig.arrowLocation == "Left"
@@ -1641,7 +2057,7 @@ const App = (() => {
                 panel.corner == "Sharp" &&
                 exitOnlyConfig.borderMode != "White Border"
               ) {
-                guideArrowsHolderElmt.style.background = `linear-gradient(270deg, var(--${panel.color}) 0%, var(--${panel.color}) 49%, var(--yellow) 50%, var(--yellow) 100%)`;
+                guideArrowsHolderElmt.style.background = `linear-gradient(270deg, var(--${panel.color}) 0%, var(--${panel.color}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 100%)`;
               }
             } else {
               arrowContElmt.style.paddingLeft =
@@ -1655,7 +2071,7 @@ const App = (() => {
                 panel.corner == "Sharp" &&
                 exitOnlyConfig.borderMode != "White Border"
               ) {
-                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--yellow) 50%, var(--yellow) 100%)`;
+                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase()}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase()}) 100%)`;
               }
             }
 
@@ -1685,6 +2101,20 @@ const App = (() => {
                 2
               }px`;
             }
+          }
+
+          if (
+            exitOnlyConfig.roundAllCorners &&
+            exitOnlyConfig.borderMode == "White Border"
+          ) {
+            exitOnlyContainer.style.borderTopLeftRadius =
+              "calc(var(--signBorderRadius) / 2)";
+            exitOnlyContainer.style.borderTopRightRadius =
+              "calc(var(--signBorderRadius) / 2)";
+            exitOnlyContainer.style.borderBottomLeftRadius =
+              "calc(var(--signBorderRadius) / 2)";
+            exitOnlyContainer.style.borderBottomRightRadius =
+              "calc(var(--signBorderRadius) / 2)";
           }
 
           break;
@@ -1825,7 +2255,6 @@ const App = (() => {
     removeSubPanel,
     changeEditingSubPanel,
     duplicateSubPanel,
-    resetPadding,
     newExitTabRow,
     removeExitTabRow,
     duplicateExitTabRow,
@@ -1851,7 +2280,7 @@ const App = (() => {
 
     getCurrentPanel,
     getCurrentSubPanel,
-    getCurrentBlockRows,
+    getCurrentBlockRow,
     getCurrentBlockElem,
     changeCurrentlyEditingShieldGroup,
     setSelectedShieldId,
@@ -1864,6 +2293,12 @@ const App = (() => {
     removeStandardArrow,
     moveStandardArrow,
     duplicateStandardArrow,
+
+    getSelectedBlockGroup,
+    getParentOfSelectedBlockGroup,
+    setSelectedBlockGroup,
+    getCurrentBlockElements,
+    getGroupNumFromElem,
 
     vars: {
       get currentlySelectedPanelIndex() {
@@ -1892,6 +2327,9 @@ const App = (() => {
       },
       get currentlySelectedStandardArrow() {
         return currentlySelectedStandardArrow;
+      },
+      get currentlySelectedGroupIndex() {
+        return currentlySelectedGroupIndex;
       },
     },
   };

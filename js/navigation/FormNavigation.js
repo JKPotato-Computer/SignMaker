@@ -19,6 +19,19 @@ const FormNavigation = (() => {
     setupGuideArrows();
     setupLimonEasterEgg();
     setupDropdownElements();
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        if (event.target.tagName === "TEXTAREA") return;
+        if (event.target.tagName === "BUTTON") return;
+
+        if (event.target.tagName === "INPUT") {
+          formHandler.readForm();
+        }
+
+        event.preventDefault();
+      }
+    });
   };
 
   const setupThemeAndWelcome = () => {
@@ -202,6 +215,14 @@ const FormNavigation = (() => {
           )
           .click();
       };
+
+    document.querySelector("#sdGroup_editGroup").onclick = function () {
+      let groupNum = App.getGroupNumFromElem(App.getCurrentBlockElem());
+      if (groupNum != null) {
+        App.setSelectedBlockGroup(groupNum);
+        formHandler.updateForm();
+      }
+    };
   };
 
   const setupTooltips = () => {
@@ -596,16 +617,27 @@ const FormNavigation = (() => {
         exitTabPresets[currentExitTab.variant] &&
         exitTabPresets[currentExitTab.variant][selectedPreset];
 
-      if (!isInPresetsLibrary && !isInPrebuiltLibrary) {
+      if (
+        !isInPresetsLibrary &&
+        !isInPrebuiltLibrary &&
+        selectedPreset != "None"
+      ) {
         return;
       }
 
-      for (const key in isInPresetsLibrary
-        ? presetsLibrary[currentExitTab.variant][selectedPreset]
-        : exitTabPresets[currentExitTab.variant][selectedPreset]) {
-        currentExitTab[key] = isInPresetsLibrary
-          ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
-          : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+      if (selectedPreset == "None") {
+        console.log("Hi");
+        for (const key in ExitTab.prototype.defaultExitTabConfig) {
+          currentExitTab[key] = ExitTab.prototype.defaultExitTabConfig[key];
+        }
+      } else {
+        for (const key in isInPresetsLibrary
+          ? presetsLibrary[currentExitTab.variant][selectedPreset]
+          : exitTabPresets[currentExitTab.variant][selectedPreset]) {
+          currentExitTab[key] = isInPresetsLibrary
+            ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
+            : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+        }
       }
 
       formHandler.updateExitTabSubform();
@@ -814,6 +846,10 @@ const FormNavigation = (() => {
       };
       valEl.addEventListener("change", onChange);
     });
+
+    for (const direction of GroupElement.prototype.blockDirection) {
+      lib.appendOption(document.querySelector("#sdGroup_direction"), direction);
+    }
   };
 
   const setupGuideArrows = () => {
@@ -890,7 +926,7 @@ const FormNavigation = (() => {
       ".sdExitOnlyGuide_rotationPreset",
     )) {
       element.addEventListener("click", () => {
-        document.querySelector("#exitOnlyArrowRotation").value = parseFloat(
+        document.querySelector("#exitOnlyArrowRotation").value = parseInt(
           element.dataset.degrees,
         );
         formHandler.readForm();
@@ -903,6 +939,12 @@ const FormNavigation = (() => {
         borderMode,
         { selected: borderMode == "Partial Black Border" },
       );
+    }
+
+    for (const bgColor in lib.colors) {
+      lib.appendOption(document.querySelector("#exitOnlyBGColor"), bgColor, {
+        selected: bgColor == "Yellow",
+      });
     }
   };
 

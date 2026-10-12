@@ -239,13 +239,16 @@ const DragSystem = (() => {
           }
 
           if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5) {
+            if (currentlyDragging.tagName === "BUTTON") {
+              currentlyDragging.click();
+            }
+
             currentlyDragging = null;
             return;
           }
 
-          event.preventDefault();
-
           currentlyDragging = null;
+          event.preventDefault();
 
           dragElement.style.position = "";
           dragElement.style.zIndex = "";

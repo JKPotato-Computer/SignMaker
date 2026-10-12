@@ -216,7 +216,7 @@
 
 .panel.round .signCorner,
 .panel.round .guideArrowsHolder {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 .panel:not(.round) .guideArrowsHolder:has(.guideArrows.apl) {
@@ -267,11 +267,9 @@
   display: flex;
   clear: both;
   border-radius: var(--signBorderRadius, 0.75rem);
-  border-style: solid;
-  border-width: 0.2rem;
+  border: .2rem solid;
   clear: both;
   visibility: visible;
-  overflow: hidden;
   z-index: 2;
   position: relative;
 }
@@ -374,7 +372,7 @@
     .guideArrows.exit_only.partial_black_border,
     .guideArrows.exit_only.full_black_border
   ) {
-  background-color: var(--yellow);
+  background-color: var(--bgColor);
 }
 
 .guideArrowsHolder:has(
@@ -387,9 +385,9 @@
 
 .guideArrows.exit_only.partial_black_border,
 .guideArrows.exit_only.full_black_border {
-  border-color: var(--black);
-  color: var(--black);
-  background-color: var(--yellow);
+  border-color: inherit;
+  color: inherit;
+  background-color: var(--bgColor);
 }
 
 .guideArrows.exit_only.full_black_border {
@@ -401,7 +399,7 @@
 }
 
 .guideArrows.exit_only.white_border > .arrowContainer {
-  background-color: var(--yellow);
+  background-color: var(--bgColor);
   border-bottom-left-radius: calc(var(--signBorderRadius) / 2);
   border-bottom-right-radius: calc(var(--signBorderRadius) / 2);
   color: black;
@@ -427,7 +425,7 @@
   height: stretch;
   padding: var(--splitVerticalPadding) var(--splitHorizontalPadding);
   flex-direction: row;
-  background-color: var(--yellow);
+  background-color: var(--bgColor);
   color: black;
 }
 
@@ -436,7 +434,6 @@
 }
 
 .halfExitOnlyOutsideArrow {
-  top: 0.2rem;
   position: relative;
 }
 
@@ -445,9 +442,16 @@
 }
 
 .subDivider {
-  width: 4px;
-  background-color: var(--white);
+  width: .2rem;
   min-width: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.subDividerSegment {
+  width: 100%;
+  position: relative;
+  flex: 0 0 auto;
 }
 
 img.diagrammicImage {
@@ -473,4 +477,5 @@ img.diagrammicImage {
 
 .signHolder.diagrammic .subDivider {
   display: none;
+}
 }

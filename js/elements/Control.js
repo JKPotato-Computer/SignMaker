@@ -452,28 +452,15 @@ class DividerElement {
 
     if (this.fullBleed) {
       newDivider.classList.add("fullBleed");
-      const paddingString = panel?.sign?.padding || "";
-      const paddingValues = paddingString.trim().split(/\s+/).filter(Boolean);
 
-      let top = "0rem",
-        right = "0rem",
-        bottom = "0rem",
-        left = "0rem";
-
-      if (paddingValues.length === 1) {
-        top = right = bottom = left = paddingValues[0];
-      } else if (paddingValues.length === 2) {
-        top = bottom = paddingValues[0];
-        right = left = paddingValues[1];
-      } else if (paddingValues.length === 3) {
-        [top, right, bottom] = paddingValues;
-        left = right;
-      } else if (paddingValues.length >= 4) {
-        [top, right, bottom, left] = paddingValues;
-      }
-
-      newDivider.style.setProperty("--dividerBleedLeft", left || "0rem");
-      newDivider.style.setProperty("--dividerBleedRight", right || "0rem");
+      newDivider.style.setProperty(
+        "--dividerBleedLeft",
+        `${panel.sign.paddingLeft + 0.2}rem`,
+      );
+      newDivider.style.setProperty(
+        "--dividerBleedRight",
+        `${panel.sign.paddingRight + 0.2}rem`,
+      );
     } else {
       newDivider.classList.remove("fullBleed");
       newDivider.style.setProperty("--dividerBleedLeft", "0rem");
@@ -1051,8 +1038,15 @@ TollLogoElement.prototype.direction = {
 
 class Block {
   constructor({
+    topMargin = 0,
     topPadding = 0,
+
+    bottomMargin = 0,
     bottomPadding = 0,
+
+    leftPadding = 0,
+    rightPadding = 0,
+
     backgroundColor = "Inherit",
     backgroundFullWidth = true,
     width = 0,
@@ -1060,7 +1054,9 @@ class Block {
     stretchCenter = true,
     stretchRight = true,
   } = {}) {
+    this.topMargin = topMargin;
     this.topPadding = topPadding;
+    this.bottomMargin = bottomMargin;
     this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
     this.backgroundFullWidth = backgroundFullWidth;
@@ -1068,13 +1064,51 @@ class Block {
     this.stretchLeft = stretchLeft;
     this.stretchCenter = stretchCenter;
     this.stretchRight = stretchRight;
+    this.leftPadding = leftPadding;
+    this.rightPadding = rightPadding;
   }
 }
 
+// basically control but w/o some of the block properties
+class GroupElement {
+  constructor({ blockElements, direction = "Vertical", width = 0 } = {}) {
+    if (this.blockElements) {
+      this.blockElements = blockElements;
+    } else {
+      this.blockElements = new Control();
+      this.blockElements.addElement(ControlTextElement, {}, 0, 0);
+    }
+
+    this.blockElements.isGroup = true;
+    this.direction = direction;
+    this.width = width;
+  }
+
+  createElement(panel, subPanel) {
+    const blockElementHolder = this.blockElements.createElement(
+      panel,
+      subPanel,
+    );
+    if (this.direction == "Horizontal") {
+      blockElementHolder.style.flexDirection = "row";
+    } else {
+      blockElementHolder.style.flexDirection = "column";
+    }
+
+    if (this.width > 0) {
+      blockElementHolder.style.width = this.width + "rem";
+    }
+
+    return blockElementHolder;
+  }
+}
+GroupElement.prototype.blockDirection = ["Horizontal", "Vertical"];
+
 class Control {
-  constructor({ rows = [], blockProperties = [] } = {}) {
+  constructor({ rows = [], blockProperties = [], isGroup = false } = {}) {
     this.rows = rows;
     this.blockProperties = blockProperties;
+    this.isGroup = isGroup;
   }
 
   addElement(element, properties, row, column) {
@@ -1153,125 +1187,177 @@ class Control {
     const flexBox = document.createElement("div");
     flexBox.className = "blockElementMaster";
 
-    const parsePadding = (paddingString = "") => {
-      const defaultPadding = {
-        top: "0rem",
-        right: "0rem",
-        bottom: "0rem",
-        left: "0rem",
-      };
-
-      if (!paddingString || typeof paddingString !== "string") {
-        return defaultPadding;
-      }
-
-      const values = paddingString.trim().split(/\s+/).filter(Boolean);
-      if (values.length === 0) {
-        return defaultPadding;
-      }
-
-      if (values.length === 1) {
-        return {
-          top: values[0],
-          right: values[0],
-          bottom: values[0],
-          left: values[0],
-        };
-      }
-
-      if (values.length === 2) {
-        return {
-          top: values[0],
-          right: values[1],
-          bottom: values[0],
-          left: values[1],
-        };
-      }
-
-      if (values.length === 3) {
-        return {
-          top: values[0],
-          right: values[1],
-          bottom: values[2],
-          left: values[1],
-        };
-      }
-
-      return {
-        top: values[0],
-        right: values[1],
-        bottom: values[2],
-        left: values[3],
-      };
-    };
-
-    const signPadding = parsePadding(panel?.sign?.padding);
-
     const totalRows = this.rows.length;
     for (let i = 0; i < totalRows; i++) {
       const row = this.rows[i];
       const properties = this.blockProperties[i];
-      const topPadding = parseFloat(properties.topPadding) || 0;
-      const bottomPadding = parseFloat(properties.bottomPadding) || 0;
-      const topSpacing = topPadding + "rem";
-      const bottomSpacing = bottomPadding + "rem";
-      const bleedTop = i === 0 ? signPadding.top : "0rem";
-      const bleedBottom = i === totalRows - 1 ? signPadding.bottom : "0rem";
 
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
-      flexRow.style.setProperty("--marginTop", topSpacing);
-      flexRow.style.setProperty("--marginBottom", bottomSpacing);
-      flexRow.style.setProperty("--blockPaddingTopExtra", "0rem");
-      flexRow.style.setProperty("--blockPaddingBottomExtra", "0rem");
-      const resolvedBackgroundColor =
+
+      flexRow.style.setProperty("--marginTop", `${properties.topMargin}rem`);
+      flexRow.style.setProperty(
+        "--marginBottom",
+        `${properties.bottomMargin}rem`,
+      );
+
+      flexRow.style.setProperty(
+        "--blockPaddingLeft",
+        `${properties.leftPadding}rem`,
+      );
+      flexRow.style.setProperty(
+        "--blockPaddingRight",
+        `${properties.rightPadding}rem`,
+      );
+      flexRow.style.setProperty(
+        "--blockPaddingTop",
+        `${properties.topPadding}rem`,
+      );
+      flexRow.style.setProperty(
+        "--blockPaddingBottom",
+        `${properties.bottomPadding}rem`,
+      );
+
+      flexRow.style.setProperty(
+        "--masterBlockBgColor",
         properties.backgroundColor == "Inherit"
           ? ""
           : (
               lib.colors[properties.backgroundColor] ||
               properties.backgroundColor
-            ).toLowerCase();
-      flexRow.style.setProperty(
-        "--masterBlockBgColor",
-        resolvedBackgroundColor,
+            ).toLowerCase(),
       );
 
-      const usesLightBleedBackground =
-        properties.backgroundColor == "Orange" ||
-        properties.backgroundColor == "White" ||
-        properties.backgroundColor == "Yellow" ||
-        properties.backgroundColor == "Fluorescent Yellow-Green" ||
-        properties.backgroundColor == "Fluorescent Pink";
+      const blockBackgroundColor = (
+        properties.backgroundColor == "Inherit"
+          ? lib.colors[panel.color] || panel.color
+          : lib.colors[properties.backgroundColor] || properties.backgroundColor
+      ).toLowerCase();
+      const usesBlackBorder = lib.checkForContrast(blockBackgroundColor);
+      flexRow.dataset.blockBackgroundColor = blockBackgroundColor;
+      flexRow.dataset.blockBorderColor = usesBlackBorder ? "black" : "white";
 
       if (properties.backgroundFullWidth) {
         flexRow.classList.add("fullBleed");
-        flexRow.style.setProperty("--blockBleedLeft", signPadding.left);
-        flexRow.style.setProperty("--blockBleedRight", signPadding.right);
-        flexRow.style.setProperty("--blockBleedTop", bleedTop);
-        flexRow.style.setProperty("--blockBleedBottom", bleedBottom);
-        flexRow.style.width = "";
-        flexRow.style.setProperty("--marginTop", "0rem");
-        flexRow.style.setProperty("--marginBottom", "0rem");
-        flexRow.style.setProperty("--blockPaddingTopExtra", topSpacing);
-        flexRow.style.setProperty("--blockPaddingBottomExtra", bottomSpacing);
+
+        flexRow.style.setProperty(
+          "--blockBleedLeft",
+          `${panel.sign.paddingLeft}rem`,
+        );
+        flexRow.style.setProperty(
+          "--blockBleedRight",
+          `${panel.sign.paddingRight}rem`,
+        );
+        flexRow.style.setProperty(
+          "--blockBleedTop",
+          i == 0 ? `${panel.sign.paddingTop}rem` : "0rem",
+        );
+        flexRow.style.setProperty(
+          "--blockBleedBottom",
+          i == totalRows - 1 ? `${panel.sign.paddingBottom}rem` : "0rem",
+        );
+
+        flexRow.style.setProperty("--marginBorderLeft", "0rem");
+        flexRow.style.setProperty("--marginBorderRight", "0rem");
+        flexRow.style.setProperty("--marginBorderTop", "0rem");
+        flexRow.style.setProperty("--marginBorderBottom", "0rem");
+
+        if (totalRows == 1 && panel.sign.subPanels.length == 1) {
+          flexRow.style.setProperty(
+            "--blockBorderRadiusTopLeft",
+            `${panel.borderRadius}rem`,
+          );
+          flexRow.style.setProperty(
+            "--blockBorderRadiusTopRight",
+            `${panel.borderRadius}rem`,
+          );
+          flexRow.style.setProperty(
+            "--blockBorderRadiusBottomLeft",
+            `${panel.borderRadius}rem`,
+          );
+          flexRow.style.setProperty(
+            "--blockBorderRadiusBottomRight",
+            `${panel.borderRadius}rem`,
+          );
+        }
+
+        if (i == totalRows - 1 && panel.sign.subPanels[0] === subPanel) {
+          flexRow.style.setProperty(
+            "--blockBorderRadiusBottomLeft",
+            `${panel.borderRadius}rem`,
+          );
+        }
+
+        if (
+          i == totalRows - 1 &&
+          panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
+        ) {
+          flexRow.style.setProperty(
+            "--blockBorderRadiusBottomRight",
+            `${panel.borderRadius}rem`,
+          );
+        }
+
+        if (i == 0 && panel.sign.subPanels[0] === subPanel) {
+          flexRow.style.setProperty(
+            "--blockBorderRadiusTopLeft",
+            `${panel.borderRadius}rem`,
+          );
+        }
+
+        if (
+          i == 0 &&
+          panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
+        ) {
+          flexRow.style.setProperty(
+            "--blockBorderRadiusTopRight",
+            `${panel.borderRadius}rem`,
+          );
+        }
+
+        if (
+          panel.color != properties.backgroundColor &&
+          properties.backgroundColor != "Inherit"
+        ) {
+          if (i == 0) {
+            flexRow.style.borderTop = `.2rem solid`;
+            flexRow.style.setProperty("--marginBorderTop", "-0.2rem");
+          }
+
+          if (i == totalRows - 1) {
+            flexRow.style.borderBottom = `.2rem solid`;
+            flexRow.style.setProperty("--marginBorderBottom", "-0.2rem");
+          }
+
+          if (panel.sign.subPanels[0] === subPanel) {
+            flexRow.style.borderLeft = `.2rem solid`;
+            flexRow.style.setProperty("--marginBorderLeft", "-0.2rem");
+          }
+
+          if (
+            panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
+          ) {
+            flexRow.style.borderRight = `.2rem solid`;
+            flexRow.style.setProperty("--marginBorderRight", "-0.2rem");
+          }
+        }
       } else {
-        flexRow.classList.remove("fullBleed");
-        flexRow.style.setProperty("--blockBleedLeft", "0rem");
-        flexRow.style.setProperty("--blockBleedRight", "0rem");
-        flexRow.style.setProperty("--blockBleedTop", "0rem");
-        flexRow.style.setProperty("--blockBleedBottom", "0rem");
-        flexRow.style.setProperty("--marginTop", topSpacing);
-        flexRow.style.setProperty("--marginBottom", bottomSpacing);
         flexRow.style.width =
           properties.width == 0 ? "" : properties.width + "rem";
       }
 
-      if (usesLightBleedBackground) {
+      if (
+        lib.checkForContrast(
+          properties.backgroundColor == "Inherit"
+            ? ""
+            : (
+                lib.colors[properties.backgroundColor] ||
+                properties.backgroundColor
+              ).toLowerCase(),
+        )
+      ) {
+        flexRow.style.borderColor = "black";
         flexRow.style.color = "black";
-        if (properties.backgroundFullWidth) {
-          flexRow.dataset.fullBleedBorderColor =
-            (lib.colors && lib.colors.Black) || "rgb(0, 0, 0)";
-        }
       }
 
       const leftAlignment = document.createElement("div");
@@ -1282,7 +1368,6 @@ class Control {
       rightAlignment.className = "blockElementRight";
 
       let lastKnownAlignment = centerAlignment;
-      let dividerBorderColor = null;
       for (let i = 0; i < row.length; i++) {
         let elem = row[i];
         switch (elem.alignment) {
@@ -1298,19 +1383,6 @@ class Control {
           default:
         }
 
-        if (
-          elem instanceof DividerElement &&
-          elem.fullBleed === true &&
-          dividerBorderColor === null
-        ) {
-          if (elem.dividerColor && elem.dividerColor !== "Default") {
-            dividerBorderColor =
-              lib.colors[elem.dividerColor] || elem.dividerColor;
-          } else {
-            dividerBorderColor = lib.colors.White || "white";
-          }
-        }
-
         lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
       }
 
@@ -1324,14 +1396,6 @@ class Control {
         properties.stretchRight && rightAlignment.children.length > 0
           ? "1"
           : "0";
-
-      if (dividerBorderColor) {
-        flexRow.dataset.fullBleedBorderColor = dividerBorderColor.toLowerCase();
-      }
-
-      flexRow.dataset.lightBackground = usesLightBleedBackground
-        ? "true"
-        : "false";
 
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);
@@ -1354,6 +1418,7 @@ Control.prototype.blockToClassElems = {
   TollLogoElement: TollLogoElement,
   ActionMessageElement: ActionMessageElement,
   ElectronicSignElement: ElectronicSignElement,
+  GroupElement: GroupElement,
   getElem: (elemObj) => {
     for (const key in Control.prototype.blockToClassElems) {
       if (elemObj instanceof Control.prototype.blockToClassElems[key]) {
@@ -1374,6 +1439,7 @@ Control.prototype.blockElements = {
   IconElement: "Icon",
   BeaconElement: "Flashing Beacon",
   TollLogoElement: "Toll Logo",
+  GroupElement: "Group Element",
   ElectronicSignElement: "Electronic Sign",
 };
 
@@ -1388,4 +1454,5 @@ Control.prototype.blockInternalElements = {
   TollLogoElement: "sdTollLogo",
   ActionMessageElement: "sdActionMessage",
   ElectronicSignElement: "sdElectronicSign",
+  GroupElement: "sdGroup",
 };

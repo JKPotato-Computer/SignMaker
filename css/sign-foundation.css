@@ -36,26 +36,21 @@ main#smRender.wide #postContainer {
   width: 100%;
   margin: var(--marginTop) 0 var(--marginBottom) 0;
   background-color: var(--masterBlockBgColor);
+  padding: var(--blockPaddingTop) var(--blockPaddingRight) var(--blockPaddingBottom) var(--blockPaddingLeft);
 }
 
 .blockElementRow.fullBleed {
-  width: calc(
-    100% + var(--blockBleedLeft, 0rem) + var(--blockBleedRight, 0rem)
-  );
-  margin-left: calc(-1 * var(--blockBleedLeft, 0rem));
-  margin-right: calc(-1 * var(--blockBleedRight, 0rem));
-  margin-top: calc(var(--marginTop, 0rem) - var(--blockBleedTop, 0rem));
-  margin-bottom: calc(
-    var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem)
-  );
-  padding-left: var(--blockBleedLeft, 0rem);
-  padding-right: var(--blockBleedRight, 0rem);
-  padding-top: calc(
-    var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem)
-  );
-  padding-bottom: calc(
-    var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem)
-  );
+  margin: calc(-1 * var(--blockBleedTop) + var(--marginTop) + var(--marginBorderTop)) calc(-1 * var(--blockBleedRight) + var(--marginBorderRight)) calc(-1 * var(--blockBleedBottom) + var(--marginBottom) + var(--marginBorderBottom)) calc(-1 * var(--blockBleedLeft) + var(--marginBorderLeft));
+  padding: calc(var(--blockPaddingTop) + var(--blockBleedTop)) calc(var(--blockBleedRight) + var(--blockPaddingRight)) calc(var(--blockBleedBottom) + var(--blockPaddingBottom)) calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
+  width: calc(100% + var(--blockBleedLeft) + var(--blockBleedRight) - var(--marginBorderLeft) - var(--marginBorderRight));
+  border-top-left-radius: calc(var(
+  --blockBorderRadiusTopLeft));
+  border-top-right-radius: calc(var(
+  --blockBorderRadiusTopRight));
+  border-bottom-left-radius: calc(var(
+  --blockBorderRadiusBottomLeft));
+  border-bottom-right-radius: calc(var(
+  --blockBorderRadiusBottomRight));
 }
 
 .lineElement {
@@ -74,11 +69,17 @@ main#smRender.wide #postContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 var(--spacing);
   white-space: pre;
   word-spacing: var(--wordSpacing);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100) + 0.2));
   flex-direction: column;
+}
+
+.SM-ExitOnlyTextElement {
+  gap: .5rem;
+  color: inherit;
+  letter-spacing: var(--exitOnlyLetterSpacing);
+  word-spacing: var(--exitOnlyWordSpacing);
 }
 
 .SM-ExitOnlyTextElement * {
@@ -1313,10 +1314,14 @@ main#smRender.wide #postContainer {
 }
 
 .guideArrows.split_exit_only .SM-ExitOnlyTextElement {
-  background-color: var(--yellow);
-  color: black;
+  background-color: var(--bgColor);
+  color: inherit;
   border-radius: var(--splitBorderRadius);
   padding: var(--splitVerticalPadding) var(--splitHorizontalPadding);
+}
+
+.guideArrows.split_exit_only.full_black_border .SM-ExitOnlyTextElement {
+  border: .2rem solid black;
 }
 
 .guideArrows.exit_only,
@@ -1326,4 +1331,8 @@ main#smRender.wide #postContainer {
 
 .guideArrows.exit_only.white_border > .arrowContainer {
   padding: var(--verticalPadding) var(--horizontalPadding);
+}
+
+.guideArrowsHolder:has(.split_exit_only) {
+  background-color: var(--bg-color);
 }

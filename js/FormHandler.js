@@ -424,15 +424,10 @@ const formHandler = (() => {
     }
 
     // Sign
-    currentPanel.sign.padding =
-      form["paddingTop"].value.toString() +
-      "rem " +
-      form["paddingRight"].value.toString() +
-      "rem " +
-      form["paddingBottom"].value.toString() +
-      "rem " +
-      form["paddingLeft"].value.toString() +
-      "rem";
+    currentPanel.sign.paddingLeft = parseFloat(form["paddingLeft"].value);
+    currentPanel.sign.paddingRight = parseFloat(form["paddingRight"].value);
+    currentPanel.sign.paddingBottom = parseFloat(form["paddingBottom"].value);
+    currentPanel.sign.paddingTop = parseFloat(form["paddingTop"].value);
 
     // Control Text Revision
     const currentBlockElem = app.getCurrentBlockElem();
@@ -496,34 +491,53 @@ const formHandler = (() => {
         currentBlockElem.logo;
     }
 
-    subPanel.blockElements.blockProperties[
+    let blockElements =
+      app.vars.currentlySelectedGroupIndex >= 0
+        ? app.getSelectedBlockGroup().blockElements
+        : subPanel.blockElements;
+
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].topPadding = document.querySelector("#sdBlock_topPadding").value;
-    subPanel.blockElements.blockProperties[
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].bottomPadding = document.querySelector("#sdBlock_bottomPadding").value;
-    subPanel.blockElements.blockProperties[
+
+    blockElements.blockProperties[
+      app.vars.currentlySelectedRowIndex
+    ].topMargin = document.querySelector("#sdBlock_topMargin").value;
+    blockElements.blockProperties[
+      app.vars.currentlySelectedRowIndex
+    ].bottomMargin = document.querySelector("#sdBlock_bottomMargin").value;
+
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor",
     ).value;
-    subPanel.blockElements.blockProperties[
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].backgroundFullWidth = document.querySelector(
       "#sdBlock_backgroundFullWidth",
     ).checked;
-    subPanel.blockElements.blockProperties[
-      app.vars.currentlySelectedRowIndex
-    ].width = document.querySelector("#sdBlock_width").value;
-    subPanel.blockElements.blockProperties[
+    blockElements.blockProperties[app.vars.currentlySelectedRowIndex].width =
+      document.querySelector("#sdBlock_width").value;
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].stretchLeft = document.querySelector("#sdBlock_stretchLeft").checked;
-    subPanel.blockElements.blockProperties[
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].stretchCenter = document.querySelector("#sdBlock_stretchCenter").checked;
-    subPanel.blockElements.blockProperties[
+    blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].stretchRight = document.querySelector("#sdBlock_stretchRight").checked;
+
+    blockElements.blockProperties[
+      app.vars.currentlySelectedRowIndex
+    ].leftPadding = document.querySelector("#sdBlock_leftPadding").value;
+    blockElements.blockProperties[
+      app.vars.currentlySelectedRowIndex
+    ].rightPadding = document.querySelector("#sdBlock_rightPadding").value;
 
     subPanel.laneWidth = parseInt(form["subPanelLength"].value);
     subPanel.verticalAlign = form["subpanelAlign"].value;
@@ -617,6 +631,10 @@ const formHandler = (() => {
         );
         exitOnlyConfigs.displayOutsideArrow =
           form["exitOnlyDisplayOutsideArrow"].checked;
+
+        exitOnlyConfigs.backgroundColor = form["exitOnlyBGColor"].value;
+        exitOnlyConfigs.textGap = parseFloat(form["exitOnlyTextGap"].value);
+        exitOnlyConfigs.roundAllCorners = form["exitOnlyRoundCorners"].checked;
       }
 
       standardArrowConfig.variant = form["guideArrow"].value;
@@ -927,23 +945,26 @@ const formHandler = (() => {
     document.querySelector("#sMSPElementSelect").value =
       app.getCurrentBlockElem().constructor.name;
     document.querySelector("#sMSPDeleteSelectedRow").disabled =
-      app.getCurrentSubPanel().blockElements.rows.length == 1;
+      app.getCurrentBlockElements().rows.length == 1;
     document.querySelector("#smSPDeleteSelectedBlock").disabled =
-      app.getCurrentSubPanel().blockElements.rows.length == 1 &&
-      app.getCurrentBlockRows().length == 1;
-    for (
-      let row = 0;
-      row < Object.keys(sign.blockElements.rows).length;
-      row++
-    ) {
+      app.getCurrentBlockElements().rows.length == 1 &&
+      app.getCurrentBlockRow().length == 1;
+    document.querySelector("#smSPExitGroupedBlock").disabled =
+      app.vars.currentlySelectedGroupIndex == -1;
+
+    for (let row = 0; row < app.getCurrentBlockElements().rows.length; row++) {
       const sMControlRow = document.createElement("div");
       sMControlRow.dataset.dataRow = row.toString();
       sMControlRow.className =
         "sMControlRow" +
         (row == app.vars.currentlySelectedRowIndex ? " selected" : "");
 
-      for (let item = 0; item < sign.blockElements.rows[row].length; item++) {
-        const blockElement = sign.blockElements.rows[row][item];
+      for (
+        let item = 0;
+        item < app.getCurrentBlockElements().rows[row].length;
+        item++
+      ) {
+        const blockElement = app.getCurrentBlockElements().rows[row][item];
 
         const textEditorBlock = document.createElement("button");
         textEditorBlock.className =
@@ -960,27 +981,20 @@ const formHandler = (() => {
         textEditorBlock.textContent =
           Control.prototype.blockElements[blockElement.constructor.name];
         sMControlRow.appendChild(textEditorBlock);
-        textEditorBlock.addEventListener(
-          "click",
-          () => {
-            app.setSelectedControlElem(item);
-          },
-          {
-            once: true,
-          },
-        );
+        textEditorBlock.addEventListener("click", () => {
+          console.log(
+            textEditorBlock.dataset.row,
+            textEditorBlock.dataset.block,
+          );
+          app.setSelectedRow(parseInt(textEditorBlock.dataset.row));
+          app.setSelectedControlElem(parseInt(textEditorBlock.dataset.block));
+        });
       }
 
       sMSPTextList.appendChild(sMControlRow);
-      sMControlRow.addEventListener(
-        "click",
-        () => {
-          app.setSelectedRow(row);
-        },
-        {
-          once: true,
-        },
-      );
+      sMControlRow.addEventListener("click", () => {
+        app.setSelectedRow(parseInt(sMControlRow.dataset.dataRow));
+      });
     }
 
     for (const divConfig of document.querySelectorAll(
@@ -1029,15 +1043,12 @@ const formHandler = (() => {
         element.addEventListener(
           element.type === "range" ? "input" : "change",
           readForm,
-          {
-            once: true,
-          },
         );
       }
       document.querySelectorAll(".sdArrow_rotationPreset").forEach((button) => {
         button.classList.toggle(
-          "selected",
-          standardArrow.rotation === parseFloat(button.dataset.degrees),
+          "activated",
+          standardArrow.rotation == parseFloat(button.dataset.degrees),
         );
       });
     }
@@ -1049,40 +1060,30 @@ const formHandler = (() => {
       if (element) {
         if (element.type === "checkbox") {
           element.checked = currentBlockElem[propertyName];
-          element.addEventListener("change", readForm, {
-            once: true,
-          });
+          element.addEventListener("change", readForm);
         } else if (element.type === "radio") {
           if (element.value === currentBlockElem[propertyName].toString()) {
             element.checked = true;
           }
-          element.addEventListener("change", readForm, {
-            once: true,
-          });
+          element.addEventListener("change", readForm);
         } else if (element.tagName === "SELECT") {
           element.value = currentBlockElem[propertyName];
-          element.addEventListener("blur", readForm, {
-            once: true,
-          });
+          element.addEventListener("blur", readForm);
         } else {
           element.value = currentBlockElem[propertyName];
           element.addEventListener(
             element.type === "text" ? "input" : "change",
             readForm,
-            {
-              once: true,
-            },
           );
-          if (element.type === "range" && displayElement) {
-            element.addEventListener(
-              "input",
-              () => {
-                displayElement.value = element.value;
-              },
-              {
-                once: true,
-              },
-            );
+          if (
+            element.type === "range" &&
+            displayElement &&
+            !displayElement.dataset.paired
+          ) {
+            displayElement.dataset.paired = "true";
+            element.addEventListener("input", () => {
+              displayElement.value = element.value;
+            });
           }
         }
       }
@@ -1100,115 +1101,94 @@ const formHandler = (() => {
     }
 
     document.querySelector("#sdBlock_topPadding").value =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].topPadding;
-    document
-      .querySelector("#sdBlock_topPadding")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
 
     document.querySelector("#sdBlock_bottomPadding").value =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].bottomPadding;
-    document
-      .querySelector("#sdBlock_bottomPadding")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
+
+    document.querySelector("#sdBlock_leftPadding").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].leftPadding;
+    document.querySelector("#sdBlock_rightPadding").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].rightPadding;
 
     document.querySelector("#sdBlock_topPaddingVal").value =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].topPadding;
     document.querySelector("#sdBlock_bottomPaddingVal").value =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].bottomPadding;
 
-    document.querySelector("#sdBlock_topPadding").value =
-      sign.blockElements.blockProperties[
+    document.querySelector("#sdBlock_leftPaddingVal").value =
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
-      ].topPadding;
-    document.querySelector("#sdBlock_bottomPadding").value =
-      sign.blockElements.blockProperties[
+      ].leftPadding;
+    document.querySelector("#sdBlock_rightPaddingVal").value =
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
-      ].bottomPadding;
+      ].rightPadding;
+
+    document.querySelector("#sdBlock_topMargin").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].topMargin;
+    document.querySelector("#sdBlock_bottomMargin").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].bottomMargin;
+
+    document.querySelector("#sdBlock_topMarginVal").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].topMargin;
+    document.querySelector("#sdBlock_bottomMarginVal").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].bottomMargin;
 
     document.querySelector("#sdBlock_backgroundColor").value =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].backgroundColor;
 
-    document
-      .querySelector("#sdBlock_backgroundColor")
-      .addEventListener("blur", readForm, {
-        once: true,
-      });
-
     document.querySelector("#sdBlock_backgroundFullWidth").checked =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].backgroundFullWidth;
-    document
-      .querySelector("#sdBlock_backgroundFullWidth")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
 
     document.querySelector("#sdBlock_width").value =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].width;
-    document
-      .querySelector("#sdBlock_width")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
-
-    document
-      .querySelector("#sdBlock_stretchLeft")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
 
     document.querySelector("#sdBlock_stretchLeft").checked =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].stretchLeft;
-
-    document
-      .querySelector("#sdBlock_stretchCenter")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
     document.querySelector("#sdBlock_stretchCenter").checked =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].stretchCenter;
-
-    document
-      .querySelector("#sdBlock_stretchRight")
-      .addEventListener("change", readForm, {
-        once: true,
-      });
     document.querySelector("#sdBlock_stretchRight").checked =
-      sign.blockElements.blockProperties[
+      app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].stretchRight;
 
     updateGuideArrowsSubform();
 
-    const p = panel.sign.padding
-      .split("rem")
-      .map((val) => parseFloat(val) || 0);
-
-    document.getElementById("paddingTop").value = p[0];
-    document.getElementById("paddingRight").value = p[1];
-    document.getElementById("paddingBottom").value = p[2];
-    document.getElementById("paddingLeft").value = p[3];
+    document.getElementById("paddingTop").value = panel.sign.paddingTop;
+    document.getElementById("paddingRight").value = panel.sign.paddingRight;
+    document.getElementById("paddingBottom").value = panel.sign.paddingBottom;
+    document.getElementById("paddingLeft").value = panel.sign.paddingLeft;
 
     toggleVisibility(
       document.querySelector("#sdCtrlText_useNumeralFormatting"),
@@ -1462,6 +1442,7 @@ const formHandler = (() => {
         shieldListItem.appendChild(shieldListItemText);
 
         const shieldListItemEdit = document.createElement("button");
+
         shieldListItemEdit.className = "sMET_shieldListItemEdit";
         shieldListItemEdit.textContent = "Edit Shield";
         shieldListItem.appendChild(shieldListItemEdit);
@@ -1874,7 +1855,7 @@ const formHandler = (() => {
       shieldGroup.shields[selectedShieldIndex];
 
     const shieldGroupElements = [];
-    for (const row of sign.blockElements.rows) {
+    for (const row of app.getCurrentBlockElements().rows) {
       for (const blockElement of row) {
         if (blockElement.constructor.name === "ShieldGroupElement") {
           shieldGroupElements.push(blockElement);
@@ -1889,7 +1870,7 @@ const formHandler = (() => {
 
     shieldGroupElements.forEach((shieldGroup, id) => {
       const button = document.createElement("button");
-      button.textContent = `Shield Group ${id + 1} (Row ${sign.blockElements.rows.findIndex((row) => row.includes(shieldGroup)) + 1})`;
+      button.textContent = `Shield Group ${id + 1} (Row ${app.getCurrentBlockElements().rows.findIndex((row) => row.includes(shieldGroup)) + 1})`;
       if (id === app.vars.currentlySelectedShieldGroupId) {
         button.classList.add("selected");
       }
@@ -2371,7 +2352,7 @@ const formHandler = (() => {
             .forEach((button) => {
               button.classList.toggle(
                 "activated",
-                selectedStandardArrow.rotation ===
+                selectedStandardArrow.rotation ==
                   parseFloat(button.dataset.degrees),
               );
             });
@@ -2413,9 +2394,15 @@ const formHandler = (() => {
         }
 
         document.querySelector("#exitOnlyTextPositionLabel").style.display =
-          standardArrowConfig.exitOnlyConfigs.numArrows == 1 ? "" : "none";
+          standardArrowConfig.exitOnlyConfigs.numArrows == 1 ||
+          variant == "Split Exit Only"
+            ? ""
+            : "none";
         document.querySelector("#exitOnlyTextPosition").style.display =
-          standardArrowConfig.exitOnlyConfigs.numArrows == 1 ? "" : "none";
+          standardArrowConfig.exitOnlyConfigs.numArrows == 1 ||
+          variant == "Split Exit Only"
+            ? ""
+            : "none";
         document.querySelector("#exitOnlyTextPosition").value =
           exitOnlyConfigs.exitOnlyTextPosition;
 
@@ -2512,16 +2499,33 @@ const formHandler = (() => {
           exitOnlyConfigs.wordSpacing;
         document.querySelector("#exitOnlyLetterSpacing").value =
           exitOnlyConfigs.letterSpacing;
+        document.querySelector("#exitOnlyBGColor").value =
+          exitOnlyConfigs.backgroundColor;
 
         document.querySelector("#exitOnlyGap").value = exitOnlyConfigs.gap;
+        document.querySelector("#exitOnlyTextGap").style.display =
+          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+        document.querySelector('label[for="exitOnlyTextGap"]').style.display =
+          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+        document.querySelector("#exitOnlyTextGap").value =
+          exitOnlyConfigs.textGap;
+        document.querySelector(
+          'label[for="exitOnlyRoundCorners"]',
+        ).style.display =
+          exitOnlyConfigs.borderMode == "White Border" ? "" : "none";
+        document.querySelector("#exitOnlyRoundCorners").style.display =
+          exitOnlyConfigs.borderMode == "White Border" ? "" : "none";
+        document.querySelector("#exitOnlyRoundCorners").checked =
+          exitOnlyConfigs.roundAllCorners;
 
         document
           .querySelectorAll(".sdExitOnlyGuide_rotationPreset")
           .forEach((button) => {
-            button.classList.toggle(
-              "activated",
-              exitOnlyArrow.rotation === parseFloat(button.dataset.degrees),
-            );
+            button.className =
+              "sdExitOnlyGuide_rotationPreset" +
+              (exitOnlyArrow.rotation == parseInt(button.dataset.degrees)
+                ? " activated"
+                : "");
           });
       }
 

@@ -27,17 +27,19 @@ class Sign {
           exitOnlyOutsideGap: 5,
 
           fontFamily: "Series E",
-          fontSize: 20,
+          fontSize: 24,
           wordSpacing: 0,
           letterSpacing: 0,
-          lineHeight: 100,
           arrowLocation: "Center", // Half Exit ("Left"/"Right"); Split Exit ("Left","Right","Center")
 
-          arrow: new StandardArrow({ type: "DOWN", size: 1.5, rotation: 0 }),
+          arrow: new StandardArrow({ arrow: "DOWN", size: 1.75, rotation: 0 }),
           numArrows: 0,
-          gap: 0.5,
+          gap: 4,
+          textGap: 0.5,
 
           displayOutsideArrow: true,
+          backgroundColor: "Yellow",
+          roundAllCorners: false,
         },
       },
       apl: {
@@ -62,15 +64,18 @@ class Sign {
     subPanels = [],
     lanePanelSize = 0, // number
 
-    // panel
-    padding = "0.3rem 0.75rem 0.3rem 0.75rem",
-    arrowPosition = "Middle",
+    paddingLeft = 0.75,
+    paddingRight = 0.75,
+    paddingTop = 0.3,
+    paddingBottom = 0.3,
   } = {}) {
     this.otherSymbol = otherSymbol;
     this.oSNum = oSNum;
     this.subPanels = subPanels;
-    this.padding = padding;
-    this.arrowPosition = arrowPosition;
+    this.paddingLeft = paddingLeft;
+    this.paddingRight = paddingRight;
+    this.paddingTop = paddingTop;
+    this.paddingBottom = paddingBottom;
     this.arrows = arrows;
     this.lanePanelSize = lanePanelSize;
   }
