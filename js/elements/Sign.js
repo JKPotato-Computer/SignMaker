@@ -17,7 +17,7 @@ class Sign {
           borderMode: "Partial Black Border",
           exitOnlyText: "EXIT ONLY",
           exitOnlyTextPosition: "Center",
-          horizontalPadding: 0.5,
+          horizontalPadding: 1,
           verticalPadding: 0.5,
 
           splitHorizontalPadding: 0.25,

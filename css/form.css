@@ -72,14 +72,6 @@ nav#sMConfigBar {
   z-index: 4;
 }
 
-#export {
-  background-color: rgba(255, 0, 0, 0.25);
-}
-
-#export.hover {
-  background-color: rgba(255, 0, 0, 0.5);
-}
-
 span.toolTip {
   position: fixed;
   transform: translateX(-50%) translateY(10px);
@@ -780,7 +772,6 @@ textarea {
   background-color: rgb(226 236 255);
   padding: 1rem;
   width: 90%;
-  display: none;
   flex-direction: row;
   justify-content: center;
   gap: 1rem;

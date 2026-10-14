@@ -60,6 +60,16 @@
     gap: .5rem;
   }
 
+  #diagramFileName {
+    flex-grow: 1;
+  }
+
+  #importDiagram, #exportDiagram {
+    flex-grow: 1;
+    margin-bottom: -.5rem;
+    margin-top: .5rem;
+  }
+
   .diagrammicDrawingHolder > footer > div > button {
     width: calc(33% - .5rem);
     height: 3rem;

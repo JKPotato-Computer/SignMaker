@@ -99,9 +99,6 @@ main#smRender {
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  transition:
-    0.25s ease-in-out transform,
-    0.25s ease-in-out left;
 }
 
 main#smRender.wide {

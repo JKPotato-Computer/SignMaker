@@ -2504,9 +2504,15 @@ const formHandler = (() => {
 
         document.querySelector("#exitOnlyGap").value = exitOnlyConfigs.gap;
         document.querySelector("#exitOnlyTextGap").style.display =
-          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+          exitOnlyConfigs.numArrows == 0 ? "none" : "";
         document.querySelector('label[for="exitOnlyTextGap"]').style.display =
+          exitOnlyConfigs.numArrows == 0 ? "none" : "";
+
+        document.querySelector("#exitOnlyGap").style.display =
           exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+        document.querySelector('label[for="exitOnlyGap"]').style.display =
+          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+
         document.querySelector("#exitOnlyTextGap").value =
           exitOnlyConfigs.textGap;
         document.querySelector(

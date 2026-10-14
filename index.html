@@ -38,9 +38,7 @@
         terminal.error(`[Browser Promise Rejection] ${event.reason}`);
       });
     </script>
-    <script src="https://cdn.jsdelivr.net/gh/peterhry/CircleType@2.3.1/dist/circletype.min.js"></script>
-    <script src="js/packages/HtmlToImage.js" type="text/javascript"></script>
-
+    <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
 
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
@@ -88,7 +86,11 @@
       type="text/javascript"
       defer
     ></script>
-    <script src="js/modules/ImportExport.js" type="text/javascript"></script>
+    <script
+      src="js/modules/ImportExport.js"
+      type="text/javascript"
+      defer
+    ></script>
     <script src="js/App.js" type="text/javascript"></script>
     <script>
       const applyTheme = (theme) => {
@@ -978,8 +980,12 @@
             </div>
 
             <div>
-              <button type="button" id="importDiagram">Import Diagram</button>
-              <button type="button" id="exportDiagram">Export Diagram</button>
+              <button type="button" id="importDiagram">
+                <span class="material-symbols-outlined">upload</span>
+              </button>
+              <button type="button" id="exportDiagram">
+                <span class="material-symbols-outlined">download</span>
+              </button>
               <button type="button" id="diagramUse">Use Diagram</button>
             </div>
           </footer>
@@ -4898,7 +4904,7 @@
         </button>
         <button
           type="button"
-          id="export"
+          id="exportSign"
           class="sMConfigOption"
           data-toolTip="Export"
         >

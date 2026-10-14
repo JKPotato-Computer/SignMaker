@@ -599,7 +599,7 @@ const App = (() => {
       currentlySelectedRowIndex = Math.max(0, currentlySelectedRowIndex - 1);
       currentlySelectedBlockIndex = Math.max(
         0,
-        getCurrentBlockElements().rows.length - 1,
+        getCurrentBlockRow().length - 1,
       );
     } else {
       currentlySelectedBlockIndex = Math.max(
@@ -1195,7 +1195,12 @@ const App = (() => {
     }
 
     // Final segment: based on the very last row
-    if (rows.length > 0) {
+    if (
+      rows.length > 0 &&
+      panel.sign.arrows.arrowMode != "apl" &&
+      panel.sign.arrows.arrowMode == "standard" &&
+      panel.sign.arrows.standard.variant == "none"
+    ) {
       const lastRow = rows[rows.length - 1];
       const lastColor =
         lastRow?.dataset.blockBorderColor ||
@@ -1453,12 +1458,12 @@ const App = (() => {
 
     const sideLeftArrowElmt = document.createElement("img");
     sideLeftArrowElmt.className = "sideLeftArrow";
-    sideLeftArrowElmt.src = "assets/arrows/A-4.svg";
+    sideLeftArrowElmt.src = "assets/arrow/TypeA.svg";
     signHolderElmt.appendChild(sideLeftArrowElmt);
 
     const sideRightArrowElmt = document.createElement("img");
     sideRightArrowElmt.className = "sideRightArrow";
-    sideRightArrowElmt.src = "assets/arrows/A-4.svg";
+    sideRightArrowElmt.src = "assets/arrow/TypeA.svg";
 
     signCont.appendChild(exitTabContainerTop);
     signCont.appendChild(exitTabContainerLeft);
@@ -1772,10 +1777,6 @@ const App = (() => {
               : standardArrowConfig.customConfig.justify.toLowerCase(),
           );
           guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
-          arrowContElmt.style.setProperty(
-            "--arrowGap",
-            standardArrowConfig.customConfig.gap + "rem",
-          );
 
           for (const arrow of standardArrowConfig.arrowList) {
             const arrowElement = arrow.createElement();
@@ -1805,7 +1806,9 @@ const App = (() => {
           exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
           exitOnlyContainer.style.setProperty(
             "--arrowGap",
-            exitOnlyConfig.gap + "rem",
+            (exitOnlyConfig.numArrows <= 1
+              ? exitOnlyConfig.textGap
+              : exitOnlyConfig.gap) + "rem",
           );
           guideArrowsHolderElmt.style.setProperty(
             "--bgColor",

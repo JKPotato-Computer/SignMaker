@@ -158,28 +158,28 @@ class StandardArrow {
 }
 
 StandardArrow.prototype.arrows = {
-  TYPE_A: { label: "Type A", src: "assets/arrowBlocks/TYPE_A.svg" },
+  TYPE_A: { label: "Type A", src: "assets/arrow/TypeA.svg" },
   TYPE_A_EXTENDED: {
     label: "Type A Extended",
-    src: "assets/arrowBlocks/TYPE_A_EXTENDED.svg",
+    src: "assets/arrow/TypeAExtended.svg",
   },
-  TYPE_B: { label: "Type B", src: "assets/arrowBlocks/TYPE_B.svg" },
-  TYPE_C_45: { label: "Type C 45", src: "assets/arrowBlocks/TYPE_C_45.svg" },
+  TYPE_B: { label: "Type B", src: "assets/arrow/TypeB.svg" },
+  TYPE_C_45: { label: "Type C (45∘)", src: "assets/arrow/TypeC45.svg" },
   TYPE_C_45_ALT: {
-    label: "Type C 45 (alt)",
-    src: "assets/arrowBlocks/TYPE_C_45_ALT.svg",
+    label: "Type C (45∘) (alt)",
+    src: "assets/arrow/TypeC45Alt.svg",
   },
-  TYPE_C_90: { label: "Type C 90", src: "assets/arrowBlocks/TYPE_C_90.svg" },
-  TYPE_D: { label: "Type D", src: "assets/arrowBlocks/TYPE_D.svg" },
+  TYPE_C_90: { label: "Type C (90∘)", src: "assets/arrow/TypeC90.svg" },
+  TYPE_D: { label: "Type D", src: "assets/arrow/TypeD.svg" },
   DOWN: {
     label: "Down",
-    src: "assets/arrowBlocks/DOWN.svg",
+    src: "assets/arrow/Down.svg",
     defaultSize: 2.75,
   },
   DOWN_CA: {
     label: "Down (CA)",
-    src: "assets/arrowBlocks/DOWN_CA.svg",
+    src: "assets/arrow/CanadaDown.svg",
     defaultSize: 2.75,
   },
-  UK: { label: "UK", src: "assets/arrowBlocks/UK.svg" },
+  UK: { label: "UK", src: "assets/arrow/ArrowUK.svg" },
 };

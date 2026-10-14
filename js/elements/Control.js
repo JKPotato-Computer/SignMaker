@@ -1024,6 +1024,7 @@ TollLogoElement.prototype.logos = {
   PlatePay: { label: "PlatePay", src: "assets/tolls/PLATEPAY.svg" },
   PayByMail: { label: "Pay By Mail", src: "assets/tolls/PAY_BY_MAIL.png" },
   IPASS: { label: "I-Pass", src: "assets/tolls/I-Pass.svg" },
+  IPASS2: { label: "I-Pass (new)", src: "assets/tolls/IPASS-NEW.svg" },
   GeauxPass: { label: "GeauxPass", src: "assets/tolls/GEAUXPASS.svg" },
   GoodToGo: { label: "Good To Go!", src: "assets/tolls/GOODTOGO.svg" },
   ExpressToll: { label: "ExpressToll", src: "assets/tolls/EXPRESSTOLL.svg" },
@@ -1237,7 +1238,10 @@ class Control {
       flexRow.dataset.blockBackgroundColor = blockBackgroundColor;
       flexRow.dataset.blockBorderColor = usesBlackBorder ? "black" : "white";
 
-      if (properties.backgroundFullWidth) {
+      if (
+        properties.backgroundFullWidth &&
+        panel.sign.arrows.arrowMode != "diagrammic"
+      ) {
         flexRow.classList.add("fullBleed");
 
         flexRow.style.setProperty(

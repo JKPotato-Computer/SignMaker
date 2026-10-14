@@ -285,11 +285,12 @@
 
 .sideLeftArrow {
   margin-left: 1rem;
+  rotate: -45deg;
 }
 
 .sideRightArrow {
   margin-right: 1rem;
-  transform: scaleX(-1);
+  rotate: 45deg;
 }
 
 .signContentContainer {

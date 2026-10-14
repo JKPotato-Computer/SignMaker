@@ -10,6 +10,8 @@ const exitTabPresets = (() => {
         variant: "Normal",
         holderPadding: "2",
         useTrimFormat: true,
+        width: "full",
+        alignment: "center",
       },
       ["TX Exit Sign (2000)"]: {
         minimumHeight: 1.8,
