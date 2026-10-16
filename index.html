@@ -26,6 +26,7 @@
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
     <script type="module">
+      // compatability w/ npx vite
       import terminal from "virtual:terminal";
 
       window.addEventListener("error", (event) => {
@@ -34,9 +35,20 @@
         );
       });
 
-      window.addEventListener("unhandledrejection", (event) => {
-        terminal.error(`[Browser Promise Rejection] ${event.reason}`);
-      });
+      window.addEventListener('unhandledrejection', (event) => {
+        const error = event.reason;
+        if (error && error.stack) {
+          const matches = error.stack.match(/(https?:\/\/[^)\s]+):(\d+):(\d+)/);
+          
+          if (matches) {
+            const fileName = matches[1];
+            const lineNumber = matches[2];
+            const columnNumber = matches[3];
+            console.log(`[Browser Error] ${error} @ File: ${fileName} Line: ${lineNumber}, Column: ${columnNumber}`);
+          }
+      }
+});
+
     </script>
     <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
@@ -4758,13 +4770,15 @@
                   id="exitOnlyRoundCorners"
                   onchange="formHandler.readForm()"
                 />
-                <!--
+
                 <hr />
-                <label for="otherSymbol">Other Bottom Symbols:</label>
+                <label for="otherSymbol">Other Bottom Symbol:</label>
                 <select
                   id="otherSymbol"
                   onchange="formHandler.readForm()"
                 ></select>
+                <div>
+                  <label for="oSNum">Exit Number:</label>
                 <input
                   type="text"
                   id="oSNum"
@@ -4772,7 +4786,8 @@
                   placeholder="Exit Num"
                   onblur="formHandler.readForm()"
                 />
-                -->
+                </div>
+                
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">

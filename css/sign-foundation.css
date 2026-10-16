@@ -1336,3 +1336,9 @@ main#smRender.wide #postContainer {
 .guideArrowsHolder:has(.split_exit_only) {
   background-color: var(--bg-color);
 }
+
+.bannerElmt_specialDivider {
+  width: 100%;
+  height: 3px;
+  background: var(--fg-color);
+}

@@ -1118,10 +1118,10 @@ class GroupElement {
     direction = "Vertical",
     width = 0,
     boxFormat = "Normal",
-    formatSize = 0.1,
+    formatSize = 0.04,
     border = false,
     borderWidth = 5,
-    borderColor = "Inherit",
+    borderColor = "Black",
   } = {}) {
     if (this.blockElements) {
       this.blockElements = blockElements;
@@ -1145,7 +1145,7 @@ class GroupElement {
       panel,
       subPanel,
     );
-    blockEleemntHolder.classList.add("bE-groupElement");
+    blockElementHolder.classList.add("bE-groupElement");
 
     if (this.border) {
       blockElementHolder.style.border = `${this.borderWidth}px solid ${
@@ -1157,6 +1157,11 @@ class GroupElement {
           ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
           : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
       blockElementHolder.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
+      
+      for (const elem of blockElementHolder.querySelectorAll(".blockElementRow")) {
+        elem.style.mixBlendMode = "multiply";
+        elem.classList.remove("fullBleed");
+      }
     }
 
     if (this.direction == "Horizontal") {
