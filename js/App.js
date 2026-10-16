@@ -339,6 +339,13 @@ const App = (() => {
   const changeEditingPanel = (panelNumber) => {
     currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1);
     currentlySelectedSubPanelIndex = 0;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+
     formHandler.updateForm();
   };
 
@@ -2074,7 +2081,7 @@ const App = (() => {
                 panel.corner == "Sharp" &&
                 exitOnlyConfig.borderMode != "White Border"
               ) {
-                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase()}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase()}) 100%)`;
+                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 100%)`;
               }
             }
 

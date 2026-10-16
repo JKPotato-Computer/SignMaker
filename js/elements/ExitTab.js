@@ -385,6 +385,9 @@ class ExitTab {
         }
       }
 
+      this.textContent = this.textContent
+        .replace(/\\t/g, "\t")
+        .replace(/\\n/g, "\n");
       let splitText = this.splitText(this.textContent);
       for (let i = 0; i < splitText.length; i++) {
         let item = splitText[i];

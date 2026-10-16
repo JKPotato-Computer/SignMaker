@@ -690,59 +690,6 @@ textarea {
   transition: none;
 }
 
-#shieldBacksLabel {
-  width: auto;
-}
-
-.shields div {
-  border-radius: 0.25rem;
-
-  width: -moz-max-content;
-  width: -webkit-max-content;
-  width: intrinsic;
-}
-.shields div:nth-child(odd) {
-  background-color: rgba(var(--baseColor), 0.33);
-}
-
-.shields div:nth-child(even) {
-  background-color: rgba(var(--baseColor), 0.11);
-}
-
-.shields label,
-.shields select:first-of-type {
-  width: auto;
-}
-.shields label {
-  margin: 0;
-}
-
-.clear:hover {
-  background-color: rgb(247, 176, 176) !important;
-}
-
-#controlCitiesLabel {
-  position: relative;
-  top: -5rem;
-}
-
-#guideArrowLanes {
-  width: 2.25rem;
-}
-
-#actionMessage,
-#g_actionMessage {
-  width: 15.75rem;
-}
-
-#guideArrowLanes {
-  width: 3rem;
-}
-
-#oSNum {
-  margin-left: 8.5rem;
-}
-
 #currentPanel {
   width: auto;
   background: linear-gradient(
@@ -793,7 +740,6 @@ textarea {
   gap: 0.5rem;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  border: 1px solid black;
 }
 
 #fileTypeOptions button {
@@ -829,15 +775,6 @@ textarea {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-}
-
-.controlTextArea {
-  font-size: 0.8rem;
-  font-family: "Clearview 4W";
-}
-
-.radioOption {
-  width: auto;
 }
 
 .exitTabGroup {

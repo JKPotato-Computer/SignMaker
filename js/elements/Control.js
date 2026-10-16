@@ -1275,17 +1275,41 @@ class Control {
             "--blockBorderRadiusTopRight",
             `${panel.borderRadius}rem`,
           );
-          flexRow.style.setProperty(
-            "--blockBorderRadiusBottomLeft",
-            `${panel.borderRadius}rem`,
-          );
-          flexRow.style.setProperty(
-            "--blockBorderRadiusBottomRight",
-            `${panel.borderRadius}rem`,
-          );
+          if (
+            panel.sign.arrows.arrowMode != "apl" &&
+            (panel.sign.arrows.arrowMode == "standard"
+              ? ![
+                  "Exit Only",
+                  "Split Exit Only",
+                  "Half Exit Only",
+                  "Custom",
+                ].includes(panel.sign.arrows.standard.variant)
+              : true)
+          ) {
+            flexRow.style.setProperty(
+              "--blockBorderRadiusBottomLeft",
+              `${panel.borderRadius}rem`,
+            );
+            flexRow.style.setProperty(
+              "--blockBorderRadiusBottomRight",
+              `${panel.borderRadius}rem`,
+            );
+          }
         }
 
-        if (i == totalRows - 1 && panel.sign.subPanels[0] === subPanel) {
+        if (
+          i == totalRows - 1 &&
+          panel.sign.subPanels[0] === subPanel &&
+          panel.sign.arrows.arrowMode != "apl" &&
+          (panel.sign.arrows.arrowMode == "standard"
+            ? ![
+                "Exit Only",
+                "Split Exit Only",
+                "Half Exit Only",
+                "Custom",
+              ].includes(panel.sign.arrows.standard.variant)
+            : true)
+        ) {
           flexRow.style.setProperty(
             "--blockBorderRadiusBottomLeft",
             `${panel.borderRadius}rem`,
@@ -1294,7 +1318,16 @@ class Control {
 
         if (
           i == totalRows - 1 &&
-          panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
+          panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel &&
+          panel.sign.arrows.arrowMode != "apl" &&
+          (panel.sign.arrows.arrowMode == "standard"
+            ? ![
+                "Exit Only",
+                "Split Exit Only",
+                "Half Exit Only",
+                "Custom",
+              ].includes(panel.sign.arrows.standard.variant)
+            : true)
         ) {
           flexRow.style.setProperty(
             "--blockBorderRadiusBottomRight",
@@ -1328,7 +1361,18 @@ class Control {
             flexRow.style.setProperty("--marginBorderTop", "-0.2rem");
           }
 
-          if (i == totalRows - 1) {
+          if (
+            i == totalRows - 1 &&
+            panel.sign.arrows.arrowMode != "apl" &&
+            (panel.sign.arrows.arrowMode == "standard"
+              ? ![
+                  "Exit Only",
+                  "Split Exit Only",
+                  "Half Exit Only",
+                  "Custom",
+                ].includes(panel.sign.arrows.standard.variant)
+              : true)
+          ) {
             flexRow.style.borderBottom = `.2rem solid`;
             flexRow.style.setProperty("--marginBorderBottom", "-0.2rem");
           }
