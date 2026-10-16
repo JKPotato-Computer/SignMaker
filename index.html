@@ -3848,9 +3848,12 @@
                       value="0"
                       step="0.01"
                     />
-                    <br />
                     <label for="sdElectronicSign_textColor">Text Color:</label>
                     <select id="sdElectronicSign_textColor"></select>
+                    <br />
+                    <label for="sdElectronicSign_textFormat">Format:</label>
+                    <select id="sdElectronicSign_textFormat"></select>
+                    <input type="number" id="sdElectronicSign_formatSize" min="0" step=".01" value=".1" class="sdTextEditorSmall" data-toolTip="Pixel Size (px)"/>
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
                     <br />
@@ -3924,6 +3927,14 @@
                       step=".01"
                       value="0"
                     />
+                    <br />
+                    <label for="sdGroup_boxFormat">Box Format:</label>
+                    <select id="sdGroup_boxFormat"></select>
+                    <input type="number" id="sdGroup_formatSize" class="smallVal" min="0" step=".01" value=".04" data-toolTip="Pixel Size (rem)" />
+                    <label for="sdGroup_border">Border:</label>
+                    <input type="checkbox" id="sdGroup_border" />
+                    <input type="number" id="sdGroup_borderWidth" min="0" class="smallVal" step="1" value="5" data-toolTip="Border Width (px)" />
+                    <select id="sdGroup_borderColor" data-toolTip="Border Color"></select>
                   </div>
                 </div>
                 <fieldset id="smSPBlockProperties">

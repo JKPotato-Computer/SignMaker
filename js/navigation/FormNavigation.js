@@ -724,6 +724,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdTollLogo_backgroundColor"),
       document.querySelector("#sdTollLogo_containerBackgroundColor"),
       document.querySelector("#sdAdvisory_borderColor"),
+      document.querySelector("#sdGroup_borderColor")``
     ];
     for (const elem of textElem_bgColorSelects) {
       for (const backgroundColor of TextElement.prototype.backgroundColor) {
@@ -783,6 +784,10 @@ const FormNavigation = (() => {
     );
     for (const textColor of ElectronicSignElement.prototype.textColors) {
       lib.appendOption(eSignColorSelect, textColor);
+    }
+
+    for (const format of ElectronicSignElement.prototype.textFormats) {
+      lib.appendOption(document.querySelector("#sdElectronicSign_textFormat"), format);
     }
 
     // Divider measurement
@@ -849,6 +854,10 @@ const FormNavigation = (() => {
 
     for (const direction of GroupElement.prototype.blockDirection) {
       lib.appendOption(document.querySelector("#sdGroup_direction"), direction);
+    }
+
+    for (const format of GroupElement.prototype.boxFormat) {
+      lib.appendOption(document.querySelector("#sdGroup_boxFormat"), format);
     }
   };
 

@@ -280,6 +280,8 @@ class ElectronicSignElement extends TextElement {
   constructor({
     fontFamily = "Electronic Highway Sign",
     textColor = "Orange",
+    textFormat = "Full Text",
+    formatSize = 0.1,
     horizPadding = 0.5,
     vertPadding = 0.5,
     glow = true,
@@ -296,6 +298,8 @@ class ElectronicSignElement extends TextElement {
     this.glow = glow;
     this.setWidth = setWidth;
     this.wordSpacing = wordSpacing;
+    this.textFormat = textFormat;
+    this.formatSize = formatSize;
     Object.defineProperty(this, "backgroundColor", {
       get: function () {
         return "Black";
@@ -321,6 +325,38 @@ class ElectronicSignElement extends TextElement {
     );
     newText.style.width = this.setWidth != 0 ? this.setWidth + "rem" : "";
 
+    if (
+      this.textFormat === "Circle Pixels" ||
+      this.textFormat == "Square Pixels"
+    ) {
+      newText.style.background =
+        this.textFormat == "Circle Pixels"
+          ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
+          : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
+      newText.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
+      newText.style.setProperty("--horizPadding", 0);
+      newText.style.setProperty("--vertPadding", 0);
+      newText.style.setProperty("--textShadow", "");
+
+      let i = 0;
+      for (const elem of newText.querySelectorAll(".lineElement")) {
+        elem.style.background = "black";
+        elem.style.mixBlendMode = "multiply";
+        elem.style.paddingLeft = this.horizPadding + "rem";
+        elem.style.paddingRight = this.horizPadding + "rem";
+
+        if (i == 0) {
+          elem.style.paddingTop = this.vertPadding + "rem";
+        }
+
+        if (i == newText.querySelectorAll(".lineElement").length - 1) {
+          elem.style.paddingBottom = this.vertPadding + "rem";
+        }
+
+        i++;
+      }
+    }
+
     return newText;
   }
 }
@@ -334,6 +370,11 @@ ElectronicSignElement.prototype.textColors = [
   "White",
   "Yellow",
   "Red",
+];
+ElectronicSignElement.prototype.textFormats = [
+  "Full Text",
+  "Circle Pixels",
+  "Square Pixels",
 ];
 
 class ShieldGroupElement {
@@ -1072,7 +1113,16 @@ class Block {
 
 // basically control but w/o some of the block properties
 class GroupElement {
-  constructor({ blockElements, direction = "Vertical", width = 0 } = {}) {
+  constructor({
+    blockElements,
+    direction = "Vertical",
+    width = 0,
+    boxFormat = "Normal",
+    formatSize = 0.1,
+    border = false,
+    borderWidth = 5,
+    borderColor = "Inherit",
+  } = {}) {
     if (this.blockElements) {
       this.blockElements = blockElements;
     } else {
@@ -1083,6 +1133,11 @@ class GroupElement {
     this.blockElements.isGroup = true;
     this.direction = direction;
     this.width = width;
+    this.border = border;
+    this.borderWidth = borderWidth;
+    this.borderColor = borderColor;
+    this.boxFormat = boxFormat;
+    this.formatSize = formatSize;
   }
 
   createElement(panel, subPanel) {
@@ -1090,6 +1145,20 @@ class GroupElement {
       panel,
       subPanel,
     );
+    blockEleemntHolder.classList.add("bE-groupElement");
+
+    if (this.border) {
+      blockElementHolder.style.border = `${this.borderWidth}px solid ${
+        lib.colors[this.borderColor] || this.borderColor.toLowerCase()}`;
+    }
+
+    if (this.boxFormat == "Circle Pixels" || this.boxFormat == "Square Pixels") {
+      blockElementHolder.style.background = this.boxFormat == "Circle Pixels"
+          ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
+          : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
+      blockElementHolder.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
+    }
+
     if (this.direction == "Horizontal") {
       blockElementHolder.style.flexDirection = "row";
     } else {
@@ -1104,6 +1173,7 @@ class GroupElement {
   }
 }
 GroupElement.prototype.blockDirection = ["Horizontal", "Vertical"];
+GroupElement.prototype.boxFormat = ["Normal", "Circle Pixels", "Square Pixels"];
 
 class Control {
   constructor({ rows = [], blockProperties = [], isGroup = false } = {}) {
@@ -1265,86 +1335,6 @@ class Control {
         flexRow.style.setProperty("--marginBorderRight", "0rem");
         flexRow.style.setProperty("--marginBorderTop", "0rem");
         flexRow.style.setProperty("--marginBorderBottom", "0rem");
-
-        if (totalRows == 1 && panel.sign.subPanels.length == 1) {
-          flexRow.style.setProperty(
-            "--blockBorderRadiusTopLeft",
-            `${panel.borderRadius}rem`,
-          );
-          flexRow.style.setProperty(
-            "--blockBorderRadiusTopRight",
-            `${panel.borderRadius}rem`,
-          );
-          flexRow.style.setProperty(
-            "--blockBorderRadiusBottomLeft",
-            `${panel.borderRadius}rem`,
-          );
-          flexRow.style.setProperty(
-            "--blockBorderRadiusBottomRight",
-            `${panel.borderRadius}rem`,
-          );
-        }
-
-        if (i == totalRows - 1 && panel.sign.subPanels[0] === subPanel) {
-          flexRow.style.setProperty(
-            "--blockBorderRadiusBottomLeft",
-            `${panel.borderRadius}rem`,
-          );
-        }
-
-        if (
-          i == totalRows - 1 &&
-          panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
-        ) {
-          flexRow.style.setProperty(
-            "--blockBorderRadiusBottomRight",
-            `${panel.borderRadius}rem`,
-          );
-        }
-
-        if (i == 0 && panel.sign.subPanels[0] === subPanel) {
-          flexRow.style.setProperty(
-            "--blockBorderRadiusTopLeft",
-            `${panel.borderRadius}rem`,
-          );
-        }
-
-        if (
-          i == 0 &&
-          panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
-        ) {
-          flexRow.style.setProperty(
-            "--blockBorderRadiusTopRight",
-            `${panel.borderRadius}rem`,
-          );
-        }
-
-        if (
-          panel.color != properties.backgroundColor &&
-          properties.backgroundColor != "Inherit"
-        ) {
-          if (i == 0) {
-            flexRow.style.borderTop = `.2rem solid`;
-            flexRow.style.setProperty("--marginBorderTop", "-0.2rem");
-          }
-
-          if (i == totalRows - 1) {
-            flexRow.style.borderBottom = `.2rem solid`;
-            flexRow.style.setProperty("--marginBorderBottom", "-0.2rem");
-          }
-
-          if (panel.sign.subPanels[0] === subPanel) {
-            flexRow.style.borderLeft = `.2rem solid`;
-            flexRow.style.setProperty("--marginBorderLeft", "-0.2rem");
-          }
-
-          if (
-            panel.sign.subPanels[panel.sign.subPanels.length - 1] === subPanel
-          ) {
-            flexRow.style.borderRight = `.2rem solid`;
-            flexRow.style.setProperty("--marginBorderRight", "-0.2rem");
-          }
-        }
       } else {
         flexRow.style.width =
           properties.width == 0 ? "" : properties.width + "rem";
