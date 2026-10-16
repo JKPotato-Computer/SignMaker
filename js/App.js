@@ -1234,7 +1234,7 @@ const App = (() => {
     signCorners,
   ) => {
     const blockMasters = subpanelList.map((subpanel) =>
-      subpanel.querySelector(".blockElementMaster"),
+      subpanel.querySelector(".blockElementMaster:not(.bE-groupElement)"),
     );
     const masterRects = blockMasters.map((master) =>
       master.getBoundingClientRect(),

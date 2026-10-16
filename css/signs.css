@@ -269,6 +269,7 @@
   border-radius: var(--signBorderRadius, 0.75rem);
   border: .2rem solid;
   clear: both;
+  overflow: hidden;
   visibility: visible;
   z-index: 2;
   position: relative;
@@ -478,5 +479,4 @@ img.diagrammicImage {
 
 .signHolder.diagrammic .subDivider {
   display: none;
-}
 }

@@ -406,7 +406,28 @@ class Banner {
       bannerElmt.style.color = "black";
     }
 
-    bannerElmt.textContent = this.textContent;
+    let modifiedText = this.textContent.replace(/\\n/g, "\n");
+    if (modifiedText.split("\n").length == 2) {
+      let text1 = modifiedText.split("\n")[0];
+      let text2 = modifiedText.split("\n")[1];
+
+      const bannerText1 = document.createElement("span");
+      bannerText1.className = "bannerElmt_specialTop";
+      bannerText1.textContent = text1;
+
+      const bannerSpecialDivider = document.createElement("div");
+      bannerSpecialDivider.className = "bannerElmt_specialDivider";
+
+      const bannerText2 = document.createElement("span");
+      bannerText2.className = "bannerElmt_specialBottom";
+      bannerText2.textContent = text2;
+
+      bannerElmt.appendChild(bannerText1);
+      bannerElmt.appendChild(bannerSpecialDivider);
+      bannerElmt.appendChild(bannerText2);
+    } else {
+      bannerElmt.textContent = modifiedText;
+    }
     return bannerElmt;
   }
 }

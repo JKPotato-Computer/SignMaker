@@ -39,10 +39,6 @@ main#smRender.wide #postContainer {
   padding: var(--blockPaddingTop) var(--blockPaddingRight) var(--blockPaddingBottom) var(--blockPaddingLeft);
 }
 
-.signHolder.diagrammic .blockElementRow.fullBleed {
-  border: none !important;
-}
-
 .blockElementRow.fullBleed {
   margin: calc(-1 * var(--blockBleedTop) + var(--marginTop) + var(--marginBorderTop)) calc(-1 * var(--blockBleedRight) + var(--marginBorderRight)) calc(-1 * var(--blockBleedBottom) + var(--marginBottom) + var(--marginBorderBottom)) calc(-1 * var(--blockBleedLeft) + var(--marginBorderLeft));
   padding: calc(var(--blockPaddingTop) + var(--blockBleedTop)) calc(var(--blockBleedRight) + var(--blockPaddingRight)) calc(var(--blockBleedBottom) + var(--blockPaddingBottom)) calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
@@ -1339,4 +1335,10 @@ main#smRender.wide #postContainer {
 
 .guideArrowsHolder:has(.split_exit_only) {
   background-color: var(--bg-color);
+}
+
+.bannerElmt_specialDivider {
+  width: 100%;
+  height: 3px;
+  background: var(--fg-color);
 }
