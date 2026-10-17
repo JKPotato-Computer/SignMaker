@@ -35,21 +35,23 @@
         );
       });
 
-      window.addEventListener('unhandledrejection', (event) => {
+      window.addEventListener("unhandledrejection", (event) => {
         const error = event.reason;
         if (error && error.stack) {
           const matches = error.stack.match(/(https?:\/\/[^)\s]+):(\d+):(\d+)/);
-          
+
           if (matches) {
             const fileName = matches[1];
             const lineNumber = matches[2];
             const columnNumber = matches[3];
-            console.log(`[Browser Error] ${error} @ File: ${fileName} Line: ${lineNumber}, Column: ${columnNumber}`);
+            console.log(
+              `[Browser Error] ${error} @ File: ${fileName} Line: ${lineNumber}, Column: ${columnNumber}`,
+            );
           }
-      }
-});
-
+        }
+      });
     </script>
+
     <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
 
@@ -193,34 +195,70 @@
       </dialog>
       <dialog id="downloadContent">
         <div id="downloadContents">
-          <h3>Download Sign</h3>
+          <h3>
+            <span class="material-symbols-outlined">download</span> Export Sign
+          </h3>
+          <label for="exportAsPNG">File Type:</label>
           <div id="fileTypeOptions">
-            <label for="PNG" id="fileTypeLabel">Save As: </label>
             <button
               type="button"
-              id="PNG"
-              class="activated"
-              onclick="App.updateFileType(`png`)"
+              id="exportAsPNG"
+              onclick="
+                ImportExport.changeFileType(`png`);
+                ImportExport.updatePreview();
+              "
             >
               PNG
             </button>
             <button
               type="button"
-              id="SVG"
-              class=""
-              onclick="App.updateFileType(`png`)"
+              id="exportAsSVG"
+              onclick="
+                ImportExport.changeFileType(`svg`);
+                ImportExport.updatePreview();
+              "
             >
               SVG
             </button>
             <button
               type="button"
-              id="JSON"
-              class=""
-              onclick="App.updateFileType(`json`)"
+              id="exportAsJSON"
+              onclick="
+                ImportExport.changeFileType(`json`);
+                ImportExport.updatePreview();
+              "
             >
               JSON
             </button>
           </div>
+          <br />
+          <label for="downloadImageScale">Scale</label>
+          <input
+            type="range"
+            min="1"
+            value="2"
+            max="10"
+            step="1"
+            id="downloadImageScale"
+            onchange="
+              ImportExport.setImageScale(this.value);
+              document.querySelector('#downloadImageScaleVal').value =
+                this.value;
+              ImportExport.updatePreview();
+            "
+          />
+          <input
+            type="number"
+            min="1"
+            value="2"
+            placeholder="2"
+            max="10"
+            step="1"
+            id="downloadImageScaleVal"
+            onchange="
+              document.querySelector('#downloadImageScale').value = this.value
+            "
+          />
           <br />
           <label for="entirePost" id="entirePostLabel">Entire Post</label>
           <input
@@ -228,35 +266,70 @@
             id="entirePost"
             name="entirePost"
             value="entirePost"
-            onchange="ImportExport.updatePreview()"
+            onchange="
+              ImportExport.toggleEntirePost(this.checked);
+              ImportExport.updatePreview();
+            "
             checked=""
           />
           <br />
-          <div id="singularPanel">
-            <label for="selectPanel" id="selectPanelLabel">Panel Number</label>
-            <input
-              type="number"
-              id="selectPanel"
-              name="selectPanel"
-              onchange="ImportExport.updatePreview()"
-              min="1"
-              step="1"
-              value="1"
-            />
-            <br />
+          <div id="downloadPanelContainer" style="display: none">
+            <label for="selectPanel" id="selectPanelLabel">Panels:</label>
+            <div id="downloadPanelList">
+              <button class="downloadPanelBtn selected">1</button>
+              <button class="downloadPanelBtn selected">2</button>
+              <button class="downloadPanelBtn">3</button>
+            </div>
           </div>
-          <div class="options">
-            <button type="button" id="cancelDownload">Cancel</button>
+          <div class="downloadSignFooter">
             <button
               type="button"
-              id="download"
+              id="cancelDownload"
+              class="redButton"
+              onclick="ImportExport.close()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="copyToClipboard"
+              onclick="
+                ImportExport.downloadSign(true);
+                this.textContent = 'Copied!';
+                setTimeout(() => {
+                  this.textContent = 'Copy Image';
+                }, 1000);
+              "
+            >
+              Copy Image
+            </button>
+            <button
+              type="button"
+              id="downloadSignButton"
               onclick="ImportExport.downloadSign()"
             >
-              Download
+              Download Image
             </button>
           </div>
         </div>
-        <div id="downloadPreview"></div>
+        <div id="downloadPreviewHolder">
+          <div class="downloadImageToolbar">
+            <button class="material-symbols-outlined" id="downloadImageZoomOut">
+              zoom_out
+            </button>
+            <span id="downloadImageZoomValue">100%</span>
+            <button class="material-symbols-outlined" id="downloadImageZoomIn">
+              zoom_in
+            </button>
+            <button
+              class="material-symbols-outlined"
+              id="downloadImageZoomReset"
+            >
+              refresh
+            </button>
+          </div>
+          <div id="downloadPreview"></div>
+        </div>
       </dialog>
       <dialog id="shieldEditorModal">
         <div class="shieldEditorPane">
@@ -1579,7 +1652,10 @@
                   name="sMET_variantIconSizeVal"
                   value="3"
                   step="0.1"
-                  onchange="formHandler.readForm()"
+                  onchange="
+                    document.getElementById('sMET_variantIconSize').value =
+                      this.value
+                  "
                 />
                 <label for="sMET_variantIsSquareIcon" class="checkboxLabel">
                   <input
@@ -3865,7 +3941,15 @@
                     <br />
                     <label for="sdElectronicSign_textFormat">Format:</label>
                     <select id="sdElectronicSign_textFormat"></select>
-                    <input type="number" id="sdElectronicSign_formatSize" min="0" step=".01" value=".1" class="sdTextEditorSmall" data-toolTip="Pixel Size (px)"/>
+                    <input
+                      type="number"
+                      id="sdElectronicSign_formatSize"
+                      min="0"
+                      step=".01"
+                      value=".1"
+                      class="sdTextEditorSmall"
+                      data-toolTip="Pixel Size (px)"
+                    />
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
                     <br />
@@ -3942,11 +4026,30 @@
                     <br />
                     <label for="sdGroup_boxFormat">Box Format:</label>
                     <select id="sdGroup_boxFormat"></select>
-                    <input type="number" id="sdGroup_formatSize" class="smallVal" min="0" step=".01" value=".04" data-toolTip="Pixel Size (rem)" />
+                    <input
+                      type="number"
+                      id="sdGroup_formatSize"
+                      class="smallVal"
+                      min="0"
+                      step=".01"
+                      value=".04"
+                      data-toolTip="Pixel Size (rem)"
+                    />
                     <label for="sdGroup_border">Border:</label>
                     <input type="checkbox" id="sdGroup_border" />
-                    <input type="number" id="sdGroup_borderWidth" min="0" class="smallVal" step="1" value="5" data-toolTip="Border Width (px)" />
-                    <select id="sdGroup_borderColor" data-toolTip="Border Color"></select>
+                    <input
+                      type="number"
+                      id="sdGroup_borderWidth"
+                      min="0"
+                      class="smallVal"
+                      step="1"
+                      value="5"
+                      data-toolTip="Border Width (px)"
+                    />
+                    <select
+                      id="sdGroup_borderColor"
+                      data-toolTip="Border Color"
+                    ></select>
                   </div>
                 </div>
                 <fieldset id="smSPBlockProperties">
@@ -4779,15 +4882,14 @@
                 ></select>
                 <div>
                   <label for="oSNum">Exit Number:</label>
-                <input
-                  type="text"
-                  id="oSNum"
-                  name="oSNum"
-                  placeholder="Exit Num"
-                  onblur="formHandler.readForm()"
-                />
+                  <input
+                    type="text"
+                    id="oSNum"
+                    name="oSNum"
+                    placeholder="Exit Num"
+                    onblur="formHandler.readForm()"
+                  />
                 </div>
-                
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">

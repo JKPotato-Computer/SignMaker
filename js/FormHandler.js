@@ -1241,21 +1241,32 @@ const formHandler = (() => {
       document.querySelector("#sMET_enlargeNumeralsSize"),
     ]);
 
-    if (document.querySelector("#sdElectronicSign_textFormat").value == "Full Text") {
-      document.querySelector("#sdElectronicSign_formatSize").style.display = "none";
+    if (
+      document.querySelector("#sdElectronicSign_textFormat").value ==
+      "Full Text"
+    ) {
+      document.querySelector("#sdElectronicSign_formatSize").style.display =
+        "none";
       document.querySelector("#sdElectronicSign_glow").style.display = "";
-      document.querySelector('label[for="sdElectronicSign_glow"]').style.display = "";
+      document.querySelector(
+        'label[for="sdElectronicSign_glow"]',
+      ).style.display = "";
     } else {
       document.querySelector("#sdElectronicSign_formatSize").style.display = "";
       document.querySelector("#sdElectronicSign_glow").style.display = "none";
-      document.querySelector('label[for="sdElectronicSign_glow"]').style.display = "none";
+      document.querySelector(
+        'label[for="sdElectronicSign_glow"]',
+      ).style.display = "none";
     }
 
-    document.querySelector("#sdGroup_formatSize").style.display = document.querySelector("#sdGroup_boxFormat").value == "Normal" ? "none" : "";
+    document.querySelector("#sdGroup_formatSize").style.display =
+      document.querySelector("#sdGroup_boxFormat").value == "Normal"
+        ? "none"
+        : "";
     toggleVisibility(document.querySelector("#sdGroup_border"), [
       document.querySelector("#sdGroup_borderWidth"),
-      document.querySelector("#sdGroup_borderColor")
-    ])
+      document.querySelector("#sdGroup_borderColor"),
+    ]);
   };
 
   const updateExitTabSubform = () => {
@@ -2525,9 +2536,9 @@ const formHandler = (() => {
           exitOnlyConfigs.numArrows <= 1 ? "none" : "";
 
         document.querySelector("#exitOnlyGap").style.display =
-          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+          exitOnlyConfigs.numArrows <= 2 ? "none" : "";
         document.querySelector('label[for="exitOnlyGap"]').style.display =
-          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+          exitOnlyConfigs.numArrows <= 2 ? "none" : "";
 
         document.querySelector("#exitOnlyTextGap").value =
           exitOnlyConfigs.textGap;

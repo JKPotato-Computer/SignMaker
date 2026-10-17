@@ -6,6 +6,6 @@
     "esbuild@0.28.2": true
   },
   "dependencies": {
-    "vite": "^8.3.1"
+    "vite": "^8.3.4"
   }
 }

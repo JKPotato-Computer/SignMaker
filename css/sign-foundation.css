@@ -444,14 +444,6 @@ main#smRender.wide #postContainer {
   font-family: "Series C";
 }
 
-.shield::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  anchor-name: --routeNumberAnchor;
-  pointer-events: none;
-}
-
 .shieldImg.shieldBacks {
   background-color: var(--sbColor);
   border-radius: var(--sbRadius);
@@ -459,6 +451,7 @@ main#smRender.wide #postContainer {
 
 .shieldImg {
   height: calc(3rem * var(--shieldScale));
+  anchor-name: --routeNumberAnchor;
 }
 
 .routeNumber {
@@ -466,14 +459,15 @@ main#smRender.wide #postContainer {
   position: absolute;
   position-anchor: --routeNumberAnchor;
   position-area: center;
+  justify-self: center;
+  align-self: center;
   line-height: 0;
   scale: var(--routeScale, 1);
-  transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
-  height: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
+  transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
 }
-
 .designation {
   position: absolute;
   position-anchor: --routeNumberAnchor;
@@ -556,6 +550,10 @@ main#smRender.wide #postContainer {
   left: 0;
   width: max-content;
   min-width: 100%;
+}
+
+.panel.sharp .guideArrowsHolder:has(.guidearrows.custom) {
+  background-color: var(--bg-color);
 }
 
 .exitTabContainer.within .ET-tabHolder {
@@ -690,8 +688,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-iconImage {
-  width: calc(var(--iconSize) + var(--iconHorizontalPadding) * 2);
-  height: calc(var(--iconImageHeight) + var(--iconVerticalPadding) * 2);
+  width: var(--iconSize);
   object-fit: contain;
 }
 
@@ -704,11 +701,9 @@ main#smRender.wide #postContainer {
 
 .ET-iconImage.square {
   aspect-ratio: 1 / 1;
-  width: calc(var(--iconSize) + var(--pbmPadding) * 2);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.5cqh;
 }
 
 .ET-iconText,

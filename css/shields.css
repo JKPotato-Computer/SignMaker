@@ -1,8 +1,8 @@
 .shield.I .routeNumber,
 .shield.I-BUS .routeNumber {
   color: var(--white);
-  top: .175em;
-  font-size: 1.5em;
+  top: .4em;
+  font-size: 1.75em;
 }
 
 .shield.I.OneDigit .routeNumber,
