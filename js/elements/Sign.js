@@ -213,3 +213,5 @@ Sign.prototype.exitOnlyBorderTypes = [
   "Partial Black Border",
   "White Border",
 ];
+
+window.Sign = Sign;

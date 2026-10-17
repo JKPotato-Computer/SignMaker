@@ -733,6 +733,10 @@ const formHandler = (() => {
       );
     }
 
+    // save sign to localstorage
+    let signData = ImportExport.signToJson(post, "post");
+    localStorage.setItem("signData", signData);
+
     updateForm();
     app.redraw();
   };
@@ -1192,15 +1196,24 @@ const formHandler = (() => {
 
     toggleVisibility(
       document.querySelector("#sdCtrlText_useNumeralFormatting"),
-      [document.querySelector("#sdCtrlText_numeralFormattingSize")],
+      [
+        document.querySelector("#sdCtrlText_numeralFormattingSize"),
+        document.querySelector("#sdCtrlText_spaceNumeralsLetters"),
+      ],
     );
     toggleVisibility(
       document.querySelector("#sdActionMessage_useNumeralFormatting"),
-      [document.querySelector("#sdActionMessage_numeralFormattingSize")],
+      [
+        document.querySelector("#sdActionMessage_numeralFormattingSize"),
+        document.querySelector("#sdActionMessage_spaceNumeralsLetters"),
+      ],
     );
     toggleVisibility(
       document.querySelector("#sdAdvisory_useNumeralFormatting"),
-      [document.querySelector("#sdAdvisory_numeralFormattingSize")],
+      [
+        document.querySelector("#sdAdvisory_numeralFormattingSize"),
+        document.querySelector("#sdAdvisory_spaceNumeralsLetters"),
+      ],
     );
     toggleVisibility(
       document.querySelector("#sdCtrlText_useBannerFormatting"),

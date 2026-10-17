@@ -3014,3 +3014,6 @@ const DiagramDrawing = (() => {
     init,
   };
 })();
+
+window.Point = Point;
+window.Road = Road;

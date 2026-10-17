@@ -114,7 +114,12 @@ const FormNavigation = (() => {
       }
 
       for (const button of document.querySelectorAll(".sMConfigOption")) {
-        if (!button.id || button.id == "nightMode") {
+        if (
+          !button.id ||
+          button.id == "nightMode" ||
+          button.id == "importSign" ||
+          button.id == "exportSign"
+        ) {
           continue;
         }
 
@@ -724,7 +729,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdTollLogo_backgroundColor"),
       document.querySelector("#sdTollLogo_containerBackgroundColor"),
       document.querySelector("#sdAdvisory_borderColor"),
-      document.querySelector("#sdGroup_borderColor")
+      document.querySelector("#sdGroup_borderColor"),
     ];
     for (const elem of textElem_bgColorSelects) {
       for (const backgroundColor of TextElement.prototype.backgroundColor) {
@@ -787,7 +792,10 @@ const FormNavigation = (() => {
     }
 
     for (const format of ElectronicSignElement.prototype.textFormats) {
-      lib.appendOption(document.querySelector("#sdElectronicSign_textFormat"), format);
+      lib.appendOption(
+        document.querySelector("#sdElectronicSign_textFormat"),
+        format,
+      );
     }
 
     // Divider measurement

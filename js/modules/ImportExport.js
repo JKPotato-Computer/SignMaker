@@ -15,6 +15,85 @@ import("https://unpkg.com/@oddbird/css-anchor-positioning/dist/css-anchor-positi
 );
 
 const ImportExport = (() => {
+  // serializing & unserializing
+  const signToJson = (signContent, type) => {
+    const recursiveTagging = (obj) => {
+      if (obj && typeof obj === "object") {
+        obj._type = obj.constructor.name;
+        for (const key in obj) {
+          if (typeof obj[key] === "object") {
+            recursiveTagging(obj[key]);
+          }
+        }
+      }
+    };
+
+    const untagging = (obj) => {
+      if (obj && typeof obj === "object") {
+        delete obj._type;
+        for (const key in obj) {
+          if (typeof obj[key] === "object") {
+            untagging(obj[key]);
+          }
+        }
+      }
+    };
+
+    let jsonData = null;
+
+    if (type == "post") {
+      recursiveTagging(signContent);
+      jsonData = JSON.stringify(signContent);
+    }
+
+    if (type == "panels") {
+      for (const panel of signContent) {
+        recursiveTagging(panel);
+      }
+      jsonData = JSON.stringify(signContent);
+    }
+
+    untagging(signContent);
+
+    return jsonData;
+  };
+
+  const jsonToSign = (jsonData) => {
+    const rawData = JSON.parse(jsonData);
+
+    const convert = (data) => {
+      if (Array.isArray(data)) {
+        for (const elem of data) {
+          convert(elem);
+        }
+      }
+
+      if (data && typeof data == "object") {
+        for (const key in data) {
+          data[key] = convert(data[key]);
+        }
+
+        if (data._type && typeof window[data._type] === "function") {
+          const targetClass = window[data._type];
+          const cleanClass = new targetClass();
+
+          for (const key in data) {
+            if (key !== "_type" && key in data) {
+              cleanClass[key] = data[key];
+            }
+          }
+
+          return cleanClass;
+        }
+      }
+
+      return data;
+    };
+
+    return convert(rawData);
+  };
+
+  // image export
   const fileExportDetails = {
     fileType: "PNG",
     isFullSign: true,
@@ -180,21 +259,53 @@ const ImportExport = (() => {
     }
 
     if (copyToClipboard) {
-      const blob = await fileExportDetails.snapdomData.toBlob({
-        format: fileExportDetails.fileType.toLowerCase(),
-      });
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);
+      if (fileExportDetails.fileType == "JSON") {
+        const jsonOutput = signToJson(
+          fileExportDetails.toggleEntirePost
+            ? App.getPost()
+            : App.getPost().panels.filter((_, i) =>
+                fileExportDetails.panelNumbers.includes(i),
+              ),
+          fileExportDetails.toggleEntirePost ? "post" : "panels",
+        );
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "application/json": new Blob([jsonOutput], {
+              type: "application/json",
+            }),
+          }),
+        ]);
+      }
     } else {
       let signName = prompt("Enter a name for the sign file:", "MySign");
       if (signName) {
-        await fileExportDetails.snapdomData.download({
-          format: fileExportDetails.fileType.toLowerCase(),
-          filename: signName,
-        });
+        if (fileExportDetails.fileType == "JSON") {
+          const jsonOutput = signToJson(
+            fileExportDetails.toggleEntirePost
+              ? App.getPost()
+              : App.getPost().panels.filter((_, i) =>
+                  fileExportDetails.panelNumbers.includes(i),
+                ),
+            fileExportDetails.toggleEntirePost ? "post" : "panels",
+          );
+          const blob = new Blob([jsonOutput], {
+            type: "application/json",
+          });
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${signName}.signmaker`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } else {
+          await fileExportDetails.snapdomData.download({
+            format: fileExportDetails.fileType.toLowerCase(),
+            filename: signName,
+          });
+        }
       }
     }
   };
@@ -207,6 +318,9 @@ const ImportExport = (() => {
     changeFileType,
     setImageScale,
     downloadSign,
+
+    signToJson,
+    jsonToSign,
   };
 })();
 
@@ -252,3 +366,41 @@ document
       Math.floor(zoomLevel * 100) + "%";
     updateZoomImage();
   });
+
+document.querySelector("#importSign").addEventListener("click", async () => {
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = ".signmaker,application/json";
+
+  fileInput.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    fileInput.remove();
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const jsonData = e.target.result;
+        const signContent = ImportExport.jsonToSign(jsonData);
+
+        if (
+          signContent instanceof Post &&
+          confirm("Are you sure you want to overwrite the post?")
+        ) {
+          App.setPost(signContent);
+        } else if (
+          Array.isArray(signContent) &&
+          confirm("Are you sure you want to overwrite all your panels?")
+        ) {
+          App.getPost().panels = signContent;
+        }
+
+        formHandler.updateForm();
+        App.redraw();
+      };
+
+      reader.readAsText(file);
+    }
+  });
+
+  fileInput.click();
+});

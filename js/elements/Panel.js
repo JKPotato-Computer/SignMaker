@@ -41,3 +41,5 @@ class Panel {
 
 Panel.prototype.cornerType = ["Sharp", "Round"];
 Panel.prototype.defaultBorderRadius = 0.75;
+
+window.Panel = Panel;

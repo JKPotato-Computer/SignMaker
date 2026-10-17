@@ -42,7 +42,17 @@ const App = (() => {
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
 
   const init = async () => {
-    post = new Post(Post.prototype.polePositions[0]);
+    if (localStorage.getItem("signData")) {
+      const generatedPost = ImportExport.jsonToSign(
+        localStorage.getItem("signData"),
+      );
+      post = generatedPost;
+      currentlySelectedPanelIndex = 0;
+    } else {
+      post = new Post(Post.prototype.polePositions[0]);
+      newPanel();
+    }
+
     formHandler.init(App);
     DiagramDrawing.init(App);
 
@@ -305,7 +315,10 @@ const App = (() => {
       { attachElement: ".dragIndicator" },
     );
 
-    newPanel();
+    if (localStorage.getItem("signData")) {
+      formHandler.updateForm();
+      redraw();
+    }
   };
 
   // Panels

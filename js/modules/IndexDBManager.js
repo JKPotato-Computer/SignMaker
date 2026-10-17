@@ -101,3 +101,5 @@ const IndexDBManager = (() => {
     getDatastore,
   };
 })();
+
+window.SM_Database = SM_Database;

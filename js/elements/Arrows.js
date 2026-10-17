@@ -183,3 +183,6 @@ StandardArrow.prototype.arrows = {
   },
   UK: { label: "UK", src: "assets/arrow/ArrowUK.svg" },
 };
+
+window.APLArrow = APLArrow;
+window.StandardArrow = StandardArrow;

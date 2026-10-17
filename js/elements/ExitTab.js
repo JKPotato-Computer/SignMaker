@@ -385,20 +385,22 @@ class ExitTab {
         }
       }
 
-      this.textContent = this.textContent
-        .replace(/\\t/g, "\t")
-        .replace(/\\n/g, "\n");
       let splitText = this.splitText(this.textContent);
       for (let i = 0; i < splitText.length; i++) {
         let item = splitText[i];
         if (Array.isArray(item)) {
+          const groupHolder = document.createElement("span");
+          groupHolder.className = "ET-numeralGroup";
+          groupHolder.style.gap = this.fontSize * 0.25 + "px";
+
           const wordElem1 = document.createElement("span");
           wordElem1.textContent = item[0];
           wordElem1.className = "ET-numeral";
 
-          textParentElement.appendChild(wordElem1);
+          groupHolder.appendChild(wordElem1);
 
           if (item[1] === "") {
+            textParentElement.appendChild(groupHolder);
             continue;
           }
 
@@ -406,10 +408,13 @@ class ExitTab {
           wordElem2.textContent = item[1];
           wordElem2.className = "ET-trailing";
 
-          textParentElement.appendChild(wordElem2);
+          groupHolder.appendChild(wordElem2);
+          textParentElement.appendChild(groupHolder);
         } else {
           const wordElem = document.createElement("span");
-          wordElem.textContent = item;
+          wordElem.textContent = item
+            .replace(/\\t/g, "\t")
+            .replace(/\\n/g, "\n");
 
           if (/\d/.test(item)) {
             wordElem.className = "ET-numeral";
@@ -725,3 +730,6 @@ ExitTabRow.prototype.position = [
   "Right",
   "Within Panel",
 ];
+
+window.ExitTab = ExitTab;
+window.ExitTabRow = ExitTabRow;

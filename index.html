@@ -232,7 +232,7 @@
             </button>
           </div>
           <br />
-          <label for="downloadImageScale">Scale</label>
+          <label for="downloadImageScale">Scale:</label>
           <input
             type="range"
             min="1"
@@ -255,12 +255,14 @@
             max="10"
             step="1"
             id="downloadImageScaleVal"
-            onchange="
-              document.querySelector('#downloadImageScale').value = this.value
+            oninput="
+              ImportExport.setImageScale(this.value);
+              document.querySelector('#downloadImageScale').value = this.value;
+              ImportExport.updatePreview();
             "
           />
           <br />
-          <label for="entirePost" id="entirePostLabel">Entire Post</label>
+          <label for="entirePost" id="entirePostLabel">Entire Post:</label>
           <input
             type="checkbox"
             id="entirePost"
@@ -3036,6 +3038,13 @@
                       step="1"
                       value="120"
                     />
+                    <input
+                      type="checkbox"
+                      class="hidden"
+                      id="sdCtrlText_spaceNumeralsLetters"
+                      data-toolTip="Space Numerals & Letters"
+                    />
+
                     <label for="sdCtrlText_useBannerFormatting"
                       >Enlarge Banners:</label
                     >
@@ -3229,6 +3238,13 @@
                       step="1"
                       value="120"
                     />
+                    <input
+                      type="checkbox"
+                      class="hidden"
+                      id="sdAdvisory_spaceNumeralsLetters"
+                      data-toolTip="Space Numerals & Letters"
+                    />
+
                     <label for="sdAdvisory_useBannerFormatting"
                       >Enlarge Banners:</label
                     >
@@ -3862,6 +3878,13 @@
                       step="1"
                       value="120"
                     />
+                    <input
+                      type="checkbox"
+                      class="hidden"
+                      id="sdActionMessage_spaceNumeralsLetters"
+                      data-toolTip="Space Numerals & Letters"
+                    />
+
                     <label for="sdActionMessage_useBannerFormatting"
                       >Enlarge Banners:</label
                     >
@@ -4239,9 +4262,8 @@
                   <label
                     for="sdBlock_width"
                     data-toolTip="Width of the block, set to 0 to automatically resize"
-                    >Width:</label
+                    >Width (rem):</label
                   >
-                  <select id="sdBlock_widthType"></select>
                   <input
                     type="number"
                     id="sdBlock_width"
@@ -5037,6 +5059,14 @@
           data-toolTip="Export"
         >
           <span class="material-symbols-outlined"> download </span>
+        </button>
+        <button
+          type="button"
+          id="importSign"
+          class="sMConfigOption"
+          data-toolTip="Import"
+        >
+          <span class="material-symbols-outlined"> upload </span>
         </button>
         <button
           type="button"

@@ -11,6 +11,7 @@ class TextElement {
     bannerFirstLetterSize = 120,
     useNumeralFormatting = false,
     numeralFormattingSize = 150,
+    spaceNumeralsLetters = true,
     alignment = "Center",
     textAlign = "Center",
     lineHeight = 100,
@@ -29,6 +30,7 @@ class TextElement {
     this.lineHeight = lineHeight;
     this.wordSpacing = wordSpacing;
     this.textAlign = textAlign;
+    this.spaceNumeralsLetters = spaceNumeralsLetters;
   }
 
   splitString(text) {
@@ -153,6 +155,29 @@ class TextElement {
           fractionHolder.appendChild(slash);
           fractionHolder.appendChild(denominator);
           lineElement.appendChild(fractionHolder);
+        } else if (
+          /\d[A-z\-]*/g.test(text.value) &&
+          this.spaceNumeralsLetters &&
+          text.type == "numeral"
+        ) {
+          let numbersOnly = text.value.match(/\d+/g)[0];
+          let rest = text.value.replace(numbersOnly, "");
+
+          const wordElem1 = document.createElement("span");
+          wordElem1.textContent = numbersOnly;
+
+          wordElem1.className = "bE-numeral";
+
+          const wordElem2 = document.createElement("span");
+          wordElem2.textContent = rest;
+
+          wordElem2.className = "bE-numeral bE-trailing";
+
+          const groupElem = document.createElement("span");
+          groupElem.className = "bE-numeralGroup";
+          groupElem.appendChild(wordElem1);
+          groupElem.appendChild(wordElem2);
+          lineElement.appendChild(groupElem);
         } else {
           const newTextFragment = document.createElement("span");
           newTextFragment.className = "bE-" + text.type;
@@ -1149,19 +1174,21 @@ class GroupElement {
 
     if (this.border) {
       blockElementHolder.style.border = `${this.borderWidth}px solid ${
-        lib.colors[this.borderColor] || this.borderColor.toLowerCase()}`;
+        lib.colors[this.borderColor] || this.borderColor.toLowerCase()
+      }`;
     }
 
-    if (this.boxFormat == "Circle Pixels" || this.boxFormat == "Square Pixels") {
-      blockElementHolder.style.background = this.boxFormat == "Circle Pixels"
-          ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
-          : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
-      blockElementHolder.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
-      
-      for (const elem of blockElementHolder.querySelectorAll(".blockElementRow")) {
-        elem.style.mixBlendMode = "multiply";
-        elem.classList.remove("fullBleed");
-      }
+    if (
+      this.boxFormat == "Circle Pixels" ||
+      this.boxFormat == "Square Pixels"
+    ) {
+      const cover = document.createElement("div");
+      cover.className =
+        "bE-groupElementsCover " +
+        this.boxFormat.replace(" ", "").toLowerCase();
+
+      cover.style.setProperty("--pixelSize", this.formatSize + "rem");
+      blockElementHolder.appendChild(cover);
     }
 
     if (this.direction == "Horizontal") {
@@ -1455,3 +1482,18 @@ Control.prototype.blockInternalElements = {
   ElectronicSignElement: "sdElectronicSign",
   GroupElement: "sdGroup",
 };
+
+window.TextElement = TextElement;
+window.ControlTextElement = ControlTextElement;
+window.ActionMessageElement = ActionMessageElement;
+window.AdvisoryMessageElement = AdvisoryMessageElement;
+window.ElectronicSignElement = ElectronicSignElement;
+window.ShieldGroupElement = ShieldGroupElement;
+window.DividerElement = DividerElement;
+window.IconElement = IconElement;
+window.BeaconElement = BeaconElement;
+window.ArrowElement = ArrowElement;
+window.TollLogoElement = TollLogoElement;
+window.Block = Block;
+window.GroupElement = GroupElement;
+window.Control = Control;

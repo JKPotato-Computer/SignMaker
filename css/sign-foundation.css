@@ -36,21 +36,32 @@ main#smRender.wide #postContainer {
   width: 100%;
   margin: var(--marginTop) 0 var(--marginBottom) 0;
   background-color: var(--masterBlockBgColor);
-  padding: var(--blockPaddingTop) var(--blockPaddingRight) var(--blockPaddingBottom) var(--blockPaddingLeft);
+  padding: var(--blockPaddingTop) var(--blockPaddingRight)
+    var(--blockPaddingBottom) var(--blockPaddingLeft);
 }
 
 .blockElementRow.fullBleed {
-  margin: calc(-1 * var(--blockBleedTop) + var(--marginTop) + var(--marginBorderTop)) calc(-1 * var(--blockBleedRight) + var(--marginBorderRight)) calc(-1 * var(--blockBleedBottom) + var(--marginBottom) + var(--marginBorderBottom)) calc(-1 * var(--blockBleedLeft) + var(--marginBorderLeft));
-  padding: calc(var(--blockPaddingTop) + var(--blockBleedTop)) calc(var(--blockBleedRight) + var(--blockPaddingRight)) calc(var(--blockBleedBottom) + var(--blockPaddingBottom)) calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
-  width: calc(100% + var(--blockBleedLeft) + var(--blockBleedRight) - var(--marginBorderLeft) - var(--marginBorderRight));
-  border-top-left-radius: calc(var(
-  --blockBorderRadiusTopLeft));
-  border-top-right-radius: calc(var(
-  --blockBorderRadiusTopRight));
-  border-bottom-left-radius: calc(var(
-  --blockBorderRadiusBottomLeft));
-  border-bottom-right-radius: calc(var(
-  --blockBorderRadiusBottomRight));
+  margin: calc(
+      -1 * var(--blockBleedTop) + var(--marginTop) + var(--marginBorderTop)
+    )
+    calc(-1 * var(--blockBleedRight) + var(--marginBorderRight))
+    calc(
+      -1 * var(--blockBleedBottom) + var(--marginBottom) +
+        var(--marginBorderBottom)
+    )
+    calc(-1 * var(--blockBleedLeft) + var(--marginBorderLeft));
+  padding: calc(var(--blockPaddingTop) + var(--blockBleedTop))
+    calc(var(--blockBleedRight) + var(--blockPaddingRight))
+    calc(var(--blockBleedBottom) + var(--blockPaddingBottom))
+    calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
+  width: calc(
+    100% + var(--blockBleedLeft) + var(--blockBleedRight) -
+      var(--marginBorderLeft) - var(--marginBorderRight)
+  );
+  border-top-left-radius: calc(var(--blockBorderRadiusTopLeft));
+  border-top-right-radius: calc(var(--blockBorderRadiusTopRight));
+  border-bottom-left-radius: calc(var(--blockBorderRadiusBottomLeft));
+  border-bottom-right-radius: calc(var(--blockBorderRadiusBottomRight));
 }
 
 .lineElement {
@@ -76,7 +87,7 @@ main#smRender.wide #postContainer {
 }
 
 .SM-ExitOnlyTextElement {
-  gap: .5rem;
+  gap: 0.5rem;
   color: inherit;
   letter-spacing: var(--exitOnlyLetterSpacing);
   word-spacing: var(--exitOnlyWordSpacing);
@@ -1316,7 +1327,7 @@ main#smRender.wide #postContainer {
 }
 
 .guideArrows.split_exit_only.full_black_border .SM-ExitOnlyTextElement {
-  border: .2rem solid black;
+  border: 0.2rem solid black;
 }
 
 .guideArrows.exit_only,
@@ -1336,4 +1347,38 @@ main#smRender.wide #postContainer {
   width: 100%;
   height: 3px;
   background: var(--fg-color);
+}
+
+.ET-numeralGroup,
+.bE-numeralGroup {
+  display: flex;
+  flex-direction: row;
+}
+
+.bE-numeralGroup {
+  gap: calc(var(--fontSize) / 4);
+}
+
+.bE-groupElement {
+  position: relative;
+}
+
+.bE-groupElementsCover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: calc(var(--pixelSize) * 3) calc(var(--pixelSize) * 3);
+}
+
+.bE-groupElementsCover.circlepixels {
+  background-image: radial-gradient(
+    circle,
+    transparent var(--pixelSize),
+    black var(--pixelSize)
+  );
+}
+
+.bE-groupElementsCover.squarepixels {
+  background-image: repeating-conic-gradient(transparent 0% 25%, black 0% 50%);
 }

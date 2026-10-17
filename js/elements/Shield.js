@@ -1621,3 +1621,6 @@ Shield.prototype.bannerTypes = [
 
 Shield.prototype.bannerPositions = ["Top", "Bottom", "Left", "Right"];
 Shield.prototype.bannerAlignments = ["Center", "Start", "End"];
+
+window.Shield = Shield;
+window.Banner = Banner;

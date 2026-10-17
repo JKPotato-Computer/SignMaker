@@ -232,3 +232,5 @@ Post.prototype.postVariants = [
   "Rural",
   "Center",
 ];
+
+window.Post = Post;
