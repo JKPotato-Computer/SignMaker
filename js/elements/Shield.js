@@ -1591,7 +1591,7 @@ Shield.prototype.shieldDirectory = {
   },
 };
 
-Shield.prototype.bannerTypes = [
+Shield.bannerTypes = [
   "None",
   "Arterial",
   "North",

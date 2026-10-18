@@ -220,7 +220,7 @@ const SavesNTemplates = (() => {
       .addEventListener("click", () => {
         if (confirm("Are you sure you want to reset your sign?")) {
           localStorage.removeItem("autoSaveSignData");
-          App.setPost(new Post(Post.prototype.polePositions[0]));
+          App.setPost(new Post(Post.polePositions[0]));
           App.resetSelectors();
           App.newPanel();
         }

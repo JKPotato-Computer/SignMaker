@@ -26,7 +26,12 @@ const FormNavigation = (() => {
         if (event.target.tagName === "BUTTON") return;
 
         if (event.target.tagName === "INPUT") {
-          formHandler.readForm();
+          // if it is a descendant of diagrammicDrawing
+          if (event.target.closest("#diagrammicDrawing")) {
+            DiagramDrawing.readForm();
+          } else {
+            formHandler.readForm();
+          }
         }
 
         event.preventDefault();
@@ -345,7 +350,7 @@ const FormNavigation = (() => {
   const setupPostOptions = () => {
     // Post position
     const postPositionSelectElmt = document.querySelector("#postPosition");
-    for (const polePosition of Post.prototype.polePositions) {
+    for (const polePosition of Post.polePositions) {
       lib.appendOption(postPositionSelectElmt, polePosition, {
         selected: polePosition == post.polePosition,
       });
@@ -353,7 +358,7 @@ const FormNavigation = (() => {
 
     // Post color
     const postColorSelectElmt = document.querySelector("#postColor");
-    for (const colorOption of Post.prototype.colors) {
+    for (const colorOption of Post.colors) {
       lib.appendOption(postColorSelectElmt, colorOption, {
         selected: colorOption === post.color,
       });
@@ -361,7 +366,7 @@ const FormNavigation = (() => {
 
     // Post variant
     const postVariantSelectElmt = document.querySelector("#postVariant");
-    for (const variant of Post.prototype.postVariants) {
+    for (const variant of Post.postVariants) {
       lib.appendOption(postVariantSelectElmt, variant, {
         selected: variant === post.variant,
       });
@@ -390,7 +395,7 @@ const FormNavigation = (() => {
       lib.appendOption(guideArrowSelectElmt, display);
     }
 
-    for (const fontFamily of TextElement.prototype.fontFamily) {
+    for (const fontFamily of TextElement.fontFamilies) {
       lib.appendOption(
         document.querySelector("#exitOnlyFontFamily"),
         fontFamily,
@@ -422,7 +427,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const backgroundColor of ExitTab.prototype.backgroundColor) {
+    for (const backgroundColor of ExitTab.backgroundColors) {
       lib.appendOption(
         document.querySelector("#sMET_backgroundColor"),
         backgroundColor.toLowerCase(),
@@ -430,7 +435,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const borderStyle of ExitTab.prototype.borderStyle) {
+    for (const borderStyle of ExitTab.borderStyles) {
       lib.appendOption(
         document.querySelector("#sMET_borderStyle"),
         borderStyle.toLowerCase(),
@@ -438,13 +443,13 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const fontFamily of ExitTab.prototype.fontFamily) {
+    for (const fontFamily of ExitTab.fontFamilies) {
       lib.appendOption(document.querySelector("#sMET_fontFamily"), fontFamily, {
         text: fontFamily,
       });
     }
 
-    for (const fontFamily of ExitTab.prototype.numeralFontFamily) {
+    for (const fontFamily of ExitTab.numeralFontFamilies) {
       lib.appendOption(
         document.querySelector("#sMET_numeralFontFamily"),
         fontFamily,
@@ -452,7 +457,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const direction of ExitTab.prototype.contentDirection) {
+    for (const direction of ExitTab.contentDirections) {
       lib.appendOption(
         document.querySelector("#sMET_contentDirection"),
         direction.toLowerCase(),
@@ -460,7 +465,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const alignment of ExitTab.prototype.alignment) {
+    for (const alignment of ExitTab.alignments) {
       lib.appendOption(
         document.querySelector("#sMET_alignment"),
         alignment.toLowerCase(),
@@ -468,7 +473,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const widthPreset of ExitTab.prototype.widthPresets) {
+    for (const widthPreset of ExitTab.widthPresets) {
       lib.appendOption(
         document.querySelector("#sMET_width"),
         widthPreset.toLowerCase(),
@@ -476,7 +481,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const addon of ExitTab.prototype.iconVariant_addons) {
+    for (const addon of ExitTab.iconVariantAddons) {
       lib.appendOption(
         document.querySelector("#sMET_variantAddon"),
         addon.toLowerCase(),
@@ -484,7 +489,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const alignment of ExitTab.prototype.shieldsDirection) {
+    for (const alignment of ExitTab.shieldsDirections) {
       lib.appendOption(
         document.querySelector("#sMET_shieldsDirection"),
         alignment.toLowerCase(),
@@ -649,14 +654,14 @@ const FormNavigation = (() => {
       App.redraw();
     });
 
-    for (const color of ExitTab.prototype.tollIconBackgrounds) {
+    for (const color of ExitTab.tollIconBackgrounds) {
       lib.appendOption(document.querySelector("#smET_iconBackground"), color);
     }
   };
 
   const setupControlSignElements = () => {
     // subpanel alignment
-    for (const alignment of SubPanels.prototype.verticalAlign) {
+    for (const alignment of SubPanels.verticalAlignments) {
       lib.appendOption(document.querySelector("#subpanelAlign"), alignment);
     }
 
@@ -678,12 +683,12 @@ const FormNavigation = (() => {
       document.querySelector("#smET_partialLeftFontFamily"),
     ];
     for (const elem of textElem_fontFamilySelects) {
-      for (const fontFamily of TextElement.prototype.fontFamily) {
+      for (const fontFamily of TextElement.fontFamilies) {
         lib.appendOption(elem, fontFamily);
       }
     }
 
-    for (const fontFamily of TextElement.prototype.fontFamily) {
+    for (const fontFamily of TextElement.fontFamilies) {
       lib.appendOption(
         document.querySelector("#sdTollLogo_fontFamily"),
         fontFamily,
@@ -706,12 +711,12 @@ const FormNavigation = (() => {
       document.querySelector("#sdAdvisory_textAlign"),
     ];
     for (const elem of textElem_alignmentSelects) {
-      for (const alignment of TextElement.prototype.alignment) {
+      for (const alignment of TextElement.alignments) {
         lib.appendOption(elem, alignment);
       }
     }
 
-    for (const direction in TollLogoElement.prototype.direction) {
+    for (const direction in TollLogoElement.directions) {
       lib.appendOption(
         document.querySelector("#sdTollLogo_onlyBlockDirection"),
         direction,
@@ -732,7 +737,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdGroup_borderColor"),
     ];
     for (const elem of textElem_bgColorSelects) {
-      for (const backgroundColor of TextElement.prototype.backgroundColor) {
+      for (const backgroundColor of TextElement.backgroundColors) {
         lib.appendOption(elem, backgroundColor);
       }
     }
@@ -741,13 +746,13 @@ const FormNavigation = (() => {
     const shieldGroupSelect = document.querySelector(
       "#sdShieldGroup_direction",
     );
-    for (const direction of ShieldGroupElement.prototype.direction) {
+    for (const direction of ShieldGroupElement.directions) {
       lib.appendOption(shieldGroupSelect, direction);
     }
 
     // Beacon colors
     const beaconColorSelect = document.querySelector("#sdBeacon_color");
-    for (const color of BeaconElement.prototype.colors) {
+    for (const color of BeaconElement.colors) {
       lib.appendOption(beaconColorSelect, color);
     }
 
@@ -779,7 +784,7 @@ const FormNavigation = (() => {
     const eSignFontSelect = document.querySelector(
       "#sdElectronicSign_fontFamily",
     );
-    for (const fontFamily of ElectronicSignElement.prototype.fontFamily) {
+    for (const fontFamily of ElectronicSignElement.fontFamilies) {
       lib.appendOption(eSignFontSelect, fontFamily);
     }
 
@@ -802,7 +807,7 @@ const FormNavigation = (() => {
     const divider_widthMeasurement = document.querySelector(
       "#sdBlocker_dividerMeasurement",
     );
-    for (const measurement of DividerElement.prototype.dividerMeasurement) {
+    for (const measurement of DividerElement.dividerMeasurements) {
       lib.appendOption(divider_widthMeasurement, measurement);
     }
 
@@ -864,7 +869,7 @@ const FormNavigation = (() => {
       lib.appendOption(document.querySelector("#sdGroup_direction"), direction);
     }
 
-    for (const format of GroupElement.prototype.boxFormat) {
+    for (const format of GroupElement.boxFormats) {
       lib.appendOption(document.querySelector("#sdGroup_boxFormat"), format);
     }
   };
@@ -894,7 +899,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const font of TextElement.prototype.fontFamily) {
+    for (const font of TextElement.fontFamilies) {
       lib.appendOption(
         document
           .querySelector("#sMAPL_templateAPLItem")
@@ -1226,17 +1231,17 @@ const FormNavigation = (() => {
       document
         .querySelector("#sMAPL_templateAPLItem")
         .content.querySelector(".smAPLCat_aplSelectHolder"),
-      APLArrow.prototype.arrowTypes,
+      APLArrow.arrowTypes,
       "Up Arrow",
       (image, value) => {
-        if (APLArrow.prototype.arrowTypes[value].flipped) {
+        if (APLArrow.arrowTypes[value].flipped) {
           image.classList.add("flipped");
         }
 
         image.classList.add("smAPL_arrowImage");
 
         image.loading = "lazy";
-        image.src = `assets/arrow/${APLArrow.prototype.arrowTypes[value].asset}`;
+        image.src = `assets/arrow/${APLArrow.arrowTypes[value].asset}`;
 
         return image;
       },
@@ -1293,13 +1298,13 @@ const FormNavigation = (() => {
 
     setupDropdownElement(
       document.querySelector(".sdIconDropdown"),
-      IconElement.prototype.icons,
+      IconElement.icons,
       "AIRPORT",
       (image, value) => {
         image.loading = "lazy";
         image.src = value.startsWith("custom:")
           ? image.closest(".smDropdownInputElement").dataset.customImageData
-          : `./assets/icons/${IconElement.prototype.icons[value]}`;
+          : `./assets/icons/${IconElement.icons[value]}`;
         return image;
       },
       (text, value) => {
@@ -1312,13 +1317,13 @@ const FormNavigation = (() => {
 
     setupDropdownElement(
       document.querySelector("#sMET_variantRegularIcon"),
-      IconElement.prototype.icons,
+      IconElement.icons,
       "AIRPORT",
       (image, value) => {
         image.loading = "lazy";
         image.src = value.startsWith("custom:")
           ? image.closest(".smDropdownInputElement").dataset.customImageData
-          : `./assets/icons/${IconElement.prototype.icons[value]}`;
+          : `./assets/icons/${IconElement.icons[value]}`;
         return image;
       },
       (text, value) => {
@@ -1331,32 +1336,32 @@ const FormNavigation = (() => {
 
     setupDropdownElement(
       document.querySelector("#sMET_variantTollIcon"),
-      TollLogoElement.prototype.logos,
+      TollLogoElement.logos,
       "EZPass",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `${TollLogoElement.prototype.logos[value].src}`;
+        image.src = `${TollLogoElement.logos[value].src}`;
         image.classList.add("smWhiteDropdownImage");
         return image;
       },
       (text, value) => {
-        text.textContent = TollLogoElement.prototype.logos[value].label;
+        text.textContent = TollLogoElement.logos[value].label;
         return text;
       },
     );
 
     setupDropdownElement(
       document.querySelector("#sdTollLogoHolder"),
-      TollLogoElement.prototype.logos,
+      TollLogoElement.logos,
       "EZPass",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `${TollLogoElement.prototype.logos[value].src}`;
+        image.src = `${TollLogoElement.logos[value].src}`;
         image.classList.add("smWhiteDropdownImage");
         return image;
       },
       (text, value) => {
-        text.textContent = TollLogoElement.prototype.logos[value].label;
+        text.textContent = TollLogoElement.logos[value].label;
         return text;
       },
     );
@@ -1392,7 +1397,7 @@ const FormNavigation = (() => {
     ];
     for (const select of shieldFontSelect) {
       lib.appendOption(select, "");
-      for (const fontFamily of TextElement.prototype.fontFamily) {
+      for (const fontFamily of TextElement.fontFamilies) {
         lib.appendOption(select, fontFamily);
       }
     }
@@ -1586,7 +1591,7 @@ const FormNavigation = (() => {
     const bgColorElem = document
       .querySelector("#smSP_templateBannerElement")
       .content.querySelector(".smSPBanner_bgColor");
-    for (const color of TextElement.prototype.backgroundColor) {
+    for (const color of TextElement.backgroundColors) {
       lib.appendOption(bgColorElem, color);
     }
 
@@ -1609,7 +1614,7 @@ const FormNavigation = (() => {
     const fontFamilyElem = document
       .querySelector("#smSP_templateBannerElement")
       .content.querySelector(".smSPBanner_fontFamily");
-    for (const font of TextElement.prototype.fontFamily) {
+    for (const font of TextElement.fontFamilies) {
       lib.appendOption(fontFamilyElem, font);
     }
   };

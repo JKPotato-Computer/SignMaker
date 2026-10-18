@@ -40,11 +40,11 @@ class TextElement {
     const numeralPattern = /(\d+\/\d+)|(\d\S*)/g;
 
     const bannerPattern = new RegExp(
-      `(\\s*)(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)(\\s*)`,
+      `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)`,
       "gi",
     );
     const lightBannerPattern = new RegExp(
-      `(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)`,
+      `(\\b(?:${Shield.bannerTypes.join("|")})\\b)`,
       "gi",
     );
 
@@ -197,7 +197,7 @@ class TextElement {
   }
 }
 
-TextElement.prototype.fontFamily = [
+TextElement.fontFamilies = [
   "Clearview 1B",
   "Clearview 1W",
   "Clearview 2B",
@@ -222,9 +222,9 @@ TextElement.prototype.fontFamily = [
   "Transport",
 ];
 
-TextElement.prototype.alignment = ["Left", "Center", "Right"];
+TextElement.alignments = ["Left", "Center", "Right"];
 
-TextElement.prototype.backgroundColor = ["Inherit"].concat(
+TextElement.backgroundColors = ["Inherit"].concat(
   Object.keys(lib.colors),
 );
 
@@ -389,8 +389,7 @@ class ElectronicSignElement extends TextElement {
     return newText;
   }
 }
-ElectronicSignElement.prototype.fontFamily =
-  TextElement.prototype.fontFamily.concat([
+ElectronicSignElement.fontFamilies = TextElement.fontFamilies.concat([
     "Electronic Highway Sign",
     "VCR Mono",
   ]);
@@ -479,7 +478,7 @@ class ShieldGroupElement {
     return shieldGroupElem;
   }
 }
-ShieldGroupElement.prototype.direction = ["Horizontal", "Vertical"];
+ShieldGroupElement.directions = ["Horizontal", "Vertical"];
 
 class DividerElement {
   constructor({
@@ -541,7 +540,7 @@ class DividerElement {
   }
 }
 
-DividerElement.prototype.dividerMeasurement = ["%", "rem"];
+DividerElement.dividerMeasurements = ["%", "rem"];
 DividerElement.prototype.dividerColors = [
   { value: "White", label: "White" },
   { value: "Black", label: "Black" },
@@ -601,7 +600,7 @@ class IconElement {
     iconElement.src =
       this.iconType === "custom"
         ? this.iconData
-        : `./assets/icons/${this.icons[this.icon]}`;
+        : `./assets/icons/${IconElement.icons[this.icon]}`;
     iconElement.alt = this.icon;
     iconElement.className = "bE-iconImage";
 
@@ -614,7 +613,7 @@ class IconElement {
   }
 }
 
-IconElement.prototype.icons = {
+IconElement.icons = {
   511: "511.svg",
   AIRPORT: "AIRPORT.svg",
   ALLTERRAIN_TRAIL: "ALLTERRAIN_TRAIL.svg",
@@ -751,12 +750,12 @@ class BeaconElement {
       Number.isFinite(parsedDuration) && parsedDuration > 0
         ? parsedDuration
         : 1;
-    const validAlignments = Array.isArray(TextElement.prototype.alignment)
-      ? TextElement.prototype.alignment
+    const validAlignments = Array.isArray(TextElement.alignments)
+      ? TextElement.alignments
       : [];
     this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
-    const availableColors = Array.isArray(BeaconElement.prototype.colors)
-      ? BeaconElement.prototype.colors
+    const availableColors = Array.isArray(BeaconElement.colors)
+      ? BeaconElement.colors
       : [];
     this.color = availableColors.includes(color)
       ? color
@@ -797,16 +796,16 @@ class BeaconElement {
     );
     container.style.setProperty(
       "--beaconBackplateThickness",
-      BeaconElement.prototype.backplateThicknessRem + "rem",
+      BeaconElement.backplateThicknessRem + "rem",
     );
     container.style.setProperty(
       "--beaconBackplateRadius",
-      BeaconElement.prototype.backplateCornerRadiusRem + "rem",
+      BeaconElement.backplateCornerRadiusRem + "rem",
     );
-    const backplateColorReference = BeaconElement.prototype.backplateColor;
+    const backplateColorReference = BeaconElement.backplateColor;
     const resolvedBackplateColor =
       (lib?.colors && lib.colors[backplateColorReference]) ||
-      BeaconElement.prototype.backplateFallbackColor ||
+      BeaconElement.backplateFallbackColor ||
       backplateColorReference;
     container.style.setProperty(
       "--beaconBackplateColor",
@@ -827,13 +826,12 @@ class BeaconElement {
   }
 }
 
-BeaconElement.prototype.colors = ["Yellow", "Red", "Purple"];
-BeaconElement.prototype.halfInchInRem = 0.5 / 12;
-BeaconElement.prototype.backplateThicknessRem =
-  BeaconElement.prototype.halfInchInRem * 3;
-BeaconElement.prototype.backplateCornerRadiusRem = 0.15;
-BeaconElement.prototype.backplateColor = "Yellow";
-BeaconElement.prototype.backplateFallbackColor = "#ffd200";
+BeaconElement.colors = ["Yellow", "Red", "Purple"];
+BeaconElement.halfInchInRem = 0.5 / 12;
+BeaconElement.backplateThicknessRem = BeaconElement.halfInchInRem * 3;
+BeaconElement.backplateCornerRadiusRem = 0.15;
+BeaconElement.backplateColor = "Yellow";
+BeaconElement.backplateFallbackColor = "#ffd200";
 
 class ArrowElement {
   constructor({
@@ -883,7 +881,7 @@ class ArrowElement {
 
 class TollLogoElement {
   constructor({
-    logo = TollLogoElement.prototype.defaultLogo,
+    logo = TollLogoElement.defaultLogo,
     logoHeight = 3,
     spacing = 0,
     horizontalPadding = 0.25,
@@ -946,7 +944,7 @@ class TollLogoElement {
     container.appendChild(imgHolder);
 
     const img = document.createElement("img");
-    img.src = TollLogoElement.prototype.logos[this.logo].src;
+    img.src = TollLogoElement.logos[this.logo].src;
     imgHolder.appendChild(img);
 
     imgHolder.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
@@ -989,7 +987,7 @@ class TollLogoElement {
     if (this.showOnlyBlock) {
       container.style.setProperty(
         "--onlyBlockDirection",
-        TollLogoElement.prototype.direction[this.onlyBlockDirection],
+        TollLogoElement.directions[this.onlyBlockDirection],
       );
       container.style.setProperty(
         "--onlyBlockSpacing",
@@ -1058,8 +1056,8 @@ class TollLogoElement {
   }
 }
 
-TollLogoElement.prototype.defaultLogo = "EZPass";
-TollLogoElement.prototype.logos = {
+TollLogoElement.defaultLogo = "EZPass";
+TollLogoElement.logos = {
   EZPass: { label: "E-ZPass", src: "assets/tolls/EZPass.png" },
   TollTag: { label: "TollTag", src: "assets/tolls/NTTA.svg" },
   TxTag: { label: "TxTag", src: "assets/tolls/TXTAG.svg" },
@@ -1101,8 +1099,8 @@ TollLogoElement.prototype.logos = {
   DPASS: { label: "D-PASS", src: "assets/tolls/DPASS.svg" },
   MUTCD: { label: "MUTCD", src: "assets/tolls/MUTCD.svg" },
 };
-TollLogoElement.prototype.alignment = TextElement.prototype.alignment;
-TollLogoElement.prototype.direction = {
+TollLogoElement.alignments = TextElement.alignments;
+TollLogoElement.directions = {
   Horizontal: "row",
   Vertical: "column",
 };
@@ -1209,7 +1207,7 @@ class GroupElement {
   }
 }
 GroupElement.prototype.blockDirection = ["Horizontal", "Vertical"];
-GroupElement.prototype.boxFormat = ["Normal", "Circle Pixels", "Square Pixels"];
+GroupElement.boxFormats = ["Normal", "Circle Pixels", "Square Pixels"];
 
 class Control {
   constructor({ rows = [], blockProperties = [], isGroup = false } = {}) {

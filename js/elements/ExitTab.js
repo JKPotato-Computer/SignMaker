@@ -104,7 +104,13 @@ const defaultExitTabConfig = {
 
 class ExitTab {
   constructor(options = {}) {
-    Object.assign(this, defaultExitTabConfig, options);
+    const freshConfig = structuredClone(defaultExitTabConfig);
+
+    Object.assign(this, freshConfig);
+
+    if (Object.keys(options).length > 0) {
+      lib.deepMerge(this, options);
+    }
   }
 
   splitText(text) {
@@ -446,8 +452,8 @@ class ExitTab {
     if (this.variant == "Icon") {
       const iconSettings = this.variantSettings.icon;
       const iconLibrary = iconSettings.isTollIcon
-        ? TollLogoElement.prototype.logos
-        : IconElement.prototype.icons;
+        ? TollLogoElement.logos
+        : IconElement.icons;
       const iconDefinition = iconSettings.isTollIcon
         ? iconLibrary[iconSettings.tollIcon]
         : iconLibrary[iconSettings.icon];
@@ -612,23 +618,23 @@ delete ExitTab.prototype.defaultExitTabConfig.subTextContent;
 delete ExitTab.prototype.defaultExitTabConfig.shields;
 delete ExitTab.prototype.defaultExitTabConfig.variant;
 
-ExitTab.prototype.backgroundColor = ["Inherit"].concat(Object.keys(lib.colors));
-ExitTab.prototype.borderStyle = ["Round", "Square"];
-ExitTab.prototype.fontFamily = TextElement.prototype.fontFamily;
-ExitTab.prototype.numeralFontFamily = ["Inherit"].concat(
-  ExitTab.prototype.fontFamily,
+ExitTab.backgroundColors = ["Inherit"].concat(Object.keys(lib.colors));
+ExitTab.borderStyles = ["Round", "Square"];
+ExitTab.fontFamilies = TextElement.fontFamilies;
+ExitTab.numeralFontFamilies = ["Inherit"].concat(
+  ...ExitTab.fontFamilies,
 );
-ExitTab.prototype.shieldsDirection = ["Horizontal", "Vertical"];
-ExitTab.prototype.contentDirection = ["Horizontal", "Vertical"];
-ExitTab.prototype.shieldsPosition = ["Start", "End"];
-ExitTab.prototype.alignment = ["Left", "Center", "Right"];
-ExitTab.prototype.widthPresets = [
+ExitTab.shieldsDirections = ["Horizontal", "Vertical"];
+ExitTab.contentDirections = ["Horizontal", "Vertical"];
+ExitTab.shieldsPositions = ["Start", "End"];
+ExitTab.alignments = ["Left", "Center", "Right"];
+ExitTab.widthPresets = [
   "Auto",
   "Full",
   "Custom Percent",
   "Custom Size",
 ];
-ExitTab.prototype.variants = [
+ExitTab.variants = [
   "Normal",
   "Icon",
   "PartialLeft",
@@ -637,8 +643,8 @@ ExitTab.prototype.variants = [
   "HOVVariant2",
 ];
 
-ExitTab.prototype.iconVariant_addons = ["None", "Only", "Or Variant"];
-ExitTab.prototype.tollIconBackgrounds = ["Transparent"].concat(
+ExitTab.iconVariantAddons = ["None", "Only", "Or Variant"];
+ExitTab.tollIconBackgrounds = ["Transparent"].concat(
   Object.keys(lib.colors),
 );
 
@@ -712,9 +718,10 @@ class ExitTabRow {
 
   duplicateExitTab(index) {
     const exitTab = this.exitTabs[index];
-    const cloneExitTab = Object.assign(exitTab.constructor.prototype, exitTab);
-
+    const cloneExitTab = structuredClone(exitTab);
+    Object.setPrototypeOf(cloneExitTab, ExitTab.prototype);
     this.exitTabs.splice(index + 1, 0, cloneExitTab);
+
     return cloneExitTab;
   }
 

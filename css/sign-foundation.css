@@ -939,7 +939,7 @@ main#smRender.wide #postContainer {
 
 .ET-tab.square {
   border-radius: 0.25rem;
-  padding: var(--verticalPadding) calc(1.3rem + var(--horizontalPadding));
+  padding: var(--verticalPadding) calc(var(--horizontalPadding));
 }
 
 .signCorner {

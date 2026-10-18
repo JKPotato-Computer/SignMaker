@@ -2,7 +2,7 @@ class Post {
   constructor(
     polePosition,
     lanesWide = 1,
-    color = Post.prototype.colors?.[0],
+    color = Post.colors?.[0],
     cornerRadius = 30,
     showPost = true,
     offsetPost = true,
@@ -11,18 +11,18 @@ class Post {
     thickness = 1,
     spacing = 5,
   ) {
-    if (this.polePositions.includes(polePosition)) {
+    if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
     } else {
-      this.polePosition = this.polePositions[0];
+      this.polePosition = Post.polePositions[0];
     }
     if (lanesWide >= 1 && lanesWide <= 6) {
       this.lanesWide = lanesWide;
     } else {
       this.lanesWide = 1;
     }
-    const availableColors = Array.isArray(Post.prototype.colors)
-      ? Post.prototype.colors
+    const availableColors = Array.isArray(Post.colors)
+      ? Post.colors
       : ["Silver"];
     if (availableColors.includes(color)) {
       this.color = color;
@@ -38,7 +38,7 @@ class Post {
     this.showPost = showPost;
     this.offsetPost = offsetPost;
 
-    if (this.postVariants.includes(variant)) {
+    if (Post.postVariants.includes(variant)) {
       this.variant = variant;
     } else {
       this.variant = "Standard";
@@ -221,11 +221,11 @@ class Post {
   }
 }
 
-Post.prototype.polePositions = ["Left", "Right", "Overhead"];
+Post.polePositions = ["Left", "Right", "Overhead"];
 
-Post.prototype.colors = ["Silver", "Black", "Brown", "Red"];
+Post.colors = ["Silver", "Black", "Brown", "Red"];
 
-Post.prototype.postVariants = [
+Post.postVariants = [
   "Standard",
   "Curved",
   "Curved 2",

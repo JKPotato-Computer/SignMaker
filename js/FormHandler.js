@@ -58,6 +58,8 @@ const formHandler = (() => {
   };
 
   const readForm = (readProperties) => {
+    post = app.getPost();
+
     const form = document.forms[0];
     const currentPanel = app.getCurrentPanel();
     const subPanel =
@@ -2622,7 +2624,7 @@ const formHandler = (() => {
           const arrowSelectImage = aplHolder.querySelector(".smAPL_arrowImage");
           const arrowSelectLabel = aplHolder.querySelector(".smAPL_arrowLabel");
           const arrowDefinition =
-            APLArrow.prototype.arrowTypes[arrow.arrowVariant];
+            APLArrow.arrowTypes[arrow.arrowVariant];
           arrowSelectImage.src = `assets/arrow/${arrowDefinition.asset}`;
           arrowSelectImage.classList.toggle("flipped", arrowDefinition.flipped);
           arrowSelectLabel.textContent = arrow.arrowVariant;

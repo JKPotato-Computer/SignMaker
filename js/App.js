@@ -45,10 +45,10 @@ const App = (() => {
     if (localStorage.getItem("autoSaveSignData")) {
       post =
         ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
-        new Post(Post.prototype.polePositions[0]);
+        new Post(Post.polePositions[0]);
       currentlySelectedPanelIndex = post.panels.length > 0 ? 0 : -1;
     } else {
-      post = new Post(Post.prototype.polePositions[0]);
+      post = new Post(Post.polePositions[0]);
     }
 
     formHandler.init(App);

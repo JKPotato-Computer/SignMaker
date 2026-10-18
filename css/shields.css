@@ -44,18 +44,33 @@
   top: .08em;
 }
 
+.shield.C .shieldImg.shieldBacks {
+  padding: .1rem;
+}
+
 .shield.C .routeNumber {
   color: var(--countyYellow);
   font-size: 1.4em;
-  top: 0.1em;
+  top: 0.35em;
 }
+
+.shield.C .designation {
+  top: 2.76em;
+  font-size: .3em;
+  font-family: "Series D";
+  color: var(--countyYellow);
+}
+
 .shield.C.OneDigit .routeNumber,
 .shield.Ctwo .routeNumber {
   font-family: "Series D";
 }
 .shield.C.ThreeDigit .routeNumber {
-  font-family: "Series C";
-  font-size: 1.3em;
+  font-family: "Series D";
+  font-size: 1em;
+  letter-spacing: -.075em;
+  left: -.075em;
+  top: 0.25em;
 }
 
 .shield.AL .routeNumber {
@@ -163,9 +178,16 @@
   display: none;
 }
 .shield.FLToll .routeNumber {
-  font-family: "Series C";
-  font-size: 1em;
+  font-family: "Series D";
+  font-size: .9em;
   top: 0.85em;
+  right: .5em;
+}
+
+.shield.FL .routeNumber {
+  right: .4em;
+  top: .7em;
+  font-size: 1.8em;
 }
 
 .shield.GA .routeNumber,

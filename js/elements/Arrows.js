@@ -34,10 +34,10 @@ class APLArrow {
     holder.style.setProperty("--arrowOffset", `${this.offset}px`);
 
     const image = document.createElement("img");
-    image.src = `assets/arrow/${this.arrowTypes[this.arrowVariant].asset}`;
+    image.src = `assets/arrow/${APLArrow.arrowTypes[this.arrowVariant].asset}`;
     image.className =
       "sMGA_APLArrow " +
-      (this.arrowTypes[this.arrowVariant].flipped ? "flipped" : "") +
+      (APLArrow.arrowTypes[this.arrowVariant].flipped ? "flipped" : "") +
       " " +
       this.arrowVariant.replace(/\s+/g, "-").toLowerCase();
     image.style.setProperty("--arrowSize", `${this.size}rem`);
@@ -98,7 +98,7 @@ class APLArrow {
   }
 }
 
-APLArrow.prototype.arrowTypes = {
+APLArrow.arrowTypes = {
   ["Up Arrow"]: { asset: "APL_Up.svg", flipped: false },
   ["Left Choice Arrow"]: { asset: "APL_Choice.svg", flipped: true },
   ["Right Choice Arrow"]: { asset: "APL_Choice.svg", flipped: false },

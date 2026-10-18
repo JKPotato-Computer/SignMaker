@@ -20,7 +20,7 @@ class SubPanels {
   }
 }
 
-SubPanels.prototype.verticalAlign = ["Start", "Center", "End"];
+SubPanels.verticalAlignments = ["Start", "Center", "End"];
 SubPanels.prototype.dividerHeightUnits = ["%", "rem"];
 
 window.SubPanels = SubPanels;
