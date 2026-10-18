@@ -54,6 +54,7 @@
 
     <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
+    <script src="js/presets/TemplatePresets.js" type="text/javascript"></script>
 
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
     <script src="js/elements/lib.js" type="text/javascript"></script>
@@ -102,6 +103,11 @@
     ></script>
     <script
       src="js/modules/ImportExport.js"
+      type="text/javascript"
+      defer
+    ></script>
+    <script
+      src="js/modules/databases/SavesNTemplates.js"
       type="text/javascript"
       defer
     ></script>
@@ -202,6 +208,7 @@
           <div id="fileTypeOptions">
             <button
               type="button"
+              class="selected"
               id="exportAsPNG"
               onclick="
                 ImportExport.changeFileType(`png`);
@@ -299,18 +306,18 @@
                 ImportExport.downloadSign(true);
                 this.textContent = 'Copied!';
                 setTimeout(() => {
-                  this.textContent = 'Copy Image';
+                  this.textContent = 'Copy';
                 }, 1000);
               "
             >
-              Copy Image
+              Copy
             </button>
             <button
               type="button"
               id="downloadSignButton"
               onclick="ImportExport.downloadSign()"
             >
-              Download Image
+              Download PNG
             </button>
           </div>
         </div>
@@ -329,6 +336,8 @@
             >
               refresh
             </button>
+
+            <span id="downloadImageSize">0 x 0</span>
           </div>
           <div id="downloadPreview"></div>
         </div>
@@ -4413,7 +4422,7 @@
                   onclick="App.removeStandardArrow()"
                   type="button"
                 >
-                  <span class="material-symbols-outlined">remove</span>Remove
+                  <span class="material-symbols-outlined">delete</span>Remove
                 </button>
                 <button
                   id="standardArrowDuplicate"
@@ -4984,6 +4993,66 @@
             </div>
           </div>
         </div>
+        <div
+          class="sMModal creationsConfig"
+          data-current-menu="sMCreationsSaved"
+        >
+          <nav class="sMModalBar">
+            <div class="sMModalTitle">
+              <span class="material-symbols-outlined">draft</span> Creations
+            </div>
+            <a
+              tabindex="0"
+              data-tab="sMCreationsSaved"
+              class="sMModalTab selected"
+            >
+              Saved
+            </a>
+            <a tabindex="0" data-tab="sMCreationsTemplates" class="sMModalTab">
+              Templates
+            </a>
+          </nav>
+          <div class="sMModalContent">
+            <div id="sMCreationsSaved">
+              <fieldset>
+                <legend>Autosave</legend>
+                <span id="sMCreationsAutosaveDate"
+                  >Last updated: 12/31/1970 23:59:59</span
+                >
+                <div>
+                  <button id="sMCreationsReset" class="redButton">Reset</button>
+                  <button id="sMCreationsSaveAs">Save As</button>
+                  <label for="sMCreationsFileName" class="noLabelAlignment"
+                    >Name:</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="File Name"
+                    id="sMCreationsFileName"
+                  />
+                </div>
+              </fieldset>
+              <h3>Saved Files</h3>
+              <input
+                type="search"
+                id="sMCreationsSearchList"
+                placeholder="Search for files"
+              />
+              <div id="sMCreationsSavedList"></div>
+            </div>
+            <div id="sMCreationsTemplates" class="tabHidden">
+              <label>Category:</label>
+              <select id="sMCreationsTemplateCategory"></select>
+
+              <input
+                type="search"
+                id="sMCreationsTemplateSearch"
+                placeholder="Search for templates"
+              />
+              <div id="sMCreationsTemplatesList"></div>
+            </div>
+          </div>
+        </div>
       </div>
       <nav id="sMConfigBar" data-current-menu="">
         <button
@@ -5051,6 +5120,10 @@
         <button type="button" id="guideArrowConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> explore </span>
           <span>Guide Arrows</span>
+        </button>
+        <button type="button" id="creationsConfig" class="sMConfigOption">
+          <span class="material-symbols-outlined"> draft </span>
+          <span>Creations</span>
         </button>
         <button
           type="button"

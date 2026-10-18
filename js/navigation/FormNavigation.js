@@ -841,7 +841,7 @@ const FormNavigation = (() => {
 
     // Small value inputs
     document.querySelectorAll(".smallVal").forEach((valEl) => {
-      const onChange = (e) => {
+      const onChange = () => {
         const id = valEl.id || "";
         if (id.endsWith("Val")) {
           const controlId = id.slice(0, -3);

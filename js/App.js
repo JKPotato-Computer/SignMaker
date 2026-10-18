@@ -42,19 +42,19 @@ const App = (() => {
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
 
   const init = async () => {
-    if (localStorage.getItem("signData")) {
-      const generatedPost = ImportExport.jsonToSign(
-        localStorage.getItem("signData"),
-      );
-      post = generatedPost;
-      currentlySelectedPanelIndex = 0;
+    if (localStorage.getItem("autoSaveSignData")) {
+      post =
+        ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
+        new Post(Post.prototype.polePositions[0]);
+      currentlySelectedPanelIndex = post.panels.length > 0 ? 0 : -1;
     } else {
       post = new Post(Post.prototype.polePositions[0]);
-      newPanel();
     }
 
     formHandler.init(App);
     DiagramDrawing.init(App);
+
+    SavesNTemplates.init();
 
     window.customImages = CustomImages;
 
@@ -315,10 +315,17 @@ const App = (() => {
       { attachElement: ".dragIndicator" },
     );
 
-    if (localStorage.getItem("signData")) {
+    if (
+      localStorage.getItem("autoSaveSignData") &&
+      localStorage.getItem("autoSaveSignData") != "null"
+    ) {
       formHandler.updateForm();
       redraw();
+    } else {
+      newPanel();
     }
+
+    SavesNTemplates.updateAutoSave(post);
   };
 
   // Panels
@@ -1016,6 +1023,19 @@ const App = (() => {
     formHandler.updateGuideArrowsSubform();
     redraw();
   };
+
+  const resetSelectors = () => {
+    currentlySelectedPanelIndex = 0;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedShieldIndex = -1;
+    currentlySelectedShieldGroupId = -1;
+    currentlySelectedStandardArrow = -1;
+  }
 
   // Redraw Methods
   const redrawExitTabs = (
@@ -2209,6 +2229,9 @@ const App = (() => {
   const redraw = () => {
     const panelContainerElmt = document.getElementById("panelContainer");
 
+    // save sign to localstorage
+    SavesNTemplates.updateAutoSave(post);
+
     post.renderPost(
       document.querySelector("#postContainer"),
       document.querySelector("#panelContainer"),
@@ -2253,13 +2276,7 @@ const App = (() => {
 
   const setPost = (newPost) => {
     post = newPost;
-    if (!post) {
-      return;
-    }
-
     currentlySelectedPanelIndex = 0;
-    formHandler.updateForm();
-    redraw();
   };
 
   return {
@@ -2322,6 +2339,7 @@ const App = (() => {
     setSelectedBlockGroup,
     getCurrentBlockElements,
     getGroupNumFromElem,
+    resetSelectors,
 
     vars: {
       get currentlySelectedPanelIndex() {

@@ -772,6 +772,10 @@ textarea {
   padding: 0.75rem;
 }
 
+#fileTypeOptions button.selected {
+  background-color: rgb(var(--baseColorInv), 0.2);
+}
+
 #downloadPreviewHolder {
   display: flex;
   flex-direction: column;
@@ -784,6 +788,7 @@ textarea {
   flex-direction: row;
   padding: 0.5rem;
   justify-content: left;
+  align-items: center;
   gap: 0.25rem;
 }
 
@@ -2981,4 +2986,109 @@ summary:hover {
   padding: 0.75rem;
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+}
+
+#downloadImageSize {
+  margin-left: auto;
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > fieldset {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > fieldset > div {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+#sMCreationsSaved > fieldset > div > button {
+  padding: 0.5rem 1rem;
+}
+
+#sMCreationsSavedList,
+#sMCreationsTemplatesList {
+  display: flex;
+  flex-direction: column;
+  width: 30rem;
+}
+
+.sMCreationsSavedItem:nth-child(odd),
+.sMCreationsTemplateItem:nth-child(odd) {
+  background-color: rgb(var(--baseColor), 0.3);
+}
+
+.sMCreationsSavedItem:nth-child(even),
+.sMCreationsTemplateItem:nth-child(even) {
+  background-color: rgb(var(--baseColor), 0.15);
+}
+
+.sMCreationsSavedItem,
+.sMCreationsTemplateItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 30rem;
+}
+
+.sMCreationsSavedItem > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+}
+
+.sMCreationsSavedItem > div:nth-child(2) {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sMCreationsSavedItem > div:nth-child(2) > button {
+  flex-grow: 1;
+  width: 33%;
+  padding: 0.5rem 0.75rem;
+}
+
+.sMCreationsTemplateItem > button {
+  padding: 0.5rem 0.75rem;
+}
+
+.sMCreationsTemplateItem > span {
+  flex-grow: 1;
+}
+
+.sMCreationsFileName,
+.sMCreationsTemplateName {
+  text-wrap: wrap;
+}
+
+.sMCreationsFileSaveDate {
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > h3 {
+  display: inline-block;
+}
+
+#sMCreationsSearchList {
+  display: inline;
+  float: right;
+  width: 15rem;
+}
+
+#sMCreationsTemplateSearch {
+  display: inline;
+  float: right;
+  width: 10rem;
 }

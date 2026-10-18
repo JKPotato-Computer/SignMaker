@@ -733,10 +733,6 @@ const formHandler = (() => {
       );
     }
 
-    // save sign to localstorage
-    let signData = ImportExport.signToJson(post, "post");
-    localStorage.setItem("signData", signData);
-
     updateForm();
     app.redraw();
   };

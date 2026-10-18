@@ -163,20 +163,24 @@ class TextElement {
           let numbersOnly = text.value.match(/\d+/g)[0];
           let rest = text.value.replace(numbersOnly, "");
 
+          const groupElem = document.createElement("span");
+          groupElem.className = "bE-numeralGroup";
+
           const wordElem1 = document.createElement("span");
           wordElem1.textContent = numbersOnly;
 
           wordElem1.className = "bE-numeral";
-
-          const wordElem2 = document.createElement("span");
-          wordElem2.textContent = rest;
-
-          wordElem2.className = "bE-numeral bE-trailing";
-
-          const groupElem = document.createElement("span");
-          groupElem.className = "bE-numeralGroup";
           groupElem.appendChild(wordElem1);
-          groupElem.appendChild(wordElem2);
+
+          if (rest !== "") {
+            const wordElem2 = document.createElement("span");
+            wordElem2.textContent = rest;
+
+            wordElem2.className = "bE-numeral bE-trailing";
+
+            groupElem.appendChild(wordElem2);
+          }
+
           lineElement.appendChild(groupElem);
         } else {
           const newTextFragment = document.createElement("span");

@@ -17,45 +17,42 @@ import("https://unpkg.com/@oddbird/css-anchor-positioning/dist/css-anchor-positi
 const ImportExport = (() => {
   // serializing & unserializing
   const signToJson = (signContent, type) => {
-    const recursiveTagging = (obj) => {
-      if (obj && typeof obj === "object") {
-        obj._type = obj.constructor.name;
-        for (const key in obj) {
-          if (typeof obj[key] === "object") {
-            recursiveTagging(obj[key]);
-          }
-        }
+    const tagCopy = (obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
       }
+
+      if (Array.isArray(obj)) {
+        return obj.map((item) => tagCopy(item));
+      }
+
+      const copy = {};
+
+      copy._type = obj.constructor.name;
+
+      const proto = Object.getPrototypeOf(obj);
+
+      for (const key of Object.keys(obj)) {
+        if (proto && key in proto) {
+          continue;
+        }
+        copy[key] = tagCopy(obj[key]);
+      }
+
+      return copy;
     };
 
-    const untagging = (obj) => {
-      if (obj && typeof obj === "object") {
-        delete obj._type;
-        for (const key in obj) {
-          if (typeof obj[key] === "object") {
-            untagging(obj[key]);
-          }
-        }
+    let dataToSerialize = signContent;
+
+    if (type === "post") {
+      dataToSerialize = tagCopy(signContent);
+    } else if (type === "panels") {
+      if (Array.isArray(signContent)) {
+        dataToSerialize = signContent.map((panel) => tagCopy(panel));
       }
-    };
-
-    let jsonData = null;
-
-    if (type == "post") {
-      recursiveTagging(signContent);
-      jsonData = JSON.stringify(signContent);
     }
 
-    if (type == "panels") {
-      for (const panel of signContent) {
-        recursiveTagging(panel);
-      }
-      jsonData = JSON.stringify(signContent);
-    }
-
-    untagging(signContent);
-
-    return jsonData;
+    return JSON.stringify(dataToSerialize);
   };
 
   const jsonToSign = (jsonData) => {
@@ -63,28 +60,36 @@ const ImportExport = (() => {
 
     const convert = (data) => {
       if (Array.isArray(data)) {
-        for (const elem of data) {
-          convert(elem);
-        }
+        return data.map((elem) => convert(elem));
       }
 
-      if (data && typeof data == "object") {
-        for (const key in data) {
-          data[key] = convert(data[key]);
+      if (data && typeof data === "object") {
+        const processedData = {};
+        for (const key of Object.keys(data)) {
+          processedData[key] = convert(data[key]);
         }
 
-        if (data._type && typeof window[data._type] === "function") {
-          const targetClass = window[data._type];
+        if (
+          processedData._type &&
+          typeof window[processedData._type] === "function"
+        ) {
+          const targetClass = window[processedData._type];
           const cleanClass = new targetClass();
 
-          for (const key in data) {
-            if (key !== "_type" && key in data) {
-              cleanClass[key] = data[key];
+          for (const key of Object.keys(processedData)) {
+            if (key !== "_type") {
+              if (key in targetClass.prototype) {
+                continue;
+              }
+
+              cleanClass[key] = processedData[key];
             }
           }
 
           return cleanClass;
         }
+
+        return processedData;
       }
 
       return data;
@@ -197,6 +202,10 @@ const ImportExport = (() => {
     originalSizeX = clientRect.width;
     originalSizeY = clientRect.height;
 
+    document.querySelector("#downloadImageSize").textContent = `${Math.round(
+      originalSizeX,
+    )} x ${Math.round(originalSizeY)}`;
+
     elem.style.width = `${originalSizeX * zoomLevel}px`;
     elem.style.height = `${originalSizeY * zoomLevel}px`;
   };
@@ -242,6 +251,16 @@ const ImportExport = (() => {
 
   const changeFileType = (fileType) => {
     fileExportDetails.fileType = fileType.toUpperCase();
+
+    document.querySelector("#exportAsPNG").className =
+      fileType === "png" ? "selected" : "";
+    document.querySelector("#exportAsSVG").className =
+      fileType == "svg" ? "selected" : "";
+    document.querySelector("#exportAsJSON").className =
+      fileType === "json" ? "selected" : "";
+
+    document.querySelector("#downloadSignButton").textContent =
+      `Download ${fileType.toUpperCase()}`;
   };
 
   const setImageScale = (scale) => {
@@ -289,7 +308,7 @@ const ImportExport = (() => {
             fileExportDetails.toggleEntirePost ? "post" : "panels",
           );
           const blob = new Blob([jsonOutput], {
-            type: "application/json",
+            type: "text/json",
           });
 
           const url = URL.createObjectURL(blob);
