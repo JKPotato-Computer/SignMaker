@@ -36,26 +36,32 @@ main#smRender.wide #postContainer {
   width: 100%;
   margin: var(--marginTop) 0 var(--marginBottom) 0;
   background-color: var(--masterBlockBgColor);
+  padding: var(--blockPaddingTop) var(--blockPaddingRight)
+    var(--blockPaddingBottom) var(--blockPaddingLeft);
 }
 
 .blockElementRow.fullBleed {
+  margin: calc(
+      -1 * var(--blockBleedTop) + var(--marginTop) + var(--marginBorderTop)
+    )
+    calc(-1 * var(--blockBleedRight) + var(--marginBorderRight))
+    calc(
+      -1 * var(--blockBleedBottom) + var(--marginBottom) +
+        var(--marginBorderBottom)
+    )
+    calc(-1 * var(--blockBleedLeft) + var(--marginBorderLeft));
+  padding: calc(var(--blockPaddingTop) + var(--blockBleedTop))
+    calc(var(--blockBleedRight) + var(--blockPaddingRight))
+    calc(var(--blockBleedBottom) + var(--blockPaddingBottom))
+    calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
   width: calc(
-    100% + var(--blockBleedLeft, 0rem) + var(--blockBleedRight, 0rem)
+    100% + var(--blockBleedLeft) + var(--blockBleedRight) -
+      var(--marginBorderLeft) - var(--marginBorderRight)
   );
-  margin-left: calc(-1 * var(--blockBleedLeft, 0rem));
-  margin-right: calc(-1 * var(--blockBleedRight, 0rem));
-  margin-top: calc(var(--marginTop, 0rem) - var(--blockBleedTop, 0rem));
-  margin-bottom: calc(
-    var(--marginBottom, 0rem) - var(--blockBleedBottom, 0rem)
-  );
-  padding-left: var(--blockBleedLeft, 0rem);
-  padding-right: var(--blockBleedRight, 0rem);
-  padding-top: calc(
-    var(--blockBleedTop, 0rem) + var(--blockPaddingTopExtra, 0rem)
-  );
-  padding-bottom: calc(
-    var(--blockBleedBottom, 0rem) + var(--blockPaddingBottomExtra, 0rem)
-  );
+  border-top-left-radius: calc(var(--blockBorderRadiusTopLeft));
+  border-top-right-radius: calc(var(--blockBorderRadiusTopRight));
+  border-bottom-left-radius: calc(var(--blockBorderRadiusBottomLeft));
+  border-bottom-right-radius: calc(var(--blockBorderRadiusBottomRight));
 }
 
 .lineElement {
@@ -66,17 +72,30 @@ main#smRender.wide #postContainer {
   width: 100%;
 }
 
-.bE-textElement {
+.bE-textElement,
+.SM-ExitOnlyTextElement {
   font-family: var(--fontFamily), "Series EM";
   font-size: var(--fontSize);
   background-color: var(--blockBgColor);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 var(--spacing);
   white-space: pre;
+  word-spacing: var(--wordSpacing);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100) + 0.2));
   flex-direction: column;
+}
+
+.SM-ExitOnlyTextElement {
+  gap: 0.5rem;
+  color: inherit;
+  letter-spacing: var(--exitOnlyLetterSpacing);
+  word-spacing: var(--exitOnlyWordSpacing);
+}
+
+.SM-ExitOnlyTextElement * {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .bE-textElement > span {
@@ -100,10 +119,12 @@ main#smRender.wide #postContainer {
 .bE-electronicSign * {
   color: var(--textColor);
   text-shadow: var(--textShadow);
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .bE-electronicSign {
-  padding: 0.2rem var(--padding);
+  padding: var(--vertPadding) var(--horizPadding);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100)));
 }
 
@@ -124,51 +145,44 @@ main#smRender.wide #postContainer {
 
 .bE-tollLogoElement {
   display: block;
-  height: vmax-content;
+  height: max-content;
   margin: 0 var(--spacing, 0rem);
 }
 
-.bE-tollLogoElement.hasBackground {
-  background-color: var(--tollBgColor, white);
-  padding: var(--vertPadding) var(--horizPadding);
-  border-radius: var(--borderRadius, 4px);
+.bE-tollLogoElement.squareIcon img {
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
 }
 
-.bE-tollLogoElement.hasBackground.hasOnlyBlock {
-  border: 3px solid white;
+.bE-tollLogoImageHolder.hasBackground {
+  background-color: var(--tollBgColor);
+  padding: var(--logoVerticalPadding) var(--logoHorizontalPadding);
+  border-radius: var(--tollBorderRadius);
+  border: var(--tollBorderWidth) solid;
+}
+
+.bE-tollLogoElement.hasOnlyBlock {
+  background-color: var(--containerBackgroundColor);
+  border: var(--containerBorderWidth, 3px) solid;
   display: flex;
-  flex-direction: row;
+  flex-direction: var(--onlyBlockDirection, row);
   justify-content: center;
   align-items: center;
-  gap: calc(var(--tollLogoHeight) / 6);
-  padding: calc(var(--vertPadding) * 0.5) calc(var(--horizPadding));
-}
-
-.bE-tollLogoElement.hasBackground.hasOnlyBlock.inverseColor,
-.bE-tollLogoElement.hasBackground.hasOnlyBlock.inverseColor img {
-  border-color: black;
-}
-
-.bE-tollLogoElement.hasBackground.hasOnlyBlock.inverseColor .bE-tollOnlyBlock {
-  background: black;
-  color: white;
+  gap: var(--onlyBlockSpacing, 0.2rem);
+  padding: var(--containerVerticalPadding) var(--containerHorizontalPadding);
+  border-radius: var(--containerBorderRadius);
 }
 
 .bE-tollOnlyBlock {
   background-color: white;
   color: black;
-  font-family: "Series E";
-  padding: calc(var(--tollLogoHeight) * 0.15) 0.5rem
-    calc(var(--tollLogoHeight) * 0.075);
-  line-height: calc(var(--tollLogoHeight) * 0.55);
-  font-size: calc(var(--tollLogoHeight) * 0.8);
-  border-radius: calc(var(--borderRadius) / 2);
-}
-
-.bE-tollLogoElement.hasBackground.hasOnlyBlock img {
-  border: 3px solid white;
-  border-radius: var(--borderRadius, 4px);
-  padding: calc(var(--tollLogoHeight) / 10) calc(var(--tollLogoHeight) / 4);
+  font-family: var(--onlyBlockFontFamily, "Series E");
+  padding: var(--onlyBlockVertPadding, 0.05rem)
+    var(--onlyBlockHorizPadding, 0.2rem);
+  border-radius: var(--onlyBorderRadius);
+  text-box-edge: cap alphabetic;
+  text-box-trim: trim-both;
+  font-size: var(--onlyBlockFontSize);
 }
 
 .bE-tollLogoElement img {
@@ -176,22 +190,22 @@ main#smRender.wide #postContainer {
 }
 
 .bE-arrowElement {
-  --arrowRotation: 0deg;
-  --arrowSize: 1.75rem;
   --arrowPaddingVertical: 0rem;
   --arrowPaddingHorizontal: 0rem;
-  --arrowFlip: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 0 auto;
   padding: var(--arrowPaddingVertical) var(--arrowPaddingHorizontal);
 }
 
-.bE-arrowElement img {
+.bE-arrowImage {
   display: block;
-  width: var(--arrowSize);
-  height: auto;
+  height: var(--arrowSize);
+  width: auto;
+  margin-left: var(--arrowMarginHorizontal);
+  margin-right: var(--arrowMarginHorizontal);
+  margin-top: var(--arrowMarginVertical);
+  margin-bottom: var(--arrowMarginVertical);
   transform: scaleX(var(--arrowFlip)) rotate(var(--arrowRotation));
   transform-origin: center;
 }
@@ -417,6 +431,7 @@ main#smRender.wide #postContainer {
 .bannerGroupElem.left {
   grid-area: leftBanners;
   align-items: end;
+  padding: var(--bannerInset) 0;
   justify-content: var(--bannerJustifyContent);
   height: 100%;
 }
@@ -424,6 +439,7 @@ main#smRender.wide #postContainer {
 .bannerGroupElem.right {
   grid-area: rightBanners;
   align-items: start;
+  padding: var(--bannerInset) 0;
   justify-content: var(--bannerJustifyContent);
   height: 100%;
 }
@@ -436,15 +452,7 @@ main#smRender.wide #postContainer {
 .shield {
   margin: var(--vertShieldMargin) var(--horizShieldMargin);
   position: relative;
-  scale: var(--shieldScale);
-}
-
-.shield::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  anchor-name: --routeNumberAnchor;
-  pointer-events: none;
+  font-family: "Series C";
 }
 
 .shieldImg.shieldBacks {
@@ -453,7 +461,8 @@ main#smRender.wide #postContainer {
 }
 
 .shieldImg {
-  height: 3rem;
+  height: calc(3rem * var(--shieldScale));
+  anchor-name: --routeNumberAnchor;
 }
 
 .routeNumber {
@@ -461,14 +470,15 @@ main#smRender.wide #postContainer {
   position: absolute;
   position-anchor: --routeNumberAnchor;
   position-area: center;
+  justify-self: center;
+  align-self: center;
   line-height: 0;
   scale: var(--routeScale, 1);
-  transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
-  height: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
+  transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
 }
-
 .designation {
   position: absolute;
   position-anchor: --routeNumberAnchor;
@@ -553,6 +563,10 @@ main#smRender.wide #postContainer {
   min-width: 100%;
 }
 
+.panel.sharp .guideArrowsHolder:has(.guidearrows.custom) {
+  background-color: var(--bg-color);
+}
+
 .exitTabContainer.within .ET-tabHolder {
   background: none;
 }
@@ -627,7 +641,9 @@ main#smRender.wide #postContainer {
   margin-left: 0;
 }
 
-.ET-tab.useTrim .ET-word {
+.ET-tab.useTrim .ET-word,
+.ET-tab.useTrim .ET-numeral,
+.ET-tab.useTrim .ET-trailing {
   text-box-edge: cap alphabetic;
   text-box-trim: trim-both;
 }
@@ -673,7 +689,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab.icon.pay-by-mail-1 {
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 .ET-iconDivider {
@@ -683,8 +699,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-iconImage {
-  width: calc(var(--iconSize) + var(--iconHorizontalPadding) * 2);
-  height: calc(var(--iconImageHeight) + var(--iconVerticalPadding) * 2);
+  width: var(--iconSize);
   object-fit: contain;
 }
 
@@ -697,7 +712,9 @@ main#smRender.wide #postContainer {
 
 .ET-iconImage.square {
   aspect-ratio: 1 / 1;
-  width: calc(var(--iconSize) + var(--pbmPadding) * 2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ET-iconText,
@@ -734,22 +751,23 @@ main#smRender.wide #postContainer {
 
 .ET-iconOr {
   font-family: var(--iconFontFamily);
+  padding: calc(var(--fontSize) / 2);
 }
 
 .ET-iconPayByMail {
-  justify-content: center;
   border: none;
   padding: var(--pbmPadding);
   font-family: var(--iconFontFamily);
-  display: flex;
-  align-items: center;
   white-space: pre-line;
   width: auto;
+  letter-spacing: var(--letterSpacing);
 }
 
 .ET-tab:has(.ET-fullLeft) {
-  padding-top: calc(1.25rem + var(--fontSize) + var(--verticalPadding));
-  padding-bottom: calc(0.25rem + var(--verticalPadding));
+  padding-top: calc(
+    var(--bottomSpacing) + var(--fontSize) + var(--verticalPadding)
+  );
+  padding-bottom: calc(0.66rem + var(--verticalPadding));
 }
 
 .ET-row.extend .ET-tab:has(.ET-fullLeft) {
@@ -788,19 +806,22 @@ main#smRender.wide #postContainer {
   display: flex;
   justify-content: left;
   align-items: center;
-  padding: 0.5rem 0.5rem 0.25rem 0.5rem;
-  font-size: calc(var(--fontSize) * 1.5);
-  font-family: "Series E";
+  padding: 0.33rem 0.5rem;
+  font-size: calc(var(--fontSize));
+  font-family: var(--fontFamily);
+  letter-spacing: var(--letterSpacing);
   width: 100%;
   height: 100%;
+  text-box-edge: cap alphabetic;
+  text-box-trim: trim-both;
 }
 
 .ET-PartialLeft {
   background-color: var(--yellow);
   padding: var(--verticalPadding) var(--horizontalPadding);
-  border-radius: calc(var(--borderRadius) / 2);
+  border-radius: var(--partialLeftBorderRadius);
   color: black;
-  font-family: "Series E";
+  font-family: var(--fontFamily);
   line-height: 100%;
   font-size: calc(var(--fontSize) * 1.1);
   letter-spacing: var(--letterSpacing);
@@ -918,7 +939,7 @@ main#smRender.wide #postContainer {
 
 .ET-tab.square {
   border-radius: 0.25rem;
-  padding: var(--verticalPadding) calc(1.3rem + var(--horizontalPadding));
+  padding: var(--verticalPadding) calc(var(--horizontalPadding));
 }
 
 .signCorner {
@@ -1141,7 +1162,10 @@ main#smRender.wide #postContainer {
 }
 
 .signcontainer:has(.guideArrows.apl) .signHolder,
-.signcontainer:has(.guideArrows:not(.none, .diagrammic)) .signHolder {
+.signcontainer:has(
+    .guideArrows:not(.none, .diagrammic, .side_left, .side_right)
+  )
+  .signHolder {
   border-bottom: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -1260,4 +1284,101 @@ main#smRender.wide #postContainer {
   flex-direction: row;
   justify-content: center;
   align-items: end;
+}
+
+.ET-shieldHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bE-fraction {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bE-numerator {
+  position: relative;
+  top: -0.15em;
+  font-size: calc(var(--fontSize) * (var(--numeralSize) / 100));
+}
+
+.bE-denominator {
+  position: relative;
+  top: 0.15em;
+  font-size: calc(var(--fontSize) * (var(--numeralSize) / 100));
+}
+
+.bE-slash {
+  font-size: calc(var(--fontSize) * 1.15 * var(--numeralSize) / 100);
+}
+
+.bE-actionMessageElement {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+.guideArrows.split_exit_only .SM-ExitOnlyTextElement {
+  background-color: var(--bgColor);
+  color: inherit;
+  border-radius: var(--splitBorderRadius);
+  padding: var(--splitVerticalPadding) var(--splitHorizontalPadding);
+}
+
+.guideArrows.split_exit_only.full_black_border .SM-ExitOnlyTextElement {
+  border: 0.2rem solid black;
+}
+
+.guideArrows.exit_only,
+.guideArrows.split_exit_only {
+  padding: var(--verticalPadding) var(--horizontalPadding);
+}
+
+.guideArrows.exit_only.white_border > .arrowContainer {
+  padding: var(--verticalPadding) var(--horizontalPadding);
+}
+
+.guideArrowsHolder:has(.split_exit_only) {
+  background-color: var(--bg-color);
+}
+
+.bannerElmt_specialDivider {
+  width: 100%;
+  height: 3px;
+  background: var(--fg-color);
+}
+
+.ET-numeralGroup,
+.bE-numeralGroup {
+  display: flex;
+  flex-direction: row;
+}
+
+.bE-numeralGroup {
+  gap: calc(var(--fontSize) / 4);
+}
+
+.bE-groupElement {
+  position: relative;
+}
+
+.bE-groupElementsCover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: calc(var(--pixelSize) * 3) calc(var(--pixelSize) * 3);
+}
+
+.bE-groupElementsCover.circlepixels {
+  background-image: radial-gradient(
+    circle,
+    transparent var(--pixelSize),
+    black var(--pixelSize)
+  );
+}
+
+.bE-groupElementsCover.squarepixels {
+  background-image: repeating-conic-gradient(transparent 0% 25%, black 0% 50%);
 }

@@ -1,155 +1,425 @@
-const ImportExport = (function () {
-  let fileInfo = {
-    fileType: "png",
-    panel: -1,
+const exportModal = document.querySelector("#downloadContent");
+const smRender = document.querySelector("#smRender");
+const previewImage = document.querySelector("#downloadPreview");
+
+let cssAnchorPolyfillFn = null;
+let zoomLevel = 1;
+
+let originalSizeX = null,
+  originalSizeY = null;
+
+import("https://unpkg.com/@oddbird/css-anchor-positioning/dist/css-anchor-positioning-fn.js").then(
+  (module) => {
+    cssAnchorPolyfillFn = module.default;
+  },
+);
+
+const ImportExport = (() => {
+  // serializing & unserializing
+  const signToJson = (signContent, type) => {
+    const tagCopy = (obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+
+      if (Array.isArray(obj)) {
+        return obj.map((item) => tagCopy(item));
+      }
+
+      const copy = {};
+
+      copy._type = obj.constructor.name;
+
+      const proto = Object.getPrototypeOf(obj);
+
+      for (const key of Object.keys(obj)) {
+        if (proto && key in proto) {
+          continue;
+        }
+        copy[key] = tagCopy(obj[key]);
+      }
+
+      return copy;
+    };
+
+    let dataToSerialize = signContent;
+
+    if (type === "post") {
+      dataToSerialize = tagCopy(signContent);
+    } else if (type === "panels") {
+      if (Array.isArray(signContent)) {
+        dataToSerialize = signContent.map((panel) => tagCopy(panel));
+      }
+    }
+
+    return JSON.stringify(dataToSerialize);
   };
 
-  /**
-		Download the sign from options
-	*/
+  const jsonToSign = (jsonData) => {
+    const rawData = JSON.parse(jsonData);
 
-  function getFile() {
-    let screenshotTarget;
-    let postClass;
+    const convert = (data) => {
+      if (Array.isArray(data)) {
+        return data.map((elem) => convert(elem));
+      }
 
-    if (fileInfo.panel == -1) {
-      screenshotTarget = document.querySelector("#postContainer");
-    } else {
-      screenshotTarget = document.getElementById(
-        "panel" + fileInfo.panel.toString()
+      if (data && typeof data === "object") {
+        const processedData = {};
+        for (const key of Object.keys(data)) {
+          processedData[key] = convert(data[key]);
+        }
+
+        if (
+          processedData._type &&
+          typeof window[processedData._type] === "function"
+        ) {
+          const targetClass = window[processedData._type];
+          const cleanClass = new targetClass();
+
+          for (const key of Object.keys(processedData)) {
+            if (key !== "_type") {
+              if (key in targetClass.prototype) {
+                continue;
+              }
+
+              cleanClass[key] = processedData[key];
+            }
+          }
+
+          return cleanClass;
+        }
+
+        return processedData;
+      }
+
+      return data;
+    };
+
+    return convert(rawData);
+  };
+
+  // image export
+  const fileExportDetails = {
+    fileType: "PNG",
+    isFullSign: true,
+    panelNumbers: [0],
+    snapdomData: null,
+    rawFileData: null,
+    imageScale: 2,
+  };
+
+  const updatePreview = async () => {
+    smRender.style.setProperty("--zoomLevelDec", 1);
+    previewImage.innerHTML = `
+      <span>Generating...</span>
+    `;
+
+    let anchorSession;
+    if (cssAnchorPolyfillFn) {
+      anchorSession = await cssAnchorPolyfillFn({
+        elements: [smRender, ...smRender.querySelectorAll(".routeNumber")],
+      });
+    }
+
+    if (fileExportDetails.isFullSign) {
+      fileExportDetails.snapdomData = await snapdom(
+        smRender.querySelector("#postContainer"),
+        {
+          scale: fileExportDetails.imageScale,
+          embedFonts: true,
+          compress: true,
+        },
       );
-    }
-
-    return screenshotTarget;
-  }
-
-  const downloadFile = function (dataURL, ending) {
-    let a = document.createElement(`a`);
-    a.setAttribute("href", dataURL);
-    a.setAttribute("download", "downloadedSign" + ending);
-    a.click();
-    a.remove();
-  };
-
-  const saveSign = async function (file, isPreview, isSVG) {
-    let newElem = file.cloneNode(true);
-    newElem.style.position = "absolute";
-    newElem.style.top = "0";
-    newElem.style.left = "0";
-    document.body.appendChild(newElem);
-    return new Promise((resolve, reject) => {
-      let svg = htmlToImage.toSvg(newElem);
-      newElem.remove();
-      svg
-        .then(function (dataUrl) {
-          if (isSVG) {
-            if (isPreview) {
-              resolve(dataUrl);
-            }
-            downloadFile(dataUrl, ".svg");
-            return;
-          }
-
-          let tmpCanvas = document.createElement("canvas");
-          let ctx = tmpCanvas.getContext("2d");
-
-          let tmpImg = new Image();
-          tmpImg.addEventListener("load", onTempImageLoad);
-          tmpImg.src = dataUrl;
-
-          tmpCanvas.width = tmpCanvas.height = 512;
-          function onTempImageLoad(e) {
-            tmpCanvas.width = e.target.width;
-            tmpCanvas.height = e.target.height;
-
-            ctx.drawImage(e.target, 0, 0);
-            if (isPreview) {
-              resolve(tmpCanvas.toDataURL());
-            } else {
-              downloadFile(tmpCanvas.toDataURL(), ".png");
-              resolve(true);
-            }
-          }
-        })
-        .catch(function (error) {
-          console.error("Error Saving!", error);
-        });
-    });
-  };
-
-  const downloadSign = async function () {
-    const downloadPreview = document.getElementById("downloadPreview");
-    const entirePost_option = document.getElementById("entirePost");
-    const panelContainer = document.getElementById("panelContainer");
-    const panelNumberSelector = document.getElementById("singularPanel");
-
-    let background = "";
-
-    if (entirePost_option.checked == true) {
-      fileInfo.panel = -1;
-      panelNumberSelector.style.display = "none";
-      document.getElementById("downloadContents").style.verticalAlign = "10rem";
     } else {
-      const panelNumber = document.getElementById("selectPanel");
-      fileInfo.panel = panelNumber.value - 1;
-      panelNumberSelector.style.display = "block";
-      document.getElementById("downloadContents").style.verticalAlign = "";
+      // hide posts temporarily
+      for (const post of smRender.querySelectorAll(".post")) {
+        post.style.display = "none";
+      }
+      document.querySelector("#panelContainer").style.background = "none";
+      document.querySelector("#panelContainer").style.height = "max-content";
+
+      const panelNodeList = smRender.querySelectorAll(
+        "#panelContainer > .panel",
+      );
+      for (let i = 0; i < App.getPost().panels.length; i++) {
+        const panel = panelNodeList[i];
+        if (fileExportDetails.panelNumbers.includes(i)) {
+          panel.style.display = "block";
+        } else {
+          panel.style.display = "none";
+        }
+      }
+
+      fileExportDetails.snapdomData = await snapdom(
+        smRender.querySelector("#panelContainer"),
+        {
+          scale: fileExportDetails.imageScale,
+          embedFonts: true,
+          compress: true,
+        },
+      );
+
+      // restore posts
+      for (const post of smRender.querySelectorAll(".post")) {
+        post.style.display = "";
+      }
+
+      document.querySelector("#panelContainer").style.background = "";
+      document.querySelector("#panelContainer").style.height = "";
+
+      for (const panel of panelNodeList) {
+        panel.style.display = "block";
+      }
     }
 
-    if (fileInfo.fileType == "png") {
-      saveSign(getFile(), false);
-    } else if (fileInfo.fileType == "svg") {
-      saveSign(getFile(), false, true);
+    if (anchorSession && typeof anchorSession.disconnect === "function") {
+      anchorSession.disconnect();
     }
+
+    smRender.style.setProperty("--zoomLevelDec", formHandler.vars.zoomLevel);
+
+    // convert file
+    switch (fileExportDetails.fileType) {
+      case "JSON":
+      case "PNG":
+        fileExportDetails.rawFileData =
+          await fileExportDetails.snapdomData.toPng();
+        break;
+      case "SVG":
+        fileExportDetails.rawFileData =
+          await fileExportDetails.snapdomData.toSvg();
+        break;
+      default:
+        break;
+    }
+    previewImage.innerHTML = "";
+
+    const elem = fileExportDetails.rawFileData;
+
+    previewImage.appendChild(elem);
+
+    const clientRect = elem.getBoundingClientRect();
+    originalSizeX = clientRect.width;
+    originalSizeY = clientRect.height;
+
+    document.querySelector("#downloadImageSize").textContent = `${Math.round(
+      originalSizeX,
+    )} x ${Math.round(originalSizeY)}`;
+
+    elem.style.width = `${originalSizeX * zoomLevel}px`;
+    elem.style.height = `${originalSizeY * zoomLevel}px`;
   };
 
-  const updatePreview = async function () {
-    const downloadPreview = document.getElementById("downloadPreview");
-    const entirePost_option = document.getElementById("entirePost");
-    const panelContainer = document.getElementById("panelContainer");
-    const panelNumberSelector = document.getElementById("singularPanel");
+  const init = async () => {
+    exportModal.showModal();
+    document.querySelector("#modalHolder").style.display = "flex";
 
-    let background = "";
+    document.querySelector("#downloadPanelList").innerHTML = "";
+    for (let i = 0; i < App.getPost().panels.length; i++) {
+      const panelListItem = document.createElement("button");
+      panelListItem.classList.add("downloadPanelBtn");
 
-    if (entirePost_option.checked == true) {
-      fileInfo.panel = -1;
-      panelNumberSelector.style.display = "none";
-      document.getElementById("downloadContents").style.verticalAlign = "10rem";
-    } else {
-      const panelNumber = document.getElementById("selectPanel");
-      fileInfo.panel = panelNumber.value - 1;
-      panelNumberSelector.style.display = "block";
-      document.getElementById("downloadContents").style.verticalAlign = "";
+      if (fileExportDetails.panelNumbers.includes(i)) {
+        panelListItem.classList.add("selected");
+      }
+
+      panelListItem.innerHTML = `${i + 1}`;
+      document.querySelector("#downloadPanelList").appendChild(panelListItem);
+
+      panelListItem.addEventListener("click", async () => {
+        if (fileExportDetails.panelNumbers.includes(i)) {
+          fileExportDetails.panelNumbers =
+            fileExportDetails.panelNumbers.filter((num) => num !== i);
+          panelListItem.classList.remove("selected");
+        } else {
+          fileExportDetails.panelNumbers.push(i);
+          panelListItem.classList.add("selected");
+        }
+        updatePreview();
+      });
     }
 
-    while (downloadPreview.firstChild) {
-      downloadPreview.removeChild(downloadPreview.lastChild);
-    }
-
-    const targetImg = new Image();
-    targetImg.src = await saveSign(getFile(), true);
-    downloadPreview.appendChild(targetImg);
-  };
-
-  const updateFileType = function (fileType) {
-    fileInfo.fileType = fileType;
     updatePreview();
+  };
 
-    if (fileType == "png") {
-      document.getElementById("PNG").className = "activated";
-      document.getElementById("SVG").className = "";
-    } else if (fileType == "svg") {
-      document.getElementById("PNG").className = "";
-      document.getElementById("SVG").className = "activated";
+  const toggleEntirePost = (bool) => {
+    fileExportDetails.isFullSign = bool;
+    document.querySelector("#downloadPanelContainer").style.display = bool
+      ? "none"
+      : "";
+  };
+
+  const changeFileType = (fileType) => {
+    fileExportDetails.fileType = fileType.toUpperCase();
+
+    document.querySelector("#exportAsPNG").className =
+      fileType === "png" ? "selected" : "";
+    document.querySelector("#exportAsSVG").className =
+      fileType == "svg" ? "selected" : "";
+    document.querySelector("#exportAsJSON").className =
+      fileType === "json" ? "selected" : "";
+
+    document.querySelector("#downloadSignButton").textContent =
+      `Download ${fileType.toUpperCase()}`;
+  };
+
+  const setImageScale = (scale) => {
+    fileExportDetails.imageScale = Math.max(Math.min(scale, 10), 1);
+  };
+
+  const close = () => {
+    exportModal.close();
+    document.querySelector("#modalHolder").style.display = "none";
+  };
+
+  const downloadSign = async (copyToClipboard) => {
+    if (!fileExportDetails.rawFileData) {
+      await updatePreview();
+    }
+
+    if (copyToClipboard) {
+      if (fileExportDetails.fileType == "JSON") {
+        const jsonOutput = signToJson(
+          fileExportDetails.toggleEntirePost
+            ? App.getPost()
+            : App.getPost().panels.filter((_, i) =>
+                fileExportDetails.panelNumbers.includes(i),
+              ),
+          fileExportDetails.toggleEntirePost ? "post" : "panels",
+        );
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "application/json": new Blob([jsonOutput], {
+              type: "application/json",
+            }),
+          }),
+        ]);
+      }
+    } else {
+      let signName = prompt("Enter a name for the sign file:", "MySign");
+      if (signName) {
+        if (fileExportDetails.fileType == "JSON") {
+          const jsonOutput = signToJson(
+            fileExportDetails.toggleEntirePost
+              ? App.getPost()
+              : App.getPost().panels.filter((_, i) =>
+                  fileExportDetails.panelNumbers.includes(i),
+                ),
+            fileExportDetails.toggleEntirePost ? "post" : "panels",
+          );
+          const blob = new Blob([jsonOutput], {
+            type: "text/json",
+          });
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${signName}.signmaker`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } else {
+          await fileExportDetails.snapdomData.download({
+            format: fileExportDetails.fileType.toLowerCase(),
+            filename: signName,
+          });
+        }
+      }
     }
   };
 
   return {
-    getFile,
-    downloadFile,
-    saveSign,
-    downloadSign,
+    init,
+    close,
     updatePreview,
-    updateFileType,
+    toggleEntirePost,
+    changeFileType,
+    setImageScale,
+    downloadSign,
+
+    signToJson,
+    jsonToSign,
   };
 })();
+
+document.querySelector("#exportSign").addEventListener("click", async () => {
+  ImportExport.init();
+});
+
+exportModal.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  ImportExport.close();
+});
+
+// zoom handler
+const updateZoomImage = () => {
+  const image = previewImage.querySelector("img, svg");
+  if (image) {
+    image.style.width = `${originalSizeX * zoomLevel}px`;
+    image.style.height = `${originalSizeY * zoomLevel}px`;
+  }
+};
+
+document
+  .querySelector("#downloadImageZoomOut")
+  .addEventListener("click", () => {
+    zoomLevel = Math.max(zoomLevel - 0.1, 0.1);
+    document.querySelector("#downloadImageZoomValue").textContent =
+      Math.floor(zoomLevel * 100) + "%";
+    updateZoomImage();
+  });
+
+document.querySelector("#downloadImageZoomIn").addEventListener("click", () => {
+  zoomLevel = Math.min(zoomLevel + 0.1, 10);
+  document.querySelector("#downloadImageZoomValue").textContent =
+    Math.floor(zoomLevel * 100) + "%";
+  updateZoomImage();
+});
+
+document
+  .querySelector("#downloadImageZoomReset")
+  .addEventListener("click", () => {
+    zoomLevel = 1;
+    document.querySelector("#downloadImageZoomValue").textContent =
+      Math.floor(zoomLevel * 100) + "%";
+    updateZoomImage();
+  });
+
+document.querySelector("#importSign").addEventListener("click", async () => {
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = ".signmaker,application/json";
+
+  fileInput.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    fileInput.remove();
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const jsonData = e.target.result;
+        const signContent = ImportExport.jsonToSign(jsonData);
+
+        if (
+          signContent instanceof Post &&
+          confirm("Are you sure you want to overwrite the post?")
+        ) {
+          App.setPost(signContent);
+        } else if (
+          Array.isArray(signContent) &&
+          confirm("Are you sure you want to overwrite all your panels?")
+        ) {
+          App.getPost().panels = signContent;
+        }
+
+        formHandler.updateForm();
+        App.redraw();
+      };
+
+      reader.readAsText(file);
+    }
+  });
+
+  fileInput.click();
+});

@@ -1,25 +1,4 @@
 // Control.js
-const fractionMap = {
-  "1/2": "½",
-  "1/3": "⅓",
-  "2/3": "⅔",
-  "1/4": "¼",
-  "3/4": "¾",
-  "1/5": "⅕",
-  "2/5": "⅖",
-  "3/5": "⅗",
-  "4/5": "⅘",
-  "1/6": "⅙",
-  "5/6": "⅚",
-  "1/7": "⅐",
-  "1/8": "⅛",
-  "3/8": "⅜",
-  "5/8": "⅝",
-  "7/8": "⅞",
-  "1/9": "⅑",
-  "1/10": "⅒",
-};
-const fractionRegex = new RegExp(Object.keys(fractionMap).join("|"), "g");
 
 class TextElement {
   constructor({
@@ -32,9 +11,11 @@ class TextElement {
     bannerFirstLetterSize = 120,
     useNumeralFormatting = false,
     numeralFormattingSize = 150,
+    spaceNumeralsLetters = true,
     alignment = "Center",
     textAlign = "Center",
     lineHeight = 100,
+    wordSpacing = 0,
   } = {}) {
     this.textContent = textContent;
     this.fontFamily = fontFamily;
@@ -47,25 +28,23 @@ class TextElement {
     this.bannerFirstLetterSize = bannerFirstLetterSize;
     this.alignment = alignment;
     this.lineHeight = lineHeight;
+    this.wordSpacing = wordSpacing;
     this.textAlign = textAlign;
+    this.spaceNumeralsLetters = spaceNumeralsLetters;
   }
 
   splitString(text) {
     let result = [text];
     let tagged = [];
 
-    const numeralPattern = /(\d+\S*)|([\u00BC-\u00BE]+\S*)/;
-    const lightNumeralPattern = new RegExp(
-      numeralPattern.source + "|" + Object.values(fractionMap).join("|"),
-      "g",
-    );
+    const numeralPattern = /(\d+\/\d+)|(\d\S*)/g;
 
     const bannerPattern = new RegExp(
-      `(\\s*)(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)(\\s*)`,
+      `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)`,
       "gi",
     );
     const lightBannerPattern = new RegExp(
-      `(\\b(?:${Shield.prototype.bannerTypes.join("|")})\\b)`,
+      `(\\b(?:${Shield.bannerTypes.join("|")})\\b)`,
       "gi",
     );
 
@@ -79,9 +58,7 @@ class TextElement {
         let currentResult = result[i]
           .split(numeralPattern)
           .filter(Boolean)
-          .map((val) =>
-            val.replace(fractionRegex, (match) => fractionMap[match]),
-          );
+          .map((val) => val.replace(numeralPattern, (match) => match));
         newResult = newResult.concat(currentResult);
       }
       result = newResult;
@@ -92,7 +69,7 @@ class TextElement {
     );
     for (let i = 0; i < result.length; i++) {
       let r = result[i];
-      if (lightNumeralPattern.test(r) && this.useNumeralFormatting) {
+      if (numeralPattern.test(r) && this.useNumeralFormatting) {
         tagged[i] = { type: "numeral", value: r };
       } else if (lightBannerPattern.test(r) && this.useBannerFormatting) {
         tagged[i] = { type: "banner", value: r };
@@ -133,6 +110,7 @@ class TextElement {
       this.bannerFirstLetterSize,
     );
     newText.style.setProperty("--lineHeight", this.lineHeight);
+    newText.style.setProperty("--wordSpacing", this.wordSpacing + "rem");
     if (usesHighwayGothic) {
       newText.style.setProperty(
         "--fhwaBaselineOffset",
@@ -140,12 +118,7 @@ class TextElement {
       );
     }
 
-    if (
-      this.backgroundColor == "Orange" ||
-      this.backgroundColor == "White" ||
-      this.backgroundColor == "Yellow" ||
-      this.backgroundColor == "Fluorescent Yellow-Green"
-    ) {
+    if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
       newText.style.color = "black";
     } else if (this.backgroundColor != "Inherit") {
       newText.style.color = "white";
@@ -159,11 +132,63 @@ class TextElement {
 
       for (let i = 0; i < splitTextContent.length; i++) {
         let text = splitTextContent[i];
-        const newTextFragment = document.createElement("span");
-        newTextFragment.className = "bE-" + text.type;
-        newTextFragment.textContent = text.value;
+        if (/\d+\/\d+/g.test(text.value) && text.type == "numeral") {
+          let firstFrac = text.value.split("/")[0];
+          let secondFrac = text.value.split("/")[1];
 
-        lineElement.appendChild(newTextFragment);
+          const fractionHolder = document.createElement("div");
+          fractionHolder.className = "bE-fraction";
+
+          const numerator = document.createElement("span");
+          numerator.className = "bE-numerator";
+          numerator.textContent = firstFrac;
+
+          const denominator = document.createElement("span");
+          denominator.className = "bE-denominator";
+          denominator.textContent = secondFrac;
+
+          const slash = document.createElement("span");
+          slash.className = "bE-slash";
+          slash.textContent = "/";
+
+          fractionHolder.appendChild(numerator);
+          fractionHolder.appendChild(slash);
+          fractionHolder.appendChild(denominator);
+          lineElement.appendChild(fractionHolder);
+        } else if (
+          /\d[A-z\-]*/g.test(text.value) &&
+          this.spaceNumeralsLetters &&
+          text.type == "numeral"
+        ) {
+          let numbersOnly = text.value.match(/\d+/g)[0];
+          let rest = text.value.replace(numbersOnly, "");
+
+          const groupElem = document.createElement("span");
+          groupElem.className = "bE-numeralGroup";
+
+          const wordElem1 = document.createElement("span");
+          wordElem1.textContent = numbersOnly;
+
+          wordElem1.className = "bE-numeral";
+          groupElem.appendChild(wordElem1);
+
+          if (rest !== "") {
+            const wordElem2 = document.createElement("span");
+            wordElem2.textContent = rest;
+
+            wordElem2.className = "bE-numeral bE-trailing";
+
+            groupElem.appendChild(wordElem2);
+          }
+
+          lineElement.appendChild(groupElem);
+        } else {
+          const newTextFragment = document.createElement("span");
+          newTextFragment.className = "bE-" + text.type;
+          newTextFragment.textContent = text.value;
+
+          lineElement.appendChild(newTextFragment);
+        }
       }
       newText.appendChild(lineElement);
     }
@@ -172,17 +197,17 @@ class TextElement {
   }
 }
 
-TextElement.prototype.fontFamily = [
+TextElement.fontFamilies = [
   "Clearview 1B",
   "Clearview 1W",
   "Clearview 2B",
-  "Clearivew 2W",
+  "Clearview 2W",
   "Clearview 3B",
   "Clearview 3W",
   "Clearview 4B",
   "Clearview 4W",
-  "Clearivew 5B",
-  "Clearivew 5W",
+  "Clearview 5B",
+  "Clearview 5W",
   "Clearview 5WR",
   "Clearview 6B",
   "Series B",
@@ -197,20 +222,17 @@ TextElement.prototype.fontFamily = [
   "Transport",
 ];
 
-TextElement.prototype.alignment = ["Left", "Center", "Right"];
+TextElement.alignments = ["Left", "Center", "Right"];
 
-TextElement.prototype.backgroundColor = ["Inherit"].concat(
+TextElement.backgroundColors = ["Inherit"].concat(
   Object.keys(lib.colors),
 );
 
 class ControlTextElement extends TextElement {
-  constructor({
-    smallCapitals = false,
-    fontFamily = ControlTextElement.defaultFont,
-  } = {}) {
+  constructor({ smallCapitals = false, wordSpacing = 0 } = {}) {
     super();
-    this.fontFamily = fontFamily;
     this.smallCapitals = smallCapitals;
+    this.wordSpacing = wordSpacing;
   }
 
   createElement() {
@@ -221,13 +243,22 @@ class ControlTextElement extends TextElement {
   }
 }
 
-ControlTextElement.defaultFont = "Clearview 5WR";
-
 class ActionMessageElement extends TextElement {
-  constructor({ fontSize = 70, useNumeralFormatting = true } = {}) {
+  constructor({
+    fontSize = 70,
+    useNumeralFormatting = true,
+    wordSpacing = 0,
+  } = {}) {
     super();
     this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
+    this.wordSpacing = wordSpacing;
+  }
+
+  createElement() {
+    const newText = super.createElement();
+    newText.classList.add("bE-actionMessageElement");
+    return newText;
   }
 }
 
@@ -236,17 +267,25 @@ class AdvisoryMessageElement extends TextElement {
     backgroundColor = "Yellow",
     fontFamily = "Series E",
     borderRadius = 4,
+    border = false,
+    borderWidth = 2,
+    borderColor = "White",
     useNumeralFormatting = true,
     horizPadding = 0.3,
-    vertPadding = 0.3,
+    vertPadding = 0.2,
+    wordSpacing = 0,
   } = {}) {
     super();
+    this.borderColor = borderColor;
     this.backgroundColor = backgroundColor;
     this.fontFamily = fontFamily;
     this.borderRadius = borderRadius;
+    this.border = border;
+    this.borderWidth = borderWidth;
     this.useNumeralFormatting = useNumeralFormatting;
     this.horizPadding = horizPadding;
     this.vertPadding = vertPadding;
+    this.wordSpacing = wordSpacing;
   }
 
   createElement() {
@@ -254,6 +293,12 @@ class AdvisoryMessageElement extends TextElement {
     newText.style.setProperty("--borderRadius", this.borderRadius + "px");
     newText.style.setProperty("--horizPadding", this.horizPadding);
     newText.style.setProperty("--vertPadding", this.vertPadding);
+
+    if (this.border) {
+      newText.style.border = this.borderWidth + "px solid";
+      newText.style.borderColor = this.borderColor;
+    }
+
     newText.className = "bE-textElement bE-advisoryMessage";
 
     return newText;
@@ -264,19 +309,32 @@ class ElectronicSignElement extends TextElement {
   constructor({
     fontFamily = "Electronic Highway Sign",
     textColor = "Orange",
-    padding = 0.5,
+    textFormat = "Full Text",
+    formatSize = 0.1,
+    horizPadding = 0.5,
+    vertPadding = 0.5,
     glow = true,
     setWidth = 0,
+    wordSpacing = 0,
   } = {}) {
     super();
     this.fontFamily = fontFamily;
     this.textColor = textColor;
-    this.backgroundColor = "Black";
     this.useNumeralFormatting = false;
     this.useBannerFormatting = false;
-    this.padding = padding;
+    this.horizPadding = horizPadding;
+    this.vertPadding = vertPadding;
     this.glow = glow;
     this.setWidth = setWidth;
+    this.wordSpacing = wordSpacing;
+    this.textFormat = textFormat;
+    this.formatSize = formatSize;
+    Object.defineProperty(this, "backgroundColor", {
+      get: function () {
+        return "Black";
+      },
+      set: function () {},
+    });
   }
 
   createElement(panel) {
@@ -286,7 +344,8 @@ class ElectronicSignElement extends TextElement {
       "--textColor",
       (lib.colors[this.textColor] || this.textColor).toLowerCase(),
     );
-    newText.style.setProperty("--padding", this.padding + "rem");
+    newText.style.setProperty("--horizPadding", this.horizPadding + "rem");
+    newText.style.setProperty("--vertPadding", this.vertPadding + "rem");
     newText.style.setProperty(
       "--textShadow",
       this.glow
@@ -295,16 +354,55 @@ class ElectronicSignElement extends TextElement {
     );
     newText.style.width = this.setWidth != 0 ? this.setWidth + "rem" : "";
 
+    if (
+      this.textFormat === "Circle Pixels" ||
+      this.textFormat == "Square Pixels"
+    ) {
+      newText.style.background =
+        this.textFormat == "Circle Pixels"
+          ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
+          : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
+      newText.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
+      newText.style.setProperty("--horizPadding", 0);
+      newText.style.setProperty("--vertPadding", 0);
+      newText.style.setProperty("--textShadow", "");
+
+      let i = 0;
+      for (const elem of newText.querySelectorAll(".lineElement")) {
+        elem.style.background = "black";
+        elem.style.mixBlendMode = "multiply";
+        elem.style.paddingLeft = this.horizPadding + "rem";
+        elem.style.paddingRight = this.horizPadding + "rem";
+
+        if (i == 0) {
+          elem.style.paddingTop = this.vertPadding + "rem";
+        }
+
+        if (i == newText.querySelectorAll(".lineElement").length - 1) {
+          elem.style.paddingBottom = this.vertPadding + "rem";
+        }
+
+        i++;
+      }
+    }
+
     return newText;
   }
 }
-ElectronicSignElement.prototype.fontFamily =
-  TextElement.prototype.fontFamily.concat(["Electronic Highway Sign"]);
+ElectronicSignElement.fontFamilies = TextElement.fontFamilies.concat([
+    "Electronic Highway Sign",
+    "VCR Mono",
+  ]);
 ElectronicSignElement.prototype.textColors = [
   "Orange",
   "White",
   "Yellow",
   "Red",
+];
+ElectronicSignElement.prototype.textFormats = [
+  "Full Text",
+  "Circle Pixels",
+  "Square Pixels",
 ];
 
 class ShieldGroupElement {
@@ -380,7 +478,7 @@ class ShieldGroupElement {
     return shieldGroupElem;
   }
 }
-ShieldGroupElement.prototype.direction = ["Horizontal", "Vertical"];
+ShieldGroupElement.directions = ["Horizontal", "Vertical"];
 
 class DividerElement {
   constructor({
@@ -423,28 +521,15 @@ class DividerElement {
 
     if (this.fullBleed) {
       newDivider.classList.add("fullBleed");
-      const paddingString = panel?.sign?.padding || "";
-      const paddingValues = paddingString.trim().split(/\s+/).filter(Boolean);
 
-      let top = "0rem",
-        right = "0rem",
-        bottom = "0rem",
-        left = "0rem";
-
-      if (paddingValues.length === 1) {
-        top = right = bottom = left = paddingValues[0];
-      } else if (paddingValues.length === 2) {
-        top = bottom = paddingValues[0];
-        right = left = paddingValues[1];
-      } else if (paddingValues.length === 3) {
-        [top, right, bottom] = paddingValues;
-        left = right;
-      } else if (paddingValues.length >= 4) {
-        [top, right, bottom, left] = paddingValues;
-      }
-
-      newDivider.style.setProperty("--dividerBleedLeft", left || "0rem");
-      newDivider.style.setProperty("--dividerBleedRight", right || "0rem");
+      newDivider.style.setProperty(
+        "--dividerBleedLeft",
+        `${panel.sign.paddingLeft + 0.2}rem`,
+      );
+      newDivider.style.setProperty(
+        "--dividerBleedRight",
+        `${panel.sign.paddingRight + 0.2}rem`,
+      );
     } else {
       newDivider.classList.remove("fullBleed");
       newDivider.style.setProperty("--dividerBleedLeft", "0rem");
@@ -455,7 +540,7 @@ class DividerElement {
   }
 }
 
-DividerElement.prototype.dividerMeasurement = ["%", "rem"];
+DividerElement.dividerMeasurements = ["%", "rem"];
 DividerElement.prototype.dividerColors = [
   { value: "White", label: "White" },
   { value: "Black", label: "Black" },
@@ -464,6 +549,8 @@ DividerElement.prototype.dividerColors = [
 class IconElement {
   constructor({
     icon = "AIRPORT",
+    iconType = "preset",
+    iconData = "",
     iconSize = 100,
     backgroundColor = "Inherit",
     border = false,
@@ -472,6 +559,8 @@ class IconElement {
     spacing = 4,
   } = {}) {
     this.icon = icon;
+    this.iconType = iconType;
+    this.iconData = iconData;
     this.iconSize = iconSize;
     this.backgroundColor = backgroundColor;
     this.border = border;
@@ -498,13 +587,20 @@ class IconElement {
       );
     }
 
+    if (this.iconType == "custom") {
+      iconHolder.style.aspectRatio = "unset";
+    }
+
     iconHolder.style.setProperty(
       "--iconBackgroundColor",
       lib.colors[this.backgroundColor] || this.backgroundColor,
     );
 
     const iconElement = document.createElement("img");
-    iconElement.src = `./assets/icons/${this.icons[this.icon]}`;
+    iconElement.src =
+      this.iconType === "custom"
+        ? this.iconData
+        : `./assets/icons/${IconElement.icons[this.icon]}`;
     iconElement.alt = this.icon;
     iconElement.className = "bE-iconImage";
 
@@ -517,7 +613,7 @@ class IconElement {
   }
 }
 
-IconElement.prototype.icons = {
+IconElement.icons = {
   511: "511.svg",
   AIRPORT: "AIRPORT.svg",
   ALLTERRAIN_TRAIL: "ALLTERRAIN_TRAIL.svg",
@@ -654,12 +750,12 @@ class BeaconElement {
       Number.isFinite(parsedDuration) && parsedDuration > 0
         ? parsedDuration
         : 1;
-    const validAlignments = Array.isArray(TextElement.prototype.alignment)
-      ? TextElement.prototype.alignment
+    const validAlignments = Array.isArray(TextElement.alignments)
+      ? TextElement.alignments
       : [];
     this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
-    const availableColors = Array.isArray(BeaconElement.prototype.colors)
-      ? BeaconElement.prototype.colors
+    const availableColors = Array.isArray(BeaconElement.colors)
+      ? BeaconElement.colors
       : [];
     this.color = availableColors.includes(color)
       ? color
@@ -700,16 +796,16 @@ class BeaconElement {
     );
     container.style.setProperty(
       "--beaconBackplateThickness",
-      BeaconElement.prototype.backplateThicknessRem + "rem",
+      BeaconElement.backplateThicknessRem + "rem",
     );
     container.style.setProperty(
       "--beaconBackplateRadius",
-      BeaconElement.prototype.backplateCornerRadiusRem + "rem",
+      BeaconElement.backplateCornerRadiusRem + "rem",
     );
-    const backplateColorReference = BeaconElement.prototype.backplateColor;
+    const backplateColorReference = BeaconElement.backplateColor;
     const resolvedBackplateColor =
       (lib?.colors && lib.colors[backplateColorReference]) ||
-      BeaconElement.prototype.backplateFallbackColor ||
+      BeaconElement.backplateFallbackColor ||
       backplateColorReference;
     container.style.setProperty(
       "--beaconBackplateColor",
@@ -730,237 +826,229 @@ class BeaconElement {
   }
 }
 
-BeaconElement.prototype.colors = ["Yellow", "Red", "Purple"];
-BeaconElement.prototype.halfInchInRem = 0.5 / 12;
-BeaconElement.prototype.backplateThicknessRem =
-  BeaconElement.prototype.halfInchInRem * 3;
-BeaconElement.prototype.backplateCornerRadiusRem = 0.15;
-BeaconElement.prototype.backplateColor = "Yellow";
-BeaconElement.prototype.backplateFallbackColor = "#ffd200";
+BeaconElement.colors = ["Yellow", "Red", "Purple"];
+BeaconElement.halfInchInRem = 0.5 / 12;
+BeaconElement.backplateThicknessRem = BeaconElement.halfInchInRem * 3;
+BeaconElement.backplateCornerRadiusRem = 0.15;
+BeaconElement.backplateColor = "Yellow";
+BeaconElement.backplateFallbackColor = "#ffd200";
 
 class ArrowElement {
   constructor({
-    arrow = ArrowElement.prototype.defaultArrow,
+    arrow = "TYPE_A",
     rotation = 0,
-    size = null,
-    padding = null,
-    paddingHorizontal = null,
-    paddingVertical = null,
+    size = 1.75,
+    marginHorizontal = 0,
+    marginVertical = 0,
     flip = false,
+    paddingHorizontal = 0,
+    paddingVertical = 0,
     alignment = "Center",
   } = {}) {
-    const resolveArrowKey = ArrowElement.prototype.arrows[arrow]
-      ? arrow
-      : ArrowElement.prototype.defaultArrow;
-    this.arrow = resolveArrowKey;
-    this.rotation = rotation;
-    this.flip =
-      flip === true ||
-      flip === "true" ||
-      flip === 1 ||
-      flip === "1" ||
-      flip === "on";
+    this.standardArrow = new StandardArrow({
+      arrow,
+      rotation,
+      size,
+      marginHorizontal,
+      marginVertical,
+      flip,
+    });
     this.alignment = alignment;
-
-    const arrowDefinition = ArrowElement.prototype.arrows[this.arrow] || {};
-    const defaultSize =
-      typeof arrowDefinition.defaultSize === "number"
-        ? arrowDefinition.defaultSize
-        : ArrowElement.prototype.defaultSize;
-
-    const normalizeNumber = (value, fallback = 0) => {
-      const parsed = parseFloat(value);
-      return isNaN(parsed) ? fallback : parsed;
-    };
-
-    if (size === null || size === undefined || size === "") {
-      this.size = defaultSize;
-    } else {
-      this.size = normalizeNumber(size, defaultSize);
-    }
-
-    const fallbackPadding =
-      padding !== null && padding !== undefined ? padding : 0;
-    this.paddingHorizontal = normalizeNumber(
-      paddingHorizontal !== null && paddingHorizontal !== undefined
-        ? paddingHorizontal
-        : fallbackPadding,
-      0,
-    );
-    this.paddingVertical = normalizeNumber(
-      paddingVertical !== null && paddingVertical !== undefined
-        ? paddingVertical
-        : fallbackPadding,
-      0,
-    );
+    this.paddingHorizontal = paddingHorizontal;
+    this.paddingVertical = paddingVertical;
+    this.marginHorizontal = marginHorizontal;
+    this.marginVertical = marginVertical;
   }
 
   createElement() {
     const container = document.createElement("div");
     container.className = "bE-arrowElement";
-
-    const arrowDefinition =
-      ArrowElement.prototype.arrows[this.arrow] ||
-      ArrowElement.prototype.arrows[ArrowElement.prototype.defaultArrow];
-    const img = document.createElement("img");
-    img.src = arrowDefinition.src;
-    img.alt = arrowDefinition.label;
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.draggable = false;
-    container.appendChild(img);
-
-    const parsedRotation = parseFloat(this.rotation);
-    if (!isNaN(parsedRotation)) {
-      container.style.setProperty("--arrowRotation", parsedRotation + "deg");
-    }
-
-    const parsedSize = parseFloat(this.size);
-    if (!isNaN(parsedSize)) {
-      container.style.setProperty(
-        "--arrowSize",
-        Math.max(parsedSize, 0) + "rem",
-      );
-    }
-
-    const horizontalPadding = parseFloat(
-      this.paddingHorizontal !== undefined
-        ? this.paddingHorizontal
-        : this.padding,
-    );
-    const verticalPadding = parseFloat(
-      this.paddingVertical !== undefined ? this.paddingVertical : this.padding,
-    );
-
     container.style.setProperty(
       "--arrowPaddingHorizontal",
-      Math.max(isNaN(horizontalPadding) ? 0 : horizontalPadding, 0) + "rem",
+      this.paddingHorizontal + "rem",
     );
     container.style.setProperty(
       "--arrowPaddingVertical",
-      Math.max(isNaN(verticalPadding) ? 0 : verticalPadding, 0) + "rem",
+      this.paddingVertical + "rem",
     );
 
-    container.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
+    const arrow = this.standardArrow.createElement();
+    container.appendChild(arrow);
 
     return container;
   }
 }
 
-ArrowElement.prototype.arrows = {
-  TYPE_A: { label: "Type A", src: "assets/arrowBlocks/TYPE_A.svg" },
-  TYPE_A_EXTENDED: {
-    label: "Type A Extended",
-    src: "assets/arrowBlocks/TYPE_A_EXTENDED.svg",
-  },
-  TYPE_B: { label: "Type B", src: "assets/arrowBlocks/TYPE_B.svg" },
-  TYPE_C_45: { label: "Type C 45", src: "assets/arrowBlocks/TYPE_C_45.svg" },
-  TYPE_C_45_ALT: {
-    label: "Type C 45 (alt)",
-    src: "assets/arrowBlocks/TYPE_C_45_ALT.svg",
-  },
-  TYPE_C_90: { label: "Type C 90", src: "assets/arrowBlocks/TYPE_C_90.svg" },
-  TYPE_D: { label: "Type D", src: "assets/arrowBlocks/TYPE_D.svg" },
-  DOWN: {
-    label: "Down",
-    src: "assets/arrowBlocks/DOWN.svg",
-    defaultSize: 2.75,
-  },
-  DOWN_CA: {
-    label: "Down (CA)",
-    src: "assets/arrowBlocks/DOWN_CA.svg",
-    defaultSize: 2.75,
-  },
-  UK: { label: "UK", src: "assets/arrowBlocks/UK.svg" },
-};
-ArrowElement.prototype.defaultArrow = "TYPE_A";
-ArrowElement.prototype.defaultSize = 1.75;
-ArrowElement.prototype.arrowKeys = Object.keys(ArrowElement.prototype.arrows);
-
 class TollLogoElement {
   constructor({
-    logo = TollLogoElement.prototype.defaultLogo,
+    logo = TollLogoElement.defaultLogo,
     logoHeight = 3,
     spacing = 0,
-    horizontalPadding = 0.2,
-    verticalPadding = 0.05,
+    horizontalPadding = 0.25,
+    verticalPadding = 0.25,
     background = false,
-    backgroundColor = "White",
+    backgroundColor = "Purple",
     alignment = "Center",
     squareIcon = false,
-    borderRadius = 8,
-    hasOnlyBlock = false,
+
+    containerBorderRadius = 8,
+    tollBorderRadius = 8,
+    onlyBorderRadius = 4,
+
+    border = 3,
+    showOnlyBlock = false,
+    onlyBlockDirection = "Horizontal",
+    onlyBlockSpacing = 0.25,
+    onlyBlockFontSize = 24,
+    fontFamily = "Series D",
+    onlyBlockHorizPadding = 0.2,
+    onlyBlockVertPadding = 0.25,
+    containerHorizontalPadding = 0.25,
+    containerVerticalPadding = 0.25,
+    containerBorderWidth = 0,
+    containerBackgroundColor = "Purple",
   } = {}) {
     this.logo = logo;
     this.logoHeight = logoHeight;
     this.spacing = spacing;
     this.background = background;
     this.squareIcon = squareIcon;
-    this.borderRadius = borderRadius;
+    this.tollBorderRadius = tollBorderRadius;
+    this.containerBorderRadius = containerBorderRadius;
+    this.onlyBorderRadius = onlyBorderRadius;
+    this.border = border;
     this.backgroundColor = backgroundColor;
     this.horizontalPadding = horizontalPadding;
     this.verticalPadding = verticalPadding;
-    this.hasOnlyBlock = hasOnlyBlock;
+    this.showOnlyBlock = showOnlyBlock;
+    this.onlyBlockDirection = onlyBlockDirection;
+    this.onlyBlockSpacing = onlyBlockSpacing;
+    this.onlyBlockFontSize = onlyBlockFontSize;
+    this.fontFamily = fontFamily;
+    this.onlyBlockHorizPadding = onlyBlockHorizPadding;
+    this.onlyBlockVertPadding = onlyBlockVertPadding;
+    this.containerHorizontalPadding = containerHorizontalPadding;
+    this.containerVerticalPadding = containerVerticalPadding;
+    this.containerBorderWidth = containerBorderWidth;
+    this.containerBackgroundColor = containerBackgroundColor;
     this.alignment = alignment;
   }
 
   createElement() {
     const container = document.createElement("div");
-    container.className = "bE-tollLogoElement";
+    container.className =
+      "bE-tollLogoElement" + (this.squareIcon ? " squareIcon" : "");
 
-    const parsedSpacing = parseFloat(this.spacing);
-    const spacing = isNaN(parsedSpacing) ? 0 : parsedSpacing;
-    container.style.setProperty("--spacing", spacing + "rem");
-    container.style.setProperty(
-      "--tollBgColor",
-      lib.colors[this.backgroundColor] || this.backgroundColor.toLowerCase(),
-    );
-    container.style.setProperty("--borderRadius", this.borderRadius + "px");
-    container.style.setProperty(
-      "--horizPadding",
-      this.horizontalPadding + "rem",
-    );
-    container.style.setProperty("--vertPadding", this.verticalPadding + "rem");
-    container.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
+    const imgHolder = document.createElement("div");
+    imgHolder.className = "bE-tollLogoImageHolder";
+    container.appendChild(imgHolder);
+
+    const img = document.createElement("img");
+    img.src = TollLogoElement.logos[this.logo].src;
+    imgHolder.appendChild(img);
+
+    imgHolder.style.setProperty("--tollLogoHeight", this.logoHeight + "rem");
 
     if (this.background) {
-      container.classList.add("hasBackground");
+      imgHolder.classList.add("hasBackground");
+
+      if (this.backgroundColor != "Inherit") {
+        imgHolder.style.setProperty(
+          "--tollBgColor",
+          lib.colors[this.backgroundColor] ||
+            this.backgroundColor.toLowerCase(),
+        );
+      }
+
+      imgHolder.style.setProperty(
+        "--logoHorizontalPadding",
+        this.horizontalPadding + "rem",
+      );
+      imgHolder.style.setProperty(
+        "--logoVerticalPadding",
+        this.verticalPadding + "rem",
+      );
+      imgHolder.style.setProperty("--tollBorderWidth", this.border + "px");
+
+      imgHolder.style.setProperty(
+        "--tollBorderRadius",
+        this.tollBorderRadius + "px",
+      );
+
+      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+        imgHolder.style.borderColor = "black";
+      } else {
+        imgHolder.style.borderColor = "white";
+      }
     }
 
-    if (this.squareIcon) {
-      container.style.aspectRatio = "1 / 1";
-    }
+    container.style.setProperty("--spacing", this.spacing + "rem");
 
-    const logoDefinition =
-      TollLogoElement.prototype.logos[this.logo] ||
-      TollLogoElement.prototype.logos[TollLogoElement.prototype.defaultLogo];
+    if (this.showOnlyBlock) {
+      container.style.setProperty(
+        "--onlyBlockDirection",
+        TollLogoElement.directions[this.onlyBlockDirection],
+      );
+      container.style.setProperty(
+        "--onlyBlockSpacing",
+        this.onlyBlockSpacing + "rem",
+      );
+      container.style.setProperty(
+        "--onlyBlockFontFamily",
+        '"' + this.fontFamily + '"',
+      );
+      container.style.setProperty(
+        "--onlyBlockFontSize",
+        this.onlyBlockFontSize + "px",
+      );
+      container.style.setProperty(
+        "--onlyBlockHorizPadding",
+        this.onlyBlockHorizPadding + "rem",
+      );
+      container.style.setProperty(
+        "--onlyBlockVertPadding",
+        this.onlyBlockVertPadding + "rem",
+      );
+      container.style.setProperty(
+        "--containerHorizontalPadding",
+        this.containerHorizontalPadding + "rem",
+      );
+      container.style.setProperty(
+        "--containerVerticalPadding",
+        this.containerVerticalPadding + "rem",
+      );
+      container.style.setProperty(
+        "--containerBorderWidth",
+        this.containerBorderWidth + "px",
+      );
+      container.style.setProperty(
+        "--containerBackgroundColor",
+        lib.colors[this.containerBackgroundColor] ||
+          this.containerBackgroundColor.toLowerCase(),
+      );
+      container.style.setProperty(
+        "--containerBorderRadius",
+        this.containerBorderRadius + "px",
+      );
+      container.style.setProperty(
+        "--onlyBorderRadius",
+        this.onlyBorderRadius + "px",
+      );
 
-    if (logoDefinition) {
-      const img = document.createElement("img");
-      img.src = logoDefinition.src;
-      img.alt = logoDefinition.label;
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.draggable = false;
-      container.appendChild(img);
-    } else {
-      container.textContent = "Toll logo unavailable";
-    }
-
-    if (this.hasOnlyBlock) {
       const onlyBlock = document.createElement("div");
       onlyBlock.className = "bE-tollOnlyBlock";
       onlyBlock.textContent = "ONLY";
       container.appendChild(onlyBlock);
       container.classList.add("hasOnlyBlock");
 
-      if (
-        this.backgroundColor.toLowerCase() == "white" ||
-        this.backgroundColor.toLowerCase() == "yellow" ||
-        this.backgroundColor.toLowerCase() == "fluorescent yellow-green" ||
-        this.backgroundColor.toLowerCase() == "orange"
-      ) {
-        container.classList.add("inverseColor");
+      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+        container.style.borderColor = "black";
+        onlyBlock.style.color = "white";
+        onlyBlock.style.backgroundColor = "black";
+      } else {
+        container.style.borderColor = "white";
+        onlyBlock.style.backgroundColor = "white";
+        onlyBlock.style.color = "black";
       }
     }
 
@@ -968,8 +1056,8 @@ class TollLogoElement {
   }
 }
 
-TollLogoElement.prototype.defaultLogo = "EZPass";
-TollLogoElement.prototype.logos = {
+TollLogoElement.defaultLogo = "EZPass";
+TollLogoElement.logos = {
   EZPass: { label: "E-ZPass", src: "assets/tolls/EZPass.png" },
   TollTag: { label: "TollTag", src: "assets/tolls/NTTA.svg" },
   TxTag: { label: "TxTag", src: "assets/tolls/TXTAG.svg" },
@@ -1004,18 +1092,30 @@ TollLogoElement.prototype.logos = {
   PlatePay: { label: "PlatePay", src: "assets/tolls/PLATEPAY.svg" },
   PayByMail: { label: "Pay By Mail", src: "assets/tolls/PAY_BY_MAIL.png" },
   IPASS: { label: "I-Pass", src: "assets/tolls/I-Pass.svg" },
+  IPASS2: { label: "I-Pass (new)", src: "assets/tolls/IPASS-NEW.svg" },
   GeauxPass: { label: "GeauxPass", src: "assets/tolls/GEAUXPASS.svg" },
   GoodToGo: { label: "Good To Go!", src: "assets/tolls/GOODTOGO.svg" },
   ExpressToll: { label: "ExpressToll", src: "assets/tolls/EXPRESSTOLL.svg" },
   DPASS: { label: "D-PASS", src: "assets/tolls/DPASS.svg" },
   MUTCD: { label: "MUTCD", src: "assets/tolls/MUTCD.svg" },
 };
-TollLogoElement.prototype.alignment = TextElement.prototype.alignment;
+TollLogoElement.alignments = TextElement.alignments;
+TollLogoElement.directions = {
+  Horizontal: "row",
+  Vertical: "column",
+};
 
 class Block {
   constructor({
+    topMargin = 0,
     topPadding = 0,
+
+    bottomMargin = 0,
     bottomPadding = 0,
+
+    leftPadding = 0,
+    rightPadding = 0,
+
     backgroundColor = "Inherit",
     backgroundFullWidth = true,
     width = 0,
@@ -1023,7 +1123,9 @@ class Block {
     stretchCenter = true,
     stretchRight = true,
   } = {}) {
+    this.topMargin = topMargin;
     this.topPadding = topPadding;
+    this.bottomMargin = bottomMargin;
     this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
     this.backgroundFullWidth = backgroundFullWidth;
@@ -1031,13 +1133,87 @@ class Block {
     this.stretchLeft = stretchLeft;
     this.stretchCenter = stretchCenter;
     this.stretchRight = stretchRight;
+    this.leftPadding = leftPadding;
+    this.rightPadding = rightPadding;
   }
 }
 
+// basically control but w/o some of the block properties
+class GroupElement {
+  constructor({
+    blockElements,
+    direction = "Vertical",
+    width = 0,
+    boxFormat = "Normal",
+    formatSize = 0.04,
+    border = false,
+    borderWidth = 5,
+    borderColor = "Black",
+  } = {}) {
+    if (this.blockElements) {
+      this.blockElements = blockElements;
+    } else {
+      this.blockElements = new Control();
+      this.blockElements.addElement(ControlTextElement, {}, 0, 0);
+    }
+
+    this.blockElements.isGroup = true;
+    this.direction = direction;
+    this.width = width;
+    this.border = border;
+    this.borderWidth = borderWidth;
+    this.borderColor = borderColor;
+    this.boxFormat = boxFormat;
+    this.formatSize = formatSize;
+  }
+
+  createElement(panel, subPanel) {
+    const blockElementHolder = this.blockElements.createElement(
+      panel,
+      subPanel,
+    );
+    blockElementHolder.classList.add("bE-groupElement");
+
+    if (this.border) {
+      blockElementHolder.style.border = `${this.borderWidth}px solid ${
+        lib.colors[this.borderColor] || this.borderColor.toLowerCase()
+      }`;
+    }
+
+    if (
+      this.boxFormat == "Circle Pixels" ||
+      this.boxFormat == "Square Pixels"
+    ) {
+      const cover = document.createElement("div");
+      cover.className =
+        "bE-groupElementsCover " +
+        this.boxFormat.replace(" ", "").toLowerCase();
+
+      cover.style.setProperty("--pixelSize", this.formatSize + "rem");
+      blockElementHolder.appendChild(cover);
+    }
+
+    if (this.direction == "Horizontal") {
+      blockElementHolder.style.flexDirection = "row";
+    } else {
+      blockElementHolder.style.flexDirection = "column";
+    }
+
+    if (this.width > 0) {
+      blockElementHolder.style.width = this.width + "rem";
+    }
+
+    return blockElementHolder;
+  }
+}
+GroupElement.prototype.blockDirection = ["Horizontal", "Vertical"];
+GroupElement.boxFormats = ["Normal", "Circle Pixels", "Square Pixels"];
+
 class Control {
-  constructor({ rows = [], blockProperties = [] } = {}) {
+  constructor({ rows = [], blockProperties = [], isGroup = false } = {}) {
     this.rows = rows;
     this.blockProperties = blockProperties;
+    this.isGroup = isGroup;
   }
 
   addElement(element, properties, row, column) {
@@ -1052,6 +1228,21 @@ class Control {
     } else {
       this.rows[row].push(newElement);
     }
+  }
+
+  replaceElement(element, row, column) {
+    let exisitngElement = this.rows[row][column];
+    if (!exisitngElement) {
+      return;
+    }
+
+    let newElement = new element();
+    for (const key in exisitngElement) {
+      if (exisitngElement.hasOwnProperty(key)) {
+        newElement[key] = exisitngElement[key];
+      }
+    }
+    this.rows[row][column] = newElement;
   }
 
   removeElement(row, column) {
@@ -1080,12 +1271,13 @@ class Control {
     let newRows = [];
     for (const e of this.rows[row]) {
       const blockElemType = Control.prototype.blockToClassElems.getElem(e);
-      newRows.push(
-        Object.assign(
-          new Control.prototype.blockToClassElems[blockElemType](),
-          e,
-        ),
+      let newObject = structuredClone(e);
+      newObject = Object.setPrototypeOf(
+        newObject,
+        Control.prototype.blockToClassElems[blockElemType].prototype,
       );
+
+      newRows.push(newObject);
     }
     this.rows.splice(row + 1, 0, newRows);
     this.blockProperties.splice(row + 1, 0, new Block());
@@ -1100,125 +1292,100 @@ class Control {
     const flexBox = document.createElement("div");
     flexBox.className = "blockElementMaster";
 
-    const parsePadding = (paddingString = "") => {
-      const defaultPadding = {
-        top: "0rem",
-        right: "0rem",
-        bottom: "0rem",
-        left: "0rem",
-      };
-
-      if (!paddingString || typeof paddingString !== "string") {
-        return defaultPadding;
-      }
-
-      const values = paddingString.trim().split(/\s+/).filter(Boolean);
-      if (values.length === 0) {
-        return defaultPadding;
-      }
-
-      if (values.length === 1) {
-        return {
-          top: values[0],
-          right: values[0],
-          bottom: values[0],
-          left: values[0],
-        };
-      }
-
-      if (values.length === 2) {
-        return {
-          top: values[0],
-          right: values[1],
-          bottom: values[0],
-          left: values[1],
-        };
-      }
-
-      if (values.length === 3) {
-        return {
-          top: values[0],
-          right: values[1],
-          bottom: values[2],
-          left: values[1],
-        };
-      }
-
-      return {
-        top: values[0],
-        right: values[1],
-        bottom: values[2],
-        left: values[3],
-      };
-    };
-
-    const signPadding = parsePadding(panel?.sign?.padding);
-
     const totalRows = this.rows.length;
     for (let i = 0; i < totalRows; i++) {
       const row = this.rows[i];
       const properties = this.blockProperties[i];
-      const topPadding = parseFloat(properties.topPadding) || 0;
-      const bottomPadding = parseFloat(properties.bottomPadding) || 0;
-      const topSpacing = topPadding + "rem";
-      const bottomSpacing = bottomPadding + "rem";
-      const bleedTop = i === 0 ? signPadding.top : "0rem";
-      const bleedBottom = i === totalRows - 1 ? signPadding.bottom : "0rem";
 
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
-      flexRow.style.setProperty("--marginTop", topSpacing);
-      flexRow.style.setProperty("--marginBottom", bottomSpacing);
-      flexRow.style.setProperty("--blockPaddingTopExtra", "0rem");
-      flexRow.style.setProperty("--blockPaddingBottomExtra", "0rem");
-      const resolvedBackgroundColor =
+
+      flexRow.style.setProperty("--marginTop", `${properties.topMargin}rem`);
+      flexRow.style.setProperty(
+        "--marginBottom",
+        `${properties.bottomMargin}rem`,
+      );
+
+      flexRow.style.setProperty(
+        "--blockPaddingLeft",
+        `${properties.leftPadding}rem`,
+      );
+      flexRow.style.setProperty(
+        "--blockPaddingRight",
+        `${properties.rightPadding}rem`,
+      );
+      flexRow.style.setProperty(
+        "--blockPaddingTop",
+        `${properties.topPadding}rem`,
+      );
+      flexRow.style.setProperty(
+        "--blockPaddingBottom",
+        `${properties.bottomPadding}rem`,
+      );
+
+      flexRow.style.setProperty(
+        "--masterBlockBgColor",
         properties.backgroundColor == "Inherit"
           ? ""
           : (
               lib.colors[properties.backgroundColor] ||
               properties.backgroundColor
-            ).toLowerCase();
-      flexRow.style.setProperty(
-        "--masterBlockBgColor",
-        resolvedBackgroundColor,
+            ).toLowerCase(),
       );
 
-      const usesLightBleedBackground =
-        properties.backgroundColor == "Orange" ||
-        properties.backgroundColor == "White" ||
-        properties.backgroundColor == "Yellow" ||
-        properties.backgroundColor == "Fluorescent Yellow-Green" ||
-        properties.backgroundColor == "Fluorescent Pink";
+      const blockBackgroundColor = (
+        properties.backgroundColor == "Inherit"
+          ? lib.colors[panel.color] || panel.color
+          : lib.colors[properties.backgroundColor] || properties.backgroundColor
+      ).toLowerCase();
+      const usesBlackBorder = lib.checkForContrast(blockBackgroundColor);
+      flexRow.dataset.blockBackgroundColor = blockBackgroundColor;
+      flexRow.dataset.blockBorderColor = usesBlackBorder ? "black" : "white";
 
-      if (properties.backgroundFullWidth) {
+      if (
+        properties.backgroundFullWidth &&
+        panel.sign.arrows.arrowMode != "diagrammic"
+      ) {
         flexRow.classList.add("fullBleed");
-        flexRow.style.setProperty("--blockBleedLeft", signPadding.left);
-        flexRow.style.setProperty("--blockBleedRight", signPadding.right);
-        flexRow.style.setProperty("--blockBleedTop", bleedTop);
-        flexRow.style.setProperty("--blockBleedBottom", bleedBottom);
-        flexRow.style.width = "";
-        flexRow.style.setProperty("--marginTop", "0rem");
-        flexRow.style.setProperty("--marginBottom", "0rem");
-        flexRow.style.setProperty("--blockPaddingTopExtra", topSpacing);
-        flexRow.style.setProperty("--blockPaddingBottomExtra", bottomSpacing);
+
+        flexRow.style.setProperty(
+          "--blockBleedLeft",
+          `${panel.sign.paddingLeft}rem`,
+        );
+        flexRow.style.setProperty(
+          "--blockBleedRight",
+          `${panel.sign.paddingRight}rem`,
+        );
+        flexRow.style.setProperty(
+          "--blockBleedTop",
+          i == 0 ? `${panel.sign.paddingTop}rem` : "0rem",
+        );
+        flexRow.style.setProperty(
+          "--blockBleedBottom",
+          i == totalRows - 1 ? `${panel.sign.paddingBottom}rem` : "0rem",
+        );
+
+        flexRow.style.setProperty("--marginBorderLeft", "0rem");
+        flexRow.style.setProperty("--marginBorderRight", "0rem");
+        flexRow.style.setProperty("--marginBorderTop", "0rem");
+        flexRow.style.setProperty("--marginBorderBottom", "0rem");
       } else {
-        flexRow.classList.remove("fullBleed");
-        flexRow.style.setProperty("--blockBleedLeft", "0rem");
-        flexRow.style.setProperty("--blockBleedRight", "0rem");
-        flexRow.style.setProperty("--blockBleedTop", "0rem");
-        flexRow.style.setProperty("--blockBleedBottom", "0rem");
-        flexRow.style.setProperty("--marginTop", topSpacing);
-        flexRow.style.setProperty("--marginBottom", bottomSpacing);
         flexRow.style.width =
           properties.width == 0 ? "" : properties.width + "rem";
       }
 
-      if (usesLightBleedBackground) {
+      if (
+        lib.checkForContrast(
+          properties.backgroundColor == "Inherit"
+            ? ""
+            : (
+                lib.colors[properties.backgroundColor] ||
+                properties.backgroundColor
+              ).toLowerCase(),
+        )
+      ) {
+        flexRow.style.borderColor = "black";
         flexRow.style.color = "black";
-        if (properties.backgroundFullWidth) {
-          flexRow.dataset.fullBleedBorderColor =
-            (lib.colors && lib.colors.Black) || "rgb(0, 0, 0)";
-        }
       }
 
       const leftAlignment = document.createElement("div");
@@ -1229,7 +1396,6 @@ class Control {
       rightAlignment.className = "blockElementRight";
 
       let lastKnownAlignment = centerAlignment;
-      let dividerBorderColor = null;
       for (let i = 0; i < row.length; i++) {
         let elem = row[i];
         switch (elem.alignment) {
@@ -1245,19 +1411,6 @@ class Control {
           default:
         }
 
-        if (
-          elem instanceof DividerElement &&
-          elem.fullBleed === true &&
-          dividerBorderColor === null
-        ) {
-          if (elem.dividerColor && elem.dividerColor !== "Default") {
-            dividerBorderColor =
-              lib.colors[elem.dividerColor] || elem.dividerColor;
-          } else {
-            dividerBorderColor = lib.colors.White || "white";
-          }
-        }
-
         lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
       }
 
@@ -1271,14 +1424,6 @@ class Control {
         properties.stretchRight && rightAlignment.children.length > 0
           ? "1"
           : "0";
-
-      if (dividerBorderColor) {
-        flexRow.dataset.fullBleedBorderColor = dividerBorderColor.toLowerCase();
-      }
-
-      flexRow.dataset.lightBackground = usesLightBleedBackground
-        ? "true"
-        : "false";
 
       flexRow.appendChild(leftAlignment);
       flexRow.appendChild(centerAlignment);
@@ -1301,6 +1446,7 @@ Control.prototype.blockToClassElems = {
   TollLogoElement: TollLogoElement,
   ActionMessageElement: ActionMessageElement,
   ElectronicSignElement: ElectronicSignElement,
+  GroupElement: GroupElement,
   getElem: (elemObj) => {
     for (const key in Control.prototype.blockToClassElems) {
       if (elemObj instanceof Control.prototype.blockToClassElems[key]) {
@@ -1321,6 +1467,7 @@ Control.prototype.blockElements = {
   IconElement: "Icon",
   BeaconElement: "Flashing Beacon",
   TollLogoElement: "Toll Logo",
+  GroupElement: "Group Element",
   ElectronicSignElement: "Electronic Sign",
 };
 
@@ -1335,4 +1482,20 @@ Control.prototype.blockInternalElements = {
   TollLogoElement: "sdTollLogo",
   ActionMessageElement: "sdActionMessage",
   ElectronicSignElement: "sdElectronicSign",
+  GroupElement: "sdGroup",
 };
+
+window.TextElement = TextElement;
+window.ControlTextElement = ControlTextElement;
+window.ActionMessageElement = ActionMessageElement;
+window.AdvisoryMessageElement = AdvisoryMessageElement;
+window.ElectronicSignElement = ElectronicSignElement;
+window.ShieldGroupElement = ShieldGroupElement;
+window.DividerElement = DividerElement;
+window.IconElement = IconElement;
+window.BeaconElement = BeaconElement;
+window.ArrowElement = ArrowElement;
+window.TollLogoElement = TollLogoElement;
+window.Block = Block;
+window.GroupElement = GroupElement;
+window.Control = Control;

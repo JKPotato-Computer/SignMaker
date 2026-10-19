@@ -403,6 +403,7 @@
     url("../fonts/FHWASeries/Roadgeek2014SeriesEEM.ttf") format("truetype");
   font-style: normal;
   font-display: swap;
+  size-adjust: 140%;
 }
 
 /* Clearview */
@@ -568,6 +569,14 @@
     url("../fonts/Transport.woff") format("woff"),
     url("../fonts/Transport.ttf") format("truetype");
   font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "VCR Mono";
+  src: url("../fonts/VcrEas-rX3K.ttf") format("truetype");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }

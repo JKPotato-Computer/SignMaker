@@ -10,7 +10,6 @@ const FormNavigation = (() => {
     setupThemeAndWelcome();
     setupNavigation();
     setupTooltips();
-    setupAdvancedMenu();
     setupHorizontalScroll();
     setupPostOptions();
     setupPanelOptions();
@@ -20,6 +19,24 @@ const FormNavigation = (() => {
     setupGuideArrows();
     setupLimonEasterEgg();
     setupDropdownElements();
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        if (event.target.tagName === "TEXTAREA") return;
+        if (event.target.tagName === "BUTTON") return;
+
+        if (event.target.tagName === "INPUT") {
+          // if it is a descendant of diagrammicDrawing
+          if (event.target.closest("#diagrammicDrawing")) {
+            DiagramDrawing.readForm();
+          } else {
+            formHandler.readForm();
+          }
+        }
+
+        event.preventDefault();
+      }
+    });
   };
 
   const setupThemeAndWelcome = () => {
@@ -55,23 +72,24 @@ const FormNavigation = (() => {
 
   const setupNavigation = () => {
     const reDisplay = () => {
+      let isModalOpen = false;
       for (const holder of document.querySelectorAll(".sMModal")) {
         if (holder.classList.contains(sMConfigBar.dataset.currentMenu)) {
           holder.style.display = "block";
+
+          if (window.innerWidth > 768) {
+            let width = holder.getBoundingClientRect().width;
+            document.querySelector("#smRender").style.transform =
+              `translateX(${width / 4}px)`;
+            isModalOpen = true;
+          }
         } else {
           holder.style.display = "";
         }
       }
 
-      if (
-        sMConfigBar.dataset.currentMenu != "" &&
-        sMConfigBar.dataset.currentMenu != "panelSelector" &&
-        !document.querySelector("#smRender").classList.contains("wide") &&
-        App.getPost().panels.length <= 2
-      ) {
-        document.querySelector("#smRender").classList.add("modalOpen");
-      } else {
-        document.querySelector("#smRender").classList.remove("modalOpen");
+      if (!isModalOpen) {
+        document.querySelector("#smRender").style.transform = "";
       }
 
       if (
@@ -101,7 +119,12 @@ const FormNavigation = (() => {
       }
 
       for (const button of document.querySelectorAll(".sMConfigOption")) {
-        if (!button.id || button.id == "nightMode") {
+        if (
+          !button.id ||
+          button.id == "nightMode" ||
+          button.id == "importSign" ||
+          button.id == "exportSign"
+        ) {
           continue;
         }
 
@@ -202,6 +225,14 @@ const FormNavigation = (() => {
           )
           .click();
       };
+
+    document.querySelector("#sdGroup_editGroup").onclick = function () {
+      let groupNum = App.getGroupNumFromElem(App.getCurrentBlockElem());
+      if (groupNum != null) {
+        App.setSelectedBlockGroup(groupNum);
+        formHandler.updateForm();
+      }
+    };
   };
 
   const setupTooltips = () => {
@@ -221,7 +252,6 @@ const FormNavigation = (() => {
           "px";
         tooltip.style.top = boundingRect.top - tooltip.offsetHeight - 10 + "px";
         tooltip.style.opacity = 1;
-        tooltip.style.transform = "translateX(-50%)";
 
         if (sMConfigBar.contains(element)) {
           tooltip.style.fontFamily = "Overpass";
@@ -235,7 +265,6 @@ const FormNavigation = (() => {
         tooltip.style.left = "-100px";
         tooltip.style.top = 0;
         tooltip.textContent = "";
-        tooltip.style.transform = "";
       });
     };
 
@@ -265,6 +294,12 @@ const FormNavigation = (() => {
 
     const scrollObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
+        if (window.innerWidth <= 768) {
+          document.querySelector("#sMConfigBar").style.display = "";
+          document.querySelector("#sMConfigBar").style.opacity = "1";
+          return;
+        }
+
         isFooterVisible = entry.isIntersecting;
         if (entry.isIntersecting) {
           setTimeout(() => {
@@ -282,20 +317,6 @@ const FormNavigation = (() => {
     setTimeout(() => {
       scrollObserver.observe(document.querySelector("#signMakerFooter"));
     }, 1000);
-  };
-
-  const setupAdvancedMenu = () => {
-    document
-      .querySelector("#smSPShieldAdvanced")
-      .addEventListener("click", () => {
-        if (
-          document.querySelector("#advancedMenu").classList.contains("hidden")
-        ) {
-          document.querySelector("#advancedMenu").classList.remove("hidden");
-        } else {
-          document.querySelector("#advancedMenu").classList.add("hidden");
-        }
-      });
   };
 
   const setupHorizontalScroll = () => {
@@ -329,7 +350,7 @@ const FormNavigation = (() => {
   const setupPostOptions = () => {
     // Post position
     const postPositionSelectElmt = document.querySelector("#postPosition");
-    for (const polePosition of Post.prototype.polePositions) {
+    for (const polePosition of Post.polePositions) {
       lib.appendOption(postPositionSelectElmt, polePosition, {
         selected: polePosition == post.polePosition,
       });
@@ -337,7 +358,7 @@ const FormNavigation = (() => {
 
     // Post color
     const postColorSelectElmt = document.querySelector("#postColor");
-    for (const colorOption of Post.prototype.colors) {
+    for (const colorOption of Post.colors) {
       lib.appendOption(postColorSelectElmt, colorOption, {
         selected: colorOption === post.color,
       });
@@ -345,7 +366,7 @@ const FormNavigation = (() => {
 
     // Post variant
     const postVariantSelectElmt = document.querySelector("#postVariant");
-    for (const variant of Post.prototype.postVariants) {
+    for (const variant of Post.postVariants) {
       lib.appendOption(postVariantSelectElmt, variant, {
         selected: variant === post.variant,
       });
@@ -374,23 +395,18 @@ const FormNavigation = (() => {
       lib.appendOption(guideArrowSelectElmt, display);
     }
 
-    // Exit-only guide arrow options
-    const exitOnlyDirectionElmt = document.querySelector("#exitOnlyDirection");
-    for (const exitguideArrows of Sign.prototype.exitguideArrows) {
-      const display = exitguideArrows.split(":")[0];
-      lib.appendOption(exitOnlyDirectionElmt, display);
+    for (const fontFamily of TextElement.fontFamilies) {
+      lib.appendOption(
+        document.querySelector("#exitOnlyFontFamily"),
+        fontFamily,
+      );
     }
 
-    // Arrow directions
-    const arrowDirectionElmt = document.querySelector("#arrowLocations");
-    for (const arrowDirection of Sign.prototype.arrowPositions) {
-      lib.appendOption(arrowDirectionElmt, arrowDirection);
-    }
-
-    // Other symbols
-    const otherSymbolSelectElement = document.querySelector("#otherSymbol");
-    for (const otherSymbol of Sign.prototype.otherSymbols) {
-      lib.appendOption(otherSymbolSelectElement, otherSymbol);
+    for (const unit of SubPanels.prototype.dividerHeightUnits) {
+      lib.appendOption(
+        document.querySelector("#subpanelDividerHeightUnit"),
+        unit,
+      );
     }
   };
 
@@ -411,7 +427,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const backgroundColor of ExitTab.prototype.backgroundColor) {
+    for (const backgroundColor of ExitTab.backgroundColors) {
       lib.appendOption(
         document.querySelector("#sMET_backgroundColor"),
         backgroundColor.toLowerCase(),
@@ -419,7 +435,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const borderStyle of ExitTab.prototype.borderStyle) {
+    for (const borderStyle of ExitTab.borderStyles) {
       lib.appendOption(
         document.querySelector("#sMET_borderStyle"),
         borderStyle.toLowerCase(),
@@ -427,13 +443,13 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const fontFamily of ExitTab.prototype.fontFamily) {
+    for (const fontFamily of ExitTab.fontFamilies) {
       lib.appendOption(document.querySelector("#sMET_fontFamily"), fontFamily, {
         text: fontFamily,
       });
     }
 
-    for (const fontFamily of ExitTab.prototype.numeralFontFamily) {
+    for (const fontFamily of ExitTab.numeralFontFamilies) {
       lib.appendOption(
         document.querySelector("#sMET_numeralFontFamily"),
         fontFamily,
@@ -441,7 +457,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const direction of ExitTab.prototype.contentDirection) {
+    for (const direction of ExitTab.contentDirections) {
       lib.appendOption(
         document.querySelector("#sMET_contentDirection"),
         direction.toLowerCase(),
@@ -449,7 +465,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const alignment of ExitTab.prototype.alignment) {
+    for (const alignment of ExitTab.alignments) {
       lib.appendOption(
         document.querySelector("#sMET_alignment"),
         alignment.toLowerCase(),
@@ -457,7 +473,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const widthPreset of ExitTab.prototype.widthPresets) {
+    for (const widthPreset of ExitTab.widthPresets) {
       lib.appendOption(
         document.querySelector("#sMET_width"),
         widthPreset.toLowerCase(),
@@ -465,11 +481,21 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const addon of ExitTab.prototype.iconVariant_addons) {
+    for (const addon of ExitTab.iconVariantAddons) {
       lib.appendOption(
         document.querySelector("#sMET_variantAddon"),
         addon.toLowerCase(),
         { text: addon },
+      );
+    }
+
+    for (const alignment of ExitTab.shieldsDirections) {
+      lib.appendOption(
+        document.querySelector("#sMET_shieldsDirection"),
+        alignment.toLowerCase(),
+        {
+          text: alignment,
+        },
       );
     }
 
@@ -601,30 +627,41 @@ const FormNavigation = (() => {
         exitTabPresets[currentExitTab.variant] &&
         exitTabPresets[currentExitTab.variant][selectedPreset];
 
-      if (!isInPresetsLibrary && !isInPrebuiltLibrary) {
+      if (
+        !isInPresetsLibrary &&
+        !isInPrebuiltLibrary &&
+        selectedPreset != "None"
+      ) {
         return;
       }
 
-      for (const key in isInPresetsLibrary
-        ? presetsLibrary[currentExitTab.variant][selectedPreset]
-        : exitTabPresets[currentExitTab.variant][selectedPreset]) {
-        currentExitTab[key] = isInPresetsLibrary
-          ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
-          : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+      if (selectedPreset == "None") {
+        console.log("Hi");
+        for (const key in ExitTab.prototype.defaultExitTabConfig) {
+          currentExitTab[key] = ExitTab.prototype.defaultExitTabConfig[key];
+        }
+      } else {
+        for (const key in isInPresetsLibrary
+          ? presetsLibrary[currentExitTab.variant][selectedPreset]
+          : exitTabPresets[currentExitTab.variant][selectedPreset]) {
+          currentExitTab[key] = isInPresetsLibrary
+            ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
+            : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+        }
       }
 
       formHandler.updateExitTabSubform();
       App.redraw();
     });
 
-    for (const color of ExitTab.prototype.tollIconBackgrounds) {
+    for (const color of ExitTab.tollIconBackgrounds) {
       lib.appendOption(document.querySelector("#smET_iconBackground"), color);
     }
   };
 
   const setupControlSignElements = () => {
     // subpanel alignment
-    for (const alignment of SubPanels.prototype.verticalAlign) {
+    for (const alignment of SubPanels.verticalAlignments) {
       lib.appendOption(document.querySelector("#subpanelAlign"), alignment);
     }
 
@@ -642,11 +679,20 @@ const FormNavigation = (() => {
       document.querySelector("#sdAdvisory_fontFamily"),
       document.querySelector("#sdActionMessage_fontFamily"),
       document.querySelector("#sMET_variantFontFamily"),
+      document.querySelector("#smET_fullLeftFontFamily"),
+      document.querySelector("#smET_partialLeftFontFamily"),
     ];
     for (const elem of textElem_fontFamilySelects) {
-      for (const fontFamily of TextElement.prototype.fontFamily) {
+      for (const fontFamily of TextElement.fontFamilies) {
         lib.appendOption(elem, fontFamily);
       }
+    }
+
+    for (const fontFamily of TextElement.fontFamilies) {
+      lib.appendOption(
+        document.querySelector("#sdTollLogo_fontFamily"),
+        fontFamily,
+      );
     }
 
     // Text alignment
@@ -665,9 +711,16 @@ const FormNavigation = (() => {
       document.querySelector("#sdAdvisory_textAlign"),
     ];
     for (const elem of textElem_alignmentSelects) {
-      for (const alignment of TextElement.prototype.alignment) {
+      for (const alignment of TextElement.alignments) {
         lib.appendOption(elem, alignment);
       }
+    }
+
+    for (const direction in TollLogoElement.directions) {
+      lib.appendOption(
+        document.querySelector("#sdTollLogo_onlyBlockDirection"),
+        direction,
+      );
     }
 
     // Background colors
@@ -679,9 +732,12 @@ const FormNavigation = (() => {
       document.querySelector("#sdIcon_backgroundColor"),
       document.querySelector("#sdBlock_backgroundColor"),
       document.querySelector("#sdTollLogo_backgroundColor"),
+      document.querySelector("#sdTollLogo_containerBackgroundColor"),
+      document.querySelector("#sdAdvisory_borderColor"),
+      document.querySelector("#sdGroup_borderColor"),
     ];
     for (const elem of textElem_bgColorSelects) {
-      for (const backgroundColor of TextElement.prototype.backgroundColor) {
+      for (const backgroundColor of TextElement.backgroundColors) {
         lib.appendOption(elem, backgroundColor);
       }
     }
@@ -690,13 +746,13 @@ const FormNavigation = (() => {
     const shieldGroupSelect = document.querySelector(
       "#sdShieldGroup_direction",
     );
-    for (const direction of ShieldGroupElement.prototype.direction) {
+    for (const direction of ShieldGroupElement.directions) {
       lib.appendOption(shieldGroupSelect, direction);
     }
 
     // Beacon colors
     const beaconColorSelect = document.querySelector("#sdBeacon_color");
-    for (const color of BeaconElement.prototype.colors) {
+    for (const color of BeaconElement.colors) {
       lib.appendOption(beaconColorSelect, color);
     }
 
@@ -728,7 +784,7 @@ const FormNavigation = (() => {
     const eSignFontSelect = document.querySelector(
       "#sdElectronicSign_fontFamily",
     );
-    for (const fontFamily of ElectronicSignElement.prototype.fontFamily) {
+    for (const fontFamily of ElectronicSignElement.fontFamilies) {
       lib.appendOption(eSignFontSelect, fontFamily);
     }
 
@@ -740,11 +796,18 @@ const FormNavigation = (() => {
       lib.appendOption(eSignColorSelect, textColor);
     }
 
+    for (const format of ElectronicSignElement.prototype.textFormats) {
+      lib.appendOption(
+        document.querySelector("#sdElectronicSign_textFormat"),
+        format,
+      );
+    }
+
     // Divider measurement
     const divider_widthMeasurement = document.querySelector(
       "#sdBlocker_dividerMeasurement",
     );
-    for (const measurement of DividerElement.prototype.dividerMeasurement) {
+    for (const measurement of DividerElement.dividerMeasurements) {
       lib.appendOption(divider_widthMeasurement, measurement);
     }
 
@@ -762,33 +825,6 @@ const FormNavigation = (() => {
       lib.appendOption(shield_shieldBase, shieldType);
     }
 
-    // Arrows
-    const arrowElemSelect = document.querySelector("#sdArrow_arrow");
-    const arrowSizeInput = document.querySelector("#sdArrow_size");
-    const arrowKeys =
-      ArrowElement.prototype.arrowKeys ||
-      Object.keys(ArrowElement.prototype.arrows || {});
-    for (const arrowKey of arrowKeys) {
-      const arrowDefinition = ArrowElement.prototype.arrows[arrowKey] || {};
-      lib.appendOption(arrowElemSelect, arrowKey, {
-        text: arrowDefinition.label || arrowKey,
-        selected: arrowKey === ArrowElement.prototype.defaultArrow,
-      });
-    }
-
-    arrowElemSelect.addEventListener("change", () => {
-      const arrowDefinition =
-        ArrowElement.prototype.arrows[arrowElemSelect.value] || null;
-      const defaultSize =
-        arrowDefinition &&
-        typeof arrowDefinition.defaultSize === "number" &&
-        !isNaN(arrowDefinition.defaultSize)
-          ? arrowDefinition.defaultSize
-          : ArrowElement.prototype.defaultSize;
-      arrowSizeInput.value = defaultSize;
-      formHandler.readForm();
-    });
-
     // Arrow rotation slider
     const arrowRotationSlider = document.querySelector("#sdArrow_rotation");
     const arrowRotationVal = document.querySelector("#sdArrow_rotationVal");
@@ -796,41 +832,21 @@ const FormNavigation = (() => {
       arrowRotationVal.value = arrowRotationSlider.value;
     });
 
-    // Arrow rotation presets
     const arrowRotationButtons = document.querySelectorAll(
       ".sdArrow_rotationPreset",
     );
     for (const button of arrowRotationButtons) {
       button.addEventListener("click", () => {
-        const degrees = parseFloat(button.dataset.degrees || "0") || 0;
+        const degrees = button.dataset.degrees;
         arrowRotationSlider.value = degrees.toString();
         arrowRotationVal.value = degrees.toString();
-        arrowRotationButtons.forEach((presetButton) => {
-          presetButton.classList.toggle("activated", presetButton === button);
-        });
         formHandler.readForm();
       });
     }
 
-    // Arrow flip button
-    const arrowFlipInput = document.querySelector("#sdArrow_flip");
-    const arrowFlipButton = document.querySelector("#sdArrow_flipButton");
-    arrowFlipButton.addEventListener("click", () => {
-      const newValue = arrowFlipInput.value === "true" ? "false" : "true";
-      arrowFlipInput.value = newValue;
-      const isFlipped = newValue === "true";
-      arrowFlipButton.classList.toggle("activated", isFlipped);
-      arrowFlipButton.setAttribute(
-        "aria-pressed",
-        isFlipped ? "true" : "false",
-      );
-      arrowFlipButton.textContent = isFlipped ? "Unflip" : "Flip";
-      formHandler.readForm();
-    });
-
     // Small value inputs
     document.querySelectorAll(".smallVal").forEach((valEl) => {
-      const onChange = (e) => {
+      const onChange = () => {
         const id = valEl.id || "";
         if (id.endsWith("Val")) {
           const controlId = id.slice(0, -3);
@@ -849,14 +865,12 @@ const FormNavigation = (() => {
       valEl.addEventListener("change", onChange);
     });
 
-    // Toll logo selector
-    const tollLogoSelectElmt = document.querySelector("#sdTollLogo_logo");
-    for (const logoKey in TollLogoElement.prototype.logos) {
-      const logoDef = TollLogoElement.prototype.logos[logoKey];
-      lib.appendOption(tollLogoSelectElmt, logoKey, {
-        text: logoDef.label,
-        selected: logoKey == TollLogoElement.prototype.defaultLogo,
-      });
+    for (const direction of GroupElement.prototype.blockDirection) {
+      lib.appendOption(document.querySelector("#sdGroup_direction"), direction);
+    }
+
+    for (const format of GroupElement.boxFormats) {
+      lib.appendOption(document.querySelector("#sdGroup_boxFormat"), format);
     }
   };
 
@@ -885,7 +899,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const font of TextElement.prototype.fontFamily) {
+    for (const font of TextElement.fontFamilies) {
       lib.appendOption(
         document
           .querySelector("#sMAPL_templateAPLItem")
@@ -902,6 +916,57 @@ const FormNavigation = (() => {
         justify.toLowerCase(),
         { text: justify },
       );
+    }
+
+    for (const justify of Sign.prototype.standardArrowJustify) {
+      lib.appendOption(
+        document.querySelector("#standardArrows_justify"),
+        justify,
+        { selected: justify == "Space Between" },
+      );
+    }
+
+    for (const position of Sign.prototype.exitOnlyJustify) {
+      lib.appendOption(
+        document.querySelector("#exitOnlyTextPosition"),
+        position,
+        { selected: position == "Center" },
+      );
+    }
+
+    for (const element of document.querySelectorAll(
+      ".sdGuideArrows_rotationPreset",
+    )) {
+      element.addEventListener("click", () => {
+        document.querySelector("#guideStandardArrow_rotation").value =
+          parseFloat(element.dataset.degrees);
+        formHandler.readForm();
+      });
+    }
+
+    for (const element of document.querySelectorAll(
+      ".sdExitOnlyGuide_rotationPreset",
+    )) {
+      element.addEventListener("click", () => {
+        document.querySelector("#exitOnlyArrowRotation").value = parseInt(
+          element.dataset.degrees,
+        );
+        formHandler.readForm();
+      });
+    }
+
+    for (const borderMode of Sign.prototype.exitOnlyBorderTypes) {
+      lib.appendOption(
+        document.querySelector("#exitOnlyBorderMode"),
+        borderMode,
+        { selected: borderMode == "Partial Black Border" },
+      );
+    }
+
+    for (const bgColor in lib.colors) {
+      lib.appendOption(document.querySelector("#exitOnlyBGColor"), bgColor, {
+        selected: bgColor == "Yellow",
+      });
     }
   };
 
@@ -987,6 +1052,12 @@ const FormNavigation = (() => {
           ".smDropdownInputElement",
         );
         dropdownElement.dataset.selectedOption = dropdownButton.dataset.value;
+        if (dropdownElement.id === "sdArrow_arrow") {
+          document.querySelector("#sdArrow_size").value =
+            StandardArrow.prototype.arrows[
+              dropdownElement.dataset.selectedOption
+            ].defaultSize || 1.75;
+        }
         formHandler.readForm();
         return;
       }
@@ -1101,7 +1172,6 @@ const FormNavigation = (() => {
       const dropdownHolder = dropdownElement.querySelector(".smDropdownHolder");
       const dropdownList = dropdownHolder.querySelector(".smDropdownList");
 
-      dropdownElement.dataset.selectedOption = baseValue;
       imageFunction(selectedImage, baseValue);
       textFunction(selectedLabel, baseValue);
 
@@ -1153,23 +1223,25 @@ const FormNavigation = (() => {
         attributes: true,
         attributeFilter: ["data-selected-option"],
       });
+
+      dropdownElement.dataset.selectedOption = baseValue;
     };
 
     setupDropdownElement(
       document
         .querySelector("#sMAPL_templateAPLItem")
         .content.querySelector(".smAPLCat_aplSelectHolder"),
-      APLArrow.prototype.arrowTypes,
+      APLArrow.arrowTypes,
       "Up Arrow",
       (image, value) => {
-        if (APLArrow.prototype.arrowTypes[value].flipped) {
+        if (APLArrow.arrowTypes[value].flipped) {
           image.classList.add("flipped");
         }
 
         image.classList.add("smAPL_arrowImage");
 
         image.loading = "lazy";
-        image.src = `assets/arrow/${APLArrow.prototype.arrowTypes[value].asset}`;
+        image.src = `assets/arrow/${APLArrow.arrowTypes[value].asset}`;
 
         return image;
       },
@@ -1180,67 +1252,165 @@ const FormNavigation = (() => {
     );
 
     setupDropdownElement(
-      document.querySelector(".sdIconDropdown"),
-      IconElement.prototype.icons,
-      "AIRPORT",
+      document.querySelector("#sdArrow_arrow"),
+      StandardArrow.prototype.arrows,
+      "TYPE_A",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `./assets/icons/${IconElement.prototype.icons[value]}`;
+        image.src = StandardArrow.prototype.arrows[value].src;
         return image;
       },
       (text, value) => {
-        text.textContent = value.replace(/_/g, " ");
+        text.textContent = StandardArrow.prototype.arrows[value].label;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#guideStandardArrow"),
+      StandardArrow.prototype.arrows,
+      "TYPE_A",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = StandardArrow.prototype.arrows[value].src;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = StandardArrow.prototype.arrows[value].label;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector("#exitOnlyArrowType"),
+      StandardArrow.prototype.arrows,
+      "DOWN",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = StandardArrow.prototype.arrows[value].src;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = StandardArrow.prototype.arrows[value].label;
+        return text;
+      },
+    );
+
+    setupDropdownElement(
+      document.querySelector(".sdIconDropdown"),
+      IconElement.icons,
+      "AIRPORT",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = value.startsWith("custom:")
+          ? image.closest(".smDropdownInputElement").dataset.customImageData
+          : `./assets/icons/${IconElement.icons[value]}`;
+        return image;
+      },
+      (text, value) => {
+        text.textContent = value.startsWith("custom:")
+          ? value.slice("custom:".length)
+          : value.replace(/_/g, " ");
         return text;
       },
     );
 
     setupDropdownElement(
       document.querySelector("#sMET_variantRegularIcon"),
-      IconElement.prototype.icons,
+      IconElement.icons,
       "AIRPORT",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `./assets/icons/${IconElement.prototype.icons[value]}`;
+        image.src = value.startsWith("custom:")
+          ? image.closest(".smDropdownInputElement").dataset.customImageData
+          : `./assets/icons/${IconElement.icons[value]}`;
         return image;
       },
       (text, value) => {
-        text.textContent = value.replace(/_/g, " ");
+        text.textContent = value.startsWith("custom:")
+          ? value.slice("custom:".length)
+          : value.replace(/_/g, " ");
         return text;
       },
     );
 
     setupDropdownElement(
       document.querySelector("#sMET_variantTollIcon"),
-      TollLogoElement.prototype.logos,
+      TollLogoElement.logos,
       "EZPass",
       (image, value) => {
         image.loading = "lazy";
-        image.src = `${TollLogoElement.prototype.logos[value].src}`;
+        image.src = `${TollLogoElement.logos[value].src}`;
         image.classList.add("smWhiteDropdownImage");
         return image;
       },
       (text, value) => {
-        text.textContent = TollLogoElement.prototype.logos[value].label;
+        text.textContent = TollLogoElement.logos[value].label;
         return text;
       },
     );
+
+    setupDropdownElement(
+      document.querySelector("#sdTollLogoHolder"),
+      TollLogoElement.logos,
+      "EZPass",
+      (image, value) => {
+        image.loading = "lazy";
+        image.src = `${TollLogoElement.logos[value].src}`;
+        image.classList.add("smWhiteDropdownImage");
+        return image;
+      },
+      (text, value) => {
+        text.textContent = TollLogoElement.logos[value].label;
+        return text;
+      },
+    );
+
+    document
+      .querySelector("#sdIcon_customBtn")
+      .addEventListener("click", async () => {
+        const image = await formHandler.promptCustomIcon();
+        if (!image) return;
+
+        const iconDropdown = document.querySelector(".sdIconDropdown");
+        iconDropdown.dataset.customImageData = image.data;
+        iconDropdown.dataset.selectedOption = `custom:${image.fileName}`;
+        formHandler.readForm();
+      });
+    document
+      .querySelector("#smET_iconCustomBtn")
+      .addEventListener("click", async () => {
+        const image = await formHandler.promptCustomIcon();
+        if (!image) return;
+
+        const iconDropdown = document.querySelector("#sMET_variantRegularIcon");
+        iconDropdown.dataset.customImageData = image.data;
+        iconDropdown.dataset.selectedOption = `custom:${image.fileName}`;
+        formHandler.readForm();
+      });
   };
 
   const setupShields = () => {
-    const shieldRouteFontSelect = document.querySelector(
-      "#spShield_routeFontFamily",
-    );
-    lib.appendOption(shieldRouteFontSelect, "");
-    for (const fontFamily of TextElement.prototype.fontFamily) {
-      lib.appendOption(shieldRouteFontSelect, fontFamily);
+    const shieldFontSelect = [
+      document.querySelector("#spShield_routeFontFamily"),
+      document.querySelector("#spShield_designationFontFamily"),
+    ];
+    for (const select of shieldFontSelect) {
+      lib.appendOption(select, "");
+      for (const fontFamily of TextElement.fontFamilies) {
+        lib.appendOption(select, fontFamily);
+      }
     }
 
-    const shieldDesignationFontSelect = document.querySelector(
-      "#spShield_designationFontFamily",
-    );
-    lib.appendOption(shieldDesignationFontSelect, "");
-    for (const fontFamily of TextElement.prototype.fontFamily) {
-      lib.appendOption(shieldDesignationFontSelect, fontFamily);
+    const shieldColorSelect = [
+      document.querySelector("#spShield_routeColor"),
+      document.querySelector("#spShield_designationColor"),
+    ];
+    for (const select of shieldColorSelect) {
+      lib.appendOption(select, "");
+      for (const color in lib.colors) {
+        lib.appendOption(select, color);
+      }
     }
 
     const presetShieldList = document.querySelector("#presetShieldList");
@@ -1421,7 +1591,7 @@ const FormNavigation = (() => {
     const bgColorElem = document
       .querySelector("#smSP_templateBannerElement")
       .content.querySelector(".smSPBanner_bgColor");
-    for (const color of TextElement.prototype.backgroundColor) {
+    for (const color of TextElement.backgroundColors) {
       lib.appendOption(bgColorElem, color);
     }
 
@@ -1444,7 +1614,7 @@ const FormNavigation = (() => {
     const fontFamilyElem = document
       .querySelector("#smSP_templateBannerElement")
       .content.querySelector(".smSPBanner_fontFamily");
-    for (const font of TextElement.prototype.fontFamily) {
+    for (const font of TextElement.fontFamilies) {
       lib.appendOption(fontFamilyElem, font);
     }
   };

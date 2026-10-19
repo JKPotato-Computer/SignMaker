@@ -60,6 +60,16 @@
     gap: .5rem;
   }
 
+  #diagramFileName {
+    flex-grow: 1;
+  }
+
+  #importDiagram, #exportDiagram {
+    flex-grow: 1;
+    margin-bottom: -.5rem;
+    margin-top: .5rem;
+  }
+
   .diagrammicDrawingHolder > footer > div > button {
     width: calc(33% - .5rem);
     height: 3rem;
@@ -112,9 +122,29 @@
   .shieldLibrary {
     height: 40%;
   }
-
 }
 
+@media (max-width: 768px) {
+  input {
+    padding: .75rem;
+  }
+
+  select {
+    padding: .75rem;
+  }
+
+  button, input[type="button"] {
+    padding: .5rem;
+  }
+
+  #signMakerFooter {
+    flex-direction: column;
+  }
+
+  body > footer > div:nth-child(2) {
+    flex-direction: row;
+  }
+}
 
 @media (max-width: 768px) {
   .modals {
@@ -155,6 +185,43 @@
     gap: .3rem;
     line-height: unset !important;
     text-wrap: nowrap;
-    width: max-content !important;
+    width: auto !important;
+    aspect-ratio: 1 / 1;
+  }
+
+  #panelSelect {
+    bottom: 6rem;
+    top: auto;
+    left: 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  .panelPopoverHint {
+    top: -1.5rem;
+  }
+
+  nav.sMModalBar *:not(.material-symbols-outlined, select, button, input) {
+    font-size: 20px;
+  }
+
+  input[type="range"] {
+    padding: 0rem;
+  }
+
+  input[type="checkbox"] {
+    height: 1rem;
+    width: 1rem;
+    position: relative;
+    top: .25rem;
+  }
+
+  .sMET_typeSelect {
+    flex-wrap: nowrap !important;
+    width: 100vw !important;
+    justify-content: left !important;
+  }
+
+  .sMET_typeSelect .sMET_typeVisual {
+    width: 10rem;
   }
 }

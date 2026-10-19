@@ -9,9 +9,11 @@ const App = (() => {
 
   let currentlySelectedRowIndex = 0,
     currentlySelectedBlockIndex = 0;
+  let currentlySelectedGroupIndex = -1;
 
   let currentlySelectedShieldGroupId = -1;
   let currentlySelectedShieldIndex = -1;
+  let currentlySelectedStandardArrow = -1;
 
   // Glboal Acessor Methods
   const getCurrentPanel = () => {
@@ -22,23 +24,42 @@ const App = (() => {
     return getCurrentPanel().sign.subPanels[currentlySelectedSubPanelIndex];
   };
 
-  const getCurrentBlockRows = () => {
-    return getCurrentSubPanel().blockElements.rows[currentlySelectedRowIndex];
+  const getCurrentBlockElements = () => {
+    if (currentlySelectedGroupIndex >= 0) {
+      return getSelectedBlockGroup().blockElements;
+    }
+    return getCurrentSubPanel().blockElements;
+  };
+
+  const getCurrentBlockRow = () => {
+    return getCurrentBlockElements().rows[currentlySelectedRowIndex];
   };
 
   const getCurrentBlockElem = () => {
-    return getCurrentBlockRows()[currentlySelectedBlockIndex];
+    return getCurrentBlockRow()[currentlySelectedBlockIndex];
   };
 
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
 
   const init = async () => {
-    post = new Post(Post.prototype.polePositions[0]);
+    if (localStorage.getItem("autoSaveSignData")) {
+      post =
+        ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
+        new Post(Post.polePositions[0]);
+      currentlySelectedPanelIndex = post.panels.length > 0 ? 0 : -1;
+    } else {
+      post = new Post(Post.polePositions[0]);
+    }
+
     formHandler.init(App);
     DiagramDrawing.init(App);
 
-    window.customShields = new CustomShields();
-    await window.customShields.initialized;
+    SavesNTemplates.init();
+
+    window.customImages = CustomImages;
+
+    window.customShields = CustomShields;
+    await window.customShields.init();
 
     window.shieldLibrary = ShieldLibrary;
     await window.shieldLibrary.init();
@@ -46,7 +67,265 @@ const App = (() => {
     window.diagramLibrary = DiagrammicLibrary;
     await window.diagramLibrary.init();
 
-    newPanel();
+    // Attach Drag Systems
+    DragSystem.attachDrag(
+      document.querySelector("#sMSPTextList"),
+      ".sMControlRow",
+      "vertical",
+      (oldRowIndex, newRowIndex, oldBlockIndex, newBlockIndex) => {
+        if (oldBlockIndex == null) {
+          let currentBlockRows = getCurrentBlockElements().rows;
+          currentBlockRows.splice(
+            newRowIndex,
+            0,
+            currentBlockRows.splice(oldRowIndex, 1)[0],
+          );
+
+          currentlySelectedRowIndex = Math.max(newRowIndex, 0);
+        } else {
+          let currentBlockRows = getCurrentBlockElements().rows;
+          let block = currentBlockRows[oldRowIndex].splice(oldBlockIndex, 1)[0];
+
+          currentBlockRows[newRowIndex].splice(newBlockIndex, 0, block);
+          currentlySelectedRowIndex = Math.max(newRowIndex, 0);
+          currentlySelectedBlockIndex = clamp(
+            newBlockIndex,
+            0,
+            currentBlockRows[newRowIndex].length - 1,
+          );
+
+          if (currentBlockRows[oldRowIndex].length == 0) {
+            currentBlockRows.splice(oldRowIndex, 1);
+            currentlySelectedRowIndex =
+              oldRowIndex > newRowIndex ? newRowIndex : newRowIndex - 1;
+            currentlySelectedBlockIndex = clamp(
+              newBlockIndex,
+              0,
+              currentBlockRows[currentlySelectedRowIndex].length - 1,
+            );
+          }
+        }
+
+        formHandler.updateForm();
+        redraw();
+      },
+      { innerElement: ".textEditorBlock", innerDirection: "horizontal" },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#exitTabList"),
+      ".exitTabGroup",
+      "horizontal",
+      (oldGroupIndex, newGroupIndex, oldTabIndex, newTabIndex) => {
+        let currentExitTabs = getCurrentPanel().exitTabs;
+        if (oldTabIndex != null) {
+          let tab = currentExitTabs[oldGroupIndex].exitTabs.splice(
+            oldTabIndex,
+            1,
+          )[0];
+          currentExitTabs[newGroupIndex].exitTabs.splice(newTabIndex, 0, tab);
+          if (oldGroupIndex != newGroupIndex) {
+            changeEditingExitTabRow(newGroupIndex);
+          }
+          changeEditingExitTab(newTabIndex);
+        } else {
+          currentExitTabs.splice(
+            newGroupIndex,
+            0,
+            currentExitTabs.splice(oldGroupIndex, 1)[0],
+          );
+
+          changeEditingExitTabRow(newGroupIndex);
+        }
+        redraw();
+      },
+      {
+        attachElement: ".exitTabButton",
+        innerElement: ".exitTabNestedButton",
+        innerDirection: "horizontal",
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#subPanelList"),
+      ".smSubPanelBtn",
+      "horizontal",
+      (oldPanelIndex, newPanelIndex) => {
+        let currentSubPanels = getCurrentPanel().sign.subPanels;
+        currentSubPanels.splice(
+          newPanelIndex,
+          0,
+          currentSubPanels.splice(oldPanelIndex, 1)[0],
+        );
+        changeEditingSubPanel(newPanelIndex);
+        redraw();
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#panelList"),
+      ".panelListButton",
+      "vertical",
+      (oldPanelIndex, newPanelIndex) => {
+        post.panels.splice(
+          newPanelIndex,
+          0,
+          post.panels.splice(oldPanelIndex, 1)[0],
+        );
+        currentlySelectedPanelIndex = Math.max(newPanelIndex, 0);
+
+        formHandler.updateForm();
+        redraw();
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#sMAPL_APLCat"),
+      ".smAPLCat_container",
+      "vertical",
+      (oldPanelIndex, newPanelIndex, oldAPLIndex, newAPLIndex) => {
+        if (oldAPLIndex == null) {
+          return;
+        }
+
+        let apl = getCurrentPanel().sign.arrows.apl;
+        oldPanelIndex /= 2;
+        newPanelIndex /= 2;
+
+        let arrow = apl.subpanels[oldPanelIndex].splice(oldAPLIndex, 1)[0];
+
+        if (!apl.subpanels[newPanelIndex]) {
+          apl.subpanels[newPanelIndex] = [];
+        }
+
+        apl.subpanels[newPanelIndex].splice(newAPLIndex, 0, arrow);
+
+        formHandler.updateForm();
+        redraw();
+      },
+      {
+        attachElement: ".smAPLCat_aplDragger",
+        innerElement: ".smAPLCat_apl",
+        innerDirection: "vertical",
+        useAttachForInner: true,
+        ignoreOuterDragging: true,
+        innerTargetContainer: ".smAPLCat_aplList",
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#smSPShieldList"),
+      ".smSPShieldRow,:scope > .smSPShieldGroup",
+      "vertical",
+      (oldShieldIndex, newShieldIndex, callbackResults) => {
+        console.log(oldShieldIndex, newShieldIndex, callbackResults);
+        let currentShields = getCurrentBlockElem().shields;
+
+        let oldAdjustedShieldIndex = 0;
+        let lastShield = -1;
+        let isDragItemShieldGroup =
+          callbackResults.dragElement.classList.contains("smSPShieldGroup");
+        let isPreviousMove = newShieldIndex < oldShieldIndex;
+
+        for (let i = 0; i < currentShields.length; i++) {
+          const shield = currentShields[i];
+
+          if (
+            oldAdjustedShieldIndex == oldShieldIndex &&
+            (isDragItemShieldGroup || shield.group == 0)
+          ) {
+            oldShieldIndex = i;
+            break;
+          }
+
+          if (shield.group == 0) {
+            oldAdjustedShieldIndex += 1;
+            lastShield = -1;
+          } else if (shield.group != 0 && lastShield != shield.group) {
+            lastShield = shield.group;
+            oldAdjustedShieldIndex++;
+          }
+        }
+
+        let targetIndices = [0];
+        lastShield = -1;
+
+        for (let i = 0; i < currentShields.length; i++) {
+          const shield = currentShields[i];
+          const nextShield = currentShields[i + 1];
+
+          if (
+            !nextShield ||
+            shield.group == 0 ||
+            nextShield.group !== shield.group
+          ) {
+            targetIndices.push(i);
+          }
+        }
+
+        if (newShieldIndex == 0) {
+          newShieldIndex = targetIndices[0];
+        } else if (newShieldIndex < targetIndices.length) {
+          newShieldIndex =
+            targetIndices[
+              isPreviousMove ? newShieldIndex - 1 : newShieldIndex + 1
+            ];
+        } else {
+          newShieldIndex = currentShields.length;
+        }
+
+        console.log(oldShieldIndex, newShieldIndex);
+
+        let shield = currentShields[oldShieldIndex];
+        let shieldsToMove = [];
+        if (shield.group != 0) {
+          for (let i = oldShieldIndex; i < currentShields.length; i++) {
+            if (currentShields[i].group == shield.group) {
+              shieldsToMove.push(currentShields[i]);
+            } else {
+              break;
+            }
+          }
+          currentShields.splice(oldShieldIndex, shieldsToMove.length);
+        } else {
+          shieldsToMove.push(shield);
+          currentShields.splice(oldShieldIndex, 1);
+        }
+
+        currentShields.splice(newShieldIndex, 0, ...shieldsToMove);
+
+        formHandler.updateShieldSubform();
+        redraw();
+      },
+      {
+        attachElement: ".dragIndicator",
+        callbackElements: (dragElement) => {
+          return { dragElement: dragElement };
+        },
+      },
+    );
+
+    DragSystem.attachDrag(
+      document.querySelector("#standardArrowList"),
+      ".standardArrowListItem",
+      "vertical",
+      (oldIndex, newIndex) => {
+        moveStandardArrow(oldIndex, newIndex);
+      },
+      { attachElement: ".dragIndicator" },
+    );
+
+    if (
+      localStorage.getItem("autoSaveSignData") &&
+      localStorage.getItem("autoSaveSignData") != "null"
+    ) {
+      formHandler.updateForm();
+      redraw();
+    } else {
+      newPanel();
+    }
+
+    SavesNTemplates.updateAutoSave(post);
   };
 
   // Panels
@@ -80,6 +359,13 @@ const App = (() => {
   const changeEditingPanel = (panelNumber) => {
     currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1);
     currentlySelectedSubPanelIndex = 0;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+
     formHandler.updateForm();
   };
 
@@ -87,6 +373,7 @@ const App = (() => {
     const sign = getCurrentPanel().sign;
     sign.newSubPanel();
     currentlySelectedSubPanelIndex++;
+    currentlySelectedGroupIndex = -1;
 
     currentlySelectedRowIndex = clamp(
       currentlySelectedRowIndex,
@@ -96,7 +383,7 @@ const App = (() => {
     currentlySelectedBlockIndex = clamp(
       currentlySelectedBlockIndex,
       0,
-      getCurrentBlockRows().length - 1,
+      getCurrentBlockRow().length - 1,
     );
     currentlySelectedShieldIndex = -1;
     currentlySelectedShieldGroupId = -1;
@@ -109,7 +396,10 @@ const App = (() => {
     const sign = getCurrentPanel().sign;
     if (sign.subPanels.length > 1) {
       sign.deleteSubPanel(sign.subPanels.length - 1);
-      currentlySelectedSubPanelIndex--;
+      currentlySelectedSubPanelIndex = Math.max(
+        0,
+        currentlySelectedSubPanelIndex - 1,
+      );
 
       currentlySelectedRowIndex = clamp(
         currentlySelectedRowIndex,
@@ -119,10 +409,11 @@ const App = (() => {
       currentlySelectedBlockIndex = clamp(
         currentlySelectedBlockIndex,
         0,
-        getCurrentBlockRows().length - 1,
+        getCurrentBlockRow().length - 1,
       );
       currentlySelectedShieldIndex = -1;
       currentlySelectedShieldGroupId = -1;
+      currentlySelectedGroupIndex = -1;
 
       formHandler.updateForm();
       redraw();
@@ -151,10 +442,11 @@ const App = (() => {
     currentlySelectedBlockIndex = clamp(
       currentlySelectedBlockIndex,
       0,
-      getCurrentBlockRows().length - 1,
+      getCurrentBlockRow().length - 1,
     );
     currentlySelectedShieldIndex = -1;
     currentlySelectedShieldGroupId = -1;
+    currentlySelectedGroupIndex = -1;
 
     formHandler.updateForm();
   };
@@ -251,7 +543,8 @@ const App = (() => {
 
   // Rows
   const newRow = (selectedBlock) => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    let blockElems = getCurrentBlockElements();
+
     currentlySelectedBlockIndex = 0;
     blockElems.addRow(++currentlySelectedRowIndex, selectedBlock);
 
@@ -260,7 +553,8 @@ const App = (() => {
   };
 
   const dupRow = () => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    let blockElems = getCurrentBlockElements();
+
     blockElems.duplicateRow(currentlySelectedRowIndex++);
 
     formHandler.updateForm();
@@ -268,7 +562,8 @@ const App = (() => {
   };
 
   const delRow = () => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    let blockElems = getCurrentBlockElements();
+
     if (blockElems.rows.length == 1) {
       return;
     }
@@ -284,14 +579,19 @@ const App = (() => {
     currentlySelectedRowIndex = clamp(
       row,
       0,
-      getCurrentSubPanel().blockElements.rows.length - 1,
+      getCurrentBlockElements().rows.length - 1,
+    );
+    currentlySelectedBlockIndex = clamp(
+      currentlySelectedBlockIndex,
+      0,
+      getCurrentBlockRow().length - 1,
     );
 
     formHandler.updateForm();
   };
 
   const newControlElem = (selectedElem) => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     blockElems.addElement(
       Control.prototype.blockToClassElems[selectedElem],
       {},
@@ -303,18 +603,36 @@ const App = (() => {
     redraw();
   };
 
+  const replaceControlElem = (selectedElem) => {
+    const blockElems = getCurrentBlockElements();
+    blockElems.replaceElement(
+      Control.prototype.blockToClassElems[selectedElem],
+      currentlySelectedRowIndex,
+      currentlySelectedBlockIndex,
+    );
+
+    formHandler.updateForm();
+    redraw();
+  };
+
   const delControlElem = () => {
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     if (
       blockElems.removeElement(
         currentlySelectedRowIndex,
         currentlySelectedBlockIndex,
       )
     ) {
-      currentlySelectedRowIndex--;
-      currentlySelectedBlockIndex = getCurrentBlockRows().length - 1;
+      currentlySelectedRowIndex = Math.max(0, currentlySelectedRowIndex - 1);
+      currentlySelectedBlockIndex = Math.max(
+        0,
+        getCurrentBlockRow().length - 1,
+      );
     } else {
-      currentlySelectedBlockIndex--;
+      currentlySelectedBlockIndex = Math.max(
+        0,
+        currentlySelectedBlockIndex - 1,
+      );
     }
 
     formHandler.updateForm();
@@ -325,18 +643,104 @@ const App = (() => {
     currentlySelectedBlockIndex = clamp(
       block,
       0,
-      getCurrentBlockRows().length - 1,
+      getCurrentBlockRow().length - 1,
     );
 
     formHandler.updateForm();
   };
 
+  const getSelectedBlockGroup = () => {
+    let groupIndex = -1;
+    const rec = (blockElements) => {
+      for (let pRowInd = 0; pRowInd < blockElements.rows.length; pRowInd++) {
+        const row = blockElements.rows[pRowInd];
+        for (let pBlockInd = 0; pBlockInd < row.length; pBlockInd++) {
+          const block = row[pBlockInd];
+          if (block.constructor.name === "GroupElement") {
+            if (groupIndex + 1 === currentlySelectedGroupIndex) {
+              return block;
+            } else {
+              groupIndex++;
+              let hasReturnValue = rec(block.blockElements);
+
+              if (hasReturnValue) {
+                return hasReturnValue;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    let retVal =
+      rec(getCurrentSubPanel().blockElements) || getCurrentSubPanel();
+    return retVal;
+  };
+
+  const getParentOfSelectedBlockGroup = () => {
+    let groupIndex = -1;
+    const rec = (blockElements, parent = null) => {
+      for (let pRowInd = 0; pRowInd < blockElements.rows.length; pRowInd++) {
+        const row = blockElements.rows[pRowInd];
+        for (let pBlockInd = 0; pBlockInd < row.length; pBlockInd++) {
+          const block = row[pBlockInd];
+          if (block.constructor.name === "GroupElement") {
+            if (groupIndex + 1 === currentlySelectedGroupIndex) {
+              return parent;
+            } else {
+              groupIndex++;
+              let hasReturnValue = rec(block.blockElements, block);
+              if (hasReturnValue) {
+                return hasReturnValue;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    return rec(getCurrentSubPanel().blockElements, null);
+  };
+
+  const setSelectedBlockGroup = (group) => {
+    currentlySelectedGroupIndex = Math.max(group, -1);
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+
+    formHandler.updateForm();
+  };
+
+  const getGroupNumFromElem = (element) => {
+    let groupIndex = -1;
+    const rec = (blockElements) => {
+      for (let pRowInd = 0; pRowInd < blockElements.rows.length; pRowInd++) {
+        const rowElems = blockElements.rows[pRowInd];
+        for (let pBlockInd = 0; pBlockInd < rowElems.length; pBlockInd++) {
+          const block = rowElems[pBlockInd];
+          if (block.constructor.name === "GroupElement") {
+            if (block === element) {
+              return groupIndex + 1;
+            } else {
+              groupIndex++;
+              const nestedResult = rec(block.blockElements);
+              if (nestedResult !== null) {
+                return nestedResult;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    return rec(getCurrentSubPanel().blockElements);
+  };
+
   // Shield Groups
   const newShieldGroup = () => {
-    const panel = getCurrentPanel();
-    const sign = panel.sign.subPanels[currentlySelectedSubPanelIndex];
-
-    const firstRow = sign.blockElements.rows[0];
+    const firstRow = getCurrentBlockElements().rows[0];
     const hasOnlyShieldGroups =
       firstRow &&
       firstRow.every(
@@ -344,12 +748,12 @@ const App = (() => {
       );
 
     if (!firstRow || !hasOnlyShieldGroups) {
-      const blockElems = getCurrentSubPanel().blockElements;
+      const blockElems = getCurrentBlockElements();
       currentlySelectedBlockIndex = 0;
       currentlySelectedRowIndex = 0;
       blockElems.addRow(0, "ShieldGroupElement");
     } else if (firstRow && hasOnlyShieldGroups) {
-      getCurrentSubPanel().blockElements.addElement(
+      getCurrentBlockElements().addElement(
         Control.prototype.blockToClassElems["ShieldGroupElement"],
         {},
         0,
@@ -383,7 +787,7 @@ const App = (() => {
     currentlySelectedShieldIndex = -1;
 
     let id = 0;
-    const blockElems = getCurrentSubPanel().blockElements;
+    const blockElems = getCurrentBlockElements();
     for (let i = 0; i < blockElems.rows.length; i++) {
       for (let j = 0; j < blockElems.rows[i].length; j++) {
         const block = blockElems.rows[i][j];
@@ -579,17 +983,59 @@ const App = (() => {
     redraw();
   };
 
-  const resetPadding = () => {
-    getCurrentPanel().sign.padding = "0.3rem 0.75rem 0.3rem 0.75rem";
+  const setSelectedStandardArrow = (arrowIndex) => {
+    currentlySelectedStandardArrow = Math.max(arrowIndex, -1);
+    formHandler.updateGuideArrowsSubform();
+  };
 
-    document.getElementById("paddingTop").value = 0.3;
-    document.getElementById("paddingRight").value = 0.75;
-    document.getElementById("paddingBottom").value = 0.3;
-    document.getElementById("paddingLeft").value = 0.75;
-
-    formHandler.updateForm();
+  const addStandardArrow = () => {
+    const standardArrow = getCurrentPanel().sign.arrows.standard;
+    getCurrentPanel().sign.newStandardArrow();
+    currentlySelectedStandardArrow = standardArrow.arrowList.length - 1;
+    formHandler.updateGuideArrowsSubform();
     redraw();
   };
+
+  const removeStandardArrow = () => {
+    const standardArrow = getCurrentPanel().sign.arrows.standard;
+    getCurrentPanel().sign.deleteStandardArrow(currentlySelectedStandardArrow);
+    currentlySelectedStandardArrow = clamp(
+      currentlySelectedStandardArrow,
+      -1,
+      standardArrow.arrowList.length - 1,
+    );
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const duplicateStandardArrow = () => {
+    getCurrentPanel().sign.duplicateStandardArrow(
+      currentlySelectedStandardArrow,
+    );
+    currentlySelectedStandardArrow++;
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const moveStandardArrow = (oldIndex, newIndex) => {
+    getCurrentPanel().sign.moveStandardArrow(oldIndex, newIndex);
+    currentlySelectedStandardArrow = newIndex;
+    formHandler.updateGuideArrowsSubform();
+    redraw();
+  };
+
+  const resetSelectors = () => {
+    currentlySelectedPanelIndex = 0;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedShieldIndex = -1;
+    currentlySelectedShieldGroupId = -1;
+    currentlySelectedStandardArrow = -1;
+  }
 
   // Redraw Methods
   const redrawExitTabs = (
@@ -600,6 +1046,8 @@ const App = (() => {
     exitTabContainerLeft,
     exitTabContainerRight,
   ) => {
+    let determineWidth = new Map();
+
     for (let rowIndex = panel.exitTabs.length - 1; rowIndex >= 0; rowIndex--) {
       const exitTabRow = panel.exitTabs[rowIndex];
       const exitTabRowElement = exitTabRow.createElement();
@@ -609,8 +1057,16 @@ const App = (() => {
       );
 
       if (exitTabRow.position == "top") {
+        if (exitTabRow.independentWidth) {
+          determineWidth.set(exitTabContainerTop, true);
+        }
+
         exitTabContainerTop.appendChild(exitTabRowElement);
       } else if (exitTabRow.position == "bottom") {
+        if (exitTabRow.independentWidth) {
+          determineWidth.set(exitTabContainerBottom, true);
+        }
+
         exitTabContainerBottom.appendChild(exitTabRowElement);
       } else if (exitTabRow.position == "left") {
         exitTabContainerLeft.appendChild(exitTabRowElement);
@@ -620,10 +1076,13 @@ const App = (() => {
         exitTabContainerWithin.appendChild(exitTabRowElement);
       }
     }
+
+    return determineWidth;
   };
 
   const redrawSubPanels = (panel, signHolderElmt) => {
     const subpanelList = [];
+    const dividerList = [];
 
     for (
       let subPanelIndex = 0;
@@ -631,27 +1090,6 @@ const App = (() => {
       subPanelIndex++
     ) {
       const subPanel = panel.sign.subPanels[subPanelIndex];
-
-      if (subPanelIndex > 0) {
-        const subDivider = document.createElement("div");
-        subDivider.className = "subDivider";
-        if (subPanel.height) {
-          subDivider.style.height = subPanel.height;
-        } else {
-          subDivider.style.removeProperty("height");
-        }
-
-        if (
-          panel.sign.arrows.arrowMode == "apl" &&
-          panel.sign.lanePanelSize > 0 &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5].length > 0
-        ) {
-          subDivider.style.margin = `0 ${panel.sign.lanePanelSize / 2}px`;
-        }
-
-        signHolderElmt.appendChild(subDivider);
-      }
 
       const signContentContainerElmt = document.createElement("div");
       signContentContainerElmt.className = `signContentContainer`;
@@ -674,9 +1112,291 @@ const App = (() => {
       signContentContainerElmt.appendChild(blockElement);
       signContentContainerElmt.style.padding = panel.sign.padding;
       subpanelList.push(signContentContainerElmt);
+
+      if (subPanelIndex < panel.sign.subPanels.length - 1) {
+        const subDivider = document.createElement("div");
+        subDivider.className = "subDivider";
+        if (subPanel.dividerHeight && subPanel.dividerHeightUnit == "rem") {
+          subDivider.style.height =
+            subPanel.dividerHeight + subPanel.dividerHeightUnit;
+        } else if (
+          subPanel.dividerHeight &&
+          subPanel.dividerHeightUnit == "%"
+        ) {
+          subDivider.style.height = `${
+            (signContentContainerElmt.getBoundingClientRect().height /
+              formHandler.vars.zoomLevel) *
+            (subPanel.dividerHeight / 100)
+          }px`;
+        }
+
+        dividerList.push(subDivider);
+
+        if (
+          panel.sign.arrows.arrowMode == "apl" &&
+          panel.sign.lanePanelSize > 0 &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5] &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5].length > 0
+        ) {
+          subDivider.style.margin = `0 ${panel.sign.lanePanelSize / 2}px`;
+        }
+
+        signHolderElmt.appendChild(subDivider);
+      }
     }
 
-    return subpanelList;
+    return [subpanelList, dividerList];
+  };
+
+  const setSubDividerSegments = (
+    divider,
+    leftSubpanel,
+    rightSubpanel,
+    panel,
+  ) => {
+    const rows = [
+      ...leftSubpanel.querySelectorAll(".blockElementRow.fullBleed"),
+    ];
+    const dividerRect = divider.getBoundingClientRect();
+    const boundaries = new Set([0, dividerRect.height]);
+
+    for (const row of rows) {
+      const rowRect = row.getBoundingClientRect();
+      const top = Math.max(
+        0,
+        Math.min(dividerRect.height, rowRect.top - dividerRect.top),
+      );
+      const bottom = Math.max(
+        0,
+        Math.min(dividerRect.height, rowRect.bottom - dividerRect.top),
+      );
+      boundaries.add(top);
+      boundaries.add(bottom);
+    }
+
+    const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+    divider.innerHTML = "";
+
+    for (let i = 0; i < sortedBoundaries.length - 1; i++) {
+      const top = sortedBoundaries[i];
+      const bottom = sortedBoundaries[i + 1];
+
+      if (bottom <= top) {
+        continue;
+      }
+
+      const midpoint = dividerRect.top + (top + bottom) / 2;
+      const adjacentRows = rows.filter((row) => {
+        const rowRect = row.getBoundingClientRect();
+        return rowRect.top <= midpoint && rowRect.bottom >= midpoint;
+      });
+
+      const adjacentRow = adjacentRows[adjacentRows.length - 1] || null;
+      const segment = document.createElement("div");
+      segment.className = "subDividerSegment";
+      segment.style.height = `${bottom - top}px`;
+
+      const targetColor = adjacentRow
+        ? adjacentRow.dataset.blockBorderColor ||
+          adjacentRow.dataset.blockBackgroundColor
+        : panel.color.toLowerCase();
+
+      if (targetColor == panel.color.toLowerCase()) {
+        segment.style.backgroundColor = lib.checkForContrast(targetColor)
+          ? "black"
+          : "white";
+      } else {
+        segment.style.backgroundColor = lib.checkForContrast(targetColor)
+          ? "white"
+          : "black";
+      }
+
+      divider.appendChild(segment);
+    }
+
+    // First segment: based on the very first row
+    if (rows.length > 0) {
+      const firstRow = rows[0];
+      const firstColor =
+        firstRow?.dataset.blockBorderColor ||
+        firstRow?.dataset.blockBackgroundColor ||
+        (lib.colors[panel.color] || panel.color).toLowerCase();
+
+      const firstSegment = document.createElement("div");
+      firstSegment.className = "subDividerSegment";
+      firstSegment.style.height = ".2rem";
+      firstSegment.style.width = ".2rem";
+      firstSegment.style.position = "absolute";
+      firstSegment.style.top = "-.2rem";
+      firstSegment.style.backgroundColor = lib.checkForContrast(firstColor)
+        ? "white"
+        : "black";
+      divider.appendChild(firstSegment);
+    }
+
+    // Final segment: based on the very last row
+    if (
+      rows.length > 0 &&
+      panel.sign.arrows.arrowMode != "apl" &&
+      panel.sign.arrows.arrowMode == "standard" &&
+      panel.sign.arrows.standard.variant == "none"
+    ) {
+      const lastRow = rows[rows.length - 1];
+      const lastColor =
+        lastRow?.dataset.blockBorderColor ||
+        lastRow?.dataset.blockBackgroundColor ||
+        (lib.colors[panel.color] || panel.color).toLowerCase();
+
+      const finalSegment = document.createElement("div");
+      finalSegment.className = "subDividerSegment";
+      finalSegment.style.height = ".2rem";
+      finalSegment.style.width = ".2rem";
+      finalSegment.style.position = "absolute";
+      finalSegment.style.bottom = "-.2rem";
+      finalSegment.style.backgroundColor = lib.checkForContrast(lastColor)
+        ? "white"
+        : "black";
+      divider.appendChild(finalSegment);
+    }
+  };
+
+  const updateSubpanelEdges = (
+    panel,
+    subpanelList,
+    dividerList,
+    signCorners,
+  ) => {
+    const blockMasters = subpanelList.map((subpanel) =>
+      subpanel.querySelector(".blockElementMaster:not(.bE-groupElement)"),
+    );
+    const masterRects = blockMasters.map((master) =>
+      master.getBoundingClientRect(),
+    );
+    const minLeft = Math.min(...masterRects.map((rect) => rect.left));
+    const maxRight = Math.max(...masterRects.map((rect) => rect.right));
+    const maxBottom = Math.max(...masterRects.map((rect) => rect.bottom));
+    const minTop = Math.min(...masterRects.map((rect) => rect.top));
+    const edgeTolerance = 1;
+
+    for (let i = 0; i < blockMasters.length; i++) {
+      const rows = Array.from(
+        subpanelList[i].querySelectorAll(".blockElementRow.fullBleed"),
+      );
+      const lastRow = rows[rows.length - 1];
+      const firstRow = rows[0];
+      const masterRect = masterRects[i];
+
+      for (const row of rows) {
+        const rowRect = row.getBoundingClientRect();
+        const leftBoundary =
+          i == 0 ? minLeft : dividerList[i - 1].getBoundingClientRect().right;
+        const rightBoundary =
+          i == blockMasters.length - 1
+            ? maxRight
+            : dividerList[i].getBoundingClientRect().left;
+        const touchesLeft = rowRect.left <= leftBoundary + edgeTolerance;
+        const touchesRight = rowRect.right >= rightBoundary - edgeTolerance;
+        const touchesTop =
+          row === firstRow && rowRect.top <= minTop + edgeTolerance;
+        const touchesBottom =
+          row === lastRow && rowRect.bottom >= maxBottom - edgeTolerance;
+
+        if (!touchesLeft) {
+          row.style.setProperty("--blockBleedLeft", "0rem");
+          row.style.setProperty("--blockBorderRadiusTopLeft", "0");
+          row.style.setProperty("--blockBorderRadiusBottomLeft", "0");
+          row.style.borderLeft = "none";
+        }
+
+        if (!touchesRight) {
+          row.style.setProperty("--blockBleedRight", "0rem");
+          row.style.setProperty("--blockBorderRadiusTopRight", "0");
+          row.style.setProperty("--blockBorderRadiusBottomRight", "0");
+          row.style.borderRight = "none";
+        }
+
+        if (!touchesTop) {
+          row.style.setProperty("--blockBleedTop", "0rem");
+          row.style.setProperty("--blockBorderRadiusTopLeft", "0");
+          row.style.setProperty("--blockBorderRadiusTopRight", "0");
+        }
+
+        if (!touchesBottom) {
+          row.style.setProperty("--blockBleedBottom", "0rem");
+          row.style.setProperty("--blockBorderRadiusBottomLeft", "0");
+          row.style.setProperty("--blockBorderRadiusBottomRight", "0");
+        }
+      }
+
+      if (
+        lastRow &&
+        (masterRect.bottom < maxBottom ||
+          lastRow.getBoundingClientRect().bottom < maxBottom)
+      ) {
+        lastRow.style.borderBottom = "none";
+        lastRow.style.setProperty("--blockBorderRadiusBottomLeft", "0");
+        lastRow.style.setProperty("--blockBorderRadiusBottomRight", "0");
+      }
+
+      if (
+        firstRow &&
+        (masterRect.top > minTop ||
+          firstRow.getBoundingClientRect().top > minTop)
+      ) {
+        firstRow.style.borderTop = "none";
+        firstRow.style.setProperty("--blockBorderRadiusTopLeft", "0");
+        firstRow.style.setProperty("--blockBorderRadiusTopRight", "0");
+      }
+    }
+
+    for (let i = 0; i < dividerList.length; i++) {
+      setSubDividerSegments(
+        dividerList[i],
+        subpanelList[i],
+        subpanelList[i + 1],
+        panel,
+      );
+    }
+
+    const parentColor = (lib.colors[panel.color] || panel.color).toLowerCase();
+    const cornerRows = [
+      Array.from(
+        subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
+      )[0],
+      Array.from(
+        subpanelList[subpanelList.length - 1].querySelectorAll(
+          ".blockElementRow.fullBleed",
+        ),
+      )[0],
+      Array.from(
+        subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
+      ).slice(-1)[0],
+      Array.from(
+        subpanelList[subpanelList.length - 1].querySelectorAll(
+          ".blockElementRow.fullBleed",
+        ),
+      ).slice(-1)[0],
+    ];
+    const cornerTouchesPanel = [
+      cornerRows[0] &&
+        masterRects[0].top <= minTop &&
+        cornerRows[0].getBoundingClientRect().top <= minTop,
+      cornerRows[1] &&
+        masterRects[masterRects.length - 1].top <= minTop &&
+        cornerRows[1].getBoundingClientRect().top <= minTop,
+      cornerRows[2] &&
+        masterRects[0].bottom >= maxBottom &&
+        cornerRows[2].getBoundingClientRect().bottom >= maxBottom,
+      cornerRows[3] &&
+        masterRects[masterRects.length - 1].bottom >= maxBottom &&
+        cornerRows[3].getBoundingClientRect().bottom >= maxBottom,
+    ];
+
+    for (let i = 0; i < signCorners.length; i++) {
+      signCorners[i].style.backgroundColor = cornerTouchesPanel[i]
+        ? cornerRows[i].dataset.blockBackgroundColor
+        : parentColor;
+    }
   };
 
   const redrawPanel = (panel, panelContainerElmt, index) => {
@@ -704,7 +1424,7 @@ const App = (() => {
     const exitTabContainerWithin = document.createElement("div");
     exitTabContainerWithin.className = "exitTabContainer within";
 
-    redrawExitTabs(
+    let considerWidth = redrawExitTabs(
       panel,
       exitTabContainerTop,
       exitTabContainerBottom,
@@ -733,7 +1453,7 @@ const App = (() => {
     signElmt.appendChild(bottomLeftSignCorner);
 
     const bottomRightSignCorner = document.createElement("div");
-    bottomRightSignCorner.className = "signCorner bottomright";
+    bottomRightSignCorner.className = "signCorner bottomRight";
     signElmt.appendChild(bottomRightSignCorner);
 
     const signHolderElmt = document.createElement("div");
@@ -741,22 +1461,36 @@ const App = (() => {
     signElmt.appendChild(signHolderElmt);
     signElmt.appendChild(exitTabContainerWithin);
 
+    let hasFirstBottom = false,
+      hasFirstTop = false;
+    for (const exitTab of panel.exitTabs) {
+      if (exitTab.position == "bottom" && !hasFirstBottom) {
+        hasFirstBottom = true;
+
+        if (exitTab.hideBottomBorder) {
+          signHolderElmt.style.borderBottom = "none";
+        }
+      }
+      if (exitTab.position == "top" && !hasFirstTop) {
+        hasFirstTop = true;
+
+        if (exitTab.hideTopBorder) {
+          signHolderElmt.style.borderTop = "none";
+        }
+      }
+    }
+
     const guideArrowsHolderElmt = document.createElement("div");
     guideArrowsHolderElmt.className = "guideArrowsHolder";
 
     const guideArrowsElmt = document.createElement("div");
-    /*guideArrowsElmt.className = `guideArrows ${panel.sign.guideArrow
-        .replace("/", "-")
-        .replace(" ", "_")
-        .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
-      */
 
-    guideArrowsElmt.className = `guideArrows ${panel.sign.arrows.arrowMode.toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()} ${
+    guideArrowsElmt.className = `guideArrows ${panel.sign.arrows.arrowMode.toLowerCase()} ${
       panel.sign.arrows.arrowMode.toLowerCase() == "standard"
-        ? panel.sign.guideArrow
+        ? panel.sign.arrows.standard.variant
             .toLowerCase()
-            .replace("/", "-")
-            .replace(" ", "_")
+            .replace(/\//g, "-")
+            .replace(/\s/g, "_")
             .toLowerCase()
         : ""
     }`;
@@ -764,12 +1498,12 @@ const App = (() => {
 
     const sideLeftArrowElmt = document.createElement("img");
     sideLeftArrowElmt.className = "sideLeftArrow";
-    sideLeftArrowElmt.src = "assets/arrows/A-4.svg";
+    sideLeftArrowElmt.src = "assets/arrow/TypeA.svg";
     signHolderElmt.appendChild(sideLeftArrowElmt);
 
     const sideRightArrowElmt = document.createElement("img");
     sideRightArrowElmt.className = "sideRightArrow";
-    sideRightArrowElmt.src = "assets/arrows/A-4.svg";
+    sideRightArrowElmt.src = "assets/arrow/TypeA.svg";
 
     signCont.appendChild(exitTabContainerTop);
     signCont.appendChild(exitTabContainerLeft);
@@ -784,7 +1518,13 @@ const App = (() => {
       signHolderElmt.style.minWidth = exitTabContainerWithin.offsetWidth + "px";
     }
 
-    const subpanelList = redrawSubPanels(panel, signHolderElmt);
+    const [subpanelList, dividerList] = redrawSubPanels(panel, signHolderElmt);
+    updateSubpanelEdges(panel, subpanelList, dividerList, [
+      topLeftSignCorner,
+      topRightSignCorner,
+      bottomLeftSignCorner,
+      bottomRightSignCorner,
+    ]);
 
     signHolderElmt.appendChild(sideRightArrowElmt);
 
@@ -961,6 +1701,7 @@ const App = (() => {
           aplHolder.className =
             "sMGA_APLHolder center " +
             (autoJustify && i % 1 == 0 ? "auto" : "");
+          aplHolder.style.width = "0";
         }
 
         let pair = [];
@@ -992,29 +1733,20 @@ const App = (() => {
           }
         }
         guideArrowsElmt.appendChild(aplHolder);
+      }
 
-        let avg = 0,
-          total = 0;
-        for (const [arrow1, arrow2] of arrowElements) {
-          avg +=
-            (arrow2.getBoundingClientRect().left -
-              arrow1.getBoundingClientRect().left) /
-            formHandler.vars.zoomLevel;
-          total += 1;
-        }
-        for (const holder of dividerElements) {
-          if (autoJustify) {
-            holder.style.width = `${(avg / total) * 1.5}px`;
-          }
-        }
+      for (let i = 0; i < dividerElements.length; i++) {
+        const holder = dividerElements[i];
+        const divider = dividerList[i];
+        holder.style.marginLeft = `${(divider.getBoundingClientRect().left - holder.getBoundingClientRect().left) / formHandler.vars.zoomLevel}px`;
       }
     }
 
     if (arrows.arrowMode == "standard") {
-      const ExitKeys = ["EA", "EB", "EC"];
-      const MainKeys = ["A", "B", "C", "D", "E"];
-      let path;
-
+      const standardArrowConfig = panel.sign.arrows.standard;
+      const standardVariant = standardArrowConfig.variant;
+      const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
+      /*
       const otherSymbolsElmt = document.createElement("div");
       otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol
         .replace("/", "-")
@@ -1025,552 +1757,418 @@ const App = (() => {
       const oSNumElmt = document.createElement("div");
       oSNumElmt.className = `oSNum`;
       otherSymbolsElmt.appendChild(oSNumElmt);
+      */
 
       const arrowContElmt = document.createElement("div");
       arrowContElmt.className = `arrowContainer`;
       guideArrowsElmt.appendChild(arrowContElmt);
 
-      const createArrowElmt = (key, dir, name, extra) => {
-        if (dir == "MainArrows!ExitOnly") {
-          key = key.split("/")[1];
-        } else {
-          key = key.split("/")[0];
-        }
-
-        if (
-          ExitKeys.includes(key.split("-")[0]) ||
-          MainKeys.includes(key.split("-")[0])
-        ) {
-          const downArrowElmt = document.createElement("img");
-          downArrowElmt.className = name || "exitOnlyArrow ";
-
-          if (extra) {
-            downArrowElmt.className += " " + extra;
-          }
-
-          if (ExitKeys.includes(key.split("-")[0])) {
-            key = key.split("-")[0].split("")[1] + "-" + key.split("-")[1];
-            downArrowElmt.style.filter = "invert(1)";
-          }
-
-          const shouldUseCanadianDownArrow =
-            panel.sign.useCanadianDownArrows && key === "C-1";
-
-          if (shouldUseCanadianDownArrow) {
-            downArrowElmt.src = "assets/arrowBlocks/DOWN_CA.svg";
-            downArrowElmt.classList.add("canadianDownArrow");
-          } else {
-            downArrowElmt.src = "assets/arrows/" + key + ".svg";
-          }
-
-          return downArrowElmt;
-        }
-      };
-
-      if (
-        panel.sign.arrowPosition == "Left" &&
-        panel.sign.guideArrow != "Exit Only" &&
-        panel.sign.guideArrow != "Side Left" &&
-        panel.sign.guideArrow != "Side Right" &&
-        panel.sign.guideArrow != "Half Exit Only"
-      ) {
-        arrowContElmt.style.justifyContent = "left";
-      } else if (panel.sign.arrowPosition == "Middle") {
-        arrowContElmt.style.cssFloat = "none";
-      } else if (
-        panel.sign.arrowPosition == "Right" &&
-        panel.sign.guideArrow != "Exit Only" &&
-        panel.sign.guideArrow != "Side Left" &&
-        panel.sign.guideArrow != "Side Right" &&
-        panel.sign.guideArrow != "Half Exit Only"
-      ) {
-        arrowContElmt.style.justifyContent = "right";
-      }
-
-      if (panel.sign.guideArrow.includes("Exit Only")) {
-        const borderWidthValue = "0.2rem";
-        const exitOnlyBorderModes = Sign.prototype.exitOnlyBorderModes;
-        const resolvedExitOnlyBorderMode = exitOnlyBorderModes.includes(
-          panel.sign.exitOnlyBorderMode,
-        )
-          ? panel.sign.exitOnlyBorderMode
-          : exitOnlyBorderModes[0];
-        const hideExitOnlyArrows = panel.sign.hideExitArrow === true;
-        arrowContElmt.classList.toggle(
-          "hideExitOnlyArrows",
-          hideExitOnlyArrows,
+      if (standardVariant.includes("Exit Only")) {
+        guideArrowsElmt.classList.add(
+          exitOnlyConfigs.borderMode.replace(/\s/g, "_"),
         );
-        if (
-          !post.secondExitOnly &&
-          panel.sign.guideArrow != "Split Exit Only" &&
-          panel.sign.guideArrow != "Half Exit Only"
-        ) {
-          guideArrowsElmt.style.padding = panel.sign.exitOnlyPadding + "rem";
-        }
 
-        if (panel.sign.guideArrow == "Exit Only" && !post.secondExitOnly) {
-          guideArrowsElmt.style.borderTopWidth =
-            resolvedExitOnlyBorderMode === "edge" ? borderWidthValue : "0";
-        }
-
-        if (panel.sign.guideArrow == "Half Exit Only") {
-          const secondaryContainer = document.createElement("div");
-          secondaryContainer.className = `arrowContainer ${panel.sign.guideArrow
-            .replace("/", "-")
-            .replace(" ", "_")
-            .toLowerCase()} ${panel.sign.arrowPosition.toLowerCase()}`;
-
-          guideArrowsElmt.className += post.secondExitOnly
-            ? " new2"
-            : " default";
-          guideArrowsElmt.classList.remove("halfExitNoBorder");
-
-          if (!post.secondExitOnly) {
-            const borderMode = resolvedExitOnlyBorderMode;
-            const arrowPos = panel.sign.arrowPosition.toLowerCase();
-            const overlap = `-${borderWidthValue}`;
-            const touchesLeftEdge =
-              arrowPos === "left" || arrowPos === "middle";
-            const touchesRightEdge =
-              arrowPos === "right" || arrowPos === "middle";
-
-            secondaryContainer.style.backgroundColor = "var(--yellow)";
-            secondaryContainer.style.color = "var(--black)";
-            secondaryContainer.style.borderStyle = "solid";
-            secondaryContainer.style.borderColor = "var(--black)";
-            secondaryContainer.style.borderTopWidth = "0";
-            secondaryContainer.style.borderRightWidth = "0";
-            secondaryContainer.style.borderBottomWidth = "0";
-            secondaryContainer.style.borderLeftWidth = "0";
-            secondaryContainer.style.marginBottom = "0";
-            secondaryContainer.style.marginLeft = "0";
-            secondaryContainer.style.marginRight = "0";
-
-            if (borderMode !== "none") {
-              const edges = {
-                top: borderMode === "edge",
-                right: borderMode === "edge",
-                bottom: true,
-                left: borderMode === "edge",
-              };
-
-              if (borderMode === "white-edge") {
-                edges.top = false;
-                edges.left = touchesLeftEdge;
-                edges.right = touchesRightEdge;
-              }
-
-              secondaryContainer.style.borderTopWidth = edges.top
-                ? borderWidthValue
-                : "0";
-              secondaryContainer.style.borderRightWidth = edges.right
-                ? borderWidthValue
-                : "0";
-              secondaryContainer.style.borderBottomWidth = edges.bottom
-                ? borderWidthValue
-                : "0";
-              secondaryContainer.style.borderLeftWidth = edges.left
-                ? borderWidthValue
-                : "0";
-
-              if (edges.bottom) {
-                secondaryContainer.style.marginBottom = overlap;
-              }
-              if (edges.left) {
-                secondaryContainer.style.marginLeft = overlap;
-              }
-              if (edges.right) {
-                secondaryContainer.style.marginRight = overlap;
-              }
-            } else {
-              secondaryContainer.style.borderStyle = "none";
-              const sideOverlap = "-0.02rem";
-              if (touchesLeftEdge) {
-                secondaryContainer.style.marginLeft = sideOverlap;
-              }
-              if (touchesRightEdge) {
-                secondaryContainer.style.marginRight = sideOverlap;
-              }
-              secondaryContainer.style.marginBottom = overlap;
-            }
-
-            const leftRadius =
-              touchesLeftEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
-            const rightRadius =
-              touchesRightEdge && borderMode === "none" ? "0.85rem" : "0.75rem";
-            secondaryContainer.style.borderBottomLeftRadius = touchesLeftEdge
-              ? leftRadius
-              : "0";
-            secondaryContainer.style.borderBottomRightRadius = touchesRightEdge
-              ? rightRadius
-              : "0";
-
-            if (borderMode === "none") {
-              secondaryContainer.style.zIndex = "0";
-            } else {
-              secondaryContainer.style.removeProperty("z-index");
-            }
-          }
-
-          guideArrowsElmt.classList.remove("halfExitNoBorder");
-          path = secondaryContainer;
-
-          const arrow = createArrowElmt(
-            panel.sign.exitguideArrows.split(":")[1],
-            "MainArrows!ExitOnly",
-            "halfarrow",
-            panel.sign.arrowPosition.toLowerCase(),
-          );
-
-          if (panel.sign.arrowPosition.toLowerCase() == "left") {
-            arrowContElmt.appendChild(secondaryContainer);
-            arrowContElmt.appendChild(arrow);
-
-            if (panel.sign.guideArrowLanes > 1) {
-              let marginLeft = 4;
-
-              for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
-                if (i % 2 == 0) {
-                  marginLeft += 12;
-                } else {
-                  marginLeft += 4;
-                }
-              }
-            }
-          } else {
-            arrowContElmt.appendChild(arrow);
-            arrowContElmt.appendChild(secondaryContainer);
-
-            if (panel.sign.guideArrowLanes > 1) {
-              let marginLeft = 11;
-
-              for (let i = 1; i <= panel.sign.guideArrowLanes - 2; i++) {
-                if (i % 2 == 0) {
-                  marginLeft += 12;
-                } else {
-                  marginLeft += 4;
-                }
-              }
-            }
-          }
-
-          path.style.padding = panel.sign.exitOnlyPadding + "rem";
-        } else {
-          path = arrowContElmt;
-        }
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyFontFamily",
+          `"${exitOnlyConfigs.fontFamily}"`,
+        );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyFontSize",
+          exitOnlyConfigs.fontSize + "px",
+        );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyWordSpacing",
+          exitOnlyConfigs.wordSpacing + "rem",
+        );
+        guideArrowsElmt.style.setProperty(
+          "--exitOnlyLetterSpacing",
+          exitOnlyConfigs.letterSpacing + "rem",
+        );
+        guideArrowsElmt.style.setProperty(
+          "--verticalPadding",
+          `${exitOnlyConfigs.verticalPadding}rem`,
+        );
+        guideArrowsElmt.style.setProperty(
+          "--horizontalPadding",
+          `${exitOnlyConfigs.horizontalPadding}rem`,
+        );
       }
 
-      if ("Side Left" == panel.sign.guideArrow) {
-        sideLeftArrowElmt.style.display = "block";
-      } else if ("Side Right" == panel.sign.guideArrow) {
-        sideRightArrowElmt.style.display = "block";
-      } else if ("None" != panel.sign.guideArrow) {
-        signElmt.style.borderBottomLeftRadius = "0";
-        signElmt.style.borderBottomRightRadius = "0";
-        signElmt.style.borderBottomWidth = "0";
-        signElmt.style.width = "100%";
-        guideArrowsElmt.style.display = "block";
-        guideArrowsElmt.style.visibility = "visible";
-        if (
-          "Exit Only" == panel.sign.guideArrow ||
-          "Split Exit Only" == panel.sign.guideArrow ||
-          "Half Exit Only" == panel.sign.guideArrow
-        ) {
-          if (
-            post.secondExitOnly == true ||
-            panel.sign.guideArrow == "Half Exit Only"
-          ) {
-            if (panel.sign.guideArrow == "Exit Only") {
-              guideArrowsElmt.className += " new";
-              arrowContElmt.className += " new";
-            }
-            if (panel.sign.guideArrow == "Half Exit Only") {
-              path.className += " new2";
-              arrowContElmt.className += " new2";
-              const arrowPositionSetting =
-                typeof panel.sign.arrowPosition === "string"
-                  ? panel.sign.arrowPosition.toLowerCase()
-                  : "middle";
-              let justifyContent = "center";
-              if (arrowPositionSetting === "left") {
-                justifyContent = "flex-start";
-              } else if (arrowPositionSetting === "right") {
-                justifyContent = "flex-end";
-              }
-              arrowContElmt.style.justifyContent = justifyContent;
-              arrowContElmt.style.gap = "5rem";
-              arrowContElmt.style.width = "100%";
-            }
-            guideArrowsElmt.style.display = "flex";
+      let exitOnlyContainer = arrowContElmt;
+      switch (standardVariant) {
+        case "Side Left": {
+          sideLeftArrowElmt.style.display = "block";
+          break;
+        }
+        case "Side Right": {
+          sideRightArrowElmt.style.display = "block";
+          break;
+        }
+        case "Custom": {
+          arrowContElmt.style.setProperty(
+            "--arrowGap",
+            standardArrowConfig.customConfig.gap + "rem",
+          );
+          arrowContElmt.style.setProperty(
+            "--arrowJustify",
+            standardArrowConfig.customConfig.justify.toLowerCase() ==
+              "space between"
+              ? "space-between"
+              : standardArrowConfig.customConfig.justify.toLowerCase(),
+          );
+          guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
+
+          for (const arrow of standardArrowConfig.arrowList) {
+            const arrowElement = arrow.createElement();
+            arrowContElmt.appendChild(arrowElement);
           }
+          break;
+        }
+        case "Half Exit Only": {
+          exitOnlyContainer = document.createElement("div");
+          exitOnlyContainer.className = "arrowContainer halfExitOnly";
+          arrowContElmt.appendChild(exitOnlyContainer);
 
-          if (post.secondExitOnly && panel.sign.guideArrow == "Exit Only") {
-            path.style.padding = panel.sign.exitOnlyPadding + "rem";
-          }
+          const secondArrow =
+            standardArrowConfig.exitOnlyConfigs.arrow.createElement();
+          secondArrow.classList.add("halfExitOnlyOutsideArrow");
+          secondArrow.style.visibility = standardArrowConfig.exitOnlyConfigs
+            .displayOutsideArrow
+            ? "visible"
+            : "hidden";
+          arrowContElmt.appendChild(secondArrow);
+        }
+        case "Split Exit Only":
+        case "Exit Only": {
+          const exitOnlyConfig = standardArrowConfig.exitOnlyConfigs;
+          const arrowElement = exitOnlyConfig.arrow.createElement();
 
-          /*
-
-						if (panel.sign.advisoryMessage) {
-							actionMessageElmt.style.fontFamily = "Series E";
-						}
-					
-					*/
-
-          // Interlase arrows and the words EXIT and ONLY, ensuring
-          //   EXIT ONLY is centered between all the arrows.
+          exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
+          exitOnlyContainer.style.setProperty(
+            "--arrowGap",
+            (exitOnlyConfig.numArrows <= 1
+              ? exitOnlyConfig.textGap
+              : exitOnlyConfig.gap) + "rem",
+          );
+          guideArrowsHolderElmt.style.setProperty(
+            "--bgColor",
+            "var(--" +
+              exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-") +
+              ")",
+          );
           if (
-            panel.sign.guideArrowLanes == 0 &&
-            panel.sign.advisoryMessage == true
+            !lib.checkForContrast(exitOnlyConfig.backgroundColor.toLowerCase())
           ) {
-            const actionMessage = document.createElement("span");
-            actionMessage.className = "exitOnlyText";
-            actionMessage.appendChild(
-              document.createTextNode(panel.sign.advisoryText),
-            );
-            path.appendChild(actionMessage);
+            guideArrowsHolderElmt.style.color = "white";
+            guideArrowsHolderElmt.style.borderColor = "white";
+            exitOnlyContainer.style.color = "white";
           } else {
-            const resolveExitOnlyText = (text, fallback) =>
-              typeof text === "string" ? text : fallback;
-            const exitOnlyLabelLeft = resolveExitOnlyText(
-              panel.sign.exitOnlyLeftText,
-              "EXIT",
-            ).trim();
-            const exitOnlyLabelRight = resolveExitOnlyText(
-              panel.sign.exitOnlyRightText,
-              "ONLY",
-            ).trim();
-            const exitOnlyLabelFull = [exitOnlyLabelLeft, exitOnlyLabelRight]
-              .filter((text) => text && text.length > 0)
-              .join(" ")
-              .trim();
-            const isSplitExitOnly = panel.sign.guideArrow == "Split Exit Only";
-            const shouldRenderLabel = (text) =>
-              !(
-                panel.sign.showExitOnly == false &&
-                isSplitExitOnly &&
-                (!text || text.length === 0)
+            guideArrowsHolderElmt.style.color = "black";
+            guideArrowsHolderElmt.style.borderColor = "black";
+            exitOnlyContainer.style.color = "black";
+          }
+
+          if (standardVariant != "Split Exit Only") {
+            arrowElement.style.filter = lib.checkForContrast(
+              exitOnlyConfig.backgroundColor.toLowerCase(),
+            )
+              ? "invert(1)"
+              : "";
+          } else {
+            arrowElement.style.filter = lib.checkForContrast(
+              panel.color.toLowerCase(),
+            )
+              ? "invert(1)"
+              : "";
+          }
+
+          let numArrows = exitOnlyConfig.numArrows;
+
+          const textElementBuilder = new TextElement({
+            textContent: exitOnlyConfig.exitOnlyText,
+            fontFamily: exitOnlyConfig.fontFamily,
+            wordSpacing: exitOnlyConfig.wordSpacing,
+            letterSpacing: exitOnlyConfig.letterSpacing,
+            useNumeralFormatting: true,
+            numeralFormattingSize: 140,
+          });
+
+          if (numArrows === 0) {
+            const textElement = textElementBuilder.createElement();
+            textElement.style.setProperty(
+              "--fontSize",
+              exitOnlyConfig.fontSize + "px",
+            );
+            textElement.className = "SM-ExitOnlyTextElement";
+            exitOnlyContainer.appendChild(textElement);
+          } else if (
+            numArrows === 1 &&
+            exitOnlyConfig.exitOnlyTextPosition !== "Center"
+          ) {
+            // 1 off center
+            exitOnlyContainer.appendChild(arrowElement);
+
+            if (textElementBuilder.textContent != "") {
+              const textElement = textElementBuilder.createElement();
+              textElement.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
               );
-            for (
-              let arrowIndex = 0, length = panel.sign.guideArrowLanes;
-              arrowIndex < length;
-              arrowIndex++
+              textElement.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement);
+            }
+
+            exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
+            exitOnlyContainer.style.flexDirection =
+              exitOnlyConfig.exitOnlyTextPosition === "Left"
+                ? "row"
+                : "row-reverse";
+          } else if (
+            numArrows === 1 &&
+            exitOnlyConfig.exitOnlyTextPosition === "Center"
+          ) {
+            // 1 center
+            const spaceIndex = exitOnlyConfig.exitOnlyText.indexOf(" ");
+            if (exitOnlyConfig.exitOnlyText != "") {
+              textElementBuilder.textContent =
+                exitOnlyConfig.exitOnlyText.substring(0, spaceIndex);
+              const textElement1 = textElementBuilder.createElement();
+              textElement1.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement1.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement1);
+            }
+
+            exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+
+            if (exitOnlyConfig.exitOnlyText != "") {
+              textElementBuilder.textContent =
+                exitOnlyConfig.exitOnlyText.substring(spaceIndex + 1);
+              const textElement2 = textElementBuilder.createElement();
+              textElement2.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement2.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement2);
+            }
+          } else {
+            if (
+              standardVariant == "Split Exit Only" &&
+              exitOnlyConfig.exitOnlyTextPosition == "Left"
             ) {
-              // Evens
-              if (length % 2 == 0) {
-                if (arrowIndex == Math.floor(length / 2)) {
-                  if (shouldRenderLabel(exitOnlyLabelFull)) {
-                    const textExitOnlySpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textExitOnlySpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelFull),
-                      );
+              textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
 
-                      let bonus = "";
+              const textElement = textElementBuilder.createElement();
+              textElement.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
+              );
+              textElement.style.marginRight = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+              textElement.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement);
+            }
 
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
+            if (numArrows % 2 == 0) {
+              for (let i = 0; i < numArrows; i++) {
+                if (
+                  i === Math.floor(numArrows / 2) &&
+                  exitOnlyConfig.exitOnlyText != "" &&
+                  (standardVariant == "Split Exit Only"
+                    ? exitOnlyConfig.exitOnlyTextPosition == "Center"
+                    : true)
+                ) {
+                  textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
 
-                      textExitOnlySpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textExitOnlySpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀ ⠀⠀⠀⠀"),
-                      );
-                      textExitOnlySpanElmt.className = "exitOnlyText";
-                    }
-                    path.appendChild(textExitOnlySpanElmt);
-                  }
+                  const textElement = textElementBuilder.createElement();
+                  textElement.style.setProperty(
+                    "--fontSize",
+                    exitOnlyConfig.fontSize + "px",
+                  );
 
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
+                  textElement.style.marginRight = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+                  textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
 
-                  if (arrowIndex + 1 < length && length != 2) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
-                } else {
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (
-                    arrowIndex + 1 < length &&
-                    arrowIndex + 1 != Math.ceil(length / 2) &&
-                    length != 2
-                  ) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
+                  textElement.className = "SM-ExitOnlyTextElement";
+                  exitOnlyContainer.appendChild(textElement);
                 }
-              } else {
-                // Odds
-                if (arrowIndex == Math.floor(length / 2)) {
-                  if (shouldRenderLabel(exitOnlyLabelLeft)) {
-                    const textExitSpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textExitSpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelLeft),
-                      );
+                exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+              }
+            } else {
+              for (let i = 0; i < numArrows; i++) {
+                if (
+                  (i === Math.floor(numArrows / 2) ||
+                    i === Math.floor(numArrows / 2) + 1) &&
+                  exitOnlyConfig.exitOnlyText != "" &&
+                  (standardVariant == "Split Exit Only"
+                    ? exitOnlyConfig.exitOnlyTextPosition == "Center"
+                    : true)
+                ) {
+                  const spaceIndex = exitOnlyConfig.exitOnlyText.indexOf(" ");
 
-                      let bonus = "";
+                  textElementBuilder.textContent =
+                    i === Math.floor(numArrows / 2)
+                      ? exitOnlyConfig.exitOnlyText.substring(0, spaceIndex)
+                      : exitOnlyConfig.exitOnlyText.substring(spaceIndex + 1);
 
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
+                  const textElement = textElementBuilder.createElement();
+                  textElement.style.setProperty(
+                    "--fontSize",
+                    exitOnlyConfig.fontSize + "px",
+                  );
 
-                      textExitSpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textExitSpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀"),
-                      );
-                      textExitSpanElmt.className = "exitOnlyText";
-                    }
-
-                    path.appendChild(textExitSpanElmt);
-                  }
-
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
+                  if (i == Math.floor(numArrows / 2)) {
+                    textElement.style.marginRight = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
                   } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
+                    textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
                   }
 
-                  if (shouldRenderLabel(exitOnlyLabelRight)) {
-                    const textOnlySpanElmt = document.createElement("span");
-                    if (panel.sign.showExitOnly == false) {
-                      textOnlySpanElmt.appendChild(
-                        document.createTextNode(exitOnlyLabelRight),
-                      );
-
-                      let bonus = "";
-
-                      if (panel.sign.guideArrow == "Split Exit Only") {
-                        bonus = " yellowElmt";
-                      }
-
-                      textOnlySpanElmt.className = "exitOnlyText" + bonus;
-                    } else {
-                      textOnlySpanElmt.appendChild(
-                        document.createTextNode("⠀⠀⠀⠀"),
-                      );
-                      textOnlySpanElmt.className = "exitOnlyText";
-                    }
-                    path.appendChild(textOnlySpanElmt);
-                  }
-                } else if (arrowIndex == Math.ceil(length / 2)) {
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (
-                    arrowIndex + 1 < length &&
-                    arrowIndex + 1 != Math.floor(length / 2) &&
-                    length != 2
-                  ) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
-                } else {
-                  if (panel.sign.guideArrow == "Split Exit Only") {
-                    path.appendChild(
-                      createArrowElmt(
-                        panel.sign.exitguideArrows.split(":")[1],
-                        "MainArrows!ExitOnly",
-                      ),
-                    );
-                  } else {
-                    path.appendChild(
-                      createArrowElmt(panel.sign.exitguideArrows.split(":")[1]),
-                    );
-                  }
-
-                  if (
-                    arrowIndex + 1 < length &&
-                    arrowIndex + 1 != Math.floor(length / 2) &&
-                    length != 2
-                  ) {
-                    const space = document.createElement("span");
-                    space.className = "exitOnlySpace";
-                    path.appendChild(space);
-                  }
+                  textElement.className = "SM-ExitOnlyTextElement";
+                  exitOnlyContainer.appendChild(textElement);
                 }
+                exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
               }
             }
-          }
-        } else {
-          arrowContElmt.classList.remove("hideExitOnlyArrows");
-          for (
-            let arrowIndex = 0, length = panel.sign.guideArrowLanes;
-            arrowIndex < length;
-            arrowIndex++
-          ) {
-            if (arrowIndex % 2 == 0) {
-              arrowContElmt.insertBefore(
-                createArrowElmt(
-                  panel.sign.guideArrow.split(":")[1],
-                  "MainArrows",
-                  "arrow",
-                  panel.sign.guideArrow
-                    .split(":")[0]
-                    .toLowerCase()
-                    .replace(/ /g, ""),
-                ),
-                arrowContElmt.childNodes[0],
+
+            if (
+              standardVariant == "Split Exit Only" &&
+              exitOnlyConfig.exitOnlyTextPosition == "Right"
+            ) {
+              textElementBuilder.textContent = exitOnlyConfig.exitOnlyText;
+
+              const textElement = textElementBuilder.createElement();
+              textElement.style.setProperty(
+                "--fontSize",
+                exitOnlyConfig.fontSize + "px",
               );
-            } else {
-              arrowContElmt.appendChild(
-                createArrowElmt(
-                  panel.sign.guideArrow.split(":")[1],
-                  "MainArrows",
-                  "arrow",
-                  panel.sign.guideArrow.split(":")[0],
-                ),
-              );
+              textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
+              textElement.className = "SM-ExitOnlyTextElement";
+              exitOnlyContainer.appendChild(textElement);
             }
           }
+
+          if (
+            standardVariant == "Split Exit Only" ||
+            standardVariant == "Half Exit Only"
+          ) {
+            arrowContElmt.style.setProperty(
+              "--splitHorizontalPadding",
+              exitOnlyConfig.splitHorizontalPadding + "rem",
+            );
+            arrowContElmt.style.setProperty(
+              "--splitVerticalPadding",
+              exitOnlyConfig.splitVerticalPadding + "rem",
+            );
+            arrowContElmt.style.setProperty(
+              "--splitBorderRadius",
+              exitOnlyConfig.splitBorderRadius + "px",
+            );
+          }
+
+          if (standardVariant == "Split Exit Only") {
+            arrowContElmt.style.justifyContent =
+              exitOnlyConfig.arrowLocation.toLowerCase();
+          }
+
+          if (standardVariant == "Half Exit Only") {
+            arrowContElmt.style.flexDirection =
+              exitOnlyConfig.arrowLocation == "Left" ? "row" : "row-reverse";
+            arrowContElmt.style.gap = exitOnlyConfig.exitOnlyOutsideGap + "rem";
+
+            exitOnlyContainer.style.borderBottomLeftRadius =
+              exitOnlyConfig.arrowLocation == "Left"
+                ? "calc(var(--signBorderRadius)" +
+                  (exitOnlyConfig.borderMode == "White Border" ? " / 2)" : ")")
+                : 0;
+            exitOnlyContainer.style.borderBottomRightRadius =
+              exitOnlyConfig.arrowLocation == "Left"
+                ? 0
+                : "calc(var(--signBorderRadius)" +
+                  (exitOnlyConfig.borderMode == "White Border" ? " / 2)" : ")");
+
+            if (exitOnlyConfig.arrowLocation == "Left") {
+              arrowContElmt.style.paddingRight =
+                exitOnlyConfig.horizontalPadding + "rem";
+              if (exitOnlyConfig.borderMode != "White Border") {
+                exitOnlyContainer.style.borderLeft = ".2rem solid black";
+                exitOnlyContainer.style.marginLeft = "-.2rem";
+              }
+
+              if (
+                panel.corner == "Sharp" &&
+                exitOnlyConfig.borderMode != "White Border"
+              ) {
+                guideArrowsHolderElmt.style.background = `linear-gradient(270deg, var(--${panel.color}) 0%, var(--${panel.color}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 100%)`;
+              }
+            } else {
+              arrowContElmt.style.paddingLeft =
+                exitOnlyConfig.horizontalPadding + "rem";
+              if (exitOnlyConfig.borderMode != "White Border") {
+                exitOnlyContainer.style.borderRight = ".2rem solid black";
+                exitOnlyContainer.style.marginRight = "-.2rem";
+              }
+
+              if (
+                panel.corner == "Sharp" &&
+                exitOnlyConfig.borderMode != "White Border"
+              ) {
+                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 100%)`;
+              }
+            }
+
+            if (exitOnlyConfig.borderMode != "White Border") {
+              exitOnlyContainer.style.borderBottom = ".2rem solid black";
+              exitOnlyContainer.style.marginBottom = `${-0.2 + -exitOnlyConfig.verticalPadding}rem`;
+              arrowContElmt.style.paddingBottom =
+                exitOnlyConfig.verticalPadding + "rem";
+            } else {
+              arrowContElmt.style.paddingTop =
+                exitOnlyConfig.verticalPadding + "rem";
+            }
+
+            if (
+              arrowContElmt.querySelector(".halfExitOnlyOutsideArrow") &&
+              exitOnlyContainer.querySelector(".BE-arrowImage")
+            ) {
+              const outsideArrow = arrowContElmt.querySelector(
+                ".halfExitOnlyOutsideArrow",
+              );
+              const innerArrows =
+                exitOnlyContainer.querySelector(".BE-arrowImage");
+              outsideArrow.style.top = `${
+                (innerArrows.getBoundingClientRect().top -
+                  outsideArrow.getBoundingClientRect().top) /
+                formHandler.vars.zoomLevel /
+                2
+              }px`;
+            }
+          }
+
+          if (
+            exitOnlyConfig.roundAllCorners &&
+            exitOnlyConfig.borderMode == "White Border"
+          ) {
+            exitOnlyContainer.style.borderTopLeftRadius =
+              "calc(var(--signBorderRadius) / 2)";
+            exitOnlyContainer.style.borderTopRightRadius =
+              "calc(var(--signBorderRadius) / 2)";
+            exitOnlyContainer.style.borderBottomLeftRadius =
+              "calc(var(--signBorderRadius) / 2)";
+            exitOnlyContainer.style.borderBottomRightRadius =
+              "calc(var(--signBorderRadius) / 2)";
+          }
+
+          break;
+        }
+        default: {
+          break;
         }
       }
 
       // Bottom Symbols
-
+      /*
       if (panel.sign.oSNum != "" && panel.sign.otherSymbol != "None") {
         signElmt.style.borderBottomLeftRadius = "0";
         signElmt.style.borderBottomRightRadius = "0";
@@ -1614,11 +2212,25 @@ const App = (() => {
           otherSymbolsElmt.appendChild(markerElmt);
         default:
       }
+      */
+    }
+
+    // redraw exit tab widths
+    for (const container of considerWidth.keys()) {
+      let width =
+        container.getBoundingClientRect().width / formHandler.vars.zoomLevel;
+      container.style.left = `-${width / 2}px`;
+      container.style.width = "0";
+      container.style.position = "relative";
+      container.style.transform = `translateX(${signHolderElmt.getBoundingClientRect().width / 2 / formHandler.vars.zoomLevel}px)`;
     }
   };
 
   const redraw = () => {
     const panelContainerElmt = document.getElementById("panelContainer");
+
+    // save sign to localstorage
+    SavesNTemplates.updateAutoSave(post);
 
     post.renderPost(
       document.querySelector("#postContainer"),
@@ -1664,13 +2276,7 @@ const App = (() => {
 
   const setPost = (newPost) => {
     post = newPost;
-    if (!post) {
-      return;
-    }
-
     currentlySelectedPanelIndex = 0;
-    formHandler.updateForm();
-    redraw();
   };
 
   return {
@@ -1689,7 +2295,6 @@ const App = (() => {
     removeSubPanel,
     changeEditingSubPanel,
     duplicateSubPanel,
-    resetPadding,
     newExitTabRow,
     removeExitTabRow,
     duplicateExitTabRow,
@@ -1706,6 +2311,7 @@ const App = (() => {
     delRow,
     newControlElem,
     delControlElem,
+    replaceControlElem,
 
     recheckWidth,
     newShieldGroup,
@@ -1714,7 +2320,7 @@ const App = (() => {
 
     getCurrentPanel,
     getCurrentSubPanel,
-    getCurrentBlockRows,
+    getCurrentBlockRow,
     getCurrentBlockElem,
     changeCurrentlyEditingShieldGroup,
     setSelectedShieldId,
@@ -1722,6 +2328,18 @@ const App = (() => {
 
     addAPLArrow,
     removeAPLArrow,
+    setSelectedStandardArrow,
+    addStandardArrow,
+    removeStandardArrow,
+    moveStandardArrow,
+    duplicateStandardArrow,
+
+    getSelectedBlockGroup,
+    getParentOfSelectedBlockGroup,
+    setSelectedBlockGroup,
+    getCurrentBlockElements,
+    getGroupNumFromElem,
+    resetSelectors,
 
     vars: {
       get currentlySelectedPanelIndex() {
@@ -1747,6 +2365,12 @@ const App = (() => {
       },
       get currentlySelectedShieldIndex() {
         return currentlySelectedShieldIndex;
+      },
+      get currentlySelectedStandardArrow() {
+        return currentlySelectedStandardArrow;
+      },
+      get currentlySelectedGroupIndex() {
+        return currentlySelectedGroupIndex;
       },
     },
   };

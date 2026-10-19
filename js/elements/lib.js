@@ -28,6 +28,21 @@ const lib = (function () {
     return optionElmt;
   };
 
+  const deepMerge = (target, source) => {
+    for (const key of Object.keys(source)) {
+      if (
+        source[key] instanceof Object &&
+        key in target &&
+        !Array.isArray(source[key])
+      ) {
+        deepMerge(target[key], source[key]);
+      } else {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  };
+
   // FHW-defined colors.
   const colors = {
     Green: "rgb(0, 95, 77)",
@@ -74,5 +89,6 @@ const lib = (function () {
     appendOption,
     colors,
     checkForContrast,
+    deepMerge,
   };
 })();

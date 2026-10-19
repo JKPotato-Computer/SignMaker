@@ -1,6 +1,7 @@
 .sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
   font-size: 1rem;
   position: relative;
+  font-weight: 500;
 }
 
 nav#sMConfigBar {
@@ -71,14 +72,6 @@ nav#sMConfigBar {
   z-index: 4;
 }
 
-#export {
-  background-color: rgba(255, 0, 0, 0.25);
-}
-
-#export.hover {
-  background-color: rgba(255, 0, 0, 0.5);
-}
-
 span.toolTip {
   position: fixed;
   transform: translateX(-50%) translateY(10px);
@@ -87,13 +80,12 @@ span.toolTip {
   padding: 0.2rem 0.5rem;
   font-size: 13px;
   opacity: 1;
-  transition:
-    0.25s ease-in-out transform,
-    0.25s ease-in-out opacity;
+  transition: 0.25s ease-in-out opacity;
   z-index: 10;
   font-family: "Inter";
   width: max-content;
   max-width: 200px;
+  transform: translateX(-50%);
 }
 
 label > .toolTip {
@@ -136,7 +128,7 @@ label span.toolTip,
   align-items: stretch;
   width: 12rem;
   height: 11rem;
-  position: absolute;
+  position: fixed;
   background-color: var(--hotbarColor);
   top: -12rem;
   left: 0;
@@ -181,6 +173,7 @@ label span.toolTip,
   overflow-y: auto;
   padding-right: 0.15rem;
   height: 100%;
+  position: relative;
 }
 
 .panelListButton {
@@ -202,36 +195,6 @@ label span.toolTip,
 .panelListButton.active {
   border-color: var(--selectedColor);
   background: rgba(var(--baseColor), 0.6);
-}
-
-.panelListButton.panelWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-}
-
-.panelListButton.dragging {
-  opacity: 0.5;
-  cursor: grabbing;
-  animation: none !important;
-}
-
-.panelListButton.dropBefore::before,
-.panelListButton.dropAfter::after {
-  content: "";
-  position: absolute;
-  left: 0.35rem;
-  right: 0.35rem;
-  height: 0.15rem;
-  background: var(--selectedColor);
-  border-radius: 0.15rem;
-  pointer-events: none;
-}
-
-.panelListButton.dropBefore::before {
-  top: -0.1rem;
-}
-
-.panelListButton.dropAfter::after {
-  bottom: -0.1rem;
 }
 
 .panelSpacingControl {
@@ -411,7 +374,6 @@ div.sMModalTitle {
   display: none !important;
 }
 
-div#sMPanelPadding,
 div#sMExitTabSetting,
 div#sMSPSettings {
   display: flex;
@@ -445,7 +407,8 @@ input:disabled {
   align-items: center;
   gap: 0.5rem;
   padding-right: 0.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: max-content;
 }
 
 .listNavOptions button,
@@ -470,7 +433,10 @@ input:disabled {
   flex-grow: 1;
   flex-direction: row;
   justify-content: left;
-  width: 10rem;
+  min-width: 10rem;
+  width: stretch;
+  max-width: 15rem;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
 }
 
 .resetClass {
@@ -528,46 +494,35 @@ dialog {
   width: 100%;
 }
 
-div.options {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid black;
-}
-
-#downloadContent .options {
+#downloadContent .downloadSignFooter {
   position: absolute;
   width: 100%;
   bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  gap: 0.5rem;
 }
 
-div.options button {
+#downloadContent h3 {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+div.downloadSignFooter button {
   padding: 0.5rem;
   font-size: 1.25rem;
+  flex-grow: 1;
 }
 
-div.options a {
+div.downloadSignFooter a {
   color: black;
 }
 
 #fileTypeOptions button {
   flex-grow: 1;
-}
-
-.SMSPNewElementHolder {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: rgb(var(--baseColor), 0.4);
-}
-
-.SMSPNewElementHolder > span {
-  font-size: 0.7rem;
 }
 
 /* OLD - TO CONFIGURE */
@@ -623,7 +578,8 @@ label:hover {
 }
 
 select {
-  background: rgb(240, 240, 240) url(../assets/other-symbols/select.svg)
+  background: rgb(240, 240, 240)
+    url("data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24'%20viewBox='0%20-960%20960%20960'%20width='24'%3e%3cpath%20d='M480-345%20240-585l56-56%20184%20184%20184-184%2056%2056-240%20240Z'/%3e%3c/svg%3e")
     no-repeat right;
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -686,6 +642,7 @@ input[type="button"]:not(
 button:disabled,
 input[type="button"]:disabled {
   cursor: default;
+  background-color: rgb(var(--baseColorInv), 0.2);
 }
 
 .textEditorBlock {
@@ -694,7 +651,6 @@ input[type="button"]:disabled {
   align-items: center;
   justify-content: center;
   padding: 0.3rem 0.65rem;
-  border-radius: 0.4rem;
   cursor: grab;
   user-select: none;
   transform-origin: center;
@@ -703,59 +659,9 @@ input[type="button"]:disabled {
     0.12s ease;
 }
 
-.textEditorBlock:active {
-  cursor: grabbing;
-}
-
-.textEditorBlock.blockWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-}
-
-.textEditorBlock.dragging {
-  opacity: 0.45;
-  cursor: grabbing;
-  animation: none;
-}
-
-.textEditorBlock.dropBefore::before,
-.textEditorBlock.dropAfter::after {
-  content: "";
-  position: absolute;
-  top: 15%;
-  bottom: 15%;
-  width: 0.2rem;
-  border-radius: 0.2rem;
-  background: var(--selectedColor);
-  pointer-events: none;
-}
-
-.textEditorBlock.dropBefore::before {
-  left: -0.2rem;
-}
-
-.textEditorBlock.dropAfter::after {
-  right: -0.2rem;
-}
-
-.sMControlRow.dropActive {
-  background-color: rgba(var(--baseColor), 0.35);
-}
-
-#sMSPCreateRow.dropActive {
-  outline: 2px dashed var(--selectedColor);
-  background-color: rgba(var(--baseColor), 0.45);
-}
-
-@keyframes textEditorBlockWiggle {
-  from {
-    transform: rotate(-2deg) scale(1.02);
-  }
-  to {
-    transform: rotate(2deg) scale(1.02);
-  }
-}
-
-.sdArrow_rotationButtons {
+.sdArrow_rotationButtons,
+.sdGuideArrows_rotationButtons,
+.sdExitOnlyGuide_rotationButtons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
@@ -763,16 +669,17 @@ input[type="button"]:disabled {
   justify-content: center;
 }
 
-.sdArrow_rotationButtons > * {
+.sdArrow_rotationButtons > *,
+.sdGuideArrows_rotationButtons > *,
+.sdExitOnlyGuide_rotationButtons > * {
   font-size: 20px;
   width: 10%;
 }
 
-#sdArrow_flipButton {
-  font-size: 24px;
-  margin-top: 0.5rem;
-  width: 10rem;
-  justify-self: center;
+.sdGuideArrows_rotationButtons > button.activated,
+.sdExitOnlyGuide_rotationButtons > button.activated,
+.sdArrow_rotationButtons > button.activated {
+  background-color: rgb(var(--baseColor));
 }
 
 .sMControlRow:hover {
@@ -784,59 +691,6 @@ textarea {
   min-height: 5rem;
   max-width: 25rem;
   transition: none;
-}
-
-#shieldBacksLabel {
-  width: auto;
-}
-
-.shields div {
-  border-radius: 0.25rem;
-
-  width: -moz-max-content;
-  width: -webkit-max-content;
-  width: intrinsic;
-}
-.shields div:nth-child(odd) {
-  background-color: rgba(var(--baseColor), 0.33);
-}
-
-.shields div:nth-child(even) {
-  background-color: rgba(var(--baseColor), 0.11);
-}
-
-.shields label,
-.shields select:first-of-type {
-  width: auto;
-}
-.shields label {
-  margin: 0;
-}
-
-.clear:hover {
-  background-color: rgb(247, 176, 176) !important;
-}
-
-#controlCitiesLabel {
-  position: relative;
-  top: -5rem;
-}
-
-#guideArrowLanes {
-  width: 2.25rem;
-}
-
-#actionMessage,
-#g_actionMessage {
-  width: 15.75rem;
-}
-
-#guideArrowLanes {
-  width: 3rem;
-}
-
-#oSNum {
-  margin-left: 8.5rem;
 }
 
 #currentPanel {
@@ -865,10 +719,10 @@ textarea {
 }
 
 #downloadContent {
-  background-color: rgb(226 236 255);
+  background-color: var(--hotbarColor);
   padding: 1rem;
-  width: 90%;
-  display: none;
+  width: max-content;
+  min-width: 70%;
   flex-direction: row;
   justify-content: center;
   gap: 1rem;
@@ -879,30 +733,77 @@ textarea {
 }
 
 #downloadContents {
-  width: 50%;
+  flex-grow: 1;
   position: relative;
 }
 
+#downloadPanelContainer {
+  margin-top: 0.5rem;
+}
+
+#downloadPanelList {
+  display: inline-flex;
+  gap: 0.25rem;
+  max-width: calc(100% - 9rem);
+  overflow: auto;
+}
+
+#downloadPanelList > button {
+  font-size: 1.25rem;
+  aspect-ratio: 1 / 1;
+  width: 1.5rem;
+}
+
+#downloadPanelList > button.selected {
+  background-color: rgb(var(--baseColorInv), 0.2);
+}
+
 #fileTypeOptions {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  border: 1px solid black;
+  width: calc(100% - 9rem);
 }
 
 #fileTypeOptions button {
   padding: 0.75rem;
 }
 
+#fileTypeOptions button.selected {
+  background-color: rgb(var(--baseColorInv), 0.2);
+}
+
+#downloadPreviewHolder {
+  display: flex;
+  flex-direction: column;
+  width: 40rem;
+}
+
+.downloadImageToolbar {
+  background-color: rgb(var(--baseColor), 0.3);
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem;
+  justify-content: left;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+#downloadImageZoomValue {
+  padding: 0 0.5rem;
+}
+
 #downloadPreview {
-  width: 49%;
-  display: inline-block;
-  background-color: rgb(144, 181, 255);
+  flex-grow: 1;
   overflow: auto;
-  text-align: center;
+  display: flex;
+  justify-content: safe center;
+  align-items: safe center;
+  background-color: var(--backgroundColor);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%23ffffff' fill-opacity='0.25'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 #PNG,
@@ -912,14 +813,6 @@ textarea {
 
 #singularPanel {
   display: none;
-}
-
-:root[data-theme="light"] .activated {
-  background-color: rgb(200, 200, 200);
-}
-
-:root[data-theme="dark"] .activated {
-  background-color: rgb(100, 100, 100);
 }
 
 .close {
@@ -934,15 +827,6 @@ textarea {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-}
-
-.controlTextArea {
-  font-size: 0.8rem;
-  font-family: "Clearview 4W";
-}
-
-.radioOption {
-  width: auto;
 }
 
 .exitTabGroup {
@@ -994,35 +878,6 @@ textarea {
 :root[data-theme="dark"] .exitTabButton:hover,
 :root[data-theme="dark"] .exitTabNestedButton:hover {
   background: rgb(0, 0, 200) !important;
-}
-
-.exitTabButton.blockWiggle {
-  animation: textEditorBlockWiggle 0.12s ease-in-out infinite alternate;
-}
-
-.exitTabButton.dragging {
-  opacity: 0.6;
-  animation: none;
-  cursor: grabbing;
-}
-
-.exitTabButton.dropBefore::before,
-.exitTabButton.dropAfter::after {
-  content: "";
-  position: absolute;
-  top: -0.25rem;
-  bottom: -0.25rem;
-  width: 0.2rem;
-  background: var(--selectedColor);
-  pointer-events: none;
-}
-
-.exitTabButton.dropBefore::before {
-  left: -0.25rem;
-}
-
-.exitTabButton.dropAfter::after {
-  right: -0.25rem;
 }
 
 nav#sMConfigBar.invisible {
@@ -1143,7 +998,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.15);
   padding: 0.25rem;
   width: 100%;
-  height: m;
+  min-height: 32px;
 }
 
 :root[data-theme="dark"] .smControlRow.selected {
@@ -1251,6 +1106,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.5);
   cursor: pointer;
   font-size: 1rem;
+  padding: 0;
 }
 
 .smSPShieldRow:hover {
@@ -1296,8 +1152,11 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 .dragIndicator {
   height: stretch;
   aspect-ratio: 1 / 1;
-  display: none;
   background: none;
+  width: auto;
+  flex-grow: 1;
+  font-size: 1.5rem;
+  font-family: "Material Symbols Outlined";
 }
 
 .dragIndicator > span {
@@ -1368,23 +1227,23 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   background-color: rgb(var(--baseColor), 0.2);
 }
 
-#shieldImgSelector {
+#shieldEditorModal {
   background: none;
   padding: 0;
   flex-direction: row;
-  height: 100%;
-  min-width: max-content;
+  height: 90%;
+  width: 70%;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  max-width: 70%;
+  justify-content: center;
 }
 
-#shieldImgSelector > div {
+#shieldEditorModal > div {
   padding: 1rem;
 }
 
-#shieldImgSelector > div {
+#shieldEditorModal > div {
   background: var(--hotbarColor);
 }
 
@@ -1395,27 +1254,42 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
   gap: 0.5rem;
 }
 
-.shieldLibrary > header {
+.shieldEditorPane {
+  flex-grow: 1;
+  overflow: auto;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+}
+
+.shieldEditorPane > header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.5rem;
 }
 
-#shieldImgSelectorClose,
+#shieldEditorClose,
 #shieldImgLibraryClose,
 #diagrammicDrawingClose,
+#customImagePickerClose,
 button[data-diagram-modal-close] {
   font-size: 20px;
   padding: 0.125rem 1rem;
   background-color: rgb(255, 0, 0, 0.2);
 }
 
+.customImagePickerContent > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
 .redButton {
   background-color: rgb(255, 0, 0, 0.2);
 }
 
-#shieldImgSelectorClose:hover,
+#shieldEditorClose:hover,
 #shieldImgLibraryClose:hover,
 #diagrammicDrawingClose:hover,
 button[data-diagram-modal-close]:hover,
@@ -1434,6 +1308,7 @@ button[data-diagram-modal-close]:hover,
 .shieldLibrary > nav button {
   font-size: 24px;
   padding: 0.5rem 2rem;
+  width: stretch;
 }
 
 .shieldLibrary > nav button.selected {
@@ -1480,7 +1355,7 @@ button[data-diagram-modal-close]:hover,
 }
 
 .shieldCategoryType.selected,
-.customShieldItem.selected {
+.custoamShieldItem.selected {
   background-color: rgb(0, 0, 255, 0.1);
 }
 
@@ -1546,10 +1421,18 @@ button[data-diagram-modal-close]:hover,
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 30%;
+  gap: 0.5rem;
+}
+
+#editShieldBtn {
+  padding: 0.25rem 1rem;
+  font-size: 24px;
+  gap: 0.5rem;
 }
 
 .selectedShieldPreview {
-  height: 164px;
+  height: 5rem;
   background-color: var(--shieldBackColor, rgb(0, 0, 255, 0.8));
   border-radius: var(--shieldBackRadius);
 }
@@ -1557,15 +1440,35 @@ button[data-diagram-modal-close]:hover,
 .selectedShieldName {
   font-size: 24px;
   font-weight: 600;
+  text-align: center;
+  max-width: 8rem;
+  overflow: scroll;
+  scrollbar-color: rgb(var(--baseColorInv), 0.25) transparent;
+  text-wrap: nowrap;
 }
 
 .shieldPreview > footer {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.shieldPreview > footer > button {
+  font-size: 20px;
+  padding: 0.25rem 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 #setShield {
-  font-size: 24px;
-  padding: 0.25rem 2rem;
+  justify-content: center;
 }
 
 #uploadShield {
@@ -1604,12 +1507,44 @@ button[data-diagram-modal-close]:hover,
   border-color: #4caf50;
 }
 
+#customImageUploadField {
+  background-color: rgb(0, 0, 0, 0.1);
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#customImageUploadField > span.material-symbols-outlined {
+  font-size: 64px;
+}
+
+#customImageUploadField:hover {
+  background-color: rgb(0, 0, 0, 0.2);
+  border-color: #666;
+}
+
+#customImageUploadField.dragover {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: #4caf50;
+}
+
+#customImageUploadField input[type="file"] {
+  display: none;
+}
+
 .shieldUploadDisclaimer {
   font-size: 12px;
   padding: 0.25rem;
   color: rgb(100, 100, 100);
   overflow-wrap: break-word;
-  width: 25rem;
+  /* width: 25rem; */
 }
 
 #linkUpload {
@@ -1622,6 +1557,11 @@ button[data-diagram-modal-close]:hover,
   flex-direction: column;
 }
 
+#customImageList {
+  display: flex;
+  flex-direction: column;
+}
+
 .customShieldItem {
   display: flex;
   flex-direction: row;
@@ -1629,14 +1569,17 @@ button[data-diagram-modal-close]:hover,
   align-items: center;
   cursor: pointer;
   padding: 0.5rem;
+  width: 100%;
 }
 
-.deleteCustomShieldBtn {
+.deleteCustomShieldBtn,
+.deleteCustomImage {
   background: rgb(255, 0, 0, 0.3);
   padding: 0.5rem;
 }
 
-.deleteCustomShieldBtn:hover {
+.deleteCustomShieldBtn:hover,
+.deleteCustomImage:hover {
   background: rgb(255, 0, 0, 0.8) !important;
 }
 
@@ -2039,9 +1982,13 @@ div.sMET_typeSelect {
   width: 100%;
 }
 
+div.sMET_typeSelect > button {
+  flex: 1 1 calc(33.333% - 0.75rem);
+}
+
 div.sMET_typeSelect > button,
 div.sMA_typeSelect > button {
-  height: 5.5rem;
+  height: max-content;
   width: max-content;
   position: relative;
   padding: 0;
@@ -2049,8 +1996,8 @@ div.sMA_typeSelect > button {
 }
 
 div.sMA_typeSelect > button {
-  height: 9rem;
   font-size: 1rem;
+  flex: 1 1 calc(33.333% - 0.75rem);
 }
 
 div.sMET_typeSelect > button.selected > span,
@@ -2061,7 +2008,7 @@ div.sMA_typeSelect > button.selected > span {
 
 img.sMET_typeVisual,
 img.sMA_typeVisual {
-  height: 100%;
+  width: 100%;
 }
 
 .smET_typeLabel,
@@ -2687,7 +2634,8 @@ option.presetExitTab:hover {
   display: none;
 }
 
-.exitTabConfig:has(#sMET_variantIsTollIcon:not(:checked)) #sMET_variantTollIcon {
+.exitTabConfig:has(#sMET_variantIsTollIcon:not(:checked))
+  #sMET_variantTollIcon {
   display: none;
 }
 
@@ -2696,5 +2644,451 @@ option.presetExitTab:hover {
 }
 
 #sMET_variantAddon {
+  width: 10rem;
+}
+
+small {
+  font-size: 10px;
+}
+
+.shieldEditorPane > details[open]:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+summary {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  color: white;
+  cursor: pointer;
+  font-family: "Overpass";
+  font-weight: 500;
+  font-size: 1.25rem;
+  transition: 0.25s ease-in-out;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+details[open] > summary {
+  background-color: rgb(0, 0, 255);
+}
+
+summary::before {
+  font-family: "Material Symbols Outlined";
+  content: "arrow_drop_down";
+  font-size: 2rem;
+  line-height: 0;
+}
+
+summary::after {
+  content: " (Expand)";
+}
+
+details[open] > summary::after {
+  content: " (Collapse)";
+}
+
+details[open] > summary::before {
+  content: "arrow_drop_up";
+}
+
+summary:hover {
+  background-color: rgb(0, 0, 255, 0.75);
+}
+
+.shieldEditorImagePreview {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  gap: 1rem;
+}
+
+.shieldEditorImagePreview > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shieldEditorImagePreview > div:nth-child(2) {
+  flex-grow: 1;
+}
+
+#spShield_routeNumber,
+#spShield_designation {
+  width: calc(100% - 14rem);
+}
+
+#shieldPreviewImage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.25);
+  aspect-ratio: 1 / 1;
+  color: white;
+  overflow: hidden;
+}
+
+#scaleOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+#scaleOptions > button {
+  width: 100%;
+  font-size: 20px;
+}
+
+#scaleOptions > button.selected {
+  background-color: rgb(0, 0, 255, 0.9);
+  color: white;
+}
+
+#shieldBaseName {
+  text-wrap: nowrap;
+  width: 100%;
+  overflow: auto;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.smET_shieldListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: rgb(var(--baseColor), 0.65);
+  padding: 0.25rem;
+}
+
+#smET_shieldList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.smET_shieldListItemImage {
+  height: 2rem;
+  aspect-ratio: 1 / 1;
+  margin-right: 0;
+}
+
+.smET_shieldListItemText {
+  margin-right: auto;
+}
+
+.sMET_shieldListItemEdit {
+  font-size: 20px;
+  padding: 0.25rem 1rem;
+}
+
+.sMET_shieldListItemCategory {
+  height: stretch;
+  margin: 0;
+}
+
+.sMET_shieldListItemDelete {
+  height: stretch;
+  aspect-ratio: 1 / 1;
+}
+
+#smET_addShield {
+  font-size: 20px;
+  padding: 0.25rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.visual-box {
+  background-color: rgb(var(--baseColorInv), 0.25);
+  border: 3px dashed rgb(var(--baseColorInv));
+}
+
+#sdTollLogoHolder {
+  width: 50%;
+  display: inline-block;
+}
+
+#sdTollLogo_backgroundColor {
+  width: 70%;
+}
+
+#objectSubpanelAdd {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+}
+
+#sdArrow_arrow {
+  width: 60%;
+  display: inline-block;
+}
+
+#guideArrow {
+  width: 15rem;
+}
+
+.standardArrow_selectHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  width: 100%;
+}
+
+.standardArrow_selectHeader > span {
+  font-size: 16px;
+}
+
+#standardArrowList {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  margin-top: 0.5rem;
+  max-height: 15rem;
+  min-height: 5rem;
+  overflow: auto;
+  gap: 0.25rem;
+}
+
+.standardArrowListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 100%;
+}
+
+.standardArrowListItem.selected {
+  background-color: rgb(var(--baseColor));
+}
+
+.standardArrowListItem > .standardArrowListItem_imageHolder {
+  background-color: black;
+  padding: 0.5rem;
+  aspect-ratio: 1 / 1;
+}
+
+.standardArrowListItem_imageHolder > img {
+  height: 2rem;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
+.standardArrowListItem > .dragIndicator {
+  flex-grow: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 2rem;
+}
+
+.standardArrowListItem > span {
+  flex-grow: 1;
+  font-size: 24px;
+}
+
+#guideStandardArrow {
+  display: inline-block;
+  width: calc(100% - 8rem);
+}
+
+#standardArrowProperties {
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+}
+
+#standardArrowGeneralSettings,
+#standardArrowExitOnlySettings {
+  margin-top: 0.5rem;
+}
+
+#exitOnlyArrowType {
+  width: calc(100% - 8rem);
+  display: inline-block;
+}
+
+.iconsDropdownCustom {
+  width: 100%;
+  padding: 0.25rem;
+  background-color: rgb(0, 0, 255, 0.75);
+  font-size: 24px;
+  color: white;
+}
+
+.iconsDropdownCustom:hover {
+  background-color: rgb(0, 0, 255) !important;
+}
+
+.customImageItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  width: 100%;
+  background: rgb(var(--baseColor), 0.2);
+}
+
+.customImageUrlUpload {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#customImageUrlUpload {
+  padding: 0.25rem 1rem;
+}
+
+.customImageSelectButton {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  background: none;
+}
+
+#smSPExitGroupedBlock {
+  height: stretch;
+  padding: 0.25rem 0.5rem;
+}
+
+#sdGroup_editGroup {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#downloadImageSize {
+  margin-left: auto;
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > fieldset {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > fieldset > div {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+#sMCreationsSaved > fieldset > div > button {
+  padding: 0.5rem 1rem;
+}
+
+#sMCreationsSavedList,
+#sMCreationsTemplatesList {
+  display: flex;
+  flex-direction: column;
+  width: 30rem;
+}
+
+.sMCreationsSavedItem:nth-child(odd),
+.sMCreationsTemplateItem:nth-child(odd) {
+  background-color: rgb(var(--baseColor), 0.3);
+}
+
+.sMCreationsSavedItem:nth-child(even),
+.sMCreationsTemplateItem:nth-child(even) {
+  background-color: rgb(var(--baseColor), 0.15);
+}
+
+.sMCreationsSavedItem,
+.sMCreationsTemplateItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 30rem;
+}
+
+.sMCreationsSavedItem > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+}
+
+.sMCreationsSavedItem > div:nth-child(2) {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sMCreationsSavedItem > div:nth-child(2) > button {
+  flex-grow: 1;
+  width: 33%;
+  padding: 0.5rem 0.75rem;
+}
+
+.sMCreationsTemplateItem > button {
+  padding: 0.5rem 0.75rem;
+}
+
+.sMCreationsTemplateItem > span {
+  flex-grow: 1;
+}
+
+.sMCreationsFileName,
+.sMCreationsTemplateName {
+  text-wrap: wrap;
+}
+
+.sMCreationsFileSaveDate {
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > h3 {
+  display: inline-block;
+}
+
+#sMCreationsSearchList {
+  display: inline;
+  float: right;
+  width: 15rem;
+}
+
+#sMCreationsTemplateSearch {
+  display: inline;
+  float: right;
   width: 10rem;
 }

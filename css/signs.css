@@ -216,7 +216,7 @@
 
 .panel.round .signCorner,
 .panel.round .guideArrowsHolder {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 .panel:not(.round) .guideArrowsHolder:has(.guideArrows.apl) {
@@ -267,18 +267,14 @@
   display: flex;
   clear: both;
   border-radius: var(--signBorderRadius, 0.75rem);
-  border-style: solid;
-  border-width: 0.2rem;
+  border: .2rem solid;
   clear: both;
-  visibility: visible;
   overflow: hidden;
+  visibility: visible;
   z-index: 2;
   position: relative;
 }
 
-.panel .tabVisible {
-  visibility: visible;
-}
 .sideLeftArrow,
 .sideRightArrow {
   margin-top: auto;
@@ -290,10 +286,12 @@
 
 .sideLeftArrow {
   margin-left: 1rem;
+  rotate: -45deg;
 }
 
 .sideRightArrow {
   margin-right: 1rem;
+  rotate: 45deg;
 }
 
 .signContentContainer {
@@ -302,17 +300,6 @@
   padding: 0.3rem 0.75rem 0.3rem 0.75rem;
 }
 
-.markerImg {
-  height: 1.5rem;
-  top: 0.25rem;
-  position: relative;
-  z-index: 0;
-}
-.left .markerImg {
-  transform: scaleX(-1);
-  -webkit-transform: scaleX(-1);
-  -moz-transform: scaleX(-1);
-}
 .otherSymbols {
   display: inline-flex;
   flex-direction: column;
@@ -378,259 +365,78 @@
   z-index: 3;
 }
 
-.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only) {
-  background-color: var(--yellow);
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only.white_border) {
+  background-color: var(--green);
 }
 
-.guideArrowsHolder:has(.guideArrows.none) {
+.panel:not(.round)
+  .guideArrowsHolder:has(
+    .guideArrows.exit_only.partial_black_border,
+    .guideArrows.exit_only.full_black_border
+  ) {
+  background-color: var(--bgColor);
+}
+
+.guideArrowsHolder:has(
+  .guideArrows.none,
+  .guideArrows.side_left,
+  .guideArrows.side_right
+) {
   display: none;
 }
 
-.guideArrows.exit_only {
-  border-color: var(--black);
-  color: var(--black);
-  background-color: var(--yellow);
+.guideArrows.exit_only.partial_black_border,
+.guideArrows.exit_only.full_black_border {
+  border-color: inherit;
+  color: inherit;
+  background-color: var(--bgColor);
 }
 
-.guideArrows.new,
-.guideArrows.new2 {
-  border-color: var(--white) !important;
-  background-color: var(--green) !important;
-  padding: 0px 2px 2px 2px;
+.guideArrows.exit_only.full_black_border {
+  border-top: 0.2rem solid black;
 }
 
-.guideArrows.split_exit.only {
-  padding: 0rem 0.5rem 0.25rem 0.5rem;
+.guideArrows.exit_only.white_border {
+  padding: 0 0.2rem 0.2rem 0.2rem;
 }
 
-.guideArrows.split_exit.only .arrowContainer {
-  gap: 0.5rem;
-}
-
-.guideArrows.half_exit.only.new2 {
-  background: var(--green) !important;
-}
-
-.guideArrows.half_exit.only.default {
-  padding: 0;
-  position: relative;
-  overflow: visible;
-}
-
-.guideArrows.half_exit.only {
-  color: black !important;
-}
-
-.guideArrows.half_exit.only.default.halfExitNoBorder::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.25rem;
-  height: 0.35rem;
-  background: var(--white);
-  border-bottom-left-radius: 0.9rem;
-  border-bottom-right-radius: 0.9rem;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.guideArrows.half_exit.only.default .arrowContainer {
-  position: relative;
-  z-index: 1;
-}
-
-.halfarrow {
-  height: 1.8rem;
-  position: relative;
-  margin-left: 0rem;
-}
-
-.specialExitOnly {
-  --fhwaBaselineOffset: var(--fhwaBaselineShift);
-  color: var(--black);
-  background-color: var(--yellow);
-  font-family: "Series EM";
-  border-radius: 0.2rem;
-  border-width: 0rem;
-  padding: 0.1rem;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-
-.otherSymbols + .actionMessage {
-  padding-right: 0.2rem;
-}
-
-.exitFormat {
-  display: inline;
-  --exitTabTextBaseOffset: -0.1rem;
-}
-
-.exitOnlyArrow {
-  display: inline-block;
-
-  margin-top: 0.1em;
-
-  height: 2rem;
-
-  padding: 2px;
-}
-.arrowContainer.hideExitOnlyArrows .exitOnlyArrow,
-.arrowContainer.hideExitOnlyArrows .halfarrow {
-  opacity: 0;
-}
-
-.exitOnlyText {
-  --fhwaBaselineOffset: var(--fhwaBaselineShift);
-  font-family: "Series E";
-  padding: 0px 10px 0 10px;
-  padding-top: 0.18rem;
-  font-size: 1rem;
-  /* letter-spacing: 0.03rem; */
-  margin: -1rem 0rem;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-
-.exitOnlyText.split {
-  --fhwaBaselineOffset: var(--fhwaBaselineShift);
-  background-color: var(--yellow);
-  color: var(--black);
-  border-radius: 0.1rem;
-  font-size: 0.95rem;
-  padding: 0px 3px 0px 3px;
-  margin-left: 0.3rem;
-  margin-right: 0.3rem;
-  margin-top: 0.5rem;
-  font-family: "Series EM";
-  height: 1.15rem;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-
-.exitOnlySpace {
-  margin-right: 5rem;
-}
-
-.oText {
-  margin: 0 1rem;
-}
-
-.arrow {
-  font-size: 4rem; /* Makes arrows large and visble */
-  line-height: 0; /* Makes space text (arrow) takes up minimal */
-  display: inline-block;
-  margin: 0.5rem 5rem;
-  padding: 0 0.1rem 0 0.05rem;
-  height: 1.8rem;
+.guideArrows.exit_only.white_border > .arrowContainer {
+  background-color: var(--bgColor);
+  border-bottom-left-radius: calc(var(--signBorderRadius) / 2);
+  border-bottom-right-radius: calc(var(--signBorderRadius) / 2);
+  color: black;
 }
 
 .arrowContainer {
   display: flex;
-  justify-content: center;
+  justify-content: var(--arrowJustify);
   align-items: center;
-  /* gap: 3rem; */
+  gap: var(--arrowGap);
 }
 
-.arrow:first-child {
-  margin-left: 1rem;
-}
-.arrow:last-child {
-  margin-right: 1rem;
+.arrowContainer:has(.arrowContainer.halfexitonly) {
+  justify-content: space-between;
 }
 
-.arrowContainer .left {
-  margin-right: 1rem;
+.guideArrows.full_black_border .arrowContainer.halfExitOnly {
+  border: 0.2rem solid black;
 }
 
-.arrowContainer .middle {
-  float: none;
-}
-
-.arrowContainer .right {
-  margin-left: 1rem;
-}
-
-.centerText .arrow {
-  margin-right: 0.5rem;
-  margin-top: -0.25rem;
-}
-
-.actionMessage + .arrow {
-  margin-left: 0.5rem;
-}
-
-.arrow.sharpleft,
-.arrow.sharpright,
-.arrow.leftarrow,
-.arrow.rightarrow {
-  height: 3rem;
-}
-
-.actionMessage {
-  --fhwaBaselineOffset: 0px;
-  font-size: 1.2rem;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
-}
-
-.numeral {
-  font-size: 1.5em;
-  word-spacing: -0.4rem;
-  line-height: 0;
-}
-.fraction {
-  font-size: 1.5rem;
-}
-
-.numeral:first-child,
-.fraction:first-child {
-  padding-right: 0.5rem;
-}
-.numeral:last-child,
-.fraction:last-child {
-  padding-left: 0.5rem;
-}
-
-.numeral.special,
-.fraction.special {
-  padding-left: 0rem;
-}
-
-.numeral.special {
-  padding-left: 0.4rem;
-  padding-right: 0.2rem;
-}
-
-.fraction.special {
-  padding-right: 0.4rem;
-}
-
-.centerText .numeral:last-child,
-.centerText .fraction:last-child {
-  padding-left: 0rem;
-}
-
-.yellowElmt {
-  background-color: var(--yellow);
-  color: var(--black);
-  border-radius: 5px;
-  font-family: "Series E";
-  padding: 0.3rem 0.7rem;
+.arrowContainer.halfExitOnly {
   width: max-content;
-  width: -webkit-max-content;
-  width: -moz-max-content;
-  font-size: 1rem;
-  line-height: 1.2rem;
-  margin: 0.2rem 0rem;
-  text-box-trim: trim-both;
-  text-box-edge: cap alphabetic;
+  height: stretch;
+  padding: var(--splitVerticalPadding) var(--splitHorizontalPadding);
+  flex-direction: row;
+  background-color: var(--bgColor);
+  color: black;
 }
 
-.exitOnlyText.yellowElmt,
-.TOLL {
-  margin-top: 0;
+.guideArrows.white_border .arrowContainer:has(.arrowContainer.halfexitonly) {
+  padding: 0 0.2rem 0.2rem 0.2rem;
+}
+
+.halfExitOnlyOutsideArrow {
+  position: relative;
 }
 
 .subPanelDisplay {
@@ -638,52 +444,16 @@
 }
 
 .subDivider {
-  width: 4px;
-  background-color: var(--white);
+  width: .2rem;
   min-width: 4px;
-}
-
-.arrowContainer.new {
-  background: var(--yellow);
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-  width: 100%;
-  padding: 0.32rem 0 0.32rem 0;
-}
-
-.arrowContainer.left.new2 {
-  background-color: var(--yellow);
-  border-bottom-left-radius: 0.5rem;
-}
-
-.arrowContainer.right.new2 {
-  background-color: var(--yellow);
-  border-bottom-right-radius: 0.5rem;
-}
-
-img.exitOnlyArrow:first-child {
-  padding-left: 0.8rem;
-  padding-right: 0.45rem;
-}
-
-img.exitOnlyArrow:last-child {
-  padding-right: 0.8rem;
-  padding-left: 0.6rem;
-}
-
-.tagOnlyText {
-  color: black;
-  background: white;
-  padding: 0.3rem 0.3rem 0.2rem 0.3rem;
-  font-family: "Series E";
-  line-height: 0.8rem;
-}
-
-.exitTab:has(.tagOnlyText) {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.4rem;
+  flex-direction: column;
+}
+
+.subDividerSegment {
+  width: 100%;
+  position: relative;
+  flex: 0 0 auto;
 }
 
 img.diagrammicImage {

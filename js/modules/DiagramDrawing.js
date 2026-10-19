@@ -148,6 +148,7 @@ class Road {
       arrowWidth: 0, // number, width of arrow (0 = auto)
       bottomOffset: 40, // number, how "dented" the arrow base is
       roundness: 5, // number, how "round" the corners are
+      pointedTip: false,
     },
     subpanel = {
       enabled: false, // boolean, where the road is
@@ -157,6 +158,7 @@ class Road {
       direction: null, // "left", "right", "top", "bottom",
       manualDirection: "auto", // "auto", "left", "right", "top", "bottom"
     },
+    roadMarkingsEnabled = true,
   } = {}) {
     this.numLanes = numLanes;
     this.roadType = roadType;
@@ -172,8 +174,10 @@ class Road {
     this.arrows = {
       enabled: false,
       arrowHeight: 120,
+      arrowWidth: 0,
       bottomOffset: 40,
       roundness: 5,
+      pointedTip: false,
       ...arrows,
     };
 
@@ -188,6 +192,7 @@ class Road {
     this.calculatedPath2D = null;
     this.roadIsRendered = false;
     this.previousRoad = null;
+    this.roadMarkingsEnabled = roadMarkingsEnabled;
   }
 
   // drawing
@@ -550,14 +555,22 @@ class Road {
 
           let centerEdgeStart = Point.lerp(leftEdgeNotch, pointHeadNotch, 0.8);
           centerEdgeStart = new Point(
-            centerEdgeStart.x - this.arrows.roundness * Math.cos(headingAngle),
-            centerEdgeStart.y - this.arrows.roundness * Math.sin(headingAngle),
+            centerEdgeStart.x -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.cos(headingAngle),
+            centerEdgeStart.y -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.sin(headingAngle),
           );
 
           let centerEdgeEnd = Point.lerp(rightEdgeNotch, pointHeadNotch, 0.8);
           centerEdgeEnd = new Point(
-            centerEdgeEnd.x - this.arrows.roundness * Math.cos(headingAngle),
-            centerEdgeEnd.y - this.arrows.roundness * Math.sin(headingAngle),
+            centerEdgeEnd.x -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.cos(headingAngle),
+            centerEdgeEnd.y -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.sin(headingAngle),
           );
 
           pointsToDraw.push(this.endPoint);
@@ -658,14 +671,22 @@ class Road {
 
           let centerEdgeStart = Point.lerp(leftEdgeNotch, pointHeadNotch, 0.8);
           centerEdgeStart = new Point(
-            centerEdgeStart.x - this.arrows.roundness * Math.cos(headingAngle),
-            centerEdgeStart.y - this.arrows.roundness * Math.sin(headingAngle),
+            centerEdgeStart.x -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.cos(headingAngle),
+            centerEdgeStart.y -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.sin(headingAngle),
           );
 
           let centerEdgeEnd = Point.lerp(rightEdgeNotch, pointHeadNotch, 0.8);
           centerEdgeEnd = new Point(
-            centerEdgeEnd.x - this.arrows.roundness * Math.cos(headingAngle),
-            centerEdgeEnd.y - this.arrows.roundness * Math.sin(headingAngle),
+            centerEdgeEnd.x -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.cos(headingAngle),
+            centerEdgeEnd.y -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.sin(headingAngle),
           );
 
           pointsToDraw.push(this.endPoint);
@@ -763,14 +784,22 @@ class Road {
 
           let centerEdgeStart = Point.lerp(leftEdgeNotch, pointHeadNotch, 0.8);
           centerEdgeStart = new Point(
-            centerEdgeStart.x - this.arrows.roundness * Math.cos(headingAngle),
-            centerEdgeStart.y - this.arrows.roundness * Math.sin(headingAngle),
+            centerEdgeStart.x -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.cos(headingAngle),
+            centerEdgeStart.y -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.sin(headingAngle),
           );
 
           let centerEdgeEnd = Point.lerp(rightEdgeNotch, pointHeadNotch, 0.8);
           centerEdgeEnd = new Point(
-            centerEdgeEnd.x - this.arrows.roundness * Math.cos(headingAngle),
-            centerEdgeEnd.y - this.arrows.roundness * Math.sin(headingAngle),
+            centerEdgeEnd.x -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.cos(headingAngle),
+            centerEdgeEnd.y -
+              (this.arrows.pointedTip ? 0 : this.arrows.roundness) *
+                Math.sin(headingAngle),
           );
 
           pointsToDraw.push(this.endPoint);
@@ -808,7 +837,7 @@ class Road {
 
       ctx.lineTo(pointsToDraw[4].x, pointsToDraw[4].y);
 
-      if (this.arrows.roundness > 0) {
+      if (this.arrows.roundness > 0 && !this.arrows.pointedTip) {
         ctx.quadraticCurveTo(
           pointsToDraw[5].x,
           pointsToDraw[5].y,
@@ -1157,8 +1186,15 @@ const DiagramDrawing = (() => {
     selectedRoad.endAngle =
       (parseFloat(document.querySelector("#roadwayEndAngle").value) * Math.PI) /
       180;
+    selectedRoad.roadMarkingsEnabled = document.querySelector(
+      "#roadwayShowLaneMarkings",
+    ).checked;
+
     selectedRoad.arrows.enabled =
       document.querySelector("#objectShowArrow").checked;
+    selectedRoad.arrows.pointedTip = document.querySelector(
+      "#objectArrowPointedTip",
+    ).checked;
     selectedRoad.arrows.arrowHeight = parseFloat(
       document.querySelector("#objectArrowHeight").value,
     );
@@ -1316,6 +1352,9 @@ const DiagramDrawing = (() => {
       (selectedRoad.endAngle * 180) /
       Math.PI
     ).toFixed(0);
+    document.querySelector("#roadwayShowLaneMarkings").checked =
+      selectedRoad.roadMarkingsEnabled;
+
     document.querySelector("#objectShowArrow").checked =
       selectedRoad.arrows.enabled;
     document.querySelector("#objectArrowHeight").value =
@@ -1326,6 +1365,8 @@ const DiagramDrawing = (() => {
       selectedRoad.arrows.bottomOffset;
     document.querySelector("#objectArrowRoundness").value =
       selectedRoad.arrows.roundness;
+    document.querySelector("#objectArrowPointedTip").checked =
+      selectedRoad.arrows.pointedTip;
     document.querySelector("#objectShowSubpanel").checked =
       selectedRoad.subpanel.enabled;
 
@@ -1388,9 +1429,17 @@ const DiagramDrawing = (() => {
       .arrows.enabled
       ? ""
       : "none";
+    document.querySelector("#objectArrowPointedTip").style.display =
+      selectedRoad.arrows.enabled ? "" : "none";
+    document.querySelector('label[for="objectArrowPointedTip"]').style.display =
+      selectedRoad.arrows.enabled ? "" : "none";
     document.querySelector('label[for="objectArrowRoundness"]').style.display =
       selectedRoad.arrows.enabled ? "" : "none";
     document.querySelector("#objectSubpanelNumber").style.display = selectedRoad
+      .subpanel.enabled
+      ? ""
+      : "none";
+    document.querySelector("#objectSubpanelAdd").style.display = selectedRoad
       .subpanel.enabled
       ? ""
       : "none";
@@ -1786,7 +1835,7 @@ const DiagramDrawing = (() => {
 
       nextRoad.node.drawRoadSegment(nextRoad.parentNode);
 
-      if (nextRoad.node.numLanes > 1) {
+      if (nextRoad.node.numLanes > 1 && nextRoad.node.roadMarkingsEnabled) {
         hasLaneMarkings.push(nextRoad.node);
       }
 
@@ -1874,7 +1923,7 @@ const DiagramDrawing = (() => {
     editorProperties.points.shiftRight = null;
     editorProperties.points.subpanelPoint = null;
     document.querySelector("#diagramFileName").value = "";
-    document.body.style.cursor = "default";
+    document.body.style.cursor = "";
     ctx.clearRect(
       0,
       0,
@@ -2145,7 +2194,7 @@ const DiagramDrawing = (() => {
           ) {
             document.body.style.cursor = "pointer";
           } else {
-            document.body.style.cursor = "default";
+            document.body.style.cursor = "";
           }
 
           if (editorProperties.cursorState != "DRAG") {
@@ -2710,6 +2759,52 @@ const DiagramDrawing = (() => {
         },
       );
 
+      editorConnections.importDiagram = trackEditorConnection(
+        document.querySelector("#importDiagram"),
+        "click",
+        async () => {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".json";
+          input.onchange = async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+              const text = await file.text();
+              const data = JSON.parse(text);
+
+              const fileName = file.name;
+              loadDiagram(data);
+              document.querySelector("#diagramFileName").value =
+                fileName.replace(/\.json$/, "");
+            }
+          };
+          input.click();
+          input.remove();
+        },
+      );
+
+      editorConnections.exportDiagram = trackEditorConnection(
+        document.querySelector("#exportDiagram"),
+        "click",
+        () => {
+          const diagram = saveDiagram();
+          const dataStr =
+            "data:text/json;charset=utf-8," +
+            encodeURIComponent(JSON.stringify(diagram));
+          const downloadAnchorNode = document.createElement("a");
+          downloadAnchorNode.setAttribute("href", dataStr);
+          downloadAnchorNode.setAttribute(
+            "download",
+            (document.querySelector("#diagramFileName").value == ""
+              ? "diagram"
+              : document.querySelector("#diagramFileName").value) + ".json",
+          );
+          document.body.appendChild(downloadAnchorNode);
+          downloadAnchorNode.click();
+          downloadAnchorNode.remove();
+        },
+      );
+
       if (promptPresets) {
         document.querySelector("#diagramLoadPresets").click();
       }
@@ -2919,3 +3014,6 @@ const DiagramDrawing = (() => {
     init,
   };
 })();
+
+window.Point = Point;
+window.Road = Road;

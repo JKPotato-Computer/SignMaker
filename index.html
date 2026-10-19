@@ -9,7 +9,12 @@
       content="The ULTIMATE Sign Maker for highways, expressways, and everything!"
     />
     <title>Highway Sign Maker</title>
-    <link rel="icon" type="image/x-icon" href="assets/other-symbols/icon.png" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      r
+      href="assets/other-symbols/SignMakerFavicon.png"
+    />
     <!-- CSS Links -->
     <link href="css/fonts.css" rel="stylesheet" type="text/css" />
     <link href="css/page.css" rel="stylesheet" type="text/css" />
@@ -20,10 +25,36 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
-    <script src="https://cdn.jsdelivr.net/gh/peterhry/CircleType@2.3.1/dist/circletype.min.js"></script>
-    <script src="js/packages/HtmlToImage.js" type="text/javascript"></script>
+    <script type="module">
+      // compatability w/ npx vite
+      import terminal from "virtual:terminal";
 
+      window.addEventListener("error", (event) => {
+        terminal.error(
+          `[Browser Error] ${event.message} at ${event.filename}:${event.lineno}`,
+        );
+      });
+
+      window.addEventListener("unhandledrejection", (event) => {
+        const error = event.reason;
+        if (error && error.stack) {
+          const matches = error.stack.match(/(https?:\/\/[^)\s]+):(\d+):(\d+)/);
+
+          if (matches) {
+            const fileName = matches[1];
+            const lineNumber = matches[2];
+            const columnNumber = matches[3];
+            console.log(
+              `[Browser Error] ${error} @ File: ${fileName} Line: ${lineNumber}, Column: ${columnNumber}`,
+            );
+          }
+        }
+      });
+    </script>
+
+    <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
+    <script src="js/presets/TemplatePresets.js" type="text/javascript"></script>
 
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
     <script src="js/elements/lib.js" type="text/javascript"></script>
@@ -36,18 +67,28 @@
     <script src="js/elements/ExitTab.js" type="text/javascript"></script>
     <script src="js/elements/SubPanels.js" type="text/javascript"></script>
     <script
-      src="js/modules//DiagramDrawing.js"
+      src="js/modules/DiagramDrawing.js"
+      type="text/javascript"
+      defer
+    ></script>
+    <script src="js/navigation/DragSystem.js" type="text/javascript"></script>
+    <script
+      src="js/modules/ShieldEditor.js"
       type="text/javascript"
       defer
     ></script>
     <script src="js/FormHandler.js" type="text/javascript"></script>
     <script
       src="js/navigation/FormNavigation.js"
-      text="text/javascript"
+      type="text/javascript"
     ></script>
     <script src="js/modules/IndexDBManager.js" type="text/javascript"></script>
     <script
       src="js/modules/databases/CustomShields.js"
+      type="text/javascript"
+    ></script>
+    <script
+      src="js/modules/databases/CustomImages.js"
       type="text/javascript"
     ></script>
     <script
@@ -60,7 +101,16 @@
       type="text/javascript"
       defer
     ></script>
-    <script src="js/modules/ImportExport.js" type="text/javascript"></script>
+    <script
+      src="js/modules/ImportExport.js"
+      type="text/javascript"
+      defer
+    ></script>
+    <script
+      src="js/modules/databases/SavesNTemplates.js"
+      type="text/javascript"
+      defer
+    ></script>
     <script src="js/App.js" type="text/javascript"></script>
     <script>
       const applyTheme = (theme) => {
@@ -88,9 +138,13 @@
     </a>
     <div id="zoomControl">
       <span>Zoom</span>
-      <button id="zoomOut" onclick="formHandler.zoom(-0.25)">-</button>
+      <button type="button" id="zoomOut" onclick="formHandler.zoom(-0.25)">
+        -
+      </button>
       <span id="zoomLevel">100%</span>
-      <button id="zoomIn" onclick="formHandler.zoom(0.25)">+</button>
+      <button type="button" id="zoomIn" onclick="formHandler.zoom(0.25)">
+        +
+      </button>
     </div>
     <main id="smRender">
       <div id="postContainer">
@@ -114,173 +168,556 @@
         </p>
         <div class="options">
           <a href="https://github.com/JKPotato-Computer/SignMaker/releases">
-            <button id="changelog">Changelog</button>
+            <button type="button" id="changelog">Changelog</button>
           </a>
           <a href="https://discord.gg/yJBWggf7p4">
-            <button id="joinDiscordServer">Discord Server</button>
+            <button type="button" id="joinDiscordServer">Discord Server</button>
           </a>
           <a href="https://github.com/JKPotato-Computer/SignMaker/wiki">
-            <button id="viewTutorial">Guide / Tutorial</button>
+            <button type="button" id="viewTutorial">Guide / Tutorial</button>
           </a>
-          <button id="closeWelcome">Get signing!</button>
+          <button type="button" id="closeWelcome">Get signing!</button>
+        </div>
+      </dialog>
+      <dialog id="customImagePicker">
+        <div class="customImagePickerContent">
+          <header>
+            <h2>Select Custom Image</h2>
+            <button id="customImagePickerClose" type="button">Close</button>
+          </header>
+          <div id="customImageUploadField">
+            <span class="material-symbols-outlined">attach_file</span>
+            <span>Drag and drop a file or click to upload</span>
+            <input id="customImageFile" type="file" accept="image/*" />
+          </div>
+          <div class="customImageUrlUpload">
+            <label for="customImageUrl">OR Image URL:</label>
+            <input id="customImageUrl" type="url" placeholder="Image URL" />
+          </div>
+          <hr />
+          <h3>Saved Images</h3>
+          <div id="customImageList"></div>
         </div>
       </dialog>
       <dialog id="downloadContent">
         <div id="downloadContents">
-          <h3>Download Sign</h3>
+          <h3>
+            <span class="material-symbols-outlined">download</span> Export Sign
+          </h3>
+          <label for="exportAsPNG">File Type:</label>
           <div id="fileTypeOptions">
-            <label for="PNG" id="fileTypeLabel">Save As: </label>
             <button
-              id="PNG"
-              class="activated"
-              onclick="App.updateFileType(`png`)"
+              type="button"
+              class="selected"
+              id="exportAsPNG"
+              onclick="
+                ImportExport.changeFileType(`png`);
+                ImportExport.updatePreview();
+              "
             >
               PNG
             </button>
-            <button id="SVG" class="" onclick="App.updateFileType(`png`)">
+            <button
+              type="button"
+              id="exportAsSVG"
+              onclick="
+                ImportExport.changeFileType(`svg`);
+                ImportExport.updatePreview();
+              "
+            >
               SVG
             </button>
-            <button id="JSON" class="" onclick="App.updateFileType(`json`)">
+            <button
+              type="button"
+              id="exportAsJSON"
+              onclick="
+                ImportExport.changeFileType(`json`);
+                ImportExport.updatePreview();
+              "
+            >
               JSON
             </button>
           </div>
           <br />
-          <label for="entirePost" id="entirePostLabel">Entire Post</label>
+          <label for="downloadImageScale">Scale:</label>
+          <input
+            type="range"
+            min="1"
+            value="2"
+            max="10"
+            step="1"
+            id="downloadImageScale"
+            onchange="
+              ImportExport.setImageScale(this.value);
+              document.querySelector('#downloadImageScaleVal').value =
+                this.value;
+              ImportExport.updatePreview();
+            "
+          />
+          <input
+            type="number"
+            min="1"
+            value="2"
+            placeholder="2"
+            max="10"
+            step="1"
+            id="downloadImageScaleVal"
+            oninput="
+              ImportExport.setImageScale(this.value);
+              document.querySelector('#downloadImageScale').value = this.value;
+              ImportExport.updatePreview();
+            "
+          />
+          <br />
+          <label for="entirePost" id="entirePostLabel">Entire Post:</label>
           <input
             type="checkbox"
             id="entirePost"
             name="entirePost"
             value="entirePost"
-            onchange="ImportExport.updatePreview()"
+            onchange="
+              ImportExport.toggleEntirePost(this.checked);
+              ImportExport.updatePreview();
+            "
             checked=""
           />
           <br />
-          <div id="singularPanel">
-            <label for="selectPanel" id="selectPanelLabel">Panel Number</label>
-            <input
-              type="number"
-              id="selectPanel"
-              name="selectPanel"
-              onchange="ImportExport.updatePreview()"
-              min="1"
-              step="1"
-              value="1"
-            />
-            <br />
+          <div id="downloadPanelContainer" style="display: none">
+            <label for="selectPanel" id="selectPanelLabel">Panels:</label>
+            <div id="downloadPanelList">
+              <button class="downloadPanelBtn selected">1</button>
+              <button class="downloadPanelBtn selected">2</button>
+              <button class="downloadPanelBtn">3</button>
+            </div>
           </div>
-          <div class="options">
-            <button id="cancelDownload">Cancel</button>
-            <button id="download" onclick="ImportExport.downloadSign()">
-              Download
+          <div class="downloadSignFooter">
+            <button
+              type="button"
+              id="cancelDownload"
+              class="redButton"
+              onclick="ImportExport.close()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="copyToClipboard"
+              onclick="
+                ImportExport.downloadSign(true);
+                this.textContent = 'Copied!';
+                setTimeout(() => {
+                  this.textContent = 'Copy';
+                }, 1000);
+              "
+            >
+              Copy
+            </button>
+            <button
+              type="button"
+              id="downloadSignButton"
+              onclick="ImportExport.downloadSign()"
+            >
+              Download PNG
             </button>
           </div>
         </div>
-        <div id="downloadPreview"></div>
+        <div id="downloadPreviewHolder">
+          <div class="downloadImageToolbar">
+            <button class="material-symbols-outlined" id="downloadImageZoomOut">
+              zoom_out
+            </button>
+            <span id="downloadImageZoomValue">100%</span>
+            <button class="material-symbols-outlined" id="downloadImageZoomIn">
+              zoom_in
+            </button>
+            <button
+              class="material-symbols-outlined"
+              id="downloadImageZoomReset"
+            >
+              refresh
+            </button>
+
+            <span id="downloadImageSize">0 x 0</span>
+          </div>
+          <div id="downloadPreview"></div>
+        </div>
       </dialog>
-      <dialog id="shieldImgSelector">
-        <div class="shieldLibrary" data-tab="presetShieldList">
+      <dialog id="shieldEditorModal">
+        <div class="shieldEditorPane">
           <header>
             <h2>
               <span class="material-symbols-outlined">shield</span>
-              Shield Selector
+              Shield Editor
             </h2>
-            <button id="shieldImgSelectorClose">Close</button>
+            <button type="button" id="shieldEditorClose">Close</button>
           </header>
-          <nav>
-            <button id="presetShields" class="selected">Presets</button>
-            <button id="customShields">Custom</button>
-          </nav>
-          <input
-            type="search"
-            id="presetShieldSearch"
-            placeholder="Search for presets"
-          />
-          <div id="presetShieldList"></div>
-          <div id="uploadShield">
-            <div id="shieldUploadField">
-              <span class="material-symbols-outlined">attach_file</span>
-              <span>Drag and drop a file or click to upload</span>
-              <input type="file" id="uploadCustomShield" />
+          <details open>
+            <summary>Image</summary>
+            <div class="shieldLibrary" data-tab="presetShieldList">
+              <div class="shieldEditorImagePreview">
+                <div>
+                  <span class="selectedShieldName">Interstate</span>
+                  <img
+                    class="selectedShieldPreview"
+                    src="assets/shields/United States/Interstate Routes/I-2Digit.svg"
+                  />
+                </div>
+                <div>
+                  <label for="selectedShieldVariant" class="noLabelAlignment"
+                    >Variant:</label
+                  >
+                  <select
+                    id="selectedShieldVariant"
+                    onchange="ShieldEditor.readForm()"
+                  ></select>
+                  <label for="selectedShieldBacks" class="noLabelAlignment"
+                    >Shield Backs:</label
+                  >
+                  <input
+                    type="checkbox"
+                    id="selectedShieldBacks"
+                    onchange="ShieldEditor.readForm()"
+                  />
+                  <br />
+                  <div id="shieldBackOptions">
+                    <label for="selectedBackColor" class="noLabelAlignment"
+                      >Color:</label
+                    >
+                    <select
+                      id="selectedBackColor"
+                      onchange="ShieldEditor.readForm()"
+                    ></select>
+                    <br />
+                    <label for="selectedBackRoundness" class="noLabelAlignment"
+                      >Roundness (px):</label
+                    >
+                    <input
+                      type="number"
+                      id="selectedBackRoudness"
+                      min="0"
+                      step="1"
+                      placeholder="4"
+                      onchange="ShieldEditor.readForm()"
+                    />
+                  </div>
+                </div>
+              </div>
+              <nav>
+                <button type="button" id="presetShields" class="selected">
+                  Presets
+                </button>
+                <button type="button" id="customShields">Custom</button>
+              </nav>
+              <input
+                type="search"
+                id="presetShieldSearch"
+                placeholder="Search for presets"
+              />
+              <div id="presetShieldList"></div>
+              <div id="uploadShield">
+                <div id="shieldUploadField">
+                  <span class="material-symbols-outlined">attach_file</span>
+                  <span>Drag and drop a file or click to upload</span>
+                  <input type="file" id="uploadCustomShield" />
+                </div>
+                <div class="shieldUploadDisclaimer">
+                  Files are only saved <b>on the client side</b> using
+                  IndexedDB.
+                  <b
+                    >No files whatsoever are sent over the server. (and neither
+                    is anything really lol)</b
+                  >
+                </div>
+                <label for="linkUpload" class="noLabelAlignment"
+                  >OR Image URL:</label
+                >
+                <input type="text" id="linkUpload" placeholder="Image URL" />
+                <hr />
+                <h3>Saved Images</h3>
+                <div id="savedCustomShieldsList"></div>
+              </div>
             </div>
-            <div class="shieldUploadDisclaimer">
-              Files are only saved <b>on the client side</b> using IndexedDB.
-              <b
-                >No files whatsoever are sent over the server. (and neither is
-                anything really lol)</b
-              >
-            </div>
-            <label for="linkUpload" class="noLabelAlignment"
-              >OR Image URL:</label
-            >
-            <input type="text" id="linkUpload" placeholder="Image URL" />
-            <hr />
-            <h3>Saved Images</h3>
-            <div id="savedCustomShieldsList"></div>
-          </div>
-        </div>
-        <div class="shieldPreview">
-          <img class="selectedShieldPreview" />
-          <br />
-          <span class="selectedShieldName">Interstate</span>
-          <br />
-          <div>
-            <label for="selectedShieldVariant" class="noLabelAlignment"
-              >Variant:</label
-            >
-            <select id="selectedShieldVariant">
-              <option>2 Digit</option>
-            </select>
-          </div>
-          <br />
-          <div>
-            <label for="selectedShieldBacks" class="noLabelAlignment"
-              >Shield Backs:</label
-            >
-            <input type="checkbox" id="selectedShieldBacks" />
-          </div>
-          <br />
-          <div id="shieldBackOptions">
-            <label for="selectedBackColor" class="noLabelAlignment"
-              >Color:</label
-            >
-            <select id="selectedBackColor"></select>
+          </details>
+          <details>
+            <summary>Text</summary>
+            <label for="spShield_routeNumber">Route Number:</label>
+            <input
+              type="text"
+              placeholder="0"
+              id="spShield_routeNumber"
+              oninput="ShieldEditor.readForm()"
+            />
             <br />
-            <label for="selectedBackRoundness" class="noLabelAlignment"
-              >Roundness (px):</label
+            <label for="spShield_routeFontFamily">Font:</label>
+            <select
+              id="spShield_routeFontFamily"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <label for="spShield_routeColor">Color:</label>
+            <select
+              id="spShield_routeColor"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <br />
+            <label for="spShield_routeSpacing">Letter Spacing (px):</label>
+            <input
+              type="number"
+              id="spShield_routeSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_routeWordSpacing">Word Spacing (px):</label>
+            <input
+              type="number"
+              id="spShield_routeWordSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designation">Designation:</label>
+            <input
+              type="text"
+              placeholder=""
+              id="spShield_designation"
+              oninput="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designationFontFamily">Font:</label>
+            <select
+              id="spShield_designationFontFamily"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <label for="spShield_designationColor">Color:</label>
+            <select
+              id="spShield_designationColor"
+              onchange="ShieldEditor.readForm()"
+            ></select>
+            <br />
+            <label for="spShield_designationSpacing"
+              >Letter Spacing (px):</label
             >
             <input
               type="number"
-              id="selectedBackRoudness"
-              min="0"
+              id="spShield_designationSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
               step="1"
-              placeholder="4"
+              value="0"
+              onchange="ShieldEditor.readForm()"
             />
+            <label for="spShield_designationWordSpacing"
+              >Word Spacing (px):</label
+            >
+            <input
+              type="number"
+              id="spShield_designationWordSpacing"
+              placeholder="0"
+              min="-10"
+              max="10"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+          </details>
+          <details>
+            <summary>Position</summary>
+            <label for="spShield_scale">Shield Scale (%):</label>
+            <input
+              type="range"
+              min="0"
+              max="300"
+              step="1"
+              value="100"
+              id="spShield_scale"
+              oninput="ShieldEditor.readForm()"
+            />
+            <input
+              id="spShield_scaleVal"
+              class="smallVal"
+              type="number"
+              value="100"
+              step="1"
+              onchange="
+                document.querySelector('#spShield_scale').value = this.value;
+                ShieldEditor.readForm();
+              "
+            />
+            <br />
+            <label for="spShield_routeXOffset">Route X (%):</label>
+            <input
+              type="number"
+              id="spShield_routeXOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_routeYOffset">Route Y (%):</label>
+            <input
+              type="number"
+              id="spShield_routeYOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_routeScale">Route Number Scale (%):</label>
+            <input
+              type="number"
+              id="spShield_routeScale"
+              placeholder="100"
+              min="0"
+              max="200"
+              step="1"
+              value="100"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_routeRotation"
+              >Route Number Rotation (deg):</label
+            >
+            <input
+              type="number"
+              id="spShield_routeRotation"
+              placeholder="0"
+              min="-360"
+              max="360"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designationXOffset">Designation X (%):</label>
+            <input
+              type="number"
+              id="spShield_designationXOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_designationYOffset">Designation Y (%):</label>
+            <input
+              type="number"
+              id="spShield_designationYOffset"
+              placeholder="0"
+              min="-50"
+              max="50"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_designationScale"
+              >Designation Scale (%):</label
+            >
+            <input
+              type="number"
+              id="spShield_designationScale"
+              placeholder="100"
+              min="0"
+              max="200"
+              step="1"
+              value="100"
+              onchange="ShieldEditor.readForm()"
+            />
+            <label for="spShield_designationRotation"
+              >Designation Rotation (deg):</label
+            >
+            <input
+              type="number"
+              id="spShield_designationRotation"
+              placeholder="0"
+              min="-360"
+              max="360"
+              step="1"
+              value="0"
+              onchange="ShieldEditor.readForm()"
+            />
+            <br />
+            <label for="spShield_horizMargins"
+              >Horizontal Shield Padding (px):</label
+            >
+            <input
+              id="spShield_horizMargins"
+              class="smallVal"
+              type="number"
+              value="8"
+              onchange="ShieldEditor.readForm()"
+              step="1"
+            />
+            <label for="spShield_vertMargins"
+              >Vertical Shield Padding (px):</label
+            >
+            <input
+              id="spShield_vertMargins"
+              class="smallVal"
+              type="number"
+              value="8"
+              onchange="ShieldEditor.readForm()"
+              step="1"
+            />
+          </details>
+        </div>
+        <div class="shieldPreview">
+          <span id="shieldBaseName">INTERSTATE-1</span>
+          <div id="shieldPreviewImage"></div>
+          <div id="scaleOptions">
+            <button type="button" id="shieldFullSize" class="selected">
+              Actual Size
+            </button>
+            <button type="button" id="shieldFitSize">Fit Size</button>
           </div>
           <footer>
-            <button id="setShield">Set Shield</button>
+            <button type="button" id="saveToShieldLibrary">
+              <span class="material-symbols-outlined">file_save</span>Save to
+              Library
+            </button>
+            <button type="button" id="openShieldLibrary">
+              <span class="material-symbols-outlined">filter</span>Shield
+              Library
+            </button>
+            <button type="button" id="setShield">Set Shield</button>
           </footer>
         </div>
-      </dialog>
-      <dialog id="shieldImgLibrary">
-        <div class="shieldImgLibraryHolder">
-          <header>
-            <h2>
-              <span class="material-symbols-outlined">shield</span>
-              Shield Library
-            </h2>
-            <button id="shieldImgLibraryClose">Close</button>
-          </header>
-          <input
-            type="search"
-            id="shieldLibrarySearch"
-            placeholder="Search shields in library"
-          />
-          <div id="shieldLibraryListHolder"></div>
-          <div id="shieldLibraryListOptions">
-            <button id="shieldLibraryDelete" disabled>Delete Shield</button>
-            <button id="shieldLibraryUse">Use Shield</button>
+        <dialog id="shieldImgLibrary">
+          <div class="shieldImgLibraryHolder">
+            <header>
+              <h2>
+                <span class="material-symbols-outlined">shield</span>
+                Shield Library
+              </h2>
+              <button type="button" id="shieldImgLibraryClose">Close</button>
+            </header>
+            <input
+              type="search"
+              id="shieldLibrarySearch"
+              placeholder="Search shields in library"
+            />
+            <div id="shieldLibraryListHolder"></div>
+            <div id="shieldLibraryListOptions">
+              <button type="button" id="shieldLibraryDelete" disabled>
+                Delete Shield
+              </button>
+              <button type="button" id="shieldLibraryUse">Use Shield</button>
+            </div>
           </div>
-        </div>
+        </dialog>
       </dialog>
       <dialog id="diagrammicDrawing">
         <header>
@@ -296,7 +733,7 @@
             >
               Keyboard Shortcuts
             </button>
-            <button id="diagrammicDrawingClose">Close</button>
+            <button type="button" id="diagrammicDrawingClose">Close</button>
           </div>
         </header>
         <div class="diagrammicDrawingHolder">
@@ -468,6 +905,12 @@
                     step="1"
                     onchange="DiagramDrawing.readForm()"
                   />
+                  <label for="roadwayShowLaneMarkings">Lane Markings:</label>
+                  <input
+                    type="checkbox"
+                    id="roadwayShowLaneMarkings"
+                    onchange="DiagramDrawing.readForm()"
+                  />
                   <br />
                   <label for="roadwayCurveIntensity">Curve Intensity:</label>
                   <input
@@ -537,7 +980,6 @@
                     step="1"
                     onchange="DiagramDrawing.readForm()"
                   />
-                  <br />
                   <label for="objectArrowRoundness"
                     >Arrow Roundness (px):</label
                   >
@@ -548,6 +990,13 @@
                     min="0"
                     max="100"
                     step="1"
+                    onchange="DiagramDrawing.readForm()"
+                  />
+                  <br />
+                  <label for="objectArrowPointedTip"> Pointed Tip:</label>
+                  <input
+                    type="checkbox"
+                    id="objectArrowPointedTip"
                     onchange="DiagramDrawing.readForm()"
                   />
                 </fieldset>
@@ -565,6 +1014,17 @@
                     id="objectSubpanelNumber"
                     onchange="DiagramDrawing.readForm()"
                   ></select>
+                  <button
+                    type="button"
+                    id="objectSubpanelAdd"
+                    onclick="
+                      App.addSubPanel();
+                      DiagramDrawing.readForm();
+                    "
+                  >
+                    Add Subpanel
+                  </button>
+                  <br />
                   <label for="objectSubpanelDirection">Direction:</label>
                   <select
                     id="objectSubpanelDirection"
@@ -600,8 +1060,12 @@
               <button id="diagramLoadPresets" type="button">
                 Open Presets
               </button>
-              <button id="diagramSavePreset">Save as Preset</button>
-              <button id="diagramReset" class="redButton">Reset</button>
+              <button type="button" id="diagramSavePreset">
+                Save as Preset
+              </button>
+              <button type="button" id="diagramReset" class="redButton">
+                Reset
+              </button>
               <label for="diagramFileName">Name:</label>
               <input
                 type="text"
@@ -610,7 +1074,16 @@
                 value=""
               />
             </div>
-            <button id="diagramUse">Use Diagram</button>
+
+            <div>
+              <button type="button" id="importDiagram">
+                <span class="material-symbols-outlined">upload</span>
+              </button>
+              <button type="button" id="exportDiagram">
+                <span class="material-symbols-outlined">download</span>
+              </button>
+              <button type="button" id="diagramUse">Use Diagram</button>
+            </div>
           </footer>
         </div>
         <dialog id="diagramKeyboardShortcuts" class="diagramSubModal">
@@ -847,60 +1320,63 @@
               </div>
             </div>
             <div id="sMPanelPadding" class="tabHidden">
-              <div>
-                <label for="paddingTop">Padding Top: </label>
-                <input
-                  type="number"
-                  id="paddingTop"
-                  value=".3"
-                  placeholder=".3"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <label for="paddingRight">Padding Right: </label>
-                <input
-                  type="number"
-                  id="paddingRight"
-                  value=".75"
-                  placeholder=".75"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <br />
-                <label for="paddingBottom">Padding Bottom: </label>
-                <input
-                  type="number"
-                  id="paddingBottom"
-                  value=".3"
-                  placeholder=".3"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <label for="paddingLeft">Padding Left: </label>
-                <input
-                  type="number"
-                  id="paddingLeft"
-                  value=".75"
-                  placeholder=".75"
-                  step=".01"
-                  min="0"
-                  max="20"
-                  onchange="formHandler.readForm()"
-                />
-                <button
-                  id="resetPadding"
-                  class="resetClass"
-                  onclick="App.resetPadding()"
-                >
-                  Reset to Default
-                </button>
-              </div>
+              <label for="paddingTop">Padding Top: </label>
+              <input
+                type="number"
+                id="paddingTop"
+                value=".3"
+                placeholder=".3"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <label for="paddingRight">Padding Right: </label>
+              <input
+                type="number"
+                id="paddingRight"
+                value=".75"
+                placeholder=".75"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <br />
+              <label for="paddingBottom">Padding Bottom: </label>
+              <input
+                type="number"
+                id="paddingBottom"
+                value=".3"
+                placeholder=".3"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <label for="paddingLeft">Padding Left: </label>
+              <input
+                type="number"
+                id="paddingLeft"
+                value=".75"
+                placeholder=".75"
+                step=".01"
+                min="0"
+                onchange="formHandler.readForm()"
+              />
+              <button
+                id="resetPadding"
+                class="resetClass"
+                type="button"
+                onclick="
+                  console.log('Hello');
+                  App.getCurrentPanel().sign.paddingLeft = 0.75;
+                  App.getCurrentPanel().sign.paddingRight = 0.75;
+                  App.getCurrentPanel().sign.paddingBottom = 0.3;
+                  App.getCurrentPanel().sign.paddingTop = 0.3;
+                  formHandler.updateForm();
+                  App.redraw();
+                "
+              >
+                Reset to Default
+              </button>
             </div>
           </div>
         </div>
@@ -912,14 +1388,20 @@
             <nav class="listNav">
               <div class="scrollMenu" id="exitTabList"></div>
               <div class="listNavOptions">
-                <button onclick="App.newExitTabRow()">
+                <button type="button" onclick="App.newExitTabRow()">
                   <span class="material-symbols-outlined">add</span>
                   Group
                 </button>
-                <button onclick="formHandler.removeExitTabHelper()">
+                <button
+                  type="button"
+                  onclick="formHandler.removeExitTabHelper()"
+                >
                   <span class="material-symbols-outlined">remove</span>
                 </button>
-                <button onclick="formHandler.duplicateExitTabHelper()">
+                <button
+                  type="button"
+                  onclick="formHandler.duplicateExitTabHelper()"
+                >
                   <span class="material-symbols-outlined">content_copy</span>
                 </button>
               </div>
@@ -997,45 +1479,70 @@
                 max="2"
                 step=".05"
               />
+              <br />
+              <label for="smET_independentWidth"> Ignore Width: </label>
+              <input
+                type="checkbox"
+                id="smET_independentWidth"
+                onchange="formHandler.readForm()"
+              />
+              <label for="smET_hideTopBorder" class="checkboxLabel">
+                Hide Top Border:
+                <input
+                  type="checkbox"
+                  id="smET_hideTopBorder"
+                  name="smET_hideTopBorder"
+                  onchange="formHandler.readForm()"
+                />
+              </label>
+              <label for="smET_hideBottomBorder" class="checkboxLabel">
+                Hide Bottom Border:
+                <input
+                  type="checkbox"
+                  id="smET_hideBottomBorder"
+                  name="smET_hideBottomBorder"
+                  onchange="formHandler.readForm()"
+                />
+              </label>
             </div>
             <div id="sMExitTabVariant" class="tabHidden">
               <div class="sMET_typeSelect">
-                <button id="sMET_typeNormal" class="selected">
+                <button type="button" id="sMET_typeNormal" class="selected">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/Normal.png"
                   />
                   <span class="sMET_typeLabel">Normal Exit Tab</span>
                 </button>
-                <button id="sMET_typeIcon">
+                <button type="button" id="sMET_typeIcon">
                   <img
                     class="sMET_typeVisual"
-                    src="https://placehold.co/600x400/000000/FFFFFF/png"
+                    src="./assets/form/exitTabVariants/TollIcon.png"
                   />
                   <span class="sMET_typeLabel">Toll / Regular Icon</span>
                 </button>
-                <button id="sMET_typeFullLeft">
+                <button type="button" id="sMET_typeFullLeft">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/FullExitTab.png"
                   />
                   <span class="sMET_typeLabel">Full Left</span>
                 </button>
-                <button id="sMET_typePartialLeft">
+                <button type="button" id="sMET_typePartialLeft">
                   <img
                     class="sMET_typeVisual"
                     src="./assets/form/exitTabVariants/PartialExitTab.png"
                   />
                   <span class="sMET_typeLabel">Partial Left</span>
                 </button>
-                <button id="sMET_typeHOVVariant1">
+                <button type="button" id="sMET_typeHOVVariant1">
                   <img
                     class="sMET_typeVisual"
                     src="./assets//form//exitTabVariants//HOVVariant1.png"
                   />
                   <span class="sMET_typeLabel">HOV Variant 1</span>
                 </button>
-                <button id="sMET_typeHOVVariant2">
+                <button type="button" id="sMET_typeHOVVariant2">
                   <img
                     class="sMET_typeVisual"
                     src="./assets//form//exitTabVariants//HOVVariant2.png"
@@ -1069,6 +1576,13 @@
                       autocomplete="off"
                     />
                     <div class="smDropdownList"></div>
+                    <button
+                      type="button"
+                      id="smET_iconCustomBtn"
+                      class="iconsDropdownCustom"
+                    >
+                      Select Custom Image
+                    </button>
                   </div>
                 </div>
                 <div id="sMET_variantTollIcon" class="smDropdownInputElement">
@@ -1132,8 +1646,8 @@
                   type="range"
                   id="sMET_variantIconSize"
                   name="sMET_variantIconSize"
-                  min="1"
-                  max="6"
+                  min="0"
+                  max="10"
                   step="0.1"
                   value="3"
                   oninput="
@@ -1149,12 +1663,16 @@
                   name="sMET_variantIconSizeVal"
                   value="3"
                   step="0.1"
+                  onchange="
+                    document.getElementById('sMET_variantIconSize').value =
+                      this.value
+                  "
                 />
-                <label for="sMET_variantIsSquare" class="checkboxLabel">
+                <label for="sMET_variantIsSquareIcon" class="checkboxLabel">
                   <input
                     type="checkbox"
-                    id="sMET_variantIsSquare"
-                    name="sMET_variantIsSquare"
+                    id="sMET_variantIsSquareIcon"
+                    name="sMET_variantIsSquareIcon"
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -1218,7 +1736,6 @@
                     onchange="formHandler.readForm()"
                   />
                 </div>
-                <br />
                 <label for="sMET_variantOnlyHorizontalPadding">
                   ONLY Padding (rem):</label
                 >
@@ -1231,9 +1748,7 @@
                   value="0.25"
                   onchange="formHandler.readForm()"
                 />
-                <label for="sMET_variantPbmPadding"
-                  >Pay by Mail Padding (rem):</label
-                >
+                <label for="sMET_variantPbmPadding">Text Padding (rem):</label>
                 <input
                   type="number"
                   id="sMET_variantPbmPadding"
@@ -1252,6 +1767,17 @@
                   />
                   Square Text
                 </label>
+                <label for="smET_variantFontSize">Font Size (rem):</label>
+                <input
+                  type="number"
+                  id="smET_variantFontSize"
+                  name="smET_variantFontSize"
+                  value="0"
+                  min="0"
+                  step="0.05"
+                  data-tooltip="Set to 0 for auto"
+                  onchange="formHandler.readForm()"
+                />
                 <label for="sMET_variantUnderline" class="checkboxLabel">
                   <input
                     type="checkbox"
@@ -1262,12 +1788,68 @@
                   Underline
                 </label>
               </fieldset>
+              <fieldset id="smET_FullLeftVariant" class="hidden">
+                <legend>Full Left</legend>
+                <label for="smET_fullLeftMinimumWidth"
+                  >Minimum Width (rem):</label
+                >
+                <input
+                  type="number"
+                  id="smET_fullLeftMinimumWidth"
+                  name="smET_fullLeftMinimumWidth"
+                  value="7"
+                  min="0"
+                  max="20"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_fullLeftFontFamily">Font Family:</label>
+                <select
+                  id="smET_fullLeftFontFamily"
+                  name="smET_fullLeftFontFamily"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <br />
+                <label for="smET_fullLeftLetterSpacing"
+                  >Letter Spacing (px):</label
+                >
+                <input
+                  type="number"
+                  id="smET_fullLeftLetterSpacing"
+                  name="smET_fullLeftLetterSpacing"
+                  value="1"
+                  min="0"
+                  max="50"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_fullLeftBottomSpacing">Offset (rem): </label>
+                <input
+                  type="number"
+                  id="smET_fullLeftBottomSpacing"
+                  name="smET_fullLeftBottomSpacing"
+                  value="1.25"
+                  min="0"
+                  max="20"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="smET_fullLeftFlipJustify">Flip Justify:</label>
+                <input
+                  type="checkbox"
+                  id="smET_fullLeftFlipJustify"
+                  name="smET_fullLeftFlipJustify"
+                  onchange="formHandler.readForm()"
+                />
+              </fieldset>
               <fieldset id="smET_PartialLeftVariant" class="hidden">
                 <legend>Partial Left</legend>
                 <label for="smET_partialLeftCheckbox">
                   <input
                     type="checkbox"
                     id="smET_partialLeftCheckbox"
+                    name="smET_partialLeftCheckbox"
                     onchange="formHandler.readForm()"
                     checked
                   />
@@ -1279,16 +1861,18 @@
                 <input
                   type="number"
                   id="smET_partialLeftMinWidth"
+                  name="smET_partialLeftMinWidth"
                   value="7"
                   min="0"
                   max="20"
                   step=".01"
                   onchange="formHandler.readForm()"
                 />
-                <label for="smET_partialLeftSpacing">Spacing (rem):</label>
+                <label for="smET_partialLeftSpacing">Offset (rem):</label>
                 <input
                   type="number"
                   id="smET_partialLeftSpacing"
+                  name="smET_partialLeftSpacing"
                   value="1.5"
                   min="0"
                   max="20"
@@ -1317,6 +1901,7 @@
                 <input
                   type="number"
                   id="smET_partialLeftHorizontalPaddingVal"
+                  name="smET_partialLeftHorizontalPaddingVal"
                   min="0"
                   max="5"
                   value="0.6"
@@ -1338,6 +1923,7 @@
                   value="0.3"
                   step=".01"
                   id="smET_partialLeftVerticalPadding"
+                  name="smET_partialLeftVerticalPadding"
                   oninput="
                     document.querySelector(
                       '#smET_partialLeftVerticalPaddingVal',
@@ -1347,6 +1933,7 @@
                 />
                 <input
                   type="number"
+                  name="smET_partialLeftVerticalPaddingVal"
                   id="smET_partialLeftVerticalPaddingVal"
                   min="0"
                   max="5"
@@ -1366,9 +1953,30 @@
                 <input
                   type="number"
                   id="smET_partialLeftLetterSpacing"
+                  name="smET_partialLeftLetterSpacing"
                   value="0"
                   min="0"
                   max="20"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_partialLeftFontFamily"> Font Family: </label>
+                <select
+                  id="smET_partialLeftFontFamily"
+                  name="smET_partialLeftFontFamily"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <br />
+                <label for="smET_partialLeftBorderRadius"
+                  >Border Radius (px):
+                </label>
+                <input
+                  type="number"
+                  id="smET_partialLeftBorderRadius"
+                  name="smET_partialLeftBorderRadius"
+                  value="4"
+                  min="0"
+                  max="50"
                   step="1"
                   onchange="formHandler.readForm()"
                 />
@@ -1378,7 +1986,7 @@
                 <label
                   for="smET_HOV1Height"
                   data-toolTip="Set height to 0 to automatically size it by font size"
-                  >Height (rem):</label
+                  >Image Height (rem):</label
                 >
                 <input
                   type="number"
@@ -1392,7 +2000,7 @@
                 <label
                   for="smET_HOV1Width"
                   data-toolTip="Set width to 0 to automatically size it by an aspect ratio"
-                  >Width (rem):</label
+                  >Image Width (rem):</label
                 >
                 <input
                   type="number"
@@ -1473,9 +2081,13 @@
             <div id="sMExitTabProperties" class="tabHidden">
               <div class="sMET_Presets">
                 <select id="smET_presetSelect"></select>
-                <button id="smET_loadPreset">Load Preset</button>
-                <button id="smET_deletePreset">Delete Preset</button>
-                <button id="smET_saveAsPreset">Create New Preset</button>
+                <button type="button" id="smET_loadPreset">Load Preset</button>
+                <button type="button" id="smET_deletePreset">
+                  Delete Preset
+                </button>
+                <button type="button" id="smET_saveAsPreset">
+                  Create New Preset
+                </button>
               </div>
               <br />
               <label for="sMET_textContent" class="noLabelAlignment"
@@ -1486,7 +2098,7 @@
                 id="sMET_textContent"
                 name="sMET_textContent"
                 placeholder="Text Content"
-                onchange="formHandler.readForm()"
+                oninput="formHandler.readForm()"
               />
               <label for="sMET_subTextContent" class="noLabelAlignment"
                 >Sub Text:</label
@@ -1496,8 +2108,45 @@
                 id="sMET_subTextContent"
                 name="sMET_subTextContent"
                 placeholder="Sub Text Content"
-                onchange="formHandler.readForm()"
+                oninput="formHandler.readForm()"
               />
+
+              <fieldset>
+                <legend>Shields</legend>
+                <button type="button" id="smET_addShield">
+                  Add New Shield
+                </button>
+                <div id="smET_shieldList"></div>
+                <label for="smET_shieldGap">Shield Spacing (rem):</label>
+                <input
+                  type="number"
+                  id="smET_shieldGap"
+                  name="smET_shieldGap"
+                  value="0.25"
+                  min="0"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="smET_shieldsDirection">Shield Direction:</label>
+                <select
+                  id="smET_shieldsDirection"
+                  name="smET_shieldsDirection"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <br />
+                <label for="smET_shieldWordSpacing"
+                  >Shield Word Gap (rem):</label
+                >
+                <input
+                  type="number"
+                  id="smET_shieldWordSpacing"
+                  name="smET_shieldWordSpacing"
+                  value="0.25"
+                  min="0"
+                  step=".01"
+                  onchange="formHandler.readForm()"
+                />
+              </fieldset>
 
               <fieldset>
                 <legend>Container</legend>
@@ -1671,7 +2320,6 @@
                 />
               </fieldset>
 
-              <!-- Border Section -->
               <fieldset>
                 <legend>Border</legend>
 
@@ -1988,13 +2636,13 @@
                 id="subPanelList"
               ></div>
               <div class="listNavOptions">
-                <button onclick="App.addSubPanel()">
+                <button type="button" onclick="App.addSubPanel()">
                   <span class="material-symbols-outlined">add</span>
                 </button>
-                <button onclick="App.removeSubPanel()">
+                <button type="button" onclick="App.removeSubPanel()">
                   <span class="material-symbols-outlined">remove</span>
                 </button>
-                <button onclick="App.duplicateSubPanel()">
+                <button type="button" onclick="App.duplicateSubPanel()">
                   <span class="material-symbols-outlined">content_copy</span>
                 </button>
               </div>
@@ -2035,24 +2683,25 @@
                       >Select a shield group from <b>Block Elements</b> to
                       modify:</span
                     >
-                    <button onclick="App.newShieldGroup()">
+                    <button type="button" onclick="App.newShieldGroup()">
                       <span class="material-symbols-outlined">add</span>New
                       Shield Group
                     </button>
                   </div>
-                  <div id="shieldGroupList">
-                    <button class="selected">Shield Group 1 (Row 1)</button>
-                    <button>Shield Group 2 (Row 1)</button>
-                    <button>Shield Group 3 (Row 2)</button>
-                  </div>
+                  <div id="shieldGroupList"></div>
                 </div>
                 <div id="smSPShieldHeader">
                   <div>
                     <span id="smSPShieldSelectLabel">Selected: Shield 1</span>
-                    <button id="smSPCreateShield" onclick="App.newShield()">
+                    <button
+                      type="button"
+                      id="smSPCreateShield"
+                      onclick="App.newShield()"
+                    >
                       <span class="material-symbols-outlined">add</span> New
                     </button>
                     <button
+                      type="button"
                       id="smSPDuplicateShield"
                       onclick="
                         App.duplicateShield(
@@ -2066,6 +2715,7 @@
                       Duplicate
                     </button>
                     <button
+                      type="button"
                       id="smSPDeleteShield"
                       onclick="
                         App.deleteShield(App.vars.currentlySelectedShieldIndex)
@@ -2078,6 +2728,7 @@
                   </div>
                   <div>
                     <button
+                      type="button"
                       id="smSPGroupShieldNext"
                       onclick="
                         App.groupShields(
@@ -2089,6 +2740,7 @@
                       Group Next Shield
                     </button>
                     <button
+                      type="button"
                       id="smSPGroupShieldPrev"
                       onclick="
                         App.groupShields(
@@ -2100,6 +2752,7 @@
                       Group Previous Shield
                     </button>
                     <button
+                      type="button"
                       id="smSPGroupShieldUngroup"
                       disabled
                       onclick="
@@ -2111,6 +2764,7 @@
                       Remove from Group
                     </button>
                     <button
+                      type="button"
                       id="smSPUngroupAllShields"
                       disabled
                       onclick="
@@ -2130,34 +2784,35 @@
                   <div id="smSPShieldImgConfig">
                     <div>
                       <div id="smSPShieldImgPreview"></div>
-                      <button id="changeImgBtn">
-                        <span class="material-symbols-outlined">image</span
-                        >Change Image
-                      </button>
-                      <button id="useUserShields">
-                        <span class="material-symbols-outlined"
-                          >photo_album</span
-                        >Shield Library
+                      <button type="button" id="editShieldBtn">
+                        <span class="material-symbols-outlined">edit</span>
+                        Edit Shield
                       </button>
                     </div>
                     <div>
-                      <label for="spShield_routeNumber">Route Number: </label>
+                      <span>Quick Edits</span>
+                      <br />
+                      <label for="spShieldQuick_routeNumber"
+                        >Route Number:
+                      </label>
                       <input
                         type="string"
                         placeholder="0"
-                        id="spShield_routeNumber"
+                        id="spShieldQuick_routeNumber"
                         oninput="formHandler.readForm()"
                       />
                       <br />
-                      <label for="spShield_designation">Designation: </label>
+                      <label for="spShieldQuick_designation"
+                        >Designation:
+                      </label>
                       <input
                         type="string"
                         placeholder=""
-                        id="spShield_designation"
+                        id="spShieldQuick_designation"
                         oninput="formHandler.readForm()"
                       />
                       <br />
-                      <label for="spShield_scale">Scale: </label>
+                      <label for="spShieldQuick_scale">Scale: </label>
                       <input
                         type="range"
                         min="0"
@@ -2165,23 +2820,27 @@
                         step="1"
                         ,
                         max="300"
-                        id="spShield_scale"
+                        id="spShieldQuick_scale"
                         oninput="formHandler.readForm()"
                       />
                       <input
-                        id="spShield_scaleVal"
+                        id="spShieldQuick_scaleVal"
                         class="smallVal"
                         type="number"
                         value="1"
                         step="1"
-                        oninput="formHandler.readForm()"
+                        oninput="
+                          document.querySelector('#spShieldQuick_scale').value =
+                            this.value;
+                          formHandler.readForm();
+                        "
                       />
                       <br />
-                      <label for="spShield_horizMargins"
+                      <label for="spShieldQuick_horizMargins"
                         >Horiz / Vert Padding: (px)</label
                       >
                       <input
-                        id="spShield_horizMargins"
+                        id="spShieldQuick_horizMargins"
                         class="smallVal"
                         type="number"
                         value="8"
@@ -2190,156 +2849,13 @@
                       />
                       <span>/</span>
                       <input
-                        id="spShield_vertMargins"
+                        id="spShieldQuick_vertMargins"
                         class="smallVal"
                         type="number"
                         value="8"
                         step="1"
                         oninput="formHandler.readForm()"
                       />
-                      <br />
-                      <br />
-                      <div id="smSPShieldStyleOptions">
-                        <button id="smSPShieldAdvanced">
-                          <span class="material-symbols-outlined"
-                            >expand_content</span
-                          >
-                          Custom Shields
-                        </button>
-                        <button id="smSPShieldSave">
-                          <span class="material-symbols-outlined"
-                            >file_save</span
-                          >
-                          Save to Library
-                        </button>
-                      </div>
-                      <div id="advancedMenu" class="hidden">
-                        <h5>Route Number</h5>
-                        <label for="spShield_routeScale">Scale (%): </label>
-                        <input
-                          type="number"
-                          id="spShield_routeScale"
-                          placeholder="100"
-                          min="0"
-                          max="200"
-                          step="1"
-                          value="100"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeXOffset"
-                          >X Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_routeXOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeYOffset"
-                          >Y Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_routeYOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeSpacing"
-                          >Letter Spacing (px):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_routeSpacing"
-                          placeholder="0"
-                          min="-10"
-                          max="10"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_routeFontFamily">Font:</label>
-                        <select
-                          id="spShield_routeFontFamily"
-                          onchange="formHandler.readForm()"
-                        ></select>
-                        <hr />
-                        <h5>Designation</h5>
-                        <label for="spShield_designationScale"
-                          >Scale (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationScale"
-                          placeholder="100"
-                          min="0"
-                          max="200"
-                          step="1"
-                          value="100"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationXOffset"
-                          >X Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationXOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationYOffset"
-                          >Y Offset (%):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationYOffset"
-                          placeholder="0"
-                          min="-50"
-                          max="50"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationSpacing"
-                          >Letter Spacing (px):
-                        </label>
-                        <input
-                          type="number"
-                          id="spShield_designationSpacing"
-                          placeholder="0"
-                          min="-10"
-                          max="10"
-                          step="1"
-                          value="0"
-                          oninput="formHandler.readForm()"
-                        />
-                        <br />
-                        <label for="spShield_designationFontFamily"
-                          >Font:</label
-                        >
-                        <select
-                          id="spShield_designationFontFamily"
-                          onchange="formHandler.readForm()"
-                        ></select>
-                      </div>
                     </div>
                   </div>
                   <div id="smSPShieldBannerConfig">
@@ -2347,7 +2863,9 @@
                     <div class="smSPShieldBannerController">
                       <label for="smSPShieldBannerAlignment">Alignment:</label>
                       <select id="smSPShieldBannerAlignment"></select>
-                      <button id="smSPShieldAddBanner">Add Banner</button>
+                      <button type="button" id="smSPShieldAddBanner">
+                        Add Banner
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2356,8 +2874,9 @@
             <div id="sMSPBlocks" class="">
               <div id="sMSPTextEditor">
                 <div id="sMSPCreate">
-                  <span id="SMSPSelectLabel">Selected: Row 1</span>
+                  <span id="SMSPSelectLabel">Selected: Row 1; Block 1</span>
                   <button
+                    type="button"
                     id="sMSPCreateRow"
                     onclick="
                       App.newRow(
@@ -2367,11 +2886,16 @@
                   >
                     <span class="material-symbols-outlined">add</span> New
                   </button>
-                  <button id="sMSPDuplicateRow" onclick="App.dupRow()">
+                  <button
+                    type="button"
+                    id="sMSPDuplicateRow"
+                    onclick="App.dupRow()"
+                  >
                     <span class="material-symbols-outlined">content_copy</span>
                     Duplicate
                   </button>
                   <button
+                    type="button"
                     id="sMSPDeleteSelectedRow"
                     onclick="App.delRow()"
                     disabled
@@ -2379,33 +2903,61 @@
                     <span class="material-symbols-outlined">delete</span>
                     Selected
                   </button>
+                  <button
+                    type="button"
+                    class="redButton"
+                    id="smSPExitGroupedBlock"
+                    disabled
+                    onclick="
+                      let groupNum = App.getGroupNumFromElem(
+                        App.getParentOfSelectedBlockGroup(),
+                      );
+                      if (groupNum !== null) {
+                        App.setSelectedBlockGroup(groupNum);
+                      } else {
+                        App.setSelectedBlockGroup(-1);
+                      }
+                    "
+                  >
+                    Exit Group
+                  </button>
                 </div>
                 <div id="sMSPTextList"></div>
                 <div id="sMSPElement">
-                  <span id="SMSPElementLabel">Selected: Block 1</span>
-                  <div class="SMSPNewElementHolder">
-                    <span>New: </span>
-                    <select id="sMSPElementSelect" style="width: 30%"></select>
-                    <button
-                      id="sMSPCreateElement"
-                      onclick="
-                        App.newControlElem(
-                          document.querySelector('#sMSPElementSelect').value,
-                        )
-                      "
+                  <select id="sMSPElementSelect" style="width: 30%"></select>
+                  <button
+                    type="button"
+                    id="sMSPReplaceElement"
+                    onclick="
+                      App.replaceControlElem(
+                        document.querySelector('#sMSPElementSelect').value,
+                      )
+                    "
+                  >
+                    <span class="material-symbols-outlined">swap_horiz</span>
+                    Replace
+                  </button>
+                  <button
+                    type="button"
+                    id="sMSPCreateElement"
+                    onclick="
+                      App.newControlElem(
+                        document.querySelector('#sMSPElementSelect').value,
+                      )
+                    "
+                  >
+                    <span class="material-symbols-outlined">add</span> New
+                  </button>
+                  <button
+                    type="button"
+                    id="sMSPDeleteSelectedBlock"
+                    onclick="App.delControlElem()"
+                  >
+                    <span class="material-symbols-outlined" disabled
+                      >delete</span
                     >
-                      <span class="material-symbols-outlined">add</span> Add
-                    </button>
-                    <button
-                      id="sMSPDeleteSelectedBlock"
-                      onclick="App.delControlElem()"
-                    >
-                      <span class="material-symbols-outlined" disabled
-                        >delete</span
-                      >
-                      Selected
-                    </button>
-                  </div>
+                    Selected
+                  </button>
                 </div>
                 <div id="smSPProperties">
                   <div data-property="sdCtrlText" class="">
@@ -2458,6 +3010,24 @@
                       type="number"
                       value="100"
                     />
+                    <label for="sdCtrlText_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdCtrlText_wordSpacing"
+                    />
+                    <input
+                      id="sdCtrlText_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
+                    />
                     <br />
                     <label for="sdCtrlText_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -2477,6 +3047,13 @@
                       step="1"
                       value="120"
                     />
+                    <input
+                      type="checkbox"
+                      class="hidden"
+                      id="sdCtrlText_spaceNumeralsLetters"
+                      data-toolTip="Space Numerals & Letters"
+                    />
+
                     <label for="sdCtrlText_useBannerFormatting"
                       >Enlarge Banners:</label
                     >
@@ -2509,7 +3086,7 @@
                   </div>
 
                   <div data-property="sdBlocker" class="hidden">
-                    <label for="sdBlocker_dividerWidth">Divider Width: </label>
+                    <label for="sdBlocker_dividerWidth">Width: </label>
                     <input
                       type="number"
                       id="sdBlocker_dividerWidth"
@@ -2524,13 +3101,8 @@
                       data-toolTip="Unit (%/rem)"
                       class="sdTextEditorSmall"
                     ></select>
-                    <label for="sdBlocker_dividerColor">Color:</label>
-                    <select
-                      id="sdBlocker_dividerColor"
-                      class="sdTextEditorSmall"
-                    ></select>
                     <label for="sdBlocker_dividerHeight"
-                      >Divider Height (rem):
+                      >Height Height (rem):
                     </label>
                     <input
                       type="number"
@@ -2542,8 +3114,14 @@
                       step=".1"
                     />
                     <br />
+                    <label for="sdBlocker_dividerColor">Color:</label>
+                    <select
+                      id="sdBlocker_dividerColor"
+                      class="sdTextEditorSmall"
+                    ></select>
                     <label for="sdBlocker_alignment">Alignment: </label>
                     <select id="sdBlocker_alignment"></select>
+                    <br />
                     <label for="sdBlocker_fullBleed">Full Width:</label>
                     <input type="checkbox" id="sdBlocker_fullBleed" />
                     <label for="sdBlocker_visible">Visibility:</label>
@@ -2551,7 +3129,7 @@
                   </div>
 
                   <div data-property="sdShieldGroup" class="hidden">
-                    <button id="sdShieldGroup_OpenShieldEditor">
+                    <button type="button" id="sdShieldGroup_OpenShieldEditor">
                       Open Shield Editor
                     </button>
                     <label for="sdShieldGroup_alignment">Alignment: </label>
@@ -2600,6 +3178,27 @@
                       value="100"
                     />
                     <br />
+                    <label for="sdAdvisory_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdAdvisory_wordSpacing"
+                    />
+                    <input
+                      id="sdAdvisory_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
+                    />
+                    <label for="sdAdvisory_textAlign">Text Alignment:</label>
+                    <select id="sdAdvisory_textAlign"></select>
+                    <br />
                     <label for="sdAdvisory_borderRadius"
                       >Roundness (px):
                     </label>
@@ -2612,8 +3211,23 @@
                       step="1"
                       value="4"
                     />
-                    <label for="sdAdvisory_textAlign">Text Alignment:</label>
-                    <select id="sdAdvisory_textAlign"></select>
+                    <label for="sdAdvisory_border">Border: </label>
+                    <input type="checkbox" id="sdAdvisory_border" />
+                    <input
+                      type="number"
+                      id="sdAdvisory_borderWidth"
+                      data-toolTip="Border Width (px)"
+                      min="0"
+                      step="1"
+                      class="hidden"
+                    />
+                    <select
+                      id="sdAdvisory_borderColor"
+                      data-toolTip="Border Color (px)"
+                      min="0"
+                      step="1"
+                      class="hidden"
+                    ></select>
                     <br />
                     <label for="sdAdvisory_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -2633,6 +3247,13 @@
                       step="1"
                       value="120"
                     />
+                    <input
+                      type="checkbox"
+                      class="hidden"
+                      id="sdAdvisory_spaceNumeralsLetters"
+                      data-toolTip="Space Numerals & Letters"
+                    />
+
                     <label for="sdAdvisory_useBannerFormatting"
                       >Enlarge Banners:</label
                     >
@@ -2735,6 +3356,13 @@
                           autocomplete="off"
                         />
                         <div class="smDropdownList"></div>
+                        <button
+                          type="button"
+                          id="sdIcon_customBtn"
+                          class="iconsDropdownCustom"
+                        >
+                          Select Custom Image
+                        </button>
                       </div>
                     </div>
                     <br />
@@ -2743,8 +3371,7 @@
                       type="number"
                       id="sdIcon_iconSize"
                       placeholder="100"
-                      min="50"
-                      max="150"
+                      min="0"
                       step="1"
                       value="100"
                     />
@@ -2773,13 +3400,12 @@
                     />
                     <br />
 
-                    <label for="sdIcon_spacing">Spacing:</label>
+                    <label for="sdIcon_spacing">Padding (px):</label>
                     <input
                       type="number"
                       id="sdIcon_spacing"
                       data-toolTip="Spacing"
                       min="0"
-                      max="8"
                       value="4"
                       placeholder="4"
                     />
@@ -2809,7 +3435,25 @@
 
                   <div data-property="sdArrow" class="hidden">
                     <label for="sdArrow_arrow">Arrow:</label>
-                    <select id="sdArrow_arrow"></select>
+                    <div id="sdArrow_arrow" class="smDropdownInputElement">
+                      <button class="smDropdownSelectedButton" type="button">
+                        <img class="smDropdownSelectedImage" alt="" />
+                        <span class="smDropdownSelectedLabel"></span>
+                        <span class="material-symbols-outlined smDropdownArrow"
+                          >arrow_drop_down</span
+                        >
+                      </button>
+                      <div class="hidden smDropdownHolder">
+                        <input
+                          type="search"
+                          class="smDropdownSearch"
+                          placeholder="Search arrows"
+                          autocomplete="off"
+                        />
+                        <div class="smDropdownList"></div>
+                      </div>
+                    </div>
+                    <br />
                     <label for="sdArrow_rotation">Rotation (deg):</label>
                     <input
                       type="range"
@@ -2898,7 +3542,7 @@
                     <select id="sdArrow_alignment"></select>
                     <br />
                     <label for="sdArrow_paddingHorizontal"
-                      >Horizontal Padding (rem):</label
+                      >Horizontal Container Padding (rem):</label
                     >
                     <input
                       type="number"
@@ -2910,7 +3554,7 @@
                       value="0"
                     />
                     <label for="sdArrow_paddingVertical"
-                      >Vertical Padding (rem):</label
+                      >Vertical Container Padding (rem):</label
                     >
                     <input
                       type="number"
@@ -2922,19 +3566,55 @@
                       value="0"
                     />
                     <br />
-                    <input type="hidden" id="sdArrow_flip" value="false" />
-                    <button
-                      type="button"
-                      id="sdArrow_flipButton"
-                      class="sdArrow_flipButton"
+                    <label for="sdArrow_marginHorizontal"
+                      >Image Margin Horizontal (rem):</label
                     >
-                      Flip
-                    </button>
+                    <input
+                      type="number"
+                      id="sdArrow_marginHorizontal"
+                      class="sdTextEditorSmall"
+                      value="0"
+                      step="0.1"
+                    />
+                    <label for="sdArrow_marginVertical"
+                      >Image Margin Vertical (rem):</label
+                    >
+                    <input
+                      type="number"
+                      id="sdArrow_marginVertical"
+                      class="sdTextEditorSmall"
+                      value="0"
+                      step="0.1"
+                    />
+                    <br />
+                    <label for="sdArrow_flip">Flip:</label>
+                    <input type="checkbox" id="sdArrow_flip" />
                   </div>
 
                   <div data-property="sdTollLogo" class="hidden">
-                    <label for="sdTollLogo_logo">Toll Logo:</label>
-                    <select id="sdTollLogo_logo"></select>
+                    <label for="sdTollLogoHolder">Toll Logo:</label>
+                    <div id="sdTollLogoHolder" class="smDropdownInputElement">
+                      <button class="smDropdownSelectedButton" type="button">
+                        <img class="smDropdownSelectedImage" alt="" />
+                        <span
+                          class="sdTollLogo_selectedLabel smDropdownSelectedLabel"
+                          >AIRPORT</span
+                        >
+                        <span class="material-symbols-outlined smDropdownArrow"
+                          >arrow_drop_down</span
+                        >
+                      </button>
+                      <div class="hidden smDropdownHolder">
+                        <input
+                          type="search"
+                          class="smDropdownSearch"
+                          placeholder="Search toll logos"
+                          autocomplete="off"
+                        />
+                        <div class="smDropdownList"></div>
+                      </div>
+                    </div>
+                    <br />
                     <label for="sdTollLogo_logoHeight">Size (rem):</label>
                     <input
                       type="number"
@@ -2945,7 +3625,6 @@
                       step="0.1"
                       value="3"
                     />
-                    <br />
                     <label for="sdTollLogo_spacing">Spacing (rem):</label>
                     <input
                       type="number"
@@ -2956,59 +3635,169 @@
                       step="0.1"
                       value="0"
                     />
+                    <br />
                     <label for="sdTollLogo_alignment">Alignment:</label>
                     <select id="sdTollLogo_alignment"></select>
-                    <br />
-                    <label for="sdTollLogo_background">Background:</label>
-                    <input type="checkbox" id="sdTollLogo_background" />
-                    <select
-                      id="sdTollLogo_backgroundColor"
-                      class="hidden"
-                      data-toolTip="Toll Logo Background Color"
-                    ></select>
                     <label for="sdTollLogo_squareIcon">Square Icon:</label>
                     <input type="checkbox" id="sdTollLogo_squareIcon" />
                     <br />
-                    <label for="sdTollLogo_hasOnlyBlock" class="hidden"
+                    <label for="sdTollLogo_background">Background:</label>
+                    <input type="checkbox" id="sdTollLogo_background" />
+                    <label for="sdTollLogo_showOnlyBlock"
                       >Show Only Block</label
                     >
-                    <input
-                      type="checkbox"
-                      id="sdTollLogo_hasOnlyBlock"
-                      class="hidden"
-                    />
-                    <label for="sdTollLogo_borderRadius" class="hidden"
-                      >Toll Logo Roundness (px)</label
-                    >
-                    <input
-                      type="number"
-                      id="sdTollLogo_borderRadius"
-                      class="hidden"
-                      min="0"
-                      max="100"
-                      step="1"
-                      value="8"
-                    />
-                    <label for="sdTollLogo_horizontalPadding" class="hidden"
-                      >Horizontal Background Padding (rem)</label
-                    >
-                    <input
-                      type="number"
-                      id="sdTollLogo_horizontalPadding"
-                      class="hidden"
-                      value=".2"
-                      step=".01"
-                    />
-                    <label for="sdTollLogo_verticalPadding" class="hidden"
-                      >Vertical Background Padding (rem)</label
-                    >
-                    <input
-                      type="number"
-                      id="sdTollLogo_verticalPadding"
-                      class="hidden"
-                      value=".05"
-                      step=".01"
-                    />
+                    <input type="checkbox" id="sdTollLogo_showOnlyBlock" />
+                    <br />
+                    <fieldset class="sdTollLogo_background">
+                      <legend>Background Settings</legend>
+                      <label for="sdTollLogo_backgroundColor"
+                        >Background Color:</label
+                      >
+                      <select id="sdTollLogo_backgroundColor"></select>
+                      <br />
+                      <label for="sdTollLogo_tollBorderRadius"
+                        >BG Roundness (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_tollBorderRadius"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="8"
+                      />
+                      <label for="sdTollLogo_border">Border Width (px):</label>
+                      <input
+                        type="number"
+                        id="sdTollLogo_border"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="1"
+                      />
+                      <br />
+                      <label for="sdTollLogo_horizontalPadding"
+                        >Horizontal Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_horizontalPadding"
+                        value=".2"
+                        step=".001"
+                      />
+                      <label for="sdTollLogo_verticalPadding"
+                        >Vertical Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_verticalPadding"
+                        value=".05"
+                        step=".001"
+                      />
+                    </fieldset>
+                    <fieldset class="sdTollLogo_showOnlyBlock">
+                      <legend>Only Block Settings</legend>
+                      <label for="sdTollLogo_onlyBlockDirection"
+                        >Direction:</label
+                      >
+                      <select id="sdTollLogo_onlyBlockDirection"></select>
+                      <label for="sdTollLogo_onlyBlockSpacing"
+                        >Spacing (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockSpacing"
+                        value=".2"
+                        step=".01"
+                      />
+                      <br />
+                      <label for="sdTollLogo_onlyBlockFontSize"
+                        >Font Size (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockFontSize"
+                        value="16"
+                        step="1"
+                      />
+                      <label for="sdTollLogo_fontFamily">Font Family:</label>
+                      <select id="sdTollLogo_fontFamily"></select>
+                      <br />
+                      <label for="sdTollLogo_onlyBlockHorizPadding"
+                        >Horizontal Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockHorizPadding"
+                        value=".2"
+                        step=".001"
+                      />
+                      <label for="sdTollLogo_onlyBlockVertPadding"
+                        >Vertical Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBlockVertPadding"
+                        value=".05"
+                        step=".001"
+                      />
+                      <hr />
+                      <label for="sdTollLogo_containerHorizontalPadding"
+                        >Container Horiz. Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerHorizontalPadding"
+                        value=".2"
+                        step=".01"
+                      />
+                      <label for="sdTollLogo_containerVerticalPadding"
+                        >Container Vert. Padding (rem):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerVerticalPadding"
+                        value=".05"
+                        step=".01"
+                      />
+                      <br />
+                      <label for="sdTollLogo_containerBackgroundColor"
+                        >Container BG Color:</label
+                      >
+                      <select id="sdTollLogo_containerBackgroundColor"></select>
+                      <label for="sdTollLogo_containerBorderWidth"
+                        >Border Width (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerBorderWidth"
+                        value="0"
+                        min="0"
+                        step="1"
+                      />
+                      <br />
+                      <label for="sdTollLogo_containerBorderRadius"
+                        >Container Roundness (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_containerBorderRadius"
+                        value="0"
+                        min="0"
+                        step="1"
+                      />
+                      <label for="sdTollLogo_onlyBorderRadius"
+                        >Only Roundness (px):</label
+                      >
+                      <input
+                        type="number"
+                        id="sdTollLogo_onlyBorderRadius"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="8"
+                      />
+                    </fieldset>
                   </div>
 
                   <div data-property="sdActionMessage" class="hidden">
@@ -3061,6 +3850,25 @@
                       value="100"
                     />
                     <br />
+                    <label for="sdActionMessage_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdActionMessage_wordSpacing"
+                    />
+                    <input
+                      id="sdActionMessage_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
+                    />
+                    <br />
                     <label for="sdActionMessage_useNumeralFormatting"
                       >Enlarge Numerals:</label
                     >
@@ -3079,6 +3887,13 @@
                       step="1"
                       value="120"
                     />
+                    <input
+                      type="checkbox"
+                      class="hidden"
+                      id="sdActionMessage_spaceNumeralsLetters"
+                      data-toolTip="Space Numerals & Letters"
+                    />
+
                     <label for="sdActionMessage_useBannerFormatting"
                       >Enlarge Banners:</label
                     >
@@ -3135,46 +3950,76 @@
                       value="100"
                     />
                     <br />
+                    <label for="sdElectronicSign_wordSpacing"
+                      >Word Spacing (rem):</label
+                    >
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      value="0"
+                      step="0.01"
+                      id="sdElectronicSign_wordSpacing"
+                    />
+                    <input
+                      id="sdElectronicSign_wordSpacingVal"
+                      class="smallVal"
+                      type="number"
+                      value="0"
+                      step="0.01"
+                    />
                     <label for="sdElectronicSign_textColor">Text Color:</label>
                     <select id="sdElectronicSign_textColor"></select>
-                    <label for="sdElectronicSign_lineHeight"
-                      >Line Height (%):
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="300"
-                      value="100"
-                      step="1"
-                      id="sdElectronicSign_lineHeight"
-                    />
-                    <input
-                      id="sdElectronicSign_lineHeightVal"
-                      class="smallVal"
-                      type="number"
-                      value="100"
-                      step="1"
-                    />
                     <br />
+                    <label for="sdElectronicSign_textFormat">Format:</label>
+                    <select id="sdElectronicSign_textFormat"></select>
+                    <input
+                      type="number"
+                      id="sdElectronicSign_formatSize"
+                      min="0"
+                      step=".01"
+                      value=".1"
+                      class="sdTextEditorSmall"
+                      data-toolTip="Pixel Size (px)"
+                    />
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
-                    <label for="sdElectronicSign_padding"
-                      >Padding (rem):
+                    <br />
+                    <label for="sdElectronicSign_vertPadding"
+                      >Vertical Padding (rem):
                     </label>
                     <input
                       type="range"
                       min="0"
-                      max="3"
+                      max="10"
                       value=".5"
-                      step=".1"
-                      id="sdElectronicSign_padding"
+                      step=".01"
+                      id="sdElectronicSign_vertPadding"
                     />
                     <input
-                      id="sdElectronicSign_paddingVal"
+                      id="sdElectronicSign_vertPaddingVal"
                       class="smallVal"
                       type="number"
                       value=".5"
-                      step="0.1"
+                      step=".01"
+                    />
+                    <label for="sdElectronicSign_horizPadding"
+                      >Horizontal Padding (rem):
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      value=".5"
+                      step=".01"
+                      id="sdElectronicSign_horizPadding"
+                    />
+                    <input
+                      id="sdElectronicSign_horizPaddingVal"
+                      class="smallVal"
+                      type="number"
+                      value=".5"
+                      step="0.01"
                     />
                     <br />
                     <label
@@ -3194,11 +4039,55 @@
                     <label for="sdElectronicSign_alignment">Alignment: </label>
                     <select id="sdElectronicSign_alignment"></select>
                   </div>
+
+                  <div data-property="sdGroup" class="hidden">
+                    <button id="sdGroup_editGroup">Edit Block Elements</button>
+                    <label for="sdGroup_direction">Direction:</label>
+                    <select id="sdGroup_direction"></select>
+                    <label for="sdGroup_width" data-tooltip="Set to 0 for auto"
+                      >Width (rem):</label
+                    >
+                    <input
+                      type="number"
+                      id="sdGroup_width"
+                      placeholder="0"
+                      min="0"
+                      step=".01"
+                      value="0"
+                    />
+                    <br />
+                    <label for="sdGroup_boxFormat">Box Format:</label>
+                    <select id="sdGroup_boxFormat"></select>
+                    <input
+                      type="number"
+                      id="sdGroup_formatSize"
+                      class="smallVal"
+                      min="0"
+                      step=".01"
+                      value=".04"
+                      data-toolTip="Pixel Size (rem)"
+                    />
+                    <label for="sdGroup_border">Border:</label>
+                    <input type="checkbox" id="sdGroup_border" />
+                    <input
+                      type="number"
+                      id="sdGroup_borderWidth"
+                      min="0"
+                      class="smallVal"
+                      step="1"
+                      value="5"
+                      data-toolTip="Border Width (px)"
+                    />
+                    <select
+                      id="sdGroup_borderColor"
+                      data-toolTip="Border Color"
+                    ></select>
+                  </div>
                 </div>
                 <fieldset id="smSPBlockProperties">
                   <legend>Block Properties</legend>
                   <div>
-                    <label for="sdBlock_topPadding" class="noLabelAlignment"
+                    <label for="sdBlock_topMargin" class="noLabelAlignment"
                       >Top Margin (rem):
                     </label>
                     <div>
@@ -3208,19 +4097,24 @@
                         max="3"
                         value="0"
                         step=".01"
-                        id="sdBlock_topPadding"
+                        id="sdBlock_topMargin"
+                        onchange="formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_topPaddingVal"
+                        id="sdBlock_topMarginVal"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
+                        oninput="
+                          document.querySelector('#sdBlock_topMargin').value =
+                            this.value
+                        "
                       />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_bottomPadding" class="noLabelAlignment"
+                    <label for="sdBlock_bottomMargin" class="noLabelAlignment"
                       >Bottom Margin (rem):
                     </label>
                     <div>
@@ -3230,7 +4124,64 @@
                         max="3"
                         value="0"
                         step=".01"
+                        id="sdBlock_bottomMargin"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_bottomMarginVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector(
+                            '#sdBlock_bottomMargin',
+                          ).value = this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <br />
+                  <div>
+                    <label for="sdBlock_topPadding" class="noLabelAlignment"
+                      >Top Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
+                        id="sdBlock_topPadding"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_topPaddingVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector('#sdBlock_topPadding').value =
+                            this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="sdBlock_bottomPadding" class="noLabelAlignment"
+                      >Bottom Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
                         id="sdBlock_bottomPadding"
+                        onchange="formHandler.readForm()"
                       />
                       <input
                         id="sdBlock_bottomPaddingVal"
@@ -3238,23 +4189,90 @@
                         type="number"
                         value="0"
                         step=".01"
+                        oninput="
+                          document.querySelector(
+                            '#sdBlock_bottomPadding',
+                          ).value = this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <br />
+                  <div>
+                    <label for="sdBlock_leftPadding" class="noLabelAlignment"
+                      >Left Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
+                        id="sdBlock_leftPadding"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_leftPaddingVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector('#sdBlock_leftPadding').value =
+                            this.value
+                        "
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="sdBlock_rightPadding" class="noLabelAlignment"
+                      >Right Padding (rem):
+                    </label>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0"
+                        step=".01"
+                        id="sdBlock_rightPadding"
+                        onchange="formHandler.readForm()"
+                      />
+                      <input
+                        id="sdBlock_rightPaddingVal"
+                        class="smallVal"
+                        type="number"
+                        value="0"
+                        step=".01"
+                        oninput="
+                          document.querySelector(
+                            '#sdBlock_rightPadding',
+                          ).value = this.value
+                        "
                       />
                     </div>
                   </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
-                  <select id="sdBlock_backgroundColor"></select>
+                  <select
+                    id="sdBlock_backgroundColor"
+                    onchange="formHandler.readForm()"
+                  ></select>
                   <label for="sdBlock_backgroundFullWidth"
                     >BG Full Width:</label
                   >
-                  <input type="checkbox" id="sdBlock_backgroundFullWidth" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_backgroundFullWidth"
+                    onchange="formHandler.readForm()"
+                  />
                   <br />
                   <label
                     for="sdBlock_width"
                     data-toolTip="Width of the block, set to 0 to automatically resize"
-                    >Width:</label
+                    >Width (rem):</label
                   >
-                  <select id="sdBlock_widthType"></select>
                   <input
                     type="number"
                     id="sdBlock_width"
@@ -3263,6 +4281,7 @@
                     min="0"
                     step=".05"
                     value="0"
+                    onchange="formHandler.readForm()"
                   />
                   <br />
                   <label
@@ -3270,15 +4289,27 @@
                     data-toolTip="Allow the alignment to take up the remaining space."
                     >Stretch:</label
                   >
-                  <input type="checkbox" id="sdBlock_stretchLeft" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_stretchLeft"
+                    onchange="formHandler.readForm()"
+                  />
                   <label for="sdBlock_stretchLeft" class="noLabelAlignment"
                     >Left
                   </label>
-                  <input type="checkbox" id="sdBlock_stretchCenter" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_stretchCenter"
+                    onchange="formHandler.readForm()"
+                  />
                   <label for="sdBlock_stretchCenter" class="noLabelAlignment"
                     >Center
                   </label>
-                  <input type="checkbox" id="sdBlock_stretchRight" />
+                  <input
+                    type="checkbox"
+                    id="sdBlock_stretchRight"
+                    onchange="formHandler.readForm()"
+                  />
                   <label for="sdBlock_stretchRight" class="noLabelAlignment"
                     >Right</label
                   >
@@ -3299,7 +4330,26 @@
               />
               <br />
               <label for="subpanelAlign">Align Items:</label>
-              <select id="subpanelAlign"></select>
+              <select
+                id="subpanelAlign"
+                onchange="formHandler.readForm()"
+              ></select>
+              <br />
+              <label for="subpanelDividerHeight">Divider Height:</label>
+              <select
+                id="subpanelDividerHeightUnit"
+                name="subpanelDividerHeightUnit"
+                onchange="formHandler.readForm()"
+              ></select>
+              <input
+                id="subpanelDividerHeight"
+                name="subpanelDividerHeight"
+                type="number"
+                min="0"
+                step=".1"
+                value="50"
+                onchange="formHandler.readForm()"
+              />
             </div>
           </div>
         </div>
@@ -3328,21 +4378,21 @@
           <div class="sMModalContent">
             <div id="sMArrowType">
               <div class="sMA_typeSelect">
-                <button id="sMA_typeStandard" class="selected">
+                <button type="button" id="sMA_typeStandard" class="selected">
                   <img
                     class="sMA_typeVisual"
-                    src="./assets/form/exitTabVariants/Normal.png"
+                    src="./assets/form/arrowVariants/StandardArrows.png"
                   />
                   <span class="sMA_typeLabel">Standard Arrows</span>
                 </button>
-                <button id="sMA_typeAPL">
+                <button type="button" id="sMA_typeAPL">
                   <img
                     class="sMA_typeVisual"
                     src="./assets/form/arrowVariants/ArrowPerLane.png"
                   />
                   <span class="sMA_typeLabel">Arrow Per Lane</span>
                 </button>
-                <button id="sMA_typeDiagrammic">
+                <button type="button" id="sMA_typeDiagrammic">
                   <img
                     class="sMA_typeVisual"
                     src="./assets/form/arrowVariants/Diagrammic.png"
@@ -3352,182 +4402,525 @@
               </div>
             </div>
             <div id="sMStandardArrows" class="tabHidden">
-              <div>
-                <legend>Standard Arrows</legend>
-                <label for="guideArrow">Arrows:</label>
-                <select
-                  id="guideArrow"
-                  onchange="formHandler.readForm()"
-                ></select>
+              <label for="guideArrow">Variant:</label>
+              <select
+                id="guideArrow"
+                onchange="formHandler.readForm()"
+              ></select>
+              <br />
+              <div class="standardArrow_selectHeader">
+                <span id="standardArrowSelected">Selected: Arrow 1</span>
+                <button
+                  id="standardArrowAdd"
+                  onclick="App.addStandardArrow()"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">add</span> Add
+                </button>
+                <button
+                  id="standardArrowRemove"
+                  onclick="App.removeStandardArrow()"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">delete</span>Remove
+                </button>
+                <button
+                  id="standardArrowDuplicate"
+                  onclick="App.duplicateStandardArrow()"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">content_copy</span
+                  >Duplicate
+                </button>
+              </div>
+              <div id="standardArrowList"></div>
+              <div id="standardArrowCustomSettings">
+                <div id="standardArrowProperties">
+                  <label for="guideStandardArrow">Arrow:</label>
+                  <div id="guideStandardArrow" class="smDropdownInputElement">
+                    <button class="smDropdownSelectedButton" type="button">
+                      <img class="smDropdownSelectedImage" alt="" />
+                      <span class="smDropdownSelectedLabel"></span>
+                      <span class="material-symbols-outlined smDropdownArrow"
+                        >arrow_drop_down</span
+                      >
+                    </button>
+                    <div class="hidden smDropdownHolder">
+                      <input
+                        type="search"
+                        class="smDropdownSearch"
+                        placeholder="Search arrows"
+                        autocomplete="off"
+                      />
+                      <div class="smDropdownList"></div>
+                    </div>
+                  </div>
+                  <br />
+                  <label for="guideStandardArrow_rotation"
+                    >Rotation (deg):</label
+                  >
+                  <input
+                    type="number"
+                    id="guideStandardArrow_rotation"
+                    value="0"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="guideStandardArrow_size">Size (rem):</label>
+                  <input
+                    type="number"
+                    id="guideStandardArrow_size"
+                    value="1.75"
+                    step="0.01"
+                    min="0"
+                    onchange="formHandler.readForm()"
+                  />
+                  <div class="sdGuideArrows_rotationButtons">
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="0"
+                    >
+                      0°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="45"
+                    >
+                      45°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="90"
+                    >
+                      90°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="135"
+                    >
+                      135°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="180"
+                    >
+                      180°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="225"
+                    >
+                      225°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="270"
+                    >
+                      270°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdGuideArrows_rotationPreset"
+                      data-degrees="315"
+                    >
+                      315°
+                    </button>
+                  </div>
+                  <br />
+                  <label for="guideStandardArrow_marginHorizontal"
+                    >Margin Horizontal (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="guideStandardArrow_marginHorizontal"
+                    value="0"
+                    step="0.01"
+                    min="0"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="guideStandardArrow_marginVertical"
+                    >Margin Vertical (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="guideStandardArrow_marginVertical"
+                    value="0"
+                    step="0.01"
+                    min="0"
+                    onchange="formHandler.readForm()"
+                  />
+                  <br />
+                  <label for="guideStandardArrow_flip">Flip:</label>
+                  <input
+                    type="checkbox"
+                    id="guideStandardArrow_flip"
+                    onchange="formHandler.readForm()"
+                  />
+                </div>
+              </div>
+              <div id="standardArrowGeneralSettings">
+                <label for="standardArrows_gap">Gap (rem):</label>
                 <input
                   type="number"
-                  id="guideArrowLanes"
-                  name="guideArrowLanes"
-                  min="1"
-                  max="6"
-                  onblur="formHandler.readForm()"
+                  id="standardArrows_gap"
+                  value="1"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
                 />
+                <label for="standardArrows_justify">Align:</label>
+                <select
+                  id="standardArrows_justify"
+                  name="standardArrows_justify"
+                  onchange="formHandler.readForm()"
+                ></select>
                 <br />
-                <label id="arrowLocationLabel" for="arrowLocations"
-                  >Arrow Location:</label
+                <label for="standardArrows_horizontalPadding"
+                  >Horizontal Padding (rem):</label
                 >
+                <input
+                  type="number"
+                  id="standardArrows_horizontalPadding"
+                  value="1"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="standardArrows_verticalPadding"
+                  >Top/Bottom Padding (rem):</label
+                >
+                <input
+                  type="number"
+                  class="smallVal"
+                  id="standardArrows_verticalTopPadding"
+                  value="0"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+                <span>/</span>
+                <input
+                  type="number"
+                  class="smallVal"
+                  id="standardArrows_verticalBottomPadding"
+                  value=".5"
+                  step="0.01"
+                  min="0"
+                  onchange="formHandler.readForm()"
+                />
+              </div>
+              <div id="standardArrowExitOnlySettings">
+                <fieldset id="standardArrowExitOnlyArrowProperties">
+                  <legend>Arrows</legend>
+                  <label for="exitOnlyArrowType">Arrow Type:</label>
+                  <div id="exitOnlyArrowType" class="smDropdownInputElement">
+                    <button class="smDropdownSelectedButton" type="button">
+                      <img class="smDropdownSelectedImage" alt="" />
+                      <span class="smDropdownSelectedLabel"></span>
+                      <span class="material-symbols-outlined smDropdownArrow"
+                        >arrow_drop_down</span
+                      >
+                    </button>
+                    <div class="hidden smDropdownHolder">
+                      <input
+                        type="search"
+                        class="smDropdownSearch"
+                        placeholder="Search arrows"
+                        autocomplete="off"
+                      />
+                      <div class="smDropdownList"></div>
+                    </div>
+                  </div>
+                  <br />
+                  <label for="exitOnlyArrowCount"># Arrows:</label>
+                  <input
+                    type="number"
+                    id="exitOnlyArrowCount"
+                    min="0"
+                    value="1"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="exitOnlyArrowSize">Arrow Size (rem):</label>
+                  <input
+                    type="number"
+                    id="exitOnlyArrowSize"
+                    value="1.75"
+                    step="0.01"
+                    min="0"
+                    onchange="formHandler.readForm()"
+                  />
+                  <br />
+                  <label for="exitOnlyArrowRotation"
+                    >Arrow Rotation (deg):</label
+                  >
+                  <input
+                    type="number"
+                    id="exitOnlyArrowRotation"
+                    value="0"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="exitOnlyArrowFlip">Flip:</label>
+                  <input
+                    type="checkbox"
+                    id="exitOnlyArrowFlip"
+                    onchange="formHandler.readForm()"
+                  />
+                  <br />
+                  <div class="sdExitOnlyGuide_rotationButtons">
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="0"
+                    >
+                      0°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="45"
+                    >
+                      45°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="90"
+                    >
+                      90°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="135"
+                    >
+                      135°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="180"
+                    >
+                      180°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="225"
+                    >
+                      225°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="270"
+                    >
+                      270°
+                    </button>
+                    <button
+                      type="button"
+                      class="sdExitOnlyGuide_rotationPreset"
+                      data-degrees="315"
+                    >
+                      315°
+                    </button>
+                  </div>
+                </fieldset>
+                <br />
+                <fieldset id="standardArrowExitOnlyText">
+                  <legend>Text</legend>
+                  <label for="exitOnlyText">Exit Only Text:</label>
+                  <input
+                    type="text"
+                    id="exitOnlyText"
+                    name="exitOnlyText"
+                    placeholder="EXIT ONLY"
+                    oninput="formHandler.readForm()"
+                  />
+                  <label
+                    for="exitOnlyTextPosition"
+                    id="exitOnlyTextPositionLabel"
+                    >Exit Text Position:</label
+                  >
+                  <select
+                    id="exitOnlyTextPosition"
+                    onchange="formHandler.readForm()"
+                  ></select>
+                  <br />
+                  <label for="exitOnlyFontFamily">Exit Only Font:</label>
+                  <select
+                    id="exitOnlyFontFamily"
+                    onchange="formHandler.readForm()"
+                  ></select>
+                  <label for="exitOnlyFontSize">Exit Only Font Size:</label>
+                  <input
+                    type="number"
+                    id="exitOnlyFontSize"
+                    value="16"
+                    onchange="formHandler.readForm()"
+                  />
+                  <br />
+                  <label for="exitOnlyWordSpacing"
+                    >Exit Only Word Spacing (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="exitOnlyWordSpacing"
+                    value="0"
+                    step=".05"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="exitOnlyLetterSpacing"
+                    >Exit Only Letter Spacing (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="exitOnlyLetterSpacing"
+                    value="0"
+                    step=".05"
+                    onchange="formHandler.readForm()"
+                  />
+                  <br />
+                  <label for="splitExitOnlyHorizPadding"
+                    >Exit Only Horizontal Padding (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="splitExitOnlyHorizPadding"
+                    value="0"
+                    min="0"
+                    step=".05"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="splitExitOnlyVertPadding"
+                    >Exit Only Vertical Padding (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="splitExitOnlyVertPadding"
+                    value="0"
+                    min="0"
+                    step=".05"
+                    onchange="formHandler.readForm()"
+                  />
+                  <br />
+                  <label for="splitExitOnlyBorderRadius"
+                    >Exit Only Border Radius (px):</label
+                  >
+                  <input
+                    type="number"
+                    id="splitExitOnlyBorderRadius"
+                    value="4"
+                    min="0"
+                    step="1"
+                    onchange="formHandler.readForm()"
+                  />
+                </fieldset>
+                <label id="exitOnlyBorderModeLabel" for="exitOnlyBorderMode"
+                  >Exit Only Border:</label
+                >
+                <select
+                  id="exitOnlyBorderMode"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <label for="arrowLocations">Exit Only Position:</label>
                 <select
                   id="arrowLocations"
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="useCanadianDownArrows"
-                  >Use Canadian Down Arrow</label
+                <label for="exitOnlyHorizontalPadding"
+                  >Container Horizontal Padding (rem):</label
                 >
                 <input
-                  type="checkbox"
-                  id="useCanadianDownArrows"
-                  name="useCanadianDownArrows"
-                  onchange="formHandler.readForm()"
-                />
-                <br />
-                <label
-                  id="exitOnlyDirectionLabel"
-                  for="exitOnlyDirection"
-                  class="invisible"
-                  >Direction:</label
-                >
-                <select
-                  id="exitOnlyDirection"
-                  onchange="formHandler.readForm()"
-                  class="invisible"
-                ></select>
-                <label
-                  id="showExitOnlyLabel"
-                  for="showExitOnly"
-                  class="invisible"
-                  >Hide Label</label
-                >
-                <input
-                  type="checkbox"
-                  id="showExitOnly"
-                  name="showExitOnly"
-                  onchange="formHandler.readForm()"
-                  class="invisible"
-                />
-                <label
-                  id="hideExitArrowLabel"
-                  for="hideExitArrow"
-                  class="invisible"
-                  >Hide Arrow</label
-                >
-                <input
-                  type="checkbox"
-                  id="hideExitArrow"
-                  name="hideExitArrow"
-                  onchange="formHandler.readForm()"
-                  class="invisible"
-                />
-                <label
-                  id="exitOnlyBorderModeLabel"
-                  for="exitOnlyBorderMode"
-                  class="invisible"
-                  >Exit Only Border:</label
-                >
-                <select
-                  id="exitOnlyBorderMode"
-                  class="invisible"
-                  onchange="formHandler.readForm()"
-                >
-                  <option value="edge">Full Black Border</option>
-                  <option value="white-edge">Partial Black Border</option>
-                </select>
-                <label
-                  id="exitOnlyLeftTextLabel"
-                  for="exitOnlyLeftText"
-                  class="invisible"
-                  >Left Text:</label
-                >
-                <input
-                  type="text"
-                  id="exitOnlyLeftText"
-                  name="exitOnlyLeftText"
-                  placeholder="EXIT"
-                  class="invisible"
-                  oninput="formHandler.readForm()"
-                />
-                <label
-                  id="exitOnlyRightTextLabel"
-                  for="exitOnlyRightText"
-                  class="invisible"
-                  >Right Text:</label
-                >
-                <input
-                  type="text"
-                  id="exitOnlyRightText"
-                  name="exitOnlyRightText"
-                  placeholder="ONLY"
-                  class="invisible"
-                  oninput="formHandler.readForm()"
-                />
-                <br />
-                <label
-                  id="exitOnlyPaddingLabel"
-                  for="exitOnlyPadding"
-                  class="invisible"
-                  >Spacing:
-                  <input
-                    type="button"
-                    class="resetBtn clear"
-                    id="paddingReset"
-                    value="Reset"
-                  />
-                </label>
-                <input
-                  id="exitOnlyPadding"
-                  type="range"
+                  type="number"
+                  id="exitOnlyHorizontalPadding"
+                  value="0"
                   min="0"
-                  max="2"
-                  step="0.05"
-                  value="0.25"
-                  oninput="
-                    document.querySelector('#paddingValue').textContent =
-                      this.value
-                  "
+                  step=".05"
                   onchange="formHandler.readForm()"
-                  class="invisible"
                 />
-                <label
-                  for="exitOnlyPadding"
-                  id="paddingValue"
-                  style="
-                    text-align: left;
-                    margin: 0;
-                    font-size: 2rem;
-                    width: auto;
-                  "
-                  class="invisible"
-                  >0.25</label
+                <label for="exitOnlyVerticalPadding"
+                  >Container Vertical Padding (rem):</label
                 >
+                <input
+                  type="number"
+                  id="exitOnlyVerticalPadding"
+                  value="0.5"
+                  min="0"
+                  step=".05"
+                  onchange="formHandler.readForm()"
+                />
                 <br />
-                <label for="secondExitOnly" id="secondExitOnlyLabel"
-                  >2nd Exit Only Design
-                </label>
+                <label for="exitOnlyGap">Arrow Gap (rem):</label>
+                <input
+                  type="number"
+                  id="exitOnlyGap"
+                  value="0.5"
+                  min="0"
+                  step=".05"
+                  onchange="formHandler.readForm()"
+                />
+                <label for="exitOnlyTextGap">Text-Arrow Gap (rem):</label>
+                <input
+                  type="number"
+                  id="exitOnlyTextGap"
+                  value="0.5"
+                  min="0"
+                  step=".05"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="exitOnlyDisplayOutsideArrow">Outer Arrow:</label>
                 <input
                   type="checkbox"
-                  id="secondExitOnly"
-                  name="secondExitOnly"
-                  value="secondExitOnly"
+                  id="exitOnlyDisplayOutsideArrow"
+                  checked
                   onchange="formHandler.readForm()"
                 />
+                <label for="exitOnlyOutsideGap">Outside Arrow Gap (rem):</label>
+                <input
+                  type="number"
+                  id="exitOnlyOutsideGap"
+                  value="5"
+                  min="0"
+                  step=".05"
+                  onchange="formHandler.readForm()"
+                />
+                <br />
+                <label for="exitOnlyBGColor">Container BG Color:</label>
+                <select
+                  id="exitOnlyBGColor"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <label for="exitOnlyRoundCorners">Round All Corners:</label>
+                <input
+                  type="checkbox"
+                  id="exitOnlyRoundCorners"
+                  onchange="formHandler.readForm()"
+                />
+
                 <hr />
-                <label for="otherSymbol">Other Bottom Symbols:</label>
+                <label for="otherSymbol">Other Bottom Symbol:</label>
                 <select
                   id="otherSymbol"
                   onchange="formHandler.readForm()"
                 ></select>
-                <input
-                  type="text"
-                  id="oSNum"
-                  name="oSNum"
-                  placeholder="Exit Num"
-                  onblur="formHandler.readForm()"
-                />
+                <div>
+                  <label for="oSNum">Exit Number:</label>
+                  <input
+                    type="text"
+                    id="oSNum"
+                    name="oSNum"
+                    placeholder="Exit Num"
+                    onblur="formHandler.readForm()"
+                  />
+                </div>
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">
@@ -3570,10 +4963,10 @@
             </div>
             <div id="sMDiagrammic" class="tabHidden">
               <div>
-                <button id="sMDiagrammicOpenEditor">
+                <button type="button" id="sMDiagrammicOpenEditor">
                   Open Diagrammic Drawing Editor
                 </button>
-                <button id="sMDiagrammicOpenEditorPresets">
+                <button type="button" id="sMDiagrammicOpenEditorPresets">
                   Edit Existing Presets
                 </button>
               </div>
@@ -3600,9 +4993,70 @@
             </div>
           </div>
         </div>
+        <div
+          class="sMModal creationsConfig"
+          data-current-menu="sMCreationsSaved"
+        >
+          <nav class="sMModalBar">
+            <div class="sMModalTitle">
+              <span class="material-symbols-outlined">draft</span> Creations
+            </div>
+            <a
+              tabindex="0"
+              data-tab="sMCreationsSaved"
+              class="sMModalTab selected"
+            >
+              Saved
+            </a>
+            <a tabindex="0" data-tab="sMCreationsTemplates" class="sMModalTab">
+              Templates
+            </a>
+          </nav>
+          <div class="sMModalContent">
+            <div id="sMCreationsSaved">
+              <fieldset>
+                <legend>Autosave</legend>
+                <span id="sMCreationsAutosaveDate"
+                  >Last updated: 12/31/1970 23:59:59</span
+                >
+                <div>
+                  <button id="sMCreationsReset" class="redButton">Reset</button>
+                  <button id="sMCreationsSaveAs">Save As</button>
+                  <label for="sMCreationsFileName" class="noLabelAlignment"
+                    >Name:</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="File Name"
+                    id="sMCreationsFileName"
+                  />
+                </div>
+              </fieldset>
+              <h3>Saved Files</h3>
+              <input
+                type="search"
+                id="sMCreationsSearchList"
+                placeholder="Search for files"
+              />
+              <div id="sMCreationsSavedList"></div>
+            </div>
+            <div id="sMCreationsTemplates" class="tabHidden">
+              <label>Category:</label>
+              <select id="sMCreationsTemplateCategory"></select>
+
+              <input
+                type="search"
+                id="sMCreationsTemplateSearch"
+                placeholder="Search for templates"
+              />
+              <div id="sMCreationsTemplatesList"></div>
+            </div>
+          </div>
+        </div>
       </div>
       <nav id="sMConfigBar" data-current-menu="">
         <button
+          type="button"
           id="postConfig"
           class="sMConfigOption"
           data-toolTip="Post Settings"
@@ -3616,9 +5070,13 @@
           <div id="panelSelect" class="panelSelector">
             <span class="panelPopoverHint">(Drag to reorder)</span>
             <div class="panelActions">
-              <button class="new" onclick="App.newPanel()">Add Panel</button>
-              <!--<button id="duplicatePanel" class="dup">Duplicate</button>-->
-              <button class="del" onclick="App.deletePanel()">Remove</button>
+              <button type="button" class="new" onclick="App.newPanel()">
+                Add Panel
+              </button>
+              <!--<button type="button" id="duplicatePanel" class="dup">Duplicate</button>-->
+              <button type="button" class="del" onclick="App.deletePanel()">
+                Remove
+              </button>
             </div>
             <div id="panelList" class="panelList"></div>
             <div class="panelSpacingControl">
@@ -3647,44 +5105,74 @@
             </div>
           </div>
         </div>
-        <button id="panelStyleConfig" class="sMConfigOption">
+        <button type="button" id="panelStyleConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> tune </span>
           <span>Panel Style</span>
         </button>
-        <button id="exitTabConfig" class="sMConfigOption">
+        <button type="button" id="exitTabConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> folder </span>
           <span>Exit Tabs</span>
         </button>
-        <button id="subPanelConfig" class="sMConfigOption">
+        <button type="button" id="subPanelConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> description </span>
           <span>Subpanels</span>
         </button>
-        <button id="guideArrowConfig" class="sMConfigOption">
+        <button type="button" id="guideArrowConfig" class="sMConfigOption">
           <span class="material-symbols-outlined"> explore </span>
           <span>Guide Arrows</span>
         </button>
-        <button id="export" class="sMConfigOption" data-toolTip="Export">
+        <button type="button" id="creationsConfig" class="sMConfigOption">
+          <span class="material-symbols-outlined"> draft </span>
+          <span>Creations</span>
+        </button>
+        <button
+          type="button"
+          id="exportSign"
+          class="sMConfigOption"
+          data-toolTip="Export"
+        >
           <span class="material-symbols-outlined"> download </span>
         </button>
-        <button id="nightMode" class="sMConfigOption" data-toolTip="Night Mode">
+        <button
+          type="button"
+          id="importSign"
+          class="sMConfigOption"
+          data-toolTip="Import"
+        >
+          <span class="material-symbols-outlined"> upload </span>
+        </button>
+        <button
+          type="button"
+          id="nightMode"
+          class="sMConfigOption"
+          data-toolTip="Night Mode"
+        >
           <span class="material-symbols-outlined"> dark_mode </span>
         </button>
-        <button id="hideConfig" class="sMConfigOption" data-toolTip="Hide">
+        <button
+          type="button"
+          id="hideConfig"
+          class="sMConfigOption"
+          data-toolTip="Hide"
+        >
           <span class="material-symbols-outlined"> hide </span>
         </button>
       </nav>
     </form>
     <footer id="signMakerFooter">
       <div>
-        <img src="assets/other-symbols/icon.png" />
+        <img src="assets/other-symbols/SignMakerIconRotated.png" />
         <div>
           <h3>Highway Sign Maker (v2.2)</h3>
-          <p>made by JK_Potato/Computer the community</p>
+          <p>made by JK_Potato/Computer & the community*</p>
           <p>
             forked from
             <a href="https://github.com/dki-os/SignMaker" target="_blank"
               >dki-os/SignMaker</a
             >
+          </p>
+          <p>
+            <small>*built with love and human ingenuity, <b>not</b> ai.</small>
           </p>
         </div>
       </div>
@@ -3709,7 +5197,7 @@
     <template id="sMAPL_templateAPLItem">
       <div class="smAPLCat_apl">
         <div class="smAPLCat_aplRow1">
-          <button class="smAPLCat_aplDragger">::</button>
+          <button type="button" class="smAPLCat_aplDragger">::</button>
           <div class="smAPLCat_aplSelectHolder smDropdownInputElement">
             <button
               type="button"
@@ -3731,7 +5219,7 @@
               <div class="smDropdownList"></div>
             </div>
           </div>
-          <button class="smAPL_Delete redButton">Delete</button>
+          <button type="button" class="smAPL_Delete redButton">Delete</button>
         </div>
         <div class="smAPLCat_aplRow2">
           <span>Size (rem):</span>
@@ -3843,7 +5331,7 @@
       <div class="smAPLCat_container">
         <span class="smAPLCat_title">Subpanel 1</span>
         <div class="smAPLCat_options">
-          <button class="smAPLCat_addArrow">Add Arrow</button>
+          <button type="button" class="smAPLCat_addArrow">Add Arrow</button>
           <span class="smAPLCat_justifyLabel">Justify:</span>
           <select
             class="smAPLCat_justifyAPLs"
@@ -3856,7 +5344,7 @@
 
     <template id="smSP_templateBannerElement">
       <div class="smSP_bannerElement">
-        <button class="smSP_deleteBanner">X</button>
+        <button type="button" class="smSP_deleteBanner">X</button>
         <div class="smSP_bannerEditor">
           <div>
             <input

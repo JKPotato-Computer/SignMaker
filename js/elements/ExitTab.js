@@ -1,125 +1,116 @@
-class ExitTab {
-  constructor({
-    // Content
-    textContent = "EXIT 1",
-    subTextContent = "",
-    shields = [],
+const defaultExitTabConfig = {
+  // Content
+  textContent: "EXIT 1",
+  subTextContent: "",
+  shields: {
+    left: [],
+    right: [],
+  },
 
-    // Appearance
-    backgroundColor = "inherit",
-    borderStyle = "round",
-    borderThickness = 0.2,
-    borderRadius = 0.5,
-    useFullBorder = true,
+  // Appearance
+  backgroundColor: "inherit",
+  borderStyle: "round",
+  borderThickness: 0.2,
+  borderRadius: 0.5,
+  useFullBorder: true,
 
-    horizontalPadding = 0.5,
-    verticalPadding = 0,
-    minimumHeight = 2.25,
-    holderPadding = 0,
+  horizontalPadding: 0.5,
+  verticalPadding: 0,
+  minimumHeight: 2.25,
+  holderPadding: 0,
 
-    fontSize = 20,
-    lineHeight = 100,
-    enlargeNumerals = true,
-    enlargeNumeralsSize = 150,
-    spaceLettersNumerals = true,
-    numeralWordSpacing = 0.25,
+  fontSize: 20,
+  lineHeight: 100,
+  enlargeNumerals: true,
+  enlargeNumeralsSize: 150,
+  spaceLettersNumerals: true,
+  numeralWordSpacing: 0.25,
 
-    offsetNonNumerals = false,
-    fontFamily = "Clearview 5WR",
-    numeralFontFamily = "Inherit",
-    letterSpacing = 0,
-    numeralLetterSpacing = 0,
-    useTrimFormat = false,
+  offsetNonNumerals: false,
+  fontFamily: "Clearview 5WR",
+  numeralFontFamily: "Inherit",
+  letterSpacing: 0,
+  numeralLetterSpacing: 0,
+  useTrimFormat: false,
 
-    shieldsPosition = "start",
-    shieldsDirection = "horizontal",
-    shieldsGap = 0.5,
+  shieldsDirection: "horizontal",
+  shieldsGap: 0.5,
+  shieldWordSpacing: 0.25,
 
-    contentDirection = "horizontal",
+  contentDirection: "horizontal",
 
-    // Positioning
-    alignment = "center",
-    width = "auto",
-    widthSize = 0,
+  // Positioning
+  alignment: "right",
+  width: "auto",
+  widthSize: 0,
 
-    // Variant
-    variant = "Normal",
-    variantSettings = {
-      icon: {
-        icon: "AIRPORT",
-        tollIcon: "EZPass",
-        isTextBased: false,
-        iconBackgroundConfiguration: {
-          backgroundColor: "Transparent",
-          horizontalPadding: 0,
-          verticalPadding: 0,
-          borderRadius: 0,
-        },
-        addon: "none",
-        iconSize: 3,
-        isSquare: true,
-        isTollIcon: false,
-        showBackground: true,
-        onlyHorizontalPadding: 0.25,
-        pbmPadding: 0.25,
-        pbmIsSquare: true,
-        fontFamily: "Series E",
-        underline: false,
+  // Variant
+  variant: "Normal",
+  variantSettings: {
+    icon: {
+      icon: "AIRPORT",
+      iconType: "preset",
+      iconData: "",
+      tollIcon: "EZPass",
+      isTextBased: false,
+      iconBackgroundConfiguration: {
+        backgroundColor: "Transparent",
+        horizontalPadding: 0,
+        verticalPadding: 0,
+        borderRadius: 0,
       },
-      partialLeft: {
-        separateRow: true,
-        horizontalPadding: 0.6,
-        verticalPadding: 0.3,
-        letterSpacing: 2,
-        minWidth: 7,
-        spacing: 1.8,
-      },
-      hovVariant1: {
-        height: 0,
-        width: 0,
-        verticalPadding: 0.125,
-        roundCorners: false,
-      },
-      hovVariant2: {
-        height: 0,
-        width: 0,
-        verticalPadding: 0.125,
-      },
+      addon: "none",
+      iconSize: 3,
+      isSquare: true,
+      isTollIcon: false,
+      showBackground: true,
+      onlyHorizontalPadding: 0.25,
+      pbmPadding: 0.25,
+      pbmIsSquare: true,
+      fontFamily: "Series E",
+      underline: false,
+      fontSize: 0,
     },
-  } = {}) {
-    this.textContent = textContent;
-    this.subTextContent = subTextContent;
-    this.shields = shields;
-    this.backgroundColor = backgroundColor;
-    this.borderStyle = borderStyle;
-    this.borderThickness = borderThickness;
-    this.borderRadius = borderRadius;
-    this.useFullBorder = useFullBorder;
-    this.horizontalPadding = horizontalPadding;
-    this.verticalPadding = verticalPadding;
-    this.minimumHeight = minimumHeight;
-    this.fontSize = fontSize;
-    this.lineHeight = lineHeight;
-    this.enlargeNumerals = enlargeNumerals;
-    this.enlargeNumeralsSize = enlargeNumeralsSize;
-    this.spaceLettersNumerals = spaceLettersNumerals;
-    this.numeralWordSpacing = numeralWordSpacing;
-    this.offsetNonNumerals = offsetNonNumerals;
-    this.fontFamily = fontFamily;
-    this.numeralFontFamily = numeralFontFamily;
-    this.letterSpacing = letterSpacing;
-    this.numeralLetterSpacing = numeralLetterSpacing;
-    this.shieldsPosition = shieldsPosition;
-    this.shieldsDirection = shieldsDirection;
-    this.shieldsGap = shieldsGap;
-    this.contentDirection = contentDirection;
-    this.alignment = alignment;
-    this.width = width;
-    this.widthSize = widthSize;
-    this.variant = variant;
-    this.variantSettings = variantSettings;
-    this.holderPadding = holderPadding;
-    this.useTrimFormat = useTrimFormat;
+    fullLeft: {
+      minimumWidth: 7,
+      fontFamily: "Series E",
+      letterSpacing: 0,
+      bottomSpacing: 1.25,
+      flipJustify: false,
+    },
+    partialLeft: {
+      separateRow: true,
+      horizontalPadding: 0.6,
+      verticalPadding: 0.3,
+      letterSpacing: 2,
+      minWidth: 7,
+      spacing: 1.5,
+      fontFamily: "Series E",
+      borderRadius: 4,
+    },
+    hovVariant1: {
+      height: 0,
+      width: 0,
+      verticalPadding: 0.125,
+      roundCorners: false,
+    },
+    hovVariant2: {
+      height: 0,
+      width: 0,
+      verticalPadding: 0.125,
+    },
+  },
+};
+
+class ExitTab {
+  constructor(options = {}) {
+    const freshConfig = structuredClone(defaultExitTabConfig);
+
+    Object.assign(this, freshConfig);
+
+    if (Object.keys(options).length > 0) {
+      lib.deepMerge(this, options);
+    }
   }
 
   splitText(text) {
@@ -244,6 +235,30 @@ class ExitTab {
       leftElementContent.textContent = "LEFT";
       leftElementContent.className = "ET-FullLeft";
 
+      exitTabElement.style.minWidth =
+        this.variantSettings.fullLeft.minimumWidth + "rem";
+      leftElementContent.style.setProperty(
+        "--fontFamily",
+        '"' + this.variantSettings.fullLeft.fontFamily + '"',
+      );
+      leftElementContent.style.setProperty(
+        "--letterSpacing",
+        this.variantSettings.fullLeft.letterSpacing + "px",
+      );
+      exitTabElement.style.setProperty(
+        "--bottomSpacing",
+        this.variantSettings.fullLeft.bottomSpacing + "rem",
+      );
+
+      if (this.variantSettings.fullLeft.flipJustify) {
+        exitTabElement.style.justifyContent =
+          this.alignment == "left"
+            ? "right"
+            : this.alignment == "right"
+              ? "left"
+              : "center";
+      }
+
       leftElement.appendChild(leftElementContent);
       exitTabElement.appendChild(leftElement);
     } else if (this.variant == "PartialLeft") {
@@ -270,6 +285,15 @@ class ExitTab {
         "--partialLeftSpacing",
         this.variantSettings.partialLeft.spacing + "rem",
       );
+      leftElement.style.setProperty(
+        "--fontFamily",
+        '"' + this.variantSettings.partialLeft.fontFamily + '"',
+      );
+      leftElement.style.setProperty(
+        "--partialLeftBorderRadius",
+        this.variantSettings.partialLeft.borderRadius + "px",
+      );
+
       exitTabElement.appendChild(leftElement);
     }
 
@@ -326,17 +350,63 @@ class ExitTab {
         this.variant,
       )
     ) {
+      let afterShieldElems = null;
+
+      for (const shieldDirection of ["left", "right"]) {
+        if (
+          !this.shields[shieldDirection] ||
+          this.shields[shieldDirection].length === 0
+        ) {
+          continue;
+        }
+
+        const shieldHolder = document.createElement("div");
+        shieldHolder.className = `ET-shieldHolder ${shieldDirection} ${this.shieldsDirection}`;
+        shieldHolder.style.gap = this.shieldsGap + "rem";
+        shieldHolder.style.flexDirection =
+          this.shieldsDirection == "horizontal" ? "row" : "column";
+
+        if (shieldDirection == "left") {
+          shieldHolder.style.marginRight = this.shieldWordSpacing + "rem";
+        } else {
+          shieldHolder.style.marginLeft = this.shieldWordSpacing + "rem";
+        }
+
+        for (const shield of this.shields[shieldDirection]) {
+          const shieldElement = shield.createElement();
+          shieldHolder.appendChild(shieldElement);
+        }
+
+        if (shieldDirection == "left") {
+          if (this.variant == "HOVVariant2") {
+            textParentElement.insertBefore(
+              shieldHolder,
+              textParentElement.firstChild,
+            );
+          } else {
+            textParentElement.appendChild(shieldHolder);
+          }
+        } else {
+          afterShieldElems = shieldHolder;
+        }
+      }
+
       let splitText = this.splitText(this.textContent);
       for (let i = 0; i < splitText.length; i++) {
         let item = splitText[i];
         if (Array.isArray(item)) {
+          const groupHolder = document.createElement("span");
+          groupHolder.className = "ET-numeralGroup";
+          groupHolder.style.gap = this.fontSize * 0.25 + "px";
+
           const wordElem1 = document.createElement("span");
           wordElem1.textContent = item[0];
           wordElem1.className = "ET-numeral";
 
-          textParentElement.appendChild(wordElem1);
+          groupHolder.appendChild(wordElem1);
 
           if (item[1] === "") {
+            textParentElement.appendChild(groupHolder);
             continue;
           }
 
@@ -344,10 +414,13 @@ class ExitTab {
           wordElem2.textContent = item[1];
           wordElem2.className = "ET-trailing";
 
-          textParentElement.appendChild(wordElem2);
+          groupHolder.appendChild(wordElem2);
+          textParentElement.appendChild(groupHolder);
         } else {
           const wordElem = document.createElement("span");
-          wordElem.textContent = item;
+          wordElem.textContent = item
+            .replace(/\\t/g, "\t")
+            .replace(/\\n/g, "\n");
 
           if (/\d/.test(item)) {
             wordElem.className = "ET-numeral";
@@ -370,17 +443,20 @@ class ExitTab {
           textParentElement.appendChild(wordElem);
         }
       }
+
+      if (afterShieldElems) {
+        textParentElement.appendChild(afterShieldElems);
+      }
     }
 
     if (this.variant == "Icon") {
       const iconSettings = this.variantSettings.icon;
       const iconLibrary = iconSettings.isTollIcon
-        ? TollLogoElement.prototype.logos
-        : IconElement.prototype.icons;
-      const iconDefinition =
-        iconLibrary[
-          iconSettings.isTollIcon ? iconSettings.tollIcon : iconSettings.icon
-        ];
+        ? TollLogoElement.logos
+        : IconElement.icons;
+      const iconDefinition = iconSettings.isTollIcon
+        ? iconLibrary[iconSettings.tollIcon]
+        : iconLibrary[iconSettings.icon];
 
       if (!iconSettings.showBackground) {
         exitTabHolder.style.background = "none";
@@ -425,7 +501,9 @@ class ExitTab {
         "ET-iconImage " + (iconSettings.isSquare ? "square" : "");
       imageElement.src = iconSettings.isTollIcon
         ? iconDefinition.src
-        : `./assets/icons/${iconDefinition}`;
+        : iconSettings.iconType === "custom"
+          ? iconSettings.iconData
+          : `./assets/icons/${iconDefinition}`;
       imageHolder.appendChild(imageElement);
 
       if (
@@ -462,7 +540,6 @@ class ExitTab {
         }
       }
 
-      exitTabElement.style.padding = "0";
       exitTabElement.style.gap = "";
 
       if (iconSettings.addon.toLowerCase() == "only") {
@@ -484,7 +561,7 @@ class ExitTab {
         exitTabElement.appendChild(onlyElement);
 
         exitTabElement.style.padding = "";
-      } else if (iconSettings.addon.toLowerCase() == "pay by mail 1") {
+      } else if (iconSettings.addon.toLowerCase() == "or variant") {
         exitTabElement.appendChild(imageHolder);
 
         const orElement = document.createElement("span");
@@ -497,11 +574,19 @@ class ExitTab {
           "ET-iconPayByMail ET-iconImage " +
           (iconSettings.pbmIsSquare ? "square" : "");
         payByMailElement.textContent = this.textContent;
+
+        if (iconSettings.fontSize > 0) {
+          payByMailElement.style.fontSize = iconSettings.fontSize + "rem";
+        }
+
+        exitTabElement.style.padding = "";
         exitTabElement.appendChild(payByMailElement);
       } else {
         const textElement = document.createElement("span");
         textElement.className = "ET-iconText ";
-        textElement.textContent = this.textContent;
+        textElement.textContent = this.textContent
+          .replace(/\\t/g, "\t")
+          .replace(/\\n/g, "\n");
         if (this.subTextContent) {
           textElement.textContent += "\n" + this.subTextContent;
         }
@@ -517,6 +602,7 @@ class ExitTab {
           exitTabElement.appendChild(divider);
         }
 
+        exitTabElement.style.padding = "0";
         exitTabElement.appendChild(imageHolder);
       }
     }
@@ -525,23 +611,30 @@ class ExitTab {
     return exitTabHolder;
   }
 }
-ExitTab.prototype.backgroundColor = ["Inherit"].concat(Object.keys(lib.colors));
-ExitTab.prototype.borderStyle = ["Round", "Square"];
-ExitTab.prototype.fontFamily = TextElement.prototype.fontFamily;
-ExitTab.prototype.numeralFontFamily = ["Inherit"].concat(
-  ExitTab.prototype.fontFamily,
+
+ExitTab.prototype.defaultExitTabConfig = structuredClone(defaultExitTabConfig);
+delete ExitTab.prototype.defaultExitTabConfig.textContent;
+delete ExitTab.prototype.defaultExitTabConfig.subTextContent;
+delete ExitTab.prototype.defaultExitTabConfig.shields;
+delete ExitTab.prototype.defaultExitTabConfig.variant;
+
+ExitTab.backgroundColors = ["Inherit"].concat(Object.keys(lib.colors));
+ExitTab.borderStyles = ["Round", "Square"];
+ExitTab.fontFamilies = TextElement.fontFamilies;
+ExitTab.numeralFontFamilies = ["Inherit"].concat(
+  ...ExitTab.fontFamilies,
 );
-ExitTab.prototype.shieldsDirection = ["Horizontal", "Vertical"];
-ExitTab.prototype.contentDirection = ["Horizontal", "Vertical"];
-ExitTab.prototype.shieldsPosition = ["Start", "End"];
-ExitTab.prototype.alignment = ["Left", "Center", "Right"];
-ExitTab.prototype.widthPresets = [
+ExitTab.shieldsDirections = ["Horizontal", "Vertical"];
+ExitTab.contentDirections = ["Horizontal", "Vertical"];
+ExitTab.shieldsPositions = ["Start", "End"];
+ExitTab.alignments = ["Left", "Center", "Right"];
+ExitTab.widthPresets = [
   "Auto",
   "Full",
   "Custom Percent",
   "Custom Size",
 ];
-ExitTab.prototype.variants = [
+ExitTab.variants = [
   "Normal",
   "Icon",
   "PartialLeft",
@@ -550,8 +643,8 @@ ExitTab.prototype.variants = [
   "HOVVariant2",
 ];
 
-ExitTab.prototype.iconVariant_addons = ["None", "Only", "Pay by Mail 1"];
-ExitTab.prototype.tollIconBackgrounds = ["Transparent"].concat(
+ExitTab.iconVariantAddons = ["None", "Only", "Or Variant"];
+ExitTab.tollIconBackgrounds = ["Transparent"].concat(
   Object.keys(lib.colors),
 );
 
@@ -562,12 +655,18 @@ class ExitTabRow {
     panelEdgeType = "separate",
     position = "top",
     marginBottom = 0.3,
+    independentWidth = false,
+    hideTopBorder = false,
+    hideBottomBorder = false,
   } = {}) {
     this.exitTabs = exitTabs;
     this.gap = gap;
     this.panelEdgeType = panelEdgeType;
     this.position = position;
     this.marginBottom = marginBottom;
+    this.independentWidth = independentWidth;
+    this.hideTopBorder = hideTopBorder;
+    this.hideBottomBorder = hideBottomBorder;
   }
 
   createElement() {
@@ -619,9 +718,10 @@ class ExitTabRow {
 
   duplicateExitTab(index) {
     const exitTab = this.exitTabs[index];
-    const cloneExitTab = Object.assign(exitTab.constructor.prototype, exitTab);
-
+    const cloneExitTab = structuredClone(exitTab);
+    Object.setPrototypeOf(cloneExitTab, ExitTab.prototype);
     this.exitTabs.splice(index + 1, 0, cloneExitTab);
+
     return cloneExitTab;
   }
 
@@ -637,3 +737,6 @@ ExitTabRow.prototype.position = [
   "Right",
   "Within Panel",
 ];
+
+window.ExitTab = ExitTab;
+window.ExitTabRow = ExitTabRow;

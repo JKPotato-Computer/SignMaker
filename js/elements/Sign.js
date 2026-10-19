@@ -3,7 +3,45 @@ class Sign {
     // arrow
     arrows = {
       arrowMode: "standard",
-      standard: {},
+      standard: {
+        variant: "None",
+        arrowList: [],
+        customConfig: {
+          horizontalPadding: 1,
+          verticalTopPadding: 0,
+          verticalBottomPadding: 0.5,
+          gap: 1,
+          justify: "Space Between",
+        },
+        exitOnlyConfigs: {
+          borderMode: "Partial Black Border",
+          exitOnlyText: "EXIT ONLY",
+          exitOnlyTextPosition: "Center",
+          horizontalPadding: 1,
+          verticalPadding: 0.5,
+
+          splitHorizontalPadding: 0.25,
+          splitVerticalPadding: 0.25,
+          splitBorderRadius: 4,
+
+          exitOnlyOutsideGap: 5,
+
+          fontFamily: "Series E",
+          fontSize: 24,
+          wordSpacing: 0,
+          letterSpacing: 0,
+          arrowLocation: "Center", // Half Exit ("Left"/"Right"); Split Exit ("Left","Right","Center")
+
+          arrow: new StandardArrow({ arrow: "DOWN", size: 1.75, rotation: 0 }),
+          numArrows: 0,
+          gap: 4,
+          textGap: 0.5,
+
+          displayOutsideArrow: true,
+          backgroundColor: "Yellow",
+          roundAllCorners: false,
+        },
+      },
       apl: {
         horizontalPadding: 0,
         verticalTopPadding: 0,
@@ -18,17 +56,6 @@ class Sign {
       },
     },
 
-    guideArrow = "None",
-    guideArrowLanes = 1,
-    useCanadianDownArrows = false,
-    exitguideArrows = "Down Arrow",
-    exitOnlyPadding = 0,
-    exitOnlyBorderMode = "white-edge",
-    exitOnlyLeftText = "EXIT",
-    exitOnlyRightText = "ONLY",
-    exitOnlyLabelPreset = "EXIT ONLY",
-    hideExitArrow = false,
-
     // other
     otherSymbol = "None",
     oSNum = "",
@@ -37,25 +64,18 @@ class Sign {
     subPanels = [],
     lanePanelSize = 0, // number
 
-    // panel
-    padding = "0.3rem 0.75rem 0.3rem 0.75rem",
-    arrowPosition = "Middle",
+    paddingLeft = 0.75,
+    paddingRight = 0.75,
+    paddingTop = 0.3,
+    paddingBottom = 0.3,
   } = {}) {
     this.otherSymbol = otherSymbol;
-    this.guideArrow = guideArrow;
-    this.guideArrowLanes = guideArrowLanes;
-    this.useCanadianDownArrows = useCanadianDownArrows;
     this.oSNum = oSNum;
     this.subPanels = subPanels;
-    this.padding = padding;
-    this.arrowPosition = arrowPosition;
-    this.exitguideArrows = exitguideArrows;
-    this.exitOnlyPadding = exitOnlyPadding;
-    this.exitOnlyBorderMode = exitOnlyBorderMode;
-    this.exitOnlyLeftText = exitOnlyLeftText;
-    this.exitOnlyRightText = exitOnlyRightText;
-    this.exitOnlyLabelPreset = exitOnlyLabelPreset;
-    this.hideExitArrow = hideExitArrow;
+    this.paddingLeft = paddingLeft;
+    this.paddingRight = paddingRight;
+    this.paddingTop = paddingTop;
+    this.paddingBottom = paddingBottom;
     this.arrows = arrows;
     this.lanePanelSize = lanePanelSize;
   }
@@ -113,6 +133,32 @@ class Sign {
     this.arrows.apl.subpanels[subpanelNumber].splice(newAplIndex, 0, apl);
   }
 
+  // Guide Arrows
+  newStandardArrow(arrowProperties) {
+    const newArrow = new StandardArrow({
+      size: 2,
+      ...arrowProperties,
+    });
+    this.arrows.standard.arrowList.push(newArrow);
+  }
+
+  deleteStandardArrow(arrowIndex) {
+    this.arrows.standard.arrowList.splice(arrowIndex, 1);
+  }
+
+  moveStandardArrow(arrowIndex, newArrowIndex) {
+    const arrow = this.arrows.standard.arrowList.splice(arrowIndex, 1)[0];
+    this.arrows.standard.arrowList.splice(newArrowIndex, 0, arrow);
+  }
+
+  duplicateStandardArrow(arrowIndex) {
+    const existingArrow = this.arrows.standard.arrowList[arrowIndex];
+    const newArrow = new StandardArrow({
+      ...existingArrow,
+    });
+    this.arrows.standard.arrowList.splice(arrowIndex + 1, 0, newArrow);
+  }
+
   // subpanels
   newSubPanel() {
     const new_subPanel = new SubPanels();
@@ -145,35 +191,27 @@ Sign.prototype.guideArrows = [
   "Exit Only",
   "Split Exit Only",
   "Half Exit Only",
-  "Left/Down Arrow:A-3",
-  "Left Arrow:D-1",
-  "Left/Up Arrow:A-4",
-  "Right/Down Arrow:A-2",
-  "Right Arrow:D-2",
-  "Right/Up Arrow:A-1",
-  "Down Arrow:C-1",
-  "Up Arrow:C-2",
-  "alt. Left/Down Arrow:B-3",
-  "alt. Left/Up Arrow:B-4",
-  "alt. Right/Up Arrow:B-1",
-  "alt. Right/Down Arrow:B-2",
-  "Sharp Left:E-1",
-  "Sharp Right:E-2",
-];
-Sign.prototype.exitguideArrows = [
-  "Down Arrow:EC-1/C-1",
-  "Left/Up Arrow:EB-4/B-4",
-  "alt. Left/Up Arrow:EA-4/A-4",
-  "Right/Up Arrow:EB-1/B-1",
-  "alt. Right/Up Arrow:EA-1/A-1",
+  "Custom",
 ];
 
-Sign.prototype.exitOnlyBorderModes = ["edge", "white-edge"];
-
-Sign.prototype.arrowPositions = ["Middle", "Left", "Right"];
+Sign.prototype.standardArrowJustify = [
+  "Left",
+  "Center",
+  "Right",
+  "Space Between",
+];
+Sign.prototype.exitOnlyJustify = ["Left", "Center", "Right"];
 
 Sign.prototype.otherSymbols = [
   "None",
   "Quebec-Style Exit Marker",
   "Quebec-Left",
 ];
+
+Sign.prototype.exitOnlyBorderTypes = [
+  "Full Black Border",
+  "Partial Black Border",
+  "White Border",
+];
+
+window.Sign = Sign;
