@@ -123,6 +123,14 @@ main#smRender.wide #postContainer {
   text-box-edge: cap alphabetic;
 }
 
+.bE-electronicSign * {
+  padding-bottom: .25rem;
+}
+
+.be-electronicsign *:last-child {
+  padding-bottom: 0;
+}
+
 .bE-electronicSign {
   padding: var(--vertPadding) var(--horizPadding);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100)));
@@ -493,6 +501,8 @@ main#smRender.wide #postContainer {
   scale: var(--designationScale);
   text-wrap: nowrap;
   word-spacing: -0.2rem;
+  justify-self: center;
+  align-self: start;
 }
 
 .shieldGroupContainer {
@@ -1301,17 +1311,17 @@ main#smRender.wide #postContainer {
 .bE-numerator {
   position: relative;
   top: -0.15em;
-  font-size: calc(var(--fontSize) * (var(--numeralSize) / 100));
+  font-size: calc(var(--fontSize) * .75 * (var(--numeralSize) / 100));
 }
 
 .bE-denominator {
   position: relative;
-  top: 0.15em;
-  font-size: calc(var(--fontSize) * (var(--numeralSize) / 100));
+  top: 0.155em;
+  font-size: calc(var(--fontSize) * .75 * (var(--numeralSize) / 100));
 }
 
 .bE-slash {
-  font-size: calc(var(--fontSize) * 1.15 * var(--numeralSize) / 100);
+  font-size: calc(var(--fontSize) * .75 * var(--numeralSize) / 100);
 }
 
 .bE-actionMessageElement {
@@ -1347,6 +1357,7 @@ main#smRender.wide #postContainer {
   width: 100%;
   height: 3px;
   background: var(--fg-color);
+  margin: .25rem 0 .5rem;
 }
 
 .ET-numeralGroup,

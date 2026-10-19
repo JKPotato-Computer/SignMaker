@@ -435,8 +435,8 @@ input:disabled {
   justify-content: left;
   min-width: 10rem;
   width: stretch;
-  max-width: 15rem;
   scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+  max-width: 25rem;
 }
 
 .resetClass {

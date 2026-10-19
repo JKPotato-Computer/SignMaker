@@ -310,7 +310,7 @@ class ElectronicSignElement extends TextElement {
     fontFamily = "Electronic Highway Sign",
     textColor = "Orange",
     textFormat = "Full Text",
-    formatSize = 0.1,
+    formatSize = 0.05,
     horizPadding = 0.5,
     vertPadding = 0.5,
     glow = true,

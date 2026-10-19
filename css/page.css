@@ -93,7 +93,7 @@ main#smRender {
   height: max-content;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: safe center;
   justify-content: left;
   min-height: max(calc(100svh * var(--zoomLevelDec, 1)), 100svh);
   position: relative;
