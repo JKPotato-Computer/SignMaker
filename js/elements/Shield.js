@@ -449,7 +449,7 @@ Shield.prototype.shieldDirectory = {
       name: "National Route",
       variants: ["1 Digit", "2 Digit", "3 Digit"],
     },
-    NR: { type: "shield", name: "National Route (NR)", variants: ["2 Digit"] },
+    NR: { type: "shield", name: "National Route (NR)", variants: ["1 Digit", "2 Digit"] },
     SR: { type: "shield", name: "State Route (SR)", variants: ["2 Digit"] },
     TD: {
       type: "shield",

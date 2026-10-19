@@ -826,8 +826,7 @@
 .shield.NR.OneDigit .routeNumber {
   color: black;
   font-size: 2.25em;
-  font-family: "Series EM";
-  top: -0.10em;
+  font-family: "Series E";
 }
 
 .shield.MR .routeNumber {
