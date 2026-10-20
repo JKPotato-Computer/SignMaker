@@ -86,6 +86,7 @@ class Sign {
       this.arrows.apl.subpanels[subpanelNumber] = [];
       this.arrows.apl.subpanelConfigs[subpanelNumber] = {
         justify: "left",
+        minWidth: 5,
       };
     }
 

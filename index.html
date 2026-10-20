@@ -5337,6 +5337,24 @@
             class="smAPLCat_justifyAPLs"
             onchange="formHandler.readForm()"
           ></select>
+          <span class="smAPLCat_minWidthLabel">Width (rem):</span>
+          <input
+            type="number"
+            class="smAPLCat_minWidth"
+            min="0"
+            step=".01"
+            value="0"
+            onchange="formHandler.readForm()"
+          />
+          <span class="smAPLCat_numLanesLabel">Num Lanes:</span>
+          <input
+            type="number"
+            class="smAPLCat_numLanes"
+            min="0"
+            step="1"
+            value="0"
+            onchange="formHandler.readForm({ aplSubpanelConfigChange: true })"
+          />
         </div>
         <div class="smAPLCat_aplList"></div>
       </div>

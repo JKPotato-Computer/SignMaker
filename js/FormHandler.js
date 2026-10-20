@@ -541,7 +541,13 @@ const formHandler = (() => {
       app.vars.currentlySelectedRowIndex
     ].rightPadding = document.querySelector("#sdBlock_rightPadding").value;
 
-    subPanel.laneWidth = parseInt(form["subPanelLength"].value);
+    if (
+      !readProperties ||
+      (readProperties && !readProperties["aplSubpanelConfigChange"])
+    ) {
+      subPanel.laneWidth = parseInt(form["subPanelLength"].value);
+    }
+
     subPanel.verticalAlign = form["subpanelAlign"].value;
     if (
       app.vars.currentlySelectedSubPanelIndex !=
@@ -658,6 +664,18 @@ const formHandler = (() => {
         ];
         const aplList = apl.subpanels[i];
 
+        if (
+          i % 1 == 0 &&
+          readProperties &&
+          readProperties["aplSubpanelConfigChange"]
+        ) {
+          let subpanel = currentPanel.sign.subPanels[i];
+          subpanel.laneWidth = parseInt(
+            aplContainer.querySelector(".smAPLCat_numLanes").value,
+          );
+          console.log(i + " " + subpanel.laneWidth);
+        }
+
         if (!aplContainer || !aplList) {
           continue;
         }
@@ -666,6 +684,14 @@ const formHandler = (() => {
           apl.subpanelConfigs[i].justify = aplContainer.querySelector(
             ".smAPLCat_justifyAPLs",
           ).value;
+        } else if (
+          i % 1 != 0 &&
+          apl.subpanelConfigs[i] &&
+          currentPanel.sign.lanePanelSize == 0
+        ) {
+          apl.subpanelConfigs[i].minWidth = parseFloat(
+            aplContainer.querySelector(".smAPLCat_minWidth").value,
+          );
         }
 
         aplList.forEach((arrow, arrowIndex) => {
@@ -2585,7 +2611,7 @@ const formHandler = (() => {
         arrows.verticalBottomPadding;
       document.querySelector("#sMAPL_APLCat").innerHTML = "";
 
-      let subpanels = app.getCurrentPanel().sign.subPanels;
+      const subpanels = app.getCurrentPanel().sign.subPanels;
       for (let i = 0; i <= subpanels.length - 1; i += 0.5) {
         let aplList = arrows.subpanels[i] || [];
         const aplContTemplate = document
@@ -2601,13 +2627,33 @@ const formHandler = (() => {
         if (i % 1 != 0) {
           aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
           aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
+
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").remove();
+          aplContHolder.querySelector(".smAPLCat_numLanes").remove();
+
+          if (sign.lanePanelSize != 0) {
+            aplContHolder.querySelector(".smAPLCat_minWidthLabel").remove();
+            aplContHolder.querySelector(".smAPLCat_minWidth").remove();
+          } else {
+            aplContHolder.querySelector(".smAPLCat_minWidth").value =
+              arrows.subpanelConfigs[i]?.minWidth;
+            aplContHolder.querySelector(".smAPLCat_minWidth").disabled =
+              !arrows.subpanelConfigs[i];
+          }
         } else {
-          aplContHolder.querySelector(".smAPLCat_justifyAPLs").disabled =
-            !arrows.subpanelConfigs[i];
-          if (arrows.subpanelConfigs[i]) {
+          aplContHolder.querySelector(".smAPLCat_minWidthLabel").remove();
+          aplContHolder.querySelector(".smAPLCat_minWidth").remove();
+
+          if (!arrows.subpanelConfigs[i]) {
+            aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
+            aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
+          } else {
             aplContHolder.querySelector(".smAPLCat_justifyAPLs").value =
               arrows.subpanelConfigs[i].justify;
           }
+
+          aplContHolder.querySelector(".smAPLCat_numLanes").value =
+            subpanels[i].laneWidth;
         }
 
         for (let j = 0; j < aplList.length; j++) {
@@ -2623,8 +2669,7 @@ const formHandler = (() => {
           ).dataset.selectedOption = arrow.arrowVariant;
           const arrowSelectImage = aplHolder.querySelector(".smAPL_arrowImage");
           const arrowSelectLabel = aplHolder.querySelector(".smAPL_arrowLabel");
-          const arrowDefinition =
-            APLArrow.arrowTypes[arrow.arrowVariant];
+          const arrowDefinition = APLArrow.arrowTypes[arrow.arrowVariant];
           arrowSelectImage.src = `assets/arrow/${arrowDefinition.asset}`;
           arrowSelectImage.classList.toggle("flipped", arrowDefinition.flipped);
           arrowSelectLabel.textContent = arrow.arrowVariant;
@@ -2669,7 +2714,17 @@ const formHandler = (() => {
 
         document.querySelector("#smAPL_APLCat").appendChild(aplContTemplate);
 
-        if (i % 1 != 0 && aplList.length > 0) {
+        if (
+          (i % 1 != 0 && aplList.length > 0) ||
+          (app.getCurrentPanel().sign.lanePanelSize > 0 &&
+            i % 1 == 0 &&
+            aplList.length >=
+              subpanels[i].laneWidth -
+                (arrows.subpanels[i - 0.5] &&
+                arrows.subpanels[i - 0.5].length >= 0
+                  ? 1
+                  : 0))
+        ) {
           aplContHolder.querySelector(".smAPLCat_addArrow").remove();
         } else {
           aplContHolder

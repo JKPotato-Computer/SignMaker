@@ -1035,7 +1035,7 @@ const App = (() => {
     currentlySelectedShieldIndex = -1;
     currentlySelectedShieldGroupId = -1;
     currentlySelectedStandardArrow = -1;
-  }
+  };
 
   // Redraw Methods
   const redrawExitTabs = (
@@ -1083,6 +1083,7 @@ const App = (() => {
   const redrawSubPanels = (panel, signHolderElmt) => {
     const subpanelList = [];
     const dividerList = [];
+    let hasShifted = false;
 
     for (
       let subPanelIndex = 0;
@@ -1102,6 +1103,12 @@ const App = (() => {
       ) {
         signContentContainerElmt.style.width =
           panel.sign.lanePanelSize * subPanel.laneWidth + "px";
+      } else if (
+        panel.sign.arrows.arrowMode != "diagrammic" &&
+        subPanel.laneWidth == 0 &&
+        panel.sign.lanePanelSize > 0
+      ) {
+        signContentContainerElmt.style.display = "none";
       }
 
       const blockElement = subPanel.blockElements.createElement(
@@ -1131,17 +1138,31 @@ const App = (() => {
         }
 
         dividerList.push(subDivider);
+        signHolderElmt.appendChild(subDivider);
 
         if (
           panel.sign.arrows.arrowMode == "apl" &&
           panel.sign.lanePanelSize > 0 &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex - 0.5].length > 0
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0 &&
+          !hasShifted
         ) {
-          subDivider.style.margin = `0 ${panel.sign.lanePanelSize / 2}px`;
-        }
+          hasShifted = true;
+          subDivider.style.marginLeft = `${panel.sign.lanePanelSize / 2 - 2}px`;
 
-        signHolderElmt.appendChild(subDivider);
+          const subPanelRect = signContentContainerElmt.getBoundingClientRect();
+          const subDividerRect = subDivider.getBoundingClientRect();
+
+          const midpointViewport =
+            (subPanelRect.left + subDividerRect.left) / 2;
+          const panelCenterViewport =
+            subPanelRect.left + subPanelRect.width / 2;
+
+          const offsetViewport = midpointViewport - panelCenterViewport;
+          const leftOffset = offsetViewport / formHandler.vars.zoomLevel;
+
+          signContentContainerElmt.style.left = `${leftOffset}px`;
+        }
       }
     }
 
@@ -1722,10 +1743,12 @@ const App = (() => {
           }
         }
 
-        if (subpanel) {
+        if (!autoJustify && subpanel) {
+          aplHolder.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0 ? 1 : 0))}px`;
+        } else if (autoJustify && subpanel) {
           aplHolder.style.width = `max-content`;
           aplHolder.style.minWidth = `${subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
-        } else {
+        } else if (!subpanel) {
           if (autoJustify && aplArrows.length > 0) {
             dividerElements.push(aplHolder);
           } else if (aplArrows.length > 0) {
@@ -1820,6 +1843,9 @@ const App = (() => {
 
           for (const arrow of standardArrowConfig.arrowList) {
             const arrowElement = arrow.createElement();
+            if (panel.sign.lanePanelSize >= 0) {
+              arrowElement.style.width = panel.sign.lanePanelSize + "px";
+            }
             arrowContElmt.appendChild(arrowElement);
           }
           break;
@@ -1842,6 +1868,10 @@ const App = (() => {
         case "Exit Only": {
           const exitOnlyConfig = standardArrowConfig.exitOnlyConfigs;
           const arrowElement = exitOnlyConfig.arrow.createElement();
+
+          if (panel.sign.lanePanelSize >= 0) {
+            arrowElement.style.width = panel.sign.lanePanelSize + "px";
+          }
 
           exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
           exitOnlyContainer.style.setProperty(

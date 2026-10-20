@@ -20,17 +20,18 @@ const FormNavigation = (() => {
     setupLimonEasterEgg();
     setupDropdownElements();
 
+    const changeEvent = new Event("change", { bubbles: true });
+
     document.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
         if (event.target.tagName === "TEXTAREA") return;
         if (event.target.tagName === "BUTTON") return;
 
         if (event.target.tagName === "INPUT") {
-          // if it is a descendant of diagrammicDrawing
-          if (event.target.closest("#diagrammicDrawing")) {
-            DiagramDrawing.readForm();
+          if (event.target.onchange || event.target.getAttribute("onchange")) {
+            event.target.dispatchEvent(changeEvent);
           } else {
-            formHandler.readForm();
+            event.target.dispatchEvent(changeEvent);
           }
         }
 
@@ -78,9 +79,9 @@ const FormNavigation = (() => {
           holder.style.display = "block";
 
           if (window.innerWidth > 768) {
-            let width = holder.getBoundingClientRect().width;
+            let width = holder.getBoundingClientRect().left;
             document.querySelector("#smRender").style.transform =
-              `translateX(${width / 4}px)`;
+              `translateX(${width}px)`;
             isModalOpen = true;
           }
         } else {
