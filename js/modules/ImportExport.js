@@ -102,7 +102,7 @@ const ImportExport = (() => {
   const fileExportDetails = {
     fileType: "PNG",
     isFullSign: true,
-    panelNumbers: [0],
+    groupNumbers: [0],
     snapdomData: null,
     rawFileData: null,
     imageScale: 2,
@@ -138,15 +138,15 @@ const ImportExport = (() => {
       document.querySelector("#panelContainer").style.background = "none";
       document.querySelector("#panelContainer").style.height = "max-content";
 
-      const panelNodeList = smRender.querySelectorAll(
-        "#panelContainer > .panel",
+      const panelGroupNodeList = smRender.querySelectorAll(
+        "#panelContainer > .panelGroupContainer",
       );
       for (let i = 0; i < App.getPost().panels.length; i++) {
-        const panel = panelNodeList[i];
-        if (fileExportDetails.panelNumbers.includes(i)) {
-          panel.style.display = "block";
+        const panelGroup = panelGroupNodeList[i];
+        if (fileExportDetails.groupNumbers.includes(i)) {
+          panelGroup.style.display = "flex";
         } else {
-          panel.style.display = "none";
+          panelGroup.style.display = "none";
         }
       }
 
@@ -219,7 +219,7 @@ const ImportExport = (() => {
       const panelListItem = document.createElement("button");
       panelListItem.classList.add("downloadPanelBtn");
 
-      if (fileExportDetails.panelNumbers.includes(i)) {
+      if (fileExportDetails.groupNumbers.includes(i)) {
         panelListItem.classList.add("selected");
       }
 
@@ -227,12 +227,12 @@ const ImportExport = (() => {
       document.querySelector("#downloadPanelList").appendChild(panelListItem);
 
       panelListItem.addEventListener("click", async () => {
-        if (fileExportDetails.panelNumbers.includes(i)) {
-          fileExportDetails.panelNumbers =
-            fileExportDetails.panelNumbers.filter((num) => num !== i);
+        if (fileExportDetails.groupNumbers.includes(i)) {
+          fileExportDetails.groupNumbers =
+            fileExportDetails.groupNumbers.filter((num) => num !== i);
           panelListItem.classList.remove("selected");
         } else {
-          fileExportDetails.panelNumbers.push(i);
+          fileExportDetails.groupNumbers.push(i);
           panelListItem.classList.add("selected");
         }
         updatePreview();
@@ -283,7 +283,7 @@ const ImportExport = (() => {
           fileExportDetails.toggleEntirePost
             ? App.getPost()
             : App.getPost().panels.filter((_, i) =>
-                fileExportDetails.panelNumbers.includes(i),
+                fileExportDetails.groupNumbers.includes(i),
               ),
           fileExportDetails.toggleEntirePost ? "post" : "panels",
         );
@@ -303,7 +303,7 @@ const ImportExport = (() => {
             fileExportDetails.toggleEntirePost
               ? App.getPost()
               : App.getPost().panels.filter((_, i) =>
-                  fileExportDetails.panelNumbers.includes(i),
+                  fileExportDetails.groupNumbers.includes(i),
                 ),
             fileExportDetails.toggleEntirePost ? "post" : "panels",
           );
@@ -410,7 +410,10 @@ document.querySelector("#importSign").addEventListener("click", async () => {
           Array.isArray(signContent) &&
           confirm("Are you sure you want to overwrite all your panels?")
         ) {
-          App.getPost().panels = signContent;
+          App.getPost().panels =
+            signContent.length > 0 && Array.isArray(signContent[0])
+              ? signContent
+              : signContent.map((panel) => [panel]);
         }
 
         formHandler.updateForm();

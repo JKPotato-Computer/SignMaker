@@ -2,6 +2,7 @@
 const App = (() => {
   let post = {};
   let currentlySelectedPanelIndex = -1;
+  let currentlySelectedPanelGroupIndex = -1;
   let currentlySelectedSubPanelIndex = 0;
 
   let currentlySelectedExitTabRowIndex = -1;
@@ -17,7 +18,9 @@ const App = (() => {
 
   // Glboal Acessor Methods
   const getCurrentPanel = () => {
-    return post.panels[currentlySelectedPanelIndex];
+    return post.panels[currentlySelectedPanelGroupIndex][
+      Math.max(currentlySelectedPanelIndex, 0)
+    ];
   };
 
   const getCurrentSubPanel = () => {
@@ -46,7 +49,15 @@ const App = (() => {
       post =
         ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
         new Post(Post.polePositions[0]);
-      currentlySelectedPanelIndex = post.panels.length > 0 ? 0 : -1;
+      if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
+        post.panels = post.panels.map((panel) => [panel]);
+      }
+      currentlySelectedPanelGroupIndex = post.panels.length > 0 ? 0 : -1;
+      currentlySelectedPanelIndex =
+        currentlySelectedPanelGroupIndex == -1 ||
+        post.panels[currentlySelectedPanelGroupIndex].length == 0
+          ? -1
+          : 0;
     } else {
       post = new Post(Post.polePositions[0]);
     }
@@ -164,18 +175,30 @@ const App = (() => {
 
     DragSystem.attachDrag(
       document.querySelector("#panelList"),
-      ".panelListButton",
+      ".panelGroup",
       "vertical",
-      (oldPanelIndex, newPanelIndex) => {
-        post.panels.splice(
-          newPanelIndex,
-          0,
-          post.panels.splice(oldPanelIndex, 1)[0],
-        );
-        currentlySelectedPanelIndex = Math.max(newPanelIndex, 0);
-
+      (oldPanelGroupIndex, newPanelGroupIndex, oldPanelIndex, newPanelIndex) => {
+        if (oldPanelIndex != null) {
+          const panel = post.panels[oldPanelGroupIndex].splice(oldPanelIndex, 1)[0];
+          post.panels[newPanelGroupIndex].splice(newPanelIndex, 0, panel);
+          currentlySelectedPanelGroupIndex = newPanelGroupIndex;
+          currentlySelectedPanelIndex = newPanelIndex;
+        } else {
+          post.panels.splice(
+            newPanelGroupIndex,
+            0,
+            post.panels.splice(oldPanelGroupIndex, 1)[0],
+          );
+          currentlySelectedPanelGroupIndex = newPanelGroupIndex;
+          currentlySelectedPanelIndex = 0;
+        }
         formHandler.updateForm();
         redraw();
+      },
+      {
+        attachElement: ".panelGroupButton",
+        innerElement: ".panelListButton",
+        innerDirection: "vertical",
       },
     );
 
@@ -330,23 +353,51 @@ const App = (() => {
 
   // Panels
   const newPanel = () => {
-    post.newPanel();
-    currentlySelectedPanelIndex = post.panels.length - 1;
+    if (currentlySelectedPanelGroupIndex == -1) {
+      post.panels.push([]);
+      currentlySelectedPanelGroupIndex = post.panels.length - 1;
+    }
+    post.newPanel(currentlySelectedPanelGroupIndex);
+    currentlySelectedPanelIndex =
+      post.panels[currentlySelectedPanelGroupIndex].length - 1;
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const newPanelGroup = () => {
+    post.panels.push([]);
+    currentlySelectedPanelGroupIndex = post.panels.length - 1;
+    post.newPanel(currentlySelectedPanelGroupIndex);
+    currentlySelectedPanelIndex = 0;
     formHandler.updateForm();
     redraw();
   };
 
   const duplicatePanel = () => {
-    post.duplicatePanel(currentlySelectedPanelIndex);
+    post.duplicatePanel([
+      currentlySelectedPanelGroupIndex,
+      currentlySelectedPanelIndex,
+    ]);
     currentlySelectedPanelIndex++;
     formHandler.updateForm();
     redraw();
   };
 
   const deletePanel = () => {
-    post.deletePanel(currentlySelectedPanelIndex);
+    post.deletePanel([
+      currentlySelectedPanelGroupIndex,
+      currentlySelectedPanelIndex,
+    ]);
     if (currentlySelectedPanelIndex > 0) {
       currentlySelectedPanelIndex--;
+    }
+    if (post.panels[currentlySelectedPanelGroupIndex].length == 0) {
+      post.panels.splice(currentlySelectedPanelGroupIndex, 1);
+      currentlySelectedPanelGroupIndex = Math.max(
+        0,
+        currentlySelectedPanelGroupIndex - 1,
+      );
+      currentlySelectedPanelIndex = 0;
     }
     if (post.panels.length == 0) {
       newPanel();
@@ -357,7 +408,11 @@ const App = (() => {
   };
 
   const changeEditingPanel = (panelNumber) => {
-    currentlySelectedPanelIndex = clamp(panelNumber, 0, post.panels.length - 1);
+    currentlySelectedPanelIndex = clamp(
+      panelNumber,
+      0,
+      post.panels[currentlySelectedPanelGroupIndex].length - 1,
+    );
     currentlySelectedSubPanelIndex = 0;
     currentlySelectedRowIndex = 0;
     currentlySelectedBlockIndex = 0;
@@ -367,6 +422,36 @@ const App = (() => {
     currentlySelectedExitTabRowIndex = -1;
 
     formHandler.updateForm();
+  };
+
+  const deletePanelGroup = () => {
+    post.panels.splice(currentlySelectedPanelGroupIndex, 1);
+    currentlySelectedPanelGroupIndex = Math.max(
+      -1,
+      currentlySelectedPanelGroupIndex - 1,
+    );
+    currentlySelectedPanelIndex = 0;
+    if (post.panels.length == 0) {
+      newPanel();
+    } else {
+      formHandler.updateForm();
+      redraw();
+    }
+  };
+
+  const changeEditingPanelGroup = (index) => {
+    currentlySelectedPanelGroupIndex = clamp(index, 0, post.panels.length - 1);
+    currentlySelectedPanelIndex = -1;
+    currentlySelectedSubPanelIndex = 0;
+    formHandler.updateForm();
+  };
+
+  const deletePanelHelper = () => {
+    if (currentlySelectedPanelIndex == -1) {
+      deletePanelGroup();
+    } else {
+      deletePanel();
+    }
   };
 
   const addSubPanel = () => {
@@ -1025,6 +1110,7 @@ const App = (() => {
   };
 
   const resetSelectors = () => {
+    currentlySelectedPanelGroupIndex = 0;
     currentlySelectedPanelIndex = 0;
     currentlySelectedSubPanelIndex = 0;
     currentlySelectedRowIndex = 0;
@@ -2275,13 +2361,19 @@ const App = (() => {
     );
 
     let ind = 0;
-    for (const panel of post.panels) {
-      redrawPanel(panel, panelContainerElmt, ind++);
+    for (const panelGroup of post.panels) {
+      const panelGroupContainer = document.createElement("div");
+      panelGroupContainer.className = "panelGroupContainer";
+      panelContainerElmt.appendChild(panelGroupContainer);
+
+      for (const panel of panelGroup) {
+        redrawPanel(panel, panelGroupContainer, ind++);
+      }
     }
 
     recheckWidth();
     document
-      .querySelector("#panel" + currentlySelectedPanelIndex)
+      .querySelector("#panel" + getPanels().indexOf(getCurrentPanel()))
       .scrollIntoView({
         behavior: "auto",
         block: "nearest",
@@ -2304,17 +2396,29 @@ const App = (() => {
     return post;
   };
 
+  const getPanels = () => {
+    return post.panels.flat();
+  };
+
   const setPost = (newPost) => {
     post = newPost;
+    if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
+      post.panels = post.panels.map((panel) => [panel]);
+    }
+    currentlySelectedPanelGroupIndex = 0;
     currentlySelectedPanelIndex = 0;
   };
 
   return {
     init,
     newPanel,
+    newPanelGroup,
     duplicatePanel,
     deletePanel,
+    deletePanelGroup,
+    deletePanelHelper,
     changeEditingPanel,
+    changeEditingPanelGroup,
     newShield,
     duplicateShield,
     deleteShield,
@@ -2334,6 +2438,7 @@ const App = (() => {
     changeEditingExitTabRow,
     changeEditingExitTab,
     getPost,
+    getPanels,
     setPost,
 
     newRow,
@@ -2374,6 +2479,9 @@ const App = (() => {
     vars: {
       get currentlySelectedPanelIndex() {
         return currentlySelectedPanelIndex;
+      },
+      get currentlySelectedPanelGroupIndex() {
+        return currentlySelectedPanelGroupIndex;
       },
       get currentlySelectedSubPanelIndex() {
         return currentlySelectedSubPanelIndex;

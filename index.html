@@ -201,7 +201,8 @@
       </dialog>
       <dialog id="downloadContent">
         <div id="downloadContents">
-          <h3>
+          <div>
+            <h3>
             <span class="material-symbols-outlined">download</span> Export Sign
           </h3>
           <label for="exportAsPNG">File Type:</label>
@@ -289,6 +290,7 @@
               <button class="downloadPanelBtn selected">2</button>
               <button class="downloadPanelBtn">3</button>
             </div>
+          </div>
           </div>
           <div class="downloadSignFooter">
             <button
@@ -5070,11 +5072,11 @@
           <div id="panelSelect" class="panelSelector">
             <span class="panelPopoverHint">(Drag to reorder)</span>
             <div class="panelActions">
-              <button type="button" class="new" onclick="App.newPanel()">
-                Add Panel
+              <button type="button" class="new" onclick="App.newPanelGroup()">
+                Add Panel Group
               </button>
               <!--<button type="button" id="duplicatePanel" class="dup">Duplicate</button>-->
-              <button type="button" class="del" onclick="App.deletePanel()">
+              <button type="button" class="del" onclick="App.deletePanelHelper()">
                 Remove
               </button>
             </div>

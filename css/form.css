@@ -197,6 +197,25 @@ label span.toolTip,
   background: rgba(var(--baseColor), 0.6);
 }
 
+.panelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.panelGroupButton {
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  background: rgba(var(--baseColor), 0.3);
+  border-radius: 0;
+  cursor: grab;
+}
+
+.newPanelButton {
+  justify-content: center;
+}
+
 .panelSpacingControl {
   display: flex;
   flex-direction: column;
@@ -495,9 +514,7 @@ dialog {
 }
 
 #downloadContent .downloadSignFooter {
-  position: absolute;
   width: 100%;
-  bottom: 0;
   display: flex;
   flex-direction: row;
   justify-content: right;
@@ -735,6 +752,9 @@ textarea {
 #downloadContents {
   flex-grow: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 #downloadPanelContainer {

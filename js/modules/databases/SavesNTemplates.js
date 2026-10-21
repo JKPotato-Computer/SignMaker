@@ -183,8 +183,10 @@ const SavesNTemplates = (() => {
           return;
         }
 
-        App.getPost().panels[app.vars.currentlySelectedPanelIndex] =
-          ImportExport.jsonToSign(template.data)[0];
+        Object.assign(
+          App.getCurrentPanel(),
+          ImportExport.jsonToSign(template.data)[0],
+        );
         formHandler.updateForm();
         App.redraw();
       });

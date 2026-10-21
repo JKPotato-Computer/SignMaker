@@ -146,13 +146,6 @@
   position: relative;
 }
 
-.panel:first-child {
-  padding-left: 1rem;
-}
-.panel:last-child {
-  padding-right: 1rem;
-}
-
 #postContainer.postVariantRural .panel {
   margin-top: -10rem;
 }

@@ -10,6 +10,18 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   scale: var(--zoomLevel, 100%);
 }
 
+.panelGroupContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--panelSpacing, 0rem);
+  width: max-content;
+  height: max-content;
+  align-self: center;
+  padding: 0 1rem;
+}
+
 main#smRender.wide #postContainer {
   left: calc((var(--zoomLevel, 100%) - 100%) / 2);
 }

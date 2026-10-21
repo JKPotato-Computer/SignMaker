@@ -773,9 +773,19 @@ const formHandler = (() => {
     const subPanelList = document.getElementById("subPanelList");
     const exitTabList = document.getElementById("exitTabList");
 
-    document.querySelector("#currentlySelectedPanel").textContent = `Panel ${
-      app.vars.currentlySelectedPanelIndex + 1
-    }`;
+    let selectedPanelLabel = app.vars.currentlySelectedPanelIndex + 1;
+    let selectedPanelName = "";
+    while (selectedPanelLabel > 0) {
+      selectedPanelLabel--;
+      selectedPanelName =
+        String.fromCharCode(65 + (selectedPanelLabel % 26)) +
+        selectedPanelName;
+      selectedPanelLabel = Math.floor(selectedPanelLabel / 26);
+    }
+    document.querySelector("#currentlySelectedPanel").textContent =
+      app.vars.currentlySelectedPanelIndex == -1
+        ? `Group ${app.vars.currentlySelectedPanelGroupIndex + 1}`
+        : `Panel ${selectedPanelName}`;
 
     document.getElementById("postPosition").value = post.polePosition;
     document.getElementById("postColor").value = post.color;
@@ -791,30 +801,60 @@ const formHandler = (() => {
     exitTabList.innerHTML = "";
     subPanelList.innerHTML = "";
 
-    for (
-      let panelIndex = 0, panelsLength = post.panels.length;
-      panelIndex < panelsLength;
-      panelIndex++
-    ) {
-      const panelButton = document.createElement("button");
-      panelButton.id = "edit" + (panelIndex + 1);
-      panelButton.type = "button";
-      panelButton.className =
-        "panelListButton" +
-        (app.vars.currentlySelectedPanelIndex == panelIndex ? " active" : "");
-      panelButton.dataset.panelIndex = panelIndex.toString();
+    for (let panelGroupIndex = 0; panelGroupIndex < post.panels.length; panelGroupIndex++) {
+      const panelGroup = document.createElement("div");
+      panelGroup.className =
+        "panelGroup" +
+        (app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex
+          ? " active"
+          : "");
 
-      const label = document.createElement("span");
-      label.className = "panelListLabel";
-      label.textContent = "Panel " + (panelIndex + 1);
-      panelButton.appendChild(label);
-
-      panelButton.addEventListener("click", () => {
-        app.changeEditingPanel(panelIndex);
-        panelButton.classList.add("active");
+      const panelGroupButton = document.createElement("button");
+      panelGroupButton.type = "button";
+      panelGroupButton.className = "panelGroupButton";
+      panelGroupButton.textContent =
+        "Group " + (panelGroupIndex + 1) +
+        (app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex
+          ? ""
+          : " (" + post.panels[panelGroupIndex].length + ")");
+      panelGroupButton.addEventListener("click", () => {
+        app.changeEditingPanelGroup(panelGroupIndex);
       });
+      panelGroup.appendChild(panelGroupButton);
 
-      panelList.appendChild(panelButton);
+      for (let panelIndex = 0; panelIndex <= post.panels[panelGroupIndex].length; panelIndex++) {
+        const panelButton = document.createElement("button");
+        panelButton.type = "button";
+        panelButton.className = "panelListButton";
+
+        if (panelIndex < post.panels[panelGroupIndex].length) {
+          let panelLabel = panelIndex + 1;
+          let panelName = "";
+          while (panelLabel > 0) {
+            panelLabel--;
+            panelName = String.fromCharCode(65 + (panelLabel % 26)) + panelName;
+            panelLabel = Math.floor(panelLabel / 26);
+          }
+          panelButton.textContent = "Panel " + panelName;
+          if (
+            app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex &&
+            app.vars.currentlySelectedPanelIndex == panelIndex
+          ) {
+            panelButton.classList.add("active");
+          }
+          panelButton.addEventListener("click", () => {
+            app.changeEditingPanelGroup(panelGroupIndex);
+            app.changeEditingPanel(panelIndex);
+          });
+        } else if (app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex) {
+          panelButton.textContent = "+";
+          panelButton.dataset.tooltip = "Add a panel";
+          panelButton.className = "panelListButton newPanelButton";
+          panelButton.addEventListener("click", app.newPanel);
+        }
+        panelGroup.appendChild(panelButton);
+      }
+      panelList.appendChild(panelGroup);
     }
 
     for (

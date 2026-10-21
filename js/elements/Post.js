@@ -50,12 +50,16 @@ class Post {
   /**
    * Create a new panel for the post. Add it to the end of the list of existing panels.
    */
-  newPanel() {
+  newPanel(panelGroupIndex = this.panels.length - 1) {
     const newSign = new Sign();
     newSign.newSubPanel();
 
     const newPanel = new Panel({ sign: newSign });
-    this.panels.push(newPanel);
+    if (this.panels.length === 0) {
+      this.panels.push([]);
+      panelGroupIndex = 0;
+    }
+    this.panels[panelGroupIndex].push(newPanel);
   }
 
   /**
@@ -63,7 +67,7 @@ class Post {
    * @param {number} panelIndex - Position of the panel in the array of panels on this post.
    */
   duplicatePanel(panelIndex) {
-    const existingPanel = this.panels[panelIndex];
+    const existingPanel = this.panels[panelIndex[0]][panelIndex[1]];
     const newSubPanels = [];
     for (const subPanel of existingPanel.sign.subPanels) {
       newSubPanels.push(Object.assign(new SubPanels(), subPanel));
@@ -89,7 +93,7 @@ class Post {
     const newPanel = Object.assign(new Panel(), existingPanel);
     newPanel.sign = newSign;
     newPanel.exitTabs = newExitTabs;
-    this.panels.splice(++panelIndex, 0, newPanel);
+    this.panels[panelIndex[0]].splice(++panelIndex[1], 0, newPanel);
   }
 
   /**
@@ -97,7 +101,7 @@ class Post {
    * @param {number} panelIndex - Position of the panel in the array of panels on this post to delete.
    */
   deletePanel(panelIndex) {
-    this.panels.splice(panelIndex, 1);
+    this.panels[panelIndex[0]].splice(panelIndex[1], 1);
   }
 
   /**

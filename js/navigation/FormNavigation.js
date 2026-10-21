@@ -99,7 +99,7 @@ const FormNavigation = (() => {
         document.querySelector("#smRender").classList.contains("wide")
       ) {
         document
-          .querySelector("#panel" + App.vars.currentlySelectedPanelIndex)
+          .querySelector("#panel" + App.getPanels().indexOf(App.getCurrentPanel()))
           .scrollIntoView({
             behavior: "smooth", // or 'auto'
             block: "nearest", // Prevents vertical scroll
