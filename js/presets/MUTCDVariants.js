@@ -1,5 +1,6 @@
 const MUTCDVariants = (() => {
   const variants = {
+    // note: pls do not change MUTCD - the code sees these variables as the source of truth so don't like delete anything or else idk the entire program explodes
     MUTCD: {
       APLArrow: {
         arrowVariant: "Up Arrow",
