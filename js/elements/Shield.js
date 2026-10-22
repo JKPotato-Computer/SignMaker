@@ -1,63 +1,25 @@
 class Shield {
-  constructor({
-    shieldType = "preset",
-    shieldName = "Interstate",
-    shieldValue = "I",
-    variant = "Auto",
-
-    shieldBacks = false,
-    shieldBackColor = "Black",
-    shieldBackRadius = 4,
-
-    imageType = "",
-    imageData = "",
-
-    banners = {},
-    bannerSettings = {
-      top: {
-        alignment: "start",
-        gap: 0,
-      },
-      left: {
-        alignment: "start",
-        gap: 0,
-        inset: 0.5,
-      },
-      right: {
-        alignment: "start",
-        gap: 0,
-        inset: 0.5,
-      },
-      bottom: {
-        alignment: "end",
-        gap: 0,
-      },
-    },
-    group = 0,
-
-    designation = "",
-    routeNumber = "1",
-
-    scale = 100,
-    horizMargin = 8,
-    vertMargin = 8,
-
-    customShields = {
-      route_scale: 100,
-      route_xOffset: 0,
-      route_yOffset: 0,
-      route_letterSpacing: 0,
-      route_fontFamily: "",
-      route_color: "",
-
-      designation_scale: 100,
-      designation_xOffset: 0,
-      designation_yOffset: 0,
-      designation_letterSpacing: 0,
-      designation_fontFamily: "",
-      designation_color: "",
-    },
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      shieldType,
+      shieldName,
+      shieldValue,
+      variant,
+      shieldBacks,
+      shieldBackColor,
+      shieldBackRadius,
+      imageType,
+      imageData,
+      banners,
+      bannerSettings,
+      group,
+      designation,
+      routeNumber,
+      scale,
+      horizMargin,
+      vertMargin,
+      customShields,
+    } = MUTCDVariants.get("Shield", options);
     // Shield Image
     this.shieldType = shieldType;
     this.shieldName = shieldName;
@@ -337,18 +299,19 @@ class Shield {
 }
 
 class Banner {
-  constructor({
-    textContent = "NORTH",
-    firstLetterSize = 125,
-    fontSize = 1.3,
-    backgroundColor = "Inherit",
-    horizontalPadding = 0,
-    verticalPadding = 0,
-    horizontalMargin = 0,
-    verticalMargin = 0,
-    borderRadius = 4,
-    fontFamily = "Clearview 5WR",
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      textContent,
+      firstLetterSize,
+      fontSize,
+      backgroundColor,
+      horizontalPadding,
+      verticalPadding,
+      horizontalMargin,
+      verticalMargin,
+      borderRadius,
+      fontFamily,
+    } = MUTCDVariants.get("Banner", options);
     this.textContent = textContent;
     this.firstLetterSize = firstLetterSize;
     this.fontSize = fontSize;

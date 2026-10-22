@@ -17,6 +17,31 @@ import("https://unpkg.com/@oddbird/css-anchor-positioning/dist/css-anchor-positi
 const ImportExport = (() => {
   // serializing & unserializing
   const signToJson = (signContent, type) => {
+    const copyValue = (value) => {
+      if (Array.isArray(value)) {
+        return value.map((item) => copyValue(item));
+      }
+
+      if (!value || typeof value !== "object") {
+        return value;
+      }
+
+      const className = value.constructor?.name;
+      if (
+        className &&
+        MUTCDVariants.MUTCD &&
+        Object.hasOwn(MUTCDVariants.MUTCD, className)
+      ) {
+        return tagCopy(value);
+      }
+
+      const copy = {};
+      for (const key of Object.keys(value)) {
+        copy[key] = copyValue(value[key]);
+      }
+      return copy;
+    };
+
     const tagCopy = (obj) => {
       if (!obj || typeof obj !== "object") {
         return obj;
@@ -29,14 +54,30 @@ const ImportExport = (() => {
       const copy = {};
 
       copy._type = obj.constructor.name;
-
       const proto = Object.getPrototypeOf(obj);
+      const constructor = obj.constructor;
+      const variableNames = MUTCDVariants.getVariableNames(obj.constructor.name);
+      const fields =
+        variableNames.length > 0
+          ? variableNames
+          : obj.constructor.name === "Object"
+          ? Object.keys(obj)
+          : [];
 
-      for (const key of Object.keys(obj)) {
+      for (const key of fields) {
+        if (!Object.hasOwn(obj, key)) {
+          continue;
+        }
+
         if (proto && key in proto) {
           continue;
         }
-        copy[key] = tagCopy(obj[key]);
+
+        if (constructor && Object.hasOwn(constructor, key)) {
+          continue;
+        }
+
+        copy[key] = copyValue(obj[key]);
       }
 
       return copy;
@@ -77,13 +118,17 @@ const ImportExport = (() => {
           const cleanClass = new targetClass();
 
           for (const key of Object.keys(processedData)) {
-            if (key !== "_type") {
-              if (key in targetClass.prototype) {
-                continue;
-              }
+            if (key === "_type") continue;
 
-              cleanClass[key] = processedData[key];
+            if (key in targetClass.prototype) {
+              continue;
             }
+
+            if (Object.hasOwn(targetClass, key)) {
+              continue;
+            }
+
+            cleanClass[key] = processedData[key];
           }
 
           return cleanClass;

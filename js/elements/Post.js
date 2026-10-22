@@ -1,16 +1,38 @@
 class Post {
   constructor(
     polePosition,
-    lanesWide = 1,
-    color = Post.colors?.[0],
-    cornerRadius = 30,
-    showPost = true,
-    offsetPost = true,
-    variant = "Standard",
-    panelSpacing = 0,
-    thickness = 1,
-    spacing = 5,
+    lanesWide,
+    color,
+    cornerRadius,
+    showPost,
+    offsetPost,
+    variant,
+    panelSpacing,
+    thickness,
+    spacing,
   ) {
+    const defaults = MUTCDVariants.get("Post", {
+      polePosition,
+      lanesWide,
+      color,
+      cornerRadius,
+      showPost,
+      offsetPost,
+      variant,
+      panelSpacing,
+      thickness,
+      spacing,
+    });
+    polePosition = defaults.polePosition;
+    lanesWide = defaults.lanesWide;
+    color = defaults.color;
+    cornerRadius = defaults.cornerRadius;
+    showPost = defaults.showPost;
+    offsetPost = defaults.offsetPost;
+    variant = defaults.variant;
+    panelSpacing = defaults.panelSpacing;
+    thickness = defaults.thickness;
+    spacing = defaults.spacing;
     if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
     } else {

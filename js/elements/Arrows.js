@@ -1,19 +1,19 @@
 class APLArrow {
-  constructor({
-    arrowVariant = "Up Arrow",
-    offset = 0,
-    size = 4.5,
-
-    exitOnlyEnabled = false,
-    exitTextContent = ["EXIT", "ONLY"],
-    exitBGColor = "Yellow",
-    exitTextRoundness = 4,
-    exitTextHorizontalPadding = 5,
-    exitTextMargins = [0, 0],
-    exitTextSize = 16,
-    exitTextLineHeight = 100,
-    fontFamily = "Series E",
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      arrowVariant,
+      offset,
+      size,
+      exitOnlyEnabled,
+      exitTextContent,
+      exitBGColor,
+      exitTextRoundness,
+      exitTextHorizontalPadding,
+      exitTextMargins,
+      exitTextSize,
+      exitTextLineHeight,
+      fontFamily,
+    } = MUTCDVariants.get("APLArrow", options);
     this.arrowVariant = arrowVariant;
     this.offset = offset;
     this.size = size;
@@ -128,14 +128,15 @@ APLArrow.prototype.backgroundColors = [
 APLArrow.prototype.justifyAPLs = ["Left", "Right", "Center"];
 
 class StandardArrow {
-  constructor({
-    arrow = "TYPE_A",
-    rotation = 180,
-    size = 1.75,
-    marginHorizontal = 0,
-    marginVertical = 0,
-    flip = false,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      arrow,
+      rotation,
+      size,
+      marginHorizontal,
+      marginVertical,
+      flip,
+    } = MUTCDVariants.get("StandardArrow", options);
     this.arrow = arrow;
     this.rotation = rotation;
     this.size = size;

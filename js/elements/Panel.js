@@ -1,11 +1,9 @@
 class Panel {
-  constructor({
-    sign,
-    color = "Green",
-    exitTabs = [],
-    corner = "Sharp",
-    borderRadius = 0.75,
-  } = {}) {
+  constructor(options = {}) {
+    const { sign, color, exitTabs, corner, borderRadius } = MUTCDVariants.get(
+      "Panel",
+      options,
+    );
     this.color = color;
     this.corner = corner;
     this.sign = sign;

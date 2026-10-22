@@ -55,6 +55,7 @@
     <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
     <script src="js/presets/TemplatePresets.js" type="text/javascript"></script>
+    <script src="js/presets/MUTCDVariants.js" type="text/javascript"></script>
 
     <script src="js/modules/History.js" type="text/javascript"></script>
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
@@ -1153,6 +1154,15 @@
             </button>
           </footer>
         </dialog>
+      </dialog>
+      <dialog id="signMakerSettings">
+        <header>
+          <h2>
+            <span class="material-symbols-outlined">settings</span>
+            SignMaker Settings
+          </h2>
+          <button type="button" id="signMakerSettingsClose">Close</button>
+        </header>
       </dialog>
     </div>
     <form name="signMaker">
@@ -5141,6 +5151,14 @@
           data-toolTip="Import"
         >
           <span class="material-symbols-outlined"> upload </span>
+        </button>
+        <button
+          type="button"
+          id="toggleSettings"
+          class="sMConfigOption"
+          data-toolTip="Settings"
+        >
+          <span class="material-symbols-outlined"> settings </span>
         </button>
         <button
           type="button"

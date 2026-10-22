@@ -1,116 +1,6 @@
-const defaultExitTabConfig = {
-  // Content
-  textContent: "EXIT 1",
-  subTextContent: "",
-  shields: {
-    left: [],
-    right: [],
-  },
-
-  // Appearance
-  backgroundColor: "inherit",
-  borderStyle: "round",
-  borderThickness: 0.2,
-  borderRadius: 0.5,
-  useFullBorder: true,
-
-  horizontalPadding: 0.5,
-  verticalPadding: 0,
-  minimumHeight: 2.25,
-  holderPadding: 0,
-
-  fontSize: 20,
-  lineHeight: 100,
-  enlargeNumerals: true,
-  enlargeNumeralsSize: 150,
-  spaceLettersNumerals: true,
-  numeralWordSpacing: 0.25,
-
-  offsetNonNumerals: false,
-  fontFamily: "Clearview 5WR",
-  numeralFontFamily: "Inherit",
-  letterSpacing: 0,
-  numeralLetterSpacing: 0,
-  useTrimFormat: false,
-
-  shieldsDirection: "horizontal",
-  shieldsGap: 0.5,
-  shieldWordSpacing: 0.25,
-
-  contentDirection: "horizontal",
-
-  // Positioning
-  alignment: "right",
-  width: "auto",
-  widthSize: 0,
-
-  // Variant
-  variant: "Normal",
-  variantSettings: {
-    icon: {
-      icon: "AIRPORT",
-      iconType: "preset",
-      iconData: "",
-      tollIcon: "EZPass",
-      isTextBased: false,
-      iconBackgroundConfiguration: {
-        backgroundColor: "Transparent",
-        horizontalPadding: 0,
-        verticalPadding: 0,
-        borderRadius: 0,
-      },
-      addon: "none",
-      iconSize: 3,
-      isSquare: true,
-      isTollIcon: false,
-      showBackground: true,
-      onlyHorizontalPadding: 0.25,
-      pbmPadding: 0.25,
-      pbmIsSquare: true,
-      fontFamily: "Series E",
-      underline: false,
-      fontSize: 0,
-    },
-    fullLeft: {
-      minimumWidth: 7,
-      fontFamily: "Series E",
-      letterSpacing: 0,
-      bottomSpacing: 1.25,
-      flipJustify: false,
-    },
-    partialLeft: {
-      separateRow: true,
-      horizontalPadding: 0.6,
-      verticalPadding: 0.3,
-      letterSpacing: 2,
-      minWidth: 7,
-      spacing: 1.5,
-      fontFamily: "Series E",
-      borderRadius: 4,
-    },
-    hovVariant1: {
-      height: 0,
-      width: 0,
-      verticalPadding: 0.125,
-      roundCorners: false,
-    },
-    hovVariant2: {
-      height: 0,
-      width: 0,
-      verticalPadding: 0.125,
-    },
-  },
-};
-
 class ExitTab {
   constructor(options = {}) {
-    const freshConfig = structuredClone(defaultExitTabConfig);
-
-    Object.assign(this, freshConfig);
-
-    if (Object.keys(options).length > 0) {
-      lib.deepMerge(this, options);
-    }
+    Object.assign(this, MUTCDVariants.get("ExitTab", options));
   }
 
   splitText(text) {
@@ -612,7 +502,7 @@ class ExitTab {
   }
 }
 
-ExitTab.prototype.defaultExitTabConfig = structuredClone(defaultExitTabConfig);
+ExitTab.prototype.defaultExitTabConfig = MUTCDVariants.get("ExitTab");
 delete ExitTab.prototype.defaultExitTabConfig.textContent;
 delete ExitTab.prototype.defaultExitTabConfig.subTextContent;
 delete ExitTab.prototype.defaultExitTabConfig.shields;
@@ -649,16 +539,17 @@ ExitTab.tollIconBackgrounds = ["Transparent"].concat(
 );
 
 class ExitTabRow {
-  constructor({
-    exitTabs = [],
-    gap = 0,
-    panelEdgeType = "separate",
-    position = "top",
-    marginBottom = 0.3,
-    independentWidth = false,
-    hideTopBorder = false,
-    hideBottomBorder = false,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      exitTabs,
+      gap,
+      panelEdgeType,
+      position,
+      marginBottom,
+      independentWidth,
+      hideTopBorder,
+      hideBottomBorder,
+    } = MUTCDVariants.get("ExitTabRow", options);
     this.exitTabs = exitTabs;
     this.gap = gap;
     this.panelEdgeType = panelEdgeType;

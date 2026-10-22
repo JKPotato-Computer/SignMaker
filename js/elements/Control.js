@@ -1,22 +1,23 @@
 // Control.js
 
 class TextElement {
-  constructor({
-    textContent = "New Sign",
-    backgroundColor = "Inherit",
-    fontFamily = "Clearview 5WR",
-    fontSize = 100,
-    useBannerFormatting = false,
-    bannerFormattingSize = 100,
-    bannerFirstLetterSize = 120,
-    useNumeralFormatting = false,
-    numeralFormattingSize = 150,
-    spaceNumeralsLetters = true,
-    alignment = "Center",
-    textAlign = "Center",
-    lineHeight = 100,
-    wordSpacing = 0,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      textContent,
+      backgroundColor,
+      fontFamily,
+      fontSize,
+      useBannerFormatting,
+      bannerFormattingSize,
+      bannerFirstLetterSize,
+      useNumeralFormatting,
+      numeralFormattingSize,
+      spaceNumeralsLetters,
+      alignment,
+      textAlign,
+      lineHeight,
+      wordSpacing,
+    } = MUTCDVariants.get("TextElement", options);
     this.textContent = textContent;
     this.fontFamily = fontFamily;
     this.backgroundColor = backgroundColor;
@@ -229,7 +230,11 @@ TextElement.backgroundColors = ["Inherit"].concat(
 );
 
 class ControlTextElement extends TextElement {
-  constructor({ smallCapitals = false, wordSpacing = 0 } = {}) {
+  constructor(options = {}) {
+    const { smallCapitals, wordSpacing } = MUTCDVariants.get(
+      "ControlTextElement",
+      options,
+    );
     super();
     this.smallCapitals = smallCapitals;
     this.wordSpacing = wordSpacing;
@@ -244,11 +249,9 @@ class ControlTextElement extends TextElement {
 }
 
 class ActionMessageElement extends TextElement {
-  constructor({
-    fontSize = 70,
-    useNumeralFormatting = true,
-    wordSpacing = 0,
-  } = {}) {
+  constructor(options = {}) {
+    const { fontSize, useNumeralFormatting, wordSpacing } =
+      MUTCDVariants.get("ActionMessageElement", options);
     super();
     this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
@@ -263,18 +266,19 @@ class ActionMessageElement extends TextElement {
 }
 
 class AdvisoryMessageElement extends TextElement {
-  constructor({
-    backgroundColor = "Yellow",
-    fontFamily = "Series E",
-    borderRadius = 4,
-    border = false,
-    borderWidth = 2,
-    borderColor = "White",
-    useNumeralFormatting = true,
-    horizPadding = 0.3,
-    vertPadding = 0.2,
-    wordSpacing = 0,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      backgroundColor,
+      fontFamily,
+      borderRadius,
+      border,
+      borderWidth,
+      borderColor,
+      useNumeralFormatting,
+      horizPadding,
+      vertPadding,
+      wordSpacing,
+    } = MUTCDVariants.get("AdvisoryMessageElement", options);
     super();
     this.borderColor = borderColor;
     this.backgroundColor = backgroundColor;
@@ -306,17 +310,18 @@ class AdvisoryMessageElement extends TextElement {
 }
 
 class ElectronicSignElement extends TextElement {
-  constructor({
-    fontFamily = "Electronic Highway Sign",
-    textColor = "Orange",
-    textFormat = "Full Text",
-    formatSize = 0.05,
-    horizPadding = 0.5,
-    vertPadding = 0.5,
-    glow = true,
-    setWidth = 0,
-    wordSpacing = 0,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      fontFamily,
+      textColor,
+      textFormat,
+      formatSize,
+      horizPadding,
+      vertPadding,
+      glow,
+      setWidth,
+      wordSpacing,
+    } = MUTCDVariants.get("ElectronicSignElement", options);
     super();
     this.fontFamily = fontFamily;
     this.textColor = textColor;
@@ -407,12 +412,11 @@ ElectronicSignElement.prototype.textFormats = [
 
 class ShieldGroupElement {
   f;
-  constructor({
-    shields = [],
-    alignment = "Center",
-    direction = "Horizontal",
-    gap = 0.5,
-  } = {}) {
+  constructor(options = {}) {
+    const { shields, alignment, direction, gap } = MUTCDVariants.get(
+      "ShieldGroupElement",
+      options,
+    );
     this.shields = shields;
     this.alignment = alignment;
     this.direction = direction;
@@ -481,15 +485,16 @@ class ShieldGroupElement {
 ShieldGroupElement.directions = ["Horizontal", "Vertical"];
 
 class DividerElement {
-  constructor({
-    dividerWidth = 100,
-    dividerMeasurement = "%",
-    dividerHeight = 0.2,
-    alignment = "Center",
-    visible = true,
-    dividerColor = "White",
-    fullBleed = false,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      dividerWidth,
+      dividerMeasurement,
+      dividerHeight,
+      alignment,
+      visible,
+      dividerColor,
+      fullBleed,
+    } = MUTCDVariants.get("DividerElement", options);
     this.dividerWidth = dividerWidth;
     this.dividerMeasurement = dividerMeasurement;
     this.dividerHeight = dividerHeight;
@@ -547,17 +552,18 @@ DividerElement.prototype.dividerColors = [
 ];
 
 class IconElement {
-  constructor({
-    icon = "AIRPORT",
-    iconType = "preset",
-    iconData = "",
-    iconSize = 100,
-    backgroundColor = "Inherit",
-    border = false,
-    borderRadius = 4,
-    borderColor = "White",
-    spacing = 4,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      icon,
+      iconType,
+      iconData,
+      iconSize,
+      backgroundColor,
+      border,
+      borderRadius,
+      borderColor,
+      spacing,
+    } = MUTCDVariants.get("IconElement", options);
     this.icon = icon;
     this.iconType = iconType;
     this.iconData = iconData;
@@ -735,14 +741,15 @@ IconElement.icons = {
 };
 
 class BeaconElement {
-  constructor({
-    size = 2,
-    alignment = "Center",
-    flashDuration = 1,
-    color = "Yellow",
-    backplate = false,
-    flashOpposite = false,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      size,
+      alignment,
+      flashDuration,
+      color,
+      backplate,
+      flashOpposite,
+    } = MUTCDVariants.get("BeaconElement", options);
     const parsedSize = parseFloat(size);
     this.size = Number.isFinite(parsedSize) ? Math.max(parsedSize, 0.5) : 2;
     const parsedDuration = parseFloat(flashDuration);
@@ -834,17 +841,18 @@ BeaconElement.backplateColor = "Yellow";
 BeaconElement.backplateFallbackColor = "#ffd200";
 
 class ArrowElement {
-  constructor({
-    arrow = "TYPE_A",
-    rotation = 0,
-    size = 1.75,
-    marginHorizontal = 0,
-    marginVertical = 0,
-    flip = false,
-    paddingHorizontal = 0,
-    paddingVertical = 0,
-    alignment = "Center",
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      arrow,
+      rotation,
+      size,
+      marginHorizontal,
+      marginVertical,
+      flip,
+      paddingHorizontal,
+      paddingVertical,
+      alignment,
+    } = MUTCDVariants.get("ArrowElement", options);
     this.standardArrow = new StandardArrow({
       arrow,
       rotation,
@@ -880,34 +888,33 @@ class ArrowElement {
 }
 
 class TollLogoElement {
-  constructor({
-    logo = TollLogoElement.defaultLogo,
-    logoHeight = 3,
-    spacing = 0,
-    horizontalPadding = 0.25,
-    verticalPadding = 0.25,
-    background = false,
-    backgroundColor = "Purple",
-    alignment = "Center",
-    squareIcon = false,
-
-    containerBorderRadius = 8,
-    tollBorderRadius = 8,
-    onlyBorderRadius = 4,
-
-    border = 3,
-    showOnlyBlock = false,
-    onlyBlockDirection = "Horizontal",
-    onlyBlockSpacing = 0.25,
-    onlyBlockFontSize = 24,
-    fontFamily = "Series D",
-    onlyBlockHorizPadding = 0.2,
-    onlyBlockVertPadding = 0.25,
-    containerHorizontalPadding = 0.25,
-    containerVerticalPadding = 0.25,
-    containerBorderWidth = 0,
-    containerBackgroundColor = "Purple",
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      logo,
+      logoHeight,
+      spacing,
+      horizontalPadding,
+      verticalPadding,
+      background,
+      backgroundColor,
+      alignment,
+      squareIcon,
+      containerBorderRadius,
+      tollBorderRadius,
+      onlyBorderRadius,
+      border,
+      showOnlyBlock,
+      onlyBlockDirection,
+      onlyBlockSpacing,
+      onlyBlockFontSize,
+      fontFamily,
+      onlyBlockHorizPadding,
+      onlyBlockVertPadding,
+      containerHorizontalPadding,
+      containerVerticalPadding,
+      containerBorderWidth,
+      containerBackgroundColor,
+    } = MUTCDVariants.get("TollLogoElement", options);
     this.logo = logo;
     this.logoHeight = logoHeight;
     this.spacing = spacing;
@@ -1106,23 +1113,21 @@ TollLogoElement.directions = {
 };
 
 class Block {
-  constructor({
-    topMargin = 0,
-    topPadding = 0,
-
-    bottomMargin = 0,
-    bottomPadding = 0,
-
-    leftPadding = 0,
-    rightPadding = 0,
-
-    backgroundColor = "Inherit",
-    backgroundFullWidth = true,
-    width = 0,
-    stretchLeft = true,
-    stretchCenter = true,
-    stretchRight = true,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      topMargin,
+      topPadding,
+      bottomMargin,
+      bottomPadding,
+      leftPadding,
+      rightPadding,
+      backgroundColor,
+      backgroundFullWidth,
+      width,
+      stretchLeft,
+      stretchCenter,
+      stretchRight,
+    } = MUTCDVariants.get("Block", options);
     this.topMargin = topMargin;
     this.topPadding = topPadding;
     this.bottomMargin = bottomMargin;
@@ -1140,16 +1145,17 @@ class Block {
 
 // basically control but w/o some of the block properties
 class GroupElement {
-  constructor({
-    blockElements,
-    direction = "Vertical",
-    width = 0,
-    boxFormat = "Normal",
-    formatSize = 0.04,
-    border = false,
-    borderWidth = 5,
-    borderColor = "Black",
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      blockElements,
+      direction,
+      width,
+      boxFormat,
+      formatSize,
+      border,
+      borderWidth,
+      borderColor,
+    } = MUTCDVariants.get("GroupElement", options);
     if (this.blockElements) {
       this.blockElements = blockElements;
     } else {
@@ -1210,7 +1216,11 @@ GroupElement.prototype.blockDirection = ["Horizontal", "Vertical"];
 GroupElement.boxFormats = ["Normal", "Circle Pixels", "Square Pixels"];
 
 class Control {
-  constructor({ rows = [], blockProperties = [], isGroup = false } = {}) {
+  constructor(options = {}) {
+    const { rows, blockProperties, isGroup } = MUTCDVariants.get(
+      "Control",
+      options,
+    );
     this.rows = rows;
     this.blockProperties = blockProperties;
     this.isGroup = isGroup;

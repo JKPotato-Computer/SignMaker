@@ -244,6 +244,16 @@ const FormNavigation = (() => {
         formHandler.updateForm();
       }
     };
+
+    document.querySelector("#toggleSettings").onclick = function () {
+      document.querySelector("#signMakerSettings").showModal();
+      document.querySelector("#modalHolder").style.display = "flex";
+    };
+
+    document.querySelector("#signMakerSettingsClose").onclick = function () {
+      document.querySelector("#signMakerSettings").close();
+      document.querySelector("#modalHolder").style.display = "none";
+    }; 
   };
 
   const setupTooltips = () => {

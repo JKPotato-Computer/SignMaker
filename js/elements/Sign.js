@@ -1,74 +1,24 @@
 class Sign {
-  constructor({
-    // arrow
-    arrows = {
-      arrowMode: "standard",
-      standard: {
-        variant: "None",
-        arrowList: [],
-        customConfig: {
-          horizontalPadding: 1,
-          verticalTopPadding: 0,
-          verticalBottomPadding: 0.5,
-          gap: 1,
-          justify: "Space Between",
-        },
-        exitOnlyConfigs: {
-          borderMode: "Partial Black Border",
-          exitOnlyText: "EXIT ONLY",
-          exitOnlyTextPosition: "Center",
-          horizontalPadding: 1,
-          verticalPadding: 0.5,
-
-          splitHorizontalPadding: 0.25,
-          splitVerticalPadding: 0.25,
-          splitBorderRadius: 4,
-
-          exitOnlyOutsideGap: 5,
-
-          fontFamily: "Series E",
-          fontSize: 24,
-          wordSpacing: 0,
-          letterSpacing: 0,
-          arrowLocation: "Center", // Half Exit ("Left"/"Right"); Split Exit ("Left","Right","Center")
-
-          arrow: new StandardArrow({ arrow: "DOWN", size: 1.75, rotation: 0 }),
-          numArrows: 0,
-          gap: 4,
-          textGap: 0.5,
-
-          displayOutsideArrow: true,
-          backgroundColor: "Yellow",
-          roundAllCorners: false,
-        },
-      },
-      apl: {
-        horizontalPadding: 0,
-        verticalTopPadding: 0,
-        verticalBottomPadding: 0.25,
-        subpanels: {},
-        subpanelConfigs: {},
-      },
-      diagrammic: {
-        diagramData: {},
-        scale: 100,
-        preset: "None",
-      },
-    },
-
-    // other
-    otherSymbol = "None",
-    oSNum = "",
-
-    // subpanel
-    subPanels = [],
-    lanePanelSize = 0, // number
-
-    paddingLeft = 0.75,
-    paddingRight = 0.75,
-    paddingTop = 0.3,
-    paddingBottom = 0.3,
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      arrows,
+      otherSymbol,
+      oSNum,
+      subPanels,
+      lanePanelSize,
+      paddingLeft,
+      paddingRight,
+      paddingTop,
+      paddingBottom,
+    } = MUTCDVariants.get("Sign", options);
+    if (
+      arrows.standard?.exitOnlyConfigs?.arrow &&
+      !(arrows.standard.exitOnlyConfigs.arrow instanceof StandardArrow)
+    ) {
+      arrows.standard.exitOnlyConfigs.arrow = new StandardArrow(
+        arrows.standard.exitOnlyConfigs.arrow,
+      );
+    }
     this.otherSymbol = otherSymbol;
     this.oSNum = oSNum;
     this.subPanels = subPanels;

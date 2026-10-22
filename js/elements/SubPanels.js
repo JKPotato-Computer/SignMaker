@@ -1,11 +1,12 @@
 class SubPanels {
-  constructor({
-    laneWidth = 0,
-    blockElements,
-    verticalAlign = "Start",
-    dividerHeight = 50,
-    dividerHeightUnit = "%",
-  } = {}) {
+  constructor(options = {}) {
+    const {
+      laneWidth,
+      blockElements,
+      verticalAlign,
+      dividerHeight,
+      dividerHeightUnit,
+    } = MUTCDVariants.get("SubPanels", options);
     if (blockElements) {
       this.blockElements = blockElements;
     } else {

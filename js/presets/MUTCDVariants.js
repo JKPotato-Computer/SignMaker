@@ -1,0 +1,544 @@
+const MUTCDVariants = (() => {
+  const variants = {
+    MUTCD: {
+      APLArrow: {
+        arrowVariant: "Up Arrow",
+        offset: 0,
+        size: 4.5,
+        exitOnlyEnabled: false,
+        exitTextContent: ["EXIT", "ONLY"],
+        exitBGColor: "Yellow",
+        exitTextRoundness: 4,
+        exitTextHorizontalPadding: 5,
+        exitTextMargins: [0, 0],
+        exitTextSize: 16,
+        exitTextLineHeight: 100,
+        fontFamily: "Series E",
+      },
+      StandardArrow: {
+        arrow: "TYPE_A",
+        rotation: 180,
+        size: 1.75,
+        marginHorizontal: 0,
+        marginVertical: 0,
+        flip: false,
+      },
+      Post: {
+        polePosition: "Left",
+        lanesWide: 1,
+        color: "Silver",
+        cornerRadius: 30,
+        showPost: true,
+        offsetPost: true,
+        variant: "Standard",
+        panelSpacing: 0,
+        thickness: 1,
+        spacing: 5,
+        panels: [],
+      },
+      Panel: {
+        sign: null,
+        color: "Green",
+        exitTabs: [],
+        corner: "Sharp",
+        borderRadius: 0.75,
+      },
+      Sign: {
+        arrows: {
+          arrowMode: "standard",
+          standard: {
+            variant: "None",
+            arrowList: [],
+            customConfig: {
+              horizontalPadding: 1,
+              verticalTopPadding: 0,
+              verticalBottomPadding: 0.5,
+              gap: 1,
+              justify: "Space Between",
+            },
+            exitOnlyConfigs: {
+              borderMode: "Partial Black Border",
+              exitOnlyText: "EXIT ONLY",
+              exitOnlyTextPosition: "Center",
+              horizontalPadding: 1,
+              verticalPadding: 0.5,
+              splitHorizontalPadding: 0.25,
+              splitVerticalPadding: 0.25,
+              splitBorderRadius: 4,
+              exitOnlyOutsideGap: 5,
+              fontFamily: "Series E",
+              fontSize: 24,
+              wordSpacing: 0,
+              letterSpacing: 0,
+              arrowLocation: "Center",
+              arrow: {
+                arrow: "DOWN",
+                rotation: 0,
+                size: 1.75,
+                marginHorizontal: 0,
+                marginVertical: 0,
+                flip: false,
+              },
+              numArrows: 0,
+              gap: 4,
+              textGap: 0.5,
+              displayOutsideArrow: true,
+              backgroundColor: "Yellow",
+              roundAllCorners: false,
+            },
+          },
+          apl: {
+            horizontalPadding: 0,
+            verticalTopPadding: 0,
+            verticalBottomPadding: 0.25,
+            subpanels: {},
+            subpanelConfigs: {},
+          },
+          diagrammic: {
+            diagramData: {},
+            scale: 100,
+            preset: "None",
+          },
+        },
+        otherSymbol: "None",
+        oSNum: "",
+        subPanels: [],
+        lanePanelSize: 0,
+        paddingLeft: 0.75,
+        paddingRight: 0.75,
+        paddingTop: 0.3,
+        paddingBottom: 0.3,
+      },
+      SubPanels: {
+        laneWidth: 0,
+        blockElements: null,
+        verticalAlign: "Start",
+        dividerHeight: 50,
+        dividerHeightUnit: "%",
+      },
+      TextElement: {
+        textContent: "New Sign",
+        backgroundColor: "Inherit",
+        fontFamily: "Series EM",
+        fontSize: 100,
+        useBannerFormatting: false,
+        bannerFormattingSize: 100,
+        bannerFirstLetterSize: 120,
+        useNumeralFormatting: false,
+        numeralFormattingSize: 150,
+        spaceNumeralsLetters: true,
+        alignment: "Center",
+        textAlign: "Center",
+        lineHeight: 100,
+        wordSpacing: 0,
+      },
+      ControlTextElement: {
+        smallCapitals: false,
+        wordSpacing: 0,
+      },
+      ActionMessageElement: {
+        fontSize: 70,
+        useNumeralFormatting: true,
+        wordSpacing: 0,
+      },
+      AdvisoryMessageElement: {
+        backgroundColor: "Yellow",
+        fontFamily: "Series E",
+        borderRadius: 4,
+        border: false,
+        borderWidth: 2,
+        borderColor: "White",
+        useNumeralFormatting: true,
+        horizPadding: 0.3,
+        vertPadding: 0.2,
+        wordSpacing: 0,
+      },
+      ElectronicSignElement: {
+        fontFamily: "Electronic Highway Sign",
+        textColor: "Orange",
+        textFormat: "Full Text",
+        formatSize: 0.05,
+        horizPadding: 0.5,
+        vertPadding: 0.5,
+        glow: true,
+        setWidth: 0,
+        wordSpacing: 0,
+      },
+      ShieldGroupElement: {
+        shields: [],
+        alignment: "Center",
+        direction: "Horizontal",
+        gap: 0.5,
+      },
+      DividerElement: {
+        dividerWidth: 100,
+        dividerMeasurement: "%",
+        dividerHeight: 0.2,
+        alignment: "Center",
+        visible: true,
+        dividerColor: "White",
+        fullBleed: false,
+      },
+      IconElement: {
+        icon: "AIRPORT",
+        iconType: "preset",
+        iconData: "",
+        iconSize: 100,
+        backgroundColor: "Inherit",
+        border: false,
+        borderRadius: 4,
+        borderColor: "White",
+        spacing: 4,
+      },
+      BeaconElement: {
+        size: 2,
+        alignment: "Center",
+        flashDuration: 1,
+        color: "Yellow",
+        backplate: false,
+        flashOpposite: false,
+      },
+      ArrowElement: {
+        arrow: "TYPE_A",
+        rotation: 0,
+        size: 1.75,
+        marginHorizontal: 0,
+        marginVertical: 0,
+        flip: false,
+        paddingHorizontal: 0,
+        paddingVertical: 0,
+        alignment: "Center",
+      },
+      TollLogoElement: {
+        logo: "EZPass",
+        logoHeight: 3,
+        spacing: 0,
+        horizontalPadding: 0.25,
+        verticalPadding: 0.25,
+        background: false,
+        backgroundColor: "Purple",
+        alignment: "Center",
+        squareIcon: false,
+        containerBorderRadius: 8,
+        tollBorderRadius: 8,
+        onlyBorderRadius: 4,
+        border: 3,
+        showOnlyBlock: false,
+        onlyBlockDirection: "Horizontal",
+        onlyBlockSpacing: 0.25,
+        onlyBlockFontSize: 24,
+        fontFamily: "Series D",
+        onlyBlockHorizPadding: 0.2,
+        onlyBlockVertPadding: 0.25,
+        containerHorizontalPadding: 0.25,
+        containerVerticalPadding: 0.25,
+        containerBorderWidth: 0,
+        containerBackgroundColor: "Purple",
+      },
+      Block: {
+        topMargin: 0,
+        topPadding: 0,
+        bottomMargin: 0,
+        bottomPadding: 0,
+        leftPadding: 0,
+        rightPadding: 0,
+        backgroundColor: "Inherit",
+        backgroundFullWidth: true,
+        width: 0,
+        stretchLeft: true,
+        stretchCenter: true,
+        stretchRight: true,
+      },
+      GroupElement: {
+        blockElements: null,
+        direction: "Vertical",
+        width: 0,
+        boxFormat: "Normal",
+        formatSize: 0.04,
+        border: false,
+        borderWidth: 5,
+        borderColor: "Black",
+      },
+      Control: {
+        rows: [],
+        blockProperties: [],
+        isGroup: false,
+      },
+      ExitTab: {
+        textContent: "EXIT 1",
+        subTextContent: "",
+        shields: { left: [], right: [] },
+        backgroundColor: "inherit",
+        borderStyle: "round",
+        borderThickness: 0.2,
+        borderRadius: 0.5,
+        useFullBorder: true,
+        horizontalPadding: 0.5,
+        verticalPadding: 0,
+        minimumHeight: 2.25,
+        holderPadding: 0,
+        fontSize: 20,
+        lineHeight: 100,
+        enlargeNumerals: true,
+        enlargeNumeralsSize: 150,
+        spaceLettersNumerals: true,
+        numeralWordSpacing: 0.25,
+        offsetNonNumerals: false,
+        fontFamily: "Clearview 5WR",
+        numeralFontFamily: "Inherit",
+        letterSpacing: 0,
+        numeralLetterSpacing: 0,
+        useTrimFormat: false,
+        shieldsDirection: "horizontal",
+        shieldsGap: 0.5,
+        shieldWordSpacing: 0.25,
+        contentDirection: "horizontal",
+        alignment: "right",
+        width: "auto",
+        widthSize: 0,
+        variant: "Normal",
+        variantSettings: {
+          icon: {
+            icon: "AIRPORT",
+            iconType: "preset",
+            iconData: "",
+            tollIcon: "EZPass",
+            isTextBased: false,
+            iconBackgroundConfiguration: {
+              backgroundColor: "Transparent",
+              horizontalPadding: 0,
+              verticalPadding: 0,
+              borderRadius: 0,
+            },
+            addon: "none",
+            iconSize: 3,
+            isSquare: true,
+            isTollIcon: false,
+            showBackground: true,
+            onlyHorizontalPadding: 0.25,
+            pbmPadding: 0.25,
+            pbmIsSquare: true,
+            fontFamily: "Series E",
+            underline: false,
+            fontSize: 0,
+          },
+          fullLeft: {
+            minimumWidth: 7,
+            fontFamily: "Series E",
+            letterSpacing: 0,
+            bottomSpacing: 1.25,
+            flipJustify: false,
+          },
+          partialLeft: {
+            separateRow: true,
+            horizontalPadding: 0.6,
+            verticalPadding: 0.3,
+            letterSpacing: 2,
+            minWidth: 7,
+            spacing: 1.5,
+            fontFamily: "Series E",
+            borderRadius: 4,
+          },
+          hovVariant1: {
+            height: 0,
+            width: 0,
+            verticalPadding: 0.125,
+            roundCorners: false,
+          },
+          hovVariant2: {
+            height: 0,
+            width: 0,
+            verticalPadding: 0.125,
+          },
+        },
+      },
+      ExitTabRow: {
+        exitTabs: [],
+        gap: 0,
+        panelEdgeType: "separate",
+        position: "top",
+        marginBottom: 0.3,
+        independentWidth: false,
+        hideTopBorder: false,
+        hideBottomBorder: false,
+      },
+      Shield: {
+        shieldType: "preset",
+        shieldName: "Interstate",
+        shieldValue: "I",
+        variant: "Auto",
+        shieldBacks: false,
+        shieldBackColor: "Black",
+        shieldBackRadius: 4,
+        imageType: "",
+        imageData: "",
+        banners: {},
+        bannerSettings: {
+          top: { alignment: "start", gap: 0 },
+          left: { alignment: "start", gap: 0, inset: 0.5 },
+          right: { alignment: "start", gap: 0, inset: 0.5 },
+          bottom: { alignment: "end", gap: 0 },
+        },
+        group: 0,
+        designation: "",
+        routeNumber: "1",
+        scale: 100,
+        horizMargin: 8,
+        vertMargin: 8,
+        customShields: {
+          route_scale: 100,
+          route_xOffset: 0,
+          route_yOffset: 0,
+          route_letterSpacing: 0,
+          route_fontFamily: "",
+          route_color: "",
+          designation_scale: 100,
+          designation_xOffset: 0,
+          designation_yOffset: 0,
+          designation_letterSpacing: 0,
+          designation_fontFamily: "",
+          designation_color: "",
+        },
+      },
+      Banner: {
+        textContent: "NORTH",
+        firstLetterSize: 125,
+        fontSize: 1.3,
+        backgroundColor: "Inherit",
+        horizontalPadding: 0,
+        verticalPadding: 0,
+        horizontalMargin: 0,
+        verticalMargin: 0,
+        borderRadius: 4,
+        fontFamily: "Clearview 5WR",
+      },
+    },
+    TMUTCD: {
+      TextElement: {
+        textContent: "New Sign",
+        backgroundColor: "Inherit",
+        fontFamily: "Clearview 5WR",
+        fontSize: 250,
+        useBannerFormatting: false,
+        bannerFormattingSize: 100,
+        bannerFirstLetterSize: 120,
+        useNumeralFormatting: false,
+        numeralFormattingSize: 150,
+        spaceNumeralsLetters: true,
+        alignment: "Center",
+        textAlign: "Center",
+        lineHeight: 100,
+        wordSpacing: 0,
+      },
+    },
+  };
+
+  const cloneValue = (value) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => cloneValue(item));
+    }
+    if (!value || typeof value !== "object") {
+      return value;
+    }
+    if (value.constructor !== Object) {
+      return value;
+    }
+    const clone = {};
+    for (const key of Object.keys(value)) {
+      clone[key] = cloneValue(value[key]);
+    }
+    return clone;
+  };
+
+  const merge = (target, source) => {
+    for (const key in source) {
+      if (source[key] === undefined) {
+        continue;
+      }
+      if (Array.isArray(source[key])) {
+        target[key] = cloneValue(source[key]);
+        continue;
+      }
+      if (
+        source[key] &&
+        typeof source[key] === "object" &&
+        source[key].constructor !== Object &&
+        !Array.isArray(source[key])
+      ) {
+        target[key] = source[key];
+        continue;
+      }
+      if (
+        source[key] &&
+        typeof source[key] === "object" &&
+        !Array.isArray(source[key])
+      ) {
+        target[key] = merge(target[key] || {}, source[key]);
+      } else {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  };
+
+  const getClassNames = (className) => {
+    const classNames = [className];
+    let currentClass =
+      typeof window !== "undefined" ? window[className] : undefined;
+
+    while (typeof currentClass === "function") {
+      const parentClass = Object.getPrototypeOf(currentClass);
+      if (
+        typeof parentClass !== "function" ||
+        parentClass === Function ||
+        parentClass === Object
+      ) {
+        break;
+      }
+
+      classNames.push(parentClass.name);
+      currentClass = parentClass;
+    }
+
+    return classNames.reverse();
+  };
+
+  const getDefaults = (className, guide) => {
+    const defaults = {};
+
+    for (const currentClassName of getClassNames(className)) {
+      merge(defaults, variants.MUTCD[currentClassName] || {});
+      if (guide !== "MUTCD") {
+        merge(defaults, variants[guide]?.[currentClassName] || {});
+      }
+    }
+
+    return defaults;
+  };
+
+  const get = (className, options = {}) => {
+    const guide =
+      typeof App !== "undefined" &&
+      App.vars &&
+      App.vars.currentlySelectedReferenceGuide
+        ? App.vars.currentlySelectedReferenceGuide
+        : "MUTCD";
+    return merge(getDefaults(className, guide), options);
+  };
+
+  Object.defineProperty(variants, "get", {
+    value: get,
+  });
+  Object.defineProperty(variants, "getVariableNames", {
+    value: (className) => {
+      const variableNames = new Set();
+      for (const currentClassName of getClassNames(className)) {
+        for (const key of Object.keys(variants.MUTCD[currentClassName] || {})) {
+          variableNames.add(key);
+        }
+      }
+      return [...variableNames];
+    },
+  });
+  return variants;
+})();
