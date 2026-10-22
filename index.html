@@ -56,6 +56,7 @@
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
     <script src="js/presets/TemplatePresets.js" type="text/javascript"></script>
 
+    <script src="js/modules/History.js" type="text/javascript"></script>
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
     <script src="js/elements/lib.js" type="text/javascript"></script>
     <script src="js/elements/Shield.js" type="text/javascript"></script>
@@ -127,15 +128,6 @@
     </script>
   </head>
   <body onload="App.init()">
-    <a
-      class="mutcd-link"
-      href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="material-symbols-outlined">open_in_new</span>
-      MUTCD
-    </a>
     <div id="zoomControl">
       <span>Zoom</span>
       <button type="button" id="zoomOut" onclick="formHandler.zoom(-0.25)">
@@ -203,94 +195,96 @@
         <div id="downloadContents">
           <div>
             <h3>
-            <span class="material-symbols-outlined">download</span> Export Sign
-          </h3>
-          <label for="exportAsPNG">File Type:</label>
-          <div id="fileTypeOptions">
-            <button
-              type="button"
-              class="selected"
-              id="exportAsPNG"
-              onclick="
-                ImportExport.changeFileType(`png`);
-                ImportExport.updatePreview();
-              "
-            >
-              PNG
-            </button>
-            <button
-              type="button"
-              id="exportAsSVG"
-              onclick="
-                ImportExport.changeFileType(`svg`);
-                ImportExport.updatePreview();
-              "
-            >
-              SVG
-            </button>
-            <button
-              type="button"
-              id="exportAsJSON"
-              onclick="
-                ImportExport.changeFileType(`json`);
-                ImportExport.updatePreview();
-              "
-            >
-              JSON
-            </button>
-          </div>
-          <br />
-          <label for="downloadImageScale">Scale:</label>
-          <input
-            type="range"
-            min="1"
-            value="2"
-            max="10"
-            step="1"
-            id="downloadImageScale"
-            onchange="
-              ImportExport.setImageScale(this.value);
-              document.querySelector('#downloadImageScaleVal').value =
-                this.value;
-              ImportExport.updatePreview();
-            "
-          />
-          <input
-            type="number"
-            min="1"
-            value="2"
-            placeholder="2"
-            max="10"
-            step="1"
-            id="downloadImageScaleVal"
-            oninput="
-              ImportExport.setImageScale(this.value);
-              document.querySelector('#downloadImageScale').value = this.value;
-              ImportExport.updatePreview();
-            "
-          />
-          <br />
-          <label for="entirePost" id="entirePostLabel">Entire Post:</label>
-          <input
-            type="checkbox"
-            id="entirePost"
-            name="entirePost"
-            value="entirePost"
-            onchange="
-              ImportExport.toggleEntirePost(this.checked);
-              ImportExport.updatePreview();
-            "
-            checked=""
-          />
-          <br />
-          <div id="downloadPanelContainer" style="display: none">
-            <label for="selectPanel" id="selectPanelLabel">Panels:</label>
-            <div id="downloadPanelList">
-              <button class="downloadPanelBtn selected">1</button>
-              <button class="downloadPanelBtn selected">2</button>
-              <button class="downloadPanelBtn">3</button>
+              <span class="material-symbols-outlined">download</span> Export
+              Sign
+            </h3>
+            <label for="exportAsPNG">File Type:</label>
+            <div id="fileTypeOptions">
+              <button
+                type="button"
+                class="selected"
+                id="exportAsPNG"
+                onclick="
+                  ImportExport.changeFileType(`png`);
+                  ImportExport.updatePreview();
+                "
+              >
+                PNG
+              </button>
+              <button
+                type="button"
+                id="exportAsSVG"
+                onclick="
+                  ImportExport.changeFileType(`svg`);
+                  ImportExport.updatePreview();
+                "
+              >
+                SVG
+              </button>
+              <button
+                type="button"
+                id="exportAsJSON"
+                onclick="
+                  ImportExport.changeFileType(`json`);
+                  ImportExport.updatePreview();
+                "
+              >
+                JSON
+              </button>
             </div>
-          </div>
+            <br />
+            <label for="downloadImageScale">Scale:</label>
+            <input
+              type="range"
+              min="1"
+              value="2"
+              max="10"
+              step="1"
+              id="downloadImageScale"
+              onchange="
+                ImportExport.setImageScale(this.value);
+                document.querySelector('#downloadImageScaleVal').value =
+                  this.value;
+                ImportExport.updatePreview();
+              "
+            />
+            <input
+              type="number"
+              min="1"
+              value="2"
+              placeholder="2"
+              max="10"
+              step="1"
+              id="downloadImageScaleVal"
+              oninput="
+                ImportExport.setImageScale(this.value);
+                document.querySelector('#downloadImageScale').value =
+                  this.value;
+                ImportExport.updatePreview();
+              "
+            />
+            <br />
+            <label for="entirePost" id="entirePostLabel">Entire Post:</label>
+            <input
+              type="checkbox"
+              id="entirePost"
+              name="entirePost"
+              value="entirePost"
+              onchange="
+                ImportExport.toggleEntirePost(this.checked);
+                ImportExport.updatePreview();
+              "
+              checked=""
+            />
+            <br />
+            <div id="downloadPanelContainer" style="display: none">
+              <label for="selectPanel" id="selectPanelLabel">Groups:</label>
+              <div id="downloadPanelList">
+                <button class="downloadPanelBtn selected">1</button>
+                <button class="downloadPanelBtn selected">2</button>
+                <button class="downloadPanelBtn">3</button>
+              </div>
+            </div>
           </div>
           <div class="downloadSignFooter">
             <button
@@ -5001,7 +4995,8 @@
         >
           <nav class="sMModalBar">
             <div class="sMModalTitle">
-              <span class="material-symbols-outlined">draft</span> Creations
+              <span class="material-symbols-outlined">photo_album</span> Sign
+              Library
             </div>
             <a
               tabindex="0"
@@ -5076,7 +5071,11 @@
                 Add Panel Group
               </button>
               <!--<button type="button" id="duplicatePanel" class="dup">Duplicate</button>-->
-              <button type="button" class="del" onclick="App.deletePanelHelper()">
+              <button
+                type="button"
+                class="del"
+                onclick="App.deletePanelHelper()"
+              >
                 Remove
               </button>
             </div>
@@ -5124,8 +5123,8 @@
           <span>Guide Arrows</span>
         </button>
         <button type="button" id="creationsConfig" class="sMConfigOption">
-          <span class="material-symbols-outlined"> draft </span>
-          <span>Creations</span>
+          <span class="material-symbols-outlined"> photo_album </span>
+          <span>Sign Library</span>
         </button>
         <button
           type="button"
@@ -5145,19 +5144,47 @@
         </button>
         <button
           type="button"
-          id="nightMode"
-          class="sMConfigOption"
-          data-toolTip="Night Mode"
-        >
-          <span class="material-symbols-outlined"> dark_mode </span>
-        </button>
-        <button
-          type="button"
           id="hideConfig"
           class="sMConfigOption"
           data-toolTip="Hide"
         >
           <span class="material-symbols-outlined"> hide </span>
+        </button>
+      </nav>
+
+      <nav id="sMMiniToolbar">
+        <a
+          class="mutcd-link sMConfigOption"
+          href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="material-symbols-outlined">open_in_new</span>
+          MUTCD
+        </a>
+        <button
+          type="button"
+          id="undoButton"
+          class="sMConfigOption"
+          data-toolTip="Undo"
+        >
+          <span class="material-symbols-outlined"> undo </span>
+        </button>
+        <button
+          type="button"
+          id="redoButton"
+          class="sMConfigOption"
+          data-toolTip="Redo"
+        >
+          <span class="material-symbols-outlined"> redo </span>
+        </button>
+        <button
+          type="button"
+          id="nightMode"
+          class="sMConfigOption"
+          data-toolTip="Night Mode"
+        >
+          <span class="material-symbols-outlined"> dark_mode </span>
         </button>
       </nav>
     </form>

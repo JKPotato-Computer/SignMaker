@@ -46,6 +46,8 @@ const FormNavigation = (() => {
       localStorage.setItem("userTheme", theme);
       document.querySelector("#nightMode").dataset.tooltip =
         theme == "dark" ? "Day Mode" : "Night Mode";
+      document.querySelector("#nightMode").innerHTML =
+        `<span class="material-symbols-outlined"> ${theme == "dark" ? "light_mode" : "dark_mode"} </span>`;
     };
 
     document.querySelector("#nightMode").addEventListener("click", () => {
@@ -54,10 +56,7 @@ const FormNavigation = (() => {
       applyTheme(nextTheme);
     });
 
-    document.querySelector("#nightMode").dataset.tooltip =
-      document.documentElement.dataset.theme == "dark"
-        ? "Day Mode"
-        : "Night Mode";
+    applyTheme(document.documentElement.dataset.theme);
 
     if (!localStorage.getItem("closedWelcome")) {
       document.querySelector("#modalHolder").style.display = "flex";
@@ -99,7 +98,9 @@ const FormNavigation = (() => {
         document.querySelector("#smRender").classList.contains("wide")
       ) {
         document
-          .querySelector("#panel" + App.getPanels().indexOf(App.getCurrentPanel()))
+          .querySelector(
+            "#panel" + App.getPanels().indexOf(App.getCurrentPanel()),
+          )
           .scrollIntoView({
             behavior: "smooth", // or 'auto'
             block: "nearest", // Prevents vertical scroll
@@ -110,16 +111,18 @@ const FormNavigation = (() => {
       if (sMConfigBar.dataset.currentMenu == "panelSelector") {
         document.querySelector("#panelSelect").style.display = "flex";
         document.querySelectorAll(
-          ".sMConfigOption:has(#panelSelector)",
+          "#sMConfigBar .sMConfigOption:has(#panelSelector)",
         )[0].className = "sMConfigOption selected";
       } else {
         document.querySelector("#panelSelect").style.display = "";
         document.querySelectorAll(
-          ".sMConfigOption:has(#panelSelector)",
+          "#sMConfigBar .sMConfigOption:has(#panelSelector)",
         )[0].className = "sMConfigOption";
       }
 
-      for (const button of document.querySelectorAll(".sMConfigOption")) {
+      for (const button of document.querySelectorAll(
+        "#sMConfigBar .sMConfigOption",
+      )) {
         if (
           !button.id ||
           button.id == "nightMode" ||
@@ -137,9 +140,16 @@ const FormNavigation = (() => {
       }
     };
 
-    for (const button of document.querySelectorAll(".sMConfigOption")) {
+    for (const button of document.querySelectorAll(
+      "#sMConfigBar .sMConfigOption",
+    )) {
       button.onclick = function () {
-        if (!button.id || button.id == "nightMode") {
+        if (
+          !button.id ||
+          button.id == "nightMode" ||
+          button.id == "importSign" ||
+          button.id == "exportSign"
+        ) {
           return;
         }
 
@@ -209,11 +219,11 @@ const FormNavigation = (() => {
     document.getElementById("hideConfig").onclick = function () {
       if (sMConfigBar.classList.contains("invisible")) {
         sMConfigBar.classList.remove("invisible");
-        document.querySelector(".mutcd-link").style.display = "";
+        document.querySelector("#sMMiniToolbar").style.display = "";
         this.dataset.tooltip = "Hide";
       } else {
         sMConfigBar.classList.add("invisible");
-        document.querySelector(".mutcd-link").style.display = "none";
+        document.querySelector("#sMMiniToolbar").style.display = "none";
         this.dataset.tooltip = "Show";
       }
     };
@@ -251,7 +261,17 @@ const FormNavigation = (() => {
           boundingRect.left +
           (boundingRect.right - boundingRect.left) / 2 +
           "px";
-        tooltip.style.top = boundingRect.top - tooltip.offsetHeight - 10 + "px";
+
+        if (
+          boundingRect.bottom + tooltip.offsetHeight + 10 >
+          window.innerHeight
+        ) {
+          tooltip.style.top =
+            boundingRect.top - tooltip.offsetHeight - 10 + "px";
+        } else {
+          tooltip.style.top = boundingRect.bottom + 10 + "px";
+        }
+
         tooltip.style.opacity = 1;
 
         if (sMConfigBar.contains(element)) {

@@ -1,4 +1,6 @@
-// Constants
+// Main.js
+// AI Disclosure: probably like 2% lol im a terrible coder that i'd confuse ai instead
+
 const App = (() => {
   let post = {};
   let currentlySelectedPanelIndex = -1;
@@ -45,6 +47,14 @@ const App = (() => {
   const clamp = (number, min, max) => Math.max(min, Math.min(number, max));
 
   const init = async () => {
+    document
+      .querySelector("#undoButton")
+      .addEventListener("click", HistoryManager.undo);
+    document
+      .querySelector("#redoButton")
+      .addEventListener("click", HistoryManager.redo);
+    HistoryManager.updateButtons();
+
     if (localStorage.getItem("autoSaveSignData")) {
       post =
         ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
@@ -177,9 +187,17 @@ const App = (() => {
       document.querySelector("#panelList"),
       ".panelGroup",
       "vertical",
-      (oldPanelGroupIndex, newPanelGroupIndex, oldPanelIndex, newPanelIndex) => {
+      (
+        oldPanelGroupIndex,
+        newPanelGroupIndex,
+        oldPanelIndex,
+        newPanelIndex,
+      ) => {
         if (oldPanelIndex != null) {
-          const panel = post.panels[oldPanelGroupIndex].splice(oldPanelIndex, 1)[0];
+          const panel = post.panels[oldPanelGroupIndex].splice(
+            oldPanelIndex,
+            1,
+          )[0];
           post.panels[newPanelGroupIndex].splice(newPanelIndex, 0, panel);
           currentlySelectedPanelGroupIndex = newPanelGroupIndex;
           currentlySelectedPanelIndex = newPanelIndex;
@@ -353,6 +371,9 @@ const App = (() => {
 
   // Panels
   const newPanel = () => {
+    if (post.panels.length > 0) {
+      HistoryManager.addToUndoStack(post);
+    }
     if (currentlySelectedPanelGroupIndex == -1) {
       post.panels.push([]);
       currentlySelectedPanelGroupIndex = post.panels.length - 1;
@@ -365,6 +386,7 @@ const App = (() => {
   };
 
   const newPanelGroup = () => {
+    HistoryManager.addToUndoStack(post);
     post.panels.push([]);
     currentlySelectedPanelGroupIndex = post.panels.length - 1;
     post.newPanel(currentlySelectedPanelGroupIndex);
@@ -384,6 +406,7 @@ const App = (() => {
   };
 
   const deletePanel = () => {
+    HistoryManager.addToUndoStack(post);
     post.deletePanel([
       currentlySelectedPanelGroupIndex,
       currentlySelectedPanelIndex,
@@ -425,6 +448,7 @@ const App = (() => {
   };
 
   const deletePanelGroup = () => {
+    HistoryManager.addToUndoStack(post);
     post.panels.splice(currentlySelectedPanelGroupIndex, 1);
     currentlySelectedPanelGroupIndex = Math.max(
       -1,
@@ -455,6 +479,7 @@ const App = (() => {
   };
 
   const addSubPanel = () => {
+    HistoryManager.addToUndoStack(post);
     const sign = getCurrentPanel().sign;
     sign.newSubPanel();
     currentlySelectedSubPanelIndex++;
@@ -480,6 +505,7 @@ const App = (() => {
   const removeSubPanel = () => {
     const sign = getCurrentPanel().sign;
     if (sign.subPanels.length > 1) {
+      HistoryManager.addToUndoStack(post);
       sign.deleteSubPanel(sign.subPanels.length - 1);
       currentlySelectedSubPanelIndex = Math.max(
         0,
@@ -538,6 +564,7 @@ const App = (() => {
 
   // Exit Tabs
   const newExitTabRow = () => {
+    HistoryManager.addToUndoStack(post);
     const panel = getCurrentPanel();
     panel.newExitTabRow();
 
@@ -558,6 +585,7 @@ const App = (() => {
   };
 
   const removeExitTabRow = () => {
+    HistoryManager.addToUndoStack(post);
     const panel = getCurrentPanel();
     panel.deleteExitTabRow(currentlySelectedExitTabRowIndex);
     currentlySelectedExitTabRowIndex = Math.max(
@@ -581,6 +609,7 @@ const App = (() => {
   };
 
   const newExitTab = () => {
+    HistoryManager.addToUndoStack(post);
     const panel = getCurrentPanel();
     const exitTabRow = panel.exitTabs[currentlySelectedExitTabRowIndex];
     exitTabRow.newExitTab("right");
@@ -591,6 +620,7 @@ const App = (() => {
   };
 
   const deleteExitTab = () => {
+    HistoryManager.addToUndoStack(post);
     const panel = getCurrentPanel();
     const exitTabRow = panel.exitTabs[currentlySelectedExitTabRowIndex];
     exitTabRow.deleteExitTab(currentlySelectedExitTabIndex);
@@ -628,6 +658,7 @@ const App = (() => {
 
   // Rows
   const newRow = (selectedBlock) => {
+    HistoryManager.addToUndoStack(post);
     let blockElems = getCurrentBlockElements();
 
     currentlySelectedBlockIndex = 0;
@@ -653,6 +684,7 @@ const App = (() => {
       return;
     }
 
+    HistoryManager.addToUndoStack(post);
     blockElems.deleteRow(currentlySelectedRowIndex);
     currentlySelectedRowIndex = Math.max(currentlySelectedRowIndex - 1, 0);
 
@@ -676,6 +708,7 @@ const App = (() => {
   };
 
   const newControlElem = (selectedElem) => {
+    HistoryManager.addToUndoStack(post);
     const blockElems = getCurrentBlockElements();
     blockElems.addElement(
       Control.prototype.blockToClassElems[selectedElem],
@@ -701,6 +734,7 @@ const App = (() => {
   };
 
   const delControlElem = () => {
+    HistoryManager.addToUndoStack(post);
     const blockElems = getCurrentBlockElements();
     if (
       blockElems.removeElement(
@@ -825,6 +859,7 @@ const App = (() => {
 
   // Shield Groups
   const newShieldGroup = () => {
+    HistoryManager.addToUndoStack(post);
     const firstRow = getCurrentBlockElements().rows[0];
     const hasOnlyShieldGroups =
       firstRow &&
@@ -896,6 +931,7 @@ const App = (() => {
       selectedShieldGroup &&
       selectedShieldGroup.constructor?.name === "ShieldGroupElement"
     ) {
+      HistoryManager.addToUndoStack(post);
       selectedShieldGroup.newShield();
       currentlySelectedShieldIndex = selectedShieldGroup.shields.length - 1;
 
@@ -911,6 +947,7 @@ const App = (() => {
       selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
       shieldIndex >= 0
     ) {
+      HistoryManager.addToUndoStack(post);
       selectedShieldGroup.deleteShield(shieldIndex);
       currentlySelectedShieldIndex = Math.max(0, shieldIndex - 1);
       formHandler.updateShieldSubform();
@@ -966,6 +1003,7 @@ const App = (() => {
       nextShieldIndex >= 0 &&
       nextShieldIndex < selectedShieldGroup.shields.length
     ) {
+      HistoryManager.addToUndoStack(post);
       const shield = selectedShieldGroup.shields[shieldIndex];
       const nextShield = selectedShieldGroup.shields[nextShieldIndex];
 
@@ -999,6 +1037,7 @@ const App = (() => {
       shieldIndex >= 0 &&
       shieldIndex < selectedShieldGroup.shields.length
     ) {
+      HistoryManager.addToUndoStack(post);
       const shield = selectedShieldGroup.shields[shieldIndex];
 
       let previousGroup = shield.group;
@@ -1033,6 +1072,7 @@ const App = (() => {
       shieldIndex >= 0 &&
       shieldIndex < selectedShieldGroup.shields.length
     ) {
+      HistoryManager.addToUndoStack(post);
       let groupNumber = selectedShieldGroup.shields[shieldIndex].group;
       for (let i = 0; i < selectedShieldGroup.shields.length; i++) {
         const s = selectedShieldGroup.shields[i];
@@ -1052,6 +1092,7 @@ const App = (() => {
       return;
     }
 
+    HistoryManager.addToUndoStack(post);
     getCurrentPanel().sign.newAPL(subpanelIndex);
     formHandler.updateGuideArrowsSubform();
     redraw();
@@ -1063,6 +1104,7 @@ const App = (() => {
       return;
     }
 
+    HistoryManager.addToUndoStack(post);
     getCurrentPanel().sign.deleteAPL(subpanelIndex, aplIndex);
     formHandler.updateGuideArrowsSubform();
     redraw();
@@ -1075,6 +1117,7 @@ const App = (() => {
 
   const addStandardArrow = () => {
     const standardArrow = getCurrentPanel().sign.arrows.standard;
+    HistoryManager.addToUndoStack(post);
     getCurrentPanel().sign.newStandardArrow();
     currentlySelectedStandardArrow = standardArrow.arrowList.length - 1;
     formHandler.updateGuideArrowsSubform();
@@ -1083,6 +1126,7 @@ const App = (() => {
 
   const removeStandardArrow = () => {
     const standardArrow = getCurrentPanel().sign.arrows.standard;
+    HistoryManager.addToUndoStack(post);
     getCurrentPanel().sign.deleteStandardArrow(currentlySelectedStandardArrow);
     currentlySelectedStandardArrow = clamp(
       currentlySelectedStandardArrow,
@@ -1929,7 +1973,7 @@ const App = (() => {
 
           for (const arrow of standardArrowConfig.arrowList) {
             const arrowElement = arrow.createElement();
-            if (panel.sign.lanePanelSize >= 0) {
+            if (panel.sign.lanePanelSize > 0) {
               arrowElement.style.width = panel.sign.lanePanelSize + "px";
             }
             arrowContElmt.appendChild(arrowElement);
@@ -1955,7 +1999,7 @@ const App = (() => {
           const exitOnlyConfig = standardArrowConfig.exitOnlyConfigs;
           const arrowElement = exitOnlyConfig.arrow.createElement();
 
-          if (panel.sign.lanePanelSize >= 0) {
+          if (panel.sign.lanePanelSize > 0) {
             arrowElement.style.width = panel.sign.lanePanelSize + "px";
           }
 
@@ -2382,6 +2426,29 @@ const App = (() => {
   };
 
   const recheckWidth = () => {
+    let minTop = 0;
+    let maxBottom = 0;
+    document.querySelector("#smRender").style.height = "";
+    for (const panelGroupContainer of document.querySelectorAll(
+      ".panelGroupContainer",
+    )) {
+      minTop = Math.min(
+        minTop,
+        panelGroupContainer.getBoundingClientRect().top + window.scrollY,
+      );
+      maxBottom = Math.max(
+        maxBottom,
+        panelGroupContainer.getBoundingClientRect().top +
+          panelGroupContainer.getBoundingClientRect().height +
+          window.scrollY,
+      );
+    }
+    document.querySelector("#smRender").style.height =
+      Math.max(
+        (maxBottom - minTop) * 1.5,
+        document.querySelector("#postContainer").getBoundingClientRect().height,
+      ) + "px";
+
     if (
       document.querySelector("#smRender").scrollWidth >
       document.documentElement.clientWidth
@@ -2407,6 +2474,65 @@ const App = (() => {
     }
     currentlySelectedPanelGroupIndex = 0;
     currentlySelectedPanelIndex = 0;
+  };
+
+  // i guess w ai efficiency :sob:
+  // well i mean it's future proofing
+  const getHistoryVars = () => {
+    return {
+      currentlySelectedPanelIndex,
+      currentlySelectedPanelGroupIndex,
+      currentlySelectedSubPanelIndex,
+      currentlySelectedExitTabRowIndex,
+      currentlySelectedExitTabIndex,
+      currentlySelectedRowIndex,
+      currentlySelectedBlockIndex,
+      currentlySelectedGroupIndex,
+      currentlySelectedShieldGroupId,
+      currentlySelectedShieldIndex,
+      currentlySelectedStandardArrow,
+    };
+  };
+
+  const setHistoryVars = (historyVars = {}) => {
+    if (typeof historyVars.currentlySelectedPanelIndex === "number") {
+      currentlySelectedPanelIndex = historyVars.currentlySelectedPanelIndex;
+    }
+    if (typeof historyVars.currentlySelectedPanelGroupIndex === "number") {
+      currentlySelectedPanelGroupIndex =
+        historyVars.currentlySelectedPanelGroupIndex;
+    }
+    if (typeof historyVars.currentlySelectedSubPanelIndex === "number") {
+      currentlySelectedSubPanelIndex =
+        historyVars.currentlySelectedSubPanelIndex;
+    }
+    if (typeof historyVars.currentlySelectedExitTabRowIndex === "number") {
+      currentlySelectedExitTabRowIndex =
+        historyVars.currentlySelectedExitTabRowIndex;
+    }
+    if (typeof historyVars.currentlySelectedExitTabIndex === "number") {
+      currentlySelectedExitTabIndex = historyVars.currentlySelectedExitTabIndex;
+    }
+    if (typeof historyVars.currentlySelectedRowIndex === "number") {
+      currentlySelectedRowIndex = historyVars.currentlySelectedRowIndex;
+    }
+    if (typeof historyVars.currentlySelectedBlockIndex === "number") {
+      currentlySelectedBlockIndex = historyVars.currentlySelectedBlockIndex;
+    }
+    if (typeof historyVars.currentlySelectedGroupIndex === "number") {
+      currentlySelectedGroupIndex = historyVars.currentlySelectedGroupIndex;
+    }
+    if (typeof historyVars.currentlySelectedShieldGroupId === "number") {
+      currentlySelectedShieldGroupId =
+        historyVars.currentlySelectedShieldGroupId;
+    }
+    if (typeof historyVars.currentlySelectedShieldIndex === "number") {
+      currentlySelectedShieldIndex = historyVars.currentlySelectedShieldIndex;
+    }
+    if (typeof historyVars.currentlySelectedStandardArrow === "number") {
+      currentlySelectedStandardArrow =
+        historyVars.currentlySelectedStandardArrow;
+    }
   };
 
   return {
@@ -2440,6 +2566,8 @@ const App = (() => {
     getPost,
     getPanels,
     setPost,
+    getHistoryVars,
+    setHistoryVars,
 
     newRow,
     dupRow,

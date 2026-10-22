@@ -15,11 +15,10 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--panelSpacing, 0rem);
   width: max-content;
   height: max-content;
   align-self: center;
-  padding: 0 1rem;
+  padding: 0 var(--panelSpacing);
 }
 
 main#smRender.wide #postContainer {
@@ -228,6 +227,7 @@ main#smRender.wide #postContainer {
   margin-bottom: var(--arrowMarginVertical);
   transform: scaleX(var(--arrowFlip)) rotate(var(--arrowRotation));
   transform-origin: center;
+  min-width: min-content;
 }
 
 .blockElementRow[data-light-background="true"] .bE-arrowElement img {
@@ -1269,12 +1269,24 @@ main#smRender.wide #postContainer {
   margin: 0 calc(var(--arrowSize) * 0.1) 0 calc(var(--arrowSize) * -0.5);
 }
 
+.sMGA_APLArrow.alt-right-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.5) 0 0;
+}
+
+.sMGA_APLArrow.alt-left-arrow {
+  margin: 0 0 0 calc(var(--arrowSize) * -0.5);
+}
+
 .sMGA_APLArrow.cfx-right-arrow {
   margin: 0 calc(var(--arrowSize) * -0.5) 0 calc(var(--arrowSize) * 0.1);
 }
 
 .sMGA_APLArrow.dual-turn {
   margin-bottom: calc(var(--arrowSize) * -0.1);
+}
+
+.sMGA_APLArrow.alt-left-choice-arrow {
+   margin: 0 calc(var(--arrowSize) * -0.1) 0 calc(var(--arrowSize) * -.5);
 }
 
 .sMGA_APLArrow.flipped {

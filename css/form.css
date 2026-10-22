@@ -4,7 +4,8 @@
   font-weight: 500;
 }
 
-nav#sMConfigBar {
+nav#sMConfigBar,
+nav#sMMiniToolbar {
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -22,7 +23,14 @@ nav#sMConfigBar {
   transition: 0.1s ease-in-out opacity;
 }
 
-:root[data-theme="dark"] .sMConfigOption:not(.selected) {
+nav#sMMiniToolbar {
+  top: 1rem;
+  right: 1rem;
+  left: unset;
+  transform: unset;
+}
+
+:root[data-theme="dark"] .sMConfigOption:not(.selected,:disabled) {
   background: rgba(var(--baseColor), 0.1);
 }
 
@@ -46,6 +54,10 @@ nav#sMConfigBar {
 .sMConfigOption.selected {
   background: var(--selectedColor);
   transition: 0s;
+}
+
+.mutcd-link {
+  text-decoration: none;
 }
 
 .sMModal {
@@ -127,10 +139,10 @@ label span.toolTip,
   justify-content: flex-start;
   align-items: stretch;
   width: 12rem;
-  height: 11rem;
+  height: 20rem;
   position: fixed;
   background-color: var(--hotbarColor);
-  top: -12rem;
+  top: -21rem;
   left: 0;
   padding: 0.5rem;
   gap: 0.5rem;
@@ -169,7 +181,7 @@ label span.toolTip,
   flex-direction: column;
   gap: 0.2rem;
   width: 100%;
-  max-height: 8.5rem;
+  max-height: stretch;
   overflow-y: auto;
   padding-right: 0.15rem;
   height: 100%;
@@ -184,12 +196,11 @@ label span.toolTip,
   width: 100%;
   padding: 0.25rem 0.4rem;
   font-size: 0.75rem;
-  background: rgba(var(--baseColor), 0.3);
+  background: rgba(var(--baseColor), 0.15);
   border-radius: 0;
   cursor: grab;
   position: relative;
   user-select: none;
-  border: 1px solid transparent;
 }
 
 .panelListButton.active {
@@ -204,16 +215,22 @@ label span.toolTip,
   width: 100%;
 }
 
+.panelGroup:not(.active) > *:not(.panelGroupButton) {
+  display: none;
+}
+
 .panelGroupButton {
   width: 100%;
   padding: 0.25rem 0.4rem;
   background: rgba(var(--baseColor), 0.3);
   border-radius: 0;
   cursor: grab;
+  font-weight: 700;
 }
 
 .newPanelButton {
   justify-content: center;
+  background: rgb(var(--baseColor), 0.8);
 }
 
 .panelSpacingControl {
@@ -543,18 +560,6 @@ div.downloadSignFooter a {
 }
 
 /* OLD - TO CONFIGURE */
-
-:not(.exitTabGroup).active,
-.exitTabButton.active,
-.exitTabNestedButton.active {
-  background-color: rgb(200, 200, 200);
-}
-
-:root[data-theme="dark"] .active:not(.exitTabGroup),
-:root[data-theme="dark"] .exitTabButton.active {
-  background-color: rgb(0, 0, 175);
-}
-
 :root[data-theme="dark"] .scrollMenu button:not(.active, .newNestedButton),
 :root[data-theme="dark"] .scrolMenu button:not(.active, .newNestedButton) {
   background-color: rgb(0, 0, 255);

@@ -59,6 +59,7 @@ const formHandler = (() => {
 
   const readForm = (readProperties) => {
     post = app.getPost();
+    HistoryManager.addToUndoStack(post);
 
     const form = document.forms[0];
     const currentPanel = app.getCurrentPanel();
@@ -1518,8 +1519,8 @@ const formHandler = (() => {
         horizMargin: 0,
         vertMargin: 0,
       });
+      HistoryManager.addToUndoStack(app.getPost());
       currentExitTab.shields.left.push(shield);
-
       updateExitTabSubform();
       app.redraw();
     });
@@ -1584,6 +1585,7 @@ const formHandler = (() => {
             const shieldIndex =
               currentExitTab.shields[shieldDirection].indexOf(shield);
             if (shieldIndex !== -1) {
+              HistoryManager.addToUndoStack(app.getPost());
               currentExitTab.shields[shieldDirection].splice(shieldIndex, 1);
               currentExitTab.shields[newDirection].push(shield);
               updateExitTabSubform();
@@ -1602,6 +1604,7 @@ const formHandler = (() => {
           const shieldIndex =
             currentExitTab.shields[shieldDirection].indexOf(shield);
           if (shieldIndex !== -1) {
+            HistoryManager.addToUndoStack(app.getPost());
             currentExitTab.shields[shieldDirection].splice(shieldIndex, 1);
             readForm();
           }
@@ -2302,6 +2305,7 @@ const formHandler = (() => {
         bannerElement
           .querySelector(".smSP_deleteBanner")
           .addEventListener("click", () => {
+            HistoryManager.addToUndoStack(app.getPost());
             currentShield.removeBanner(alignment, i);
             updateShieldSubform();
             app.redraw();
@@ -2315,6 +2319,7 @@ const formHandler = (() => {
     addBanner.parentNode.replaceChild(clone, addBanner);
 
     clone.addEventListener("click", () => {
+      HistoryManager.addToUndoStack(app.getPost());
       currentShield.addBanner(
         document.querySelector("#smSPShieldBannerAlignment").value,
       );
