@@ -1378,7 +1378,7 @@ class Control {
         lib.checkForContrast(
           properties.backgroundColor == "Inherit"
             ? ""
-            : properties.backgroundColorgit.toLowerCase(),
+            : properties.backgroundColor.toLowerCase(),
         )
       ) {
         flexRow.style.borderColor = "black";
