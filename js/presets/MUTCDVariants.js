@@ -419,7 +419,7 @@ const MUTCDVariants = (() => {
         textContent: "New Sign",
         backgroundColor: "Inherit",
         fontFamily: "Clearview 5WR",
-        fontSize: 250,
+        fontSize: 100,
         useBannerFormatting: false,
         bannerFormattingSize: 100,
         bannerFirstLetterSize: 120,

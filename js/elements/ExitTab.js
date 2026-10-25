@@ -463,10 +463,13 @@ class ExitTab {
         payByMailElement.className =
           "ET-iconPayByMail ET-iconImage " +
           (iconSettings.pbmIsSquare ? "square" : "");
-        payByMailElement.textContent = this.textContent;
+        payByMailElement.textContent = this.textContent
+          .replace(/\\t/g, "\t")
+          .replace(/\\n/g, "\n");
 
         if (iconSettings.fontSize > 0) {
           payByMailElement.style.fontSize = iconSettings.fontSize + "rem";
+          payByMailElement.style.lineHeight = iconSettings.fontSize + "rem";
         }
 
         exitTabElement.style.padding = "";
@@ -511,19 +514,12 @@ delete ExitTab.prototype.defaultExitTabConfig.variant;
 ExitTab.backgroundColors = ["Inherit"].concat(Object.keys(lib.colors));
 ExitTab.borderStyles = ["Round", "Square"];
 ExitTab.fontFamilies = TextElement.fontFamilies;
-ExitTab.numeralFontFamilies = ["Inherit"].concat(
-  ...ExitTab.fontFamilies,
-);
+ExitTab.numeralFontFamilies = ["Inherit"].concat(...ExitTab.fontFamilies);
 ExitTab.shieldsDirections = ["Horizontal", "Vertical"];
 ExitTab.contentDirections = ["Horizontal", "Vertical"];
 ExitTab.shieldsPositions = ["Start", "End"];
 ExitTab.alignments = ["Left", "Center", "Right"];
-ExitTab.widthPresets = [
-  "Auto",
-  "Full",
-  "Custom Percent",
-  "Custom Size",
-];
+ExitTab.widthPresets = ["Auto", "Full", "Custom Percent", "Custom Size"];
 ExitTab.variants = [
   "Normal",
   "Icon",
@@ -534,9 +530,7 @@ ExitTab.variants = [
 ];
 
 ExitTab.iconVariantAddons = ["None", "Only", "Or Variant"];
-ExitTab.tollIconBackgrounds = ["Transparent"].concat(
-  Object.keys(lib.colors),
-);
+ExitTab.tollIconBackgrounds = ["Transparent"].concat(Object.keys(lib.colors));
 
 class ExitTabRow {
   constructor(options = {}) {

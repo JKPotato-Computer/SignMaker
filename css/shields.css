@@ -631,36 +631,9 @@
 .shield.TXRM .routeNumber,
 .shield.TXBELTWAY .routeNumber {
   color: var(--black);
-  font-size: 2.2em;
-  top: 0.2em;
-}
-.shield.TX.OneDigit .routeNumber,
-.shield.TX.TwoDigit .routeNumber,
-.shield.TXLOOP.OneDigit .routeNumber,
-.shield.TXLOOP.TwoDigit .routeNumber,
-.shield.TXSPUR.OneDigit .routeNumber,
-.shield.TXSPUR.TwoDigit .routeNumber,
-.shield.TXFM.OneDigit .routeNumber,
-.shield.TXFM.TwoDigit .routeNumber,
-.shield.TXPARK.OneDigit .routeNumber,
-.shield.TXPARK.TwoDigit .routeNumber,
-.shield.TXRM.OneDigit .routeNumber,
-.shield.TXRM.TwoDigit .routeNumber,
-.shield.TXBELTWAY.OneDigit .routeNumber,
-.shield.TXBELTWAY.TwoDigit .routeNumber {
+  font-size: 1.6em;
+  top: 0.65em;
   font-family: "Series D";
-  top: 0.45em;
-}
-.shield.TX.ThreeDigit .routeNumber,
-.shield.TXLOOP.ThreeDigit .routeNumber,
-.shield.TXSPUR.ThreeDigit .routeNumber,
-.shield.TXEXPRESS.ThreeDigit .routeNumber,
-.shield.TXFM.ThreeDigit .routeNumber,
-.shield.TXPARK.ThreeDigit .routeNumber,
-.shield.TXRM.ThreeDigit .routeNumber,
-.shield.TXBELTWAY.ThreeDigit .routeNumber {
-  font-family: "Series D";
-  top: .25em;
 }
 
 .shield.TXTOLL.ThreeDigit .routeNumber {
@@ -688,18 +661,23 @@
   top: -0.45rem;
 }
 
+.shield.TXTOLL.ThreeDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.7em;
+  top: -.4em;
+}
+
 .shield.TXTOLL .routeNumber {
   color: var(--white);
   top: -0.6rem;
-  font-size: 1.9em;
+  font-size: 1.7em;
   font-family: "Series E";
-  left: -0.01em;
 }
 
 .shield.TXEXPRESS .routeNumber {
   color: var(--white);
-  top: 0.075em;
-  font-size: 2.1rem;
+  top: 0.2em;
+  font-size: 1.7rem;
   font-family: "Series D";
   letter-spacing: -1px;
 }

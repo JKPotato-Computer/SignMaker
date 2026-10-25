@@ -56,13 +56,15 @@ const ImportExport = (() => {
       copy._type = obj.constructor.name;
       const proto = Object.getPrototypeOf(obj);
       const constructor = obj.constructor;
-      const variableNames = MUTCDVariants.getVariableNames(obj.constructor.name);
+      const variableNames = MUTCDVariants.getVariableNames(
+        obj.constructor.name,
+      );
       const fields =
         variableNames.length > 0
           ? variableNames
           : obj.constructor.name === "Object"
-          ? Object.keys(obj)
-          : [];
+            ? Object.keys(obj)
+            : [];
 
       for (const key of fields) {
         if (!Object.hasOwn(obj, key)) {
@@ -167,14 +169,11 @@ const ImportExport = (() => {
     }
 
     if (fileExportDetails.isFullSign) {
-      fileExportDetails.snapdomData = await snapdom(
-        smRender.querySelector("#postContainer"),
-        {
-          scale: fileExportDetails.imageScale,
-          embedFonts: true,
-          compress: true,
-        },
-      );
+      fileExportDetails.snapdomData = await snapdom(smRender, {
+        scale: fileExportDetails.imageScale,
+        embedFonts: true,
+        compress: true,
+      });
     } else {
       // hide posts temporarily
       for (const post of smRender.querySelectorAll(".post")) {
@@ -212,7 +211,7 @@ const ImportExport = (() => {
       document.querySelector("#panelContainer").style.background = "";
       document.querySelector("#panelContainer").style.height = "";
 
-      for (const panel of panelNodeList) {
+      for (const panel of panelGroupNodeList) {
         panel.style.display = "block";
       }
     }

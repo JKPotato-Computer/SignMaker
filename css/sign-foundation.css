@@ -773,12 +773,11 @@ main#smRender.wide #postContainer {
 
 .ET-iconOr {
   font-family: var(--iconFontFamily);
-  padding: calc(var(--fontSize) / 2);
+  padding: 0 var(--pbmPadding);
 }
 
 .ET-iconPayByMail {
   border: none;
-  padding: var(--pbmPadding);
   font-family: var(--iconFontFamily);
   white-space: pre-line;
   width: auto;
@@ -952,6 +951,10 @@ main#smRender.wide #postContainer {
 }
 .ET-alignment.right .ET-tab {
   justify-content: right;
+}
+
+.ET-tab.icon.or-variant {
+  justify-content: center;
 }
 
 .ET-tab.fullBorder {
@@ -1196,7 +1199,7 @@ main#smRender.wide #postContainer {
 .guideArrows.apl {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: left;
   padding: var(--verticalTopPadding) var(--horizontalPadding)
     var(--verticalBottomPadding);
   height: max-content;

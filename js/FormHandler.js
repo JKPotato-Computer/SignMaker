@@ -168,7 +168,7 @@ const formHandler = (() => {
 
         if (exitTab.width.toLowerCase().includes("percent")) {
           exitTab.widthSize = Math.min(
-            parseInt(form["sMET_widthSize"].value),
+            parseFloat(form["sMET_widthSize"].value),
             100,
           );
         } else if (exitTab.width.toLowerCase().includes("size")) {
@@ -779,8 +779,7 @@ const formHandler = (() => {
     while (selectedPanelLabel > 0) {
       selectedPanelLabel--;
       selectedPanelName =
-        String.fromCharCode(65 + (selectedPanelLabel % 26)) +
-        selectedPanelName;
+        String.fromCharCode(65 + (selectedPanelLabel % 26)) + selectedPanelName;
       selectedPanelLabel = Math.floor(selectedPanelLabel / 26);
     }
     document.querySelector("#currentlySelectedPanel").textContent =
@@ -802,7 +801,11 @@ const formHandler = (() => {
     exitTabList.innerHTML = "";
     subPanelList.innerHTML = "";
 
-    for (let panelGroupIndex = 0; panelGroupIndex < post.panels.length; panelGroupIndex++) {
+    for (
+      let panelGroupIndex = 0;
+      panelGroupIndex < post.panels.length;
+      panelGroupIndex++
+    ) {
       const panelGroup = document.createElement("div");
       panelGroup.className =
         "panelGroup" +
@@ -814,7 +817,8 @@ const formHandler = (() => {
       panelGroupButton.type = "button";
       panelGroupButton.className = "panelGroupButton";
       panelGroupButton.textContent =
-        "Group " + (panelGroupIndex + 1) +
+        "Group " +
+        (panelGroupIndex + 1) +
         (app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex
           ? ""
           : " (" + post.panels[panelGroupIndex].length + ")");
@@ -823,7 +827,11 @@ const formHandler = (() => {
       });
       panelGroup.appendChild(panelGroupButton);
 
-      for (let panelIndex = 0; panelIndex <= post.panels[panelGroupIndex].length; panelIndex++) {
+      for (
+        let panelIndex = 0;
+        panelIndex <= post.panels[panelGroupIndex].length;
+        panelIndex++
+      ) {
         const panelButton = document.createElement("button");
         panelButton.type = "button";
         panelButton.className = "panelListButton";
@@ -847,7 +855,9 @@ const formHandler = (() => {
             app.changeEditingPanelGroup(panelGroupIndex);
             app.changeEditingPanel(panelIndex);
           });
-        } else if (app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex) {
+        } else if (
+          app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex
+        ) {
           panelButton.textContent = "+";
           panelButton.dataset.tooltip = "Add a panel";
           panelButton.className = "panelListButton newPanelButton";
@@ -1699,12 +1709,10 @@ const formHandler = (() => {
         document.querySelector("#sMET_widthSizeLabel").textContent =
           "Width Size (%):";
         document.querySelector("#sMET_widthSize").max = 100;
-        document.querySelector("#sMET_widthSize").step = 1;
       } else {
         document.querySelector("#sMET_widthSizeLabel").textContent =
           "Width Size (rem):";
         document.querySelector("#sMET_widthSize").max = 20;
-        document.querySelector("#sMET_widthSize").step = 0.1;
       }
 
       document.querySelector("#sMET_widthSize").value =
@@ -2766,7 +2774,7 @@ const formHandler = (() => {
             aplList.length >=
               subpanels[i].laneWidth -
                 (arrows.subpanels[i - 0.5] &&
-                arrows.subpanels[i - 0.5].length >= 0
+                arrows.subpanels[i - 0.5].length > 0
                   ? 1
                   : 0))
         ) {

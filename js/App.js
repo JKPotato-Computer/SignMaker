@@ -1884,6 +1884,8 @@ const App = (() => {
             dividerElements.push(aplHolder);
           } else if (aplArrows.length > 0) {
             aplHolder.style.width = panel.sign.lanePanelSize + "px";
+          } else {
+            aplHolder.style.width = `${panel.sign.lanePanelSize / 2}px`;
           }
         }
         guideArrowsElmt.appendChild(aplHolder);
