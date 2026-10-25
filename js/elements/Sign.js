@@ -1,16 +1,7 @@
 class Sign {
   constructor(options = {}) {
-    const {
-      arrows,
-      otherSymbol,
-      oSNum,
-      subPanels,
-      lanePanelSize,
-      paddingLeft,
-      paddingRight,
-      paddingTop,
-      paddingBottom,
-    } = MUTCDVariants.get("Sign", options);
+    const { arrows, otherSymbol, oSNum, subPanels, lanePanelSize } =
+      MUTCDVariants.get("Sign", options);
     if (
       arrows.standard?.exitOnlyConfigs?.arrow &&
       !(arrows.standard.exitOnlyConfigs.arrow instanceof StandardArrow)
@@ -22,10 +13,6 @@ class Sign {
     this.otherSymbol = otherSymbol;
     this.oSNum = oSNum;
     this.subPanels = subPanels;
-    this.paddingLeft = paddingLeft;
-    this.paddingRight = paddingRight;
-    this.paddingTop = paddingTop;
-    this.paddingBottom = paddingBottom;
     this.arrows = arrows;
     this.lanePanelSize = lanePanelSize;
   }

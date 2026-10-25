@@ -54,28 +54,26 @@ const ImportExport = (() => {
       const copy = {};
 
       copy._type = obj.constructor.name;
+
       const proto = Object.getPrototypeOf(obj);
       const constructor = obj.constructor;
       const variableNames = MUTCDVariants.getVariableNames(
         obj.constructor.name,
       );
-      const fields =
+
+      const fieldNames =
         variableNames.length > 0
           ? variableNames
           : obj.constructor.name === "Object"
             ? Object.keys(obj)
             : [];
 
-      for (const key of fields) {
-        if (!Object.hasOwn(obj, key)) {
-          continue;
-        }
-
-        if (proto && key in proto) {
-          continue;
-        }
-
-        if (constructor && Object.hasOwn(constructor, key)) {
+      for (const key of fieldNames) {
+        if (
+          !Object.hasOwn(obj, key) ||
+          (proto && key in proto) ||
+          (constructor && Object.hasOwn(constructor, key))
+        ) {
           continue;
         }
 
@@ -100,7 +98,6 @@ const ImportExport = (() => {
 
   const jsonToSign = (jsonData) => {
     const rawData = JSON.parse(jsonData);
-
     const convert = (data) => {
       if (Array.isArray(data)) {
         return data.map((elem) => convert(elem));
@@ -132,7 +129,6 @@ const ImportExport = (() => {
 
             cleanClass[key] = processedData[key];
           }
-
           return cleanClass;
         }
 

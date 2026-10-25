@@ -32,7 +32,7 @@ const MUTCDVariants = (() => {
         showPost: true,
         offsetPost: true,
         variant: "Standard",
-        panelSpacing: 0,
+        panelSpacing: 1,
         thickness: 1,
         spacing: 5,
         panels: [],
@@ -105,10 +105,6 @@ const MUTCDVariants = (() => {
         oSNum: "",
         subPanels: [],
         lanePanelSize: 0,
-        paddingLeft: 0.75,
-        paddingRight: 0.75,
-        paddingTop: 0.3,
-        paddingBottom: 0.3,
       },
       SubPanels: {
         laneWidth: 0,
@@ -238,11 +234,11 @@ const MUTCDVariants = (() => {
       },
       Block: {
         topMargin: 0,
-        topPadding: 0,
+        topPadding: 0.3,
         bottomMargin: 0,
-        bottomPadding: 0,
-        leftPadding: 0,
-        rightPadding: 0,
+        bottomPadding: 0.3,
+        leftPadding: 0.75,
+        rightPadding: 0.75,
         backgroundColor: "Inherit",
         backgroundFullWidth: true,
         width: 0,
@@ -434,49 +430,30 @@ const MUTCDVariants = (() => {
     },
   };
 
+  const isPlainObject = (value) =>
+    value !== null && typeof value === "object" && value.constructor === Object;
+
   const cloneValue = (value) => {
-    if (Array.isArray(value)) {
-      return value.map((item) => cloneValue(item));
-    }
-    if (!value || typeof value !== "object") {
-      return value;
-    }
-    if (value.constructor !== Object) {
-      return value;
-    }
-    const clone = {};
-    for (const key of Object.keys(value)) {
-      clone[key] = cloneValue(value[key]);
-    }
-    return clone;
+    if (Array.isArray(value)) return value.map((item) => cloneValue(item));
+    if (!isPlainObject(value)) return value;
+
+    return Object.fromEntries(
+      Object.entries(value).map(([key, val]) => [key, cloneValue(val)]),
+    );
   };
 
   const merge = (target, source) => {
     for (const key in source) {
-      if (source[key] === undefined) {
-        continue;
-      }
-      if (Array.isArray(source[key])) {
-        target[key] = cloneValue(source[key]);
-        continue;
-      }
-      if (
-        source[key] &&
-        typeof source[key] === "object" &&
-        source[key].constructor !== Object &&
-        !Array.isArray(source[key])
-      ) {
-        target[key] = source[key];
-        continue;
-      }
-      if (
-        source[key] &&
-        typeof source[key] === "object" &&
-        !Array.isArray(source[key])
-      ) {
-        target[key] = merge(target[key] || {}, source[key]);
+      const val = source[key];
+      if (val === undefined) continue;
+
+      if (Array.isArray(val)) {
+        target[key] = cloneValue(val);
+      } else if (isPlainObject(val)) {
+        if (!isPlainObject(target[key])) target[key] = {};
+        merge(target[key], val);
       } else {
-        target[key] = source[key];
+        target[key] = val;
       }
     }
     return target;
@@ -484,8 +461,7 @@ const MUTCDVariants = (() => {
 
   const getClassNames = (className) => {
     const classNames = [className];
-    let currentClass =
-      typeof window !== "undefined" ? window[className] : undefined;
+    let currentClass = typeof window[className];
 
     while (typeof currentClass === "function") {
       const parentClass = Object.getPrototypeOf(currentClass);
@@ -527,19 +503,16 @@ const MUTCDVariants = (() => {
     return merge(getDefaults(className, guide), options);
   };
 
-  Object.defineProperty(variants, "get", {
-    value: get,
-  });
-  Object.defineProperty(variants, "getVariableNames", {
-    value: (className) => {
-      const variableNames = new Set();
-      for (const currentClassName of getClassNames(className)) {
-        for (const key of Object.keys(variants.MUTCD[currentClassName] || {})) {
-          variableNames.add(key);
-        }
+  variants.get = get;
+  variants.getVariableNames = (className) => {
+    const variableNames = new Set();
+    for (const currentClassName of getClassNames(className)) {
+      for (const key of Object.keys(variants.MUTCD[currentClassName] || {})) {
+        variableNames.add(key);
       }
-      return [...variableNames];
-    },
-  });
+    }
+    return [...variableNames];
+  };
+
   return variants;
 })();

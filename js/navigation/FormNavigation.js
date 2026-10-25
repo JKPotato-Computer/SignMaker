@@ -28,11 +28,7 @@ const FormNavigation = (() => {
         if (event.target.tagName === "BUTTON") return;
 
         if (event.target.tagName === "INPUT") {
-          if (event.target.onchange || event.target.getAttribute("onchange")) {
-            event.target.dispatchEvent(changeEvent);
-          } else {
-            event.target.dispatchEvent(changeEvent);
-          }
+          event.target.dispatchEvent(changeEvent);
         }
 
         event.preventDefault();
@@ -253,7 +249,7 @@ const FormNavigation = (() => {
     document.querySelector("#signMakerSettingsClose").onclick = function () {
       document.querySelector("#signMakerSettings").close();
       document.querySelector("#modalHolder").style.display = "none";
-    }; 
+    };
   };
 
   const setupTooltips = () => {

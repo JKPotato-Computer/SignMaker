@@ -2475,8 +2475,16 @@ const App = (() => {
     if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
       post.panels = post.panels.map((panel) => [panel]);
     }
-    currentlySelectedPanelGroupIndex = 0;
-    currentlySelectedPanelIndex = 0;
+    currentlySelectedPanelGroupIndex = clamp(
+      currentlySelectedPanelGroupIndex,
+      0,
+      post.panels.length - 1,
+    );
+    currentlySelectedPanelIndex = clamp(
+      currentlySelectedPanelIndex,
+      0,
+      post.panels[currentlySelectedPanelGroupIndex]?.length - 1,
+    );
   };
 
   // i guess w ai efficiency :sob:

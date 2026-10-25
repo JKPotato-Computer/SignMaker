@@ -1,19 +1,7 @@
 class Post {
-  constructor(
-    polePosition,
-    lanesWide,
-    color,
-    cornerRadius,
-    showPost,
-    offsetPost,
-    variant,
-    panelSpacing,
-    thickness,
-    spacing,
-  ) {
-    const defaults = MUTCDVariants.get("Post", {
+  constructor(options = {}) {
+    const {
       polePosition,
-      lanesWide,
       color,
       cornerRadius,
       showPost,
@@ -22,34 +10,29 @@ class Post {
       panelSpacing,
       thickness,
       spacing,
-    });
-    polePosition = defaults.polePosition;
-    lanesWide = defaults.lanesWide;
-    color = defaults.color;
-    cornerRadius = defaults.cornerRadius;
-    showPost = defaults.showPost;
-    offsetPost = defaults.offsetPost;
-    variant = defaults.variant;
-    panelSpacing = defaults.panelSpacing;
-    thickness = defaults.thickness;
-    spacing = defaults.spacing;
+    } = MUTCDVariants.get("Post", options);
+    this.polePosition = polePosition;
+    this.color = color;
+    this.cornerRadius = cornerRadius;
+    this.showPost = true;
+    this.offsetPost = offsetPost;
+    this.variant = variant;
+    this.panelSpacing = panelSpacing;
+    this.thickness = thickness;
+    this.spacing = spacing;
+
+    console.log(polePosition);
+
     if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
     } else {
       this.polePosition = Post.polePositions[0];
     }
-    if (lanesWide >= 1 && lanesWide <= 6) {
-      this.lanesWide = lanesWide;
-    } else {
-      this.lanesWide = 1;
-    }
-    const availableColors = Array.isArray(Post.colors)
-      ? Post.colors
-      : ["Silver"];
-    if (availableColors.includes(color)) {
+
+    if (Post.colors.includes(color)) {
       this.color = color;
     } else {
-      this.color = availableColors[0];
+      this.color = Post.colors[0];
     }
 
     this.thickness = thickness;
@@ -69,9 +52,6 @@ class Post {
     this.spacing = spacing || 1;
   }
 
-  /**
-   * Create a new panel for the post. Add it to the end of the list of existing panels.
-   */
   newPanel(panelGroupIndex = this.panels.length - 1) {
     const newSign = new Sign();
     newSign.newSubPanel();
@@ -82,122 +62,6 @@ class Post {
       panelGroupIndex = 0;
     }
     this.panels[panelGroupIndex].push(newPanel);
-  }
-
-  /**
-   * Duplicate an existing panel. Add it immediately after the panel being duplicated.
-   * @param {number} panelIndex - Position of the panel in the array of panels on this post.
-   */
-  duplicatePanel(panelIndex) {
-    const existingPanel = this.panels[panelIndex[0]][panelIndex[1]];
-    const newSubPanels = [];
-    for (const subPanel of existingPanel.sign.subPanels) {
-      newSubPanels.push(Object.assign(new SubPanels(), subPanel));
-    }
-
-    const newExitTabs = [];
-    const cloneExitTab = (tab) => {
-      const clonedTab = Object.assign(new ExitTab(), tab);
-      if (Array.isArray(tab?.nestedExitTabs)) {
-        clonedTab.nestedExitTabs = tab.nestedExitTabs.map((nested) =>
-          cloneExitTab(nested),
-        );
-      } else {
-        clonedTab.nestedExitTabs = [];
-      }
-      return clonedTab;
-    };
-    for (const exitTab of existingPanel.exitTabs) {
-      newExitTabs.push(cloneExitTab(exitTab));
-    }
-
-    const newSign = new Sign({});
-    const newPanel = Object.assign(new Panel(), existingPanel);
-    newPanel.sign = newSign;
-    newPanel.exitTabs = newExitTabs;
-    this.panels[panelIndex[0]].splice(++panelIndex[1], 0, newPanel);
-  }
-
-  /**
-   * Delete an existing panel at the requested index.
-   * @param {number} panelIndex - Position of the panel in the array of panels on this post to delete.
-   */
-  deletePanel(panelIndex) {
-    this.panels[panelIndex[0]].splice(panelIndex[1], 1);
-  }
-
-  /**
-   * Shift the requested panel to the left one position swapping it with that panel to the left.
-   * @param {number} panelIndex - Position of the panel in the array of panels on this post to shift left.
-   * @return {number} The new index of the shifted panel.
-   */
-  shiftLeft(panelIndex) {
-    // If already at the far left end, return.
-    if (panelIndex <= 0) {
-      return panelIndex;
-    }
-    this.panels.splice(
-      panelIndex - 1,
-      2,
-      this.panels[panelIndex],
-      this.panels[panelIndex - 1],
-    );
-    return panelIndex - 1;
-  }
-
-  /**
-   * Shift the requested panel to the right one position swaping it with that panel to the right.
-   * @param {number} panelIndex - Position of the panel in the array of panels on this post to shift right.
-   * @return {number} The new index of the shifted panel.
-   */
-  shiftRight(panelIndex) {
-    // If already at the far right end, return.
-    if (panelIndex >= this.panels.length - 1) {
-      return panelIndex;
-    }
-    this.panels.splice(
-      panelIndex,
-      2,
-      this.panels[panelIndex + 1],
-      this.panels[panelIndex],
-    );
-    return panelIndex + 1;
-  }
-
-  /**
-   * Move a panel to a new position within the list.
-   * @param {number} fromIndex - Current position of the panel.
-   * @param {number} toIndex - Target insertion index (before adjustment for removal).
-   * @return {number} The new index of the moved panel.
-   */
-  movePanel(fromIndex, toIndex) {
-    const panelCount = this.panels.length;
-    if (panelCount < 2) {
-      return fromIndex;
-    }
-
-    const clampIndex = (value, max) => Math.max(0, Math.min(value, max));
-    const normalizedFrom = clampIndex(fromIndex, panelCount - 1);
-    let normalizedTo = clampIndex(toIndex, panelCount);
-
-    if (
-      normalizedFrom === normalizedTo ||
-      normalizedFrom + 1 === normalizedTo
-    ) {
-      return normalizedFrom;
-    }
-
-    const [panel] = this.panels.splice(normalizedFrom, 1);
-    if (!panel) {
-      return normalizedFrom;
-    }
-
-    if (normalizedTo > normalizedFrom) {
-      normalizedTo--;
-    }
-
-    this.panels.splice(normalizedTo, 0, panel);
-    return normalizedTo;
   }
 
   renderPost(postContainerElmt, panelContainerElmt, posts) {
@@ -215,6 +79,7 @@ class Post {
       "--postOffset",
       this.offsetPost ? "1rem" : "",
     );
+
     // Set curved post specific CSS variables
     const cornerRadVar = this.cornerRadius;
     const cornerRadVar2 = cornerRadVar * 2;
@@ -251,12 +116,6 @@ Post.polePositions = ["Left", "Right", "Overhead"];
 
 Post.colors = ["Silver", "Black", "Brown", "Red"];
 
-Post.postVariants = [
-  "Standard",
-  "Curved",
-  "Curved 2",
-  "Rural",
-  "Center",
-];
+Post.postVariants = ["Standard", "Curved", "Curved 2", "Rural", "Center"];
 
 window.Post = Post;

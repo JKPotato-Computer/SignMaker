@@ -23,9 +23,7 @@ const formHandler = (() => {
       );
     }
 
-    post.polePosition = postConfiguration.polePosition || post.polePosition;
     post.showPost = postConfiguration.showPost || post.showPost;
-    post.color = postConfiguration.color || post.color;
 
     let textElementConfiguration = StorageManager.getItem(
       StorageManager.STORAGE_KEYS.textElement,
@@ -88,6 +86,9 @@ const formHandler = (() => {
 
     // Handle spacing (only for OVERHEAD and Curved 2)
     post.spacing = form["postSpacing"].value;
+
+    // preliminary set post
+    app.setPost(post);
 
     StorageManager.setItem(
       StorageManager.STORAGE_KEYS.postPosition,
@@ -425,12 +426,6 @@ const formHandler = (() => {
         }
       }
     }
-
-    // Sign
-    currentPanel.sign.paddingLeft = parseFloat(form["paddingLeft"].value);
-    currentPanel.sign.paddingRight = parseFloat(form["paddingRight"].value);
-    currentPanel.sign.paddingBottom = parseFloat(form["paddingBottom"].value);
-    currentPanel.sign.paddingTop = parseFloat(form["paddingTop"].value);
 
     // Control Text Revision
     const currentBlockElem = app.getCurrentBlockElem();
@@ -1263,11 +1258,6 @@ const formHandler = (() => {
       ].stretchRight;
 
     updateGuideArrowsSubform();
-
-    document.getElementById("paddingTop").value = panel.sign.paddingTop;
-    document.getElementById("paddingRight").value = panel.sign.paddingRight;
-    document.getElementById("paddingBottom").value = panel.sign.paddingBottom;
-    document.getElementById("paddingLeft").value = panel.sign.paddingLeft;
 
     toggleVisibility(
       document.querySelector("#sdCtrlText_useNumeralFormatting"),
@@ -2621,9 +2611,9 @@ const formHandler = (() => {
 
         document.querySelector("#exitOnlyGap").value = exitOnlyConfigs.gap;
         document.querySelector("#exitOnlyTextGap").style.display =
-          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+          exitOnlyConfigs.numArrows < 1 ? "none" : "";
         document.querySelector('label[for="exitOnlyTextGap"]').style.display =
-          exitOnlyConfigs.numArrows <= 1 ? "none" : "";
+          exitOnlyConfigs.numArrows < 1 ? "none" : "";
 
         document.querySelector("#exitOnlyGap").style.display =
           exitOnlyConfigs.numArrows <= 2 ? "none" : "";

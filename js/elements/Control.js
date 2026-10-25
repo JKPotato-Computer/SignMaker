@@ -225,9 +225,7 @@ TextElement.fontFamilies = [
 
 TextElement.alignments = ["Left", "Center", "Right"];
 
-TextElement.backgroundColors = ["Inherit"].concat(
-  Object.keys(lib.colors),
-);
+TextElement.backgroundColors = ["Inherit"].concat(Object.keys(lib.colors));
 
 class ControlTextElement extends TextElement {
   constructor(options = {}) {
@@ -250,8 +248,10 @@ class ControlTextElement extends TextElement {
 
 class ActionMessageElement extends TextElement {
   constructor(options = {}) {
-    const { fontSize, useNumeralFormatting, wordSpacing } =
-      MUTCDVariants.get("ActionMessageElement", options);
+    const { fontSize, useNumeralFormatting, wordSpacing } = MUTCDVariants.get(
+      "ActionMessageElement",
+      options,
+    );
     super();
     this.fontSize = fontSize;
     this.useNumeralFormatting = useNumeralFormatting;
@@ -395,9 +395,9 @@ class ElectronicSignElement extends TextElement {
   }
 }
 ElectronicSignElement.fontFamilies = TextElement.fontFamilies.concat([
-    "Electronic Highway Sign",
-    "VCR Mono",
-  ]);
+  "Electronic Highway Sign",
+  "VCR Mono",
+]);
 ElectronicSignElement.prototype.textColors = [
   "Orange",
   "White",
@@ -527,14 +527,8 @@ class DividerElement {
     if (this.fullBleed) {
       newDivider.classList.add("fullBleed");
 
-      newDivider.style.setProperty(
-        "--dividerBleedLeft",
-        `${panel.sign.paddingLeft + 0.2}rem`,
-      );
-      newDivider.style.setProperty(
-        "--dividerBleedRight",
-        `${panel.sign.paddingRight + 0.2}rem`,
-      );
+      newDivider.style.setProperty("--dividerBleedLeft", `${0.2}rem`);
+      newDivider.style.setProperty("--dividerBleedRight", `${0.2}rem`);
     } else {
       newDivider.classList.remove("fullBleed");
       newDivider.style.setProperty("--dividerBleedLeft", "0rem");
@@ -740,16 +734,12 @@ IconElement.icons = {
   YIELD: "YIELD.svg",
 };
 
+// the following code segment is an embarassment to humanity
+// authored by DuskDarf1
 class BeaconElement {
   constructor(options = {}) {
-    const {
-      size,
-      alignment,
-      flashDuration,
-      color,
-      backplate,
-      flashOpposite,
-    } = MUTCDVariants.get("BeaconElement", options);
+    const { size, alignment, flashDuration, color, backplate, flashOpposite } =
+      MUTCDVariants.get("BeaconElement", options);
     const parsedSize = parseFloat(size);
     this.size = Number.isFinite(parsedSize) ? Math.max(parsedSize, 0.5) : 2;
     const parsedDuration = parseFloat(flashDuration);
@@ -1360,19 +1350,19 @@ class Control {
 
         flexRow.style.setProperty(
           "--blockBleedLeft",
-          `${panel.sign.paddingLeft}rem`,
+          `${properties.leftPadding}rem`,
         );
         flexRow.style.setProperty(
           "--blockBleedRight",
-          `${panel.sign.paddingRight}rem`,
+          `${properties.rightPadding}rem`,
         );
         flexRow.style.setProperty(
           "--blockBleedTop",
-          i == 0 ? `${panel.sign.paddingTop}rem` : "0rem",
+          i == 0 ? `${properties.topPadding}rem` : "0rem",
         );
         flexRow.style.setProperty(
           "--blockBleedBottom",
-          i == totalRows - 1 ? `${panel.sign.paddingBottom}rem` : "0rem",
+          i == totalRows - 1 ? `${properties.bottomPadding}rem` : "0rem",
         );
 
         flexRow.style.setProperty("--marginBorderLeft", "0rem");
@@ -1388,10 +1378,7 @@ class Control {
         lib.checkForContrast(
           properties.backgroundColor == "Inherit"
             ? ""
-            : (
-                lib.colors[properties.backgroundColor] ||
-                properties.backgroundColor
-              ).toLowerCase(),
+            : properties.backgroundColorgit.toLowerCase(),
         )
       ) {
         flexRow.style.borderColor = "black";
