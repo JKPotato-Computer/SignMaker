@@ -21,8 +21,6 @@ class Post {
     this.thickness = thickness;
     this.spacing = spacing;
 
-    console.log(polePosition);
-
     if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
     } else {
@@ -62,6 +60,10 @@ class Post {
       panelGroupIndex = 0;
     }
     this.panels[panelGroupIndex].push(newPanel);
+  }
+
+  deletePanel(panelIndex) {
+    this.panels[panelIndex[0]].splice(panelIndex[1], 1);
   }
 
   renderPost(postContainerElmt, panelContainerElmt, posts) {
