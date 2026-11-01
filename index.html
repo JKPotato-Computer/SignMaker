@@ -446,7 +446,7 @@
 
     <script>
       // not the final release date if you are trying to inspect element ts website
-      const releaseDate = new Date("2026-11-07T12:00:00-06:00");
+      const releaseDate = new Date("2026-11-14T12:00:00-06:00");
       const daysElement = document.getElementById('daysHolder');
       const hoursElement = document.getElementById('hoursHolder');
       const minutesElement = document.getElementById('minutesHolder');
@@ -467,10 +467,10 @@
           minutesElement.querySelector('span').textContent = minutes.toString().padStart(2, '0');
           secondsElement.querySelector('span').textContent = seconds.toString().padStart(2, '0');
         } else {
-          daysElement.querySelector('span').textContent = 'Expired';
-          hoursElement.querySelector('span').textContent = 'Expired';
-          minutesElement.querySelector('span').textContent = 'Expired';
-          secondsElement.querySelector('span').textContent = 'Expired';
+          daysElement.querySelector('span').textContent = '00';
+          hoursElement.querySelector('span').textContent = '00';
+          minutesElement.querySelector('span').textContent = '00';
+          secondsElement.querySelector('span').textContent = '00';
         }
       }
 
