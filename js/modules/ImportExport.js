@@ -17,83 +17,41 @@ import("https://unpkg.com/@oddbird/css-anchor-positioning/dist/css-anchor-positi
 const ImportExport = (() => {
   // serializing & unserializing
   const signToJson = (signContent, type) => {
-    const copyValue = (value) => {
-      if (Array.isArray(value)) {
-        return value.map((item) => copyValue(item));
-      }
+    let newData;
 
-      if (!value || typeof value !== "object") {
-        return value;
-      }
-
-      const className = value.constructor?.name;
-      if (
-        className &&
-        MUTCDVariants.MUTCD &&
-        Object.hasOwn(MUTCDVariants.MUTCD, className)
-      ) {
-        return tagCopy(value);
-      }
-
-      const copy = {};
-      for (const key of Object.keys(value)) {
-        copy[key] = copyValue(value[key]);
-      }
-      return copy;
-    };
-
-    const tagCopy = (obj) => {
-      if (!obj || typeof obj !== "object") {
-        return obj;
-      }
-
+    const copyRecursive = (obj) => {
       if (Array.isArray(obj)) {
-        return obj.map((item) => tagCopy(item));
+        return obj.map((elem) => copyRecursive(elem));
       }
+      if (obj && typeof obj === "object") {
+        const processedData = {};
+        processedData._type = obj.constructor.name;
 
-      const copy = {};
-
-      copy._type = obj.constructor.name;
-
-      const proto = Object.getPrototypeOf(obj);
-      const constructor = obj.constructor;
-      const variableNames = MUTCDVariants.getVariableNames(
-        obj.constructor.name,
-      );
-
-      const fieldNames =
-        variableNames.length > 0
-          ? variableNames
-          : obj.constructor.name === "Object"
-            ? Object.keys(obj)
-            : [];
-
-      for (const key of fieldNames) {
-        if (
-          !Object.hasOwn(obj, key) ||
-          (proto && key in proto) ||
-          (constructor && Object.hasOwn(constructor, key))
-        ) {
-          continue;
+        const validKeys = Object.keys(obj).filter(
+          (key) =>
+            key !== "_type" && key !== "constructor" && key !== "prototype",
+        );
+        for (const key of validKeys) {
+          processedData[key] = copyRecursive(obj[key]);
         }
 
-        copy[key] = copyValue(obj[key]);
+        return processedData;
       }
-
-      return copy;
+      return obj;
     };
 
-    let dataToSerialize = signContent;
-
     if (type === "post") {
-      dataToSerialize = tagCopy(signContent);
+      newData = copyRecursive(signContent);
     } else if (type === "panels") {
       if (Array.isArray(signContent)) {
-        dataToSerialize = signContent.map((panel) => tagCopy(panel));
+        newData = [];
+        for (const panelGroup of signContent) {
+          newData.push(copyRecursive(panelGroup));
+        }
       }
     }
 
-    return JSON.stringify(dataToSerialize);
+    return JSON.stringify(newData);
   };
 
   const jsonToSign = (jsonData) => {
@@ -105,7 +63,11 @@ const ImportExport = (() => {
 
       if (data && typeof data === "object") {
         const processedData = {};
-        for (const key of Object.keys(data)) {
+
+        const validKeys = Object.keys(data).filter(
+          (key) => key !== "constructor" && key !== "prototype",
+        );
+        for (const key of validKeys) {
           processedData[key] = convert(data[key]);
         }
 

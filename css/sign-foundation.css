@@ -65,10 +65,10 @@ main#smRender.wide #postContainer {
     calc(var(--blockBleedRight) + var(--blockPaddingRight))
     calc(var(--blockBleedBottom) + var(--blockPaddingBottom))
     calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
-  width: calc(
+  /* width: calc(
     100% + var(--blockBleedLeft) + var(--blockBleedRight) -
       var(--marginBorderLeft) - var(--marginBorderRight)
-  );
+  ); */
   border-top-left-radius: calc(var(--blockBorderRadiusTopLeft));
   border-top-right-radius: calc(var(--blockBorderRadiusTopRight));
   border-bottom-left-radius: calc(var(--blockBorderRadiusBottomLeft));
