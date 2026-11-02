@@ -17,7 +17,7 @@ const App = (() => {
   let currentlySelectedShieldGroupId = -1;
   let currentlySelectedShieldIndex = -1;
   let currentlySelectedStandardArrow = -1;
-  let currentlySelectedReferenceGuide = "TMUTCD";
+  let currentlySelectedReferenceGuide = "MUTCD";
 
   // Glboal Acessor Methods
   const getCurrentPanel = () => {
@@ -468,6 +468,13 @@ const App = (() => {
     currentlySelectedPanelGroupIndex = clamp(index, 0, post.panels.length - 1);
     currentlySelectedPanelIndex = -1;
     currentlySelectedSubPanelIndex = 0;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+
     formHandler.updateForm();
   };
 

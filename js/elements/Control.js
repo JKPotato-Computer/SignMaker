@@ -604,7 +604,7 @@ class IconElement {
     iconElement.alt = this.icon;
     iconElement.className = "bE-iconImage";
 
-    if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+    if (lib.checkForContrast(this.backgroundColor.toLowerCase()) && this.iconType !== "custom") {
       iconElement.style.filter = "invert(1)";
     }
 

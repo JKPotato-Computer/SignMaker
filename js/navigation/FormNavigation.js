@@ -1079,12 +1079,6 @@ const FormNavigation = (() => {
           ".smDropdownInputElement",
         );
         dropdownElement.dataset.selectedOption = dropdownButton.dataset.value;
-        if (dropdownElement.id === "sdArrow_arrow") {
-          document.querySelector("#sdArrow_size").value =
-            StandardArrow.prototype.arrows[
-              dropdownElement.dataset.selectedOption
-            ].defaultSize || 1.75;
-        }
         formHandler.readForm();
         return;
       }
@@ -1185,6 +1179,7 @@ const FormNavigation = (() => {
       baseValue,
       imageFunction,
       textFunction,
+      changeFunction = null,
     ) => {
       const selectedButton = dropdownElement.querySelector(
         ".smDropdownSelectedButton",
@@ -1252,6 +1247,37 @@ const FormNavigation = (() => {
       });
 
       dropdownElement.dataset.selectedOption = baseValue;
+
+      if (!changeFunction) {
+        return;
+      }
+
+      let debounce = false;
+      const changeObserver = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (
+            mutation.type !== "attributes" ||
+            mutation.attributeName != "data-selected-option"
+          ) {
+            continue;
+          }
+
+          if (debounce) {
+            return;
+          }
+
+          debounce = true;
+          changeFunction(dropdownElement.dataset.selectedOption);
+          setTimeout(() => {
+            debounce = false;
+          }, 10);
+        }
+      });
+
+      changeObserver.observe(dropdownElement, {
+        attributes: true,
+        attributeFilter: ["data-selected-option"],
+      });
     };
 
     setupDropdownElement(
@@ -1306,6 +1332,28 @@ const FormNavigation = (() => {
         text.textContent = StandardArrow.prototype.arrows[value].label;
         return text;
       },
+      (option) => {
+        const currentPanel = App.getCurrentPanel();
+        if (!currentPanel) {
+          return;
+        }
+
+        switch (option) {
+          case "DOWN":
+            currentPanel.sign.arrows.standard.arrowList[
+              App.vars.currentlySelectedStandardArrow
+            ].size = 1.75;
+            currentPanel.sign.arrows.standard.arrowList[
+              App.vars.currentlySelectedStandardArrow
+            ].rotation = 0;
+
+            formHandler.updateForm();
+            App.redraw();
+            break;
+          default:
+            break;
+        }
+      },
     );
 
     setupDropdownElement(
@@ -1320,6 +1368,24 @@ const FormNavigation = (() => {
       (text, value) => {
         text.textContent = StandardArrow.prototype.arrows[value].label;
         return text;
+      },
+      (option) => {
+        const currentPanel = App.getCurrentPanel();
+        if (!currentPanel) {
+          return;
+        }
+
+        switch (option) {
+          case "DOWN":
+            currentPanel.sign.arrows.standard.exitOnlyConfigs.arrow.size = 1.75;
+            currentPanel.sign.arrows.standard.exitOnlyConfigs.arrow.rotation = 0;
+
+            formHandler.updateForm();
+            App.redraw();
+            break;
+          default:
+            break;
+        }
       },
     );
 

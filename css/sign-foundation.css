@@ -498,6 +498,7 @@ main#smRender.wide #postContainer {
   justify-content: center;
   align-items: center;
   transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
+  color: black;
 }
 .designation {
   position: absolute;

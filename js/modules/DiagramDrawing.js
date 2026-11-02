@@ -159,6 +159,7 @@ class Road {
       manualDirection: "auto", // "auto", "left", "right", "top", "bottom"
     },
     roadMarkingsEnabled = true,
+    isSegmentVisible = true,
   } = {}) {
     this.numLanes = numLanes;
     this.roadType = roadType;
@@ -193,6 +194,7 @@ class Road {
     this.roadIsRendered = false;
     this.previousRoad = null;
     this.roadMarkingsEnabled = roadMarkingsEnabled;
+    this.isSegmentVisible = isSegmentVisible;
   }
 
   // drawing
@@ -462,7 +464,7 @@ class Road {
       }
     }
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle = this.isSegmentVisible ? "white" : "transparent";
     ctx.fill(this.calculatedPath2D);
 
     this.roadIsRendered = true;
@@ -866,7 +868,7 @@ class Road {
       ctx.lineTo(pointsToDraw[0].x, pointsToDraw[0].y);
       ctx.closePath();
 
-      ctx.fillStyle = "white";
+      ctx.fillStyle = this.isSegmentVisible ? "white" : "transparent";
       ctx.fill();
     }
   }
@@ -1190,6 +1192,9 @@ const DiagramDrawing = (() => {
       "#roadwayShowLaneMarkings",
     ).checked;
 
+    selectedRoad.isSegmentVisible =
+      document.querySelector("#roadwayShowRoad").checked;
+
     selectedRoad.arrows.enabled =
       document.querySelector("#objectShowArrow").checked;
     selectedRoad.arrows.pointedTip = document.querySelector(
@@ -1354,6 +1359,8 @@ const DiagramDrawing = (() => {
     ).toFixed(0);
     document.querySelector("#roadwayShowLaneMarkings").checked =
       selectedRoad.roadMarkingsEnabled;
+    document.querySelector("#roadwayShowRoad").checked =
+      selectedRoad.isSegmentVisible;
 
     document.querySelector("#objectShowArrow").checked =
       selectedRoad.arrows.enabled;
