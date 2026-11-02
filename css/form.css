@@ -1297,6 +1297,7 @@ nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
 #shieldImgLibraryClose,
 #diagrammicDrawingClose,
 #customImagePickerClose,
+#signMakerSettingsClose,
 button[data-diagram-modal-close] {
   font-size: 20px;
   padding: 0.125rem 1rem;
@@ -3116,4 +3117,53 @@ summary:hover {
   display: inline;
   float: right;
   width: 10rem;
+}
+
+#signMakerSettings {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  background: none;
+}
+
+#signMakerSettings > div {
+  background-color: var(--hotbarColor);
+  width: 100%;
+  height: max-content;
+  padding: 1rem;
+}
+
+#sMSettingsHeader > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#signMakerSettingsContent {
+  flex-grow: 1;
+}
+
+#signMakerTabOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 0.5rem;
+  padding: .5rem;
+  margin-top: .5rem;
+  background-color: rgb(var(--baseColor),.15);
+}
+
+#signMakerTabOptions > button {
+  flex-grow: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: rgb(var(--baseColor),.15);
+}
+
+
+#signMakerTabOptions > button:hover {
+  background-color: rgb(var(--baseColorInv), .3);
 }

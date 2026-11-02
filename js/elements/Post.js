@@ -10,6 +10,7 @@ class Post {
       panelSpacing,
       thickness,
       spacing,
+      mutcdVariant,
     } = MUTCDVariants.get("Post", options);
     this.polePosition = polePosition;
     this.color = color;

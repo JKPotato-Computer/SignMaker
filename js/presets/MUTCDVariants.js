@@ -18,7 +18,7 @@ const MUTCDVariants = (() => {
       },
       StandardArrow: {
         arrow: "TYPE_A",
-        rotation: 180,
+        rotation: 0,
         size: 1.75,
         marginHorizontal: 0,
         marginVertical: 0,
@@ -35,6 +35,7 @@ const MUTCDVariants = (() => {
         panelSpacing: 1,
         thickness: 1,
         spacing: 5,
+        mutcdVariant: "MUTCD",
         panels: [],
       },
       Panel: {
@@ -496,9 +497,8 @@ const MUTCDVariants = (() => {
   const get = (className, options = {}) => {
     const guide =
       typeof App !== "undefined" &&
-      App.vars &&
-      App.vars.currentlySelectedReferenceGuide
-        ? App.vars.currentlySelectedReferenceGuide
+      App.getPost()
+        ? App.getPost().mutcdVariant
         : "MUTCD";
     return merge(getDefaults(className, guide), options);
   };

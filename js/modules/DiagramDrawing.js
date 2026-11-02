@@ -2753,6 +2753,19 @@ const DiagramDrawing = (() => {
         },
       );
 
+      editorConnections.closeEditor2 = trackEditorConnection(
+        DiagrammicDrawingHolder,
+        "cancel",
+        () => {
+          const diagram = saveDiagram() || null;
+          closeDraw(diagram);
+
+          if (typeof returnMethod === "function") {
+            returnMethod(diagram);
+          }
+        }
+      );
+
       editorConnections.usePresetInSign = trackEditorConnection(
         document.querySelector("#diagramUse"),
         "click",

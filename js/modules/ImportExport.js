@@ -282,12 +282,12 @@ const ImportExport = (() => {
     if (copyToClipboard) {
       if (fileExportDetails.fileType == "JSON") {
         const jsonOutput = signToJson(
-          fileExportDetails.toggleEntirePost
+          fileExportDetails.isFullSign
             ? App.getPost()
             : App.getPost().panels.filter((_, i) =>
                 fileExportDetails.groupNumbers.includes(i),
               ),
-          fileExportDetails.toggleEntirePost ? "post" : "panels",
+          fileExportDetails.isFullSign ? "post" : "panels",
         );
         await navigator.clipboard.write([
           new ClipboardItem({
@@ -302,12 +302,12 @@ const ImportExport = (() => {
       if (signName) {
         if (fileExportDetails.fileType == "JSON") {
           const jsonOutput = signToJson(
-            fileExportDetails.toggleEntirePost
+            fileExportDetails.isFullSign
               ? App.getPost()
               : App.getPost().panels.filter((_, i) =>
                   fileExportDetails.groupNumbers.includes(i),
                 ),
-            fileExportDetails.toggleEntirePost ? "post" : "panels",
+            fileExportDetails.isFullSign ? "post" : "panels",
           );
           const blob = new Blob([jsonOutput], {
             type: "text/json",
