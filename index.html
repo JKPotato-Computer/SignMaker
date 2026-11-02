@@ -1156,13 +1156,54 @@
         </dialog>
       </dialog>
       <dialog id="signMakerSettings">
-        <header>
+        <div id="sMSettingsHeader">
+          <header>
           <h2>
             <span class="material-symbols-outlined">settings</span>
             SignMaker Settings
           </h2>
           <button type="button" id="signMakerSettingsClose">Close</button>
         </header>
+          <nav id="signMakerTabOptions">
+            <button class="signMakerTabOption">General</button>
+            <button class="signMakerTabOption" id="smSettingsBtn_MUTCDVariants">Reference Guides</button>
+          </nav>
+        </div>
+        <div id="signMakerSettingsContent">
+          <div id="sMSettings_MUTCDVariants">
+            <div id="smSettings_MUTCDGallery">
+              <div class="mutcdOption">
+                <button class="mutcdImage">
+                  <img src="assets/form/mutcd/MUTCD.jpg" />
+                  <div class="mutcdSlideInfo">
+                    <h3>MUTCD: Standard Highway Designs</h3>
+                    <p>2023 Edition: Revision 1 Dec 2025</p>
+                    <p>The MUTCD (Manual on Uniform Traffic Control Devices) is the national standard for traffic control devices in the United States. This version in particular is FHWA's Standard Highway Signs, the official standard for U.S-based highway sigange.</p> 
+
+                    <span class="mutcdBottom">Click to select</span>
+                  </div>
+                </button>
+                <button class="mutcdImage">
+                  <img src="assets/form/mutcd/SHSD.jpg" />
+                  <div class="mutcdSlideInfo">
+                    <h3>TMUTCD: Texas's Standard Highway Sign Designs</h3>
+                    <p>2026 Edition</p>
+                    <p>The TMUTCD is Texas's state-revised version of the MUTCD, designed to meets Texas's own standards on traffic control devices. This version in particular is TXDOT's Standard Highway Sign Designs (SHSD) which adopts the Clearview typeface as a part of official signage.</p> 
+
+                    <span class="mutcdBottom">Click to select</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+            <div id="smSettings_Options">
+              <div>
+                <label for="smSettings_searchVariant">Search:</label>
+                <input type="search" id="smSettings_searchVariant" placeholder="Search for reference guide" />
+              </div>
+              <button id="smSettings_addVariant" type="button">Use Reference Guide</button>
+            </div>
+          </div>
+        </div>
       </dialog>
     </div>
     <form name="signMaker">
