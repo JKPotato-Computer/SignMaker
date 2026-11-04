@@ -3171,8 +3171,11 @@ summary:hover {
 .mutcdOption {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: safe center;
   align-items: center;
+  gap: 1rem;
+  overflow: auto;
+  padding: 1rem;
 }
 
 .mutcdImage {
@@ -3181,7 +3184,6 @@ summary:hover {
   position: relative;
   padding: 0;
   margin: 0;
-  transition: .25s ease-in-out;
   background: none;
 }
 
@@ -3194,15 +3196,15 @@ summary:hover {
   z-index: 1;
 }
 
-
-.mutcdImage:hover img,
-.mutcdImage:focus img {
-  margin-right: 100%;
+.mutcdImage:hover,
+.mutcdImage:focus {
+  margin-right: 15rem;
 }
+
 
 .mutcdImage:hover .mutcdSlideInfo,
 .mutcdImage:focus .mutcdSlideInfo {
-  left: 50%;
+  left: 100%;
 }
 
 
@@ -3211,7 +3213,9 @@ summary:hover {
   z-index: 0;
   height: 100%;
   width: 100%;
-  transition: .25s ease-in-out;
+  left: 0;
+  top: 0;
+  transition: .125s ease-in-out;
   background: rgb(var(--baseColorInv), .15);
   display: flex;
   flex-direction: column;
@@ -3224,4 +3228,21 @@ summary:hover {
 
 .mutcdBottom {
   margin-top: auto;
+}
+
+#smSettings_Options {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+#smSettings_searchVariant {
+  width: 20rem;
+}
+
+#smSettings_addVariant {
+  padding: .5rem 1rem;
+  font-size: 1.25rem;
 }
