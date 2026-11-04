@@ -3167,3 +3167,61 @@ summary:hover {
 #signMakerTabOptions > button:hover {
   background-color: rgb(var(--baseColorInv), .3);
 }
+
+.mutcdOption {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.mutcdImage {
+  width: max-content;
+  height: max-content;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  transition: .25s ease-in-out;
+  background: none;
+}
+
+.mutcdImage:hover {
+  background: none !important;
+}
+
+.mutcdImage > img {
+  width: 15rem;
+  z-index: 1;
+}
+
+
+.mutcdImage:hover img,
+.mutcdImage:focus img {
+  margin-right: 100%;
+}
+
+.mutcdImage:hover .mutcdSlideInfo,
+.mutcdImage:focus .mutcdSlideInfo {
+  left: 50%;
+}
+
+
+.mutcdSlideInfo {
+  position: absolute;
+  z-index: 0;
+  height: 100%;
+  width: 100%;
+  transition: .25s ease-in-out;
+  background: rgb(var(--baseColorInv), .15);
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: start;
+  text-align: left;
+  gap: .5rem;
+  padding: 1rem;
+}
+
+.mutcdBottom {
+  margin-top: auto;
+}
