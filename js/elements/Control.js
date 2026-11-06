@@ -604,7 +604,10 @@ class IconElement {
     iconElement.alt = this.icon;
     iconElement.className = "bE-iconImage";
 
-    if (lib.checkForContrast(this.backgroundColor.toLowerCase()) && this.iconType !== "custom") {
+    if (
+      lib.checkForContrast(this.backgroundColor.toLowerCase()) &&
+      this.iconType !== "custom"
+    ) {
       iconElement.style.filter = "invert(1)";
     }
 
@@ -1094,6 +1097,8 @@ TollLogoElement.logos = {
   GoodToGo: { label: "Good To Go!", src: "assets/tolls/GOODTOGO.svg" },
   ExpressToll: { label: "ExpressToll", src: "assets/tolls/EXPRESSTOLL.svg" },
   DPASS: { label: "D-PASS", src: "assets/tolls/DPASS.svg" },
+  VeriTag: { label: "VeriTag", src: "assets/tolls/VeriTag.svg" },
+  VeriTag2: { label: "VeriTag (Alt)", src: "assets/tolls/VeriTag-Alt.svg" },
   MUTCD: { label: "MUTCD", src: "assets/tolls/MUTCD.svg" },
 };
 TollLogoElement.alignments = TextElement.alignments;

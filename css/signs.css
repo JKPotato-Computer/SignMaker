@@ -202,7 +202,42 @@
   --bg-color: var(--fluorescent-yellow-green);
   --fg-color: var(--black);
 }
-
+.panel.avarian.green {
+  --bg-color: var(--veridian-green);
+  --fg-color: var(--white);
+}
+.panel.avarian.blue {
+  --bg-color: var(--veridian-blue);
+  --fg-color: var(--white);
+}
+.panel.avarian.blue {
+  --bg-color: var(--veridian-blue);
+  --fg-color: var(--white);
+}
+.panel.avarian.brown {
+  --bg-color: var(--veridian-brown);
+  --fg-color: var(--white);
+}
+.panel.avarian.red {
+  --bg-color: var(--veridian-red);
+  --fg-color: var(--white);
+}
+.panel.avarian.purple {
+  --bg-color: var(--veridian-purple);
+  --fg-color: var(--white);
+}
+.panel.avarian.yellow {
+  --bg-color: var(--veridian-yellow);
+  --fg-color: var(--black);
+}
+.panel.avarian.orange {
+  --bg-color: var(--veridian-orange);
+  --fg-color: var(--black);
+}
+.panel.avarian.coral {
+  --bg-color: var(--veridian-coral);
+  --fg-color: var(--white);
+}
 .panel :is(.signCorner, .signHolder, .guideArrows) {
   background-color: var(--bg-color);
 }
@@ -260,7 +295,7 @@
   display: flex;
   clear: both;
   border-radius: var(--signBorderRadius, 0.75rem);
-  border: .2rem solid;
+  border: 0.2rem solid;
   clear: both;
   overflow: hidden;
   visibility: visible;
@@ -437,8 +472,7 @@
 }
 
 .subDivider {
-  width: .2rem;
-  min-width: 4px;
+  width: 0.2rem;
   display: flex;
   flex-direction: column;
 }

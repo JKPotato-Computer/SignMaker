@@ -37,7 +37,7 @@ class Panel {
   duplicateExitTabRow(index) {}
 }
 
-Panel.prototype.cornerType = ["Sharp", "Round"];
+Panel.prototype.cornerType = ["Sharp", "Round", "Veridian"];
 Panel.prototype.defaultBorderRadius = 0.75;
 
 window.Panel = Panel;

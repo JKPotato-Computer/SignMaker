@@ -21,6 +21,7 @@ class Post {
     this.panelSpacing = panelSpacing;
     this.thickness = thickness;
     this.spacing = spacing;
+    this.mutcdVariant = mutcdVariant;
 
     if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
@@ -82,7 +83,6 @@ class Post {
       "--postOffset",
       this.offsetPost ? "1rem" : "",
     );
-
     // Set curved post specific CSS variables
     const cornerRadVar = this.cornerRadius;
     const cornerRadVar2 = cornerRadVar * 2;

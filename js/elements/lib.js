@@ -56,6 +56,14 @@ const lib = (function () {
     Red: "rgb(255, 0, 0)",
     "Fluorescent Pink": "rgb(255, 51, 204)",
     "Fluorescent Yellow-Green": "rgb(153, 255, 0)",
+    "Avarian Green": "rgb(0, 64, 64)",
+    "Avarian Blue": "rgb(0, 47, 108)",
+    "Avarian Brown": "rgb(105, 63, 35)",
+    "Avarian Yellow": "rgb(254, 209, 65)",
+    "Avarian Purple": "rgb(105, 13, 163)",
+    "Avarian Orange": "rgb(229, 114, 0)",
+    "Avarian Red": "rgb(175, 39, 47)",
+    "Avarian Coral": "rgb(223, 70, 97)",
   };
 
   const checkForContrast = (color) => {

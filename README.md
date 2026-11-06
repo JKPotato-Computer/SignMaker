@@ -23,7 +23,7 @@ Typefaces sourced from the:
 - [ClearviewHwy by Don Meeker and James Montalbano](https://cofonts.com/clearview-font/)
 - [Highway Gothic by Ash Pikachu Font](https://www.dafont.com/highway-gothic.font)
 
-Route shields are sourced from [Wikipedia](https://en.wikipedia.org/wiki/Numbered_highways_in_the_United_States).
+Route shields are sourced from [Wikipedia](https://en.wikipedia.org/wiki/Numbered_highways_in_the_United_States), created by tweaking those shields, or created by hand.
 
 ## License
 

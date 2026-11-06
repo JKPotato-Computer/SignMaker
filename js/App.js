@@ -2487,7 +2487,7 @@ const App = (() => {
     if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
       post.panels = post.panels.map((panel) => [panel]);
     }
-    
+
     currentlySelectedPanelGroupIndex = clamp(
       currentlySelectedPanelGroupIndex,
       0,
