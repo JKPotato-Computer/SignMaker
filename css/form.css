@@ -1,0 +1,3119 @@
+.sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
+  font-size: 1rem;
+  position: relative;
+  font-weight: 500;
+}
+
+nav#sMConfigBar,
+nav#sMMiniToolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  gap: 0.4rem;
+  padding: 0.2rem;
+  align-items: center;
+  background: var(--hotbarColor);
+  width: max-content;
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  height: max-content;
+  z-index: 1;
+  transition: 0.1s ease-in-out opacity;
+}
+
+nav#sMMiniToolbar {
+  top: 1rem;
+  right: 1rem;
+  left: unset;
+  transform: unset;
+}
+
+:root[data-theme="dark"] .sMConfigOption:not(.selected,:disabled) {
+  background: rgba(var(--baseColor), 0.1);
+}
+
+.sMConfigOption {
+  background: rgba(var(--baseColor), 0.25);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  transition: 0.25s ease-in-out;
+  cursor: pointer;
+  position: relative; /* for tooltips / mini menus */
+  font-family: "Overpass";
+  color: var(--textColor);
+  line-height: 0;
+  font-size: 1rem;
+}
+
+.sMConfigOption.selected {
+  background: var(--selectedColor);
+  transition: 0s;
+}
+
+.mutcd-link {
+  text-decoration: none;
+}
+
+.sMModal {
+  max-width: 100vh;
+  background: var(--hotbarColor);
+  display: none;
+  min-width: 45vh;
+  width: max-content;
+  height: 100%;
+}
+
+.sMModalContent {
+  padding: 1rem;
+  max-height: 75svh;
+  overflow-x: auto;
+}
+
+.modals {
+  width: max-content;
+  inset: 1.5rem;
+  position: fixed;
+  height: max-content;
+  max-height: calc(100% - 5rem);
+  z-index: 4;
+}
+
+span.toolTip {
+  position: fixed;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  font-size: 13px;
+  opacity: 1;
+  transition: 0.25s ease-in-out opacity;
+  z-index: 10;
+  font-family: "Inter";
+  width: max-content;
+  max-width: 200px;
+  transform: translateX(-50%);
+}
+
+label > .toolTip {
+  font-family: "Inter";
+}
+
+.modals label {
+  position: relative;
+}
+
+label span.toolTip,
+.listNavOptions button .toolTip {
+  width: 8rem;
+  text-align: right;
+  left: 4rem;
+  height: max-content;
+  top: 0.5rem;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+@keyframes appear {
+  from {
+    display: none;
+    opacity: 0;
+  }
+  to {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.sMConfigOption:not(.selected):hover {
+  background: var(--hoverColor);
+}
+
+#panelSelect {
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 12rem;
+  height: 20rem;
+  position: fixed;
+  background-color: var(--hotbarColor);
+  top: -21rem;
+  left: 0;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  z-index: 2;
+  border-radius: 0;
+  font-family: "Overpass", sans-serif;
+}
+
+.panelPopoverHint {
+  font-size: 0.65rem;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 0.8;
+  font-family: inherit;
+  position: absolute;
+
+  top: -0.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.panelActions {
+  display: flex;
+  width: 100%;
+  gap: 0.25rem;
+}
+
+.panelActions button {
+  flex: 1 1 auto;
+  padding: 0.25rem 0.35rem;
+  border-radius: 0;
+}
+
+#panelList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  max-height: stretch;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+  height: 100%;
+  position: relative;
+}
+
+.panelListButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  background: rgba(var(--baseColor), 0.15);
+  border-radius: 0;
+  cursor: grab;
+  position: relative;
+  user-select: none;
+}
+
+.panelListButton.active {
+  border-color: var(--selectedColor);
+  background: rgba(var(--baseColor), 0.6);
+}
+
+.panelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.panelGroup:not(.active) > *:not(.panelGroupButton) {
+  display: none;
+}
+
+.panelGroupButton {
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  background: rgba(var(--baseColor), 0.3);
+  border-radius: 0;
+  cursor: grab;
+  font-weight: 700;
+}
+
+.newPanelButton {
+  justify-content: center;
+  background: rgb(var(--baseColor), 0.8);
+}
+
+.panelSpacingControl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.panelSpacingControl label {
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 0.85;
+  font-family: inherit;
+}
+
+.panelSpacingInputs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.panelSpacingInputs input[type="range"] {
+  flex: 1 1 auto;
+}
+
+.panelSpacingInputs input[type="number"] {
+  width: 3.5rem;
+  padding: 0.2rem;
+  border-radius: 0;
+}
+
+.postThicknessControl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.postThicknessControl label {
+  font-size: 0.85rem;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 1;
+  width: auto;
+  text-align: left;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+.postThicknessControl input {
+  width: 4.5rem;
+  padding: 0.25rem;
+}
+
+.hitbox {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+}
+
+.listNav > .scrollMenu {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  width: 10rem;
+  white-space: nowrap;
+  overflow-x: auto;
+  gap: 4px;
+  margin-left: -8px;
+  height: 2rem;
+}
+
+/* Minimalistic scrollbar for Firefox */
+/* Note: Firefox styling options are more limited */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255, 255, 255, 0.5) transparent; /* thumb track */
+}
+
+.sMModalContent > div:not(#sMSPSettings),
+#sMSPSettings > div {
+  width: max-content;
+  flex-grow: 1;
+  height: 100%;
+}
+
+fieldset {
+  background-color: rgb(var(--baseColor), 0.3);
+  border: 1px solid rgb(var(--baseColor));
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+#sMExitTabProperties > fieldset:last-child {
+  margin-bottom: 0rem;
+}
+
+#sMET_subTextContent,
+#sMET_textContent {
+  width: 40%;
+  margin-bottom: 1rem;
+}
+
+legend {
+  font-family: "Overpass";
+  font-weight: 700;
+  text-align: left;
+  padding: 0 0.5rem;
+  font-size: 20px;
+  background-color: rgb(var(--baseColor));
+}
+
+nav.sMModalBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  height: max-content;
+  background-color: rgba(var(--baseColor), 0.5);
+}
+
+:root[data-theme="dark"] nav.sMModalBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  height: max-content;
+  background-color: rgb(50, 75, 255, 1);
+}
+
+nav.sMModalBar *:not(.material-symbols-outlined, select, button, input) {
+  font-family: "Overpass";
+  font-size: 16px;
+  font-weight: 600;
+}
+
+nav.sMModalSubBar {
+  padding: 0.2rem;
+}
+
+:root[data-theme="dark"] div.sMModalTitle {
+  background-color: rgb(50, 50, 200, 1);
+}
+
+div.sMModalTitle {
+  background-color: rgba(var(--baseColor), 0.75);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+  height: stretch;
+}
+
+a.sMModalTab {
+  padding: 0rem 0.5rem;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+a.sMModalTab.selected {
+  text-decoration: underline;
+}
+
+div.sMModalTitle *,
+div.sMModalTitle {
+  font-size: 16px;
+}
+
+.tabHidden {
+  display: none !important;
+}
+
+div#sMExitTabSetting,
+div#sMSPSettings {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: start;
+  gap: 1rem;
+}
+
+input[type="number"] {
+  border: 0;
+  margin: 0.25rem;
+}
+
+input:disabled {
+  background-color: rgb(var(--baseColorInv), 0.4);
+}
+
+.listNav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.listNavOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
+  flex-wrap: nowrap;
+  width: max-content;
+}
+
+.listNavOptions button,
+.listNavOptions label {
+  width: max-content;
+  position: relative;
+}
+
+.listNavOptions .listNavLabel {
+  flex-basis: 100%;
+  text-align: right;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+#exitTabNumber,
+#subPanelNumber {
+  width: 3rem;
+}
+
+.listNav .scrollMenu {
+  flex-grow: 1;
+  flex-direction: row;
+  justify-content: left;
+  min-width: 10rem;
+  width: stretch;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+  max-width: 25rem;
+}
+
+.resetClass {
+  background-color: rgb(255, 0, 0, 20%);
+  padding: 0.3rem;
+}
+
+.resetClass:hover {
+  background-color: rgb(255, 0, 0, 30%);
+}
+
+div#modalHolder {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+  display: none;
+  overflow-y: auto;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+::backdrop {
+  background-color: rgb(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+dialog {
+  border: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  inset: auto;
+  margin: auto;
+  background: var(--hotbarColor);
+  color: rgb(var(--baseColorInv));
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+}
+
+#welcomeToSignMaker {
+  width: 70%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#welcomeToSignMaker img {
+  width: 100%;
+}
+
+#downloadContent .downloadSignFooter {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  gap: 0.5rem;
+}
+
+#downloadContent h3 {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+div.downloadSignFooter button {
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  flex-grow: 1;
+}
+
+div.downloadSignFooter a {
+  color: black;
+}
+
+#fileTypeOptions button {
+  flex-grow: 1;
+}
+
+/* OLD - TO CONFIGURE */
+:root[data-theme="dark"] .scrollMenu button:not(.active, .newNestedButton),
+:root[data-theme="dark"] .scrolMenu button:not(.active, .newNestedButton) {
+  background-color: rgb(0, 0, 255);
+}
+
+input,
+select,
+textarea {
+  width: 6rem;
+  margin: 0.25rem;
+  padding: 0.25rem;
+  border: none;
+  font-family: "Inter";
+  font-weight: 600;
+  transition: 0.15s ease-in-out;
+}
+
+label {
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  width: 7.5rem;
+  text-align: right;
+  display: inline-block;
+}
+
+label:has(input),
+label:has(select) {
+  width: auto;
+}
+
+label.noLabelAlignment {
+  width: max-content;
+}
+
+label:hover {
+  font-weight: 600;
+}
+
+select {
+  background: rgb(240, 240, 240)
+    url("data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24'%20viewBox='0%20-960%20960%20960'%20width='24'%3e%3cpath%20d='M480-345%20240-585l56-56%20184%20184%20184-184%2056%2056-240%20240Z'/%3e%3c/svg%3e")
+    no-repeat right;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 17px;
+
+  cursor: pointer;
+}
+
+select:hover,
+select:focus {
+  background-color: rgb(var(--baseColor));
+  font-weight: 700;
+}
+
+input,
+select {
+  background-color: rgb(var(--inputColor));
+  color: var(--textColor);
+}
+
+:root[data-theme="dark"] .listNavOptions input,
+:root[data-theme="dark"] .listNavOptions button {
+  background-color: rgb(40, 40, 255);
+}
+
+button,
+input[type="button"] {
+  display: flex;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.15s ease-in-out;
+  border: 0;
+  width: max-content;
+  background-color: rgb(var(--inputColor));
+  font-family: "Inter";
+  font-weight: 500;
+  color: var(--textColor);
+}
+
+button:not(
+    .textEditorBlock,
+    .sMControlRow .sMConfigOption,
+    .shieldCategoryHead,
+    .shieldCategortyType
+  ):enabled:hover,
+input[type="button"]:not(
+    .textEditorblock,
+    .sMControlRow,
+    .sMConfigOption
+  ):enabled:hover {
+  background-color: var(--selectedColor);
+}
+
+button:disabled,
+input[type="button"]:disabled {
+  cursor: default;
+  background-color: rgb(var(--baseColorInv), 0.2);
+}
+
+.textEditorBlock {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.65rem;
+  cursor: grab;
+  user-select: none;
+  transform-origin: center;
+  transition:
+    transform 0.12s ease,
+    0.12s ease;
+}
+
+.sdArrow_rotationButtons,
+.sdGuideArrows_rotationButtons,
+.sdExitOnlyGuide_rotationButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  justify-content: center;
+}
+
+.sdArrow_rotationButtons > *,
+.sdGuideArrows_rotationButtons > *,
+.sdExitOnlyGuide_rotationButtons > * {
+  font-size: 20px;
+  width: 10%;
+}
+
+.sdGuideArrows_rotationButtons > button.activated,
+.sdExitOnlyGuide_rotationButtons > button.activated,
+.sdArrow_rotationButtons > button.activated {
+  background-color: rgb(var(--baseColor));
+}
+
+.sMControlRow:hover {
+  cursor: pointer;
+}
+
+textarea {
+  min-width: 15rem;
+  min-height: 5rem;
+  max-width: 25rem;
+  transition: none;
+}
+
+#currentPanel {
+  width: auto;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--baseColor), 0.2),
+    rgba(var(--baseColor), 0.4)
+  );
+  border-radius: 0rem 0rem 1rem 2rem;
+  padding: 0.4rem;
+  display: table;
+}
+
+#panelNumber {
+  background-color: rgb(var(--baseColor));
+  text-align: center;
+  padding: 0.1rem;
+  border-radius: 0;
+  width: 3rem;
+}
+
+#panelNumberTitle {
+  font-size: 1.3rem;
+  padding: 0.2rem;
+}
+
+#downloadContent {
+  background-color: var(--hotbarColor);
+  padding: 1rem;
+  width: max-content;
+  min-width: 70%;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+  height: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#downloadContents {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#downloadPanelContainer {
+  margin-top: 0.5rem;
+}
+
+#downloadPanelList {
+  display: inline-flex;
+  gap: 0.25rem;
+  max-width: calc(100% - 9rem);
+  overflow: auto;
+}
+
+#downloadPanelList > button {
+  font-size: 1.25rem;
+  aspect-ratio: 1 / 1;
+  width: 1.5rem;
+}
+
+#downloadPanelList > button.selected {
+  background-color: rgb(var(--baseColorInv), 0.2);
+}
+
+#fileTypeOptions {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  width: calc(100% - 9rem);
+}
+
+#fileTypeOptions button {
+  padding: 0.75rem;
+}
+
+#fileTypeOptions button.selected {
+  background-color: rgb(var(--baseColorInv), 0.2);
+}
+
+#downloadPreviewHolder {
+  display: flex;
+  flex-direction: column;
+  width: 40rem;
+}
+
+.downloadImageToolbar {
+  background-color: rgb(var(--baseColor), 0.3);
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem;
+  justify-content: left;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+#downloadImageZoomValue {
+  padding: 0 0.5rem;
+}
+
+#downloadPreview {
+  flex-grow: 1;
+  overflow: auto;
+  display: flex;
+  justify-content: safe center;
+  align-items: safe center;
+  background-color: var(--backgroundColor);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%23ffffff' fill-opacity='0.25'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#PNG,
+#SVG {
+  width: 15%;
+}
+
+#singularPanel {
+  display: none;
+}
+
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.exitTabGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+}
+
+.exitTabGroup:not(.active) .exitTabNestedButton {
+  display: none;
+}
+
+.exitTabNestedButton.newNestedButton {
+  background: rgb(var(--baseColor));
+  min-width: 1rem;
+  width: 1rem;
+}
+
+.exitTabButton,
+.exitTabNestedButton {
+  background: rgb(230, 230, 230);
+  border-radius: 0;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0.25rem 0.5rem;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.exitTabButton {
+  min-width: 1.5rem;
+  height: 1.5rem;
+}
+
+.exitTabNestedButton {
+  font-size: 0.7rem;
+  min-width: 3rem;
+  padding: 0.125rem 0.5rem;
+  height: max-content;
+}
+
+:root[data-theme="light"] .exitTabButton:hover,
+:root[data-theme="light"] .exitTabNestedButton:hover {
+  background: rgb(200, 200, 200);
+}
+
+:root[data-theme="dark"] .exitTabButton:hover,
+:root[data-theme="dark"] .exitTabNestedButton:hover {
+  background: rgb(0, 0, 200) !important;
+}
+
+nav#sMConfigBar.invisible {
+  left: 1rem;
+  transform: none;
+}
+
+nav#SMConfigBar.invisible > .sMConfigOption:not(#hideConfig) {
+  display: none;
+}
+
+#smSPTextEditor,
+#smSPShieldEditor {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(var(--baseColor), 0.2);
+  padding: 1rem;
+  gap: 1rem;
+}
+
+#sMSPCreate,
+#smSPElement,
+#smSPShieldHeader,
+#smSPShieldList,
+#smPShieldGroupSelector {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.3);
+  width: 100%;
+}
+
+#smSPShieldHeader {
+  flex-direction: column;
+  padding: 0;
+}
+
+#smSPShieldHeader > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+}
+
+#smSPShieldHeader > div:nth-child(2) {
+  background-color: rgb(var(--baseColor), 0.3);
+  margin-top: -0.5rem;
+  width: 100%;
+}
+
+#smPShieldGroupSelector {
+  flex-direction: column;
+}
+
+#smPShieldGroupSelector > div:nth-child(1) {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+#smPShieldGroupSelector > div:nth-child(1) > span {
+  font-size: 16px;
+}
+
+#shieldGroupList {
+  display: grid;
+  grid-template-columns: repeat(3, 0fr);
+  justify-content: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+#shieldGroupList > button {
+  padding: 0.5rem;
+}
+
+#shieldGroupList > button.selected {
+  background-color: rgb(var(--baseColor));
+}
+
+#smSPElement,
+#smSPShieldList {
+  gap: 1rem;
+}
+
+#sMSPCreate > span,
+#sMSPElement > span,
+#smSPShieldHeader > span,
+#smSPShieldList > span {
+  font-size: 16px;
+}
+
+#sMSPTextList {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.15);
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.smControlRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.15);
+  padding: 0.25rem;
+  width: 100%;
+  min-height: 32px;
+}
+
+:root[data-theme="dark"] .smControlRow.selected {
+  background-color: rgb(var(--baseColor), 0.25);
+}
+
+.smControlRow.selected {
+  background-color: rgb(var(--baseColor), 0.5);
+}
+
+.smControlRow * {
+  font-size: 16px;
+  padding: 4px 8px;
+}
+
+.smControlRow *.selected {
+  text-decoration: underline;
+}
+
+.sdCtrlText {
+  background-color: var(--green);
+  color: white;
+}
+
+.sdBlocker {
+  background-color: white;
+  color: black;
+}
+
+.sdShieldGroup {
+  background-color: var(--blue);
+  color: white;
+}
+
+.sdAdvisory {
+  background-color: var(--yellow);
+  border-radius: 8px;
+  color: black;
+}
+
+.sdTollLogo {
+  background-color: var(--purple);
+  color: white;
+}
+
+.sdIcon {
+  background-color: var(--brown);
+  color: white;
+}
+
+.sdBeacon {
+  background-color: var(--black);
+  color: var(--yellow);
+}
+
+.sdActionMessage {
+  background-color: var(--green);
+  color: white;
+}
+
+.sdElectronicSign {
+  background-color: var(--black);
+  color: var(--orange);
+}
+
+#smSPProperties,
+#smSPBlockProperties,
+#smSPShieldProperties {
+  background-color: rgb(var(--baseColor), 0.225);
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.sdTextEditorWide {
+  width: 70%;
+}
+
+.sdTextEditorSmall {
+  width: 3rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.smSPShieldVisual {
+  height: 30px;
+  width: auto;
+}
+
+.smSPShieldLargeVisual {
+  height: 90px;
+  width: auto;
+  background-color: var(--shieldBackColor);
+  border-radius: var(--shieldBackRadius);
+}
+
+.smSPShieldRow,
+.smSPShieldGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.smSPShieldRow:hover {
+  background-color: rgb(200, 200, 200, 0.5);
+}
+
+.smSPShieldRow.selected {
+  background-color: rgb(var(--baseColor), 1);
+}
+
+.smSPShieldGroupHolder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem;
+}
+
+.newBlock {
+  background-color: rgb(0, 0, 0, 0.3);
+  color: white;
+  width: 100%;
+  padding: 0.25rem;
+  text-align: center;
+  font-weight: bold;
+  height: 1.5rem;
+  border: 3px dashed black;
+}
+
+.smSPShieldBlock {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  flex-grow: 1;
+  padding: 0.25rem;
+}
+
+.dragIndicator {
+  height: stretch;
+  aspect-ratio: 1 / 1;
+  background: none;
+  width: auto;
+  flex-grow: 1;
+  font-size: 1.5rem;
+  font-family: "Material Symbols Outlined";
+}
+
+.dragIndicator > span {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.dragIndicator:hover {
+  background-color: rgb(0, 0, 0, 0.2) !important;
+}
+
+.smSPShieldRow.selected .dragIndicator,
+.smSPShieldGroup.selected > .dragIndicator {
+  display: block;
+}
+
+#smSPShieldList {
+  flex-direction: column;
+}
+
+#smSPShieldImgPreview {
+  color: white;
+  font-size: 20px;
+}
+
+#smSPShieldImgConfig {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  padding: 1rem;
+}
+
+#smSPShieldImgConfig > div {
+  background-color: rgb(var(--baseColor), 0.125);
+  height: stretch;
+}
+
+#smSPShieldImgConfig > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  flex-grow: 1;
+}
+
+#smSPShieldImgConfig > div:nth-child(2) {
+  padding: 0.5rem;
+}
+
+#changeImgBtn,
+#smSPShieldAdvanced {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+#advancedMenu {
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.2);
+}
+
+#shieldEditorModal {
+  background: none;
+  padding: 0;
+  flex-direction: row;
+  height: 90%;
+  width: 70%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: center;
+}
+
+#shieldEditorModal > div {
+  padding: 1rem;
+}
+
+#shieldEditorModal > div {
+  background: var(--hotbarColor);
+}
+
+.shieldLibrary {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shieldEditorPane {
+  flex-grow: 1;
+  overflow: auto;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+}
+
+.shieldEditorPane > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+#shieldEditorClose,
+#shieldImgLibraryClose,
+#diagrammicDrawingClose,
+#customImagePickerClose,
+button[data-diagram-modal-close] {
+  font-size: 20px;
+  padding: 0.125rem 1rem;
+  background-color: rgb(255, 0, 0, 0.2);
+}
+
+.customImagePickerContent > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.redButton {
+  background-color: rgb(255, 0, 0, 0.2);
+}
+
+#shieldEditorClose:hover,
+#shieldImgLibraryClose:hover,
+#diagrammicDrawingClose:hover,
+button[data-diagram-modal-close]:hover,
+.redButton:hover {
+  background-color: rgb(255, 0, 0, 0.6);
+}
+
+.shieldLibrary > nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shieldLibrary > nav button {
+  font-size: 24px;
+  padding: 0.5rem 2rem;
+  width: stretch;
+}
+
+.shieldLibrary > nav button.selected {
+  background-color: rgb(0, 0, 255, 0.7);
+  color: white;
+}
+
+.shieldLibrary[data-tab="presetShieldList"] #uploadShield {
+  display: none;
+}
+
+.shieldLibrary[data-tab="uploadShield"] #presetShieldList,
+.shieldLibrary[data-tab="uploadShield"] #presetShieldSearch {
+  display: none;
+}
+
+.shieldLibrary > nav button.selected:hover {
+  background-color: rgb(0, 0, 255, 1) !important;
+}
+
+.shieldLibrary > nav button:not(.selected):hover {
+  background-color: rgb(0, 0, 255, 0.125) !important;
+}
+
+#presetShieldList {
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.shieldItemImg {
+  height: 70px;
+  background: rgb(0, 0, 255, 0.8);
+  padding: 0.25rem;
+}
+
+.shieldCategoryType {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.shieldCategoryType.selected,
+.custoamShieldItem.selected {
+  background-color: rgb(0, 0, 255, 0.1);
+}
+
+.shieldCategoryType.selected .shieldItemName {
+  font-weight: 600;
+}
+
+.shieldCategoryHead {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  padding: 0.5rem;
+  color: white;
+  margin-left: -1rem;
+  cursor: pointer;
+  width: 100%;
+  text-align: initial;
+  font-size: 20px;
+}
+
+.shieldCategory {
+  padding-left: 1rem;
+}
+
+.shieldCategoryHead:hover {
+  background-color: rgb(0, 0, 255, 0.75);
+}
+
+.shieldItemName {
+  font-size: 24px;
+  text-align: center;
+}
+
+.shieldCategoryType:not(.selected):nth-child(odd),
+.customShieldItem:not(.selected):nth-child(odd) {
+  background-color: rgb(0, 0, 0, 0.075);
+}
+
+.shieldCategoryType:not(.selected):nth-child(even),
+.customShieldItem:not(.selected):nth-child(even) {
+  background-color: rgb(0, 0, 0, 0.025);
+}
+
+.shieldCategoryType:hover,
+.customShieldItem:hover {
+  background-color: rgb(0, 0, 255, 0.2) !important;
+}
+
+#presetShieldSearch,
+#shieldLibrarySearch {
+  width: 100%;
+  border: 1px solid black;
+  padding: 0.75rem;
+  margin: 0;
+  font-size: 20px;
+}
+
+.shieldPreview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+  gap: 0.5rem;
+}
+
+#editShieldBtn {
+  padding: 0.25rem 1rem;
+  font-size: 24px;
+  gap: 0.5rem;
+}
+
+.selectedShieldPreview {
+  height: 5rem;
+  background-color: var(--shieldBackColor, rgb(0, 0, 255, 0.8));
+  border-radius: var(--shieldBackRadius);
+}
+
+.selectedShieldName {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  max-width: 8rem;
+  overflow: scroll;
+  scrollbar-color: rgb(var(--baseColorInv), 0.25) transparent;
+  text-wrap: nowrap;
+}
+
+.shieldPreview > footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.shieldPreview > footer > button {
+  font-size: 20px;
+  padding: 0.25rem 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#setShield {
+  justify-content: center;
+}
+
+#uploadShield {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+#shieldUploadField {
+  background-color: rgb(0, 0, 0, 0.1);
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+#shieldUploadField > span.material-symbols-outlined {
+  font-size: 64px;
+}
+
+#shieldUploadField {
+  cursor: pointer;
+}
+
+#shieldUploadField:hover {
+  background-color: rgb(0, 0, 0, 0.2);
+  border-color: #666;
+}
+
+#shieldUploadField.dragover {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: #4caf50;
+}
+
+#customImageUploadField {
+  background-color: rgb(0, 0, 0, 0.1);
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#customImageUploadField > span.material-symbols-outlined {
+  font-size: 64px;
+}
+
+#customImageUploadField:hover {
+  background-color: rgb(0, 0, 0, 0.2);
+  border-color: #666;
+}
+
+#customImageUploadField.dragover {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-color: #4caf50;
+}
+
+#customImageUploadField input[type="file"] {
+  display: none;
+}
+
+.shieldUploadDisclaimer {
+  font-size: 12px;
+  padding: 0.25rem;
+  color: rgb(100, 100, 100);
+  overflow-wrap: break-word;
+  /* width: 25rem; */
+}
+
+#linkUpload {
+  width: 15rem;
+  border: 1px solid black;
+}
+
+#savedCustomShieldsList {
+  display: flex;
+  flex-direction: column;
+}
+
+#customImageList {
+  display: flex;
+  flex-direction: column;
+}
+
+.customShieldItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.deleteCustomShieldBtn,
+.deleteCustomImage {
+  background: rgb(255, 0, 0, 0.3);
+  padding: 0.5rem;
+}
+
+.deleteCustomShieldBtn:hover,
+.deleteCustomImage:hover {
+  background: rgb(255, 0, 0, 0.8) !important;
+}
+
+#uploadShield h3 {
+  margin-bottom: 0.5rem;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+.shieldCategory:not(.open) .shieldCategoryType,
+.shieldCategory:not(.open) > .shieldCategory {
+  display: none;
+}
+
+#selectedBackRoudness {
+  background-color: rgb(0, 0, 0, 0.05);
+}
+
+.smallVal {
+  width: 3rem;
+  display: inline-block;
+}
+
+#zoomControl {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  left: 0.75rem;
+  top: 0.75rem;
+  background-color: var(--hotbarColor);
+  padding: 0.4rem;
+  width: max-content;
+  gap: 0.25rem;
+  opacity: 0.4;
+  transition: 0.1s ease-in-out opacity;
+  position: fixed;
+  z-index: 3;
+}
+
+#zoomControl:hover {
+  opacity: 1;
+}
+
+#zoomControl * {
+  width: max-content;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+#zoomControl button {
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 2rem;
+}
+
+#zoomControl > span:nth-child(1) {
+  font-size: 16px;
+  width: 3rem;
+}
+
+div#subPanelList {
+  padding: 0.25rem;
+}
+
+#smSPBlockProperties > div {
+  width: 49%;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+input#uploadCustomShield {
+  display: none;
+}
+
+button#sdShieldGroup_OpenShieldEditor {
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.smSPShieldBannerController {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.5);
+  padding: 0.5rem;
+}
+
+.smSPShieldBannerController > button {
+  width: 50%;
+  font-size: 1rem;
+}
+
+#smSP_bannerMaster {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: rgb(var(--baseColor), 0.25);
+}
+
+.smSP_bannerEditor {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.smSP_bannerElement {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+.smSP_bannerEditor > div:nth-child(1) * {
+  width: 25%;
+}
+
+.smSP_bannerEditor > div:nth-child(1) {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.smSP_bannerEditor > div:nth-child(2) span {
+  width: max-content;
+  display: block;
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.smSP_bannerEditor > div:nth-child(2) {
+  width: 100%;
+}
+
+.smSP_bannerEditor > div:nth-child(2) > div {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.smSP_bannerEditor > div:nth-child(2) > div > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.smSP_deleteBanner {
+  height: stretch;
+  font-size: 1.5rem;
+  background-color: rgb(255, 0, 0, 0.6);
+  color: white;
+  padding: 0.75rem;
+}
+
+.smSP_deleteBanner:hover {
+  background-color: rgb(255, 0, 0, 1) !important;
+}
+
+.halfSizeInput {
+  width: 3rem;
+}
+
+#smSPShieldStyleOptions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+#smSPShieldStyleOptions > button {
+  flex-grow: 1;
+}
+
+.smSPBanner_alignmentHeader {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor));
+}
+
+#shieldImgLibrary {
+  display: none;
+  width: 70%;
+  height: 70%;
+  color: var(--textColor);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.shieldimgLibraryholder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.shieldImgLibraryHolder > header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#shieldLibraryListHolder {
+  width: 100%;
+  flex-grow: 1;
+  background-color: rgb(var(--baseColorInv), 0.025);
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: start;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  height: -webkit-fill-available;
+  overflow: auto;
+}
+
+#shieldLibraryListHolder > button {
+  aspect-ratio: 1 / 1;
+  width: 20vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: 1px solid black;
+}
+
+#shieldLibraryListHolder > button.selected {
+  background-color: rgb(var(--baseColor));
+}
+
+#shieldLibraryListHolder > button.selected > span {
+  font-weight: 700;
+}
+
+#shieldLibraryListHolder > button > span {
+  width: 100%;
+  height: 20%;
+  background-color: rgb(0, 0, 255, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#shieldLibraryListHolder > button > div {
+  height: 80%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 20px;
+}
+
+div#shieldLibraryListOptions {
+  display: flex;
+  justify-content: right;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: auto;
+}
+
+div#shieldLibraryListOptions > button {
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.smSPBanner_alignmentHeaderText {
+  font-weight: 700;
+}
+
+.smDropdownInputElement {
+  position: relative;
+  flex-grow: 1;
+}
+
+.smDropdownSelectedButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+.smDropdownSelectedLabel {
+  flex: 1;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+.smDropdownHolder {
+  position: fixed;
+  background-color: rgb(var(--baseColor));
+  z-index: 99;
+  width: 18rem;
+  max-width: min(90vw, 18rem);
+  padding: 0.3rem;
+  border: 1px solid #c7c7c7;
+}
+
+.smDropdownSearch {
+  width: 100%;
+  margin: 0 0;
+  padding: 0.5rem;
+}
+
+.smDropdownList {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  gap: 0.2rem;
+}
+
+button.smDropdownOption {
+  width: 100%;
+  height: max-content;
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+}
+
+button.smDropdownOption:not(.selected):hover {
+  background-color: rgb(var(--baseColorInv), 0.05) !important;
+}
+
+button.smDropdownOption.selected,
+button.smDropdownOption.selected:hover {
+  background-color: rgb(var(--baseColorInv), 0.1) !important;
+}
+
+.smDropdownImage {
+  height: 3rem;
+  object-fit: contain;
+  flex-shrink: 0;
+  background-color: black;
+  aspect-ratio: 1 / 1;
+}
+
+.smDropdownLabel {
+  font-size: 0.95rem;
+  flex-grow: 1;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.smDropdownSelectedImage {
+  aspect-ratio: 1 / 1;
+  height: 20px;
+  background-color: black;
+  object-fit: contain;
+}
+
+div.sMET_typeSelect,
+div.sMA_typeSelect {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: left;
+  gap: 0.75rem;
+  width: 80vh;
+  flex-wrap: wrap;
+}
+
+div.sMET_typeSelect {
+  justify-content: center;
+}
+
+.div.sMA_typeSelect {
+  width: 100%;
+}
+
+div.sMET_typeSelect > button {
+  flex: 1 1 calc(33.333% - 0.75rem);
+}
+
+div.sMET_typeSelect > button,
+div.sMA_typeSelect > button {
+  height: max-content;
+  width: max-content;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+div.sMA_typeSelect > button {
+  font-size: 1rem;
+  flex: 1 1 calc(33.333% - 0.75rem);
+}
+
+div.sMET_typeSelect > button.selected > span,
+div.sMA_typeSelect > button.selected > span {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+img.sMET_typeVisual,
+img.sMA_typeVisual {
+  width: 100%;
+}
+
+.smET_typeLabel,
+.smA_typeLabel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.5rem;
+  color: white;
+  z-index: 2;
+  background-color: rgb(0, 0, 255, 0.8);
+}
+
+.diagrammicDrawingHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: max-content;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.diagrammicDrawingHolder {
+  flex-grow: 1;
+  display: flex;
+  height: auto;
+  flex-direction: column;
+}
+
+#diagrammicDrawing header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.diagrammicDrawingHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.diagramModalLink {
+  padding: 0.25rem;
+  color: rgb(var(--baseColorInv));
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.diagramSubModal {
+  width: max-content;
+  max-width: 80%;
+  max-height: 85vh;
+  padding: 1rem;
+  background-color: var(--hotbarColor);
+  inset: 50%;
+  transform: translate(-50%);
+  position: fixed;
+  color: var(--textColor);
+}
+
+#diagramPresets {
+  width: 80%;
+}
+
+.diagramSubModal::backdrop {
+  background-color: rgb(0, 0, 0, 0.45);
+}
+
+.diagramSubModal header {
+  margin-bottom: 1rem;
+}
+
+.diagramSubModal h3 {
+  margin: 0;
+}
+
+.diagramShortcutList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.diagramShortcutList li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.diagramShortcutList li span {
+  margin-left: 0.25rem;
+}
+
+kbd {
+  padding: 0.15rem 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+#diagramPresetGallery {
+  display: flex;
+  gap: 0.75rem;
+  max-height: 55vh;
+  overflow-y: auto;
+  flex-wrap: wrap;
+}
+
+.diagramPresetCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(var(--baseColorInv), 1);
+  cursor: pointer;
+  outline: none;
+  background: var(--green);
+}
+
+.diagramPresetCard.selected {
+  background: rgb(var(--baseColorInv), 0.3);
+}
+
+.diagramPresetCard.selected .diagramPresetLabel {
+  .diagramPresetCard.selected {
+    background: rgb(var(--baseColorInv), 0.3);
+  }
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.diagramPresetLabel {
+  width: 100%;
+  background-color: rgb(0, 0, 255, 0.8);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  color: White;
+  font-size: 0.8rem;
+}
+
+.diagramPresetCard input {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.diagramPresetCard img {
+  display: block;
+  width: 10rem;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--green);
+}
+
+.diagramPresetActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.diagramPresetActions > button {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+}
+
+#diagramCanvas {
+  background-color: var(--green);
+  height: 100%;
+  width: 100%;
+}
+
+.canvasBackground {
+  height: 35rem;
+  justify-content: center;
+  align-items: start;
+  display: flex;
+  aspect-ratio: 1;
+  flex-direction: column;
+  flex: 0 0 35rem;
+  position: relative;
+}
+
+#diagrammicDrawing {
+  width: 100%;
+  overflow-y: scroll;
+  scrollbar-color: rgb(var(--baseColorInv), 0.3) transparent;
+}
+
+.diagramEditor {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-grow: 1;
+  width: 100%;
+  align-items: start;
+  padding: 0 1rem;
+  justify-content: center;
+}
+
+.diagramEditorCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: stretch;
+  min-width: 0;
+}
+
+.diagramEditorCol:nth-child(1) {
+  flex: 1 0 calc((100% - 35rem) * 0.35);
+}
+
+.diagramEditorCol:nth-child(3) {
+  flex: 1 0 calc((100% - 35rem) * 0.65);
+  background-color: rgb(var(--baseColor), 0.4);
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.diagramEditorCol:nth-child(1) > div {
+  background-color: rgb(var(--baseColor), 0.4);
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.diagramObjectList,
+.diagramObjectProperties {
+  flex-grow: 1;
+  position: relative;
+}
+
+.diagramObjectList {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.diagramObjectList > span {
+  text-align: center;
+}
+
+.diagramObjList {
+  flex-grow: 1;
+  max-height: 20rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+.diagramObjList:has(.moving)
+  .diagramObjectButton:not(.diagramObjectAddButton):hover {
+  text-decoration: underline;
+}
+
+.diagramObjectButton {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.diagramObjectButton.selected {
+  background-color: rgb(var(--baseColor), 1);
+  text-decoration: underline;
+}
+
+.diagramObjectButton.selected.moving {
+  background-color: rgb(var(--baseColorInv), 0.1);
+  border: 3px dashed black;
+  font-weight: 600;
+}
+
+.diagramObjectAddButton {
+  font-size: 0.8rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  color: white;
+  padding: 0.25rem 0.5rem;
+}
+
+.diagramObjectAddButton:hover {
+  background-color: rgb(0, 0, 255, 1) !important;
+}
+
+.objectRoadType {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0rem 0rem 0.5rem;
+}
+
+.objectRoadType > button {
+  width: calc(33% - 0.5rem);
+  height: 100%;
+  padding: 1rem;
+}
+
+.objectRoadType > button.selected {
+  text-decoration: underline;
+  background-color: rgb(var(--baseColor));
+}
+
+.diagrammicDrawingHolder > footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.diagrammicDrawingHolder > footer > div {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.diagrammicDrawingHolder > footer button {
+  padding: 0.5rem;
+  font-size: 24px;
+}
+
+.objectGroupManager {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.objectGroupManager > button {
+  padding: 0.5rem;
+  font-size: 16px;
+  width: calc(50% - 0.5rem);
+}
+
+.objectNameLabel {
+  float: right;
+}
+
+div#debugEditor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20%;
+  font-size: 0.5rem;
+  color: black;
+  background-color: rgb(255, 255, 255, 0.85);
+  padding: 0.25rem;
+}
+
+.objectRoadOptions {
+  display: flex;
+  width: 100%;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: auto;
+}
+
+.objectRoadOptions > button {
+  width: 33%;
+  padding: 0.5rem;
+}
+
+#diagrammicDrawing h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diagramProperties {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.diagramProperties > label {
+  width: auto;
+}
+
+#sMDiagrammic > div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#sMDiagrammic > div > button {
+  font-size: 1rem;
+  width: 50%;
+  padding: 0.5rem;
+}
+
+label[for="diagramFileName"] {
+  height: max-content;
+  width: auto;
+  margin-right: -1rem;
+}
+
+#diagramFileName {
+  width: 10rem;
+}
+
+.smAPLCat_container {
+  background-color: rgb(var(--baseColor), 0.1);
+  padding: 1rem;
+}
+
+.smAPLCat_aplList {
+  display: flex;
+  flex-direction: column;
+}
+
+div#sMAPL_APLCat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.smAPLCat_aplRow1,
+.smAPLCat_aplRow2,
+.smAPLCat_aplRow3 {
+  font-size: 16px;
+}
+
+.smAPLCat_aplRow1,
+.smAPLCat_aplRow2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  gap: 0.5rem;
+}
+
+.smAPLCat_apl:nth-child(even) {
+  background-color: rgb(var(--baseColor), 0.2);
+  padding: 1rem;
+}
+
+.smAPLCat_apl:nth-child(odd) {
+  background-color: rgb(var(--baseColor), 0.1);
+  padding: 1rem;
+}
+
+.smAPLCat_aplSelect {
+  display: none;
+}
+
+.smAPLCat_aplSelectHolder {
+  position: relative;
+  flex-grow: 1;
+}
+
+.smAPLCat_aplSelectButton {
+  width: 100%;
+  min-height: 3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 24px;
+}
+
+.smAPL_arrowImage,
+.smAPL_arrowOptionImage {
+  width: 3rem;
+  height: 3rem;
+  padding: 0.5rem;
+  background-color: black;
+}
+
+.smAPL_arrowImage.flipped,
+.smAPL_arrowOptionImage.flipped {
+  transform: scaleX(-1);
+}
+
+.smAPL_arrowLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.smAPLCat_aplSelectPanel {
+  position: fixed;
+  width: 18rem;
+  max-width: min(80vw, 18rem);
+  padding: 0.3rem;
+  background-color: rgb(var(--baseColor));
+  z-index: 3;
+}
+
+.smAPL_arrowSearch {
+  width: 100%;
+  margin: 0 0 0.3rem;
+  padding: 0.5rem;
+}
+
+.smAPL_arrowList {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  gap: 0.2rem;
+  scrollbar-color: rgb(var(--baseColorInv), 0.5) transparent;
+}
+
+.smAPL_arrowOption {
+  width: 100%;
+  min-height: 3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+  text-align: left;
+  font-size: 24px;
+}
+
+.smAPL_arrowOption:hover {
+  background-color: rgb(var(--baseColorInv), 0.05) !important;
+}
+
+.smAPL_arrowOption.selected,
+.smAPL_arrowOption.selected:hover {
+  background-color: rgb(var(--baseColorInv), 0.1) !important;
+}
+
+.smAPL_arrowOption span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.smAPLCat_aplRow1 > button {
+  height: stretch;
+  padding: 0.5rem 1rem;
+}
+
+.smAPLCat_aplDragger {
+  aspect-ratio: 1 / 1;
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.smAPLCat_addArrow {
+  padding: 0.5rem 2rem;
+  font-size: 1rem;
+  margin: 0.5rem;
+}
+
+.smAPLCat_title {
+  font-weight: 700;
+}
+
+.smAPLCat_options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 16px;
+}
+
+.sMET_Presets {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.2);
+}
+
+.smET_Presets button {
+  font-size: 18px;
+}
+
+.smET_Presets select {
+  font-size: 20px;
+  width: 10rem;
+}
+
+select#sMDiagrammicPreset {
+  width: 20rem;
+}
+
+option.presetExitTab {
+  color: white;
+  background-color: var(--green);
+}
+
+option.presetExitTab:hover {
+  background-color: rgb(0, 154, 126);
+}
+
+.sdIconDropdown.smDropdownInputElement,
+#sMET_variantTollIcon,
+#sMET_variantRegularIcon {
+  width: 15rem;
+  display: inline-block;
+}
+
+.exitTabConfig:has(#sMET_variantIsTollIcon:checked) #sMET_variantRegularIcon {
+  display: none;
+}
+
+.exitTabConfig:has(#sMET_variantIsTollIcon:not(:checked))
+  #sMET_variantTollIcon {
+  display: none;
+}
+
+.smWhiteDropdownImage {
+  background-color: rgb(255, 255, 255);
+}
+
+#sMET_variantAddon {
+  width: 10rem;
+}
+
+small {
+  font-size: 10px;
+}
+
+.shieldEditorPane > details[open]:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+summary {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: rgb(0, 0, 255, 0.5);
+  color: white;
+  cursor: pointer;
+  font-family: "Overpass";
+  font-weight: 500;
+  font-size: 1.25rem;
+  transition: 0.25s ease-in-out;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+details[open] > summary {
+  background-color: rgb(0, 0, 255);
+}
+
+summary::before {
+  font-family: "Material Symbols Outlined";
+  content: "arrow_drop_down";
+  font-size: 2rem;
+  line-height: 0;
+}
+
+summary::after {
+  content: " (Expand)";
+}
+
+details[open] > summary::after {
+  content: " (Collapse)";
+}
+
+details[open] > summary::before {
+  content: "arrow_drop_up";
+}
+
+summary:hover {
+  background-color: rgb(0, 0, 255, 0.75);
+}
+
+.shieldEditorImagePreview {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  gap: 1rem;
+}
+
+.shieldEditorImagePreview > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shieldEditorImagePreview > div:nth-child(2) {
+  flex-grow: 1;
+}
+
+#spShield_routeNumber,
+#spShield_designation {
+  width: calc(100% - 14rem);
+}
+
+#shieldPreviewImage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.25);
+  aspect-ratio: 1 / 1;
+  color: white;
+  overflow: hidden;
+}
+
+#scaleOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+#scaleOptions > button {
+  width: 100%;
+  font-size: 20px;
+}
+
+#scaleOptions > button.selected {
+  background-color: rgb(0, 0, 255, 0.9);
+  color: white;
+}
+
+#shieldBaseName {
+  text-wrap: nowrap;
+  width: 100%;
+  overflow: auto;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.smET_shieldListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: rgb(var(--baseColor), 0.65);
+  padding: 0.25rem;
+}
+
+#smET_shieldList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.smET_shieldListItemImage {
+  height: 2rem;
+  aspect-ratio: 1 / 1;
+  margin-right: 0;
+}
+
+.smET_shieldListItemText {
+  margin-right: auto;
+}
+
+.sMET_shieldListItemEdit {
+  font-size: 20px;
+  padding: 0.25rem 1rem;
+}
+
+.sMET_shieldListItemCategory {
+  height: stretch;
+  margin: 0;
+}
+
+.sMET_shieldListItemDelete {
+  height: stretch;
+  aspect-ratio: 1 / 1;
+}
+
+#smET_addShield {
+  font-size: 20px;
+  padding: 0.25rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.visual-box {
+  background-color: rgb(var(--baseColorInv), 0.25);
+  border: 3px dashed rgb(var(--baseColorInv));
+}
+
+#sdTollLogoHolder {
+  width: 50%;
+  display: inline-block;
+}
+
+#sdTollLogo_backgroundColor {
+  width: 70%;
+}
+
+#objectSubpanelAdd {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+}
+
+#sdArrow_arrow {
+  width: 60%;
+  display: inline-block;
+}
+
+#guideArrow {
+  width: 15rem;
+}
+
+.standardArrow_selectHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  width: 100%;
+}
+
+.standardArrow_selectHeader > span {
+  font-size: 16px;
+}
+
+#standardArrowList {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+  margin-top: 0.5rem;
+  max-height: 15rem;
+  min-height: 5rem;
+  overflow: auto;
+  gap: 0.25rem;
+}
+
+.standardArrowListItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 100%;
+}
+
+.standardArrowListItem.selected {
+  background-color: rgb(var(--baseColor));
+}
+
+.standardArrowListItem > .standardArrowListItem_imageHolder {
+  background-color: black;
+  padding: 0.5rem;
+  aspect-ratio: 1 / 1;
+}
+
+.standardArrowListItem_imageHolder > img {
+  height: 2rem;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
+.standardArrowListItem > .dragIndicator {
+  flex-grow: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(var(--baseColor), 0.5);
+  width: 2rem;
+}
+
+.standardArrowListItem > span {
+  flex-grow: 1;
+  font-size: 24px;
+}
+
+#guideStandardArrow {
+  display: inline-block;
+  width: calc(100% - 8rem);
+}
+
+#standardArrowProperties {
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: rgb(var(--baseColor), 0.25);
+}
+
+#standardArrowGeneralSettings,
+#standardArrowExitOnlySettings {
+  margin-top: 0.5rem;
+}
+
+#exitOnlyArrowType {
+  width: calc(100% - 8rem);
+  display: inline-block;
+}
+
+.iconsDropdownCustom {
+  width: 100%;
+  padding: 0.25rem;
+  background-color: rgb(0, 0, 255, 0.75);
+  font-size: 24px;
+  color: white;
+}
+
+.iconsDropdownCustom:hover {
+  background-color: rgb(0, 0, 255) !important;
+}
+
+.customImageItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  width: 100%;
+  background: rgb(var(--baseColor), 0.2);
+}
+
+.customImageUrlUpload {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#customImageUrlUpload {
+  padding: 0.25rem 1rem;
+}
+
+.customImageSelectButton {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  background: none;
+}
+
+#smSPExitGroupedBlock {
+  height: stretch;
+  padding: 0.25rem 0.5rem;
+}
+
+#sdGroup_editGroup {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#downloadImageSize {
+  margin-left: auto;
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > fieldset {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > fieldset > div {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+#sMCreationsSaved > fieldset > div > button {
+  padding: 0.5rem 1rem;
+}
+
+#sMCreationsSavedList,
+#sMCreationsTemplatesList {
+  display: flex;
+  flex-direction: column;
+  width: 30rem;
+}
+
+.sMCreationsSavedItem:nth-child(odd),
+.sMCreationsTemplateItem:nth-child(odd) {
+  background-color: rgb(var(--baseColor), 0.3);
+}
+
+.sMCreationsSavedItem:nth-child(even),
+.sMCreationsTemplateItem:nth-child(even) {
+  background-color: rgb(var(--baseColor), 0.15);
+}
+
+.sMCreationsSavedItem,
+.sMCreationsTemplateItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 30rem;
+}
+
+.sMCreationsSavedItem > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+}
+
+.sMCreationsSavedItem > div:nth-child(2) {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sMCreationsSavedItem > div:nth-child(2) > button {
+  flex-grow: 1;
+  width: 33%;
+  padding: 0.5rem 0.75rem;
+}
+
+.sMCreationsTemplateItem > button {
+  padding: 0.5rem 0.75rem;
+}
+
+.sMCreationsTemplateItem > span {
+  flex-grow: 1;
+}
+
+.sMCreationsFileName,
+.sMCreationsTemplateName {
+  text-wrap: wrap;
+}
+
+.sMCreationsFileSaveDate {
+  font-size: 0.75rem;
+}
+
+#sMCreationsSaved > h3 {
+  display: inline-block;
+}
+
+#sMCreationsSearchList {
+  display: inline;
+  float: right;
+  width: 15rem;
+}
+
+#sMCreationsTemplateSearch {
+  display: inline;
+  float: right;
+  width: 10rem;
+}

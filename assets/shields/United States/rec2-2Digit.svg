@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="Shield" inkscape:output_extension="org.inkscape.output.svg.inkscape" inkscape:version="0.48.1 " sodipodi:docname="Connecticut_Highway_x[1].svg" sodipodi:version="0.32" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"
+	 style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+</style>
+<g id="Back">
+	<path class="st0" d="M32,496c-8.8,0-16-7.2-16-16V32c0-8.8,7.2-16,16-16h448c8.8,0,16,7.2,16,16v448c0,8.8-7.2,16-16,16H32z"/>
+	<path d="M480,32v448H32V32H480 M480,0H32C14.3,0,0,14.3,0,32v448c0,17.7,14.3,32,32,32h448c17.7,0,32-14.3,32-32V32
+		C512,14.3,497.7,0,480,0L480,0z"/>
+</g>
+</svg>

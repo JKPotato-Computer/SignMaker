@@ -1,0 +1,2980 @@
+/*
+  Shield CSS touched up by Vivi (highoncatnip95/highoncatnip_)
+  so if this is bad blame me lmao
+  absolutely no AI used in this process :D
+*/
+
+/* 
+  TODO: Redo this CSS because it is so unbearably unoptimized :L
+*/
+
+/*
+  American Road Signs ====================================================
+*/
+/* County */
+.shield.C .shieldImg.shieldBacks {
+  padding: 0.1rem;
+}
+
+.shield.C .routeNumber {
+  color: var(--countyYellow);
+  font-size: 1.4em;
+  top: 0.45em;
+}
+
+.shield.C .designation {
+  color: var(--countyYellow);
+  font-family: "Series D";
+  font-size: 0.3em;
+  margin-top: 2.2em;
+}
+
+.shield.C.OneDigit .routeNumber,
+.shield.C.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.C.ThreeDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1em;
+  left: -0.075em;
+  letter-spacing: -0.075em;
+  top: 0.25em;
+}
+
+/* Interstate, Business Interstate, Business Loop */
+.shield.I .routeNumber,
+.shield.I-BUS .routeNumber,
+.shield.I-BL .routeNumber,
+.shield.I-BS .routeNumber,
+.shield.I-DL .routeNumber,
+.shield.I-DS .routeNumber,
+.shield.I-F .routeNumber {
+  color: var(--white);
+  font-size: 1.55em;
+  letter-spacing: 0.01em;
+  top: 0.35em;
+}
+
+.shield.I.OneDigit .routeNumber,
+.shield.I.TwoDigit .routeNumber,
+.shield.I-BUS.OneDigit .routeNumber,
+.shield.I-BUS.TwoDigit .routeNumber,
+.shield.I-BL.OneDigit .routeNumber,
+.shield.I-BL.TwoDigit .routeNumber,
+.shield.I-BS.OneDigit .routeNumber,
+.shield.I-BS.TwoDigit .routeNumber,
+.shield.I-DL.OneDigit .routeNumber,
+.shield.I-DL.TwoDigit .routeNumber,
+.shield.I-DS.OneDigit .routeNumber,
+.shield.I-DS.TwoDigit .routeNumber,
+.shield.I-F.OneDigit .routeNumber,
+.shield.I-F.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.I.ThreeDigit .routeNumber,
+.shield.I-BUS.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.5em;
+  top: 0.35em;
+}
+
+.shield.I-BUS .banner {
+  display: none;
+}
+
+.shield.I .designation,
+.shield.I-BUS .designation {
+  font-family: "Series D";
+  font-size: 0.23em;
+  top: 3.9em;
+  word-spacing: -0.2rem;
+}
+
+.shield.I:has(.designation) .routeNumber,
+.shield.I-BUS:has(.designation) .routeNumber {
+  top: 0.4em;
+}
+
+/* US Route California */
+.shield.US-CA .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.4em;
+  top: 0.08em;
+}
+
+/* US Route, Nova Scotia, Circle, Ellipse, Rectangle 1, Rectangle 2 */
+.shield.US .routeNumber,
+.shield.NS.TwoDigit .routeNumber,
+.shield.NS.OneDigit .routeNumber,
+.shield.cir .routeNumber,
+.shield.elp .routeNumber,
+.shield.rec .routeNumber,
+.shield.rec2 .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.8em;
+  top: 0.15em;
+}
+
+.shield.cir.ThreeDigit .routeNumber,
+.shield.elp.ThreeDigit .routeNumber,
+.shield.rec.ThreeDigit .routeNumber,
+.shield.rec2.ThreeDigit .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 1.8em;
+  top: 0.15em;
+}
+
+/* Alabama */
+.shield.AL .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.75em;
+  letter-spacing: -0.1em;
+  right: 0.1em;
+  top: 0;
+}
+
+/* Alaska */
+.shield.AK .routeNumber {
+  color: var(--black);
+  top: 0.27em;
+}
+
+.shield.AK.OneDigit .routeNumber {
+  font-family: "Series E";
+  left: 0.75em;
+  text-align: right;
+}
+
+.shield.AK.ThreeDigit .routeNumber,
+.shield.AK.TwoDigit .routeNumber {
+  font-family: "Series C";
+  left: 0.65em;
+  text-align: right;
+}
+
+/* Arizona */
+.shield.AZ .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.75em;
+  top: 0.4em;
+}
+
+.shield.AZLOOP .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 1.75em;
+  top: 0.4em;
+}
+
+.shield.AZLOOP.ThreeDigit .banner {
+  display: none;
+}
+
+/* Arkansas */
+.shield.AR .routeNumber {
+  color: var(--black);
+  font-size: 1.55em;
+  right: 0.25em;
+  top: 0.15em;
+}
+
+.shield.AR.OneDigit .routeNumber,
+.shield.AR.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.AR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  right: 0.25em;
+}
+
+/* California */
+.shield.CA .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.35em;
+  top: 0.65em;
+}
+
+/* Colorado */
+.shield.CO .routeNumber {
+  color: var(--black);
+  font-size: 1.3em;
+  top: 1.3em;
+}
+
+.shield.CO.OneDigit .routeNumber,
+.shield.CO.TwoDigit .routeNumber {
+  font-family: "Series E";
+}
+
+.shield.CO.ThreeDigit .routeNumber {
+  font-family: "Series D";
+}
+
+/* District of Columbia */
+.shield.DC .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1em;
+  top: 0.85em;
+}
+
+/* Florida */
+.shield.FL .routeNumber {
+  color: var(--black);
+  font-size: 1.75em;
+  right: 0.2em;
+  top: 0.8em;
+}
+
+.shield.FLCFXToll .routeNumber,
+.shield.FLToll .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 0.9em;
+  right: 0.5em;
+  top: 1em;
+}
+
+.shield.FLTURNPIKE .routeNumber {
+  display: none;
+}
+
+.shield.FL.OneDigit .routeNumber,
+.shield.FL.TwoDigit .routeNumber,
+.shield.FLToll.OneDigit .routeNumber,
+.shield.FLToll.TwoDigit .routeNumber,
+.shield.FLCFXToll.OneDigit .routeNumber,
+.shield.FLCFXToll.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.FL.ThreeDigit .routeNumber,
+.shield.FLToll.ThreeDigit .routeNumber,
+.shield.FLTURNPIKE.ThreeDigit .routeNumber,
+.shield.FLCFXToll.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.FLToll .banner {
+  display: none;
+}
+
+/* Georgia */
+.shield.GA .routeNumber,
+.shield.GAALT .routeNumber,
+.shield.GABYP .routeNumber,
+.shield.GACONN .routeNumber,
+.shield.GALOOP .routeNumber,
+.shield.GASPUR .routeNumber {
+  color: var(--black);
+  top: 0.3em;
+}
+
+.shield.GA.OneDigit .routeNumber,
+.shield.GA.TwoDigit .routeNumber,
+.shield.GAALT.OneDigit .routeNumber,
+.shield.GAALT.TwoDigit .routeNumber,
+.shield.GABYP.OneDigit .routeNumber,
+.shield.GABYP.TwoDigit .routeNumber,
+.shield.GACONN.OneDigit .routeNumber,
+.shield.GACONN.TwoDigit .routeNumber,
+.shield.GALOOP.OneDigit .routeNumber,
+.shield.GALOOP.TwoDigit .routeNumber,
+.shield.GASPUR.OneDigit .routeNumber,
+.shield.GASPUR.TwoDigit .routeNumber {
+  font-family: "Series D";
+  letter-spacing: -0.05em;
+  right: 0.1em;
+}
+
+.shield.GA.ThreeDigit .routeNumber,
+.shield.GAALT.ThreeDigit .routeNumber,
+.shield.GABYP.ThreeDigit .routeNumber,
+.shield.GACONN.ThreeDigit .routeNumber,
+.shield.GALOOP.ThreeDigit .routeNumber,
+.shield.GASPUR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  letter-spacing: -0.1em;
+  right: 0.25em;
+}
+
+.shield.GAALT .banner,
+.shield.GABYP .banner,
+.shield.GACONN .banner,
+.shield.GALOOP .banner,
+.shield.GASPUR .banner {
+  display: none;
+}
+
+/* Hawaii */
+.shield.HI .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.25em;
+  top: 0.7em;
+}
+
+.shield.HI.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Idaho */
+.shield.ID .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 1.5em;
+  text-align: right;
+  top: -0.8em;
+}
+
+.shield.ID.OneDigit .routeNumber,
+.shield.ID.TwoDigit .routeNumber {
+  left: 0.9em;
+}
+
+.shield.ID.ThreeDigit .routeNumber {
+  font-family: "Series B";
+  font-size: 1.4em;
+  left: 0.7em;
+}
+
+.shieldsContainer.shieldBacks .ID .routeNumber {
+  color: var(--white);
+}
+
+.shieldsContainer:not(.shieldBacks) .ID .routeNumber {
+  color: var(--black);
+}
+
+/* Illinois, Indiana, Rhode Island */
+.shield.IL .routeNumber,
+.shield.IN .routeNumber,
+.shield.RI .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.85em;
+  top: 0.6em;
+}
+
+.shield.IL.ThreeDigit .routeNumber,
+.shield.IN.ThreeDigit .routeNumber,
+.shield.RI.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Kansas */
+.shield.KS .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 0.27em;
+}
+
+/* Louisiana */
+.shield.LA .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 1em;
+}
+
+/* Maryland */
+.shield.MD .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.9em;
+  top: 0.7em;
+}
+
+.shield.MD.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Michigan */
+.shield.MI .routeNumber {
+  color: var(--black);
+  font-size: 1.3em;
+  top: 0.3em;
+}
+
+.shield.MI.OneDigit .routeNumber,
+.shield.MI.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.MI.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Minnesota */
+.shield.MN .routeNumber,
+.shield.MNBUS .routeNumber {
+  color: var(--white);
+  font-family: "Series C";
+  font-size: 1.6em;
+  top: 0.25em;
+}
+
+/* Minnesota */
+.shield.MN .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 0.55em;
+}
+
+.shield.MNBUS .banner {
+  display: none;
+}
+
+/* Missouri */
+.shield.MO .routeNumber {
+  color: var(--black);
+  font-size: 1.5em;
+  top: 0.15em;
+}
+
+.shield.MO.OneDigit .routeNumber,
+.shield.MO.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.MO.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Montana */
+.shield.MT .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 0.3em;
+}
+
+.shield.MT2 .routeNumber {
+  color: var(--black);
+}
+
+.shield.MT2.OneDigit .routeNumber,
+.shield.MT2.TwoDigit .routeNumber {
+  top: 0.2em;
+}
+
+.shield.MT2.ThreeDigit .routeNumber {
+  font-size: 1.15em;
+  top: 0.3em;
+}
+
+.shield.MT2.OneDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.MT2.TwoDigit .routeNumber,
+.shield.MT2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Nebraska */
+.shield.NE .routeNumber {
+  color: var(--black);
+  top: 0.05em;
+}
+
+.shield.NELINK .routeNumber,
+.shield.NESPUR .routeNumber {
+  bottom: 0.5em;
+  color: var(--black);
+  font-size: 1.5em;
+}
+
+.shield.NE.OneDigit .routeNumber,
+.shield.NE.TwoDigit .routeNumber,
+.shield.NELINK.OneDigit .routeNumber,
+.shield.NELINK.TwoDigit .routeNumber,
+.shield.NESPUR.OneDigit .routeNumber,
+.shield.NESPUR.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.NE.ThreeDigit .routeNumber,
+.shield.NELINK.ThreeDigit .routeNumber,
+.shield.NESPUR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.NELINK.OneDigit .banner,
+.shield.NELINK.TwoDigit .banner,
+.shield.NESPUR.OneDigit .banner,
+.shield.NESPUR.TwoDigit .banner {
+  display: none;
+}
+
+.shield.NELINK.OneDigit .routeNumber .shield.NELINK.TwoDigit .routeNumber,
+.shield.NESPUR.OneDigit .routeNumber .shield.NESPUR.TwoDigit .routeNumber {
+  top: -0.1em;
+}
+
+/* Nevada */
+.shield.NV .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 0.9em;
+  top: -1em;
+}
+
+/* New Hampshire */
+.shield.NH .routeNumber {
+  color: var(--black);
+  font-size: 1.75em;
+  right: -0.1em;
+  top: 0.15em;
+}
+
+.shield.NH.OneDigit .routeNumber,
+.shield.NH.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.NH.ThreeDigit .routeNumber {
+  font-family: "Series B";
+}
+
+/* New Jersey */
+.shield.NJ .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.7em;
+  top: 0.08em;
+}
+
+/* New Mexico */
+.shield.NM .routeNumber {
+  color: var(--black);
+}
+
+.shield.NM.OneDigit .routeNumber,
+.shield.NM.TwoDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.2em;
+  top: 0.25em;
+}
+
+.shield.NM.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1em;
+  top: 0.3em;
+}
+
+/* New York */
+.shield.NY .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.6em;
+  top: 0.17em;
+}
+
+/* North Carolina */
+.shield.NC .routeNumber {
+  color: var(--black);
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+.shield.NC.OneDigit .routeNumber,
+.shield.NC.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.NC.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* North Dakota */
+.shield.ND .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 0.25em;
+}
+
+/* Ohio */
+.shield.OH .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.75em;
+  top: 0.15em;
+}
+
+/* Oklahoma */
+.shield.OK .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.75em;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+  top: 0.8em;
+}
+
+.shield.OK.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Oregon */
+.shield.OR .routeNumber {
+  color: var(--black);
+  font-size: 1.5em;
+  top: 0.1em;
+}
+
+.shield.OR.OneDigit .routeNumber,
+.shield.OR.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.OR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Pennsylvania */
+.shield.PA .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.75em;
+  top: 0.2em;
+}
+
+.shield.PA.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* South Carolina */
+.shield.SC .routeNumber {
+  color: var(--blue);
+  font-family: "Series E";
+  font-size: 1.5em;
+  top: 0.8em;
+}
+
+/* South Dakota */
+.shield.SD .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 0.15em;
+}
+
+/* Tennessee */
+.shield.TN .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.8em;
+  top: -0.05em;
+}
+
+.shield.TN.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.TN2 .routeNumber {
+  color: var(--black);
+  font-size: 1.35em;
+  top: -0.15em;
+}
+
+.shield.TN2.OneDigit .routeNumber,
+.shield.TN2.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.TN2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Texas */
+.shield.TX .routeNumber,
+.shield.TXLOOP .routeNumber,
+.shield.TXSPUR .routeNumber,
+.shield.TXFM .routeNumber,
+.shield.TXPARK .routeNumber,
+.shield.TXRM .routeNumber,
+.shield.TXBELTWAY .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.8em;
+  top: 0.65em;
+}
+
+.shield.TX.ThreeDigit .routeNumber,
+.shield.TXLOOP.ThreeDigit .routeNumber,
+.shield.TXSPUR.ThreeDigit .routeNumber,
+.shield.TXEXPRESS.ThreeDigit .routeNumber,
+.shield.TXFM.ThreeDigit .routeNumber,
+.shield.TXPARK.ThreeDigit .routeNumber,
+.shield.TXRM.ThreeDigit .routeNumber,
+.shield.TXBELTWAY.ThreeDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.TXFM.FourDigit .routeNumber,
+.shield.TXLOOP.FourDigit .routeNumber,
+.shield.TXRM.FourDigit .routeNumber,
+.shield.TXSPUR.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.TXTollNTTA .routeNumber,
+.shield.TXTOLL .routeNumber {
+  color: var(--white);
+  font-family: "Series E";
+  font-size: 1.6em;
+  left: -0.075em;
+  top: -0.6rem;
+}
+
+.shield.TXTollNTTA .routeNumber,
+.shield.TXTOLL.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.TXTollCTRMA .routeNumber {
+  color: var(--white);
+  font-family: "Clearview 2B";
+  font-size: 1.4em;
+  left: -0.075em;
+  top: -0.9rem;
+}
+
+.shield.TXEXPRESS .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.4rem;
+  letter-spacing: -1px;
+  top: 0.075em;
+}
+
+/* Utah */
+.shield.UT .routeNumber {
+  color: var(--black);
+}
+
+.shield.UT.OneDigit .routeNumber,
+.shield.UT.TwoDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.15em;
+  top: 0.4em;
+}
+
+.shield.UT.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.15em;
+  top: 0.45em;
+}
+
+/* Vermont */
+.shield.VT .routeNumber {
+  color: var(--green);
+  font-family: "Series D";
+  font-size: 1.7em;
+  top: 0.7em;
+}
+
+/* Virginia */
+.shield.VA .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 1.7em;
+  top: 0em;
+}
+
+.shield.VA2 .routeNumber {
+  color: var(--black);
+  font-size: 1.5em;
+  left: 0.025em;
+  top: 0.15em;
+}
+
+.shield.VA2.OneDigit .routeNumber,
+.shield.VA2.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.VA2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Washington */
+.shield.WA .routeNumber {
+  color: var(--black);
+}
+
+.shield.WA.OneDigit .routeNumber,
+.shield.WA.TwoDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: -0.2em;
+}
+
+.shield.WA.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.15em;
+  top: 0em;
+}
+
+/* Wisconsin */
+.shield.WI .routeNumber {
+  color: var(--black);
+  font-size: 1.8em;
+  top: 0.15em;
+}
+
+.shield.WI.OneDigit .routeNumber,
+.shield.WI.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.WI.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Wyoming */
+.shield.WY .routeNumber {
+  color: var(--black);
+  font-size: 1.5em;
+  top: 0.35em;
+}
+
+.shield.WY.OneDigit .routeNumber,
+.shield.WY.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.WY.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/*
+  Canadian Road Signs =======================================================
+*/
+
+/* Alberta */
+.shield.AB .routeNumber {
+  color: var(--black);
+  font-size: 1.25em;
+  top: 0.65em;
+}
+
+.shield.AB.OneDigit .routeNumber {
+  font-family: "Series E";
+}
+
+.shield.AB.TwoDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.AB.ThreeDigit .routeNumber {
+  font-family: "Series B";
+}
+
+.shield.AB2 .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 0.85em;
+  top: 1em;
+}
+
+/* British Columbia */
+.shield.BC .routeNumber {
+  color: #1e53a7;
+  font-family: "Helvetica";
+  font-size: 1.45em;
+  font-weight: bold;
+  top: 0.4em;
+}
+
+.shield.BCYH .routeNumber {
+  color: var(--black);
+  font-family: "Helvetica";
+  font-size: 1em;
+  font-weight: bold;
+  right: 0.1em;
+  top: 0.35em;
+}
+
+/* Manitoba */
+.shield.MB .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.25em;
+  top: 0.6em;
+}
+
+.shield.MB2 .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 0.9em;
+  top: 1em;
+}
+
+/* New Brunswick */
+.shield.NB .routeNumber,
+.shield.NBLOCAL .routeNumber,
+.shield.NBCONN .routeNumber {
+  color: var(--black);
+  font-family: "Helvetica";
+  font-weight: bold;
+  top: 0.1em;
+}
+
+.shield.NB.OneDigit .routeNumber,
+.shield.NB.TwoDigit .routeNumber,
+.shield.NBLOCAL.OneDigit .routeNumber,
+.shield.NBLOCAL.TwoDigit .routeNumber,
+.shield.NBCONN.OneDigit .routeNumber,
+.shield.NBCONN.TwoDigit .routeNumber {
+  font-size: 1.75em;
+}
+
+.shield.NB.ThreeDigit .routeNumber,
+.shield.NBLOCAL.ThreeDigit .routeNumber,
+.shield.NBCONN.ThreeDigit .routeNumber {
+  font-size: 1.25em;
+  top: 0.2em;
+}
+
+.shield.NBLOCAL.ThreeDigit .banner,
+.shield.NBCONN.ThreeDigit .banner {
+  display: none;
+}
+
+/* Newfoundland and Labrador */
+.shield.NL .routeNumber {
+  color: var(--black);
+  font-family: "Series EM";
+  font-size: 1.6em;
+  top: 0.62em;
+}
+
+.shield.NL.ThreeDigit .routeNumber {
+  font-family: "Series D";
+}
+
+/* Nova Scotia (partially handled by US CSS) */
+.shield.NS.ThreeDigit .routeNumber {
+  color: white;
+  font-family: "Series C";
+  font-size: 1.05em;
+  left: 0.02em;
+  letter-spacing: 0.05em;
+  top: 0.8em;
+}
+
+.shield.NSCONN .routeNumber {
+  color: white;
+  font-family: "Series D";
+  font-size: 1.1em;
+  left: 0.015em;
+  letter-spacing: 0.05em;
+  top: 0.1em;
+}
+
+.shield.NS.trunk.TwoDigit .banner,
+.shield.NS.arterial.ThreeDigit .banner {
+  display: none;
+}
+
+/* Ontario */
+.shield.ON .routeNumber {
+  color: black;
+  font-family: "Series D";
+  font-size: 1.35em;
+  top: 0.8em;
+}
+
+/* Prince Edward Island */
+.shield.PEI .routeNumber {
+  color: var(--black);
+  font-family: "Series C";
+  font-size: 1.3em;
+  top: 1em;
+}
+
+.shield.PEI.ThreeDigit .routeNumber {
+  font-size: 1.1em;
+  top: 0.6em;
+}
+
+/* Quebec */
+.shield.QC .routeNumber {
+  color: var(--white);
+  font-family: "Series EM";
+  font-size: 1.2em;
+  top: 0.4em;
+}
+
+.shield.QC.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.QC.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.QC2 .routeNumber {
+  color: var(--white);
+  font-family: "Series C";
+  font-size: 1.2rem;
+  font-size: 1.25em;
+  top: 0.75em;
+}
+
+/* Saskatchewan */
+.shield.SK .routeNumber,
+.shield.SK2 .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.2em;
+  top: 0.4em;
+}
+
+.shield.SK.ThreeDigit .routeNumber,
+.shield.SK2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.SK2 .routeNumber {
+  color: var(--black);
+}
+
+/* Trans-Canada Highway */
+.shield.TCH .routeNumber,
+.shield.ABTC .routeNumber,
+.shield.BCTC .routeNumber,
+.shield.NLTC .routeNumber,
+.shield.NSTC .routeNumber,
+.shield.MBTC .routeNumber,
+.shield.ONTC .routeNumber,
+.shield.QCTC .routeNumber,
+.shield.SKTC .routeNumber {
+  color: var(--green);
+  font-family: "Series E";
+  font-size: 0.9em;
+  top: 0.4em;
+}
+
+.shield.NLTC .routeNumber {
+  top: 0.1em;
+}
+
+.shield.TCH:has(.designation) .routeNumber,
+.shield.ABTC:has(.designation) .routeNumber,
+.shield.BCTC:has(.designation) .routeNumber,
+.shield.NBTC:has(.designation) .routeNumber,
+.shield.NLTC:has(.designation) .routeNumber,
+.shield.NSTC:has(.designation) .routeNumber,
+.shield.MBTC:has(.designation) .routeNumber,
+.shield.ONTC:has(.designation) .routeNumber,
+.shield.QCTC:has(.designation) .routeNumber,
+.shield.SKTC:has(.designation) .routeNumber {
+  right: 0.3em;
+}
+
+.shield.TCH .designation,
+.shield.ABTC .designation,
+.shield.BCTC .designation,
+.shield.NLTC .designation,
+.shield.NSTC .designation,
+.shield.MBTC .designation,
+.shield.ONTC .designation,
+.shield.QCTC .designation,
+.shield.SKTC .designation {
+  color: var(--green);
+  font-family: "Series D";
+  font-size: 0.4em;
+  left: 0.75em;
+  margin-top: 3.5em;
+}
+
+.shield.TCHLeaf .routeNumber {
+  color: var(--green);
+  font-family: "Series D";
+  font-size: 1.8em;
+  top: 0.25em;
+}
+
+/*
+  Australian Road Signs =====================================================
+*/
+
+/* Australian Alphanumeric */
+.shield.ALPHANUM .routeNumber {
+  color: #ffa709;
+  font-family: "Series EM";
+  font-size: 2.2em;
+  top: 0em;
+}
+
+/* Australian Metropolitan Route */
+.shield.MR .routeNumber {
+  color: rgb(0, 67, 123);
+  font-family: "Series D";
+  font-size: 1.8em;
+  top: 0.05em;
+}
+
+.shield.MR.OneDigit .routeNumber {
+  color: rgb(0, 67, 123);
+  font-family: "Series EM";
+  font-size: 2em;
+  top: 0.05em;
+}
+
+/* Australian National Route */
+.shield.NAT .routeNumber {
+  color: var(--yellow);
+  font-family: "Series D";
+  font-size: 2em;
+  top: 0.15em;
+}
+
+.shield.NAT.TwoDigit .routeNumber {
+  color: var(--yellow);
+  font-family: "Series EM";
+  font-size: 1.75em;
+  top: 0.15em;
+}
+
+.shield.NAT.ThreeDigit .routeNumber {
+  color: var(--yellow);
+  font-family: "Series C";
+  font-size: 1.75em;
+  top: 0.1em;
+}
+
+/* Australian National Route - NR NEEDS TO BE FIXED*/
+.shield.NR .routeNumber {
+  color: black;
+  font-family: "Series C";
+  font-size: 2.25em;
+  top: 0em;
+}
+
+.shield.NR.OneDigit .routeNumber {
+  color: black;
+  font-family: "Series E";
+  font-size: 2.25em;
+}
+
+/* Australian State Route */
+.shield.SR .routeNumber {
+  color: white;
+  font-family: "Series C";
+  font-size: 2em;
+  top: -0.05em;
+}
+
+.shield.SR.OneDigit .routeNumber {
+  color: white;
+  font-family: "Series EM";
+  font-size: 2.5em;
+  top: -0.1em;
+}
+
+/* Australian Toll */
+.shield.TOLLBLUE .routeNumber {
+  color: var(--yellow);
+  font-family: "Series EM";
+  font-size: 2.2em;
+  top: 0em;
+}
+
+/* Australian Tourist Drive */
+.shield.TD .routeNumber {
+  color: rgb(255, 255, 255);
+  font-family: "Series D";
+  font-size: 1.8em;
+  top: 0.15em;
+}
+
+.shield.TD.ThreeDigit .routeNumber {
+  color: rgb(255, 255, 255);
+  font-family: "Series B";
+  font-size: 1.8em;
+  top: 0.15em;
+}
+
+/* New South Wales Freeway */
+.shield.FNSW .routeNumber {
+  color: rgb(255, 255, 255);
+  font-family: "Series C";
+  font-size: 2.1em;
+  top: 0.15em;
+}
+
+/*
+  New Zealand Road Signs ====================================================
+*/
+
+/* New Zealand State Route - VIVI NOTE: i added suffixes, just add your suffix as the designation :) */
+.shield.SH .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.4em;
+  top: -0.01em;
+}
+
+.shield.SH:has(.designation) .routeNumber {
+  top: -0.3em;
+}
+
+.shield.SH .designation {
+  font-family: "Series D";
+  font-size: 0.75em;
+  position-area: bottom;
+  top: -1em;
+}
+
+/*
+  Avarian Signage Begins =================================================
+  * Vivi's fictional world :) *
+*/
+
+/*
+  Veridian Road Signs ====================================================
+*/
+
+/* V-Route */
+.shield.V .routeNumber,
+.shield.VRB .routeNumber,
+.shield.VRD .routeNumber,
+.shield.VRF .routeNumber,
+.shield.VRH .routeNumber,
+.shield.VRL .routeNumber,
+.shield.VRO .routeNumber,
+.shield.VRS .routeNumber,
+.shield.VRT .routeNumber {
+  color: var(--white);
+  font-family: "Series B";
+  font-size: 1.15em;
+  font-weight: 1 !important;
+  top: 0.05em;
+}
+
+.shield.VRF .routeNumber,
+.shield.VRT .routeNumber,
+.shield.VRD .routeNumber,
+.shield.VRF .designation,
+.shield.VRT .designation,
+.shield.VRD .designation {
+  color: var(--black);
+}
+
+.shield.V.OneDigit .routeNumber,
+.shield.VRB.OneDigit .routeNumber,
+.shield.VRD.OneDigit .routeNumber,
+.shield.VRF.OneDigit .routeNumber,
+.shield.VRH.OneDigit .routeNumber,
+.shield.VRL.OneDigit .routeNumber,
+.shield.VRO.OneDigit .routeNumber,
+.shield.VRS.OneDigit .routeNumber,
+.shield.VRT.OneDigit .routeNumber {
+  font-family: "Series E";
+}
+
+.shield.V.TwoDigit .routeNumber,
+.shield.VRB.TwoDigit .routeNumber,
+.shield.VRD.TwoDigit .routeNumber,
+.shield.VRF.TwoDigit .routeNumber,
+.shield.VRH.TwoDigit .routeNumber,
+.shield.VRL.TwoDigit .routeNumber,
+.shield.VRO.TwoDigit .routeNumber,
+.shield.VRS.TwoDigit .routeNumber,
+.shield.VRT.TwoDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.V .designation,
+.shield.VRB .designation,
+.shield.VRD .designation,
+.shield.VRF .designation,
+.shield.VRH .designation,
+.shield.VRL .designation,
+.shield.VRO .designation,
+.shield.VRS .designation,
+.shield.VRT .designation {
+  font-family: "Series D";
+  font-size: 0.7em;
+  margin-top: 3.2em;
+}
+
+.shield.V:has(.designation) .routeNumber,
+.shield.VRB:has(.designation) .routeNumber,
+.shield.VRD:has(.designation) .routeNumber,
+.shield.VRF:has(.designation) .routeNumber,
+.shield.VRH:has(.designation) .routeNumber,
+.shield.VRL:has(.designation) .routeNumber,
+.shield.VRO:has(.designation) .routeNumber,
+.shield.VRS:has(.designation) .routeNumber,
+.shield.VRT:has(.designation) .routeNumber {
+  font-family: "Series B";
+  font-size: 1.1em;
+  top: -0.25em;
+}
+
+.shield.V:has(.designation).OneDigit .routeNumber,
+.shield.VRB:has(.designation).OneDigit .routeNumber,
+.shield.VRD:has(.designation).OneDigit .routeNumber,
+.shield.VRF:has(.designation).OneDigit .routeNumber,
+.shield.VRH:has(.designation).OneDigit .routeNumber,
+.shield.VRL:has(.designation).OneDigit .routeNumber,
+.shield.VRO:has(.designation).OneDigit .routeNumber,
+.shield.VRS:has(.designation).OneDigit .routeNumber,
+.shield.VRT:has(.designation).OneDigit .routeNumber {
+  font-family: "Series F";
+  font-size: 1.1em;
+  top: -0.25em;
+}
+
+.shield.V:has(.designation).TwoDigit .routeNumber,
+.shield.VRB:has(.designation).TwoDigit .routeNumber,
+.shield.VRD:has(.designation).TwoDigit .routeNumber,
+.shield.VRF:has(.designation).TwoDigit .routeNumber,
+.shield.VRH:has(.designation).TwoDigit .routeNumber,
+.shield.VRL:has(.designation).TwoDigit .routeNumber,
+.shield.VRO:has(.designation).TwoDigit .routeNumber,
+.shield.VRS:has(.designation).TwoDigit .routeNumber,
+.shield.VRT:has(.designation).TwoDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.1em;
+  top: -0.25em;
+}
+
+/* Interlink */
+.shield.ILG .routeNumber,
+.shield.ILT .routeNumber,
+.shield.ILGB .routeNumber,
+.shield.ILTB .routeNumber,
+.shield.ILGD .routeNumber,
+.shield.ILTD .routeNumber,
+.shield.ILGF .routeNumber,
+.shield.ILTF .routeNumber,
+.shield.ILGH .routeNumber,
+.shield.ILTH .routeNumber,
+.shield.ILGO .routeNumber,
+.shield.ILTO .routeNumber,
+.shield.ILGL .routeNumber,
+.shield.ILTL .routeNumber,
+.shield.ILGS .routeNumber,
+.shield.ILTS .routeNumber,
+.shield.ILGT .routeNumber,
+.shield.ILTT .routeNumber {
+  color: var(--white);
+  font-family: "Series E";
+  font-size: 1.4em;
+  top: 0.45em;
+}
+
+.shield.ILGD .routeNumber,
+.shield.ILTD .routeNumber,
+.shield.ILGF .routeNumber,
+.shield.ILTF .routeNumber,
+.shield.ILGT .routeNumber,
+.shield.ILTT .routeNumber,
+.shield.ILGD .designation,
+.shield.ILTD .designation,
+.shield.ILGF .designation,
+.shield.ILTF .designation,
+.shield.ILGT .designation,
+.shield.ILTT .designation {
+  color: var(--black);
+}
+
+.shield.ILG.TwoDigit .routeNumber,
+.shield.ILT.TwoDigit .routeNumber,
+.shield.ILGB.TwoDigit .routeNumber,
+.shield.ILTB.TwoDigit .routeNumber,
+.shield.ILGD.TwoDigit .routeNumber,
+.shield.ILTD.TwoDigit .routeNumber,
+.shield.ILGF.TwoDigit .routeNumber,
+.shield.ILTF.TwoDigit .routeNumber,
+.shield.ILGH.TwoDigit .routeNumber,
+.shield.ILTH.TwoDigit .routeNumber,
+.shield.ILGO.TwoDigit .routeNumber,
+.shield.ILTO.TwoDigit .routeNumber,
+.shield.ILGL.TwoDigit .routeNumber,
+.shield.ILTL.TwoDigit .routeNumber,
+.shield.ILGS.TwoDigit .routeNumber,
+.shield.ILTS.TwoDigit .routeNumber,
+.shield.ILGT.TwoDigit .routeNumber,
+.shield.ILTT.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.ILG.ThreeDigit .routeNumber,
+.shield.ILT.ThreeDigit .routeNumber,
+.shield.ILGB.ThreeDigit .routeNumber,
+.shield.ILTB.ThreeDigit .routeNumber,
+.shield.ILGD.ThreeDigit .routeNumber,
+.shield.ILTD.ThreeDigit .routeNumber,
+.shield.ILGF.ThreeDigit .routeNumber,
+.shield.ILTF.ThreeDigit .routeNumber,
+.shield.ILGH.ThreeDigit .routeNumber,
+.shield.ILTH.ThreeDigit .routeNumber,
+.shield.ILGO.ThreeDigit .routeNumber,
+.shield.ILTO.ThreeDigit .routeNumber,
+.shield.ILGL.ThreeDigit .routeNumber,
+.shield.ILTL.ThreeDigit .routeNumber,
+.shield.ILGS.ThreeDigit .routeNumber,
+.shield.ILTS.ThreeDigit .routeNumber,
+.shield.ILGT.ThreeDigit .routeNumber,
+.shield.ILTT.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.ILG.FourDigit .routeNumber,
+.shield.ILT.FourDigit .routeNumber,
+.shield.ILGB.FourDigit .routeNumber,
+.shield.ILTB.FourDigit .routeNumber,
+.shield.ILGD.FourDigit .routeNumber,
+.shield.ILTD.FourDigit .routeNumber,
+.shield.ILGF.FourDigit .routeNumber,
+.shield.ILTF.FourDigit .routeNumber,
+.shield.ILGH.FourDigit .routeNumber,
+.shield.ILTH.FourDigit .routeNumber,
+.shield.ILGO.FourDigit .routeNumber,
+.shield.ILTO.FourDigit .routeNumber,
+.shield.ILGL.FourDigit .routeNumber,
+.shield.ILTL.FourDigit .routeNumber,
+.shield.ILGS.FourDigit .routeNumber,
+.shield.ILTS.FourDigit .routeNumber,
+.shield.ILGT.FourDigit .routeNumber,
+.shield.ILTT.FourDigit .routeNumber {
+  font-family: "Series B";
+}
+
+.shield.ILG .designation,
+.shield.ILGB .designation,
+.shield.ILGD .designation,
+.shield.ILGF .designation,
+.shield.ILGH .designation,
+.shield.ILGO .designation,
+.shield.ILGL .designation,
+.shield.ILGS .designation,
+.shield.ILGT .designation {
+  font-family: "Series C";
+  font-size: 0.33em;
+  margin-top: 1.75em;
+}
+
+.shield.ILT .designation,
+.shield.ILTB .designation,
+.shield.ILTD .designation,
+.shield.ILTF .designation,
+.shield.ILTH .designation,
+.shield.ILTO .designation,
+.shield.ILTL .designation,
+.shield.ILTS .designation,
+.shield.ILTT .designation {
+  font-family: "Series D";
+  font-size: 0.6em;
+  margin-top: 4em;
+}
+
+.shield.ILT:has(.designation).OneDigit .routeNumber,
+.shield.ILTB:has(.designation).OneDigit .routeNumber,
+.shield.ILTD:has(.designation).OneDigit .routeNumber,
+.shield.ILTF:has(.designation).OneDigit .routeNumber,
+.shield.ILTH:has(.designation).OneDigit .routeNumber,
+.shield.ILTO:has(.designation).OneDigit .routeNumber,
+.shield.ILTL:has(.designation).OneDigit .routeNumber,
+.shield.ILTS:has(.designation).OneDigit .routeNumber,
+.shield.ILTT:has(.designation).OneDigit .routeNumber {
+  font-family: "Series F";
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+.shield.ILT:has(.designation).TwoDigit .routeNumber,
+.shield.ILTB:has(.designation).TwoDigit .routeNumber,
+.shield.ILTD:has(.designation).TwoDigit .routeNumber,
+.shield.ILTF:has(.designation).TwoDigit .routeNumber,
+.shield.ILTH:has(.designation).TwoDigit .routeNumber,
+.shield.ILTO:has(.designation).TwoDigit .routeNumber,
+.shield.ILTL:has(.designation).TwoDigit .routeNumber,
+.shield.ILTS:has(.designation).TwoDigit .routeNumber,
+.shield.ILTT:has(.designation).TwoDigit .routeNumber {
+  font-family: "Series E";
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+.shield.ILT:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTB:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTD:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTF:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTH:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTO:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTL:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTS:has(.designation).ThreeDigit .routeNumber,
+.shield.ILTT:has(.designation).ThreeDigit .routeNumber {
+  font-family: "Series D";
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+.shield.ILT:has(.designation).FourDigit .routeNumber,
+.shield.ILTB:has(.designation).FourDigit .routeNumber,
+.shield.ILTD:has(.designation).FourDigit .routeNumber,
+.shield.ILTF:has(.designation).FourDigit .routeNumber,
+.shield.ILTH:has(.designation).FourDigit .routeNumber,
+.shield.ILTO:has(.designation).FourDigit .routeNumber,
+.shield.ILTL:has(.designation).FourDigit .routeNumber,
+.shield.ILTS:has(.designation).FourDigit .routeNumber,
+.shield.ILTT:has(.designation).FourDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+/* Baland */
+.shield.BA .routeNumber,
+.shield.BAB .routeNumber,
+.shield.BAD .routeNumber,
+.shield.BAF .routeNumber,
+.shield.BAH .routeNumber,
+.shield.BAL .routeNumber,
+.shield.BAO .routeNumber,
+.shield.BAS .routeNumber,
+.shield.BAT .routeNumber,
+.shield.BATA .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.5em;
+  top: 0.15em;
+}
+
+.shield.BA.ThreeDigit .routeNumber,
+.shield.BAB.ThreeDigit .routeNumber,
+.shield.BAD.ThreeDigit .routeNumber,
+.shield.BAF.ThreeDigit .routeNumber,
+.shield.BAH.ThreeDigit .routeNumber,
+.shield.BAL.ThreeDigit .routeNumber,
+.shield.BAO.ThreeDigit .routeNumber,
+.shield.BAS.ThreeDigit .routeNumber,
+.shield.BAT.ThreeDigit .routeNumber,
+.shield.BATA.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.BAD .routeNumber,
+.shield.BAD .designation,
+.shield.BAF .routeNumber,
+.shield.BAF .designation,
+.shield.BAT .routeNumber,
+.shield.BAT .designation {
+  color: var(--black);
+}
+
+.shield.BA:has(.designation) .routeNumber,
+.shield.BAB:has(.designation) .routeNumber,
+.shield.BAD:has(.designation) .routeNumber,
+.shield.BAF:has(.designation) .routeNumber,
+.shield.BAH:has(.designation) .routeNumber,
+.shield.BAL:has(.designation) .routeNumber,
+.shield.BAO:has(.designation) .routeNumber,
+.shield.BAS:has(.designation) .routeNumber,
+.shield.BAT:has(.designation) .routeNumber,
+.shield.BATA:has(.designation) .routeNumber {
+  font-size: 1.4em;
+  top: -0.1em;
+}
+
+.shield.BA .designation,
+.shield.BAB .designation,
+.shield.BAD .designation,
+.shield.BAF .designation,
+.shield.BAH .designation,
+.shield.BAL .designation,
+.shield.BAO .designation,
+.shield.BAS .designation,
+.shield.BAT .designation,
+.shield.BATA .designation {
+  font-size: 0.75em;
+  margin-top: 3.25em;
+}
+
+.shield.BA .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-purple),
+    2px -2px 0 var(--veridian-purple),
+    -2px 2px 0 var(--veridian-purple),
+    2px 2px 0 var(--veridian-purple);
+}
+
+.shield.BAB .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-coral),
+    2px -2px 0 var(--veridian-coral),
+    -2px 2px 0 var(--veridian-coral),
+    2px 2px 0 var(--veridian-coral);
+}
+
+.shield.BAD .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-orange),
+    2px -2px 0 var(--veridian-orange),
+    -2px 2px 0 var(--veridian-orange),
+    2px 2px 0 var(--veridian-orange);
+}
+
+.shield.BAF .designation {
+  text-shadow:
+    -2px -2px 0 var(--white),
+    2px -2px 0 var(--white),
+    -2px 2px 0 var(--white),
+    2px 2px 0 var(--white);
+}
+
+.shield.BAH .designation {
+  text-shadow:
+    -2px -2px 0 var(--black),
+    2px -2px 0 var(--black),
+    -2px 2px 0 var(--black),
+    2px 2px 0 var(--black);
+}
+
+.shield.BAL .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-blue),
+    2px -2px 0 var(--veridian-blue),
+    -2px 2px 0 var(--veridian-blue),
+    2px 2px 0 var(--veridian-blue);
+}
+
+.shield.BAO .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-brown),
+    2px -2px 0 var(--veridian-brown),
+    -2px 2px 0 var(--veridian-brown),
+    2px 2px 0 var(--veridian-brown);
+}
+
+.shield.BAS .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-red),
+    2px -2px 0 var(--veridian-red),
+    -2px 2px 0 var(--veridian-red),
+    2px 2px 0 var(--veridian-red);
+}
+
+.shield.BAT .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-yellow),
+    2px -2px 0 var(--veridian-yellow),
+    -2px 2px 0 var(--veridian-yellow),
+    2px 2px 0 var(--veridian-yellow);
+}
+
+.shield.BATA .designation {
+  text-shadow:
+    -2px -2px 0 var(--veridian-green),
+    2px -2px 0 var(--veridian-green),
+    -2px 2px 0 var(--veridian-green),
+    2px 2px 0 var(--veridian-green);
+}
+
+.shield.BATP .routeNumber {
+  display: none;
+}
+
+/* Chautauqua */
+.shield:is(.CH, .CHB, .CHD, .CHF, .CHH, .CHL, .CHO, .CHS, .CHT, .CHTA, .CHP)
+  .routeNumber {
+  font-family: "Series C";
+  font-size: 1.4em;
+  top: 0em;
+}
+
+.shield:is(
+    .CH,
+    .CHB,
+    .CHD,
+    .CHF,
+    .CHH,
+    .CHL,
+    .CHO,
+    .CHS,
+    .CHT,
+    .CHTA,
+    .CHP
+  ).ThreeDigit
+  .routeNumber {
+  font-family: "Series B";
+}
+
+.shield:is(.CH, .CHB, .CHD, .CHF, .CHH, .CHL, .CHO, .CHS, .CHT, .CHTA)
+  .designation {
+  font-size: 0.75em;
+  left: 1.55em;
+  margin-top: 3.45em;
+}
+
+.shield.CHP .designation {
+  display: none;
+}
+
+.shield:is(.CHD, .CHF, .CHT) .designation,
+.shield:is(.CHD, .CHF, .CHT) .routeNumber {
+  color: var(--black);
+}
+
+.shield.CHTA .designation,
+.shield.CHTA .routeNumber {
+  color: var(--countyYellow);
+}
+
+/* Desicalia */
+.shield:is(.DS, .DSB, .DSD, .DSF, .DSH, .DSL, .DSO, .DSS, .DST) .routeNumber {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 1.4em;
+  top: 0.5em;
+}
+
+.shield:is(.DS, .DSB, .DSD, .DSF, .DSH, .DSL, .DSO, .DSS, .DST).ThreeDigit
+  .routeNumber {
+  font-family: "Series C";
+}
+
+.shield:is(.DS, .DSB, .DSD, .DSF, .DSH, .DSL, .DSO, .DSS, .DST) .designation {
+  display: none;
+}
+
+.shield:is(.DSD, .DSF, .DST) .routeNumber {
+  color: var(--black);
+}
+
+/* Leoria */
+.shield:is(.LE, .LEB, .LED, .LEF, .LEH, .LEL, .LEO, .LES, .LET, .LETA)
+  .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.3em;
+  right: -0.25em;
+  top: 0.6em;
+}
+
+.shield:is(.LE, .LEB, .LED, .LEF, .LEH, .LEL, .LEO, .LES, .LET).ThreeDigit
+  .routeNumber {
+  right: -0.4em;
+}
+
+.shield:is(.LE, .LEB, .LED, .LEF, .LEH, .LEL, .LEO, .LES, .LET) .designation {
+  display: none;
+}
+
+.shield:is(.LED, .LEF, .LET) .routeNumber {
+  color: var(--black);
+}
+
+.shield.LETA .routeNumber {
+  color: var(--countyYellow);
+}
+
+/* Palo Duro */
+.shield.PD .routeNumber,
+.shield.PDB .routeNumber,
+.shield.PDD .routeNumber,
+.shield.PDF .routeNumber,
+.shield.PDH .routeNumber,
+.shield.PDL .routeNumber,
+.shield.PDO .routeNumber,
+.shield.PDS .routeNumber,
+.shield.PDT .routeNumber,
+.shield.PDTA .routeNumber,
+.shield.PDTA2 .routeNumber {
+  font-family: "Series B";
+  font-size: 1.25em;
+  top: -0.55em;
+}
+
+.shield.PD.OneDigit .routeNumber,
+.shield.PDB.OneDigit .routeNumber,
+.shield.PDD.OneDigit .routeNumber,
+.shield.PDF.OneDigit .routeNumber,
+.shield.PDH.OneDigit .routeNumber,
+.shield.PDL.OneDigit .routeNumber,
+.shield.PDO.OneDigit .routeNumber,
+.shield.PDS.OneDigit .routeNumber,
+.shield.PDT.OneDigit .routeNumber,
+.shield.PDTA.OneDigit .routeNumber,
+.shield.PDTA2.OneDigit .routeNumber {
+  font-family: "Series F";
+}
+
+.shield.PD.OneDigit:has(.designation) .routeNumber,
+.shield.PDB.OneDigit:has(.designation) .routeNumber,
+.shield.PDD.OneDigit:has(.designation) .routeNumber,
+.shield.PDF.OneDigit:has(.designation) .routeNumber,
+.shield.PDH.OneDigit:has(.designation) .routeNumber,
+.shield.PDL.OneDigit:has(.designation) .routeNumber,
+.shield.PDO.OneDigit:has(.designation) .routeNumber,
+.shield.PDS.OneDigit:has(.designation) .routeNumber,
+.shield.PDT.OneDigit:has(.designation) .routeNumber {
+  font-family: "Series D";
+  right: 0.5em;
+}
+
+.shield.PD.OneDigit .designation,
+.shield.PDB.OneDigit .designation,
+.shield.PDD.OneDigit .designation,
+.shield.PDF.OneDigit .designation,
+.shield.PDH.OneDigit .designation,
+.shield.PDL.OneDigit .designation,
+.shield.PDO.OneDigit .designation,
+.shield.PDS.OneDigit .designation,
+.shield.PDT.OneDigit .designation {
+  font-family: "Series D";
+  font-size: 0.8em;
+  left: 1.1em;
+  margin-top: 1.38em;
+}
+
+.shield.PD.TwoDigit:has(.designation) .routeNumber,
+.shield.PDB.TwoDigit:has(.designation) .routeNumber,
+.shield.PDD.TwoDigit:has(.designation) .routeNumber,
+.shield.PDF.TwoDigit:has(.designation) .routeNumber,
+.shield.PDH.TwoDigit:has(.designation) .routeNumber,
+.shield.PDL.TwoDigit:has(.designation) .routeNumber,
+.shield.PDO.TwoDigit:has(.designation) .routeNumber,
+.shield.PDS.TwoDigit:has(.designation) .routeNumber,
+.shield.PDT.TwoDigit:has(.designation) .routeNumber {
+  font-family: "Series C";
+  right: 0.45em;
+}
+
+.shield.PD.TwoDigit .designation,
+.shield.PDB.TwoDigit .designation,
+.shield.PDD.TwoDigit .designation,
+.shield.PDF.TwoDigit .designation,
+.shield.PDH.TwoDigit .designation,
+.shield.PDL.TwoDigit .designation,
+.shield.PDO.TwoDigit .designation,
+.shield.PDS.TwoDigit .designation,
+.shield.PDT.TwoDigit .designation {
+  font-family: "Series D";
+  font-size: 0.8em;
+  left: 2em;
+  margin-top: 1.38em;
+}
+
+.shield.PD.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDB.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDD.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDF.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDH.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDL.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDO.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDS.ThreeDigit:has(.designation) .routeNumber,
+.shield.PDT.ThreeDigit:has(.designation) .routeNumber {
+  font-family: "Series B";
+  right: 0.4em;
+}
+
+.shield.PD.ThreeDigit .designation,
+.shield.PDB.ThreeDigit .designation,
+.shield.PDD.ThreeDigit .designation,
+.shield.PDF.ThreeDigit .designation,
+.shield.PDH.ThreeDigit .designation,
+.shield.PDL.ThreeDigit .designation,
+.shield.PDO.ThreeDigit .designation,
+.shield.PDS.ThreeDigit .designation,
+.shield.PDT.ThreeDigit .designation {
+  font-family: "Series D";
+  font-size: 0.8em;
+  left: 2em;
+  margin-top: 1.38em;
+}
+
+.shield.PD.FourDigit .designation,
+.shield.PDB.FourDigit .designation,
+.shield.PDD.FourDigit .designation,
+.shield.PDF.FourDigit .designation,
+.shield.PDH.FourDigit .designation,
+.shield.PDL.FourDigit .designation,
+.shield.PDO.FourDigit .designation,
+.shield.PDS.FourDigit .designation,
+.shield.PDT.FourDigit .designation {
+  display: none;
+}
+
+.shield.PD.TwoDigit .routeNumber,
+.shield.PDB.TwoDigit .routeNumber,
+.shield.PDD.TwoDigit .routeNumber,
+.shield.PDF.TwoDigit .routeNumber,
+.shield.PDH.TwoDigit .routeNumber,
+.shield.PDL.TwoDigit .routeNumber,
+.shield.PDO.TwoDigit .routeNumber,
+.shield.PDS.TwoDigit .routeNumber,
+.shield.PDT.TwoDigit .routeNumber,
+.shield.PDTA.TwoDigit .routeNumber,
+.shield.PDTA2.TwoDigit .routeNumber {
+  font-family: "Series E";
+}
+
+.shield.PD.ThreeDigit .routeNumber,
+.shield.PDB.ThreeDigit .routeNumber,
+.shield.PDD.ThreeDigit .routeNumber,
+.shield.PDF.ThreeDigit .routeNumber,
+.shield.PDH.ThreeDigit .routeNumber,
+.shield.PDL.ThreeDigit .routeNumber,
+.shield.PDO.ThreeDigit .routeNumber,
+.shield.PDS.ThreeDigit .routeNumber,
+.shield.PDT.ThreeDigit .routeNumber,
+.shield.PDTA.ThreeDigit .routeNumber,
+.shield.PDTA2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+.shield.PDD .routeNumber,
+.shield.PDD .designation,
+.shield.PDF .routeNumber,
+.shield.PDF .designation,
+.shield.PDT .routeNumber,
+.shield.PDT .designation {
+  color: var(--black);
+}
+
+.shield.PDTA .routeNumber,
+.shield.PDTA .designation {
+  color: var(--countyYellow);
+}
+
+.shield.PDTA .designation,
+.shield.PDTA2 .designation {
+  font-family: "Series C";
+  font-size: 0.497em;
+  margin-top: 4.6em;
+}
+
+.shield.TSTP .routeNumber,
+.shield.TSTP .designation {
+  display: none;
+}
+
+/* Roanoke */
+.shield.RO.TwoDigit .routeNumber,
+.shield.RO.ThreeDigit .routeNumber,
+.shield.RO .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-purple),
+    0.1px -0.1px 0 var(--veridian-purple),
+    -0.1px 0.1px 0 var(--veridian-purple),
+    0.1px 0.1px 0 var(--veridian-purple),
+    -0.2px -0.2px 0 var(--veridian-purple),
+    0.2px -0.2px 0 var(--veridian-purple),
+    -0.2px 0.2px 0 var(--veridian-purple),
+    0.2px 0.2px 0 var(--veridian-purple),
+    -0.3px -0.3px 0 var(--veridian-purple),
+    0.3px -0.3px 0 var(--veridian-purple),
+    -0.3px 0.3px 0 var(--veridian-purple),
+    0.3px 0.3px 0 var(--veridian-purple),
+    -0.4px -0.4px 0 var(--veridian-purple),
+    0.4px -0.4px 0 var(--veridian-purple),
+    -0.4px 0.4px 0 var(--veridian-purple),
+    0.4px 0.4px 0 var(--veridian-purple),
+    -0.5px -0.5px 0 var(--veridian-purple),
+    0.5px -0.5px 0 var(--veridian-purple),
+    -0.5px 0.5px 0 var(--veridian-purple),
+    0.5px 0.5px 0 var(--veridian-purple),
+    -0.6px -0.6px 0 var(--veridian-purple),
+    0.6px -0.6px 0 var(--veridian-purple),
+    -0.6px 0.6px 0 var(--veridian-purple),
+    0.6px 0.6px 0 var(--veridian-purple),
+    -0.7px -0.7px 0 var(--veridian-purple),
+    0.7px -0.7px 0 var(--veridian-purple),
+    -0.7px 0.7px 0 var(--veridian-purple),
+    0.7px 0.7px 0 var(--veridian-purple),
+    -0.8px -0.8px 0 var(--veridian-purple),
+    0.8px -0.8px 0 var(--veridian-purple),
+    -0.8px 0.8px 0 var(--veridian-purple),
+    0.8px 0.8px 0 var(--veridian-purple),
+    -0.9px -0.9px 0 var(--veridian-purple),
+    0.9px -0.9px 0 var(--veridian-purple),
+    -0.9px 0.9px 0 var(--veridian-purple),
+    0.9px 0.9px 0 var(--veridian-purple),
+    -1px -1px 0 var(--veridian-purple),
+    1px -1px 0 var(--veridian-purple),
+    -1px 1px 0 var(--veridian-purple),
+    1px 1px 0 var(--veridian-purple),
+    -1.1px -1.1px 0 var(--veridian-purple),
+    1.1px -1.1px 0 var(--veridian-purple),
+    -1.1px 1.1px 0 var(--veridian-purple),
+    1.1px 1.1px 0 var(--veridian-purple),
+    -1.2px -1.2px 0 var(--veridian-purple),
+    1.2px -1.2px 0 var(--veridian-purple),
+    -1.2px 1.2px 0 var(--veridian-purple),
+    1.2px 1.2px 0 var(--veridian-purple),
+    -1.3px -1.3px 0 var(--veridian-purple),
+    1.3px -1.3px 0 var(--veridian-purple),
+    -1.3px 1.3px 0 var(--veridian-purple),
+    1.3px 1.3px 0 var(--veridian-purple),
+    -1.4px -1.4px 0 var(--veridian-purple),
+    1.4px -1.4px 0 var(--veridian-purple),
+    -1.4px 1.4px 0 var(--veridian-purple),
+    1.4px 1.4px 0 var(--veridian-purple),
+    -1.5px -1.5px 0 var(--veridian-purple),
+    1.5px -1.5px 0 var(--veridian-purple),
+    -1.5px 1.5px 0 var(--veridian-purple),
+    1.5px 1.5px 0 var(--veridian-purple),
+    -1.6px -1.6px 0 var(--veridian-purple),
+    1.6px -1.6px 0 var(--veridian-purple),
+    -1.6px 1.6px 0 var(--veridian-purple),
+    1.6px 1.6px 0 var(--veridian-purple),
+    -1.7px -1.7px 0 var(--veridian-purple),
+    1.7px -1.7px 0 var(--veridian-purple),
+    -1.7px 1.7px 0 var(--veridian-purple),
+    1.7px 1.7px 0 var(--veridian-purple),
+    -1.8px -1.8px 0 var(--veridian-purple),
+    1.8px -1.8px 0 var(--veridian-purple),
+    -1.8px 1.8px 0 var(--veridian-purple),
+    1.8px 1.8px 0 var(--veridian-purple),
+    -1.9px -1.9px 0 var(--veridian-purple),
+    1.9px -1.9px 0 var(--veridian-purple),
+    -1.9px 1.9px 0 var(--veridian-purple),
+    1.9px 1.9px 0 var(--veridian-purple),
+    -2px -2px 0 var(--veridian-purple),
+    2px -2px 0 var(--veridian-purple),
+    -2px 2px 0 var(--veridian-purple),
+    2px 2px 0 var(--veridian-purple);
+}
+
+.shield.ROB.TwoDigit .routeNumber,
+.shield.ROB.ThreeDigit .routeNumber,
+.shield.ROB .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-coral),
+    0.1px -0.1px 0 var(--veridian-coral),
+    -0.1px 0.1px 0 var(--veridian-coral),
+    0.1px 0.1px 0 var(--veridian-coral),
+    -0.2px -0.2px 0 var(--veridian-coral),
+    0.2px -0.2px 0 var(--veridian-coral),
+    -0.2px 0.2px 0 var(--veridian-coral),
+    0.2px 0.2px 0 var(--veridian-coral),
+    -0.3px -0.3px 0 var(--veridian-coral),
+    0.3px -0.3px 0 var(--veridian-coral),
+    -0.3px 0.3px 0 var(--veridian-coral),
+    0.3px 0.3px 0 var(--veridian-coral),
+    -0.4px -0.4px 0 var(--veridian-coral),
+    0.4px -0.4px 0 var(--veridian-coral),
+    -0.4px 0.4px 0 var(--veridian-coral),
+    0.4px 0.4px 0 var(--veridian-coral),
+    -0.5px -0.5px 0 var(--veridian-coral),
+    0.5px -0.5px 0 var(--veridian-coral),
+    -0.5px 0.5px 0 var(--veridian-coral),
+    0.5px 0.5px 0 var(--veridian-coral),
+    -0.6px -0.6px 0 var(--veridian-coral),
+    0.6px -0.6px 0 var(--veridian-coral),
+    -0.6px 0.6px 0 var(--veridian-coral),
+    0.6px 0.6px 0 var(--veridian-coral),
+    -0.7px -0.7px 0 var(--veridian-coral),
+    0.7px -0.7px 0 var(--veridian-coral),
+    -0.7px 0.7px 0 var(--veridian-coral),
+    0.7px 0.7px 0 var(--veridian-coral),
+    -0.8px -0.8px 0 var(--veridian-coral),
+    0.8px -0.8px 0 var(--veridian-coral),
+    -0.8px 0.8px 0 var(--veridian-coral),
+    0.8px 0.8px 0 var(--veridian-coral),
+    -0.9px -0.9px 0 var(--veridian-coral),
+    0.9px -0.9px 0 var(--veridian-coral),
+    -0.9px 0.9px 0 var(--veridian-coral),
+    0.9px 0.9px 0 var(--veridian-coral),
+    -1px -1px 0 var(--veridian-coral),
+    1px -1px 0 var(--veridian-coral),
+    -1px 1px 0 var(--veridian-coral),
+    1px 1px 0 var(--veridian-coral),
+    -1.1px -1.1px 0 var(--veridian-coral),
+    1.1px -1.1px 0 var(--veridian-coral),
+    -1.1px 1.1px 0 var(--veridian-coral),
+    1.1px 1.1px 0 var(--veridian-coral),
+    -1.2px -1.2px 0 var(--veridian-coral),
+    1.2px -1.2px 0 var(--veridian-coral),
+    -1.2px 1.2px 0 var(--veridian-coral),
+    1.2px 1.2px 0 var(--veridian-coral),
+    -1.3px -1.3px 0 var(--veridian-coral),
+    1.3px -1.3px 0 var(--veridian-coral),
+    -1.3px 1.3px 0 var(--veridian-coral),
+    1.3px 1.3px 0 var(--veridian-coral),
+    -1.4px -1.4px 0 var(--veridian-coral),
+    1.4px -1.4px 0 var(--veridian-coral),
+    -1.4px 1.4px 0 var(--veridian-coral),
+    1.4px 1.4px 0 var(--veridian-coral),
+    -1.5px -1.5px 0 var(--veridian-coral),
+    1.5px -1.5px 0 var(--veridian-coral),
+    -1.5px 1.5px 0 var(--veridian-coral),
+    1.5px 1.5px 0 var(--veridian-coral),
+    -1.6px -1.6px 0 var(--veridian-coral),
+    1.6px -1.6px 0 var(--veridian-coral),
+    -1.6px 1.6px 0 var(--veridian-coral),
+    1.6px 1.6px 0 var(--veridian-coral),
+    -1.7px -1.7px 0 var(--veridian-coral),
+    1.7px -1.7px 0 var(--veridian-coral),
+    -1.7px 1.7px 0 var(--veridian-coral),
+    1.7px 1.7px 0 var(--veridian-coral),
+    -1.8px -1.8px 0 var(--veridian-coral),
+    1.8px -1.8px 0 var(--veridian-coral),
+    -1.8px 1.8px 0 var(--veridian-coral),
+    1.8px 1.8px 0 var(--veridian-coral),
+    -1.9px -1.9px 0 var(--veridian-coral),
+    1.9px -1.9px 0 var(--veridian-coral),
+    -1.9px 1.9px 0 var(--veridian-coral),
+    1.9px 1.9px 0 var(--veridian-coral),
+    -2px -2px 0 var(--veridian-coral),
+    2px -2px 0 var(--veridian-coral),
+    -2px 2px 0 var(--veridian-coral),
+    2px 2px 0 var(--veridian-coral);
+}
+
+.shield.ROD.TwoDigit .routeNumber,
+.shield.ROD.ThreeDigit .routeNumber,
+.shield.ROD .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-orange),
+    0.1px -0.1px 0 var(--veridian-orange),
+    -0.1px 0.1px 0 var(--veridian-orange),
+    0.1px 0.1px 0 var(--veridian-orange),
+    -0.2px -0.2px 0 var(--veridian-orange),
+    0.2px -0.2px 0 var(--veridian-orange),
+    -0.2px 0.2px 0 var(--veridian-orange),
+    0.2px 0.2px 0 var(--veridian-orange),
+    -0.3px -0.3px 0 var(--veridian-orange),
+    0.3px -0.3px 0 var(--veridian-orange),
+    -0.3px 0.3px 0 var(--veridian-orange),
+    0.3px 0.3px 0 var(--veridian-orange),
+    -0.4px -0.4px 0 var(--veridian-orange),
+    0.4px -0.4px 0 var(--veridian-orange),
+    -0.4px 0.4px 0 var(--veridian-orange),
+    0.4px 0.4px 0 var(--veridian-orange),
+    -0.5px -0.5px 0 var(--veridian-orange),
+    0.5px -0.5px 0 var(--veridian-orange),
+    -0.5px 0.5px 0 var(--veridian-orange),
+    0.5px 0.5px 0 var(--veridian-orange),
+    -0.6px -0.6px 0 var(--veridian-orange),
+    0.6px -0.6px 0 var(--veridian-orange),
+    -0.6px 0.6px 0 var(--veridian-orange),
+    0.6px 0.6px 0 var(--veridian-orange),
+    -0.7px -0.7px 0 var(--veridian-orange),
+    0.7px -0.7px 0 var(--veridian-orange),
+    -0.7px 0.7px 0 var(--veridian-orange),
+    0.7px 0.7px 0 var(--veridian-orange),
+    -0.8px -0.8px 0 var(--veridian-orange),
+    0.8px -0.8px 0 var(--veridian-orange),
+    -0.8px 0.8px 0 var(--veridian-orange),
+    0.8px 0.8px 0 var(--veridian-orange),
+    -0.9px -0.9px 0 var(--veridian-orange),
+    0.9px -0.9px 0 var(--veridian-orange),
+    -0.9px 0.9px 0 var(--veridian-orange),
+    0.9px 0.9px 0 var(--veridian-orange),
+    -1px -1px 0 var(--veridian-orange),
+    1px -1px 0 var(--veridian-orange),
+    -1px 1px 0 var(--veridian-orange),
+    1px 1px 0 var(--veridian-orange),
+    -1.1px -1.1px 0 var(--veridian-orange),
+    1.1px -1.1px 0 var(--veridian-orange),
+    -1.1px 1.1px 0 var(--veridian-orange),
+    1.1px 1.1px 0 var(--veridian-orange),
+    -1.2px -1.2px 0 var(--veridian-orange),
+    1.2px -1.2px 0 var(--veridian-orange),
+    -1.2px 1.2px 0 var(--veridian-orange),
+    1.2px 1.2px 0 var(--veridian-orange),
+    -1.3px -1.3px 0 var(--veridian-orange),
+    1.3px -1.3px 0 var(--veridian-orange),
+    -1.3px 1.3px 0 var(--veridian-orange),
+    1.3px 1.3px 0 var(--veridian-orange),
+    -1.4px -1.4px 0 var(--veridian-orange),
+    1.4px -1.4px 0 var(--veridian-orange),
+    -1.4px 1.4px 0 var(--veridian-orange),
+    1.4px 1.4px 0 var(--veridian-orange),
+    -1.5px -1.5px 0 var(--veridian-orange),
+    1.5px -1.5px 0 var(--veridian-orange),
+    -1.5px 1.5px 0 var(--veridian-orange),
+    1.5px 1.5px 0 var(--veridian-orange),
+    -1.6px -1.6px 0 var(--veridian-orange),
+    1.6px -1.6px 0 var(--veridian-orange),
+    -1.6px 1.6px 0 var(--veridian-orange),
+    1.6px 1.6px 0 var(--veridian-orange),
+    -1.7px -1.7px 0 var(--veridian-orange),
+    1.7px -1.7px 0 var(--veridian-orange),
+    -1.7px 1.7px 0 var(--veridian-orange),
+    1.7px 1.7px 0 var(--veridian-orange),
+    -1.8px -1.8px 0 var(--veridian-orange),
+    1.8px -1.8px 0 var(--veridian-orange),
+    -1.8px 1.8px 0 var(--veridian-orange),
+    1.8px 1.8px 0 var(--veridian-orange),
+    -1.9px -1.9px 0 var(--veridian-orange),
+    1.9px -1.9px 0 var(--veridian-orange),
+    -1.9px 1.9px 0 var(--veridian-orange),
+    1.9px 1.9px 0 var(--veridian-orange),
+    -2px -2px 0 var(--veridian-orange),
+    2px -2px 0 var(--veridian-orange),
+    -2px 2px 0 var(--veridian-orange),
+    2px 2px 0 var(--veridian-orange);
+}
+
+.shield.ROF.TwoDigit .routeNumber,
+.shield.ROF.ThreeDigit .routeNumber,
+.shield.ROF .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--white),
+    0.1px -0.1px 0 var(--white),
+    -0.1px 0.1px 0 var(--white),
+    0.1px 0.1px 0 var(--white),
+    -0.2px -0.2px 0 var(--white),
+    0.2px -0.2px 0 var(--white),
+    -0.2px 0.2px 0 var(--white),
+    0.2px 0.2px 0 var(--white),
+    -0.3px -0.3px 0 var(--white),
+    0.3px -0.3px 0 var(--white),
+    -0.3px 0.3px 0 var(--white),
+    0.3px 0.3px 0 var(--white),
+    -0.4px -0.4px 0 var(--white),
+    0.4px -0.4px 0 var(--white),
+    -0.4px 0.4px 0 var(--white),
+    0.4px 0.4px 0 var(--white),
+    -0.5px -0.5px 0 var(--white),
+    0.5px -0.5px 0 var(--white),
+    -0.5px 0.5px 0 var(--white),
+    0.5px 0.5px 0 var(--white),
+    -0.6px -0.6px 0 var(--white),
+    0.6px -0.6px 0 var(--white),
+    -0.6px 0.6px 0 var(--white),
+    0.6px 0.6px 0 var(--white),
+    -0.7px -0.7px 0 var(--white),
+    0.7px -0.7px 0 var(--white),
+    -0.7px 0.7px 0 var(--white),
+    0.7px 0.7px 0 var(--white),
+    -0.8px -0.8px 0 var(--white),
+    0.8px -0.8px 0 var(--white),
+    -0.8px 0.8px 0 var(--white),
+    0.8px 0.8px 0 var(--white),
+    -0.9px -0.9px 0 var(--white),
+    0.9px -0.9px 0 var(--white),
+    -0.9px 0.9px 0 var(--white),
+    0.9px 0.9px 0 var(--white),
+    -1px -1px 0 var(--white),
+    1px -1px 0 var(--white),
+    -1px 1px 0 var(--white),
+    1px 1px 0 var(--white),
+    -1.1px -1.1px 0 var(--white),
+    1.1px -1.1px 0 var(--white),
+    -1.1px 1.1px 0 var(--white),
+    1.1px 1.1px 0 var(--white),
+    -1.2px -1.2px 0 var(--white),
+    1.2px -1.2px 0 var(--white),
+    -1.2px 1.2px 0 var(--white),
+    1.2px 1.2px 0 var(--white),
+    -1.3px -1.3px 0 var(--white),
+    1.3px -1.3px 0 var(--white),
+    -1.3px 1.3px 0 var(--white),
+    1.3px 1.3px 0 var(--white),
+    -1.4px -1.4px 0 var(--white),
+    1.4px -1.4px 0 var(--white),
+    -1.4px 1.4px 0 var(--white),
+    1.4px 1.4px 0 var(--white),
+    -1.5px -1.5px 0 var(--white),
+    1.5px -1.5px 0 var(--white),
+    -1.5px 1.5px 0 var(--white),
+    1.5px 1.5px 0 var(--white),
+    -1.6px -1.6px 0 var(--white),
+    1.6px -1.6px 0 var(--white),
+    -1.6px 1.6px 0 var(--white),
+    1.6px 1.6px 0 var(--white),
+    -1.7px -1.7px 0 var(--white),
+    1.7px -1.7px 0 var(--white),
+    -1.7px 1.7px 0 var(--white),
+    1.7px 1.7px 0 var(--white),
+    -1.8px -1.8px 0 var(--white),
+    1.8px -1.8px 0 var(--white),
+    -1.8px 1.8px 0 var(--white),
+    1.8px 1.8px 0 var(--white),
+    -1.9px -1.9px 0 var(--white),
+    1.9px -1.9px 0 var(--white),
+    -1.9px 1.9px 0 var(--white),
+    1.9px 1.9px 0 var(--white),
+    -2px -2px 0 var(--white),
+    2px -2px 0 var(--white),
+    -2px 2px 0 var(--white),
+    2px 2px 0 var(--white);
+}
+
+.shield.ROH.TwoDigit .routeNumber,
+.shield.ROH.ThreeDigit .routeNumber,
+.shield.ROH .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--black),
+    0.1px -0.1px 0 var(--black),
+    -0.1px 0.1px 0 var(--black),
+    0.1px 0.1px 0 var(--black),
+    -0.2px -0.2px 0 var(--black),
+    0.2px -0.2px 0 var(--black),
+    -0.2px 0.2px 0 var(--black),
+    0.2px 0.2px 0 var(--black),
+    -0.3px -0.3px 0 var(--black),
+    0.3px -0.3px 0 var(--black),
+    -0.3px 0.3px 0 var(--black),
+    0.3px 0.3px 0 var(--black),
+    -0.4px -0.4px 0 var(--black),
+    0.4px -0.4px 0 var(--black),
+    -0.4px 0.4px 0 var(--black),
+    0.4px 0.4px 0 var(--black),
+    -0.5px -0.5px 0 var(--black),
+    0.5px -0.5px 0 var(--black),
+    -0.5px 0.5px 0 var(--black),
+    0.5px 0.5px 0 var(--black),
+    -0.6px -0.6px 0 var(--black),
+    0.6px -0.6px 0 var(--black),
+    -0.6px 0.6px 0 var(--black),
+    0.6px 0.6px 0 var(--black),
+    -0.7px -0.7px 0 var(--black),
+    0.7px -0.7px 0 var(--black),
+    -0.7px 0.7px 0 var(--black),
+    0.7px 0.7px 0 var(--black),
+    -0.8px -0.8px 0 var(--black),
+    0.8px -0.8px 0 var(--black),
+    -0.8px 0.8px 0 var(--black),
+    0.8px 0.8px 0 var(--black),
+    -0.9px -0.9px 0 var(--black),
+    0.9px -0.9px 0 var(--black),
+    -0.9px 0.9px 0 var(--black),
+    0.9px 0.9px 0 var(--black),
+    -1px -1px 0 var(--black),
+    1px -1px 0 var(--black),
+    -1px 1px 0 var(--black),
+    1px 1px 0 var(--black),
+    -1.1px -1.1px 0 var(--black),
+    1.1px -1.1px 0 var(--black),
+    -1.1px 1.1px 0 var(--black),
+    1.1px 1.1px 0 var(--black),
+    -1.2px -1.2px 0 var(--black),
+    1.2px -1.2px 0 var(--black),
+    -1.2px 1.2px 0 var(--black),
+    1.2px 1.2px 0 var(--black),
+    -1.3px -1.3px 0 var(--black),
+    1.3px -1.3px 0 var(--black),
+    -1.3px 1.3px 0 var(--black),
+    1.3px 1.3px 0 var(--black),
+    -1.4px -1.4px 0 var(--black),
+    1.4px -1.4px 0 var(--black),
+    -1.4px 1.4px 0 var(--black),
+    1.4px 1.4px 0 var(--black),
+    -1.5px -1.5px 0 var(--black),
+    1.5px -1.5px 0 var(--black),
+    -1.5px 1.5px 0 var(--black),
+    1.5px 1.5px 0 var(--black),
+    -1.6px -1.6px 0 var(--black),
+    1.6px -1.6px 0 var(--black),
+    -1.6px 1.6px 0 var(--black),
+    1.6px 1.6px 0 var(--black),
+    -1.7px -1.7px 0 var(--black),
+    1.7px -1.7px 0 var(--black),
+    -1.7px 1.7px 0 var(--black),
+    1.7px 1.7px 0 var(--black),
+    -1.8px -1.8px 0 var(--black),
+    1.8px -1.8px 0 var(--black),
+    -1.8px 1.8px 0 var(--black),
+    1.8px 1.8px 0 var(--black),
+    -1.9px -1.9px 0 var(--black),
+    1.9px -1.9px 0 var(--black),
+    -1.9px 1.9px 0 var(--black),
+    1.9px 1.9px 0 var(--black),
+    -2px -2px 0 var(--black),
+    2px -2px 0 var(--black),
+    -2px 2px 0 var(--black),
+    2px 2px 0 var(--black);
+}
+
+.shield.ROL.TwoDigit .routeNumber,
+.shield.ROL.ThreeDigit .routeNumber,
+.shield.ROL .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-blue),
+    0.1px -0.1px 0 var(--veridian-blue),
+    -0.1px 0.1px 0 var(--veridian-blue),
+    0.1px 0.1px 0 var(--veridian-blue),
+    -0.2px -0.2px 0 var(--veridian-blue),
+    0.2px -0.2px 0 var(--veridian-blue),
+    -0.2px 0.2px 0 var(--veridian-blue),
+    0.2px 0.2px 0 var(--veridian-blue),
+    -0.3px -0.3px 0 var(--veridian-blue),
+    0.3px -0.3px 0 var(--veridian-blue),
+    -0.3px 0.3px 0 var(--veridian-blue),
+    0.3px 0.3px 0 var(--veridian-blue),
+    -0.4px -0.4px 0 var(--veridian-blue),
+    0.4px -0.4px 0 var(--veridian-blue),
+    -0.4px 0.4px 0 var(--veridian-blue),
+    0.4px 0.4px 0 var(--veridian-blue),
+    -0.5px -0.5px 0 var(--veridian-blue),
+    0.5px -0.5px 0 var(--veridian-blue),
+    -0.5px 0.5px 0 var(--veridian-blue),
+    0.5px 0.5px 0 var(--veridian-blue),
+    -0.6px -0.6px 0 var(--veridian-blue),
+    0.6px -0.6px 0 var(--veridian-blue),
+    -0.6px 0.6px 0 var(--veridian-blue),
+    0.6px 0.6px 0 var(--veridian-blue),
+    -0.7px -0.7px 0 var(--veridian-blue),
+    0.7px -0.7px 0 var(--veridian-blue),
+    -0.7px 0.7px 0 var(--veridian-blue),
+    0.7px 0.7px 0 var(--veridian-blue),
+    -0.8px -0.8px 0 var(--veridian-blue),
+    0.8px -0.8px 0 var(--veridian-blue),
+    -0.8px 0.8px 0 var(--veridian-blue),
+    0.8px 0.8px 0 var(--veridian-blue),
+    -0.9px -0.9px 0 var(--veridian-blue),
+    0.9px -0.9px 0 var(--veridian-blue),
+    -0.9px 0.9px 0 var(--veridian-blue),
+    0.9px 0.9px 0 var(--veridian-blue),
+    -1px -1px 0 var(--veridian-blue),
+    1px -1px 0 var(--veridian-blue),
+    -1px 1px 0 var(--veridian-blue),
+    1px 1px 0 var(--veridian-blue),
+    -1.1px -1.1px 0 var(--veridian-blue),
+    1.1px -1.1px 0 var(--veridian-blue),
+    -1.1px 1.1px 0 var(--veridian-blue),
+    1.1px 1.1px 0 var(--veridian-blue),
+    -1.2px -1.2px 0 var(--veridian-blue),
+    1.2px -1.2px 0 var(--veridian-blue),
+    -1.2px 1.2px 0 var(--veridian-blue),
+    1.2px 1.2px 0 var(--veridian-blue),
+    -1.3px -1.3px 0 var(--veridian-blue),
+    1.3px -1.3px 0 var(--veridian-blue),
+    -1.3px 1.3px 0 var(--veridian-blue),
+    1.3px 1.3px 0 var(--veridian-blue),
+    -1.4px -1.4px 0 var(--veridian-blue),
+    1.4px -1.4px 0 var(--veridian-blue),
+    -1.4px 1.4px 0 var(--veridian-blue),
+    1.4px 1.4px 0 var(--veridian-blue),
+    -1.5px -1.5px 0 var(--veridian-blue),
+    1.5px -1.5px 0 var(--veridian-blue),
+    -1.5px 1.5px 0 var(--veridian-blue),
+    1.5px 1.5px 0 var(--veridian-blue),
+    -1.6px -1.6px 0 var(--veridian-blue),
+    1.6px -1.6px 0 var(--veridian-blue),
+    -1.6px 1.6px 0 var(--veridian-blue),
+    1.6px 1.6px 0 var(--veridian-blue),
+    -1.7px -1.7px 0 var(--veridian-blue),
+    1.7px -1.7px 0 var(--veridian-blue),
+    -1.7px 1.7px 0 var(--veridian-blue),
+    1.7px 1.7px 0 var(--veridian-blue),
+    -1.8px -1.8px 0 var(--veridian-blue),
+    1.8px -1.8px 0 var(--veridian-blue),
+    -1.8px 1.8px 0 var(--veridian-blue),
+    1.8px 1.8px 0 var(--veridian-blue),
+    -1.9px -1.9px 0 var(--veridian-blue),
+    1.9px -1.9px 0 var(--veridian-blue),
+    -1.9px 1.9px 0 var(--veridian-blue),
+    1.9px 1.9px 0 var(--veridian-blue),
+    -2px -2px 0 var(--veridian-blue),
+    2px -2px 0 var(--veridian-blue),
+    -2px 2px 0 var(--veridian-blue),
+    2px 2px 0 var(--veridian-blue);
+}
+
+.shield.ROO.TwoDigit .routeNumber,
+.shield.ROO.ThreeDigit .routeNumber,
+.shield.ROO .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-brown),
+    0.1px -0.1px 0 var(--veridian-brown),
+    -0.1px 0.1px 0 var(--veridian-brown),
+    0.1px 0.1px 0 var(--veridian-brown),
+    -0.2px -0.2px 0 var(--veridian-brown),
+    0.2px -0.2px 0 var(--veridian-brown),
+    -0.2px 0.2px 0 var(--veridian-brown),
+    0.2px 0.2px 0 var(--veridian-brown),
+    -0.3px -0.3px 0 var(--veridian-brown),
+    0.3px -0.3px 0 var(--veridian-brown),
+    -0.3px 0.3px 0 var(--veridian-brown),
+    0.3px 0.3px 0 var(--veridian-brown),
+    -0.4px -0.4px 0 var(--veridian-brown),
+    0.4px -0.4px 0 var(--veridian-brown),
+    -0.4px 0.4px 0 var(--veridian-brown),
+    0.4px 0.4px 0 var(--veridian-brown),
+    -0.5px -0.5px 0 var(--veridian-brown),
+    0.5px -0.5px 0 var(--veridian-brown),
+    -0.5px 0.5px 0 var(--veridian-brown),
+    0.5px 0.5px 0 var(--veridian-brown),
+    -0.6px -0.6px 0 var(--veridian-brown),
+    0.6px -0.6px 0 var(--veridian-brown),
+    -0.6px 0.6px 0 var(--veridian-brown),
+    0.6px 0.6px 0 var(--veridian-brown),
+    -0.7px -0.7px 0 var(--veridian-brown),
+    0.7px -0.7px 0 var(--veridian-brown),
+    -0.7px 0.7px 0 var(--veridian-brown),
+    0.7px 0.7px 0 var(--veridian-brown),
+    -0.8px -0.8px 0 var(--veridian-brown),
+    0.8px -0.8px 0 var(--veridian-brown),
+    -0.8px 0.8px 0 var(--veridian-brown),
+    0.8px 0.8px 0 var(--veridian-brown),
+    -0.9px -0.9px 0 var(--veridian-brown),
+    0.9px -0.9px 0 var(--veridian-brown),
+    -0.9px 0.9px 0 var(--veridian-brown),
+    0.9px 0.9px 0 var(--veridian-brown),
+    -1px -1px 0 var(--veridian-brown),
+    1px -1px 0 var(--veridian-brown),
+    -1px 1px 0 var(--veridian-brown),
+    1px 1px 0 var(--veridian-brown),
+    -1.1px -1.1px 0 var(--veridian-brown),
+    1.1px -1.1px 0 var(--veridian-brown),
+    -1.1px 1.1px 0 var(--veridian-brown),
+    1.1px 1.1px 0 var(--veridian-brown),
+    -1.2px -1.2px 0 var(--veridian-brown),
+    1.2px -1.2px 0 var(--veridian-brown),
+    -1.2px 1.2px 0 var(--veridian-brown),
+    1.2px 1.2px 0 var(--veridian-brown),
+    -1.3px -1.3px 0 var(--veridian-brown),
+    1.3px -1.3px 0 var(--veridian-brown),
+    -1.3px 1.3px 0 var(--veridian-brown),
+    1.3px 1.3px 0 var(--veridian-brown),
+    -1.4px -1.4px 0 var(--veridian-brown),
+    1.4px -1.4px 0 var(--veridian-brown),
+    -1.4px 1.4px 0 var(--veridian-brown),
+    1.4px 1.4px 0 var(--veridian-brown),
+    -1.5px -1.5px 0 var(--veridian-brown),
+    1.5px -1.5px 0 var(--veridian-brown),
+    -1.5px 1.5px 0 var(--veridian-brown),
+    1.5px 1.5px 0 var(--veridian-brown),
+    -1.6px -1.6px 0 var(--veridian-brown),
+    1.6px -1.6px 0 var(--veridian-brown),
+    -1.6px 1.6px 0 var(--veridian-brown),
+    1.6px 1.6px 0 var(--veridian-brown),
+    -1.7px -1.7px 0 var(--veridian-brown),
+    1.7px -1.7px 0 var(--veridian-brown),
+    -1.7px 1.7px 0 var(--veridian-brown),
+    1.7px 1.7px 0 var(--veridian-brown),
+    -1.8px -1.8px 0 var(--veridian-brown),
+    1.8px -1.8px 0 var(--veridian-brown),
+    -1.8px 1.8px 0 var(--veridian-brown),
+    1.8px 1.8px 0 var(--veridian-brown),
+    -1.9px -1.9px 0 var(--veridian-brown),
+    1.9px -1.9px 0 var(--veridian-brown),
+    -1.9px 1.9px 0 var(--veridian-brown),
+    1.9px 1.9px 0 var(--veridian-brown),
+    -2px -2px 0 var(--veridian-brown),
+    2px -2px 0 var(--veridian-brown),
+    -2px 2px 0 var(--veridian-brown),
+    2px 2px 0 var(--veridian-brown);
+}
+
+.shield.ROS.TwoDigit .routeNumber,
+.shield.ROS.ThreeDigit .routeNumber,
+.shield.ROS .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-red),
+    0.1px -0.1px 0 var(--veridian-red),
+    -0.1px 0.1px 0 var(--veridian-red),
+    0.1px 0.1px 0 var(--veridian-red),
+    -0.2px -0.2px 0 var(--veridian-red),
+    0.2px -0.2px 0 var(--veridian-red),
+    -0.2px 0.2px 0 var(--veridian-red),
+    0.2px 0.2px 0 var(--veridian-red),
+    -0.3px -0.3px 0 var(--veridian-red),
+    0.3px -0.3px 0 var(--veridian-red),
+    -0.3px 0.3px 0 var(--veridian-red),
+    0.3px 0.3px 0 var(--veridian-red),
+    -0.4px -0.4px 0 var(--veridian-red),
+    0.4px -0.4px 0 var(--veridian-red),
+    -0.4px 0.4px 0 var(--veridian-red),
+    0.4px 0.4px 0 var(--veridian-red),
+    -0.5px -0.5px 0 var(--veridian-red),
+    0.5px -0.5px 0 var(--veridian-red),
+    -0.5px 0.5px 0 var(--veridian-red),
+    0.5px 0.5px 0 var(--veridian-red),
+    -0.6px -0.6px 0 var(--veridian-red),
+    0.6px -0.6px 0 var(--veridian-red),
+    -0.6px 0.6px 0 var(--veridian-red),
+    0.6px 0.6px 0 var(--veridian-red),
+    -0.7px -0.7px 0 var(--veridian-red),
+    0.7px -0.7px 0 var(--veridian-red),
+    -0.7px 0.7px 0 var(--veridian-red),
+    0.7px 0.7px 0 var(--veridian-red),
+    -0.8px -0.8px 0 var(--veridian-red),
+    0.8px -0.8px 0 var(--veridian-red),
+    -0.8px 0.8px 0 var(--veridian-red),
+    0.8px 0.8px 0 var(--veridian-red),
+    -0.9px -0.9px 0 var(--veridian-red),
+    0.9px -0.9px 0 var(--veridian-red),
+    -0.9px 0.9px 0 var(--veridian-red),
+    0.9px 0.9px 0 var(--veridian-red),
+    -1px -1px 0 var(--veridian-red),
+    1px -1px 0 var(--veridian-red),
+    -1px 1px 0 var(--veridian-red),
+    1px 1px 0 var(--veridian-red),
+    -1.1px -1.1px 0 var(--veridian-red),
+    1.1px -1.1px 0 var(--veridian-red),
+    -1.1px 1.1px 0 var(--veridian-red),
+    1.1px 1.1px 0 var(--veridian-red),
+    -1.2px -1.2px 0 var(--veridian-red),
+    1.2px -1.2px 0 var(--veridian-red),
+    -1.2px 1.2px 0 var(--veridian-red),
+    1.2px 1.2px 0 var(--veridian-red),
+    -1.3px -1.3px 0 var(--veridian-red),
+    1.3px -1.3px 0 var(--veridian-red),
+    -1.3px 1.3px 0 var(--veridian-red),
+    1.3px 1.3px 0 var(--veridian-red),
+    -1.4px -1.4px 0 var(--veridian-red),
+    1.4px -1.4px 0 var(--veridian-red),
+    -1.4px 1.4px 0 var(--veridian-red),
+    1.4px 1.4px 0 var(--veridian-red),
+    -1.5px -1.5px 0 var(--veridian-red),
+    1.5px -1.5px 0 var(--veridian-red),
+    -1.5px 1.5px 0 var(--veridian-red),
+    1.5px 1.5px 0 var(--veridian-red),
+    -1.6px -1.6px 0 var(--veridian-red),
+    1.6px -1.6px 0 var(--veridian-red),
+    -1.6px 1.6px 0 var(--veridian-red),
+    1.6px 1.6px 0 var(--veridian-red),
+    -1.7px -1.7px 0 var(--veridian-red),
+    1.7px -1.7px 0 var(--veridian-red),
+    -1.7px 1.7px 0 var(--veridian-red),
+    1.7px 1.7px 0 var(--veridian-red),
+    -1.8px -1.8px 0 var(--veridian-red),
+    1.8px -1.8px 0 var(--veridian-red),
+    -1.8px 1.8px 0 var(--veridian-red),
+    1.8px 1.8px 0 var(--veridian-red),
+    -1.9px -1.9px 0 var(--veridian-red),
+    1.9px -1.9px 0 var(--veridian-red),
+    -1.9px 1.9px 0 var(--veridian-red),
+    1.9px 1.9px 0 var(--veridian-red),
+    -2px -2px 0 var(--veridian-red),
+    2px -2px 0 var(--veridian-red),
+    -2px 2px 0 var(--veridian-red),
+    2px 2px 0 var(--veridian-red);
+}
+
+.shield.ROT.TwoDigit .routeNumber,
+.shield.ROT.ThreeDigit .routeNumber,
+.shield.ROT .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-yellow),
+    0.1px -0.1px 0 var(--veridian-yellow),
+    -0.1px 0.1px 0 var(--veridian-yellow),
+    0.1px 0.1px 0 var(--veridian-yellow),
+    -0.2px -0.2px 0 var(--veridian-yellow),
+    0.2px -0.2px 0 var(--veridian-yellow),
+    -0.2px 0.2px 0 var(--veridian-yellow),
+    0.2px 0.2px 0 var(--veridian-yellow),
+    -0.3px -0.3px 0 var(--veridian-yellow),
+    0.3px -0.3px 0 var(--veridian-yellow),
+    -0.3px 0.3px 0 var(--veridian-yellow),
+    0.3px 0.3px 0 var(--veridian-yellow),
+    -0.4px -0.4px 0 var(--veridian-yellow),
+    0.4px -0.4px 0 var(--veridian-yellow),
+    -0.4px 0.4px 0 var(--veridian-yellow),
+    0.4px 0.4px 0 var(--veridian-yellow),
+    -0.5px -0.5px 0 var(--veridian-yellow),
+    0.5px -0.5px 0 var(--veridian-yellow),
+    -0.5px 0.5px 0 var(--veridian-yellow),
+    0.5px 0.5px 0 var(--veridian-yellow),
+    -0.6px -0.6px 0 var(--veridian-yellow),
+    0.6px -0.6px 0 var(--veridian-yellow),
+    -0.6px 0.6px 0 var(--veridian-yellow),
+    0.6px 0.6px 0 var(--veridian-yellow),
+    -0.7px -0.7px 0 var(--veridian-yellow),
+    0.7px -0.7px 0 var(--veridian-yellow),
+    -0.7px 0.7px 0 var(--veridian-yellow),
+    0.7px 0.7px 0 var(--veridian-yellow),
+    -0.8px -0.8px 0 var(--veridian-yellow),
+    0.8px -0.8px 0 var(--veridian-yellow),
+    -0.8px 0.8px 0 var(--veridian-yellow),
+    0.8px 0.8px 0 var(--veridian-yellow),
+    -0.9px -0.9px 0 var(--veridian-yellow),
+    0.9px -0.9px 0 var(--veridian-yellow),
+    -0.9px 0.9px 0 var(--veridian-yellow),
+    0.9px 0.9px 0 var(--veridian-yellow),
+    -1px -1px 0 var(--veridian-yellow),
+    1px -1px 0 var(--veridian-yellow),
+    -1px 1px 0 var(--veridian-yellow),
+    1px 1px 0 var(--veridian-yellow),
+    -1.1px -1.1px 0 var(--veridian-yellow),
+    1.1px -1.1px 0 var(--veridian-yellow),
+    -1.1px 1.1px 0 var(--veridian-yellow),
+    1.1px 1.1px 0 var(--veridian-yellow),
+    -1.2px -1.2px 0 var(--veridian-yellow),
+    1.2px -1.2px 0 var(--veridian-yellow),
+    -1.2px 1.2px 0 var(--veridian-yellow),
+    1.2px 1.2px 0 var(--veridian-yellow),
+    -1.3px -1.3px 0 var(--veridian-yellow),
+    1.3px -1.3px 0 var(--veridian-yellow),
+    -1.3px 1.3px 0 var(--veridian-yellow),
+    1.3px 1.3px 0 var(--veridian-yellow),
+    -1.4px -1.4px 0 var(--veridian-yellow),
+    1.4px -1.4px 0 var(--veridian-yellow),
+    -1.4px 1.4px 0 var(--veridian-yellow),
+    1.4px 1.4px 0 var(--veridian-yellow),
+    -1.5px -1.5px 0 var(--veridian-yellow),
+    1.5px -1.5px 0 var(--veridian-yellow),
+    -1.5px 1.5px 0 var(--veridian-yellow),
+    1.5px 1.5px 0 var(--veridian-yellow),
+    -1.6px -1.6px 0 var(--veridian-yellow),
+    1.6px -1.6px 0 var(--veridian-yellow),
+    -1.6px 1.6px 0 var(--veridian-yellow),
+    1.6px 1.6px 0 var(--veridian-yellow),
+    -1.7px -1.7px 0 var(--veridian-yellow),
+    1.7px -1.7px 0 var(--veridian-yellow),
+    -1.7px 1.7px 0 var(--veridian-yellow),
+    1.7px 1.7px 0 var(--veridian-yellow),
+    -1.8px -1.8px 0 var(--veridian-yellow),
+    1.8px -1.8px 0 var(--veridian-yellow),
+    -1.8px 1.8px 0 var(--veridian-yellow),
+    1.8px 1.8px 0 var(--veridian-yellow),
+    -1.9px -1.9px 0 var(--veridian-yellow),
+    1.9px -1.9px 0 var(--veridian-yellow),
+    -1.9px 1.9px 0 var(--veridian-yellow),
+    1.9px 1.9px 0 var(--veridian-yellow),
+    -2px -2px 0 var(--veridian-yellow),
+    2px -2px 0 var(--veridian-yellow),
+    -2px 2px 0 var(--veridian-yellow),
+    2px 2px 0 var(--veridian-yellow);
+}
+
+.shield.ROTA.TwoDigit .routeNumber,
+.shield.ROTA.ThreeDigit .routeNumber,
+.shield.ROTA .designation,
+.shield.ROTA2.TwoDigit .routeNumber,
+.shield.ROTA2.ThreeDigit .routeNumber,
+.shield.ROTA2 .designation {
+  text-shadow:
+    -0.1px -0.1px 0 var(--veridian-green),
+    0.1px -0.1px 0 var(--veridian-green),
+    -0.1px 0.1px 0 var(--veridian-green),
+    0.1px 0.1px 0 var(--veridian-green),
+    -0.2px -0.2px 0 var(--veridian-green),
+    0.2px -0.2px 0 var(--veridian-green),
+    -0.2px 0.2px 0 var(--veridian-green),
+    0.2px 0.2px 0 var(--veridian-green),
+    -0.3px -0.3px 0 var(--veridian-green),
+    0.3px -0.3px 0 var(--veridian-green),
+    -0.3px 0.3px 0 var(--veridian-green),
+    0.3px 0.3px 0 var(--veridian-green),
+    -0.4px -0.4px 0 var(--veridian-green),
+    0.4px -0.4px 0 var(--veridian-green),
+    -0.4px 0.4px 0 var(--veridian-green),
+    0.4px 0.4px 0 var(--veridian-green),
+    -0.5px -0.5px 0 var(--veridian-green),
+    0.5px -0.5px 0 var(--veridian-green),
+    -0.5px 0.5px 0 var(--veridian-green),
+    0.5px 0.5px 0 var(--veridian-green),
+    -0.6px -0.6px 0 var(--veridian-green),
+    0.6px -0.6px 0 var(--veridian-green),
+    -0.6px 0.6px 0 var(--veridian-green),
+    0.6px 0.6px 0 var(--veridian-green),
+    -0.7px -0.7px 0 var(--veridian-green),
+    0.7px -0.7px 0 var(--veridian-green),
+    -0.7px 0.7px 0 var(--veridian-green),
+    0.7px 0.7px 0 var(--veridian-green),
+    -0.8px -0.8px 0 var(--veridian-green),
+    0.8px -0.8px 0 var(--veridian-green),
+    -0.8px 0.8px 0 var(--veridian-green),
+    0.8px 0.8px 0 var(--veridian-green),
+    -0.9px -0.9px 0 var(--veridian-green),
+    0.9px -0.9px 0 var(--veridian-green),
+    -0.9px 0.9px 0 var(--veridian-green),
+    0.9px 0.9px 0 var(--veridian-green),
+    -1px -1px 0 var(--veridian-green),
+    1px -1px 0 var(--veridian-green),
+    -1px 1px 0 var(--veridian-green),
+    1px 1px 0 var(--veridian-green),
+    -1.1px -1.1px 0 var(--veridian-green),
+    1.1px -1.1px 0 var(--veridian-green),
+    -1.1px 1.1px 0 var(--veridian-green),
+    1.1px 1.1px 0 var(--veridian-green),
+    -1.2px -1.2px 0 var(--veridian-green),
+    1.2px -1.2px 0 var(--veridian-green),
+    -1.2px 1.2px 0 var(--veridian-green),
+    1.2px 1.2px 0 var(--veridian-green),
+    -1.3px -1.3px 0 var(--veridian-green),
+    1.3px -1.3px 0 var(--veridian-green),
+    -1.3px 1.3px 0 var(--veridian-green),
+    1.3px 1.3px 0 var(--veridian-green),
+    -1.4px -1.4px 0 var(--veridian-green),
+    1.4px -1.4px 0 var(--veridian-green),
+    -1.4px 1.4px 0 var(--veridian-green),
+    1.4px 1.4px 0 var(--veridian-green),
+    -1.5px -1.5px 0 var(--veridian-green),
+    1.5px -1.5px 0 var(--veridian-green),
+    -1.5px 1.5px 0 var(--veridian-green),
+    1.5px 1.5px 0 var(--veridian-green),
+    -1.6px -1.6px 0 var(--veridian-green),
+    1.6px -1.6px 0 var(--veridian-green),
+    -1.6px 1.6px 0 var(--veridian-green),
+    1.6px 1.6px 0 var(--veridian-green),
+    -1.7px -1.7px 0 var(--veridian-green),
+    1.7px -1.7px 0 var(--veridian-green),
+    -1.7px 1.7px 0 var(--veridian-green),
+    1.7px 1.7px 0 var(--veridian-green),
+    -1.8px -1.8px 0 var(--veridian-green),
+    1.8px -1.8px 0 var(--veridian-green),
+    -1.8px 1.8px 0 var(--veridian-green),
+    1.8px 1.8px 0 var(--veridian-green),
+    -1.9px -1.9px 0 var(--veridian-green),
+    1.9px -1.9px 0 var(--veridian-green),
+    -1.9px 1.9px 0 var(--veridian-green),
+    1.9px 1.9px 0 var(--veridian-green),
+    -2px -2px 0 var(--veridian-green),
+    2px -2px 0 var(--veridian-green),
+    -2px 2px 0 var(--veridian-green),
+    2px 2px 0 var(--veridian-green);
+}
+
+.shield.RO.TwoDigit .routeNumber,
+.shield.RO.ThreeDigit .routeNumber,
+.shield.ROB.TwoDigit .routeNumber,
+.shield.ROB.ThreeDigit .routeNumber,
+.shield.ROH.TwoDigit .routeNumber,
+.shield.ROH.ThreeDigit .routeNumber,
+.shield.ROL.TwoDigit .routeNumber,
+.shield.ROL.ThreeDigit .routeNumber,
+.shield.ROO.TwoDigit .routeNumber,
+.shield.ROO.ThreeDigit .routeNumber,
+.shield.ROS.TwoDigit .routeNumber,
+.shield.ROS.ThreeDigit .routeNumber,
+.shield.ROTA.TwoDigit .routeNumber,
+.shield.ROTA.ThreeDigit .routeNumber {
+  color: var(--white);
+}
+
+.shield.ROD.TwoDigit .routeNumber,
+.shield.ROD.ThreeDigit .routeNumber,
+.shield.ROF.TwoDigit .routeNumber,
+.shield.ROF.ThreeDigit .routeNumber,
+.shield.ROT.TwoDigit .routeNumber,
+.shield.ROT.ThreeDigit .routeNumber {
+  color: var(--black);
+}
+
+.shield.ROTA2.TwoDigit .routeNumber,
+.shield.ROTA2.ThreeDigit .routeNumber {
+  color: var(--countyYellow);
+}
+
+.shield.RO.TwoDigit .routeNumber,
+.shield.RO.ThreeDigit .routeNumber,
+.shield.ROB.TwoDigit .routeNumber,
+.shield.ROB.ThreeDigit .routeNumber,
+.shield.ROD.TwoDigit .routeNumber,
+.shield.ROD.ThreeDigit .routeNumber,
+.shield.ROF.TwoDigit .routeNumber,
+.shield.ROF.ThreeDigit .routeNumber,
+.shield.ROH.TwoDigit .routeNumber,
+.shield.ROH.ThreeDigit .routeNumber,
+.shield.ROL.TwoDigit .routeNumber,
+.shield.ROL.ThreeDigit .routeNumber,
+.shield.ROO.TwoDigit .routeNumber,
+.shield.ROO.ThreeDigit .routeNumber,
+.shield.ROS.TwoDigit .routeNumber,
+.shield.ROS.ThreeDigit .routeNumber,
+.shield.ROT.TwoDigit .routeNumber,
+.shield.ROT.ThreeDigit .routeNumber,
+.shield.ROTA.TwoDigit .routeNumber,
+.shield.ROTA.ThreeDigit .routeNumber,
+.shield.ROTA2.TwoDigit .routeNumber,
+.shield.ROTA2.ThreeDigit .routeNumber {
+  font-family: "Series C";
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+.shield.RO .designation,
+.shield.ROB .designation,
+.shield.ROH .designation,
+.shield.ROL .designation,
+.shield.ROO .designation,
+.shield.ROS .designation,
+.shield.ROTA .designation {
+  color: var(--white);
+  font-family: "Series D";
+  font-size: 0.6em;
+  margin-top: 4.1em;
+}
+
+.shield.ROD .designation,
+.shield.ROF .designation,
+.shield.ROT .designation {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 0.6em;
+  margin-top: 4.1em;
+}
+
+.shield.ROTA2 .designation {
+  color: var(--countyYellow);
+  font-family: "Series D";
+  font-size: 0.6em;
+  margin-top: 4.1em;
+}
+
+.shield.ROTP .routeNumber,
+.shield.ROTP .designation {
+  display: none;
+}
+
+/* Airport/Airstrip */
+.shield.VAIRSTRIP,
+.shield.VAIRPORT {
+  margin-bottom: 1em;
+}
+
+.shield.VAIRSTRIP .routeNumber,
+.shield.VAIRPORT .routeNumber {
+  font-family: "Transport";
+  font-size: 0.5em;
+  padding-top: 6.7em;
+}
+
+.shield.VAIRSTRIP .designation,
+.shield.VAIRPORT .designation {
+  display: none;
+}
+
+/*
+  Selenitian Road Signs ==================================================
+*/
+
+/* Arteriell */
+.shield.A .routeNumber {
+  color: var(--black);
+  font-family: "Series EM";
+  font-size: 1.2em;
+  top: 0.4em;
+}
+
+.shield.A.TwoDigit .routeNumber {
+  font-family: "Series D";
+}
+
+.shield.A.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}
+
+/* Selenitian Routes */
+.shield.SE .routeNumber {
+  color: var(--black);
+  font-family: "Series D";
+  font-size: 1.35em;
+  top: 0.1em;
+}
+
+.shield.SE.ThreeDigit .routeNumber {
+  font-family: "Series C";
+}

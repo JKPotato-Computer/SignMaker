@@ -1,0 +1,204 @@
+:root {
+  --green: rgb(0, 95, 77);
+  --blue: rgb(0, 67, 123);
+  --brown: rgb(98, 51, 30);
+  --yellow: rgb(252, 207, 52);
+  --countyYellow: rgb(247, 209, 23);
+  --white: rgb(255, 255, 255);
+  --black: rgb(0, 0, 0);
+  --purple: rgb(102, 0, 153);
+  --orange: rgb(255, 89, 4);
+  --red: rgb(255, 0, 0);
+  --fluorescent-pink: rgb(255, 51, 204);
+  --fluorescent-yellow-green: rgb(153, 255, 0);
+}
+
+/* Veridian colors */
+:root {
+  --veridian-green: rgb(0, 64, 64);
+  --veridian-blue: rgb(0, 47, 108);
+  --veridian-brown: rgb(105, 63, 35);
+  --veridian-yellow: rgb(254, 209, 65);
+  --veridian-purple: rgb(105, 13, 163);
+  --veridian-orange: rgb(229, 114, 0);
+  --veridian-red: rgb(175, 39, 47);
+  --veridian-coral: rgb(223, 70, 97);
+}
+
+:root[data-theme="light"] {
+  --backgroundColor: rgb(144 181 255);
+  --hotbarColor: rgb(210, 225, 255);
+  --textColor: rgb(0, 0, 0);
+  --selectedColor: rgb(255, 255, 255);
+  --hoverColor: rgb(255, 255, 255, 0.5);
+  --baseColor: 255, 255, 255;
+  --baseColorInv: 0, 0, 0;
+  --inputColor: 240, 240, 240;
+}
+
+:root[data-theme="dark"] {
+  --backgroundColor: rgb(10 28 77);
+  --hotbarColor: rgb(43 63 118);
+  --textColor: rgb(247 249 251);
+  --selectedColor: rgb(255, 255, 255, 0.25);
+  --hoverColor: rgb(24 39 78);
+  --baseColor: 0, 0, 0;
+  --baseColorInv: 255, 255, 255;
+  --inputColor: 15, 15, 15;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  font-family: "Inter";
+  font-size: 20px;
+  color: var(--textColor);
+}
+
+body {
+  background-color: var(--backgroundColor);
+  transition: 0.15s ease-in-out background-color;
+}
+
+main,
+footer {
+  z-index: 0;
+}
+
+main#smRender {
+  width: max-content;
+  height: max-content;
+  display: flex;
+  flex-direction: row;
+  align-items: safe center;
+  justify-content: left;
+  min-height: max(calc(100svh * var(--zoomLevelDec, 1)), 100svh);
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+main#smRender.wide {
+  left: 0;
+  transform: none;
+}
+
+main#smRender.modalOpen {
+  transform: translateX(50%);
+}
+
+body > footer img {
+  height: 100px;
+  margin: -10px 0 -10px -10px;
+}
+
+body > footer {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  transition: none;
+}
+
+body > footer > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+body > footer div:nth-child(1) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: max-content;
+  padding: 0.5rem 1rem;
+}
+
+body > footer a {
+  color: var(--textColor);
+}
+
+body > footer > div:nth-child(2) a {
+  border-radius: 0.1rem;
+
+  background-color: rgb(255, 255, 255, 0.15);
+  text-decoration: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  height: 100%;
+  width: 10rem;
+
+  transition: 0.2s;
+  font-size: 16px;
+  text-align: right;
+  transition: 0.15s ease-in-out;
+}
+
+body > footer > div:nth-child(2) a:hover {
+  background-color: rgb(255, 255, 255, 0.5);
+}
+
+body > footer p {
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Overpass";
+  font-weight: 600;
+}
+
+#oSNum {
+  display: none;
+}
+
+.warning {
+  background-color: var(--yellow);
+  padding: 6px;
+  font-weight: bold;
+  font-family: "Inter";
+  font-weight: 400;
+  font-size: 16px;
+  margin: 16px;
+}
+
+.material-symbols-outlined {
+  user-select: none;
+}
+
+input[type="checkbox"] {
+  width: auto;
+}

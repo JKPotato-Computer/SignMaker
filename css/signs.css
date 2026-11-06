@@ -1,0 +1,511 @@
+#postContainer {
+  display: flex;
+  flex-direction: row;
+  height: max-content;
+  position: relative;
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  --postThickness: 1rem;
+  --postGradient: linear-gradient(
+    90deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+}
+
+#postContainer.postColorSilver {
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+}
+
+#postContainer.postColorBlack {
+  --post-color-mid: rgb(74, 74, 74);
+  --post-color-light: rgb(120, 120, 120);
+  --post-color-dark: rgb(20, 20, 20);
+}
+
+#postContainer.postColorBrown {
+  --post-color-mid: rgb(124, 86, 52);
+  --post-color-light: rgb(171, 124, 82);
+  --post-color-dark: rgb(86, 55, 28);
+}
+
+#postContainer.postColorRed {
+  --post-color-mid: rgb(193, 38, 38);
+  --post-color-light: rgb(235, 110, 110);
+  --post-color-dark: rgb(120, 16, 16);
+}
+
+#postContainer.polePositionOverhead .post {
+  visibility: visible;
+}
+#postContainer.polePositionLeft .post:last-child,
+#postContainer.polePositionRight .post:first-child {
+  visibility: hidden;
+}
+#postContainer.postVariantRural .post,
+#postContainer.postVariantCenter .post {
+  visibility: hidden;
+}
+
+#postContainer.polePositionLeft #panelContainer,
+#postContainer.polePositionRight #panelContainer,
+#postContainer.polePositionOverhead #panelContainer {
+  background: linear-gradient(
+    180deg,
+    var(--post-color-mid) 0,
+    var(--post-color-light) calc(var(--postThickness) / 2),
+    var(--post-color-dark) calc(var(--postThickness)),
+    transparent calc(var(--postThickness)),
+    transparent calc(100% - var(--postThickness)),
+    var(--post-color-mid) calc(100% - var(--postThickness)),
+    var(--post-color-light)
+      calc(100% - var(--postThickness) + calc(var(--postThickness) / 2)),
+    var(--post-color-dark)
+      calc(100% - var(--postThickness) + var(--postThickness))
+  );
+  height: calc(var(--spacingMultiplier) * var(--postThickness));
+  margin-top: var(--postOffset);
+}
+
+#postContainer.postVariantRural #panelContainer {
+  position: relative;
+  background-image:
+    linear-gradient(
+      90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%
+    ),
+    linear-gradient(
+      90deg,
+      var(--post-color-mid) 0%,
+      var(--post-color-light) 40%,
+      var(--post-color-dark) 100%
+    );
+  background-repeat: no-repeat;
+  background-size:
+    var(--postThickness, 1rem) 24rem,
+    var(--postThickness, 1rem) 24rem;
+  background-position:
+    left 1rem bottom,
+    right 1rem bottom;
+  margin-top: 20rem;
+  height: 10rem;
+}
+#postContainer.postVariantRural .panel {
+  margin-bottom: -1rem;
+}
+
+#postContainer.postVariantCenter #panelContainer {
+  position: relative;
+  background-image: linear-gradient(
+    90deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: var(--postThickness, 1rem) 24rem;
+  background-position: center bottom;
+  height: 30rem;
+}
+
+.post {
+  background: var(--postGradient);
+  width: var(--postThickness, 1rem);
+  height: 24rem;
+
+  align-self: flex-end;
+}
+.post:first-child {
+  margin-left: auto;
+}
+.post:last-child {
+  margin-right: auto;
+}
+
+#panelContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: intrinsic;
+  gap: var(--panelSpacing, 0rem);
+}
+
+.panel {
+  --signBorderRadius: 0.75rem;
+  text-align: center;
+  display: block;
+  padding: 0rem;
+  position: relative;
+}
+
+#postContainer.postVariantRural .panel {
+  margin-top: -10rem;
+}
+#postContainer.postVariantCenter .panel {
+  margin-top: -20rem;
+}
+#postContainer.postVariantRural .panel:not(:first-child),
+#postContainer.postVariantCenter .panel:not(:first-child) {
+  display: none;
+}
+
+.panel.green {
+  --bg-color: var(--green);
+  --fg-color: var(--white);
+}
+.panel.blue {
+  --bg-color: var(--blue);
+  --fg-color: var(--white);
+}
+.panel.brown {
+  --bg-color: var(--brown);
+  --fg-color: var(--white);
+}
+.panel.black {
+  --bg-color: var(--black);
+  --fg-color: var(--white);
+}
+.panel.red {
+  --bg-color: var(--red);
+  --fg-color: var(--white);
+}
+.panel.purple {
+  --bg-color: var(--purple);
+  --fg-color: var(--white);
+}
+
+.panel.white {
+  --bg-color: var(--white);
+  --fg-color: var(--black);
+}
+.panel.yellow {
+  --bg-color: var(--yellow);
+  --fg-color: var(--black);
+}
+.panel.orange {
+  --bg-color: var(--orange);
+  --fg-color: var(--black);
+}
+.panel.fluorescent.pink {
+  --bg-color: var(--fluorescent-pink);
+  --fg-color: var(--black);
+}
+.panel.fluorescent.yellow-green {
+  --bg-color: var(--fluorescent-yellow-green);
+  --fg-color: var(--black);
+}
+.panel.avarian.green {
+  --bg-color: var(--veridian-green);
+  --fg-color: var(--white);
+}
+.panel.avarian.blue {
+  --bg-color: var(--veridian-blue);
+  --fg-color: var(--white);
+}
+.panel.avarian.blue {
+  --bg-color: var(--veridian-blue);
+  --fg-color: var(--white);
+}
+.panel.avarian.brown {
+  --bg-color: var(--veridian-brown);
+  --fg-color: var(--white);
+}
+.panel.avarian.red {
+  --bg-color: var(--veridian-red);
+  --fg-color: var(--white);
+}
+.panel.avarian.purple {
+  --bg-color: var(--veridian-purple);
+  --fg-color: var(--white);
+}
+.panel.avarian.yellow {
+  --bg-color: var(--veridian-yellow);
+  --fg-color: var(--black);
+}
+.panel.avarian.orange {
+  --bg-color: var(--veridian-orange);
+  --fg-color: var(--black);
+}
+.panel.avarian.coral {
+  --bg-color: var(--veridian-coral);
+  --fg-color: var(--white);
+}
+.panel :is(.signCorner, .signHolder, .guideArrows) {
+  background-color: var(--bg-color);
+}
+
+.panel.round .signCorner,
+.panel.round .guideArrowsHolder {
+  background-color: transparent !important;
+}
+
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.apl) {
+  background-color: var(--bg-color);
+}
+
+.panel :is(.sign, .ET-tab, .guideArrows) {
+  color: var(--fg-color);
+  border-color: var(--fg-color);
+}
+
+.panel:is(.white, .orange, .yellow, .fluorescent) .dividerElement {
+  background-color: black;
+}
+.panel.orange .arrow,
+.panel.fluorescent.yellow-green .arrow,
+.panel.fluorescent.pink .arrow {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+}
+
+.panel:not(.sharp) .sign {
+  background-color: transparent;
+}
+
+.panel:not(.sharp) .ET-tabHolder {
+  background-color: transparent;
+}
+
+.sign {
+  z-index: 3;
+}
+
+.exitTabContainer {
+  z-index: 2;
+}
+
+.signContainer {
+  width: max-content;
+}
+
+.sign {
+  display: block;
+  position: relative;
+}
+
+.signHolder {
+  display: flex;
+  clear: both;
+  border-radius: var(--signBorderRadius, 0.75rem);
+  border: 0.2rem solid;
+  clear: both;
+  overflow: hidden;
+  visibility: visible;
+  z-index: 2;
+  position: relative;
+}
+
+.sideLeftArrow,
+.sideRightArrow {
+  margin-top: auto;
+  margin-bottom: auto;
+  display: none;
+  height: 2.5rem;
+  padding: 0.2rem;
+}
+
+.sideLeftArrow {
+  margin-left: 1rem;
+  rotate: -45deg;
+}
+
+.sideRightArrow {
+  margin-right: 1rem;
+  rotate: 45deg;
+}
+
+.signContentContainer {
+  display: flex;
+  width: 100%;
+  padding: 0.3rem 0.75rem 0.3rem 0.75rem;
+  position: relative;
+}
+
+.otherSymbols {
+  display: inline-flex;
+  flex-direction: column;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0.1rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+.oSNum {
+  /* Add .left and .right */
+  font-family: "Series EM";
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+  text-align: center;
+  top: 0.1rem;
+  font-size: 1.25em;
+  left: -0.3rem;
+  color: black;
+}
+.left .oSNum {
+  left: 0.3rem;
+}
+.oSNum.short {
+  letter-spacing: 0.1rem;
+}
+.oSNum.five {
+  font-family: "Series C";
+  top: 0.29rem;
+  font-size: 1.2em;
+}
+
+.streetName {
+  border: solid var(--white) 0.15rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+}
+.streetName:last-child {
+  margin-bottom: 0;
+}
+.streetName,
+.controlText {
+  font-family: "Clearview 5WR";
+  font-size: 1.75rem;
+  line-height: 2rem;
+  white-space: pre-wrap;
+}
+
+.controlText {
+  --fhwaBaselineOffset: 0px;
+  position: relative;
+  top: var(--fhwaBaselineOffset);
+}
+
+.guideArrows {
+  border-style: solid;
+  border-width: 0.2rem;
+  border-top-width: 0;
+  border-radius: 0 0 var(--signBorderRadius, 0.75rem)
+    var(--signBorderRadius, 0.75rem);
+  z-index: 3;
+}
+
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only.white_border) {
+  background-color: var(--green);
+}
+
+.panel:not(.round)
+  .guideArrowsHolder:has(
+    .guideArrows.exit_only.partial_black_border,
+    .guideArrows.exit_only.full_black_border
+  ) {
+  background-color: var(--bgColor);
+}
+
+.guideArrowsHolder:has(
+  .guideArrows.none,
+  .guideArrows.side_left,
+  .guideArrows.side_right
+) {
+  display: none;
+}
+
+.guideArrows.exit_only.partial_black_border,
+.guideArrows.exit_only.full_black_border {
+  border-color: inherit;
+  color: inherit;
+  background-color: var(--bgColor);
+}
+
+.guideArrows.exit_only.full_black_border {
+  border-top: 0.2rem solid black;
+}
+
+.guideArrows.exit_only.white_border {
+  padding: 0 0.2rem 0.2rem 0.2rem;
+}
+
+.guideArrows.exit_only.white_border > .arrowContainer {
+  background-color: var(--bgColor);
+  border-bottom-left-radius: calc(var(--signBorderRadius) / 2);
+  border-bottom-right-radius: calc(var(--signBorderRadius) / 2);
+  color: black;
+}
+
+.arrowContainer {
+  display: flex;
+  justify-content: var(--arrowJustify);
+  align-items: center;
+  gap: var(--arrowGap);
+}
+
+.arrowContainer:has(.arrowContainer.halfexitonly) {
+  justify-content: space-between;
+}
+
+.guideArrows.full_black_border .arrowContainer.halfExitOnly {
+  border: 0.2rem solid black;
+}
+
+.arrowContainer.halfExitOnly {
+  width: max-content;
+  height: stretch;
+  padding: var(--splitVerticalPadding) var(--splitHorizontalPadding);
+  flex-direction: row;
+  background-color: var(--bgColor);
+  color: black;
+}
+
+.guideArrows.white_border .arrowContainer:has(.arrowContainer.halfexitonly) {
+  padding: 0 0.2rem 0.2rem 0.2rem;
+}
+
+.halfExitOnlyOutsideArrow {
+  position: relative;
+}
+
+.subPanelDisplay {
+  height: auto;
+}
+
+.subDivider {
+  width: 0.2rem;
+  min-width: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.subDividerSegment {
+  width: 100%;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+img.diagrammicImage {
+  height: 15rem;
+  aspect-ratio: 1 / 1;
+  width: 15rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.signHolder.diagrammic > .signContentContainer {
+  position: absolute;
+  width: max-content;
+  left: calc(var(--leftTransform) * 1px);
+  top: calc(var(--topTransform) * 1px);
+}
+
+.signHolder.diagrammic {
+  min-height: 15rem;
+  min-width: 15rem;
+}
+
+.signHolder.diagrammic .subDivider {
+  display: none;
+}
