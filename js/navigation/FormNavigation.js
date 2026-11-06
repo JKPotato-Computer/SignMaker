@@ -438,7 +438,7 @@ const FormNavigation = (() => {
   };
 
   const setupExitTabOptions = () => {
-    for (const position of ExitTabRow.prototype.position) {
+    for (const position of ExitTabRow.positions) {
       lib.appendOption(
         document.querySelector("#sMET_Position"),
         position.toLowerCase(),
@@ -446,7 +446,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const edgeType of ExitTabRow.prototype.panelEdgeType) {
+    for (const edgeType of ExitTabRow.panelEdgeTypes) {
       lib.appendOption(
         document.querySelector("#sMET_PanelEdgeType"),
         edgeType.toLowerCase(),

@@ -614,8 +614,8 @@ class ExitTabRow {
     this.exitTabs.splice(index, 1);
   }
 }
-ExitTabRow.prototype.panelEdgeType = ["Separate", "Extend", "Meet Corners"];
-ExitTabRow.prototype.position = [
+ExitTabRow.panelEdgeTypes = ["Separate", "Extend", "Meet Corners"];
+ExitTabRow.positions = [
   "Top",
   "Bottom",
   "Left",

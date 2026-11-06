@@ -56,9 +56,15 @@ const App = (() => {
     HistoryManager.updateButtons();
 
     if (localStorage.getItem("autoSaveSignData")) {
-      post =
-        ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
-        new Post(Post.polePositions[0]);
+      try {
+        post =
+          ImportExport.jsonToSign(SavesNTemplates.fetchAutoSave()) ||
+          new Post(Post.polePositions[0]);
+      } catch (e) {
+        alert("Error loading autosave data. Starting a new sign.");
+        post = new Post(Post.polePositions[0]);
+        localStorage.setItem("autoSaveSignData", null);
+      }
       if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
         post.panels = post.panels.map((panel) => [panel]);
       }
@@ -2481,6 +2487,7 @@ const App = (() => {
     if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
       post.panels = post.panels.map((panel) => [panel]);
     }
+    
     currentlySelectedPanelGroupIndex = clamp(
       currentlySelectedPanelGroupIndex,
       0,

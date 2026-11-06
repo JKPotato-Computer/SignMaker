@@ -874,7 +874,6 @@ textarea {
 
 .exitTabButton,
 .exitTabNestedButton {
-  background: rgb(230, 230, 230);
   border-radius: 0;
   min-width: 1rem;
   height: 1rem;
@@ -3135,6 +3134,16 @@ summary:hover {
   padding: 1rem;
 }
 
+#signMakerSettingsContent > div {
+  height: 100%;
+}
+
+#sMSettings_MUTCDVariants {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 #sMSettingsHeader > header {
   display: flex;
   justify-content: space-between;
@@ -3176,6 +3185,7 @@ summary:hover {
   gap: 1rem;
   overflow: auto;
   padding: 1rem;
+  width: 100%;
 }
 
 .mutcdImage {
@@ -3245,4 +3255,11 @@ summary:hover {
 #smSettings_addVariant {
   padding: .5rem 1rem;
   font-size: 1.25rem;
+}
+
+#smSettings_MUTCDGallery {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

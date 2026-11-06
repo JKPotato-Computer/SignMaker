@@ -1294,7 +1294,7 @@ main#smRender.wide #postContainer {
 }
 
 .sMGA_APLArrow.flipped {
-  transform: scaleX(-1);
+  transform: scaleX(-1) translateX(calc(-1 * var(--arrowOffset)));
 }
 
 .sMGA_APLArrow_exitText {

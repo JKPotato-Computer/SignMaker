@@ -82,10 +82,9 @@ const ImportExport = (() => {
             if (key === "_type") continue;
 
             if (key in targetClass.prototype) {
-              continue;
-            }
-
-            if (Object.hasOwn(targetClass, key)) {
+              if (processedData._type == "ExitTabRow") {
+                console.log(key);
+              }
               continue;
             }
 

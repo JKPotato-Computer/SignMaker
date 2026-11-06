@@ -496,8 +496,7 @@ const MUTCDVariants = (() => {
 
   const get = (className, options = {}) => {
     const guide =
-      typeof App !== "undefined" &&
-      App.getPost()
+      typeof App !== "undefined" && App.getPost()
         ? App.getPost().mutcdVariant
         : "MUTCD";
     return merge(getDefaults(className, guide), options);
