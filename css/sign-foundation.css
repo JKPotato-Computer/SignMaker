@@ -815,12 +815,12 @@ main#smRender.wide #postContainer {
 }
 
 .panel.sharp .ET-FullLeftHolder {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
 }
 
 .ET-FullLeft {
-  background-color: var(--yellow);
-  border: var(--borderThickness) solid var(--black);
+  background-color: rgb(252, 207, 52);
+  border: var(--borderThickness) solid rgb(0, 0, 0);
   border-radius: var(--borderRadius);
   border-bottom: none;
   border-bottom-left-radius: 0;
@@ -840,7 +840,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-PartialLeft {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
   padding: var(--verticalPadding) var(--horizontalPadding);
   border-radius: var(--partialLeftBorderRadius);
   color: black;
@@ -1926,7 +1926,8 @@ main#smRender.wide #postContainer {
   justify-content: center;
   align-items: center;
   transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
-  color: black;
+  /* color: black; */
+  color: red; /*DEBUG SHIELD COLORS*/
 }
 .designation {
   position: absolute;
@@ -2044,25 +2045,24 @@ main#smRender.wide #postContainer {
 }
 
 .exitTabContainer.top:has(.merge) {
-  top: .2rem;
+  top: 0.2rem;
   position: relative;
 }
 
 .exitTabContainer.bottom:has(.merge) {
-  bottom: .2rem;
+  bottom: 0.2rem;
   position: relative;
 }
 
 .exitTabContainer.left:has(.merge) {
-  left: .2rem;
+  left: 0.2rem;
   position: relative;
 }
 
 .exitTabContainer.right:has(.merge) {
-  right: .2rem;
+  right: 0.2rem;
   position: relative;
 }
-
 
 .exitTabContainer.left {
   grid-area: exitTabLeft;
@@ -2268,12 +2268,12 @@ main#smRender.wide #postContainer {
 }
 
 .panel.sharp .ET-FullLeftHolder {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
 }
 
 .ET-FullLeft {
-  background-color: var(--yellow);
-  border: var(--borderThickness) solid var(--black);
+  background-color: rgb(252, 207, 52);
+  border: var(--borderThickness) solid rgb(0, 0, 0);
   border-radius: var(--borderRadius);
   border-bottom: none;
   border-bottom-left-radius: 0;
@@ -2293,7 +2293,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-PartialLeft {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
   padding: var(--verticalPadding) var(--horizontalPadding);
   border-radius: var(--partialLeftBorderRadius);
   color: black;
@@ -2551,7 +2551,7 @@ main#smRender.wide #postContainer {
 .signContainer:has(
     .exitTabContainer.top .ET-row.merge:last-child .left:not(:empty)
   )
-  .signHolder{
+  .signHolder {
   border-top-left-radius: 0;
 }
 
@@ -2574,9 +2574,9 @@ main#smRender.wide #postContainer {
   )
   .signHolder,
 .signContainer:has(
-  .exitTabContainer.top
-    .ET-row.merge:last-child
-    .ET-tabHolder.full) .signHolder {
+    .exitTabContainer.top .ET-row.merge:last-child .ET-tabHolder.full
+  )
+  .signHolder {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
@@ -2588,7 +2588,7 @@ main#smRender.wide #postContainer {
 .signContainer:has(
     .exitTabContainer.top .ET-row.merge:last-child .right:not(:empty)
   )
-  .signHolder  {
+  .signHolder {
   border-top-right-radius: 0;
 }
 
@@ -2599,7 +2599,7 @@ main#smRender.wide #postContainer {
 .signContainer:has(
     .exitTabContainer.bottom .ET-row.merge:last-child .left:not(:empty)
   )
-  .signHolder{
+  .signHolder {
   border-bottom-left-radius: 0;
 }
 
@@ -2615,16 +2615,15 @@ main#smRender.wide #postContainer {
   )
   .signHolder,
 .signContainer:has(
-    .exitTabContainer.bottom
-      .ET-row.meet-corners:last-child,
-      .left
-      .ET-tabHolder.full
+    .exitTabContainer.bottom .ET-row.meet-corners:last-child,
+    .left .ET-tabHolder.full
   )
   .signHolder,
 .signContainer:has(
-  .exitTabContainer.bottom
-    .ET-row.merge:last-child,
-    .ET-tabHolder.full) .signHolder {
+    .exitTabContainer.bottom .ET-row.merge:last-child,
+    .ET-tabHolder.full
+  )
+  .signHolder {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -2636,7 +2635,7 @@ main#smRender.wide #postContainer {
 .signContainer:has(
     .exitTabContainer.bottom .ET-row.merge:last-child .right:not(:empty)
   )
-  .signHolder  {
+  .signHolder {
   border-bottom-right-radius: 0;
 }
 
