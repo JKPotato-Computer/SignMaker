@@ -2145,7 +2145,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-tab.icon {
-  background-color: var(--iconBackgroundColor);
+  background-color: var(--backgroundColor);
   padding: var(--iconVerticalPadding) var(--iconHorizontalPadding);
 }
 
