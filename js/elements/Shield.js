@@ -1569,7 +1569,7 @@ Shield.prototype.shieldDirectory = {
     LA: {
       type: "shield",
       name: "Louisiana",
-      variants: ["2 Digit", "3 Digit"],
+      variants: ["3 Digit"],
       supportsAuto: true,
     },
     MD: {
@@ -2226,7 +2226,7 @@ Shield.prototype.shieldDirectory = {
           variants: ["1 Digit", "2 Digit", "3 Digit", "4 Digit"],
           supportsAuto: true,
         },
-        PLE: {
+        PDS: {
           type: "shield",
           name: "Palo Duro (Spur)",
           variants: ["1 Digit", "2 Digit", "3 Digit", "4 Digit"],

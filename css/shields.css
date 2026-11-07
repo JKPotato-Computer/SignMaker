@@ -1062,7 +1062,6 @@
 .shield.ABTC .routeNumber,
 .shield.BCTC .routeNumber,
 .shield.NLTC .routeNumber,
-.shield.NSTC .routeNumber,
 .shield.MBTC .routeNumber,
 .shield.ONTC .routeNumber,
 .shield.QCTC .routeNumber,
@@ -1082,7 +1081,6 @@
 .shield.BCTC:has(.designation) .routeNumber,
 .shield.NBTC:has(.designation) .routeNumber,
 .shield.NLTC:has(.designation) .routeNumber,
-.shield.NSTC:has(.designation) .routeNumber,
 .shield.MBTC:has(.designation) .routeNumber,
 .shield.ONTC:has(.designation) .routeNumber,
 .shield.QCTC:has(.designation) .routeNumber,
@@ -1094,7 +1092,6 @@
 .shield.ABTC .designation,
 .shield.BCTC .designation,
 .shield.NLTC .designation,
-.shield.NSTC .designation,
 .shield.MBTC .designation,
 .shield.ONTC .designation,
 .shield.QCTC .designation,
@@ -1113,6 +1110,18 @@
   top: 0.25em;
 }
 
+.shield.NBTC .routeNumber {
+  color: rgb(0, 95, 77);
+  font-family: "Arial Bold";
+  font-size: 1.25em;
+  top: 0.25em;
+}
+
+.shield.NSTC .routeNumber {
+  top: 2.75em;
+  font-size: 0.8em;
+  font-family: "Arial Bold";
+}
 /*
   Australian Road Signs =====================================================
 */
@@ -1235,6 +1244,7 @@
 }
 
 .shield.SH:has(.designation) .routeNumber {
+  color: rgb(255, 255, 255);
   top: -0.3em;
 }
 
@@ -1270,6 +1280,20 @@
   font-weight: 1 !important;
   top: 0.05em;
 }
+.shield.V .designation,
+.shield.VRB .designation,
+.shield.VRD .designation,
+.shield.VRF .designation,
+.shield.VRH .designation,
+.shield.VRL .designation,
+.shield.VRO .designation,
+.shield.VRS .designation,
+.shield.VRT .designation {
+  color: rgb(255, 255, 255);
+  font-family: "Series D";
+  font-size: 0.7em;
+  margin-top: 3.2em;
+}
 
 .shield.VRF .routeNumber,
 .shield.VRT .routeNumber,
@@ -1302,20 +1326,6 @@
 .shield.VRS.TwoDigit .routeNumber,
 .shield.VRT.TwoDigit .routeNumber {
   font-family: "Series C";
-}
-
-.shield.V .designation,
-.shield.VRB .designation,
-.shield.VRD .designation,
-.shield.VRF .designation,
-.shield.VRH .designation,
-.shield.VRL .designation,
-.shield.VRO .designation,
-.shield.VRS .designation,
-.shield.VRT .designation {
-  font-family: "Series D";
-  font-size: 0.7em;
-  margin-top: 3.2em;
 }
 
 .shield.V:has(.designation) .routeNumber,
@@ -1385,6 +1395,34 @@
   top: 0.45em;
 }
 
+.shield.ILG .designation,
+.shield.ILGB .designation,
+.shield.ILGD .designation,
+.shield.ILGF .designation,
+.shield.ILGH .designation,
+.shield.ILGO .designation,
+.shield.ILGL .designation,
+.shield.ILGS .designation,
+.shield.ILGT .designation {
+  color: rgb(255, 255, 255);
+  font-family: "Series C";
+  font-size: 0.33em;
+  margin-top: 1.75em;
+}
+.shield.ILT .designation,
+.shield.ILTB .designation,
+.shield.ILTD .designation,
+.shield.ILTF .designation,
+.shield.ILTH .designation,
+.shield.ILTO .designation,
+.shield.ILTL .designation,
+.shield.ILTS .designation,
+.shield.ILTT .designation {
+  color: rgb(255, 255, 255);
+  font-family: "Series D";
+  font-size: 0.6em;
+  margin-top: 4em;
+}
 .shield.ILGD .routeNumber,
 .shield.ILTD .routeNumber,
 .shield.ILGF .routeNumber,
@@ -1461,34 +1499,6 @@
 .shield.ILGT.FourDigit .routeNumber,
 .shield.ILTT.FourDigit .routeNumber {
   font-family: "Series B";
-}
-
-.shield.ILG .designation,
-.shield.ILGB .designation,
-.shield.ILGD .designation,
-.shield.ILGF .designation,
-.shield.ILGH .designation,
-.shield.ILGO .designation,
-.shield.ILGL .designation,
-.shield.ILGS .designation,
-.shield.ILGT .designation {
-  font-family: "Series C";
-  font-size: 0.33em;
-  margin-top: 1.75em;
-}
-
-.shield.ILT .designation,
-.shield.ILTB .designation,
-.shield.ILTD .designation,
-.shield.ILTF .designation,
-.shield.ILTH .designation,
-.shield.ILTO .designation,
-.shield.ILTL .designation,
-.shield.ILTS .designation,
-.shield.ILTT .designation {
-  font-family: "Series D";
-  font-size: 0.6em;
-  margin-top: 4em;
 }
 
 .shield.ILT:has(.designation).OneDigit .routeNumber,
@@ -1577,6 +1587,20 @@
   font-family: "Series C";
 }
 
+.shield.BA .designation,
+.shield.BAB .designation,
+.shield.BAD .designation,
+.shield.BAF .designation,
+.shield.BAH .designation,
+.shield.BAL .designation,
+.shield.BAO .designation,
+.shield.BAS .designation,
+.shield.BAT .designation,
+.shield.BATA .designation {
+  color: rgb(255, 255, 255);
+  font-size: 0.75em;
+  margin-top: 3.25em;
+}
 .shield.BAD .routeNumber,
 .shield.BAD .designation,
 .shield.BAF .routeNumber,
@@ -1598,20 +1622,6 @@
 .shield.BATA:has(.designation) .routeNumber {
   font-size: 1.4em;
   top: -0.1em;
-}
-
-.shield.BA .designation,
-.shield.BAB .designation,
-.shield.BAD .designation,
-.shield.BAF .designation,
-.shield.BAH .designation,
-.shield.BAL .designation,
-.shield.BAO .designation,
-.shield.BAS .designation,
-.shield.BAT .designation,
-.shield.BATA .designation {
-  font-size: 0.75em;
-  margin-top: 3.25em;
 }
 
 .shield.BA .designation {
@@ -1706,6 +1716,13 @@
   top: 0em;
 }
 
+.shield:is(.CH, .CHB, .CHD, .CHF, .CHH, .CHL, .CHO, .CHS, .CHT, .CHTA)
+  .designation {
+  color: rgb(255, 255, 255);
+  font-size: 0.75em;
+  left: 1.55em;
+  margin-top: 3.45em;
+}
 .shield:is(
     .CH,
     .CHB,
@@ -1721,13 +1738,6 @@
   ).ThreeDigit
   .routeNumber {
   font-family: "Series B";
-}
-
-.shield:is(.CH, .CHB, .CHD, .CHF, .CHH, .CHL, .CHO, .CHS, .CHT, .CHTA)
-  .designation {
-  font-size: 0.75em;
-  left: 1.55em;
-  margin-top: 3.45em;
 }
 
 .shield.CHP .designation {
@@ -1768,7 +1778,7 @@
 /* Leoria */
 .shield:is(.LE, .LEB, .LED, .LEF, .LEH, .LEL, .LEO, .LES, .LET, .LETA)
   .routeNumber {
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.3em;
   right: -0.25em;
@@ -1809,6 +1819,19 @@
   top: -0.55em;
 }
 
+.shield.PD .designation,
+.shield.PDB .designation,
+.shield.PDD .designation,
+.shield.PDF .designation,
+.shield.PDH .designation,
+.shield.PDL .designation,
+.shield.PDO .designation,
+.shield.PDS .designation,
+.shield.PDT .designation,
+.shield.PDTA .designation,
+.shield.PDTA2 .designation {
+  color: rgb(255, 255, 255);
+}
 .shield.PD.OneDigit .routeNumber,
 .shield.PDB.OneDigit .routeNumber,
 .shield.PDD.OneDigit .routeNumber,
@@ -1947,15 +1970,6 @@
   font-family: "Series C";
 }
 
-.shield.PDD .routeNumber,
-.shield.PDD .designation,
-.shield.PDF .routeNumber,
-.shield.PDF .designation,
-.shield.PDT .routeNumber,
-.shield.PDT .designation {
-  color: rgb(0, 0, 0);
-}
-
 .shield.PDTA .routeNumber,
 .shield.PDTA .designation {
   color: rgb(247, 209, 23);
@@ -1971,6 +1985,14 @@
 .shield.TSTP .routeNumber,
 .shield.TSTP .designation {
   display: none;
+}
+.shield.PDD .routeNumber,
+.shield.PDD .designation,
+.shield.PDF .routeNumber,
+.shield.PDF .designation,
+.shield.PDT .routeNumber,
+.shield.PDT .designation {
+  color: rgb(0, 0, 0);
 }
 
 /* Roanoke */
