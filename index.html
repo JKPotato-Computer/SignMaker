@@ -59,6 +59,7 @@
 
     <script src="js/modules/History.js" type="text/javascript"></script>
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
+    <script src="js/elements/Colors.js" type="text/javascript"></script>
     <script src="js/elements/lib.js" type="text/javascript"></script>
     <script src="js/elements/Shield.js" type="text/javascript"></script>
     <script src="js/elements/Sign.js" type="text/javascript"></script>
@@ -3013,8 +3014,7 @@
                     <label for="sdCtrlText_backgroundColor">BG:</label>
                     <div
                       class="smColorDropdownElement"
-                      id="sdCtrlText_backgroundColor2"
-                      style="display: none;"
+                      id="sdCtrlText_backgroundColor"
                     >
                       <button class="smColorDropdownButton">
                         <div class="smColorDropdownPreviewBox"></div>
@@ -3022,7 +3022,7 @@
                       </button>
                     </div>
                     <select
-                      id="sdCtrlText_backgroundColor"
+                      id="sdCtrlText_backgroundColor2"
                     ></select>
                     <label for="sdCtrlText_fontFamily">Font:</label>
                     <select id="sdCtrlText_fontFamily"></select>
@@ -5589,14 +5589,14 @@
       </div>
     </template>
 
-    <div class="smColorDropdownHolder">
+    <div id="smColorDropdownHolder">
       <div class="smColorDropdownList">
         <input
           type="search"
-          class="smColorDropdownSearch"
+          id="smColorDropdownSearch"
           placeholder="Search colors"
         />
-        <div class="smColorDropdownItems">
+        <div id="smColorDropdownItems">
           <button
             type="button"
             class="smColorDropdownItem"
@@ -5614,24 +5614,25 @@
             </button>
           </button>
         </div>
+        <button id="smColorAddColor">+ Add Color</button>
       </div>
       <div class="smColorDropdownEdit">
         <div>
           <span>Name:</span>
           <input
             type="text"
-            class="smColorDropdownName"
+            id="smColorName"
             placeholder="Color Name"
           />
         </div>
         <div>
           <span>Color:</span>
-          <input type="color" class="smColorDropdownColor" value="#000000" />
+          <input type="color" id="smColorTheRealColor" value="#000000" />
           <br />
         </div>
         <div>
-          <button class="smColorDropdownUpdate">Update</button>
-          <button class="smColorDropdownRemove">Remove</button>
+          <button id="smColorDropdownUpdate">Update</button>
+          <button id="smColorDropdownRemove">Remove</button>
       </div>
     </div>
   </body>

@@ -20,6 +20,7 @@ const FormNavigation = (() => {
     setupLimonEasterEgg();
     setupDropdownElements();
     setupSettings();
+    setupColorHandler();
 
     const changeEvent = new Event("change", { bubbles: true });
 
@@ -1809,7 +1810,92 @@ const FormNavigation = (() => {
       });
   };
 
+  const promptColorEdit = (color = null) => {
+    const colorEditModal = document.querySelector(".smColorDropdownEdit");
+    colorEditModal.style.display = "flex";
+    if (color) {
+      document.querySelector("#smColorName").value = color;
+      document.querySelector("#smColorTheRealColor").value =
+        ColorLibrary.colorLibrary[color];
+    }
+
+    document.querySelector("#smColorDropdownUpdate").textContent = color
+      ? "Update"
+      : "Add";
+    document.querySelector("#smColorDropdownRemove").style.display = color
+      ? ""
+      : "none";
+  };
+
+  const setupColorHandler = () => {
+    const colorDropdown = document.querySelector("#smColorDropdownHolder");
+    const colorSearch = colorDropdown.querySelector("#smColorDropdownSearch");
+
+    const colorAddButton = colorDropdown.querySelector("#smColorAddColor");
+    colorAddButton.addEventListener("click", () => {
+      promptColorEdit();
+    });
+
+    colorSearch.addEventListener("input", () => {
+      const query = colorSearch.value.toLowerCase().trim();
+      for (const colorOption of colorDropdown.querySelectorAll(
+        ".smColorDropdownItem",
+      )) {
+        const colorName = colorOption.dataset.color.toLowerCase().trim();
+        if (colorName.includes(query)) {
+          colorOption.style.display = "";
+        } else {
+          colorOption.style.display = "none";
+        }
+      }
+    });
+
+    const currentColorSetttings = {
+      name: "",
+      color: "#000000",
+    };
+
+    document
+      .querySelector("#smColorName")
+      .addEventListener("change", (event) => {
+        currentColorSetttings.name = event.target.value;
+      });
+
+    document
+      .querySelector("#smColorTheRealColor")
+      .addEventListener("change", (event) => {
+        currentColorSetttings.color = event.target.value;
+      });
+
+    document
+      .querySelector("#smColorDropdownUpdate")
+      .addEventListener("click", () => {
+        if (ColorLibrary.colorLibrary[currentColorSetttings.name]) {
+          ColorLibrary.updateColor(
+            currentColorSetttings.name,
+            currentColorSetttings.color,
+          );
+        } else {
+          ColorLibrary.addColor(
+            currentColorSetttings.name,
+            currentColorSetttings.color,
+          );
+        }
+        document.querySelector(".smColorDropdownEdit").style.display = "none";
+        formHandler.updateForm();
+      });
+
+    document
+      .querySelector("#smColorDropdownRemove")
+      .addEventListener("click", () => {
+        ColorLibrary.deleteColor(currentColorSetttings.name);
+        document.querySelector(".smColorDropdownEdit").style.display = "none";
+        formHandler.updateForm();
+      });
+  };
+
   return {
     initUI,
+    promptColorEdit,
   };
 })();
