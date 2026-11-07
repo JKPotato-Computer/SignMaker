@@ -202,39 +202,35 @@
   --bg-color: rgb(153, 255, 0);
   --fg-color: rgb(0, 0, 0);
 }
-.panel.avarian.green {
+.panel.veridian.green {
   --bg-color: rgb(0, 64, 64);
   --fg-color: rgb(255, 255, 255);
 }
-.panel.avarian.blue {
+.panel.veridian.blue {
   --bg-color: rgb(0, 47, 108);
   --fg-color: rgb(255, 255, 255);
 }
-.panel.avarian.blue {
-  --bg-color: rgb(0, 47, 108);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.brown {
+.panel.veridian.brown {
   --bg-color: rgb(105, 63, 35);
   --fg-color: rgb(255, 255, 255);
 }
-.panel.avarian.red {
+.panel.veridian.red {
   --bg-color: rgb(175, 39, 47);
   --fg-color: rgb(255, 255, 255);
 }
-.panel.avarian.purple {
+.panel.veridian.purple {
   --bg-color: rgb(105, 13, 163);
   --fg-color: rgb(255, 255, 255);
 }
-.panel.avarian.yellow {
+.panel.veridian.yellow {
   --bg-color: rgb(254, 209, 65);
   --fg-color: rgb(0, 0, 0);
 }
-.panel.avarian.orange {
+.panel.veridian.orange {
   --bg-color: rgb(229, 114, 0);
   --fg-color: rgb(0, 0, 0);
 }
-.panel.avarian.coral {
+.panel.veridian.fluorescent.pink {
   --bg-color: rgb(223, 70, 97);
   --fg-color: rgb(255, 255, 255);
 }
