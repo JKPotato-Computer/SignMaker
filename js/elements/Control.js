@@ -1321,11 +1321,11 @@ class Control {
       );
       flexRow.style.setProperty(
         "--blockPaddingTop",
-        `${properties.topPadding}rem`,
+        `${i == 0 ? properties.topPadding * 2 : properties.topPadding}rem`,
       );
       flexRow.style.setProperty(
         "--blockPaddingBottom",
-        `${properties.bottomPadding}rem`,
+        `${i == totalRows - 1 ? properties.bottomPadding * 2 : properties.bottomPadding}rem`,
       );
 
       flexRow.style.setProperty(

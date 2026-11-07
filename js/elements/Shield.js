@@ -264,6 +264,18 @@ class Shield {
     }
 
     const newBanner = new Banner();
+    switch (alignment) {
+      case "Top":
+      case "Bottom":
+        newBanner.verticalMargin = 14;
+        break;
+      case "Left":
+      case "Right":
+        newBanner.horizontalMargin = 9;
+        break;
+      default:
+    }
+
     this.banners[alignment].push(newBanner);
     return newBanner;
   }

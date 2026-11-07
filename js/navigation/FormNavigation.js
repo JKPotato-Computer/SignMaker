@@ -19,6 +19,7 @@ const FormNavigation = (() => {
     setupGuideArrows();
     setupLimonEasterEgg();
     setupDropdownElements();
+    setupSettings();
 
     const changeEvent = new Event("change", { bubbles: true });
 
@@ -1710,6 +1711,102 @@ const FormNavigation = (() => {
     for (const font of TextElement.fontFamilies) {
       lib.appendOption(fontFamilyElem, font);
     }
+  };
+
+  const setupSettings = () => {
+    const mutcdVariantButtons = document.querySelectorAll(
+      "#smSettings_MUTCDGallery .mutcdImage",
+    );
+    const selectedVariantText = document.querySelector(
+      "#smSettings_selectedMUTCDVariant",
+    );
+
+    mutcdVariantButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        mutcdVariantButtons.forEach((btn) => btn.classList.remove("selected"));
+        button.classList.add("selected");
+        const selectedVariant = button.dataset.variant;
+        selectedVariantText.textContent = `Selected: ${MUTCDVariants[selectedVariant].VariantInfo.FullName}`;
+
+        let post = App.getPost();
+        if (post) {
+          post.mutcdVariant = selectedVariant;
+          formHandler.updateForm();
+          App.redraw();
+        }
+      });
+    });
+
+    document
+      .querySelector("#smSettings_replaceVariant")
+      .addEventListener("click", () => {
+        if (
+          !confirm(
+            "Are you sure you want to replace to this variant? Some elements may need to be re-edited afterwards.",
+          )
+        ) {
+          return;
+        }
+
+        let post = App.getPost();
+        const replaceRecursive = (obj) => {
+          if (Array.isArray(obj)) {
+            for (const item of obj) {
+              replaceRecursive(item);
+            }
+            return;
+          }
+
+          if (typeof obj !== "object" || obj === null) {
+            return;
+          }
+
+          let objectType = obj.constructor.name;
+          let tagsToReplace = [];
+          const validClassNames = MUTCDVariants.getClassNames(objectType);
+
+          for (const className of validClassNames) {
+            const classTags =
+              MUTCDVariants[post.mutcdVariant][className]?.tagToReplace || [];
+            tagsToReplace = [...tagsToReplace, ...classTags];
+          }
+
+          const validKeys = Object.keys(obj).filter(
+            (key) => key !== "constructor" && key !== "prototype",
+          );
+
+          for (const key of validKeys) {
+            if (tagsToReplace.includes(key)) {
+              const currentValue = obj[key];
+              let newValue;
+
+              for (const className of validClassNames) {
+                console.log(
+                  MUTCDVariants[post.mutcdVariant][className],
+                  className,
+                );
+                let thisValue =
+                  MUTCDVariants[post.mutcdVariant][className]?.[key];
+                if (thisValue !== undefined) {
+                  newValue = thisValue;
+                  break;
+                }
+              }
+
+              console.log(key, currentValue, newValue);
+              if (newValue !== undefined && newValue !== currentValue) {
+                obj[key] = newValue;
+              }
+            } else {
+              replaceRecursive(obj[key]);
+            }
+          }
+        };
+
+        replaceRecursive(post);
+        formHandler.updateForm();
+        App.redraw();
+      });
   };
 
   return {

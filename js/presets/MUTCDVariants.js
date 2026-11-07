@@ -1,7 +1,31 @@
 const MUTCDVariants = (() => {
   const variants = {
+    // tagToReplace: if promopted to update elements to a new configuration, ONLY change those variables.
     // note: pls do not change MUTCD - the code sees these variables as the source of truth so don't like delete anything or else idk the entire program explodes
     MUTCD: {
+      VariantInfo: {
+        FullName: "MUTCD: Standard Highway Designs",
+        Tags: [
+          "MUTCD",
+          "SHS",
+          "FHWA",
+          "Standard Highway Signage",
+          "US Highway Signage",
+        ],
+        ColorPalette: {
+          Green: "rgb(0, 95, 77)",
+          Blue: "rgb(0, 67, 123)",
+          Brown: "rgb(98, 51, 30)",
+          Yellow: "rgb(252, 207, 52)",
+          White: "rgb(255, 255, 255)",
+          Black: "rgb(0, 0, 0)",
+          Purple: "#4B0082",
+          Orange: "rgb(255, 89, 4)",
+          Red: "rgb(255, 0, 0)",
+          "Fluorescent Pink": "rgb(255, 51, 204)",
+          "Fluorescent Yellow-Green": "rgb(153, 255, 0)",
+        },
+      },
       APLArrow: {
         arrowVariant: "Up Arrow",
         offset: 0,
@@ -44,6 +68,7 @@ const MUTCDVariants = (() => {
         exitTabs: [],
         corner: "Sharp",
         borderRadius: 0.75,
+        tagToReplace: ["corner", "borderRadius"],
       },
       Sign: {
         arrows: {
@@ -129,15 +154,14 @@ const MUTCDVariants = (() => {
         textAlign: "Center",
         lineHeight: 100,
         wordSpacing: 0,
+        tagToReplace: ["fontFamily", "lineHeight", "wordSpacing"],
       },
       ControlTextElement: {
         smallCapitals: false,
-        wordSpacing: 0,
       },
       ActionMessageElement: {
         fontSize: 70,
         useNumeralFormatting: true,
-        wordSpacing: 0,
       },
       AdvisoryMessageElement: {
         backgroundColor: "Yellow",
@@ -149,7 +173,7 @@ const MUTCDVariants = (() => {
         useNumeralFormatting: true,
         horizPadding: 0.3,
         vertPadding: 0.2,
-        wordSpacing: 0,
+        tagToReplace: ["fontFamily"],
       },
       ElectronicSignElement: {
         fontFamily: "Electronic Highway Sign",
@@ -160,7 +184,6 @@ const MUTCDVariants = (() => {
         vertPadding: 0.5,
         glow: true,
         setWidth: 0,
-        wordSpacing: 0,
       },
       ShieldGroupElement: {
         shields: [],
@@ -208,7 +231,7 @@ const MUTCDVariants = (() => {
         alignment: "Center",
       },
       TollLogoElement: {
-        logo: "EZPass",
+        logo: "TollTag",
         logoHeight: 3,
         spacing: 0,
         horizontalPadding: 0.25,
@@ -267,12 +290,13 @@ const MUTCDVariants = (() => {
         subTextContent: "",
         shields: { left: [], right: [] },
         backgroundColor: "inherit",
-        borderStyle: "round",
+        borderStyle: "square",
         borderThickness: 0.2,
         borderRadius: 0.5,
+        roundBottomBorder: true,
         useFullBorder: true,
         horizontalPadding: 0.5,
-        verticalPadding: 0,
+        verticalPadding: 0.6,
         minimumHeight: 2.25,
         holderPadding: 0,
         fontSize: 20,
@@ -282,11 +306,11 @@ const MUTCDVariants = (() => {
         spaceLettersNumerals: true,
         numeralWordSpacing: 0.25,
         offsetNonNumerals: false,
-        fontFamily: "Clearview 5WR",
+        fontFamily: "Series E",
         numeralFontFamily: "Inherit",
         letterSpacing: 0,
         numeralLetterSpacing: 0,
-        useTrimFormat: false,
+        useTrimFormat: true,
         shieldsDirection: "horizontal",
         shieldsGap: 0.5,
         shieldWordSpacing: 0.25,
@@ -349,6 +373,12 @@ const MUTCDVariants = (() => {
             verticalPadding: 0.125,
           },
         },
+        tagToReplace: [
+          "fontFamily",
+          "useTrimFormat",
+          "numeralFontFamily",
+          "borderStyle",
+        ],
       },
       ExitTabRow: {
         exitTabs: [],
@@ -359,6 +389,7 @@ const MUTCDVariants = (() => {
         independentWidth: false,
         hideTopBorder: false,
         hideBottomBorder: false,
+        padding: 0,
       },
       Shield: {
         shieldType: "preset",
@@ -373,8 +404,8 @@ const MUTCDVariants = (() => {
         banners: {},
         bannerSettings: {
           top: { alignment: "start", gap: 0 },
-          left: { alignment: "start", gap: 0, inset: 0.5 },
-          right: { alignment: "start", gap: 0, inset: 0.5 },
+          left: { alignment: "start", gap: 0, inset: 0.9 },
+          right: { alignment: "start", gap: 0, inset: 0.9 },
           bottom: { alignment: "end", gap: 0 },
         },
         group: 0,
@@ -408,28 +439,64 @@ const MUTCDVariants = (() => {
         horizontalMargin: 0,
         verticalMargin: 0,
         borderRadius: 4,
-        fontFamily: "Clearview 5WR",
+        fontFamily: "Series E",
+        tagToReplace: ["fontFamily"],
       },
     },
     TMUTCD: {
+      VariantInfo: {
+        FullName: "TMUTCD: Texas's Standard Highway Sign Designs",
+        Tags: [
+          "TMUTCD",
+          "SHSD",
+          "TEXAS",
+          "TXDOT",
+          "Texas Highway Signage",
+          "Texas Highway Sign Designs",
+        ],
+      },
+      Post: {
+        mutcdVariant: "TMUTCD",
+      },
       TextElement: {
-        textContent: "New Sign",
-        backgroundColor: "Inherit",
         fontFamily: "Clearview 5WR",
-        fontSize: 100,
-        useBannerFormatting: false,
-        bannerFormattingSize: 100,
-        bannerFirstLetterSize: 120,
-        useNumeralFormatting: false,
-        numeralFormattingSize: 150,
-        spaceNumeralsLetters: true,
-        alignment: "Center",
-        textAlign: "Center",
         lineHeight: 100,
-        wordSpacing: 0,
+        tagToReplace: ["fontFamily", "lineHeight"],
+      },
+      Banner: {
+        fontFamily: "Clearview 5WR",
+        tagToReplace: ["fontFamily"],
+      },
+      ExitTab: {
+        fontFamily: "Clearview 4W",
+        useTrimFormat: false,
+        useFullBorder: true,
+        horizontalPadding: 0.5,
+        verticalPadding: 0.5,
+        borderStyle: "round",
+        tagToReplace: [
+          "fontFamily",
+          "useTrimFormat",
+          "borderStyle",
+          "useFullBorder",
+        ],
       },
     },
     NVUTCDG: {
+      VariantInfo: {
+        FullName: "NVUTCDG: North Veridian Universal Traffic Control Device Guidelines",
+        Tags: ["NVUTCDG"],
+        ColorPalette: {
+          "Green": "rgb(0, 64, 64)",
+    "Blue": "rgb(0, 47, 108)",
+    "Brown": "rgb(105, 63, 35)",
+    "Yellow": "rgb(254, 209, 65)",
+    "Purple": "rgb(105, 13, 163)",
+    "Orange": "rgb(229, 114, 0)",
+    "Red": "rgb(175, 39, 47)",
+    "Coral": "rgb(223, 70, 97)",
+        }
+      },
       APLArrow: {
         arrowVariant: "Up Arrow",
         offset: 0,
@@ -453,17 +520,7 @@ const MUTCDVariants = (() => {
         flip: false,
       },
       Post: {
-        polePosition: "Left",
-        lanesWide: 1,
-        color: "Silver",
-        cornerRadius: 30,
-        showPost: true,
-        offsetPost: true,
-        variant: "Standard",
-        panelSpacing: 0,
-        thickness: 1,
-        spacing: 5,
-        panels: [],
+        mutcdVariant: "NVUTCDG",
       },
       Panel: {
         sign: null,
@@ -561,15 +618,6 @@ const MUTCDVariants = (() => {
         lineHeight: 100,
         wordSpacing: 0,
       },
-      ControlTextElement: {
-        smallCapitals: false,
-        wordSpacing: 0,
-      },
-      ActionMessageElement: {
-        fontSize: 70,
-        useNumeralFormatting: true,
-        wordSpacing: 0,
-      },
       AdvisoryMessageElement: {
         backgroundColor: "White",
         fontFamily: "Transport",
@@ -592,51 +640,6 @@ const MUTCDVariants = (() => {
         glow: true,
         setWidth: 0,
         wordSpacing: 0,
-      },
-      ShieldGroupElement: {
-        shields: [],
-        alignment: "Center",
-        direction: "Horizontal",
-        gap: 0.5,
-      },
-      DividerElement: {
-        dividerWidth: 100,
-        dividerMeasurement: "%",
-        dividerHeight: 0.2,
-        alignment: "Center",
-        visible: true,
-        dividerColor: "White",
-        fullBleed: false,
-      },
-      IconElement: {
-        icon: "AIRPORT",
-        iconType: "preset",
-        iconData: "",
-        iconSize: 100,
-        backgroundColor: "Inherit",
-        border: false,
-        borderRadius: 4,
-        borderColor: "White",
-        spacing: 4,
-      },
-      BeaconElement: {
-        size: 2,
-        alignment: "Center",
-        flashDuration: 1,
-        color: "Yellow",
-        backplate: false,
-        flashOpposite: false,
-      },
-      ArrowElement: {
-        arrow: "TYPE_A",
-        rotation: 0,
-        size: 1.75,
-        marginHorizontal: 0,
-        marginVertical: 0,
-        flip: false,
-        paddingHorizontal: 0,
-        paddingVertical: 0,
-        alignment: "Center",
       },
       TollLogoElement: {
         logo: "VeriTag",
@@ -663,35 +666,6 @@ const MUTCDVariants = (() => {
         containerVerticalPadding: 0.25,
         containerBorderWidth: 0,
         containerBackgroundColor: "Yellow",
-      },
-      Block: {
-        topMargin: 0,
-        topPadding: 0,
-        bottomMargin: 0,
-        bottomPadding: 0,
-        leftPadding: 0,
-        rightPadding: 0,
-        backgroundColor: "Inherit",
-        backgroundFullWidth: true,
-        width: 0,
-        stretchLeft: true,
-        stretchCenter: true,
-        stretchRight: true,
-      },
-      GroupElement: {
-        blockElements: null,
-        direction: "Vertical",
-        width: 0,
-        boxFormat: "Normal",
-        formatSize: 0.04,
-        border: false,
-        borderWidth: 5,
-        borderColor: "Black",
-      },
-      Control: {
-        rows: [],
-        blockProperties: [],
-        isGroup: false,
       },
       ExitTab: {
         textContent: "RAMP 1A",
@@ -781,16 +755,6 @@ const MUTCDVariants = (() => {
           },
         },
       },
-      ExitTabRow: {
-        exitTabs: [],
-        gap: 0,
-        panelEdgeType: "separate",
-        position: "top",
-        marginBottom: 0.3,
-        independentWidth: false,
-        hideTopBorder: true,
-        hideBottomBorder: false,
-      },
       Shield: {
         shieldType: "preset",
         shieldName: "Interlink",
@@ -874,15 +838,20 @@ const MUTCDVariants = (() => {
   };
 
   const getClassNames = (className) => {
-    const classNames = [className];
-    let currentClass = typeof window[className];
+    let currentClass = window[className];
 
-    while (typeof currentClass === "function") {
+    if (typeof currentClass !== "function") return [];
+
+    const classNames = [currentClass.name];
+
+    while (currentClass) {
       const parentClass = Object.getPrototypeOf(currentClass);
+
       if (
-        typeof parentClass !== "function" ||
-        parentClass === Function ||
-        parentClass === Object
+        !parentClass ||
+        parentClass === Function.prototype ||
+        parentClass === Object.prototype ||
+        parentClass.name === ""
       ) {
         break;
       }
@@ -916,6 +885,7 @@ const MUTCDVariants = (() => {
   };
 
   variants.get = get;
+  variants.getClassNames = getClassNames;
   variants.getVariableNames = (className) => {
     const variableNames = new Set();
     for (const currentClassName of getClassNames(className)) {

@@ -113,6 +113,7 @@ const formHandler = (() => {
         currentPanel.exitTabs[app.vars.currentlySelectedExitTabRowIndex];
       if (app.vars.currentlySelectedExitTabIndex == -1) {
         exitTabRow.gap = parseFloat(form["sMET_Gap"].value);
+        exitTabRow.padding = parseFloat(form["sMET_Padding"].value);
         exitTabRow.panelEdgeType = form["sMET_PanelEdgeType"].value;
         exitTabRow.position = form["sMET_Position"].value;
         exitTabRow.marginBottom = parseFloat(form["smET_marginBottom"].value);
@@ -133,6 +134,7 @@ const formHandler = (() => {
         );
         exitTab.borderRadius = parseFloat(form["sMET_borderRadius"].value);
         exitTab.useFullBorder = form["sMET_useFullBorder"].checked;
+        exitTab.roundBottomBorder = form["sMET_roundBottomBorder"].checked;
         exitTab.horizontalPadding = parseFloat(
           form["sMET_horizontalPadding"].value,
         );
@@ -762,6 +764,8 @@ const formHandler = (() => {
   };
 
   const updateForm = () => {
+    post = app.getPost();
+
     const panel = app.getCurrentPanel();
     const sign = panel.sign.subPanels[app.vars.currentlySelectedSubPanelIndex];
 
@@ -791,6 +795,22 @@ const formHandler = (() => {
     document.getElementById("panelSpacing").value = post.panelSpacing;
     document.getElementById("panelSpacingValue").value = post.panelSpacing;
     document.getElementById("postThicknessValue").value = post.thickness;
+
+    // mutcd variant thing
+    let variant = post.mutcdVariant;
+
+    document.querySelector("#smSettings_selectedMUTCDVariant").textContent =
+      `Selected: ${MUTCDVariants[variant].VariantInfo.FullName}`;
+
+    for (const option of document.querySelectorAll(
+      "#smSettings_MUTCDGallery .mutcdImage",
+    )) {
+      if (option.dataset.variant === variant) {
+        option.classList.add("selected");
+      } else {
+        option.classList.remove("selected");
+      }
+    }
 
     panelList.innerHTML = "";
     exitTabList.innerHTML = "";
@@ -853,8 +873,7 @@ const formHandler = (() => {
         } else if (
           app.vars.currentlySelectedPanelGroupIndex == panelGroupIndex
         ) {
-          panelButton.textContent = "+";
-          panelButton.dataset.tooltip = "Add a panel";
+          panelButton.textContent = "+ Add Panel";
           panelButton.className = "panelListButton newPanelButton";
           panelButton.addEventListener("click", app.newPanel);
         }
@@ -1380,6 +1399,7 @@ const formHandler = (() => {
         currentExitTabRow.panelEdgeType;
 
       document.querySelector("#sMET_Gap").value = currentExitTabRow.gap;
+      document.querySelector("#sMET_Padding").value = currentExitTabRow.padding;
       document.querySelector("#smET_marginBottom").value =
         currentExitTabRow.marginBottom;
 
@@ -1632,6 +1652,11 @@ const formHandler = (() => {
       currentExitTab.borderRadius;
     document.querySelector("#sMET_useFullBorder").checked =
       currentExitTab.useFullBorder;
+    document.querySelector("#sMET_roundBottomBorder").checked =
+      currentExitTab.roundBottomBorder;
+    document.querySelector(
+      "label[for='sMET_roundBottomBorder']",
+    ).style.display = currentExitTab.useFullBorder ? "" : "none";
     document.querySelector("#sMET_horizontalPadding").value =
       currentExitTab.horizontalPadding;
     document.querySelector("#sMET_horizontalPaddingVal").value =

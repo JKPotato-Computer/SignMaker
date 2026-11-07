@@ -34,7 +34,7 @@ class ExitTab {
     exitTabHolder.style.padding = this.holderPadding + "px";
 
     const exitTabElement = document.createElement("div");
-    exitTabElement.className = `ET-tab ${this.useTrimFormat ? "useTrim" : ""} ${this.variant.toLowerCase().replace(/\s/g, "-")} ${this.borderStyle} ${this.useFullBorder ? "fullBorder" : ""}`;
+    exitTabElement.className = `ET-tab ${this.useTrimFormat ? "useTrim" : ""} ${this.variant.toLowerCase().replace(/\s/g, "-")} ${this.borderStyle} ${this.useFullBorder ? "fullBorder" : ""} ${!this.roundBottomBorder ? "noRoundBottom" : ""}`;
 
     if (this.backgroundColor != "inherit") {
       exitTabHolder.style.setProperty(
@@ -540,6 +540,7 @@ class ExitTabRow {
       panelEdgeType,
       position,
       marginBottom,
+      padding,
       independentWidth,
       hideTopBorder,
       hideBottomBorder,
@@ -552,6 +553,7 @@ class ExitTabRow {
     this.independentWidth = independentWidth;
     this.hideTopBorder = hideTopBorder;
     this.hideBottomBorder = hideBottomBorder;
+    this.padding = padding;
   }
 
   createElement() {
@@ -559,6 +561,7 @@ class ExitTabRow {
     exitTabHolder.className =
       "ET-row " + this.panelEdgeType.toLowerCase().replace(/\s/g, "-");
     exitTabHolder.style.setProperty("--spacing", this.gap + "rem");
+    exitTabHolder.style.setProperty("--padding", this.padding + "rem");
     exitTabHolder.style.setProperty(
       "--marginBottom",
       this.marginBottom + "rem",
@@ -614,14 +617,8 @@ class ExitTabRow {
     this.exitTabs.splice(index, 1);
   }
 }
-ExitTabRow.panelEdgeTypes = ["Separate", "Extend", "Meet Corners"];
-ExitTabRow.positions = [
-  "Top",
-  "Bottom",
-  "Left",
-  "Right",
-  "Within Panel",
-];
+ExitTabRow.panelEdgeTypes = ["Separate", "Extend", "Meet Corners", "Merge"];
+ExitTabRow.positions = ["Top", "Bottom", "Left", "Right", "Within Panel"];
 
 window.ExitTab = ExitTab;
 window.ExitTabRow = ExitTabRow;

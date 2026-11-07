@@ -1180,9 +1180,12 @@
         </div>
         <div id="signMakerSettingsContent">
           <div id="sMSettings_MUTCDVariants">
+            <span id="smSettings_selectedMUTCDVariant"
+              >Selected: MUTCD: Standard Highway Designs</span
+            >
             <div id="smSettings_MUTCDGallery">
               <div class="mutcdOption">
-                <button class="mutcdImage" data-variannt="MUTCD">
+                <button class="mutcdImage selected" data-variant="MUTCD">
                   <img src="assets/form/mutcd/MUTCD.png" />
                   <div class="mutcdSlideInfo">
                     <h2>MUTCD: Standard Highway Designs*</h2>
@@ -1195,14 +1198,14 @@
                       U.S-based highway sigange.
                     </p>
                     <p>
-                      * This uses the in-progress version of the Standard
-                      Highway Sign designs.
+                      * Contrary to the cover image, This uses the in-progress
+                      version of the Standard Highway Sign designs.
                     </p>
 
                     <span class="mutcdBottom">Click to select</span>
                   </div>
                 </button>
-                <button class="mutcdImage" data-variannt="TMUTCD">
+                <button class="mutcdImage" data-variant="TMUTCD">
                   <img src="assets/form/mutcd/SHSD.jpg" />
                   <div class="mutcdSlideInfo">
                     <h2>TMUTCD: Texas's Standard Highway Sign Designs</h2>
@@ -1231,8 +1234,8 @@
                   placeholder="Search for reference guide"
                 />
               </div>
-              <button id="smSettings_addVariant" type="button">
-                Use Reference Guide
+              <button id="smSettings_replaceVariant" type="button">
+                Replace Elements
               </button>
             </div>
           </div>
@@ -1481,9 +1484,18 @@
                 id="sMET_Gap"
                 value="0"
                 min="0"
-                max="2"
                 step=".05"
               />
+              <label for="sMET_Padding">Padding (rem):</label>
+              <input
+                onchange="formHandler.readForm()"
+                type="number"
+                id="sMET_Padding"
+                value="0"
+                min="0"
+                step=".05"
+              />
+              <br />
               <label for="smET_marginBottom" style="display: none"
                 >Margin Bottom (rem):</label
               >
@@ -1497,7 +1509,6 @@
                 max="2"
                 step=".04"
               />
-              <br />
               <label for="smET_independentWidth"> Ignore Width: </label>
               <input
                 type="checkbox"
@@ -2359,6 +2370,17 @@
                   />
                   Full Border
                 </label>
+
+                <label for="sMET_roundBottomBorder" class="checkboxLabel">
+                  <input
+                    type="checkbox"
+                    id="sMET_roundBottomBorder"
+                    name="sMET_roundBottomBorder"
+                    checked=""
+                    onchange="formHandler.readForm()"
+                  />
+                  Round Bottom Border
+                </label>
                 <br />
 
                 <!-- Border Thickness  Roundness -->
@@ -2989,7 +3011,19 @@
                     />
                     <br />
                     <label for="sdCtrlText_backgroundColor">BG:</label>
-                    <select id="sdCtrlText_backgroundColor"></select>
+                    <div
+                      class="smColorDropdownElement"
+                      id="sdCtrlText_backgroundColor2"
+                      style="display: none;"
+                    >
+                      <button class="smColorDropdownButton">
+                        <div class="smColorDropdownPreviewBox"></div>
+                        Inherit
+                      </button>
+                    </div>
+                    <select
+                      id="sdCtrlText_backgroundColor"
+                    ></select>
                     <label for="sdCtrlText_fontFamily">Font:</label>
                     <select id="sdCtrlText_fontFamily"></select>
                     <br />
@@ -5554,5 +5588,51 @@
         </div>
       </div>
     </template>
+
+    <div class="smColorDropdownHolder">
+      <div class="smColorDropdownList">
+        <input
+          type="search"
+          class="smColorDropdownSearch"
+          placeholder="Search colors"
+        />
+        <div class="smColorDropdownItems">
+          <button
+            type="button"
+            class="smColorDropdownItem"
+            data-color="inherit"
+          >
+            <span>Inherit</span>
+          </button>
+          <button type="button" class="smColorDropdownItem" data-color="green">
+            <span>Green</span>
+          </button>
+          <button type="button" class="smColorDropdownItem" data-color="orange">
+            <span>Orange</span>
+            <button type="button" class="smColorDropdownEdit material-symbols-outlined">
+              edit
+            </button>
+          </button>
+        </div>
+      </div>
+      <div class="smColorDropdownEdit">
+        <div>
+          <span>Name:</span>
+          <input
+            type="text"
+            class="smColorDropdownName"
+            placeholder="Color Name"
+          />
+        </div>
+        <div>
+          <span>Color:</span>
+          <input type="color" class="smColorDropdownColor" value="#000000" />
+          <br />
+        </div>
+        <div>
+          <button class="smColorDropdownUpdate">Update</button>
+          <button class="smColorDropdownRemove">Remove</button>
+      </div>
+    </div>
   </body>
 </html>

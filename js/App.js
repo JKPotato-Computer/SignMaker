@@ -1258,9 +1258,9 @@ const App = (() => {
         panel,
         subPanel,
       );
+
       blockElement.style.justifyContent = subPanel.verticalAlign.toLowerCase();
       signContentContainerElmt.appendChild(blockElement);
-      signContentContainerElmt.style.padding = panel.sign.padding;
       subpanelList.push(signContentContainerElmt);
 
       if (subPanelIndex < panel.sign.subPanels.length - 1) {
