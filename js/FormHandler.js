@@ -2111,17 +2111,13 @@ const formHandler = (() => {
         shieldLabel.textContent = `${
           shield.shieldType == "custom"
             ? shield.shieldName.replace(/\.\w+/g, "")
-            : Shield.prototype
-                .getPropertiesFromName(shield.shieldValue)
-                .name.toUpperCase()
+            : shield.shieldValue
         }-${shield.routeNumber}`;
       } else {
         shieldLabel.textContent = `${
           shield.shieldType == "custom"
             ? shield.shieldName.replace(/\.\w+/g, "")
-            : Shield.prototype
-                .getPropertiesFromName(shield.shieldValue)
-                .name.toUpperCase()
+            : shield.shieldValue
         }`;
       }
       shieldBlock.appendChild(shieldLabel);

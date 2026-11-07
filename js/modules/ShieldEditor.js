@@ -210,7 +210,7 @@ const ShieldEditor = (() => {
         : Shield.prototype
             .getPropertiesFromName(baseShield.shieldValue)
             .name.toUpperCase()
-    }-${baseShield.routeNumber}`;
+    } ${baseShield.routeNumber}`;
   };
 
   const promptEditShield = (shieldBase = {}, returnFunction) => {
