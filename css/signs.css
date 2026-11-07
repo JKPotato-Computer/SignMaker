@@ -158,85 +158,85 @@
 }
 
 .panel.green {
-  --bg-color: var(--green);
-  --fg-color: var(--white);
+  --bg-color: rgb(0, 95, 77);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.blue {
-  --bg-color: var(--blue);
-  --fg-color: var(--white);
+  --bg-color: rgb(0, 67, 123);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.brown {
-  --bg-color: var(--brown);
-  --fg-color: var(--white);
+  --bg-color: rgb(98, 51, 30);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.black {
-  --bg-color: var(--black);
-  --fg-color: var(--white);
+  --bg-color: rgb(0, 0, 0);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.red {
-  --bg-color: var(--red);
-  --fg-color: var(--white);
+  --bg-color: rgb(255, 0, 0);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.purple {
-  --bg-color: var(--purple);
-  --fg-color: var(--white);
+  --bg-color: rgb(102, 0, 153);
+  --fg-color: rgb(255, 255, 255);
 }
 
 .panel.white {
-  --bg-color: var(--white);
-  --fg-color: var(--black);
+  --bg-color: rgb(255, 255, 255);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.yellow {
-  --bg-color: var(--yellow);
-  --fg-color: var(--black);
+  --bg-color: rgb(252, 207, 52);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.orange {
-  --bg-color: var(--orange);
-  --fg-color: var(--black);
+  --bg-color: rgb(255, 89, 4);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.fluorescent.pink {
-  --bg-color: var(--fluorescent-pink);
-  --fg-color: var(--black);
+  --bg-color: rgb(255, 51, 204);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.fluorescent.yellow-green {
-  --bg-color: var(--fluorescent-yellow-green);
-  --fg-color: var(--black);
+  --bg-color: rgb(153, 255, 0);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.avarian.green {
-  --bg-color: var(--veridian-green);
-  --fg-color: var(--white);
+  --bg-color: rgb(0, 64, 64);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.avarian.blue {
-  --bg-color: var(--veridian-blue);
-  --fg-color: var(--white);
+  --bg-color: rgb(0, 47, 108);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.avarian.blue {
-  --bg-color: var(--veridian-blue);
-  --fg-color: var(--white);
+  --bg-color: rgb(0, 47, 108);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.avarian.brown {
-  --bg-color: var(--veridian-brown);
-  --fg-color: var(--white);
+  --bg-color: rgb(105, 63, 35);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.avarian.red {
-  --bg-color: var(--veridian-red);
-  --fg-color: var(--white);
+  --bg-color: rgb(175, 39, 47);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.avarian.purple {
-  --bg-color: var(--veridian-purple);
-  --fg-color: var(--white);
+  --bg-color: rgb(105, 13, 163);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel.avarian.yellow {
-  --bg-color: var(--veridian-yellow);
-  --fg-color: var(--black);
+  --bg-color: rgb(254, 209, 65);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.avarian.orange {
-  --bg-color: var(--veridian-orange);
-  --fg-color: var(--black);
+  --bg-color: rgb(229, 114, 0);
+  --fg-color: rgb(0, 0, 0);
 }
 .panel.avarian.coral {
-  --bg-color: var(--veridian-coral);
-  --fg-color: var(--white);
+  --bg-color: rgb(223, 70, 97);
+  --fg-color: rgb(255, 255, 255);
 }
 .panel :is(.signCorner, .signHolder, .guideArrows) {
   background-color: var(--bg-color);
@@ -362,7 +362,7 @@
 }
 
 .streetName {
-  border: solid var(--white) 0.15rem;
+  border: solid rgb(255, 255, 255) 0.15rem;
   border-radius: 0.25rem;
   margin-bottom: 0.5rem;
   padding: 0 1rem;
@@ -394,7 +394,7 @@
 }
 
 .panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only.white_border) {
-  background-color: var(--green);
+  background-color: rgb(0, 95, 77);
 }
 
 .panel:not(.round)

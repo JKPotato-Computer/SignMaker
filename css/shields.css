@@ -17,13 +17,13 @@
 }
 
 .shield.C .routeNumber {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
   font-size: 1.4em;
   top: 0.45em;
 }
 
 .shield.C .designation {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
   font-family: "Series D";
   font-size: 0.3em;
   margin-top: 2.2em;
@@ -50,7 +50,7 @@
 .shield.I-DL .routeNumber,
 .shield.I-DS .routeNumber,
 .shield.I-F .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-size: 1.55em;
   letter-spacing: 0.01em;
   top: 0.35em;
@@ -99,7 +99,7 @@
 
 /* US Route California */
 .shield.US-CA .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.4em;
   top: 0.08em;
@@ -113,7 +113,7 @@
 .shield.elp .routeNumber,
 .shield.rec .routeNumber,
 .shield.rec2 .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.8em;
   top: 0.15em;
@@ -123,7 +123,7 @@
 .shield.elp.ThreeDigit .routeNumber,
 .shield.rec.ThreeDigit .routeNumber,
 .shield.rec2.ThreeDigit .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 1.8em;
   top: 0.15em;
@@ -131,7 +131,7 @@
 
 /* Alabama */
 .shield.AL .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.75em;
   letter-spacing: -0.1em;
@@ -141,7 +141,7 @@
 
 /* Alaska */
 .shield.AK .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   top: 0.27em;
 }
 
@@ -160,14 +160,14 @@
 
 /* Arizona */
 .shield.AZ .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.75em;
   top: 0.4em;
 }
 
 .shield.AZLOOP .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 1.75em;
   top: 0.4em;
@@ -179,7 +179,7 @@
 
 /* Arkansas */
 .shield.AR .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.55em;
   right: 0.25em;
   top: 0.15em;
@@ -197,7 +197,7 @@
 
 /* California */
 .shield.CA .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.35em;
   top: 0.65em;
@@ -205,7 +205,7 @@
 
 /* Colorado */
 .shield.CO .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.3em;
   top: 1.3em;
 }
@@ -221,7 +221,7 @@
 
 /* District of Columbia */
 .shield.DC .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1em;
   top: 0.85em;
@@ -229,7 +229,7 @@
 
 /* Florida */
 .shield.FL .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.75em;
   right: 0.2em;
   top: 0.8em;
@@ -237,7 +237,7 @@
 
 .shield.FLCFXToll .routeNumber,
 .shield.FLToll .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 0.9em;
   right: 0.5em;
@@ -275,7 +275,7 @@
 .shield.GACONN .routeNumber,
 .shield.GALOOP .routeNumber,
 .shield.GASPUR .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   top: 0.3em;
 }
 
@@ -317,7 +317,7 @@
 
 /* Hawaii */
 .shield.HI .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.25em;
   top: 0.7em;
@@ -329,7 +329,7 @@
 
 /* Idaho */
 .shield.ID .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 1.5em;
   text-align: right;
@@ -348,18 +348,18 @@
 }
 
 .shieldsContainer.shieldBacks .ID .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
 }
 
 .shieldsContainer:not(.shieldBacks) .ID .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 /* Illinois, Indiana, Rhode Island */
 .shield.IL .routeNumber,
 .shield.IN .routeNumber,
 .shield.RI .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.85em;
   top: 0.6em;
@@ -373,7 +373,7 @@
 
 /* Kansas */
 .shield.KS .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.5em;
   top: 0.27em;
@@ -381,7 +381,7 @@
 
 /* Louisiana */
 .shield.LA .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.5em;
   top: 1em;
@@ -389,7 +389,7 @@
 
 /* Maryland */
 .shield.MD .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.9em;
   top: 0.7em;
@@ -401,7 +401,7 @@
 
 /* Michigan */
 .shield.MI .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.3em;
   top: 0.3em;
 }
@@ -418,7 +418,7 @@
 /* Minnesota */
 .shield.MN .routeNumber,
 .shield.MNBUS .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series C";
   font-size: 1.6em;
   top: 0.25em;
@@ -426,7 +426,7 @@
 
 /* Minnesota */
 .shield.MN .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.5em;
   top: 0.55em;
@@ -438,7 +438,7 @@
 
 /* Missouri */
 .shield.MO .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.5em;
   top: 0.15em;
 }
@@ -454,14 +454,14 @@
 
 /* Montana */
 .shield.MT .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.5em;
   top: 0.3em;
 }
 
 .shield.MT2 .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.MT2.OneDigit .routeNumber,
@@ -485,14 +485,14 @@
 
 /* Nebraska */
 .shield.NE .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   top: 0.05em;
 }
 
 .shield.NELINK .routeNumber,
 .shield.NESPUR .routeNumber {
   bottom: 0.5em;
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.5em;
 }
 
@@ -525,7 +525,7 @@
 
 /* Nevada */
 .shield.NV .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 0.9em;
   top: -1em;
@@ -533,7 +533,7 @@
 
 /* New Hampshire */
 .shield.NH .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.75em;
   right: -0.1em;
   top: 0.15em;
@@ -550,7 +550,7 @@
 
 /* New Jersey */
 .shield.NJ .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.7em;
   top: 0.08em;
@@ -558,7 +558,7 @@
 
 /* New Mexico */
 .shield.NM .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.NM.OneDigit .routeNumber,
@@ -576,7 +576,7 @@
 
 /* New York */
 .shield.NY .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.6em;
   top: 0.17em;
@@ -584,7 +584,7 @@
 
 /* North Carolina */
 .shield.NC .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.25em;
   top: 0.25em;
 }
@@ -600,7 +600,7 @@
 
 /* North Dakota */
 .shield.ND .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.5em;
   top: 0.25em;
@@ -608,7 +608,7 @@
 
 /* Ohio */
 .shield.OH .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.75em;
   top: 0.15em;
@@ -616,7 +616,7 @@
 
 /* Oklahoma */
 .shield.OK .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.75em;
   text-shadow:
@@ -633,7 +633,7 @@
 
 /* Oregon */
 .shield.OR .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.5em;
   top: 0.1em;
 }
@@ -649,7 +649,7 @@
 
 /* Pennsylvania */
 .shield.PA .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.75em;
   top: 0.2em;
@@ -661,7 +661,7 @@
 
 /* South Carolina */
 .shield.SC .routeNumber {
-  color: var(--blue);
+  color: rgb(0, 67, 123);
   font-family: "Series E";
   font-size: 1.5em;
   top: 0.8em;
@@ -669,7 +669,7 @@
 
 /* South Dakota */
 .shield.SD .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.5em;
   top: 0.15em;
@@ -677,7 +677,7 @@
 
 /* Tennessee */
 .shield.TN .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.8em;
   top: -0.05em;
@@ -688,7 +688,7 @@
 }
 
 .shield.TN2 .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.35em;
   top: -0.15em;
 }
@@ -710,7 +710,7 @@
 .shield.TXPARK .routeNumber,
 .shield.TXRM .routeNumber,
 .shield.TXBELTWAY .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.8em;
   top: 0.65em;
@@ -736,7 +736,7 @@
 
 .shield.TXTollNTTA .routeNumber,
 .shield.TXTOLL .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series E";
   font-size: 1.6em;
   left: -0.075em;
@@ -749,7 +749,7 @@
 }
 
 .shield.TXTollCTRMA .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Clearview 2B";
   font-size: 1.4em;
   left: -0.075em;
@@ -757,7 +757,7 @@
 }
 
 .shield.TXEXPRESS .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.4rem;
   letter-spacing: -1px;
@@ -766,7 +766,7 @@
 
 /* Utah */
 .shield.UT .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.UT.OneDigit .routeNumber,
@@ -784,7 +784,7 @@
 
 /* Vermont */
 .shield.VT .routeNumber {
-  color: var(--green);
+  color: rgb(0, 95, 77);
   font-family: "Series D";
   font-size: 1.7em;
   top: 0.7em;
@@ -792,14 +792,14 @@
 
 /* Virginia */
 .shield.VA .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 1.7em;
   top: 0em;
 }
 
 .shield.VA2 .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.5em;
   left: 0.025em;
   top: 0.15em;
@@ -816,7 +816,7 @@
 
 /* Washington */
 .shield.WA .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.WA.OneDigit .routeNumber,
@@ -834,7 +834,7 @@
 
 /* Wisconsin */
 .shield.WI .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.8em;
   top: 0.15em;
 }
@@ -850,7 +850,7 @@
 
 /* Wyoming */
 .shield.WY .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.5em;
   top: 0.35em;
 }
@@ -870,7 +870,7 @@
 
 /* Alberta */
 .shield.AB .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-size: 1.25em;
   top: 0.65em;
 }
@@ -888,7 +888,7 @@
 }
 
 .shield.AB2 .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 0.85em;
   top: 1em;
@@ -904,7 +904,7 @@
 }
 
 .shield.BCYH .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Helvetica";
   font-size: 1em;
   font-weight: bold;
@@ -914,14 +914,14 @@
 
 /* Manitoba */
 .shield.MB .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.25em;
   top: 0.6em;
 }
 
 .shield.MB2 .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 0.9em;
   top: 1em;
@@ -931,7 +931,7 @@
 .shield.NB .routeNumber,
 .shield.NBLOCAL .routeNumber,
 .shield.NBCONN .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Helvetica";
   font-weight: bold;
   top: 0.1em;
@@ -960,7 +960,7 @@
 
 /* Newfoundland and Labrador */
 .shield.NL .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series EM";
   font-size: 1.6em;
   top: 0.62em;
@@ -1004,7 +1004,7 @@
 
 /* Prince Edward Island */
 .shield.PEI .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 1.3em;
   top: 1em;
@@ -1017,7 +1017,7 @@
 
 /* Quebec */
 .shield.QC .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series EM";
   font-size: 1.2em;
   top: 0.4em;
@@ -1032,7 +1032,7 @@
 }
 
 .shield.QC2 .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series C";
   font-size: 1.2rem;
   font-size: 1.25em;
@@ -1042,7 +1042,7 @@
 /* Saskatchewan */
 .shield.SK .routeNumber,
 .shield.SK2 .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.2em;
   top: 0.4em;
@@ -1054,7 +1054,7 @@
 }
 
 .shield.SK2 .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 /* Trans-Canada Highway */
@@ -1067,7 +1067,7 @@
 .shield.ONTC .routeNumber,
 .shield.QCTC .routeNumber,
 .shield.SKTC .routeNumber {
-  color: var(--green);
+  color: rgb(0, 95, 77);
   font-family: "Series E";
   font-size: 0.9em;
   top: 0.4em;
@@ -1099,7 +1099,7 @@
 .shield.ONTC .designation,
 .shield.QCTC .designation,
 .shield.SKTC .designation {
-  color: var(--green);
+  color: rgb(0, 95, 77);
   font-family: "Series D";
   font-size: 0.4em;
   left: 0.75em;
@@ -1107,7 +1107,7 @@
 }
 
 .shield.TCHLeaf .routeNumber {
-  color: var(--green);
+  color: rgb(0, 95, 77);
   font-family: "Series D";
   font-size: 1.8em;
   top: 0.25em;
@@ -1142,21 +1142,21 @@
 
 /* Australian National Route */
 .shield.NAT .routeNumber {
-  color: var(--yellow);
+  color: rgb(252, 207, 52);
   font-family: "Series D";
   font-size: 2em;
   top: 0.15em;
 }
 
 .shield.NAT.TwoDigit .routeNumber {
-  color: var(--yellow);
+  color: rgb(252, 207, 52);
   font-family: "Series EM";
   font-size: 1.75em;
   top: 0.15em;
 }
 
 .shield.NAT.ThreeDigit .routeNumber {
-  color: var(--yellow);
+  color: rgb(252, 207, 52);
   font-family: "Series C";
   font-size: 1.75em;
   top: 0.1em;
@@ -1193,7 +1193,7 @@
 
 /* Australian Toll */
 .shield.TOLLBLUE .routeNumber {
-  color: var(--yellow);
+  color: rgb(252, 207, 52);
   font-family: "Series EM";
   font-size: 2.2em;
   top: 0em;
@@ -1228,7 +1228,7 @@
 
 /* New Zealand State Route - VIVI NOTE: i added suffixes, just add your suffix as the designation :) */
 .shield.SH .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.4em;
   top: -0.01em;
@@ -1264,7 +1264,7 @@
 .shield.VRO .routeNumber,
 .shield.VRS .routeNumber,
 .shield.VRT .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series B";
   font-size: 1.15em;
   font-weight: 1 !important;
@@ -1277,7 +1277,7 @@
 .shield.VRF .designation,
 .shield.VRT .designation,
 .shield.VRD .designation {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.V.OneDigit .routeNumber,
@@ -1379,7 +1379,7 @@
 .shield.ILTS .routeNumber,
 .shield.ILGT .routeNumber,
 .shield.ILTT .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series E";
   font-size: 1.4em;
   top: 0.45em;
@@ -1397,7 +1397,7 @@
 .shield.ILTF .designation,
 .shield.ILGT .designation,
 .shield.ILTT .designation {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.ILG.TwoDigit .routeNumber,
@@ -1558,7 +1558,7 @@
 .shield.BAS .routeNumber,
 .shield.BAT .routeNumber,
 .shield.BATA .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.5em;
   top: 0.15em;
@@ -1583,7 +1583,7 @@
 .shield.BAF .designation,
 .shield.BAT .routeNumber,
 .shield.BAT .designation {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.BA:has(.designation) .routeNumber,
@@ -1616,82 +1616,82 @@
 
 .shield.BA .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-purple),
-    2px -2px 0 var(--veridian-purple),
-    -2px 2px 0 var(--veridian-purple),
-    2px 2px 0 var(--veridian-purple);
+    -2px -2px 0 rgb(105, 13, 163),
+    2px -2px 0 rgb(105, 13, 163),
+    -2px 2px 0 rgb(105, 13, 163),
+    2px 2px 0 rgb(105, 13, 163);
 }
 
 .shield.BAB .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-coral),
-    2px -2px 0 var(--veridian-coral),
-    -2px 2px 0 var(--veridian-coral),
-    2px 2px 0 var(--veridian-coral);
+    -2px -2px 0 rgb(223, 70, 97),
+    2px -2px 0 rgb(223, 70, 97),
+    -2px 2px 0 rgb(223, 70, 97),
+    2px 2px 0 rgb(223, 70, 97);
 }
 
 .shield.BAD .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-orange),
-    2px -2px 0 var(--veridian-orange),
-    -2px 2px 0 var(--veridian-orange),
-    2px 2px 0 var(--veridian-orange);
+    -2px -2px 0 rgb(229, 114, 0),
+    2px -2px 0 rgb(229, 114, 0),
+    -2px 2px 0 rgb(229, 114, 0),
+    2px 2px 0 rgb(229, 114, 0);
 }
 
 .shield.BAF .designation {
   text-shadow:
-    -2px -2px 0 var(--white),
-    2px -2px 0 var(--white),
-    -2px 2px 0 var(--white),
-    2px 2px 0 var(--white);
+    -2px -2px 0 rgb(255, 255, 255),
+    2px -2px 0 rgb(255, 255, 255),
+    -2px 2px 0 rgb(255, 255, 255),
+    2px 2px 0 rgb(255, 255, 255);
 }
 
 .shield.BAH .designation {
   text-shadow:
-    -2px -2px 0 var(--black),
-    2px -2px 0 var(--black),
-    -2px 2px 0 var(--black),
-    2px 2px 0 var(--black);
+    -2px -2px 0 rgb(0, 0, 0),
+    2px -2px 0 rgb(0, 0, 0),
+    -2px 2px 0 rgb(0, 0, 0),
+    2px 2px 0 rgb(0, 0, 0);
 }
 
 .shield.BAL .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-blue),
-    2px -2px 0 var(--veridian-blue),
-    -2px 2px 0 var(--veridian-blue),
-    2px 2px 0 var(--veridian-blue);
+    -2px -2px 0 rgb(0, 47, 108),
+    2px -2px 0 rgb(0, 47, 108),
+    -2px 2px 0 rgb(0, 47, 108),
+    2px 2px 0 rgb(0, 47, 108);
 }
 
 .shield.BAO .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-brown),
-    2px -2px 0 var(--veridian-brown),
-    -2px 2px 0 var(--veridian-brown),
-    2px 2px 0 var(--veridian-brown);
+    -2px -2px 0 rgb(105, 63, 35),
+    2px -2px 0 rgb(105, 63, 35),
+    -2px 2px 0 rgb(105, 63, 35),
+    2px 2px 0 rgb(105, 63, 35);
 }
 
 .shield.BAS .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-red),
-    2px -2px 0 var(--veridian-red),
-    -2px 2px 0 var(--veridian-red),
-    2px 2px 0 var(--veridian-red);
+    -2px -2px 0 rgb(175, 39, 47),
+    2px -2px 0 rgb(175, 39, 47),
+    -2px 2px 0 rgb(175, 39, 47),
+    2px 2px 0 rgb(175, 39, 47);
 }
 
 .shield.BAT .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-yellow),
-    2px -2px 0 var(--veridian-yellow),
-    -2px 2px 0 var(--veridian-yellow),
-    2px 2px 0 var(--veridian-yellow);
+    -2px -2px 0 rgb(254, 209, 65),
+    2px -2px 0 rgb(254, 209, 65),
+    -2px 2px 0 rgb(254, 209, 65),
+    2px 2px 0 rgb(254, 209, 65);
 }
 
 .shield.BATA .designation {
   text-shadow:
-    -2px -2px 0 var(--veridian-green),
-    2px -2px 0 var(--veridian-green),
-    -2px 2px 0 var(--veridian-green),
-    2px 2px 0 var(--veridian-green);
+    -2px -2px 0 rgb(0, 64, 64),
+    2px -2px 0 rgb(0, 64, 64),
+    -2px 2px 0 rgb(0, 64, 64),
+    2px 2px 0 rgb(0, 64, 64);
 }
 
 .shield.BATP .routeNumber {
@@ -1736,17 +1736,17 @@
 
 .shield:is(.CHD, .CHF, .CHT) .designation,
 .shield:is(.CHD, .CHF, .CHT) .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.CHTA .designation,
 .shield.CHTA .routeNumber {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
 }
 
 /* Desicalia */
 .shield:is(.DS, .DSB, .DSD, .DSF, .DSH, .DSL, .DSO, .DSS, .DST) .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 1.4em;
   top: 0.5em;
@@ -1762,13 +1762,13 @@
 }
 
 .shield:is(.DSD, .DSF, .DST) .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 /* Leoria */
 .shield:is(.LE, .LEB, .LED, .LEF, .LEH, .LEL, .LEO, .LES, .LET, .LETA)
   .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.3em;
   right: -0.25em;
@@ -1785,11 +1785,11 @@
 }
 
 .shield:is(.LED, .LEF, .LET) .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.LETA .routeNumber {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
 }
 
 /* Palo Duro */
@@ -1953,12 +1953,12 @@
 .shield.PDF .designation,
 .shield.PDT .routeNumber,
 .shield.PDT .designation {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.PDTA .routeNumber,
 .shield.PDTA .designation {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
 }
 
 .shield.PDTA .designation,
@@ -1978,774 +1978,774 @@
 .shield.RO.ThreeDigit .routeNumber,
 .shield.RO .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-purple),
-    0.1px -0.1px 0 var(--veridian-purple),
-    -0.1px 0.1px 0 var(--veridian-purple),
-    0.1px 0.1px 0 var(--veridian-purple),
-    -0.2px -0.2px 0 var(--veridian-purple),
-    0.2px -0.2px 0 var(--veridian-purple),
-    -0.2px 0.2px 0 var(--veridian-purple),
-    0.2px 0.2px 0 var(--veridian-purple),
-    -0.3px -0.3px 0 var(--veridian-purple),
-    0.3px -0.3px 0 var(--veridian-purple),
-    -0.3px 0.3px 0 var(--veridian-purple),
-    0.3px 0.3px 0 var(--veridian-purple),
-    -0.4px -0.4px 0 var(--veridian-purple),
-    0.4px -0.4px 0 var(--veridian-purple),
-    -0.4px 0.4px 0 var(--veridian-purple),
-    0.4px 0.4px 0 var(--veridian-purple),
-    -0.5px -0.5px 0 var(--veridian-purple),
-    0.5px -0.5px 0 var(--veridian-purple),
-    -0.5px 0.5px 0 var(--veridian-purple),
-    0.5px 0.5px 0 var(--veridian-purple),
-    -0.6px -0.6px 0 var(--veridian-purple),
-    0.6px -0.6px 0 var(--veridian-purple),
-    -0.6px 0.6px 0 var(--veridian-purple),
-    0.6px 0.6px 0 var(--veridian-purple),
-    -0.7px -0.7px 0 var(--veridian-purple),
-    0.7px -0.7px 0 var(--veridian-purple),
-    -0.7px 0.7px 0 var(--veridian-purple),
-    0.7px 0.7px 0 var(--veridian-purple),
-    -0.8px -0.8px 0 var(--veridian-purple),
-    0.8px -0.8px 0 var(--veridian-purple),
-    -0.8px 0.8px 0 var(--veridian-purple),
-    0.8px 0.8px 0 var(--veridian-purple),
-    -0.9px -0.9px 0 var(--veridian-purple),
-    0.9px -0.9px 0 var(--veridian-purple),
-    -0.9px 0.9px 0 var(--veridian-purple),
-    0.9px 0.9px 0 var(--veridian-purple),
-    -1px -1px 0 var(--veridian-purple),
-    1px -1px 0 var(--veridian-purple),
-    -1px 1px 0 var(--veridian-purple),
-    1px 1px 0 var(--veridian-purple),
-    -1.1px -1.1px 0 var(--veridian-purple),
-    1.1px -1.1px 0 var(--veridian-purple),
-    -1.1px 1.1px 0 var(--veridian-purple),
-    1.1px 1.1px 0 var(--veridian-purple),
-    -1.2px -1.2px 0 var(--veridian-purple),
-    1.2px -1.2px 0 var(--veridian-purple),
-    -1.2px 1.2px 0 var(--veridian-purple),
-    1.2px 1.2px 0 var(--veridian-purple),
-    -1.3px -1.3px 0 var(--veridian-purple),
-    1.3px -1.3px 0 var(--veridian-purple),
-    -1.3px 1.3px 0 var(--veridian-purple),
-    1.3px 1.3px 0 var(--veridian-purple),
-    -1.4px -1.4px 0 var(--veridian-purple),
-    1.4px -1.4px 0 var(--veridian-purple),
-    -1.4px 1.4px 0 var(--veridian-purple),
-    1.4px 1.4px 0 var(--veridian-purple),
-    -1.5px -1.5px 0 var(--veridian-purple),
-    1.5px -1.5px 0 var(--veridian-purple),
-    -1.5px 1.5px 0 var(--veridian-purple),
-    1.5px 1.5px 0 var(--veridian-purple),
-    -1.6px -1.6px 0 var(--veridian-purple),
-    1.6px -1.6px 0 var(--veridian-purple),
-    -1.6px 1.6px 0 var(--veridian-purple),
-    1.6px 1.6px 0 var(--veridian-purple),
-    -1.7px -1.7px 0 var(--veridian-purple),
-    1.7px -1.7px 0 var(--veridian-purple),
-    -1.7px 1.7px 0 var(--veridian-purple),
-    1.7px 1.7px 0 var(--veridian-purple),
-    -1.8px -1.8px 0 var(--veridian-purple),
-    1.8px -1.8px 0 var(--veridian-purple),
-    -1.8px 1.8px 0 var(--veridian-purple),
-    1.8px 1.8px 0 var(--veridian-purple),
-    -1.9px -1.9px 0 var(--veridian-purple),
-    1.9px -1.9px 0 var(--veridian-purple),
-    -1.9px 1.9px 0 var(--veridian-purple),
-    1.9px 1.9px 0 var(--veridian-purple),
-    -2px -2px 0 var(--veridian-purple),
-    2px -2px 0 var(--veridian-purple),
-    -2px 2px 0 var(--veridian-purple),
-    2px 2px 0 var(--veridian-purple);
+    -0.1px -0.1px 0 rgb(105, 13, 163),
+    0.1px -0.1px 0 rgb(105, 13, 163),
+    -0.1px 0.1px 0 rgb(105, 13, 163),
+    0.1px 0.1px 0 rgb(105, 13, 163),
+    -0.2px -0.2px 0 rgb(105, 13, 163),
+    0.2px -0.2px 0 rgb(105, 13, 163),
+    -0.2px 0.2px 0 rgb(105, 13, 163),
+    0.2px 0.2px 0 rgb(105, 13, 163),
+    -0.3px -0.3px 0 rgb(105, 13, 163),
+    0.3px -0.3px 0 rgb(105, 13, 163),
+    -0.3px 0.3px 0 rgb(105, 13, 163),
+    0.3px 0.3px 0 rgb(105, 13, 163),
+    -0.4px -0.4px 0 rgb(105, 13, 163),
+    0.4px -0.4px 0 rgb(105, 13, 163),
+    -0.4px 0.4px 0 rgb(105, 13, 163),
+    0.4px 0.4px 0 rgb(105, 13, 163),
+    -0.5px -0.5px 0 rgb(105, 13, 163),
+    0.5px -0.5px 0 rgb(105, 13, 163),
+    -0.5px 0.5px 0 rgb(105, 13, 163),
+    0.5px 0.5px 0 rgb(105, 13, 163),
+    -0.6px -0.6px 0 rgb(105, 13, 163),
+    0.6px -0.6px 0 rgb(105, 13, 163),
+    -0.6px 0.6px 0 rgb(105, 13, 163),
+    0.6px 0.6px 0 rgb(105, 13, 163),
+    -0.7px -0.7px 0 rgb(105, 13, 163),
+    0.7px -0.7px 0 rgb(105, 13, 163),
+    -0.7px 0.7px 0 rgb(105, 13, 163),
+    0.7px 0.7px 0 rgb(105, 13, 163),
+    -0.8px -0.8px 0 rgb(105, 13, 163),
+    0.8px -0.8px 0 rgb(105, 13, 163),
+    -0.8px 0.8px 0 rgb(105, 13, 163),
+    0.8px 0.8px 0 rgb(105, 13, 163),
+    -0.9px -0.9px 0 rgb(105, 13, 163),
+    0.9px -0.9px 0 rgb(105, 13, 163),
+    -0.9px 0.9px 0 rgb(105, 13, 163),
+    0.9px 0.9px 0 rgb(105, 13, 163),
+    -1px -1px 0 rgb(105, 13, 163),
+    1px -1px 0 rgb(105, 13, 163),
+    -1px 1px 0 rgb(105, 13, 163),
+    1px 1px 0 rgb(105, 13, 163),
+    -1.1px -1.1px 0 rgb(105, 13, 163),
+    1.1px -1.1px 0 rgb(105, 13, 163),
+    -1.1px 1.1px 0 rgb(105, 13, 163),
+    1.1px 1.1px 0 rgb(105, 13, 163),
+    -1.2px -1.2px 0 rgb(105, 13, 163),
+    1.2px -1.2px 0 rgb(105, 13, 163),
+    -1.2px 1.2px 0 rgb(105, 13, 163),
+    1.2px 1.2px 0 rgb(105, 13, 163),
+    -1.3px -1.3px 0 rgb(105, 13, 163),
+    1.3px -1.3px 0 rgb(105, 13, 163),
+    -1.3px 1.3px 0 rgb(105, 13, 163),
+    1.3px 1.3px 0 rgb(105, 13, 163),
+    -1.4px -1.4px 0 rgb(105, 13, 163),
+    1.4px -1.4px 0 rgb(105, 13, 163),
+    -1.4px 1.4px 0 rgb(105, 13, 163),
+    1.4px 1.4px 0 rgb(105, 13, 163),
+    -1.5px -1.5px 0 rgb(105, 13, 163),
+    1.5px -1.5px 0 rgb(105, 13, 163),
+    -1.5px 1.5px 0 rgb(105, 13, 163),
+    1.5px 1.5px 0 rgb(105, 13, 163),
+    -1.6px -1.6px 0 rgb(105, 13, 163),
+    1.6px -1.6px 0 rgb(105, 13, 163),
+    -1.6px 1.6px 0 rgb(105, 13, 163),
+    1.6px 1.6px 0 rgb(105, 13, 163),
+    -1.7px -1.7px 0 rgb(105, 13, 163),
+    1.7px -1.7px 0 rgb(105, 13, 163),
+    -1.7px 1.7px 0 rgb(105, 13, 163),
+    1.7px 1.7px 0 rgb(105, 13, 163),
+    -1.8px -1.8px 0 rgb(105, 13, 163),
+    1.8px -1.8px 0 rgb(105, 13, 163),
+    -1.8px 1.8px 0 rgb(105, 13, 163),
+    1.8px 1.8px 0 rgb(105, 13, 163),
+    -1.9px -1.9px 0 rgb(105, 13, 163),
+    1.9px -1.9px 0 rgb(105, 13, 163),
+    -1.9px 1.9px 0 rgb(105, 13, 163),
+    1.9px 1.9px 0 rgb(105, 13, 163),
+    -2px -2px 0 rgb(105, 13, 163),
+    2px -2px 0 rgb(105, 13, 163),
+    -2px 2px 0 rgb(105, 13, 163),
+    2px 2px 0 rgb(105, 13, 163);
 }
 
 .shield.ROB.TwoDigit .routeNumber,
 .shield.ROB.ThreeDigit .routeNumber,
 .shield.ROB .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-coral),
-    0.1px -0.1px 0 var(--veridian-coral),
-    -0.1px 0.1px 0 var(--veridian-coral),
-    0.1px 0.1px 0 var(--veridian-coral),
-    -0.2px -0.2px 0 var(--veridian-coral),
-    0.2px -0.2px 0 var(--veridian-coral),
-    -0.2px 0.2px 0 var(--veridian-coral),
-    0.2px 0.2px 0 var(--veridian-coral),
-    -0.3px -0.3px 0 var(--veridian-coral),
-    0.3px -0.3px 0 var(--veridian-coral),
-    -0.3px 0.3px 0 var(--veridian-coral),
-    0.3px 0.3px 0 var(--veridian-coral),
-    -0.4px -0.4px 0 var(--veridian-coral),
-    0.4px -0.4px 0 var(--veridian-coral),
-    -0.4px 0.4px 0 var(--veridian-coral),
-    0.4px 0.4px 0 var(--veridian-coral),
-    -0.5px -0.5px 0 var(--veridian-coral),
-    0.5px -0.5px 0 var(--veridian-coral),
-    -0.5px 0.5px 0 var(--veridian-coral),
-    0.5px 0.5px 0 var(--veridian-coral),
-    -0.6px -0.6px 0 var(--veridian-coral),
-    0.6px -0.6px 0 var(--veridian-coral),
-    -0.6px 0.6px 0 var(--veridian-coral),
-    0.6px 0.6px 0 var(--veridian-coral),
-    -0.7px -0.7px 0 var(--veridian-coral),
-    0.7px -0.7px 0 var(--veridian-coral),
-    -0.7px 0.7px 0 var(--veridian-coral),
-    0.7px 0.7px 0 var(--veridian-coral),
-    -0.8px -0.8px 0 var(--veridian-coral),
-    0.8px -0.8px 0 var(--veridian-coral),
-    -0.8px 0.8px 0 var(--veridian-coral),
-    0.8px 0.8px 0 var(--veridian-coral),
-    -0.9px -0.9px 0 var(--veridian-coral),
-    0.9px -0.9px 0 var(--veridian-coral),
-    -0.9px 0.9px 0 var(--veridian-coral),
-    0.9px 0.9px 0 var(--veridian-coral),
-    -1px -1px 0 var(--veridian-coral),
-    1px -1px 0 var(--veridian-coral),
-    -1px 1px 0 var(--veridian-coral),
-    1px 1px 0 var(--veridian-coral),
-    -1.1px -1.1px 0 var(--veridian-coral),
-    1.1px -1.1px 0 var(--veridian-coral),
-    -1.1px 1.1px 0 var(--veridian-coral),
-    1.1px 1.1px 0 var(--veridian-coral),
-    -1.2px -1.2px 0 var(--veridian-coral),
-    1.2px -1.2px 0 var(--veridian-coral),
-    -1.2px 1.2px 0 var(--veridian-coral),
-    1.2px 1.2px 0 var(--veridian-coral),
-    -1.3px -1.3px 0 var(--veridian-coral),
-    1.3px -1.3px 0 var(--veridian-coral),
-    -1.3px 1.3px 0 var(--veridian-coral),
-    1.3px 1.3px 0 var(--veridian-coral),
-    -1.4px -1.4px 0 var(--veridian-coral),
-    1.4px -1.4px 0 var(--veridian-coral),
-    -1.4px 1.4px 0 var(--veridian-coral),
-    1.4px 1.4px 0 var(--veridian-coral),
-    -1.5px -1.5px 0 var(--veridian-coral),
-    1.5px -1.5px 0 var(--veridian-coral),
-    -1.5px 1.5px 0 var(--veridian-coral),
-    1.5px 1.5px 0 var(--veridian-coral),
-    -1.6px -1.6px 0 var(--veridian-coral),
-    1.6px -1.6px 0 var(--veridian-coral),
-    -1.6px 1.6px 0 var(--veridian-coral),
-    1.6px 1.6px 0 var(--veridian-coral),
-    -1.7px -1.7px 0 var(--veridian-coral),
-    1.7px -1.7px 0 var(--veridian-coral),
-    -1.7px 1.7px 0 var(--veridian-coral),
-    1.7px 1.7px 0 var(--veridian-coral),
-    -1.8px -1.8px 0 var(--veridian-coral),
-    1.8px -1.8px 0 var(--veridian-coral),
-    -1.8px 1.8px 0 var(--veridian-coral),
-    1.8px 1.8px 0 var(--veridian-coral),
-    -1.9px -1.9px 0 var(--veridian-coral),
-    1.9px -1.9px 0 var(--veridian-coral),
-    -1.9px 1.9px 0 var(--veridian-coral),
-    1.9px 1.9px 0 var(--veridian-coral),
-    -2px -2px 0 var(--veridian-coral),
-    2px -2px 0 var(--veridian-coral),
-    -2px 2px 0 var(--veridian-coral),
-    2px 2px 0 var(--veridian-coral);
+    -0.1px -0.1px 0 rgb(223, 70, 97),
+    0.1px -0.1px 0 rgb(223, 70, 97),
+    -0.1px 0.1px 0 rgb(223, 70, 97),
+    0.1px 0.1px 0 rgb(223, 70, 97),
+    -0.2px -0.2px 0 rgb(223, 70, 97),
+    0.2px -0.2px 0 rgb(223, 70, 97),
+    -0.2px 0.2px 0 rgb(223, 70, 97),
+    0.2px 0.2px 0 rgb(223, 70, 97),
+    -0.3px -0.3px 0 rgb(223, 70, 97),
+    0.3px -0.3px 0 rgb(223, 70, 97),
+    -0.3px 0.3px 0 rgb(223, 70, 97),
+    0.3px 0.3px 0 rgb(223, 70, 97),
+    -0.4px -0.4px 0 rgb(223, 70, 97),
+    0.4px -0.4px 0 rgb(223, 70, 97),
+    -0.4px 0.4px 0 rgb(223, 70, 97),
+    0.4px 0.4px 0 rgb(223, 70, 97),
+    -0.5px -0.5px 0 rgb(223, 70, 97),
+    0.5px -0.5px 0 rgb(223, 70, 97),
+    -0.5px 0.5px 0 rgb(223, 70, 97),
+    0.5px 0.5px 0 rgb(223, 70, 97),
+    -0.6px -0.6px 0 rgb(223, 70, 97),
+    0.6px -0.6px 0 rgb(223, 70, 97),
+    -0.6px 0.6px 0 rgb(223, 70, 97),
+    0.6px 0.6px 0 rgb(223, 70, 97),
+    -0.7px -0.7px 0 rgb(223, 70, 97),
+    0.7px -0.7px 0 rgb(223, 70, 97),
+    -0.7px 0.7px 0 rgb(223, 70, 97),
+    0.7px 0.7px 0 rgb(223, 70, 97),
+    -0.8px -0.8px 0 rgb(223, 70, 97),
+    0.8px -0.8px 0 rgb(223, 70, 97),
+    -0.8px 0.8px 0 rgb(223, 70, 97),
+    0.8px 0.8px 0 rgb(223, 70, 97),
+    -0.9px -0.9px 0 rgb(223, 70, 97),
+    0.9px -0.9px 0 rgb(223, 70, 97),
+    -0.9px 0.9px 0 rgb(223, 70, 97),
+    0.9px 0.9px 0 rgb(223, 70, 97),
+    -1px -1px 0 rgb(223, 70, 97),
+    1px -1px 0 rgb(223, 70, 97),
+    -1px 1px 0 rgb(223, 70, 97),
+    1px 1px 0 rgb(223, 70, 97),
+    -1.1px -1.1px 0 rgb(223, 70, 97),
+    1.1px -1.1px 0 rgb(223, 70, 97),
+    -1.1px 1.1px 0 rgb(223, 70, 97),
+    1.1px 1.1px 0 rgb(223, 70, 97),
+    -1.2px -1.2px 0 rgb(223, 70, 97),
+    1.2px -1.2px 0 rgb(223, 70, 97),
+    -1.2px 1.2px 0 rgb(223, 70, 97),
+    1.2px 1.2px 0 rgb(223, 70, 97),
+    -1.3px -1.3px 0 rgb(223, 70, 97),
+    1.3px -1.3px 0 rgb(223, 70, 97),
+    -1.3px 1.3px 0 rgb(223, 70, 97),
+    1.3px 1.3px 0 rgb(223, 70, 97),
+    -1.4px -1.4px 0 rgb(223, 70, 97),
+    1.4px -1.4px 0 rgb(223, 70, 97),
+    -1.4px 1.4px 0 rgb(223, 70, 97),
+    1.4px 1.4px 0 rgb(223, 70, 97),
+    -1.5px -1.5px 0 rgb(223, 70, 97),
+    1.5px -1.5px 0 rgb(223, 70, 97),
+    -1.5px 1.5px 0 rgb(223, 70, 97),
+    1.5px 1.5px 0 rgb(223, 70, 97),
+    -1.6px -1.6px 0 rgb(223, 70, 97),
+    1.6px -1.6px 0 rgb(223, 70, 97),
+    -1.6px 1.6px 0 rgb(223, 70, 97),
+    1.6px 1.6px 0 rgb(223, 70, 97),
+    -1.7px -1.7px 0 rgb(223, 70, 97),
+    1.7px -1.7px 0 rgb(223, 70, 97),
+    -1.7px 1.7px 0 rgb(223, 70, 97),
+    1.7px 1.7px 0 rgb(223, 70, 97),
+    -1.8px -1.8px 0 rgb(223, 70, 97),
+    1.8px -1.8px 0 rgb(223, 70, 97),
+    -1.8px 1.8px 0 rgb(223, 70, 97),
+    1.8px 1.8px 0 rgb(223, 70, 97),
+    -1.9px -1.9px 0 rgb(223, 70, 97),
+    1.9px -1.9px 0 rgb(223, 70, 97),
+    -1.9px 1.9px 0 rgb(223, 70, 97),
+    1.9px 1.9px 0 rgb(223, 70, 97),
+    -2px -2px 0 rgb(223, 70, 97),
+    2px -2px 0 rgb(223, 70, 97),
+    -2px 2px 0 rgb(223, 70, 97),
+    2px 2px 0 rgb(223, 70, 97);
 }
 
 .shield.ROD.TwoDigit .routeNumber,
 .shield.ROD.ThreeDigit .routeNumber,
 .shield.ROD .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-orange),
-    0.1px -0.1px 0 var(--veridian-orange),
-    -0.1px 0.1px 0 var(--veridian-orange),
-    0.1px 0.1px 0 var(--veridian-orange),
-    -0.2px -0.2px 0 var(--veridian-orange),
-    0.2px -0.2px 0 var(--veridian-orange),
-    -0.2px 0.2px 0 var(--veridian-orange),
-    0.2px 0.2px 0 var(--veridian-orange),
-    -0.3px -0.3px 0 var(--veridian-orange),
-    0.3px -0.3px 0 var(--veridian-orange),
-    -0.3px 0.3px 0 var(--veridian-orange),
-    0.3px 0.3px 0 var(--veridian-orange),
-    -0.4px -0.4px 0 var(--veridian-orange),
-    0.4px -0.4px 0 var(--veridian-orange),
-    -0.4px 0.4px 0 var(--veridian-orange),
-    0.4px 0.4px 0 var(--veridian-orange),
-    -0.5px -0.5px 0 var(--veridian-orange),
-    0.5px -0.5px 0 var(--veridian-orange),
-    -0.5px 0.5px 0 var(--veridian-orange),
-    0.5px 0.5px 0 var(--veridian-orange),
-    -0.6px -0.6px 0 var(--veridian-orange),
-    0.6px -0.6px 0 var(--veridian-orange),
-    -0.6px 0.6px 0 var(--veridian-orange),
-    0.6px 0.6px 0 var(--veridian-orange),
-    -0.7px -0.7px 0 var(--veridian-orange),
-    0.7px -0.7px 0 var(--veridian-orange),
-    -0.7px 0.7px 0 var(--veridian-orange),
-    0.7px 0.7px 0 var(--veridian-orange),
-    -0.8px -0.8px 0 var(--veridian-orange),
-    0.8px -0.8px 0 var(--veridian-orange),
-    -0.8px 0.8px 0 var(--veridian-orange),
-    0.8px 0.8px 0 var(--veridian-orange),
-    -0.9px -0.9px 0 var(--veridian-orange),
-    0.9px -0.9px 0 var(--veridian-orange),
-    -0.9px 0.9px 0 var(--veridian-orange),
-    0.9px 0.9px 0 var(--veridian-orange),
-    -1px -1px 0 var(--veridian-orange),
-    1px -1px 0 var(--veridian-orange),
-    -1px 1px 0 var(--veridian-orange),
-    1px 1px 0 var(--veridian-orange),
-    -1.1px -1.1px 0 var(--veridian-orange),
-    1.1px -1.1px 0 var(--veridian-orange),
-    -1.1px 1.1px 0 var(--veridian-orange),
-    1.1px 1.1px 0 var(--veridian-orange),
-    -1.2px -1.2px 0 var(--veridian-orange),
-    1.2px -1.2px 0 var(--veridian-orange),
-    -1.2px 1.2px 0 var(--veridian-orange),
-    1.2px 1.2px 0 var(--veridian-orange),
-    -1.3px -1.3px 0 var(--veridian-orange),
-    1.3px -1.3px 0 var(--veridian-orange),
-    -1.3px 1.3px 0 var(--veridian-orange),
-    1.3px 1.3px 0 var(--veridian-orange),
-    -1.4px -1.4px 0 var(--veridian-orange),
-    1.4px -1.4px 0 var(--veridian-orange),
-    -1.4px 1.4px 0 var(--veridian-orange),
-    1.4px 1.4px 0 var(--veridian-orange),
-    -1.5px -1.5px 0 var(--veridian-orange),
-    1.5px -1.5px 0 var(--veridian-orange),
-    -1.5px 1.5px 0 var(--veridian-orange),
-    1.5px 1.5px 0 var(--veridian-orange),
-    -1.6px -1.6px 0 var(--veridian-orange),
-    1.6px -1.6px 0 var(--veridian-orange),
-    -1.6px 1.6px 0 var(--veridian-orange),
-    1.6px 1.6px 0 var(--veridian-orange),
-    -1.7px -1.7px 0 var(--veridian-orange),
-    1.7px -1.7px 0 var(--veridian-orange),
-    -1.7px 1.7px 0 var(--veridian-orange),
-    1.7px 1.7px 0 var(--veridian-orange),
-    -1.8px -1.8px 0 var(--veridian-orange),
-    1.8px -1.8px 0 var(--veridian-orange),
-    -1.8px 1.8px 0 var(--veridian-orange),
-    1.8px 1.8px 0 var(--veridian-orange),
-    -1.9px -1.9px 0 var(--veridian-orange),
-    1.9px -1.9px 0 var(--veridian-orange),
-    -1.9px 1.9px 0 var(--veridian-orange),
-    1.9px 1.9px 0 var(--veridian-orange),
-    -2px -2px 0 var(--veridian-orange),
-    2px -2px 0 var(--veridian-orange),
-    -2px 2px 0 var(--veridian-orange),
-    2px 2px 0 var(--veridian-orange);
+    -0.1px -0.1px 0 rgb(229, 114, 0),
+    0.1px -0.1px 0 rgb(229, 114, 0),
+    -0.1px 0.1px 0 rgb(229, 114, 0),
+    0.1px 0.1px 0 rgb(229, 114, 0),
+    -0.2px -0.2px 0 rgb(229, 114, 0),
+    0.2px -0.2px 0 rgb(229, 114, 0),
+    -0.2px 0.2px 0 rgb(229, 114, 0),
+    0.2px 0.2px 0 rgb(229, 114, 0),
+    -0.3px -0.3px 0 rgb(229, 114, 0),
+    0.3px -0.3px 0 rgb(229, 114, 0),
+    -0.3px 0.3px 0 rgb(229, 114, 0),
+    0.3px 0.3px 0 rgb(229, 114, 0),
+    -0.4px -0.4px 0 rgb(229, 114, 0),
+    0.4px -0.4px 0 rgb(229, 114, 0),
+    -0.4px 0.4px 0 rgb(229, 114, 0),
+    0.4px 0.4px 0 rgb(229, 114, 0),
+    -0.5px -0.5px 0 rgb(229, 114, 0),
+    0.5px -0.5px 0 rgb(229, 114, 0),
+    -0.5px 0.5px 0 rgb(229, 114, 0),
+    0.5px 0.5px 0 rgb(229, 114, 0),
+    -0.6px -0.6px 0 rgb(229, 114, 0),
+    0.6px -0.6px 0 rgb(229, 114, 0),
+    -0.6px 0.6px 0 rgb(229, 114, 0),
+    0.6px 0.6px 0 rgb(229, 114, 0),
+    -0.7px -0.7px 0 rgb(229, 114, 0),
+    0.7px -0.7px 0 rgb(229, 114, 0),
+    -0.7px 0.7px 0 rgb(229, 114, 0),
+    0.7px 0.7px 0 rgb(229, 114, 0),
+    -0.8px -0.8px 0 rgb(229, 114, 0),
+    0.8px -0.8px 0 rgb(229, 114, 0),
+    -0.8px 0.8px 0 rgb(229, 114, 0),
+    0.8px 0.8px 0 rgb(229, 114, 0),
+    -0.9px -0.9px 0 rgb(229, 114, 0),
+    0.9px -0.9px 0 rgb(229, 114, 0),
+    -0.9px 0.9px 0 rgb(229, 114, 0),
+    0.9px 0.9px 0 rgb(229, 114, 0),
+    -1px -1px 0 rgb(229, 114, 0),
+    1px -1px 0 rgb(229, 114, 0),
+    -1px 1px 0 rgb(229, 114, 0),
+    1px 1px 0 rgb(229, 114, 0),
+    -1.1px -1.1px 0 rgb(229, 114, 0),
+    1.1px -1.1px 0 rgb(229, 114, 0),
+    -1.1px 1.1px 0 rgb(229, 114, 0),
+    1.1px 1.1px 0 rgb(229, 114, 0),
+    -1.2px -1.2px 0 rgb(229, 114, 0),
+    1.2px -1.2px 0 rgb(229, 114, 0),
+    -1.2px 1.2px 0 rgb(229, 114, 0),
+    1.2px 1.2px 0 rgb(229, 114, 0),
+    -1.3px -1.3px 0 rgb(229, 114, 0),
+    1.3px -1.3px 0 rgb(229, 114, 0),
+    -1.3px 1.3px 0 rgb(229, 114, 0),
+    1.3px 1.3px 0 rgb(229, 114, 0),
+    -1.4px -1.4px 0 rgb(229, 114, 0),
+    1.4px -1.4px 0 rgb(229, 114, 0),
+    -1.4px 1.4px 0 rgb(229, 114, 0),
+    1.4px 1.4px 0 rgb(229, 114, 0),
+    -1.5px -1.5px 0 rgb(229, 114, 0),
+    1.5px -1.5px 0 rgb(229, 114, 0),
+    -1.5px 1.5px 0 rgb(229, 114, 0),
+    1.5px 1.5px 0 rgb(229, 114, 0),
+    -1.6px -1.6px 0 rgb(229, 114, 0),
+    1.6px -1.6px 0 rgb(229, 114, 0),
+    -1.6px 1.6px 0 rgb(229, 114, 0),
+    1.6px 1.6px 0 rgb(229, 114, 0),
+    -1.7px -1.7px 0 rgb(229, 114, 0),
+    1.7px -1.7px 0 rgb(229, 114, 0),
+    -1.7px 1.7px 0 rgb(229, 114, 0),
+    1.7px 1.7px 0 rgb(229, 114, 0),
+    -1.8px -1.8px 0 rgb(229, 114, 0),
+    1.8px -1.8px 0 rgb(229, 114, 0),
+    -1.8px 1.8px 0 rgb(229, 114, 0),
+    1.8px 1.8px 0 rgb(229, 114, 0),
+    -1.9px -1.9px 0 rgb(229, 114, 0),
+    1.9px -1.9px 0 rgb(229, 114, 0),
+    -1.9px 1.9px 0 rgb(229, 114, 0),
+    1.9px 1.9px 0 rgb(229, 114, 0),
+    -2px -2px 0 rgb(229, 114, 0),
+    2px -2px 0 rgb(229, 114, 0),
+    -2px 2px 0 rgb(229, 114, 0),
+    2px 2px 0 rgb(229, 114, 0);
 }
 
 .shield.ROF.TwoDigit .routeNumber,
 .shield.ROF.ThreeDigit .routeNumber,
 .shield.ROF .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--white),
-    0.1px -0.1px 0 var(--white),
-    -0.1px 0.1px 0 var(--white),
-    0.1px 0.1px 0 var(--white),
-    -0.2px -0.2px 0 var(--white),
-    0.2px -0.2px 0 var(--white),
-    -0.2px 0.2px 0 var(--white),
-    0.2px 0.2px 0 var(--white),
-    -0.3px -0.3px 0 var(--white),
-    0.3px -0.3px 0 var(--white),
-    -0.3px 0.3px 0 var(--white),
-    0.3px 0.3px 0 var(--white),
-    -0.4px -0.4px 0 var(--white),
-    0.4px -0.4px 0 var(--white),
-    -0.4px 0.4px 0 var(--white),
-    0.4px 0.4px 0 var(--white),
-    -0.5px -0.5px 0 var(--white),
-    0.5px -0.5px 0 var(--white),
-    -0.5px 0.5px 0 var(--white),
-    0.5px 0.5px 0 var(--white),
-    -0.6px -0.6px 0 var(--white),
-    0.6px -0.6px 0 var(--white),
-    -0.6px 0.6px 0 var(--white),
-    0.6px 0.6px 0 var(--white),
-    -0.7px -0.7px 0 var(--white),
-    0.7px -0.7px 0 var(--white),
-    -0.7px 0.7px 0 var(--white),
-    0.7px 0.7px 0 var(--white),
-    -0.8px -0.8px 0 var(--white),
-    0.8px -0.8px 0 var(--white),
-    -0.8px 0.8px 0 var(--white),
-    0.8px 0.8px 0 var(--white),
-    -0.9px -0.9px 0 var(--white),
-    0.9px -0.9px 0 var(--white),
-    -0.9px 0.9px 0 var(--white),
-    0.9px 0.9px 0 var(--white),
-    -1px -1px 0 var(--white),
-    1px -1px 0 var(--white),
-    -1px 1px 0 var(--white),
-    1px 1px 0 var(--white),
-    -1.1px -1.1px 0 var(--white),
-    1.1px -1.1px 0 var(--white),
-    -1.1px 1.1px 0 var(--white),
-    1.1px 1.1px 0 var(--white),
-    -1.2px -1.2px 0 var(--white),
-    1.2px -1.2px 0 var(--white),
-    -1.2px 1.2px 0 var(--white),
-    1.2px 1.2px 0 var(--white),
-    -1.3px -1.3px 0 var(--white),
-    1.3px -1.3px 0 var(--white),
-    -1.3px 1.3px 0 var(--white),
-    1.3px 1.3px 0 var(--white),
-    -1.4px -1.4px 0 var(--white),
-    1.4px -1.4px 0 var(--white),
-    -1.4px 1.4px 0 var(--white),
-    1.4px 1.4px 0 var(--white),
-    -1.5px -1.5px 0 var(--white),
-    1.5px -1.5px 0 var(--white),
-    -1.5px 1.5px 0 var(--white),
-    1.5px 1.5px 0 var(--white),
-    -1.6px -1.6px 0 var(--white),
-    1.6px -1.6px 0 var(--white),
-    -1.6px 1.6px 0 var(--white),
-    1.6px 1.6px 0 var(--white),
-    -1.7px -1.7px 0 var(--white),
-    1.7px -1.7px 0 var(--white),
-    -1.7px 1.7px 0 var(--white),
-    1.7px 1.7px 0 var(--white),
-    -1.8px -1.8px 0 var(--white),
-    1.8px -1.8px 0 var(--white),
-    -1.8px 1.8px 0 var(--white),
-    1.8px 1.8px 0 var(--white),
-    -1.9px -1.9px 0 var(--white),
-    1.9px -1.9px 0 var(--white),
-    -1.9px 1.9px 0 var(--white),
-    1.9px 1.9px 0 var(--white),
-    -2px -2px 0 var(--white),
-    2px -2px 0 var(--white),
-    -2px 2px 0 var(--white),
-    2px 2px 0 var(--white);
+    -0.1px -0.1px 0 rgb(255, 255, 255),
+    0.1px -0.1px 0 rgb(255, 255, 255),
+    -0.1px 0.1px 0 rgb(255, 255, 255),
+    0.1px 0.1px 0 rgb(255, 255, 255),
+    -0.2px -0.2px 0 rgb(255, 255, 255),
+    0.2px -0.2px 0 rgb(255, 255, 255),
+    -0.2px 0.2px 0 rgb(255, 255, 255),
+    0.2px 0.2px 0 rgb(255, 255, 255),
+    -0.3px -0.3px 0 rgb(255, 255, 255),
+    0.3px -0.3px 0 rgb(255, 255, 255),
+    -0.3px 0.3px 0 rgb(255, 255, 255),
+    0.3px 0.3px 0 rgb(255, 255, 255),
+    -0.4px -0.4px 0 rgb(255, 255, 255),
+    0.4px -0.4px 0 rgb(255, 255, 255),
+    -0.4px 0.4px 0 rgb(255, 255, 255),
+    0.4px 0.4px 0 rgb(255, 255, 255),
+    -0.5px -0.5px 0 rgb(255, 255, 255),
+    0.5px -0.5px 0 rgb(255, 255, 255),
+    -0.5px 0.5px 0 rgb(255, 255, 255),
+    0.5px 0.5px 0 rgb(255, 255, 255),
+    -0.6px -0.6px 0 rgb(255, 255, 255),
+    0.6px -0.6px 0 rgb(255, 255, 255),
+    -0.6px 0.6px 0 rgb(255, 255, 255),
+    0.6px 0.6px 0 rgb(255, 255, 255),
+    -0.7px -0.7px 0 rgb(255, 255, 255),
+    0.7px -0.7px 0 rgb(255, 255, 255),
+    -0.7px 0.7px 0 rgb(255, 255, 255),
+    0.7px 0.7px 0 rgb(255, 255, 255),
+    -0.8px -0.8px 0 rgb(255, 255, 255),
+    0.8px -0.8px 0 rgb(255, 255, 255),
+    -0.8px 0.8px 0 rgb(255, 255, 255),
+    0.8px 0.8px 0 rgb(255, 255, 255),
+    -0.9px -0.9px 0 rgb(255, 255, 255),
+    0.9px -0.9px 0 rgb(255, 255, 255),
+    -0.9px 0.9px 0 rgb(255, 255, 255),
+    0.9px 0.9px 0 rgb(255, 255, 255),
+    -1px -1px 0 rgb(255, 255, 255),
+    1px -1px 0 rgb(255, 255, 255),
+    -1px 1px 0 rgb(255, 255, 255),
+    1px 1px 0 rgb(255, 255, 255),
+    -1.1px -1.1px 0 rgb(255, 255, 255),
+    1.1px -1.1px 0 rgb(255, 255, 255),
+    -1.1px 1.1px 0 rgb(255, 255, 255),
+    1.1px 1.1px 0 rgb(255, 255, 255),
+    -1.2px -1.2px 0 rgb(255, 255, 255),
+    1.2px -1.2px 0 rgb(255, 255, 255),
+    -1.2px 1.2px 0 rgb(255, 255, 255),
+    1.2px 1.2px 0 rgb(255, 255, 255),
+    -1.3px -1.3px 0 rgb(255, 255, 255),
+    1.3px -1.3px 0 rgb(255, 255, 255),
+    -1.3px 1.3px 0 rgb(255, 255, 255),
+    1.3px 1.3px 0 rgb(255, 255, 255),
+    -1.4px -1.4px 0 rgb(255, 255, 255),
+    1.4px -1.4px 0 rgb(255, 255, 255),
+    -1.4px 1.4px 0 rgb(255, 255, 255),
+    1.4px 1.4px 0 rgb(255, 255, 255),
+    -1.5px -1.5px 0 rgb(255, 255, 255),
+    1.5px -1.5px 0 rgb(255, 255, 255),
+    -1.5px 1.5px 0 rgb(255, 255, 255),
+    1.5px 1.5px 0 rgb(255, 255, 255),
+    -1.6px -1.6px 0 rgb(255, 255, 255),
+    1.6px -1.6px 0 rgb(255, 255, 255),
+    -1.6px 1.6px 0 rgb(255, 255, 255),
+    1.6px 1.6px 0 rgb(255, 255, 255),
+    -1.7px -1.7px 0 rgb(255, 255, 255),
+    1.7px -1.7px 0 rgb(255, 255, 255),
+    -1.7px 1.7px 0 rgb(255, 255, 255),
+    1.7px 1.7px 0 rgb(255, 255, 255),
+    -1.8px -1.8px 0 rgb(255, 255, 255),
+    1.8px -1.8px 0 rgb(255, 255, 255),
+    -1.8px 1.8px 0 rgb(255, 255, 255),
+    1.8px 1.8px 0 rgb(255, 255, 255),
+    -1.9px -1.9px 0 rgb(255, 255, 255),
+    1.9px -1.9px 0 rgb(255, 255, 255),
+    -1.9px 1.9px 0 rgb(255, 255, 255),
+    1.9px 1.9px 0 rgb(255, 255, 255),
+    -2px -2px 0 rgb(255, 255, 255),
+    2px -2px 0 rgb(255, 255, 255),
+    -2px 2px 0 rgb(255, 255, 255),
+    2px 2px 0 rgb(255, 255, 255);
 }
 
 .shield.ROH.TwoDigit .routeNumber,
 .shield.ROH.ThreeDigit .routeNumber,
 .shield.ROH .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--black),
-    0.1px -0.1px 0 var(--black),
-    -0.1px 0.1px 0 var(--black),
-    0.1px 0.1px 0 var(--black),
-    -0.2px -0.2px 0 var(--black),
-    0.2px -0.2px 0 var(--black),
-    -0.2px 0.2px 0 var(--black),
-    0.2px 0.2px 0 var(--black),
-    -0.3px -0.3px 0 var(--black),
-    0.3px -0.3px 0 var(--black),
-    -0.3px 0.3px 0 var(--black),
-    0.3px 0.3px 0 var(--black),
-    -0.4px -0.4px 0 var(--black),
-    0.4px -0.4px 0 var(--black),
-    -0.4px 0.4px 0 var(--black),
-    0.4px 0.4px 0 var(--black),
-    -0.5px -0.5px 0 var(--black),
-    0.5px -0.5px 0 var(--black),
-    -0.5px 0.5px 0 var(--black),
-    0.5px 0.5px 0 var(--black),
-    -0.6px -0.6px 0 var(--black),
-    0.6px -0.6px 0 var(--black),
-    -0.6px 0.6px 0 var(--black),
-    0.6px 0.6px 0 var(--black),
-    -0.7px -0.7px 0 var(--black),
-    0.7px -0.7px 0 var(--black),
-    -0.7px 0.7px 0 var(--black),
-    0.7px 0.7px 0 var(--black),
-    -0.8px -0.8px 0 var(--black),
-    0.8px -0.8px 0 var(--black),
-    -0.8px 0.8px 0 var(--black),
-    0.8px 0.8px 0 var(--black),
-    -0.9px -0.9px 0 var(--black),
-    0.9px -0.9px 0 var(--black),
-    -0.9px 0.9px 0 var(--black),
-    0.9px 0.9px 0 var(--black),
-    -1px -1px 0 var(--black),
-    1px -1px 0 var(--black),
-    -1px 1px 0 var(--black),
-    1px 1px 0 var(--black),
-    -1.1px -1.1px 0 var(--black),
-    1.1px -1.1px 0 var(--black),
-    -1.1px 1.1px 0 var(--black),
-    1.1px 1.1px 0 var(--black),
-    -1.2px -1.2px 0 var(--black),
-    1.2px -1.2px 0 var(--black),
-    -1.2px 1.2px 0 var(--black),
-    1.2px 1.2px 0 var(--black),
-    -1.3px -1.3px 0 var(--black),
-    1.3px -1.3px 0 var(--black),
-    -1.3px 1.3px 0 var(--black),
-    1.3px 1.3px 0 var(--black),
-    -1.4px -1.4px 0 var(--black),
-    1.4px -1.4px 0 var(--black),
-    -1.4px 1.4px 0 var(--black),
-    1.4px 1.4px 0 var(--black),
-    -1.5px -1.5px 0 var(--black),
-    1.5px -1.5px 0 var(--black),
-    -1.5px 1.5px 0 var(--black),
-    1.5px 1.5px 0 var(--black),
-    -1.6px -1.6px 0 var(--black),
-    1.6px -1.6px 0 var(--black),
-    -1.6px 1.6px 0 var(--black),
-    1.6px 1.6px 0 var(--black),
-    -1.7px -1.7px 0 var(--black),
-    1.7px -1.7px 0 var(--black),
-    -1.7px 1.7px 0 var(--black),
-    1.7px 1.7px 0 var(--black),
-    -1.8px -1.8px 0 var(--black),
-    1.8px -1.8px 0 var(--black),
-    -1.8px 1.8px 0 var(--black),
-    1.8px 1.8px 0 var(--black),
-    -1.9px -1.9px 0 var(--black),
-    1.9px -1.9px 0 var(--black),
-    -1.9px 1.9px 0 var(--black),
-    1.9px 1.9px 0 var(--black),
-    -2px -2px 0 var(--black),
-    2px -2px 0 var(--black),
-    -2px 2px 0 var(--black),
-    2px 2px 0 var(--black);
+    -0.1px -0.1px 0 rgb(0, 0, 0),
+    0.1px -0.1px 0 rgb(0, 0, 0),
+    -0.1px 0.1px 0 rgb(0, 0, 0),
+    0.1px 0.1px 0 rgb(0, 0, 0),
+    -0.2px -0.2px 0 rgb(0, 0, 0),
+    0.2px -0.2px 0 rgb(0, 0, 0),
+    -0.2px 0.2px 0 rgb(0, 0, 0),
+    0.2px 0.2px 0 rgb(0, 0, 0),
+    -0.3px -0.3px 0 rgb(0, 0, 0),
+    0.3px -0.3px 0 rgb(0, 0, 0),
+    -0.3px 0.3px 0 rgb(0, 0, 0),
+    0.3px 0.3px 0 rgb(0, 0, 0),
+    -0.4px -0.4px 0 rgb(0, 0, 0),
+    0.4px -0.4px 0 rgb(0, 0, 0),
+    -0.4px 0.4px 0 rgb(0, 0, 0),
+    0.4px 0.4px 0 rgb(0, 0, 0),
+    -0.5px -0.5px 0 rgb(0, 0, 0),
+    0.5px -0.5px 0 rgb(0, 0, 0),
+    -0.5px 0.5px 0 rgb(0, 0, 0),
+    0.5px 0.5px 0 rgb(0, 0, 0),
+    -0.6px -0.6px 0 rgb(0, 0, 0),
+    0.6px -0.6px 0 rgb(0, 0, 0),
+    -0.6px 0.6px 0 rgb(0, 0, 0),
+    0.6px 0.6px 0 rgb(0, 0, 0),
+    -0.7px -0.7px 0 rgb(0, 0, 0),
+    0.7px -0.7px 0 rgb(0, 0, 0),
+    -0.7px 0.7px 0 rgb(0, 0, 0),
+    0.7px 0.7px 0 rgb(0, 0, 0),
+    -0.8px -0.8px 0 rgb(0, 0, 0),
+    0.8px -0.8px 0 rgb(0, 0, 0),
+    -0.8px 0.8px 0 rgb(0, 0, 0),
+    0.8px 0.8px 0 rgb(0, 0, 0),
+    -0.9px -0.9px 0 rgb(0, 0, 0),
+    0.9px -0.9px 0 rgb(0, 0, 0),
+    -0.9px 0.9px 0 rgb(0, 0, 0),
+    0.9px 0.9px 0 rgb(0, 0, 0),
+    -1px -1px 0 rgb(0, 0, 0),
+    1px -1px 0 rgb(0, 0, 0),
+    -1px 1px 0 rgb(0, 0, 0),
+    1px 1px 0 rgb(0, 0, 0),
+    -1.1px -1.1px 0 rgb(0, 0, 0),
+    1.1px -1.1px 0 rgb(0, 0, 0),
+    -1.1px 1.1px 0 rgb(0, 0, 0),
+    1.1px 1.1px 0 rgb(0, 0, 0),
+    -1.2px -1.2px 0 rgb(0, 0, 0),
+    1.2px -1.2px 0 rgb(0, 0, 0),
+    -1.2px 1.2px 0 rgb(0, 0, 0),
+    1.2px 1.2px 0 rgb(0, 0, 0),
+    -1.3px -1.3px 0 rgb(0, 0, 0),
+    1.3px -1.3px 0 rgb(0, 0, 0),
+    -1.3px 1.3px 0 rgb(0, 0, 0),
+    1.3px 1.3px 0 rgb(0, 0, 0),
+    -1.4px -1.4px 0 rgb(0, 0, 0),
+    1.4px -1.4px 0 rgb(0, 0, 0),
+    -1.4px 1.4px 0 rgb(0, 0, 0),
+    1.4px 1.4px 0 rgb(0, 0, 0),
+    -1.5px -1.5px 0 rgb(0, 0, 0),
+    1.5px -1.5px 0 rgb(0, 0, 0),
+    -1.5px 1.5px 0 rgb(0, 0, 0),
+    1.5px 1.5px 0 rgb(0, 0, 0),
+    -1.6px -1.6px 0 rgb(0, 0, 0),
+    1.6px -1.6px 0 rgb(0, 0, 0),
+    -1.6px 1.6px 0 rgb(0, 0, 0),
+    1.6px 1.6px 0 rgb(0, 0, 0),
+    -1.7px -1.7px 0 rgb(0, 0, 0),
+    1.7px -1.7px 0 rgb(0, 0, 0),
+    -1.7px 1.7px 0 rgb(0, 0, 0),
+    1.7px 1.7px 0 rgb(0, 0, 0),
+    -1.8px -1.8px 0 rgb(0, 0, 0),
+    1.8px -1.8px 0 rgb(0, 0, 0),
+    -1.8px 1.8px 0 rgb(0, 0, 0),
+    1.8px 1.8px 0 rgb(0, 0, 0),
+    -1.9px -1.9px 0 rgb(0, 0, 0),
+    1.9px -1.9px 0 rgb(0, 0, 0),
+    -1.9px 1.9px 0 rgb(0, 0, 0),
+    1.9px 1.9px 0 rgb(0, 0, 0),
+    -2px -2px 0 rgb(0, 0, 0),
+    2px -2px 0 rgb(0, 0, 0),
+    -2px 2px 0 rgb(0, 0, 0),
+    2px 2px 0 rgb(0, 0, 0);
 }
 
 .shield.ROL.TwoDigit .routeNumber,
 .shield.ROL.ThreeDigit .routeNumber,
 .shield.ROL .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-blue),
-    0.1px -0.1px 0 var(--veridian-blue),
-    -0.1px 0.1px 0 var(--veridian-blue),
-    0.1px 0.1px 0 var(--veridian-blue),
-    -0.2px -0.2px 0 var(--veridian-blue),
-    0.2px -0.2px 0 var(--veridian-blue),
-    -0.2px 0.2px 0 var(--veridian-blue),
-    0.2px 0.2px 0 var(--veridian-blue),
-    -0.3px -0.3px 0 var(--veridian-blue),
-    0.3px -0.3px 0 var(--veridian-blue),
-    -0.3px 0.3px 0 var(--veridian-blue),
-    0.3px 0.3px 0 var(--veridian-blue),
-    -0.4px -0.4px 0 var(--veridian-blue),
-    0.4px -0.4px 0 var(--veridian-blue),
-    -0.4px 0.4px 0 var(--veridian-blue),
-    0.4px 0.4px 0 var(--veridian-blue),
-    -0.5px -0.5px 0 var(--veridian-blue),
-    0.5px -0.5px 0 var(--veridian-blue),
-    -0.5px 0.5px 0 var(--veridian-blue),
-    0.5px 0.5px 0 var(--veridian-blue),
-    -0.6px -0.6px 0 var(--veridian-blue),
-    0.6px -0.6px 0 var(--veridian-blue),
-    -0.6px 0.6px 0 var(--veridian-blue),
-    0.6px 0.6px 0 var(--veridian-blue),
-    -0.7px -0.7px 0 var(--veridian-blue),
-    0.7px -0.7px 0 var(--veridian-blue),
-    -0.7px 0.7px 0 var(--veridian-blue),
-    0.7px 0.7px 0 var(--veridian-blue),
-    -0.8px -0.8px 0 var(--veridian-blue),
-    0.8px -0.8px 0 var(--veridian-blue),
-    -0.8px 0.8px 0 var(--veridian-blue),
-    0.8px 0.8px 0 var(--veridian-blue),
-    -0.9px -0.9px 0 var(--veridian-blue),
-    0.9px -0.9px 0 var(--veridian-blue),
-    -0.9px 0.9px 0 var(--veridian-blue),
-    0.9px 0.9px 0 var(--veridian-blue),
-    -1px -1px 0 var(--veridian-blue),
-    1px -1px 0 var(--veridian-blue),
-    -1px 1px 0 var(--veridian-blue),
-    1px 1px 0 var(--veridian-blue),
-    -1.1px -1.1px 0 var(--veridian-blue),
-    1.1px -1.1px 0 var(--veridian-blue),
-    -1.1px 1.1px 0 var(--veridian-blue),
-    1.1px 1.1px 0 var(--veridian-blue),
-    -1.2px -1.2px 0 var(--veridian-blue),
-    1.2px -1.2px 0 var(--veridian-blue),
-    -1.2px 1.2px 0 var(--veridian-blue),
-    1.2px 1.2px 0 var(--veridian-blue),
-    -1.3px -1.3px 0 var(--veridian-blue),
-    1.3px -1.3px 0 var(--veridian-blue),
-    -1.3px 1.3px 0 var(--veridian-blue),
-    1.3px 1.3px 0 var(--veridian-blue),
-    -1.4px -1.4px 0 var(--veridian-blue),
-    1.4px -1.4px 0 var(--veridian-blue),
-    -1.4px 1.4px 0 var(--veridian-blue),
-    1.4px 1.4px 0 var(--veridian-blue),
-    -1.5px -1.5px 0 var(--veridian-blue),
-    1.5px -1.5px 0 var(--veridian-blue),
-    -1.5px 1.5px 0 var(--veridian-blue),
-    1.5px 1.5px 0 var(--veridian-blue),
-    -1.6px -1.6px 0 var(--veridian-blue),
-    1.6px -1.6px 0 var(--veridian-blue),
-    -1.6px 1.6px 0 var(--veridian-blue),
-    1.6px 1.6px 0 var(--veridian-blue),
-    -1.7px -1.7px 0 var(--veridian-blue),
-    1.7px -1.7px 0 var(--veridian-blue),
-    -1.7px 1.7px 0 var(--veridian-blue),
-    1.7px 1.7px 0 var(--veridian-blue),
-    -1.8px -1.8px 0 var(--veridian-blue),
-    1.8px -1.8px 0 var(--veridian-blue),
-    -1.8px 1.8px 0 var(--veridian-blue),
-    1.8px 1.8px 0 var(--veridian-blue),
-    -1.9px -1.9px 0 var(--veridian-blue),
-    1.9px -1.9px 0 var(--veridian-blue),
-    -1.9px 1.9px 0 var(--veridian-blue),
-    1.9px 1.9px 0 var(--veridian-blue),
-    -2px -2px 0 var(--veridian-blue),
-    2px -2px 0 var(--veridian-blue),
-    -2px 2px 0 var(--veridian-blue),
-    2px 2px 0 var(--veridian-blue);
+    -0.1px -0.1px 0 rgb(0, 47, 108),
+    0.1px -0.1px 0 rgb(0, 47, 108),
+    -0.1px 0.1px 0 rgb(0, 47, 108),
+    0.1px 0.1px 0 rgb(0, 47, 108),
+    -0.2px -0.2px 0 rgb(0, 47, 108),
+    0.2px -0.2px 0 rgb(0, 47, 108),
+    -0.2px 0.2px 0 rgb(0, 47, 108),
+    0.2px 0.2px 0 rgb(0, 47, 108),
+    -0.3px -0.3px 0 rgb(0, 47, 108),
+    0.3px -0.3px 0 rgb(0, 47, 108),
+    -0.3px 0.3px 0 rgb(0, 47, 108),
+    0.3px 0.3px 0 rgb(0, 47, 108),
+    -0.4px -0.4px 0 rgb(0, 47, 108),
+    0.4px -0.4px 0 rgb(0, 47, 108),
+    -0.4px 0.4px 0 rgb(0, 47, 108),
+    0.4px 0.4px 0 rgb(0, 47, 108),
+    -0.5px -0.5px 0 rgb(0, 47, 108),
+    0.5px -0.5px 0 rgb(0, 47, 108),
+    -0.5px 0.5px 0 rgb(0, 47, 108),
+    0.5px 0.5px 0 rgb(0, 47, 108),
+    -0.6px -0.6px 0 rgb(0, 47, 108),
+    0.6px -0.6px 0 rgb(0, 47, 108),
+    -0.6px 0.6px 0 rgb(0, 47, 108),
+    0.6px 0.6px 0 rgb(0, 47, 108),
+    -0.7px -0.7px 0 rgb(0, 47, 108),
+    0.7px -0.7px 0 rgb(0, 47, 108),
+    -0.7px 0.7px 0 rgb(0, 47, 108),
+    0.7px 0.7px 0 rgb(0, 47, 108),
+    -0.8px -0.8px 0 rgb(0, 47, 108),
+    0.8px -0.8px 0 rgb(0, 47, 108),
+    -0.8px 0.8px 0 rgb(0, 47, 108),
+    0.8px 0.8px 0 rgb(0, 47, 108),
+    -0.9px -0.9px 0 rgb(0, 47, 108),
+    0.9px -0.9px 0 rgb(0, 47, 108),
+    -0.9px 0.9px 0 rgb(0, 47, 108),
+    0.9px 0.9px 0 rgb(0, 47, 108),
+    -1px -1px 0 rgb(0, 47, 108),
+    1px -1px 0 rgb(0, 47, 108),
+    -1px 1px 0 rgb(0, 47, 108),
+    1px 1px 0 rgb(0, 47, 108),
+    -1.1px -1.1px 0 rgb(0, 47, 108),
+    1.1px -1.1px 0 rgb(0, 47, 108),
+    -1.1px 1.1px 0 rgb(0, 47, 108),
+    1.1px 1.1px 0 rgb(0, 47, 108),
+    -1.2px -1.2px 0 rgb(0, 47, 108),
+    1.2px -1.2px 0 rgb(0, 47, 108),
+    -1.2px 1.2px 0 rgb(0, 47, 108),
+    1.2px 1.2px 0 rgb(0, 47, 108),
+    -1.3px -1.3px 0 rgb(0, 47, 108),
+    1.3px -1.3px 0 rgb(0, 47, 108),
+    -1.3px 1.3px 0 rgb(0, 47, 108),
+    1.3px 1.3px 0 rgb(0, 47, 108),
+    -1.4px -1.4px 0 rgb(0, 47, 108),
+    1.4px -1.4px 0 rgb(0, 47, 108),
+    -1.4px 1.4px 0 rgb(0, 47, 108),
+    1.4px 1.4px 0 rgb(0, 47, 108),
+    -1.5px -1.5px 0 rgb(0, 47, 108),
+    1.5px -1.5px 0 rgb(0, 47, 108),
+    -1.5px 1.5px 0 rgb(0, 47, 108),
+    1.5px 1.5px 0 rgb(0, 47, 108),
+    -1.6px -1.6px 0 rgb(0, 47, 108),
+    1.6px -1.6px 0 rgb(0, 47, 108),
+    -1.6px 1.6px 0 rgb(0, 47, 108),
+    1.6px 1.6px 0 rgb(0, 47, 108),
+    -1.7px -1.7px 0 rgb(0, 47, 108),
+    1.7px -1.7px 0 rgb(0, 47, 108),
+    -1.7px 1.7px 0 rgb(0, 47, 108),
+    1.7px 1.7px 0 rgb(0, 47, 108),
+    -1.8px -1.8px 0 rgb(0, 47, 108),
+    1.8px -1.8px 0 rgb(0, 47, 108),
+    -1.8px 1.8px 0 rgb(0, 47, 108),
+    1.8px 1.8px 0 rgb(0, 47, 108),
+    -1.9px -1.9px 0 rgb(0, 47, 108),
+    1.9px -1.9px 0 rgb(0, 47, 108),
+    -1.9px 1.9px 0 rgb(0, 47, 108),
+    1.9px 1.9px 0 rgb(0, 47, 108),
+    -2px -2px 0 rgb(0, 47, 108),
+    2px -2px 0 rgb(0, 47, 108),
+    -2px 2px 0 rgb(0, 47, 108),
+    2px 2px 0 rgb(0, 47, 108);
 }
 
 .shield.ROO.TwoDigit .routeNumber,
 .shield.ROO.ThreeDigit .routeNumber,
 .shield.ROO .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-brown),
-    0.1px -0.1px 0 var(--veridian-brown),
-    -0.1px 0.1px 0 var(--veridian-brown),
-    0.1px 0.1px 0 var(--veridian-brown),
-    -0.2px -0.2px 0 var(--veridian-brown),
-    0.2px -0.2px 0 var(--veridian-brown),
-    -0.2px 0.2px 0 var(--veridian-brown),
-    0.2px 0.2px 0 var(--veridian-brown),
-    -0.3px -0.3px 0 var(--veridian-brown),
-    0.3px -0.3px 0 var(--veridian-brown),
-    -0.3px 0.3px 0 var(--veridian-brown),
-    0.3px 0.3px 0 var(--veridian-brown),
-    -0.4px -0.4px 0 var(--veridian-brown),
-    0.4px -0.4px 0 var(--veridian-brown),
-    -0.4px 0.4px 0 var(--veridian-brown),
-    0.4px 0.4px 0 var(--veridian-brown),
-    -0.5px -0.5px 0 var(--veridian-brown),
-    0.5px -0.5px 0 var(--veridian-brown),
-    -0.5px 0.5px 0 var(--veridian-brown),
-    0.5px 0.5px 0 var(--veridian-brown),
-    -0.6px -0.6px 0 var(--veridian-brown),
-    0.6px -0.6px 0 var(--veridian-brown),
-    -0.6px 0.6px 0 var(--veridian-brown),
-    0.6px 0.6px 0 var(--veridian-brown),
-    -0.7px -0.7px 0 var(--veridian-brown),
-    0.7px -0.7px 0 var(--veridian-brown),
-    -0.7px 0.7px 0 var(--veridian-brown),
-    0.7px 0.7px 0 var(--veridian-brown),
-    -0.8px -0.8px 0 var(--veridian-brown),
-    0.8px -0.8px 0 var(--veridian-brown),
-    -0.8px 0.8px 0 var(--veridian-brown),
-    0.8px 0.8px 0 var(--veridian-brown),
-    -0.9px -0.9px 0 var(--veridian-brown),
-    0.9px -0.9px 0 var(--veridian-brown),
-    -0.9px 0.9px 0 var(--veridian-brown),
-    0.9px 0.9px 0 var(--veridian-brown),
-    -1px -1px 0 var(--veridian-brown),
-    1px -1px 0 var(--veridian-brown),
-    -1px 1px 0 var(--veridian-brown),
-    1px 1px 0 var(--veridian-brown),
-    -1.1px -1.1px 0 var(--veridian-brown),
-    1.1px -1.1px 0 var(--veridian-brown),
-    -1.1px 1.1px 0 var(--veridian-brown),
-    1.1px 1.1px 0 var(--veridian-brown),
-    -1.2px -1.2px 0 var(--veridian-brown),
-    1.2px -1.2px 0 var(--veridian-brown),
-    -1.2px 1.2px 0 var(--veridian-brown),
-    1.2px 1.2px 0 var(--veridian-brown),
-    -1.3px -1.3px 0 var(--veridian-brown),
-    1.3px -1.3px 0 var(--veridian-brown),
-    -1.3px 1.3px 0 var(--veridian-brown),
-    1.3px 1.3px 0 var(--veridian-brown),
-    -1.4px -1.4px 0 var(--veridian-brown),
-    1.4px -1.4px 0 var(--veridian-brown),
-    -1.4px 1.4px 0 var(--veridian-brown),
-    1.4px 1.4px 0 var(--veridian-brown),
-    -1.5px -1.5px 0 var(--veridian-brown),
-    1.5px -1.5px 0 var(--veridian-brown),
-    -1.5px 1.5px 0 var(--veridian-brown),
-    1.5px 1.5px 0 var(--veridian-brown),
-    -1.6px -1.6px 0 var(--veridian-brown),
-    1.6px -1.6px 0 var(--veridian-brown),
-    -1.6px 1.6px 0 var(--veridian-brown),
-    1.6px 1.6px 0 var(--veridian-brown),
-    -1.7px -1.7px 0 var(--veridian-brown),
-    1.7px -1.7px 0 var(--veridian-brown),
-    -1.7px 1.7px 0 var(--veridian-brown),
-    1.7px 1.7px 0 var(--veridian-brown),
-    -1.8px -1.8px 0 var(--veridian-brown),
-    1.8px -1.8px 0 var(--veridian-brown),
-    -1.8px 1.8px 0 var(--veridian-brown),
-    1.8px 1.8px 0 var(--veridian-brown),
-    -1.9px -1.9px 0 var(--veridian-brown),
-    1.9px -1.9px 0 var(--veridian-brown),
-    -1.9px 1.9px 0 var(--veridian-brown),
-    1.9px 1.9px 0 var(--veridian-brown),
-    -2px -2px 0 var(--veridian-brown),
-    2px -2px 0 var(--veridian-brown),
-    -2px 2px 0 var(--veridian-brown),
-    2px 2px 0 var(--veridian-brown);
+    -0.1px -0.1px 0 rgb(105, 63, 35),
+    0.1px -0.1px 0 rgb(105, 63, 35),
+    -0.1px 0.1px 0 rgb(105, 63, 35),
+    0.1px 0.1px 0 rgb(105, 63, 35),
+    -0.2px -0.2px 0 rgb(105, 63, 35),
+    0.2px -0.2px 0 rgb(105, 63, 35),
+    -0.2px 0.2px 0 rgb(105, 63, 35),
+    0.2px 0.2px 0 rgb(105, 63, 35),
+    -0.3px -0.3px 0 rgb(105, 63, 35),
+    0.3px -0.3px 0 rgb(105, 63, 35),
+    -0.3px 0.3px 0 rgb(105, 63, 35),
+    0.3px 0.3px 0 rgb(105, 63, 35),
+    -0.4px -0.4px 0 rgb(105, 63, 35),
+    0.4px -0.4px 0 rgb(105, 63, 35),
+    -0.4px 0.4px 0 rgb(105, 63, 35),
+    0.4px 0.4px 0 rgb(105, 63, 35),
+    -0.5px -0.5px 0 rgb(105, 63, 35),
+    0.5px -0.5px 0 rgb(105, 63, 35),
+    -0.5px 0.5px 0 rgb(105, 63, 35),
+    0.5px 0.5px 0 rgb(105, 63, 35),
+    -0.6px -0.6px 0 rgb(105, 63, 35),
+    0.6px -0.6px 0 rgb(105, 63, 35),
+    -0.6px 0.6px 0 rgb(105, 63, 35),
+    0.6px 0.6px 0 rgb(105, 63, 35),
+    -0.7px -0.7px 0 rgb(105, 63, 35),
+    0.7px -0.7px 0 rgb(105, 63, 35),
+    -0.7px 0.7px 0 rgb(105, 63, 35),
+    0.7px 0.7px 0 rgb(105, 63, 35),
+    -0.8px -0.8px 0 rgb(105, 63, 35),
+    0.8px -0.8px 0 rgb(105, 63, 35),
+    -0.8px 0.8px 0 rgb(105, 63, 35),
+    0.8px 0.8px 0 rgb(105, 63, 35),
+    -0.9px -0.9px 0 rgb(105, 63, 35),
+    0.9px -0.9px 0 rgb(105, 63, 35),
+    -0.9px 0.9px 0 rgb(105, 63, 35),
+    0.9px 0.9px 0 rgb(105, 63, 35),
+    -1px -1px 0 rgb(105, 63, 35),
+    1px -1px 0 rgb(105, 63, 35),
+    -1px 1px 0 rgb(105, 63, 35),
+    1px 1px 0 rgb(105, 63, 35),
+    -1.1px -1.1px 0 rgb(105, 63, 35),
+    1.1px -1.1px 0 rgb(105, 63, 35),
+    -1.1px 1.1px 0 rgb(105, 63, 35),
+    1.1px 1.1px 0 rgb(105, 63, 35),
+    -1.2px -1.2px 0 rgb(105, 63, 35),
+    1.2px -1.2px 0 rgb(105, 63, 35),
+    -1.2px 1.2px 0 rgb(105, 63, 35),
+    1.2px 1.2px 0 rgb(105, 63, 35),
+    -1.3px -1.3px 0 rgb(105, 63, 35),
+    1.3px -1.3px 0 rgb(105, 63, 35),
+    -1.3px 1.3px 0 rgb(105, 63, 35),
+    1.3px 1.3px 0 rgb(105, 63, 35),
+    -1.4px -1.4px 0 rgb(105, 63, 35),
+    1.4px -1.4px 0 rgb(105, 63, 35),
+    -1.4px 1.4px 0 rgb(105, 63, 35),
+    1.4px 1.4px 0 rgb(105, 63, 35),
+    -1.5px -1.5px 0 rgb(105, 63, 35),
+    1.5px -1.5px 0 rgb(105, 63, 35),
+    -1.5px 1.5px 0 rgb(105, 63, 35),
+    1.5px 1.5px 0 rgb(105, 63, 35),
+    -1.6px -1.6px 0 rgb(105, 63, 35),
+    1.6px -1.6px 0 rgb(105, 63, 35),
+    -1.6px 1.6px 0 rgb(105, 63, 35),
+    1.6px 1.6px 0 rgb(105, 63, 35),
+    -1.7px -1.7px 0 rgb(105, 63, 35),
+    1.7px -1.7px 0 rgb(105, 63, 35),
+    -1.7px 1.7px 0 rgb(105, 63, 35),
+    1.7px 1.7px 0 rgb(105, 63, 35),
+    -1.8px -1.8px 0 rgb(105, 63, 35),
+    1.8px -1.8px 0 rgb(105, 63, 35),
+    -1.8px 1.8px 0 rgb(105, 63, 35),
+    1.8px 1.8px 0 rgb(105, 63, 35),
+    -1.9px -1.9px 0 rgb(105, 63, 35),
+    1.9px -1.9px 0 rgb(105, 63, 35),
+    -1.9px 1.9px 0 rgb(105, 63, 35),
+    1.9px 1.9px 0 rgb(105, 63, 35),
+    -2px -2px 0 rgb(105, 63, 35),
+    2px -2px 0 rgb(105, 63, 35),
+    -2px 2px 0 rgb(105, 63, 35),
+    2px 2px 0 rgb(105, 63, 35);
 }
 
 .shield.ROS.TwoDigit .routeNumber,
 .shield.ROS.ThreeDigit .routeNumber,
 .shield.ROS .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-red),
-    0.1px -0.1px 0 var(--veridian-red),
-    -0.1px 0.1px 0 var(--veridian-red),
-    0.1px 0.1px 0 var(--veridian-red),
-    -0.2px -0.2px 0 var(--veridian-red),
-    0.2px -0.2px 0 var(--veridian-red),
-    -0.2px 0.2px 0 var(--veridian-red),
-    0.2px 0.2px 0 var(--veridian-red),
-    -0.3px -0.3px 0 var(--veridian-red),
-    0.3px -0.3px 0 var(--veridian-red),
-    -0.3px 0.3px 0 var(--veridian-red),
-    0.3px 0.3px 0 var(--veridian-red),
-    -0.4px -0.4px 0 var(--veridian-red),
-    0.4px -0.4px 0 var(--veridian-red),
-    -0.4px 0.4px 0 var(--veridian-red),
-    0.4px 0.4px 0 var(--veridian-red),
-    -0.5px -0.5px 0 var(--veridian-red),
-    0.5px -0.5px 0 var(--veridian-red),
-    -0.5px 0.5px 0 var(--veridian-red),
-    0.5px 0.5px 0 var(--veridian-red),
-    -0.6px -0.6px 0 var(--veridian-red),
-    0.6px -0.6px 0 var(--veridian-red),
-    -0.6px 0.6px 0 var(--veridian-red),
-    0.6px 0.6px 0 var(--veridian-red),
-    -0.7px -0.7px 0 var(--veridian-red),
-    0.7px -0.7px 0 var(--veridian-red),
-    -0.7px 0.7px 0 var(--veridian-red),
-    0.7px 0.7px 0 var(--veridian-red),
-    -0.8px -0.8px 0 var(--veridian-red),
-    0.8px -0.8px 0 var(--veridian-red),
-    -0.8px 0.8px 0 var(--veridian-red),
-    0.8px 0.8px 0 var(--veridian-red),
-    -0.9px -0.9px 0 var(--veridian-red),
-    0.9px -0.9px 0 var(--veridian-red),
-    -0.9px 0.9px 0 var(--veridian-red),
-    0.9px 0.9px 0 var(--veridian-red),
-    -1px -1px 0 var(--veridian-red),
-    1px -1px 0 var(--veridian-red),
-    -1px 1px 0 var(--veridian-red),
-    1px 1px 0 var(--veridian-red),
-    -1.1px -1.1px 0 var(--veridian-red),
-    1.1px -1.1px 0 var(--veridian-red),
-    -1.1px 1.1px 0 var(--veridian-red),
-    1.1px 1.1px 0 var(--veridian-red),
-    -1.2px -1.2px 0 var(--veridian-red),
-    1.2px -1.2px 0 var(--veridian-red),
-    -1.2px 1.2px 0 var(--veridian-red),
-    1.2px 1.2px 0 var(--veridian-red),
-    -1.3px -1.3px 0 var(--veridian-red),
-    1.3px -1.3px 0 var(--veridian-red),
-    -1.3px 1.3px 0 var(--veridian-red),
-    1.3px 1.3px 0 var(--veridian-red),
-    -1.4px -1.4px 0 var(--veridian-red),
-    1.4px -1.4px 0 var(--veridian-red),
-    -1.4px 1.4px 0 var(--veridian-red),
-    1.4px 1.4px 0 var(--veridian-red),
-    -1.5px -1.5px 0 var(--veridian-red),
-    1.5px -1.5px 0 var(--veridian-red),
-    -1.5px 1.5px 0 var(--veridian-red),
-    1.5px 1.5px 0 var(--veridian-red),
-    -1.6px -1.6px 0 var(--veridian-red),
-    1.6px -1.6px 0 var(--veridian-red),
-    -1.6px 1.6px 0 var(--veridian-red),
-    1.6px 1.6px 0 var(--veridian-red),
-    -1.7px -1.7px 0 var(--veridian-red),
-    1.7px -1.7px 0 var(--veridian-red),
-    -1.7px 1.7px 0 var(--veridian-red),
-    1.7px 1.7px 0 var(--veridian-red),
-    -1.8px -1.8px 0 var(--veridian-red),
-    1.8px -1.8px 0 var(--veridian-red),
-    -1.8px 1.8px 0 var(--veridian-red),
-    1.8px 1.8px 0 var(--veridian-red),
-    -1.9px -1.9px 0 var(--veridian-red),
-    1.9px -1.9px 0 var(--veridian-red),
-    -1.9px 1.9px 0 var(--veridian-red),
-    1.9px 1.9px 0 var(--veridian-red),
-    -2px -2px 0 var(--veridian-red),
-    2px -2px 0 var(--veridian-red),
-    -2px 2px 0 var(--veridian-red),
-    2px 2px 0 var(--veridian-red);
+    -0.1px -0.1px 0 rgb(175, 39, 47),
+    0.1px -0.1px 0 rgb(175, 39, 47),
+    -0.1px 0.1px 0 rgb(175, 39, 47),
+    0.1px 0.1px 0 rgb(175, 39, 47),
+    -0.2px -0.2px 0 rgb(175, 39, 47),
+    0.2px -0.2px 0 rgb(175, 39, 47),
+    -0.2px 0.2px 0 rgb(175, 39, 47),
+    0.2px 0.2px 0 rgb(175, 39, 47),
+    -0.3px -0.3px 0 rgb(175, 39, 47),
+    0.3px -0.3px 0 rgb(175, 39, 47),
+    -0.3px 0.3px 0 rgb(175, 39, 47),
+    0.3px 0.3px 0 rgb(175, 39, 47),
+    -0.4px -0.4px 0 rgb(175, 39, 47),
+    0.4px -0.4px 0 rgb(175, 39, 47),
+    -0.4px 0.4px 0 rgb(175, 39, 47),
+    0.4px 0.4px 0 rgb(175, 39, 47),
+    -0.5px -0.5px 0 rgb(175, 39, 47),
+    0.5px -0.5px 0 rgb(175, 39, 47),
+    -0.5px 0.5px 0 rgb(175, 39, 47),
+    0.5px 0.5px 0 rgb(175, 39, 47),
+    -0.6px -0.6px 0 rgb(175, 39, 47),
+    0.6px -0.6px 0 rgb(175, 39, 47),
+    -0.6px 0.6px 0 rgb(175, 39, 47),
+    0.6px 0.6px 0 rgb(175, 39, 47),
+    -0.7px -0.7px 0 rgb(175, 39, 47),
+    0.7px -0.7px 0 rgb(175, 39, 47),
+    -0.7px 0.7px 0 rgb(175, 39, 47),
+    0.7px 0.7px 0 rgb(175, 39, 47),
+    -0.8px -0.8px 0 rgb(175, 39, 47),
+    0.8px -0.8px 0 rgb(175, 39, 47),
+    -0.8px 0.8px 0 rgb(175, 39, 47),
+    0.8px 0.8px 0 rgb(175, 39, 47),
+    -0.9px -0.9px 0 rgb(175, 39, 47),
+    0.9px -0.9px 0 rgb(175, 39, 47),
+    -0.9px 0.9px 0 rgb(175, 39, 47),
+    0.9px 0.9px 0 rgb(175, 39, 47),
+    -1px -1px 0 rgb(175, 39, 47),
+    1px -1px 0 rgb(175, 39, 47),
+    -1px 1px 0 rgb(175, 39, 47),
+    1px 1px 0 rgb(175, 39, 47),
+    -1.1px -1.1px 0 rgb(175, 39, 47),
+    1.1px -1.1px 0 rgb(175, 39, 47),
+    -1.1px 1.1px 0 rgb(175, 39, 47),
+    1.1px 1.1px 0 rgb(175, 39, 47),
+    -1.2px -1.2px 0 rgb(175, 39, 47),
+    1.2px -1.2px 0 rgb(175, 39, 47),
+    -1.2px 1.2px 0 rgb(175, 39, 47),
+    1.2px 1.2px 0 rgb(175, 39, 47),
+    -1.3px -1.3px 0 rgb(175, 39, 47),
+    1.3px -1.3px 0 rgb(175, 39, 47),
+    -1.3px 1.3px 0 rgb(175, 39, 47),
+    1.3px 1.3px 0 rgb(175, 39, 47),
+    -1.4px -1.4px 0 rgb(175, 39, 47),
+    1.4px -1.4px 0 rgb(175, 39, 47),
+    -1.4px 1.4px 0 rgb(175, 39, 47),
+    1.4px 1.4px 0 rgb(175, 39, 47),
+    -1.5px -1.5px 0 rgb(175, 39, 47),
+    1.5px -1.5px 0 rgb(175, 39, 47),
+    -1.5px 1.5px 0 rgb(175, 39, 47),
+    1.5px 1.5px 0 rgb(175, 39, 47),
+    -1.6px -1.6px 0 rgb(175, 39, 47),
+    1.6px -1.6px 0 rgb(175, 39, 47),
+    -1.6px 1.6px 0 rgb(175, 39, 47),
+    1.6px 1.6px 0 rgb(175, 39, 47),
+    -1.7px -1.7px 0 rgb(175, 39, 47),
+    1.7px -1.7px 0 rgb(175, 39, 47),
+    -1.7px 1.7px 0 rgb(175, 39, 47),
+    1.7px 1.7px 0 rgb(175, 39, 47),
+    -1.8px -1.8px 0 rgb(175, 39, 47),
+    1.8px -1.8px 0 rgb(175, 39, 47),
+    -1.8px 1.8px 0 rgb(175, 39, 47),
+    1.8px 1.8px 0 rgb(175, 39, 47),
+    -1.9px -1.9px 0 rgb(175, 39, 47),
+    1.9px -1.9px 0 rgb(175, 39, 47),
+    -1.9px 1.9px 0 rgb(175, 39, 47),
+    1.9px 1.9px 0 rgb(175, 39, 47),
+    -2px -2px 0 rgb(175, 39, 47),
+    2px -2px 0 rgb(175, 39, 47),
+    -2px 2px 0 rgb(175, 39, 47),
+    2px 2px 0 rgb(175, 39, 47);
 }
 
 .shield.ROT.TwoDigit .routeNumber,
 .shield.ROT.ThreeDigit .routeNumber,
 .shield.ROT .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-yellow),
-    0.1px -0.1px 0 var(--veridian-yellow),
-    -0.1px 0.1px 0 var(--veridian-yellow),
-    0.1px 0.1px 0 var(--veridian-yellow),
-    -0.2px -0.2px 0 var(--veridian-yellow),
-    0.2px -0.2px 0 var(--veridian-yellow),
-    -0.2px 0.2px 0 var(--veridian-yellow),
-    0.2px 0.2px 0 var(--veridian-yellow),
-    -0.3px -0.3px 0 var(--veridian-yellow),
-    0.3px -0.3px 0 var(--veridian-yellow),
-    -0.3px 0.3px 0 var(--veridian-yellow),
-    0.3px 0.3px 0 var(--veridian-yellow),
-    -0.4px -0.4px 0 var(--veridian-yellow),
-    0.4px -0.4px 0 var(--veridian-yellow),
-    -0.4px 0.4px 0 var(--veridian-yellow),
-    0.4px 0.4px 0 var(--veridian-yellow),
-    -0.5px -0.5px 0 var(--veridian-yellow),
-    0.5px -0.5px 0 var(--veridian-yellow),
-    -0.5px 0.5px 0 var(--veridian-yellow),
-    0.5px 0.5px 0 var(--veridian-yellow),
-    -0.6px -0.6px 0 var(--veridian-yellow),
-    0.6px -0.6px 0 var(--veridian-yellow),
-    -0.6px 0.6px 0 var(--veridian-yellow),
-    0.6px 0.6px 0 var(--veridian-yellow),
-    -0.7px -0.7px 0 var(--veridian-yellow),
-    0.7px -0.7px 0 var(--veridian-yellow),
-    -0.7px 0.7px 0 var(--veridian-yellow),
-    0.7px 0.7px 0 var(--veridian-yellow),
-    -0.8px -0.8px 0 var(--veridian-yellow),
-    0.8px -0.8px 0 var(--veridian-yellow),
-    -0.8px 0.8px 0 var(--veridian-yellow),
-    0.8px 0.8px 0 var(--veridian-yellow),
-    -0.9px -0.9px 0 var(--veridian-yellow),
-    0.9px -0.9px 0 var(--veridian-yellow),
-    -0.9px 0.9px 0 var(--veridian-yellow),
-    0.9px 0.9px 0 var(--veridian-yellow),
-    -1px -1px 0 var(--veridian-yellow),
-    1px -1px 0 var(--veridian-yellow),
-    -1px 1px 0 var(--veridian-yellow),
-    1px 1px 0 var(--veridian-yellow),
-    -1.1px -1.1px 0 var(--veridian-yellow),
-    1.1px -1.1px 0 var(--veridian-yellow),
-    -1.1px 1.1px 0 var(--veridian-yellow),
-    1.1px 1.1px 0 var(--veridian-yellow),
-    -1.2px -1.2px 0 var(--veridian-yellow),
-    1.2px -1.2px 0 var(--veridian-yellow),
-    -1.2px 1.2px 0 var(--veridian-yellow),
-    1.2px 1.2px 0 var(--veridian-yellow),
-    -1.3px -1.3px 0 var(--veridian-yellow),
-    1.3px -1.3px 0 var(--veridian-yellow),
-    -1.3px 1.3px 0 var(--veridian-yellow),
-    1.3px 1.3px 0 var(--veridian-yellow),
-    -1.4px -1.4px 0 var(--veridian-yellow),
-    1.4px -1.4px 0 var(--veridian-yellow),
-    -1.4px 1.4px 0 var(--veridian-yellow),
-    1.4px 1.4px 0 var(--veridian-yellow),
-    -1.5px -1.5px 0 var(--veridian-yellow),
-    1.5px -1.5px 0 var(--veridian-yellow),
-    -1.5px 1.5px 0 var(--veridian-yellow),
-    1.5px 1.5px 0 var(--veridian-yellow),
-    -1.6px -1.6px 0 var(--veridian-yellow),
-    1.6px -1.6px 0 var(--veridian-yellow),
-    -1.6px 1.6px 0 var(--veridian-yellow),
-    1.6px 1.6px 0 var(--veridian-yellow),
-    -1.7px -1.7px 0 var(--veridian-yellow),
-    1.7px -1.7px 0 var(--veridian-yellow),
-    -1.7px 1.7px 0 var(--veridian-yellow),
-    1.7px 1.7px 0 var(--veridian-yellow),
-    -1.8px -1.8px 0 var(--veridian-yellow),
-    1.8px -1.8px 0 var(--veridian-yellow),
-    -1.8px 1.8px 0 var(--veridian-yellow),
-    1.8px 1.8px 0 var(--veridian-yellow),
-    -1.9px -1.9px 0 var(--veridian-yellow),
-    1.9px -1.9px 0 var(--veridian-yellow),
-    -1.9px 1.9px 0 var(--veridian-yellow),
-    1.9px 1.9px 0 var(--veridian-yellow),
-    -2px -2px 0 var(--veridian-yellow),
-    2px -2px 0 var(--veridian-yellow),
-    -2px 2px 0 var(--veridian-yellow),
-    2px 2px 0 var(--veridian-yellow);
+    -0.1px -0.1px 0 rgb(254, 209, 65),
+    0.1px -0.1px 0 rgb(254, 209, 65),
+    -0.1px 0.1px 0 rgb(254, 209, 65),
+    0.1px 0.1px 0 rgb(254, 209, 65),
+    -0.2px -0.2px 0 rgb(254, 209, 65),
+    0.2px -0.2px 0 rgb(254, 209, 65),
+    -0.2px 0.2px 0 rgb(254, 209, 65),
+    0.2px 0.2px 0 rgb(254, 209, 65),
+    -0.3px -0.3px 0 rgb(254, 209, 65),
+    0.3px -0.3px 0 rgb(254, 209, 65),
+    -0.3px 0.3px 0 rgb(254, 209, 65),
+    0.3px 0.3px 0 rgb(254, 209, 65),
+    -0.4px -0.4px 0 rgb(254, 209, 65),
+    0.4px -0.4px 0 rgb(254, 209, 65),
+    -0.4px 0.4px 0 rgb(254, 209, 65),
+    0.4px 0.4px 0 rgb(254, 209, 65),
+    -0.5px -0.5px 0 rgb(254, 209, 65),
+    0.5px -0.5px 0 rgb(254, 209, 65),
+    -0.5px 0.5px 0 rgb(254, 209, 65),
+    0.5px 0.5px 0 rgb(254, 209, 65),
+    -0.6px -0.6px 0 rgb(254, 209, 65),
+    0.6px -0.6px 0 rgb(254, 209, 65),
+    -0.6px 0.6px 0 rgb(254, 209, 65),
+    0.6px 0.6px 0 rgb(254, 209, 65),
+    -0.7px -0.7px 0 rgb(254, 209, 65),
+    0.7px -0.7px 0 rgb(254, 209, 65),
+    -0.7px 0.7px 0 rgb(254, 209, 65),
+    0.7px 0.7px 0 rgb(254, 209, 65),
+    -0.8px -0.8px 0 rgb(254, 209, 65),
+    0.8px -0.8px 0 rgb(254, 209, 65),
+    -0.8px 0.8px 0 rgb(254, 209, 65),
+    0.8px 0.8px 0 rgb(254, 209, 65),
+    -0.9px -0.9px 0 rgb(254, 209, 65),
+    0.9px -0.9px 0 rgb(254, 209, 65),
+    -0.9px 0.9px 0 rgb(254, 209, 65),
+    0.9px 0.9px 0 rgb(254, 209, 65),
+    -1px -1px 0 rgb(254, 209, 65),
+    1px -1px 0 rgb(254, 209, 65),
+    -1px 1px 0 rgb(254, 209, 65),
+    1px 1px 0 rgb(254, 209, 65),
+    -1.1px -1.1px 0 rgb(254, 209, 65),
+    1.1px -1.1px 0 rgb(254, 209, 65),
+    -1.1px 1.1px 0 rgb(254, 209, 65),
+    1.1px 1.1px 0 rgb(254, 209, 65),
+    -1.2px -1.2px 0 rgb(254, 209, 65),
+    1.2px -1.2px 0 rgb(254, 209, 65),
+    -1.2px 1.2px 0 rgb(254, 209, 65),
+    1.2px 1.2px 0 rgb(254, 209, 65),
+    -1.3px -1.3px 0 rgb(254, 209, 65),
+    1.3px -1.3px 0 rgb(254, 209, 65),
+    -1.3px 1.3px 0 rgb(254, 209, 65),
+    1.3px 1.3px 0 rgb(254, 209, 65),
+    -1.4px -1.4px 0 rgb(254, 209, 65),
+    1.4px -1.4px 0 rgb(254, 209, 65),
+    -1.4px 1.4px 0 rgb(254, 209, 65),
+    1.4px 1.4px 0 rgb(254, 209, 65),
+    -1.5px -1.5px 0 rgb(254, 209, 65),
+    1.5px -1.5px 0 rgb(254, 209, 65),
+    -1.5px 1.5px 0 rgb(254, 209, 65),
+    1.5px 1.5px 0 rgb(254, 209, 65),
+    -1.6px -1.6px 0 rgb(254, 209, 65),
+    1.6px -1.6px 0 rgb(254, 209, 65),
+    -1.6px 1.6px 0 rgb(254, 209, 65),
+    1.6px 1.6px 0 rgb(254, 209, 65),
+    -1.7px -1.7px 0 rgb(254, 209, 65),
+    1.7px -1.7px 0 rgb(254, 209, 65),
+    -1.7px 1.7px 0 rgb(254, 209, 65),
+    1.7px 1.7px 0 rgb(254, 209, 65),
+    -1.8px -1.8px 0 rgb(254, 209, 65),
+    1.8px -1.8px 0 rgb(254, 209, 65),
+    -1.8px 1.8px 0 rgb(254, 209, 65),
+    1.8px 1.8px 0 rgb(254, 209, 65),
+    -1.9px -1.9px 0 rgb(254, 209, 65),
+    1.9px -1.9px 0 rgb(254, 209, 65),
+    -1.9px 1.9px 0 rgb(254, 209, 65),
+    1.9px 1.9px 0 rgb(254, 209, 65),
+    -2px -2px 0 rgb(254, 209, 65),
+    2px -2px 0 rgb(254, 209, 65),
+    -2px 2px 0 rgb(254, 209, 65),
+    2px 2px 0 rgb(254, 209, 65);
 }
 
 .shield.ROTA.TwoDigit .routeNumber,
@@ -2755,86 +2755,86 @@
 .shield.ROTA2.ThreeDigit .routeNumber,
 .shield.ROTA2 .designation {
   text-shadow:
-    -0.1px -0.1px 0 var(--veridian-green),
-    0.1px -0.1px 0 var(--veridian-green),
-    -0.1px 0.1px 0 var(--veridian-green),
-    0.1px 0.1px 0 var(--veridian-green),
-    -0.2px -0.2px 0 var(--veridian-green),
-    0.2px -0.2px 0 var(--veridian-green),
-    -0.2px 0.2px 0 var(--veridian-green),
-    0.2px 0.2px 0 var(--veridian-green),
-    -0.3px -0.3px 0 var(--veridian-green),
-    0.3px -0.3px 0 var(--veridian-green),
-    -0.3px 0.3px 0 var(--veridian-green),
-    0.3px 0.3px 0 var(--veridian-green),
-    -0.4px -0.4px 0 var(--veridian-green),
-    0.4px -0.4px 0 var(--veridian-green),
-    -0.4px 0.4px 0 var(--veridian-green),
-    0.4px 0.4px 0 var(--veridian-green),
-    -0.5px -0.5px 0 var(--veridian-green),
-    0.5px -0.5px 0 var(--veridian-green),
-    -0.5px 0.5px 0 var(--veridian-green),
-    0.5px 0.5px 0 var(--veridian-green),
-    -0.6px -0.6px 0 var(--veridian-green),
-    0.6px -0.6px 0 var(--veridian-green),
-    -0.6px 0.6px 0 var(--veridian-green),
-    0.6px 0.6px 0 var(--veridian-green),
-    -0.7px -0.7px 0 var(--veridian-green),
-    0.7px -0.7px 0 var(--veridian-green),
-    -0.7px 0.7px 0 var(--veridian-green),
-    0.7px 0.7px 0 var(--veridian-green),
-    -0.8px -0.8px 0 var(--veridian-green),
-    0.8px -0.8px 0 var(--veridian-green),
-    -0.8px 0.8px 0 var(--veridian-green),
-    0.8px 0.8px 0 var(--veridian-green),
-    -0.9px -0.9px 0 var(--veridian-green),
-    0.9px -0.9px 0 var(--veridian-green),
-    -0.9px 0.9px 0 var(--veridian-green),
-    0.9px 0.9px 0 var(--veridian-green),
-    -1px -1px 0 var(--veridian-green),
-    1px -1px 0 var(--veridian-green),
-    -1px 1px 0 var(--veridian-green),
-    1px 1px 0 var(--veridian-green),
-    -1.1px -1.1px 0 var(--veridian-green),
-    1.1px -1.1px 0 var(--veridian-green),
-    -1.1px 1.1px 0 var(--veridian-green),
-    1.1px 1.1px 0 var(--veridian-green),
-    -1.2px -1.2px 0 var(--veridian-green),
-    1.2px -1.2px 0 var(--veridian-green),
-    -1.2px 1.2px 0 var(--veridian-green),
-    1.2px 1.2px 0 var(--veridian-green),
-    -1.3px -1.3px 0 var(--veridian-green),
-    1.3px -1.3px 0 var(--veridian-green),
-    -1.3px 1.3px 0 var(--veridian-green),
-    1.3px 1.3px 0 var(--veridian-green),
-    -1.4px -1.4px 0 var(--veridian-green),
-    1.4px -1.4px 0 var(--veridian-green),
-    -1.4px 1.4px 0 var(--veridian-green),
-    1.4px 1.4px 0 var(--veridian-green),
-    -1.5px -1.5px 0 var(--veridian-green),
-    1.5px -1.5px 0 var(--veridian-green),
-    -1.5px 1.5px 0 var(--veridian-green),
-    1.5px 1.5px 0 var(--veridian-green),
-    -1.6px -1.6px 0 var(--veridian-green),
-    1.6px -1.6px 0 var(--veridian-green),
-    -1.6px 1.6px 0 var(--veridian-green),
-    1.6px 1.6px 0 var(--veridian-green),
-    -1.7px -1.7px 0 var(--veridian-green),
-    1.7px -1.7px 0 var(--veridian-green),
-    -1.7px 1.7px 0 var(--veridian-green),
-    1.7px 1.7px 0 var(--veridian-green),
-    -1.8px -1.8px 0 var(--veridian-green),
-    1.8px -1.8px 0 var(--veridian-green),
-    -1.8px 1.8px 0 var(--veridian-green),
-    1.8px 1.8px 0 var(--veridian-green),
-    -1.9px -1.9px 0 var(--veridian-green),
-    1.9px -1.9px 0 var(--veridian-green),
-    -1.9px 1.9px 0 var(--veridian-green),
-    1.9px 1.9px 0 var(--veridian-green),
-    -2px -2px 0 var(--veridian-green),
-    2px -2px 0 var(--veridian-green),
-    -2px 2px 0 var(--veridian-green),
-    2px 2px 0 var(--veridian-green);
+    -0.1px -0.1px 0 rgb(0, 64, 64),
+    0.1px -0.1px 0 rgb(0, 64, 64),
+    -0.1px 0.1px 0 rgb(0, 64, 64),
+    0.1px 0.1px 0 rgb(0, 64, 64),
+    -0.2px -0.2px 0 rgb(0, 64, 64),
+    0.2px -0.2px 0 rgb(0, 64, 64),
+    -0.2px 0.2px 0 rgb(0, 64, 64),
+    0.2px 0.2px 0 rgb(0, 64, 64),
+    -0.3px -0.3px 0 rgb(0, 64, 64),
+    0.3px -0.3px 0 rgb(0, 64, 64),
+    -0.3px 0.3px 0 rgb(0, 64, 64),
+    0.3px 0.3px 0 rgb(0, 64, 64),
+    -0.4px -0.4px 0 rgb(0, 64, 64),
+    0.4px -0.4px 0 rgb(0, 64, 64),
+    -0.4px 0.4px 0 rgb(0, 64, 64),
+    0.4px 0.4px 0 rgb(0, 64, 64),
+    -0.5px -0.5px 0 rgb(0, 64, 64),
+    0.5px -0.5px 0 rgb(0, 64, 64),
+    -0.5px 0.5px 0 rgb(0, 64, 64),
+    0.5px 0.5px 0 rgb(0, 64, 64),
+    -0.6px -0.6px 0 rgb(0, 64, 64),
+    0.6px -0.6px 0 rgb(0, 64, 64),
+    -0.6px 0.6px 0 rgb(0, 64, 64),
+    0.6px 0.6px 0 rgb(0, 64, 64),
+    -0.7px -0.7px 0 rgb(0, 64, 64),
+    0.7px -0.7px 0 rgb(0, 64, 64),
+    -0.7px 0.7px 0 rgb(0, 64, 64),
+    0.7px 0.7px 0 rgb(0, 64, 64),
+    -0.8px -0.8px 0 rgb(0, 64, 64),
+    0.8px -0.8px 0 rgb(0, 64, 64),
+    -0.8px 0.8px 0 rgb(0, 64, 64),
+    0.8px 0.8px 0 rgb(0, 64, 64),
+    -0.9px -0.9px 0 rgb(0, 64, 64),
+    0.9px -0.9px 0 rgb(0, 64, 64),
+    -0.9px 0.9px 0 rgb(0, 64, 64),
+    0.9px 0.9px 0 rgb(0, 64, 64),
+    -1px -1px 0 rgb(0, 64, 64),
+    1px -1px 0 rgb(0, 64, 64),
+    -1px 1px 0 rgb(0, 64, 64),
+    1px 1px 0 rgb(0, 64, 64),
+    -1.1px -1.1px 0 rgb(0, 64, 64),
+    1.1px -1.1px 0 rgb(0, 64, 64),
+    -1.1px 1.1px 0 rgb(0, 64, 64),
+    1.1px 1.1px 0 rgb(0, 64, 64),
+    -1.2px -1.2px 0 rgb(0, 64, 64),
+    1.2px -1.2px 0 rgb(0, 64, 64),
+    -1.2px 1.2px 0 rgb(0, 64, 64),
+    1.2px 1.2px 0 rgb(0, 64, 64),
+    -1.3px -1.3px 0 rgb(0, 64, 64),
+    1.3px -1.3px 0 rgb(0, 64, 64),
+    -1.3px 1.3px 0 rgb(0, 64, 64),
+    1.3px 1.3px 0 rgb(0, 64, 64),
+    -1.4px -1.4px 0 rgb(0, 64, 64),
+    1.4px -1.4px 0 rgb(0, 64, 64),
+    -1.4px 1.4px 0 rgb(0, 64, 64),
+    1.4px 1.4px 0 rgb(0, 64, 64),
+    -1.5px -1.5px 0 rgb(0, 64, 64),
+    1.5px -1.5px 0 rgb(0, 64, 64),
+    -1.5px 1.5px 0 rgb(0, 64, 64),
+    1.5px 1.5px 0 rgb(0, 64, 64),
+    -1.6px -1.6px 0 rgb(0, 64, 64),
+    1.6px -1.6px 0 rgb(0, 64, 64),
+    -1.6px 1.6px 0 rgb(0, 64, 64),
+    1.6px 1.6px 0 rgb(0, 64, 64),
+    -1.7px -1.7px 0 rgb(0, 64, 64),
+    1.7px -1.7px 0 rgb(0, 64, 64),
+    -1.7px 1.7px 0 rgb(0, 64, 64),
+    1.7px 1.7px 0 rgb(0, 64, 64),
+    -1.8px -1.8px 0 rgb(0, 64, 64),
+    1.8px -1.8px 0 rgb(0, 64, 64),
+    -1.8px 1.8px 0 rgb(0, 64, 64),
+    1.8px 1.8px 0 rgb(0, 64, 64),
+    -1.9px -1.9px 0 rgb(0, 64, 64),
+    1.9px -1.9px 0 rgb(0, 64, 64),
+    -1.9px 1.9px 0 rgb(0, 64, 64),
+    1.9px 1.9px 0 rgb(0, 64, 64),
+    -2px -2px 0 rgb(0, 64, 64),
+    2px -2px 0 rgb(0, 64, 64),
+    -2px 2px 0 rgb(0, 64, 64),
+    2px 2px 0 rgb(0, 64, 64);
 }
 
 .shield.RO.TwoDigit .routeNumber,
@@ -2851,7 +2851,7 @@
 .shield.ROS.ThreeDigit .routeNumber,
 .shield.ROTA.TwoDigit .routeNumber,
 .shield.ROTA.ThreeDigit .routeNumber {
-  color: var(--white);
+  color: rgb(255, 255, 255);
 }
 
 .shield.ROD.TwoDigit .routeNumber,
@@ -2860,12 +2860,12 @@
 .shield.ROF.ThreeDigit .routeNumber,
 .shield.ROT.TwoDigit .routeNumber,
 .shield.ROT.ThreeDigit .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
 }
 
 .shield.ROTA2.TwoDigit .routeNumber,
 .shield.ROTA2.ThreeDigit .routeNumber {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
 }
 
 .shield.RO.TwoDigit .routeNumber,
@@ -2902,7 +2902,7 @@
 .shield.ROO .designation,
 .shield.ROS .designation,
 .shield.ROTA .designation {
-  color: var(--white);
+  color: rgb(255, 255, 255);
   font-family: "Series D";
   font-size: 0.6em;
   margin-top: 4.1em;
@@ -2911,14 +2911,14 @@
 .shield.ROD .designation,
 .shield.ROF .designation,
 .shield.ROT .designation {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 0.6em;
   margin-top: 4.1em;
 }
 
 .shield.ROTA2 .designation {
-  color: var(--countyYellow);
+  color: rgb(247, 209, 23);
   font-family: "Series D";
   font-size: 0.6em;
   margin-top: 4.1em;
@@ -2953,7 +2953,7 @@
 
 /* Arteriell */
 .shield.A .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series EM";
   font-size: 1.2em;
   top: 0.4em;
@@ -2969,7 +2969,7 @@
 
 /* Selenitian Routes */
 .shield.SE .routeNumber {
-  color: var(--black);
+  color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.35em;
   top: 0.1em;

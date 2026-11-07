@@ -815,12 +815,12 @@ main#smRender.wide #postContainer {
 }
 
 .panel.sharp .ET-FullLeftHolder {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
 }
 
 .ET-FullLeft {
-  background-color: var(--yellow);
-  border: var(--borderThickness) solid var(--black);
+  background-color: rgb(252, 207, 52);
+  border: var(--borderThickness) solid rgb(0, 0, 0);
   border-radius: var(--borderRadius);
   border-bottom: none;
   border-bottom-left-radius: 0;
@@ -840,7 +840,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-PartialLeft {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
   padding: var(--verticalPadding) var(--horizontalPadding);
   border-radius: var(--partialLeftBorderRadius);
   color: black;
@@ -2266,12 +2266,12 @@ main#smRender.wide #postContainer {
 }
 
 .panel.sharp .ET-FullLeftHolder {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
 }
 
 .ET-FullLeft {
-  background-color: var(--yellow);
-  border: var(--borderThickness) solid var(--black);
+  background-color: rgb(252, 207, 52);
+  border: var(--borderThickness) solid rgb(0, 0, 0);
   border-radius: var(--borderRadius);
   border-bottom: none;
   border-bottom-left-radius: 0;
@@ -2291,7 +2291,7 @@ main#smRender.wide #postContainer {
 }
 
 .ET-PartialLeft {
-  background-color: var(--yellow);
+  background-color: rgb(252, 207, 52);
   padding: var(--verticalPadding) var(--horizontalPadding);
   border-radius: var(--partialLeftBorderRadius);
   color: black;
