@@ -32,8 +32,8 @@ const lib = (function () {
 
   // FHW-defined colors.
   const colors = {
-    Green: "rgb(0, 95, 77)",
-    Blue: "rgb(0, 67, 123)",
+    Green: "#005f4d",
+    Blue: "#00437b",
     Brown: "rgb(98, 51, 30)",
     Yellow: "rgb(252, 207, 52)",
     White: "rgb(255, 255, 255)",

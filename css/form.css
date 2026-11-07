@@ -3279,38 +3279,39 @@ summary:hover {
   align-items: center;
 }
 
-.smColorDropdownHolder {
+#smColorDropdownHolder {
   position: fixed;
   top: 50%;
   left: 1rem;
-  display: none;
+  display: flex;
   flex-direction: row;
   gap: 0.5rem;
   z-index: 9999;
 }
 
-.smColorDropdownHolder > div {
+#smColorDropdownHolder > div {
   background-color: var(--hotbarColor);
   border: 1px solid rgb(var(--baseColorInv));
   padding: 0.5rem;
 }
 
-.smColorDropdownItems {
+#smColorDropdownItems {
   display: flex;
   flex-direction: column;
   width: 10rem;
-  margin-top: 0.5rem;
+  margin: .5rem 0;
+  height: 10rem;
+  overflow: auto;
 }
 
-.smColorDropdownItems > button {
+#smColorDropdownItems > button {
   width: 100%;
   padding: 0.25rem 0;
   font-size: 1rem;
   background-color: green;
 }
 
-.smColorDropdownUpdate,
-.smColorDropdownRemove {
+#smColorDropdownUpdate, #smColorDropdownRemove {
   flex-grow: 1;
   margin: 0;
   padding: 0.25rem;
@@ -3319,23 +3320,34 @@ summary:hover {
 
 .smColorDropdownColor {
   height: 2rem;
+  padding: 0;
+  margin: 0;
 }
 
-.smColorDropdownRemove {
-  background-color: rgb(255, 0, 0, 0.8);
+#smColorDropdownRemove {
+  background-color: rgb(255,0,0,.8)
 }
 
 .smColorDropdownEdit {
-  display: flex;
+  display: none;
   flex-direction: column;
 }
 
 .smColorDropdownEdit > div {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
+
+.smColorDropdownEdit > div:has(input) {
+  gap: .5rem;
+}
+
+.smColorDropdownEdit > div > input {
+  flex-grow: 1;
+}
+
 .smColorDropdownEdit > div > span {
   font-size: 16px;
 }
@@ -3345,7 +3357,12 @@ summary:hover {
   gap: 0.5rem;
 }
 
-.smColorDropdownSearch {
+#smColorDropdownSearch {
   width: 100%;
   margin: 0;
+}
+
+#smColorAddColor {
+  width: 100%;
+  padding: .33rem;
 }

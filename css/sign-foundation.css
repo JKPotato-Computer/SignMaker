@@ -962,7 +962,6 @@ main#smRender.wide #postContainer {
 
 .ET-tab.square {
   border-radius: 0.25rem;
-  padding: var(--verticalPadding) calc(var(--horizontalPadding));
 }
 
 .signCorner {
@@ -1926,8 +1925,7 @@ main#smRender.wide #postContainer {
   justify-content: center;
   align-items: center;
   transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
-  /* color: black; */
-  color: red; /*DEBUG SHIELD COLORS*/
+  color: white;
 }
 .designation {
   position: absolute;

@@ -796,6 +796,59 @@ const formHandler = (() => {
     document.getElementById("panelSpacingValue").value = post.panelSpacing;
     document.getElementById("postThicknessValue").value = post.thickness;
 
+    ColorLibrary.updateDefaultColors();
+    // reload color dropdown
+    const colorDropdown = document.querySelector("#smColorDropdownItems");
+    colorDropdown.innerHTML = "";
+
+    // create a panel color button
+    const panelColorOption = document.createElement("button");
+    panelColorOption.type = "button";
+    panelColorOption.className = "smColorDropdownItem";
+    panelColorOption.dataset.color = "panelColor";
+    panelColorOption.style.backgroundColor =
+      ColorLibrary.colorLibrary[panel.color];
+
+    const panelColorOptionSpan = document.createElement("span");
+    panelColorOptionSpan.textContent = "Panel Color";
+    panelColorOptionSpan.style.color = ColorLibrary.checkForContrast(
+      panel.color,
+    )
+      ? "black"
+      : "white";
+    panelColorOption.appendChild(panelColorOptionSpan);
+
+    colorDropdown.appendChild(panelColorOption);
+
+    for (const color in ColorLibrary.colorLibrary) {
+      const colorOption = document.createElement("button");
+      colorOption.type = "button";
+      colorOption.className = "smColorDropdownItem";
+      colorOption.dataset.color = color;
+      colorOption.style.backgroundColor = ColorLibrary.colorLibrary[color];
+
+      const span = document.createElement("span");
+      span.textContent = color;
+      span.style.color = ColorLibrary.checkForContrast(color)
+        ? "black"
+        : "white";
+      colorOption.appendChild(span);
+
+      if (!ColorLibrary.isDefaultColor(color)) {
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className =
+          "smColorDropdownEditBtn material-symbols-outlined";
+        editButton.textContent = "edit";
+        editButton.addEventListener("click", () => {
+          FormNavigation.promptColorEdit(color);
+        });
+        colorOption.appendChild(editButton);
+      }
+
+      colorDropdown.appendChild(colorOption);
+    }
+
     // mutcd variant thing
     let variant = post.mutcdVariant;
 

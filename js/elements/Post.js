@@ -11,6 +11,7 @@ class Post {
       thickness,
       spacing,
       mutcdVariant,
+      userColors,
     } = MUTCDVariants.get("Post", options);
     this.polePosition = polePosition;
     this.color = color;
@@ -22,6 +23,7 @@ class Post {
     this.thickness = thickness;
     this.spacing = spacing;
     this.mutcdVariant = mutcdVariant;
+    this.userColors = userColors;
 
     if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
