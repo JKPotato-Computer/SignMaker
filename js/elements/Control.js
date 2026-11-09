@@ -38,7 +38,7 @@ class TextElement {
     let result = [text];
     let tagged = [];
 
-    const numeralPattern = /(\d+\/\d+)|(\d\S*)/g;
+    const numeralPattern = /(\d+\/\d+)|(\d\S*)|[\u00BC-\u00BE\u2150-\u2189]/g;
 
     const bannerPattern = new RegExp(
       `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)`,
@@ -98,9 +98,8 @@ class TextElement {
       "--blockBgColor",
       this.backgroundColor == "Inherit"
         ? ""
-        : (
-            lib.colors[this.backgroundColor] || this.backgroundColor
-          ).toLowerCase(),
+        : ColorLibrary.colorLibrary[this.backgroundColor] ||
+            this.backgroundColor,
     );
     newText.style.setProperty("--alignment", this.alignment);
     newText.style.setProperty("--textAlign", this.textAlign);
@@ -119,7 +118,7 @@ class TextElement {
       );
     }
 
-    if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+    if (ColorLibrary.checkForContrast(this.backgroundColor)) {
       newText.style.color = "black";
     } else if (this.backgroundColor != "Inherit") {
       newText.style.color = "white";
@@ -221,11 +220,21 @@ TextElement.fontFamilies = [
   "Arial",
   "Arial Bold",
   "Transport",
+  "Transport Medium",
+  "Motorway Bold",
+  "Motorway Semibold",
+  "Engschrift",
+  "Mittleschrift",
+  "LLM Normal",
+  "LLM Narrow",
+  "Overpass 4",
+  "Overpass 5",
+  "Overpass 6",
+  "Overpass 7",
+  "Overpass 8",
 ];
 
 TextElement.alignments = ["Left", "Center", "Right"];
-
-TextElement.backgroundColors = ["Inherit"].concat(Object.keys(lib.colors));
 
 class ControlTextElement extends TextElement {
   constructor(options = {}) {
@@ -347,7 +356,7 @@ class ElectronicSignElement extends TextElement {
     newText.className = "bE-textElement bE-electronicSign";
     newText.style.setProperty(
       "--textColor",
-      (lib.colors[this.textColor] || this.textColor).toLowerCase(),
+      ColorLibrary.colorLibrary[this.textColor] || this.textColor,
     );
     newText.style.setProperty("--horizPadding", this.horizPadding + "rem");
     newText.style.setProperty("--vertPadding", this.vertPadding + "rem");
@@ -518,7 +527,7 @@ class DividerElement {
 
     if (this.dividerColor && this.dividerColor !== "Default") {
       const resolvedColor =
-        lib.colors[this.dividerColor] || this.dividerColor || "";
+        ColorLibrary.colorLibrary[this.dividerColor] || this.dividerColor || "";
       if (resolvedColor) {
         newDivider.style.backgroundColor = resolvedColor;
       }
@@ -544,7 +553,6 @@ DividerElement.prototype.dividerColors = [
   { value: "White", label: "White" },
   { value: "Black", label: "Black" },
 ];
-
 class IconElement {
   constructor(options = {}) {
     const {
@@ -583,7 +591,7 @@ class IconElement {
       );
       iconHolder.style.setProperty(
         "--iconBorderColor",
-        lib.colors[this.borderColor] || this.borderColor,
+        ColorLibrary.colorLibrary[this.borderColor] || this.borderColor,
       );
     }
 
@@ -593,7 +601,7 @@ class IconElement {
 
     iconHolder.style.setProperty(
       "--iconBackgroundColor",
-      lib.colors[this.backgroundColor] || this.backgroundColor,
+      ColorLibrary.colorLibrary[this.backgroundColor] || this.backgroundColor,
     );
 
     const iconElement = document.createElement("img");
@@ -605,7 +613,7 @@ class IconElement {
     iconElement.className = "bE-iconImage";
 
     if (
-      lib.checkForContrast(this.backgroundColor.toLowerCase()) &&
+      ColorLibrary.checkForContrast(this.backgroundColor) &&
       this.iconType !== "custom"
     ) {
       iconElement.style.filter = "invert(1)";
@@ -754,12 +762,7 @@ class BeaconElement {
       ? TextElement.alignments
       : [];
     this.alignment = validAlignments.includes(alignment) ? alignment : "Center";
-    const availableColors = Array.isArray(BeaconElement.colors)
-      ? BeaconElement.colors
-      : [];
-    this.color = availableColors.includes(color)
-      ? color
-      : availableColors[0] || "Yellow";
+    this.color = color || "Yellow";
     this.backplate =
       backplate === true ||
       backplate === "true" ||
@@ -789,7 +792,7 @@ class BeaconElement {
     );
     container.style.setProperty("--beaconFlashDuration", flashDuration + "s");
     const resolvedColor =
-      (lib?.colors && lib.colors[this.color]) || this.color || "Yellow";
+      ColorLibrary.colorLibrary[this.color] || this.color || "Yellow";
     container.style.setProperty(
       "--beaconBulbColor",
       typeof resolvedColor === "string" ? resolvedColor : "Yellow",
@@ -804,7 +807,7 @@ class BeaconElement {
     );
     const backplateColorReference = BeaconElement.backplateColor;
     const resolvedBackplateColor =
-      (lib?.colors && lib.colors[backplateColorReference]) ||
+      ColorLibrary.colorLibrary[backplateColorReference] ||
       BeaconElement.backplateFallbackColor ||
       backplateColorReference;
     container.style.setProperty(
@@ -826,8 +829,8 @@ class BeaconElement {
   }
 }
 
-BeaconElement.colors = ["Yellow", "Red", "Purple"];
 BeaconElement.halfInchInRem = 0.5 / 12;
+BeaconElement.colors = ["Yellow", "Red", "Purple"];
 BeaconElement.backplateThicknessRem = BeaconElement.halfInchInRem * 3;
 BeaconElement.backplateCornerRadiusRem = 0.15;
 BeaconElement.backplateColor = "Yellow";
@@ -955,8 +958,8 @@ class TollLogoElement {
       if (this.backgroundColor != "Inherit") {
         imgHolder.style.setProperty(
           "--tollBgColor",
-          lib.colors[this.backgroundColor] ||
-            this.backgroundColor.toLowerCase(),
+          ColorLibrary.colorLibrary[this.backgroundColor] ||
+            this.backgroundColor,
         );
       }
 
@@ -975,7 +978,7 @@ class TollLogoElement {
         this.tollBorderRadius + "px",
       );
 
-      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+      if (ColorLibrary.checkForContrast(this.backgroundColor)) {
         imgHolder.style.borderColor = "black";
       } else {
         imgHolder.style.borderColor = "white";
@@ -1023,8 +1026,8 @@ class TollLogoElement {
       );
       container.style.setProperty(
         "--containerBackgroundColor",
-        lib.colors[this.containerBackgroundColor] ||
-          this.containerBackgroundColor.toLowerCase(),
+        ColorLibrary.colorLibrary[this.containerBackgroundColor] ||
+          this.containerBackgroundColor,
       );
       container.style.setProperty(
         "--containerBorderRadius",
@@ -1041,7 +1044,7 @@ class TollLogoElement {
       container.appendChild(onlyBlock);
       container.classList.add("hasOnlyBlock");
 
-      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+      if (ColorLibrary.checkForContrast(this.backgroundColor)) {
         container.style.borderColor = "black";
         onlyBlock.style.color = "white";
         onlyBlock.style.backgroundColor = "black";
@@ -1177,7 +1180,7 @@ class GroupElement {
 
     if (this.border) {
       blockElementHolder.style.border = `${this.borderWidth}px solid ${
-        lib.colors[this.borderColor] || this.borderColor.toLowerCase()
+        ColorLibrary.colorLibrary[this.borderColor] || this.borderColor
       }`;
     }
 
@@ -1332,18 +1335,17 @@ class Control {
         "--masterBlockBgColor",
         properties.backgroundColor == "Inherit"
           ? ""
-          : (
-              lib.colors[properties.backgroundColor] ||
-              properties.backgroundColor
-            ).toLowerCase(),
+          : ColorLibrary.colorLibrary[properties.backgroundColor] ||
+              properties.backgroundColor,
       );
 
-      const blockBackgroundColor = (
+      const blockBackgroundColor =
         properties.backgroundColor == "Inherit"
-          ? lib.colors[panel.color] || panel.color
-          : lib.colors[properties.backgroundColor] || properties.backgroundColor
-      ).toLowerCase();
-      const usesBlackBorder = lib.checkForContrast(blockBackgroundColor);
+          ? ColorLibrary.colorLibrary[panel.color] || panel.color
+          : ColorLibrary.colorLibrary[properties.backgroundColor] ||
+            properties.backgroundColor;
+      const usesBlackBorder =
+        ColorLibrary.checkForContrast(blockBackgroundColor);
       flexRow.dataset.blockBackgroundColor = blockBackgroundColor;
       flexRow.dataset.blockBorderColor = usesBlackBorder ? "black" : "white";
 
@@ -1380,10 +1382,10 @@ class Control {
       }
 
       if (
-        lib.checkForContrast(
+        ColorLibrary.checkForContrast(
           properties.backgroundColor == "Inherit"
             ? ""
-            : properties.backgroundColor.toLowerCase(),
+            : properties.backgroundColor,
         )
       ) {
         flexRow.style.borderColor = "black";

@@ -147,10 +147,10 @@ class Shield {
       this.customShields.route_yOffset + "%",
     );
 
-    if (this.customShields.route_color != null) {
+    if (this.customShields.route_color != "") {
       routeNumberElmt.style.color =
-        lib.colors[this.customShields.route_color] ||
-        this.customShields.route_color.toLowerCase();
+        ColorLibrary.colorLibrary[this.customShields.route_color] ||
+        this.customShields.route_color;
     }
 
     if (this.customShields.route_letterSpacing != 0) {
@@ -178,10 +178,10 @@ class Shield {
         this.customShields.designation_yOffset + "%",
       );
 
-      if (this.customShields.designation_color != null) {
+      if (this.customShields.designation_color != "") {
         designationElmt.style.color =
-          lib.colors[this.customShields.designation_color] ||
-          this.customShields.designation_color.toLowerCase();
+          ColorLibrary.colorLibrary[this.customShields.designation_color] ||
+          this.customShields.designation_color;
       }
 
       if (this.customShields.designation_letterSpacing != 0) {
@@ -243,9 +243,7 @@ class Shield {
       shieldImgElmt.classList.add("shieldBacks");
       shieldImgElmt.style.setProperty(
         "--sbColor",
-        (
-          lib.colors[this.shieldBackColor] || this.shieldBackColor
-        ).toLowerCase(),
+        ColorLibrary.colorLibrary[this.shieldBackColor] || this.shieldBackColor,
       );
       shieldImgElmt.style.setProperty(
         "--sbRadius",
@@ -343,9 +341,8 @@ class Banner {
       "--bgColor",
       this.backgroundColor == "Inherit"
         ? "transparent"
-        : (
-            lib.colors[this.backgroundColor] || this.backgroundColor
-          ).toLowerCase(),
+        : ColorLibrary.colorLibrary[this.backgroundColor] ||
+            this.backgroundColor,
     );
     bannerElmt.style.setProperty("--fontSize", this.fontSize + "rem");
     bannerElmt.style.setProperty(
@@ -372,10 +369,10 @@ class Banner {
     );
 
     if (
-      lib.checkForContrast(
+      ColorLibrary.checkForContrast(
         this.backgroundColor == "Inherit"
-          ? "transparent"
-          : this.backgroundColor.toLowerCase(),
+          ? "Transparent"
+          : this.backgroundColor,
       )
     ) {
       bannerElmt.style.color = "black";

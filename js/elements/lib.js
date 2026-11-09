@@ -28,53 +28,16 @@ const lib = (function () {
     return optionElmt;
   };
 
-  const colorsLibrary = {};
-
-  // FHW-defined colors.
-  const colors = {
-    Green: "#005f4d",
-    Blue: "#00437b",
-    Brown: "rgb(98, 51, 30)",
-    Yellow: "rgb(252, 207, 52)",
-    White: "rgb(255, 255, 255)",
-    Black: "rgb(0, 0, 0)",
-    Purple: "#4B0082",
-    Orange: "rgb(255, 89, 4)",
-    Red: "rgb(255, 0, 0)",
-    "Fluorescent Pink": "rgb(255, 51, 204)",
-    "Fluorescent Yellow-Green": "rgb(153, 255, 0)",
-  };
-
-  const checkForContrast = (color) => {
-    let contrastColors = [
-      "white",
-      "orange",
-      "yellow",
-      "fluorescent pink",
-      "flourescent yellow-green",
-    ];
-    if (contrastColors.includes(color)) {
-      return true;
-    }
-
-    color = color.replace(/(rgb\()|\)/g, "");
-    color = color.split(",");
-    let r = parseInt(color[0]) / 255;
-    let g = parseInt(color[1]) / 255;
-    let b = parseInt(color[2]) / 255;
-
-    let r_l = r < 0.04045 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
-    let g_l = g < 0.04045 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
-    let b_l = b < 0.04045 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
-
-    let l = 0.2126 * r_l + 0.7152 * g_l + 0.0722 * b_l;
-    return l > 0.1791;
+  const isClass = function (obj) {
+    return (
+      typeof obj === "function" &&
+      /^class\s/.test(Function.prototype.toString.call(obj))
+    );
   };
 
   return {
     clearChildren,
     appendOption,
-    colors,
-    checkForContrast,
+    isClass,
   };
 })();

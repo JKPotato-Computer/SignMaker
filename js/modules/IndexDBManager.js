@@ -49,7 +49,7 @@ class SM_Database {
 
 const IndexDBManager = (() => {
   const databaseName = "SignMakerDB";
-  const databaseVersion = 17;
+  const databaseVersion = 18;
 
   const schema = {
     shieldLibrary: { keyPath: "shieldId" },

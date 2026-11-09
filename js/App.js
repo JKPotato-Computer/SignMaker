@@ -265,7 +265,6 @@ const App = (() => {
       ".smSPShieldRow,:scope > .smSPShieldGroup",
       "vertical",
       (oldShieldIndex, newShieldIndex, callbackResults) => {
-        console.log(oldShieldIndex, newShieldIndex, callbackResults);
         let currentShields = getCurrentBlockElem().shields;
 
         let oldAdjustedShieldIndex = 0;
@@ -320,8 +319,6 @@ const App = (() => {
         } else {
           newShieldIndex = currentShields.length;
         }
-
-        console.log(oldShieldIndex, newShieldIndex);
 
         let shield = currentShields[oldShieldIndex];
         let shieldsToMove = [];
@@ -925,7 +922,6 @@ const App = (() => {
       for (let j = 0; j < blockElems.rows[i].length; j++) {
         const block = blockElems.rows[i][j];
         if (block.constructor.name === "ShieldGroupElement" && id == newId) {
-          console.log(i, j, id);
           currentlySelectedRowIndex = i;
           currentlySelectedBlockIndex = j;
           break;
@@ -1196,7 +1192,7 @@ const App = (() => {
       const exitTabRowElement = exitTabRow.createElement();
       exitTabRowElement.style.setProperty(
         "--backgroundColor",
-        lib.colors[panel.color] || panel.color.toLowerCase(),
+        ColorLibrary.colorLibrary[panel.color] || panel.color,
       );
 
       if (exitTabRow.position == "top") {
@@ -1363,14 +1359,18 @@ const App = (() => {
       const targetColor = adjacentRow
         ? adjacentRow.dataset.blockBorderColor ||
           adjacentRow.dataset.blockBackgroundColor
-        : panel.color.toLowerCase();
+        : panel.color;
 
-      if (targetColor == panel.color.toLowerCase()) {
-        segment.style.backgroundColor = lib.checkForContrast(targetColor)
+      if (targetColor == panel.color) {
+        segment.style.backgroundColor = ColorLibrary.checkForContrast(
+          targetColor,
+        )
           ? "black"
           : "white";
       } else {
-        segment.style.backgroundColor = lib.checkForContrast(targetColor)
+        segment.style.backgroundColor = ColorLibrary.checkForContrast(
+          targetColor,
+        )
           ? "white"
           : "black";
       }
@@ -1384,7 +1384,8 @@ const App = (() => {
       const firstColor =
         firstRow?.dataset.blockBorderColor ||
         firstRow?.dataset.blockBackgroundColor ||
-        (lib.colors[panel.color] || panel.color).toLowerCase();
+        ColorLibrary.colorLibrary[panel.color] ||
+        panel.color;
 
       const firstSegment = document.createElement("div");
       firstSegment.className = "subDividerSegment";
@@ -1392,7 +1393,9 @@ const App = (() => {
       firstSegment.style.width = ".2rem";
       firstSegment.style.position = "absolute";
       firstSegment.style.top = "-.2rem";
-      firstSegment.style.backgroundColor = lib.checkForContrast(firstColor)
+      firstSegment.style.backgroundColor = ColorLibrary.checkForContrast(
+        firstColor,
+      )
         ? "white"
         : "black";
       divider.appendChild(firstSegment);
@@ -1409,7 +1412,8 @@ const App = (() => {
       const lastColor =
         lastRow?.dataset.blockBorderColor ||
         lastRow?.dataset.blockBackgroundColor ||
-        (lib.colors[panel.color] || panel.color).toLowerCase();
+        ColorLibrary.colorLibrary[panel.color] ||
+        panel.color;
 
       const finalSegment = document.createElement("div");
       finalSegment.className = "subDividerSegment";
@@ -1417,7 +1421,9 @@ const App = (() => {
       finalSegment.style.width = ".2rem";
       finalSegment.style.position = "absolute";
       finalSegment.style.bottom = "-.2rem";
-      finalSegment.style.backgroundColor = lib.checkForContrast(lastColor)
+      finalSegment.style.backgroundColor = ColorLibrary.checkForContrast(
+        lastColor,
+      )
         ? "white"
         : "black";
       divider.appendChild(finalSegment);
@@ -1522,7 +1528,7 @@ const App = (() => {
       );
     }
 
-    const parentColor = (lib.colors[panel.color] || panel.color).toLowerCase();
+    const parentColor = ColorLibrary.colorLibrary[panel.color] || panel.color;
     const cornerRows = [
       Array.from(
         subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
@@ -1565,7 +1571,17 @@ const App = (() => {
 
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
-    panelElmt.className = `panel ${panel.color.toLowerCase()} ${panel.corner.toLowerCase()}`;
+    panelElmt.className = `panel ${panel.corner.toLowerCase()}`;
+
+    panelElmt.style.setProperty(
+      "--bg-color",
+      ColorLibrary.colorLibrary[panel.color] || panel.color,
+    );
+    panelElmt.style.setProperty(
+      "--fg-color",
+      ColorLibrary.checkForContrast(panel.color) ? "black" : "white",
+    );
+
     panelElmt.style.setProperty(
       "--signBorderRadius",
       panel.borderRadius + "rem",
@@ -2027,13 +2043,10 @@ const App = (() => {
           );
           guideArrowsHolderElmt.style.setProperty(
             "--bgColor",
-            "var(--" +
-              exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-") +
-              ")",
+            ColorLibrary.colorLibrary[exitOnlyConfig.backgroundColor] ||
+              exitOnlyConfig.backgroundColor,
           );
-          if (
-            !lib.checkForContrast(exitOnlyConfig.backgroundColor.toLowerCase())
-          ) {
+          if (!ColorLibrary.checkForContrast(exitOnlyConfig.backgroundColor)) {
             guideArrowsHolderElmt.style.color = "white";
             guideArrowsHolderElmt.style.borderColor = "white";
             exitOnlyContainer.style.color = "white";
@@ -2044,14 +2057,14 @@ const App = (() => {
           }
 
           if (standardVariant != "Split Exit Only") {
-            arrowElement.style.filter = lib.checkForContrast(
-              exitOnlyConfig.backgroundColor.toLowerCase(),
+            arrowElement.style.filter = ColorLibrary.checkForContrast(
+              exitOnlyConfig.backgroundColor,
             )
               ? "invert(1)"
               : "";
           } else {
-            arrowElement.style.filter = lib.checkForContrast(
-              panel.color.toLowerCase(),
+            arrowElement.style.filter = ColorLibrary.checkForContrast(
+              panel.color,
             )
               ? "invert(1)"
               : "";
@@ -2275,7 +2288,7 @@ const App = (() => {
                 panel.corner == "Sharp" &&
                 exitOnlyConfig.borderMode != "White Border"
               ) {
-                guideArrowsHolderElmt.style.background = `linear-gradient(270deg, var(--${panel.color}) 0%, var(--${panel.color}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 100%)`;
+                guideArrowsHolderElmt.style.background = `linear-gradient(270deg, ${ColorLibrary.colorLibrary[panel.color] || panel.color} 0%, ${ColorLibrary.colorLibrary[panel.color] || panel.color} 49%, ${ColorLibrary.colorLibrary[exitOnlyConfig.backgroundColor] || exitOnlyConfig.backgroundColor} 50%, ${ColorLibrary.colorLibrary[exitOnlyConfig.backgroundColor] || exitOnlyConfig.backgroundColor} 100%)`;
               }
             } else {
               arrowContElmt.style.paddingLeft =
@@ -2289,7 +2302,7 @@ const App = (() => {
                 panel.corner == "Sharp" &&
                 exitOnlyConfig.borderMode != "White Border"
               ) {
-                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, var(--${panel.color.toLowerCase()}) 0%, var(--${panel.color.toLowerCase()}) 49%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 50%, var(--${exitOnlyConfig.backgroundColor.toLowerCase().replace(/\s/g, "-")}) 100%)`;
+                guideArrowsHolderElmt.style.background = `linear-gradient(90deg, ${ColorLibrary.colorLibrary[panel.color] || panel.color} 0%, ${ColorLibrary.colorLibrary[panel.color] || panel.color} 49%, ${ColorLibrary.colorLibrary[exitOnlyConfig.backgroundColor] || exitOnlyConfig.backgroundColor} 50%, ${ColorLibrary.colorLibrary[exitOnlyConfig.backgroundColor] || exitOnlyConfig.backgroundColor} 100%)`;
               }
             }
 

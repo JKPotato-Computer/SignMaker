@@ -91,17 +91,12 @@ const formHandler = (() => {
     app.setPost(post);
 
     StorageManager.setItem(
-      StorageManager.STORAGE_KEYS.postPosition,
-      post.polePosition,
-    );
-    StorageManager.setItem(
       StorageManager.STORAGE_KEYS.showPost,
       String(post.showPost),
     );
-    StorageManager.setItem(StorageManager.STORAGE_KEYS.postColor, post.color);
 
     // Panel
-    currentPanel.color = form["panelColor"].value;
+    currentPanel.color = form["panelColor"].dataset.color;
     currentPanel.corner = form["panelCorner"].value;
     currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
 
@@ -127,7 +122,7 @@ const formHandler = (() => {
         exitTab.textContent = form["sMET_textContent"].value;
         exitTab.subTextContent = form["sMET_subTextContent"].value;
 
-        exitTab.backgroundColor = form["sMET_backgroundColor"].value;
+        exitTab.backgroundColor = form["sMET_backgroundColor"].dataset.color;
         exitTab.borderStyle = form["sMET_borderStyle"].value;
         exitTab.borderThickness = parseFloat(
           form["sMET_borderThickness"].value,
@@ -264,7 +259,7 @@ const formHandler = (() => {
             form["smET_showBackground"].checked;
 
           exitTab.variantSettings.icon.iconBackgroundConfiguration.backgroundColor =
-            form["smET_iconBackground"].value;
+            form["smET_iconBackground"].dataset.color;
           exitTab.variantSettings.icon.iconBackgroundConfiguration.horizontalPadding =
             parseFloat(form["smET_iconBackgroundHorizPadding"].value);
           exitTab.variantSettings.icon.iconBackgroundConfiguration.verticalPadding =
@@ -390,7 +385,7 @@ const formHandler = (() => {
           ).value;
           banner.backgroundColor = bannerElement.querySelector(
             ".smSPBanner_bgColor",
-          ).value;
+          ).dataset.color;
           banner.fontFamily = bannerElement.querySelector(
             ".smSPBanner_fontFamily",
           ).value;
@@ -467,6 +462,11 @@ const formHandler = (() => {
             : currentBlockElem[propertyName];
         } else if (element.tagName === "SELECT") {
           nextValue = element.value;
+        } else if (
+          element.tagName === "BUTTON" &&
+          element.classList.contains("smColorDropdownButton")
+        ) {
+          nextValue = element.dataset.color;
         }
 
         currentBlockElem[propertyName] = nextValue;
@@ -557,10 +557,6 @@ const formHandler = (() => {
     }
 
     // guide arrows
-    currentPanel.sign.arrows.arrowMode = document
-      .querySelector("div.sMA_typeSelect > button.selected")
-      .id.split("sMA_type")[1]
-      .toLowerCase();
 
     if (currentPanel.sign.arrows.arrowMode == "standard") {
       const standardArrowConfig = currentPanel.sign.arrows.standard;
@@ -638,7 +634,7 @@ const formHandler = (() => {
         exitOnlyConfigs.displayOutsideArrow =
           form["exitOnlyDisplayOutsideArrow"].checked;
 
-        exitOnlyConfigs.backgroundColor = form["exitOnlyBGColor"].value;
+        exitOnlyConfigs.backgroundColor = form["exitOnlyBGColor"].dataset.color;
         exitOnlyConfigs.textGap = parseFloat(form["exitOnlyTextGap"].value);
         exitOnlyConfigs.roundAllCorners = form["exitOnlyRoundCorners"].checked;
       }
@@ -759,6 +755,11 @@ const formHandler = (() => {
       );
     }
 
+    currentPanel.sign.arrows.arrowMode = document
+      .querySelector("div.sMA_typeSelect > button.selected")
+      .id.split("sMA_type")[1]
+      .toLowerCase();
+
     updateForm();
     app.redraw();
   };
@@ -787,7 +788,6 @@ const formHandler = (() => {
         : `Panel ${selectedPanelName}`;
 
     document.getElementById("postPosition").value = post.polePosition;
-    document.getElementById("postColor").value = post.color;
     document.getElementById("showPost").checked = post.showPost;
     document.getElementById("offsetPost").checked = post.offsetPost;
     document.getElementById("postCornerRadius").value = post.cornerRadius;
@@ -797,28 +797,19 @@ const formHandler = (() => {
     document.getElementById("postThicknessValue").value = post.thickness;
 
     ColorLibrary.updateDefaultColors();
+    document.getElementById("postColor").value = post.color;
+    document.getElementById("panelColor").dataset.color = panel.color;
     // reload color dropdown
     const colorDropdown = document.querySelector("#smColorDropdownItems");
     colorDropdown.innerHTML = "";
 
-    // create a panel color button
-    const panelColorOption = document.createElement("button");
-    panelColorOption.type = "button";
-    panelColorOption.className = "smColorDropdownItem";
-    panelColorOption.dataset.color = "panelColor";
-    panelColorOption.style.backgroundColor =
-      ColorLibrary.colorLibrary[panel.color];
-
-    const panelColorOptionSpan = document.createElement("span");
-    panelColorOptionSpan.textContent = "Panel Color";
-    panelColorOptionSpan.style.color = ColorLibrary.checkForContrast(
-      panel.color,
-    )
-      ? "black"
-      : "white";
-    panelColorOption.appendChild(panelColorOptionSpan);
-
-    colorDropdown.appendChild(panelColorOption);
+    const emptyColorOption = document.createElement("button");
+    emptyColorOption.type = "button";
+    emptyColorOption.className =
+      "smColorDropdownItem smColorDropdownEmptyButton";
+    emptyColorOption.dataset.color = "";
+    emptyColorOption.style.display = "none";
+    colorDropdown.appendChild(emptyColorOption);
 
     for (const color in ColorLibrary.colorLibrary) {
       const colorOption = document.createElement("button");
@@ -892,6 +883,7 @@ const formHandler = (() => {
           : " (" + post.panels[panelGroupIndex].length + ")");
       panelGroupButton.addEventListener("click", () => {
         app.changeEditingPanelGroup(panelGroupIndex);
+        app.changeEditingPanel(0);
       });
       panelGroup.appendChild(panelGroupButton);
 
@@ -1022,7 +1014,6 @@ const formHandler = (() => {
     }
 
     // Panel Setting Config
-    document.getElementById("panelColor").value = panel.color;
     document.getElementById("panelCorner").value = panel.corner;
     document.getElementById("panelBorderRadius").value =
       panel.borderRadius || 0.5;
@@ -1212,6 +1203,9 @@ const formHandler = (() => {
             element.checked = true;
           }
           element.addEventListener("change", readForm);
+        } else if (element.classList.contains("smColorDropdownButton")) {
+          const color = currentBlockElem[propertyName];
+          element.dataset.color = color;
         } else if (element.tagName === "SELECT") {
           element.value = currentBlockElem[propertyName];
           element.addEventListener("blur", readForm);
@@ -1301,7 +1295,7 @@ const formHandler = (() => {
         app.vars.currentlySelectedRowIndex
       ].bottomMargin;
 
-    document.querySelector("#sdBlock_backgroundColor").value =
+    document.querySelector("#sdBlock_backgroundColor").dataset.color =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].backgroundColor;
@@ -1691,7 +1685,7 @@ const formHandler = (() => {
       currentExitTab.textContent;
     document.querySelector("#smET_subTextContent").value =
       currentExitTab.subTextContent;
-    document.querySelector("#sMET_backgroundColor").value =
+    document.querySelector("#sMET_backgroundColor").dataset.color =
       currentExitTab.backgroundColor;
     document.querySelector("#sMET_borderStyle").value =
       currentExitTab.borderStyle;
@@ -1933,16 +1927,17 @@ const formHandler = (() => {
         currentExitTab.variantSettings.icon.isTextBased;
       document.querySelector("#smET_showBackground").value =
         currentExitTab.variantSettings.icon.showBackground;
-      document.querySelector("#smET_iconBackground").value =
+      document.querySelector("#smET_iconBackground").dataset.color =
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration.backgroundColor;
 
       document.querySelector(
         "#smET_iconBackgroundConfigurations",
-      ).style.display =
+      ).style.display = ["Transparent", "Inherit"].includes(
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration
-          .backgroundColor == "Transparent"
-          ? "none"
-          : "";
+          .backgroundColor,
+      )
+        ? "none"
+        : "";
 
       document.querySelector("#smET_iconBackgroundHorizPadding").value =
         currentExitTab.variantSettings.icon.iconBackgroundConfiguration.horizontalPadding;
@@ -2358,8 +2353,8 @@ const formHandler = (() => {
 
         bannerElement.querySelector(".smSPBanner_textContent").value =
           banner.textContent;
-        bannerElement.querySelector(".smSPBanner_bgColor").value =
-          banner.backgroundColor;
+        const bannerColor = bannerElement.querySelector(".smSPBanner_bgColor");
+        bannerColor.dataset.color = banner.backgroundColor;
         bannerElement.querySelector(".smSPBanner_fontFamily").value =
           banner.fontFamily;
         bannerElement.querySelector(".smSPBanner_firstLetterScale").value =
@@ -2424,6 +2419,8 @@ const formHandler = (() => {
       }
     }
 
+    document.querySelector("#guideArrow").value = sign.arrows.standard.variant;
+
     if (sign.arrows.arrowMode == "standard") {
       const standardArrowConfig = sign.arrows.standard;
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
@@ -2450,7 +2447,6 @@ const formHandler = (() => {
       document.querySelector("#standardArrowList").style.display =
         isExitOnly || isSimpleVariant ? "none" : "";
 
-      document.querySelector("#guideArrow").value = variant;
       document.querySelector("#standardArrowSelected").textContent =
         "Selected: " +
         (selectedIndex === -1 ? "None" : "Arrow " + (selectedIndex + 1));
@@ -2684,7 +2680,7 @@ const formHandler = (() => {
           exitOnlyConfigs.wordSpacing;
         document.querySelector("#exitOnlyLetterSpacing").value =
           exitOnlyConfigs.letterSpacing;
-        document.querySelector("#exitOnlyBGColor").value =
+        document.querySelector("#exitOnlyBGColor").dataset.color =
           exitOnlyConfigs.backgroundColor;
 
         document.querySelector("#exitOnlyGap").value = exitOnlyConfigs.gap;

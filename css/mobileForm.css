@@ -64,7 +64,7 @@
     flex-grow: 1;
   }
 
-  #importDiagram, #exportDiagram {
+  #importDiagram, #exportDiagramImage, #exportDiagramJSON {
     flex-grow: 1;
     margin-bottom: -.5rem;
     margin-top: .5rem;
@@ -215,6 +215,10 @@
     top: .25rem;
   }
 
+  .smColorDropdownButton {
+    padding: .5rem;
+  }
+
   .sMET_typeSelect {
     flex-wrap: nowrap !important;
     width: 100vw !important;
@@ -223,5 +227,85 @@
 
   .sMET_typeSelect .sMET_typeVisual {
     width: 10rem;
+  }
+
+  #smColorDropdownItems > button > span {
+    padding: .75rem 0;
+  }
+
+  #smColorDropdownHolder {
+    left: 1rem !important;
+    width: calc(100% - 2rem) !important;
+  }
+
+  #smColorDropdownHolder > * {
+    flex-grow: 1;
+  }
+
+  #smColorAddColor, #smColorDropdownUpdate, #smColorDropdownRemove {
+    padding: .75rem 0;
+  }
+
+  #smColorTheRealColor {
+    height: 5rem;
+  }
+
+  .textEditorBlock {
+    padding: .75rem;
+  }
+
+  #smSettings_MUTCDGallery {
+    flex-direction: column;
+  }
+
+  .mutcdOption {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .mutcdImage.selected {
+    margin-right: 0;
+    margin-bottom: 125%;
+  }
+  
+  .mutcdImage:hover,
+  .mutcdImage:focus {
+    margin-right: 0;
+    margin-bottom: 110%;
+  }
+
+  .mutcdImage:hover .mutcdSlideInfo, .mutcdImage:focus .mutcdSlideInfo, .mutcdImage.selected .mutcdSlideInfo {
+    top: 100%;
+    left: 0;
+  }
+
+  #smSettings_Options {
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+  #smSettings_Options > button {
+    width: 100%;
+  }
+
+   #smSettings_Options > div > label,
+  #smSettings_searchVariant {
+     text-align: center;
+     width: 100%;
+    flex-grow: 1;
+    margin: 0;
+   }
+
+  
+  #smSettings_Options > div > label {
+    margin-bottom: .5rem;
+  }
+
+  #smSettings_Options > div {
+    width: 100%;
+  }
+
+  #sMSettings_MUTCDVariants {
+    flex-direction: column-reverse;
   }
 }

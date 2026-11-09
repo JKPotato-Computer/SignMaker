@@ -259,7 +259,7 @@ main#smRender.wide #postContainer {
   width: calc(var(--beaconSize) * 0.85);
   height: calc(var(--beaconSize) * 0.85);
   border-radius: 50%;
-  background-color: var(--beaconBulbColor, var(--yellow, #ffd200));
+  background-color: var(--beaconBulbColor, #ffd200);
   animation: beaconFlash var(--beaconFlashDuration) steps(1, end) infinite;
   animation-fill-mode: both;
   box-shadow: none;
@@ -270,7 +270,7 @@ main#smRender.wide #postContainer {
   49.9% {
     opacity: 1;
     box-shadow: 0 0 calc(var(--beaconSize) * 0.25)
-      var(--beaconBulbColor, var(--yellow, #ffd200));
+      var(--beaconBulbColor, #ffd200);
   }
   50%,
   100% {
@@ -563,10 +563,6 @@ main#smRender.wide #postContainer {
     "exitTabLeft sign exitTabRight"
     "exitTabLeft guideSigns exitTabRight"
     ". exitTabBottom .";
-}
-
-.sign {
-  grid-area: sign;
 }
 
 .guideArrowsHolder {
@@ -1686,7 +1682,7 @@ main#smRender.wide #postContainer {
   width: calc(var(--beaconSize) * 0.85);
   height: calc(var(--beaconSize) * 0.85);
   border-radius: 50%;
-  background-color: var(--beaconBulbColor, var(--yellow, #ffd200));
+  background-color: var(--beaconBulbColor, #ffd200);
   animation: beaconFlash var(--beaconFlashDuration) steps(1, end) infinite;
   animation-fill-mode: both;
   box-shadow: none;
@@ -1697,7 +1693,7 @@ main#smRender.wide #postContainer {
   49.9% {
     opacity: 1;
     box-shadow: 0 0 calc(var(--beaconSize) * 0.25)
-      var(--beaconBulbColor, var(--yellow, #ffd200));
+      var(--beaconBulbColor, #ffd200);
   }
   50%,
   100% {
@@ -1924,8 +1920,8 @@ main#smRender.wide #postContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  transform: translate(var(--routeXOffset, 0%), var(--routeYOffset, 0%));
-  color: white;
+  transform: translateX(var(--routeXOffset, 0%)) translateY(var(--routeYOffset, 0%));
+  height: stretch;
 }
 .designation {
   position: absolute;
@@ -1995,6 +1991,9 @@ main#smRender.wide #postContainer {
 
 .sign {
   grid-area: sign;
+  display: block;
+  position: relative;
+  z-index: 3;
 }
 
 .guideArrowsHolder {
@@ -2422,7 +2421,6 @@ main#smRender.wide #postContainer {
 
 .ET-tab.square {
   border-radius: 0.25rem;
-  padding: var(--verticalPadding) calc(var(--horizontalPadding));
 }
 
 .signCorner {

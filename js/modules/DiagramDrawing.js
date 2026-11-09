@@ -2763,7 +2763,7 @@ const DiagramDrawing = (() => {
           if (typeof returnMethod === "function") {
             returnMethod(diagram);
           }
-        }
+        },
       );
 
       editorConnections.usePresetInSign = trackEditorConnection(
@@ -2803,8 +2803,8 @@ const DiagramDrawing = (() => {
         },
       );
 
-      editorConnections.exportDiagram = trackEditorConnection(
-        document.querySelector("#exportDiagram"),
+      editorConnections.exportDiagramJSON = trackEditorConnection(
+        document.querySelector("#exportDiagramJSON"),
         "click",
         () => {
           const diagram = saveDiagram();
@@ -2822,6 +2822,30 @@ const DiagramDrawing = (() => {
           document.body.appendChild(downloadAnchorNode);
           downloadAnchorNode.click();
           downloadAnchorNode.remove();
+        },
+      );
+
+      editorConnections.exportDiagramImage = trackEditorConnection(
+        document.querySelector("#exportDiagramImage"),
+        "click",
+        async () => {
+          const diagram = saveDiagram();
+          loadDiagram(diagram, true);
+          canvasElement.toBlob((blob) => {
+            loadDiagram(diagram, false);
+            const output = URL.createObjectURL(blob);
+            const downloadAnchorNode = document.createElement("a");
+            downloadAnchorNode.setAttribute("href", output);
+            downloadAnchorNode.setAttribute(
+              "download",
+              (document.querySelector("#diagramFileName").value == ""
+                ? "diagram"
+                : document.querySelector("#diagramFileName").value) + ".png",
+            );
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+          });
         },
       );
 

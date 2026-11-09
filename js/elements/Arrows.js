@@ -54,7 +54,8 @@ class APLArrow {
         exitText.textContent = this.exitTextContent[i];
         exitText.style.setProperty(
           "--exitBGColor",
-          lib.colors[this.exitBGColor] || this.exitBGColor.toLowerCase(),
+          ColorLibrary.colorLibrary[this.exitBGColor] ||
+            this.exitBGColor,
         );
         exitText.style.setProperty(
           "--exitTextRoundness",
@@ -78,7 +79,7 @@ class APLArrow {
           this.exitBGColor,
         )
           ? "auto"
-          : lib.checkForContrast(this.exitBGColor.toLowerCase())
+          : ColorLibrary.checkForContrast(this.exitBGColor)
             ? "black"
             : "white";
 
@@ -119,24 +120,18 @@ APLArrow.arrowTypes = {
   ["CFX Up Arrow"]: { asset: "APL_CFXUp.svg", flipped: false },
 };
 
+APLArrow.prototype.justifyAPLs = ["Left", "Right", "Center"];
 APLArrow.prototype.backgroundColors = [
   "Yellow",
   "White",
   "Transparent",
   "Outline",
 ];
-APLArrow.prototype.justifyAPLs = ["Left", "Right", "Center"];
 
 class StandardArrow {
   constructor(options = {}) {
-    const {
-      arrow,
-      rotation,
-      size,
-      marginHorizontal,
-      marginVertical,
-      flip,
-    } = MUTCDVariants.get("StandardArrow", options);
+    const { arrow, rotation, size, marginHorizontal, marginVertical, flip } =
+      MUTCDVariants.get("StandardArrow", options);
     this.arrow = arrow;
     this.rotation = rotation;
     this.size = size;

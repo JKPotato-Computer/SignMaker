@@ -245,13 +245,24 @@ const FormNavigation = (() => {
 
     document.querySelector("#toggleSettings").onclick = function () {
       document.querySelector("#signMakerSettings").showModal();
+      document.querySelector("#signMakerSettings").style.display = "flex";
       document.querySelector("#modalHolder").style.display = "flex";
     };
 
     document.querySelector("#signMakerSettingsClose").onclick = function () {
       document.querySelector("#signMakerSettings").close();
+      document.querySelector("#signMakerSettings").style.display = "";
       document.querySelector("#modalHolder").style.display = "none";
     };
+
+    document
+      .querySelector("#signMakerSettings")
+      .addEventListener("cancel", (event) => {
+        event.preventDefault();
+        document.querySelector("#signMakerSettings").close();
+        document.querySelector("#signMakerSettings").style.display = "";
+        document.querySelector("#modalHolder").style.display = "none";
+      });
   };
 
   const setupTooltips = () => {
@@ -386,10 +397,9 @@ const FormNavigation = (() => {
     }
 
     // Post color
-    const postColorSelectElmt = document.querySelector("#postColor");
-    for (const colorOption of Post.colors) {
-      lib.appendOption(postColorSelectElmt, colorOption, {
-        selected: colorOption === post.color,
+    for (const color of Post.colors) {
+      lib.appendOption(document.querySelector("#postColor"), color, {
+        selected: color == post.color,
       });
     }
 
@@ -404,11 +414,6 @@ const FormNavigation = (() => {
 
   const setupPanelOptions = () => {
     // Panel color
-    const colorSelectElmt = document.querySelector("#panelColor");
-    for (const color in lib.colors) {
-      lib.appendOption(colorSelectElmt, color, { text: color });
-    }
-
     // Panel corner
     const cornerTypeSelectElmt = document.querySelector("#panelCorner");
     for (const corner of Panel.prototype.cornerType) {
@@ -453,14 +458,6 @@ const FormNavigation = (() => {
         document.querySelector("#sMET_PanelEdgeType"),
         edgeType.toLowerCase(),
         { text: edgeType },
-      );
-    }
-
-    for (const backgroundColor of ExitTab.backgroundColors) {
-      lib.appendOption(
-        document.querySelector("#sMET_backgroundColor"),
-        backgroundColor.toLowerCase(),
-        { text: backgroundColor },
       );
     }
 
@@ -665,7 +662,6 @@ const FormNavigation = (() => {
       }
 
       if (selectedPreset == "None") {
-        console.log("Hi");
         for (const key in ExitTab.prototype.defaultExitTabConfig) {
           currentExitTab[key] = ExitTab.prototype.defaultExitTabConfig[key];
         }
@@ -682,10 +678,6 @@ const FormNavigation = (() => {
       formHandler.updateExitTabSubform();
       App.redraw();
     });
-
-    for (const color of ExitTab.tollIconBackgrounds) {
-      lib.appendOption(document.querySelector("#smET_iconBackground"), color);
-    }
   };
 
   const setupControlSignElements = () => {
@@ -752,37 +744,12 @@ const FormNavigation = (() => {
       );
     }
 
-    // Background colors
-    let textElem_bgColorSelects = [
-      document.querySelector("#sdCtrlText_backgroundColor"),
-      document.querySelector("#sdAdvisory_backgroundColor"),
-      document.querySelector("#sdActionMessage_backgroundColor"),
-      document.querySelector("#sdIcon_borderColor"),
-      document.querySelector("#sdIcon_backgroundColor"),
-      document.querySelector("#sdBlock_backgroundColor"),
-      document.querySelector("#sdTollLogo_backgroundColor"),
-      document.querySelector("#sdTollLogo_containerBackgroundColor"),
-      document.querySelector("#sdAdvisory_borderColor"),
-      document.querySelector("#sdGroup_borderColor"),
-    ];
-    for (const elem of textElem_bgColorSelects) {
-      for (const backgroundColor of TextElement.backgroundColors) {
-        lib.appendOption(elem, backgroundColor);
-      }
-    }
-
     // Shields
     const shieldGroupSelect = document.querySelector(
       "#sdShieldGroup_direction",
     );
     for (const direction of ShieldGroupElement.directions) {
       lib.appendOption(shieldGroupSelect, direction);
-    }
-
-    // Beacon colors
-    const beaconColorSelect = document.querySelector("#sdBeacon_color");
-    for (const color of BeaconElement.colors) {
-      lib.appendOption(beaconColorSelect, color);
     }
 
     // Control text font (with storage support)
@@ -840,12 +807,16 @@ const FormNavigation = (() => {
       lib.appendOption(divider_widthMeasurement, measurement);
     }
 
-    // Divider colors
-    const divider_colorSelect = document.querySelector(
-      "#sdBlocker_dividerColor",
-    );
     for (const { value, label } of DividerElement.prototype.dividerColors) {
-      lib.appendOption(divider_colorSelect, value, { text: label });
+      lib.appendOption(
+        document.querySelector("#sdBlocker_dividerColor"),
+        value,
+        { text: label },
+      );
+    }
+
+    for (const color of BeaconElement.colors) {
+      lib.appendOption(document.querySelector("#sdBeacon_color"), color);
     }
 
     // Shield types
@@ -919,21 +890,21 @@ const FormNavigation = (() => {
       });
     }
 
-    for (const color of APLArrow.prototype.backgroundColors) {
-      lib.appendOption(
-        document
-          .querySelector("#sMAPL_templateAPLItem")
-          .content.querySelector(".smAPL_bgColor"),
-        color,
-      );
-    }
-
     for (const font of TextElement.fontFamilies) {
       lib.appendOption(
         document
           .querySelector("#sMAPL_templateAPLItem")
           .content.querySelector(".smAPL_font"),
         font,
+      );
+    }
+
+    for (const color of APLArrow.prototype.backgroundColors) {
+      lib.appendOption(
+        document
+          .querySelector("#sMAPL_templateAPLItem")
+          .content.querySelector(".smAPL_bgColor"),
+        color,
       );
     }
 
@@ -990,12 +961,6 @@ const FormNavigation = (() => {
         borderMode,
         { selected: borderMode == "Partial Black Border" },
       );
-    }
-
-    for (const bgColor in lib.colors) {
-      lib.appendOption(document.querySelector("#exitOnlyBGColor"), bgColor, {
-        selected: bgColor == "Yellow",
-      });
     }
   };
 
@@ -1072,6 +1037,19 @@ const FormNavigation = (() => {
     document.addEventListener("input", handleLimonInput, true);
   };
 
+  const positionDropdown = (dropdownHolder, trigger) => {
+    const bounds = trigger.getBoundingClientRect();
+    const gap = 5;
+    const dropdownHeight = dropdownHolder.getBoundingClientRect().height;
+    const top =
+      bounds.bottom + gap + dropdownHeight > window.innerHeight
+        ? bounds.top - dropdownHeight - gap
+        : bounds.bottom + gap;
+
+    dropdownHolder.style.left = bounds.left + "px";
+    dropdownHolder.style.top = top + "px";
+  };
+
   const setupDropdownElements = () => {
     document.addEventListener("click", (event) => {
       const dropdownButton = event.target.closest(".smDropdownOption");
@@ -1099,13 +1077,7 @@ const FormNavigation = (() => {
 
         if (!dropdownHolder.classList.toggle("hidden")) {
           dropdownSearch.value = "";
-          dropdownHolder.style.left =
-            selectedButton.getBoundingClientRect().left + "px";
-          dropdownHolder.style.top =
-            selectedButton.getBoundingClientRect().top +
-            selectedButton.getBoundingClientRect().height +
-            5 +
-            "px";
+          positionDropdown(dropdownHolder, selectedButton);
           dropdownSearch.focus();
           selectedArrow.style.rotate = "180deg";
         }
@@ -1491,20 +1463,9 @@ const FormNavigation = (() => {
       document.querySelector("#spShield_designationFontFamily"),
     ];
     for (const select of shieldFontSelect) {
-      lib.appendOption(select, "");
+      lib.appendOption(select, "", {text: "Unset"});
       for (const fontFamily of TextElement.fontFamilies) {
         lib.appendOption(select, fontFamily);
-      }
-    }
-
-    const shieldColorSelect = [
-      document.querySelector("#spShield_routeColor"),
-      document.querySelector("#spShield_designationColor"),
-    ];
-    for (const select of shieldColorSelect) {
-      lib.appendOption(select, "");
-      for (const color in lib.colors) {
-        lib.appendOption(select, color);
       }
     }
 
@@ -1679,17 +1640,6 @@ const FormNavigation = (() => {
         });
       });
 
-    for (const color in lib.colors) {
-      lib.appendOption(document.querySelector("#selectedBackColor"), color);
-    }
-
-    const bgColorElem = document
-      .querySelector("#smSP_templateBannerElement")
-      .content.querySelector(".smSPBanner_bgColor");
-    for (const color of TextElement.backgroundColors) {
-      lib.appendOption(bgColorElem, color);
-    }
-
     const bannerPosiitonsElem = document
       .querySelector("#smSP_templateBannerElement")
       .content.querySelector(".smSPBanner_position");
@@ -1763,8 +1713,8 @@ const FormNavigation = (() => {
           }
 
           let objectType = obj.constructor.name;
-          let tagsToReplace = [];
           const validClassNames = MUTCDVariants.getClassNames(objectType);
+          let tagsToReplace = [];
 
           for (const className of validClassNames) {
             const classTags =
@@ -1782,10 +1732,6 @@ const FormNavigation = (() => {
               let newValue;
 
               for (const className of validClassNames) {
-                console.log(
-                  MUTCDVariants[post.mutcdVariant][className],
-                  className,
-                );
                 let thisValue =
                   MUTCDVariants[post.mutcdVariant][className]?.[key];
                 if (thisValue !== undefined) {
@@ -1794,10 +1740,53 @@ const FormNavigation = (() => {
                 }
               }
 
-              console.log(key, currentValue, newValue);
               if (newValue !== undefined && newValue !== currentValue) {
                 obj[key] = newValue;
               }
+            } else if (
+              typeof obj[key] === "object" &&
+              !lib.isClass(obj[key].constructor) &&
+              !Array.isArray(obj[key])
+            ) {
+              const recursiveHelper = (o, mutcdRecursive) => {
+                const valKeys = Object.keys(o).filter(
+                  (k) => k !== "constructor" && k !== "prototype",
+                );
+
+                for (const k of valKeys) {
+                  if (tagsToReplace.includes(k)) {
+                    const currentValue = o[k];
+                    let newValue;
+
+                    for (const className of validClassNames) {
+                      let thisValue =
+                        MUTCDVariants[post.mutcdVariant][className]?.[key];
+                      for (const nestedKey of mutcdRecursive) {
+                        thisValue = thisValue?.[nestedKey];
+                      }
+                      thisValue = thisValue?.[k];
+
+                      if (thisValue !== undefined) {
+                        newValue = thisValue;
+                        break;
+                      }
+                    }
+
+                    console.log(k, currentValue, newValue, mutcdRecursive);
+
+                    if (newValue !== undefined && newValue !== currentValue) {
+                      o[k] = newValue;
+                    }
+                  } else if (
+                    typeof o[k] === "object" &&
+                    !lib.isClass(o[k].constructor) &&
+                    !Array.isArray(o[k])
+                  ) {
+                    recursiveHelper(o[k], [...mutcdRecursive, k]);
+                  }
+                }
+              };
+              recursiveHelper(obj[key], []);
             } else {
               replaceRecursive(obj[key]);
             }
@@ -1810,13 +1799,24 @@ const FormNavigation = (() => {
       });
   };
 
+  let oldColorName = null;
   const promptColorEdit = (color = null) => {
     const colorEditModal = document.querySelector(".smColorDropdownEdit");
     colorEditModal.style.display = "flex";
     if (color) {
+      oldColorName = color;
       document.querySelector("#smColorName").value = color;
       document.querySelector("#smColorTheRealColor").value =
         ColorLibrary.colorLibrary[color];
+
+      const event = new Event("change", { bubbles: true });
+      document.querySelector("#smColorName").dispatchEvent(event);
+      document.querySelector("#smColorTheRealColor").dispatchEvent(event);
+      document.querySelector("#smColorEditingLabel").textContent =
+        "Editing: " + color;
+      document.querySelector("#smColorEditingLabel").style.display = "";
+    } else {
+      document.querySelector("#smColorEditingLabel").style.display = "none";
     }
 
     document.querySelector("#smColorDropdownUpdate").textContent = color
@@ -1830,12 +1830,92 @@ const FormNavigation = (() => {
   const setupColorHandler = () => {
     const colorDropdown = document.querySelector("#smColorDropdownHolder");
     const colorSearch = colorDropdown.querySelector("#smColorDropdownSearch");
+    let activeColorButton = null;
 
-    const colorAddButton = colorDropdown.querySelector("#smColorAddColor");
-    colorAddButton.addEventListener("click", () => {
-      promptColorEdit();
+    // listener event
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(".smColorDropdownButton");
+      if (button) {
+        activeColorButton = button;
+        colorDropdown.classList.remove("hidden");
+        positionDropdown(colorDropdown, button);
+        colorSearch.value = "";
+        colorSearch.focus();
+        colorSearch.dispatchEvent(new Event("input"));
+
+        if (activeColorButton.dataset.emptyValue) {
+          document.querySelector(".smColorDropdownEmptyButton").style.display =
+            "";
+          document.querySelector(".smColorDropdownEmptyButton").textContent =
+            button.dataset.emptyValue;
+        } else {
+          document.querySelector(".smColorDropdownEmptyButton").style.display =
+            "none";
+        }
+      }
     });
 
+    for (const id of [
+      "#sMET_backgroundColor",
+      "#sdCtrlText_backgroundColor",
+      "#sdAdvisory_backgroundColor",
+      "#sdBlock_backgroundColor",
+      "#sdIcon_backgroundColor",
+      "#sdTollLogo_backgroundColor",
+      "#sdTollLogo_containerBackgroundColor",
+      "#sdActionMessage_backgroundColor",
+    ]) {
+      document.querySelector(id).dataset.emptyValue = "Inherit";
+    }
+
+    document.querySelector("#smET_iconBackground").dataset.emptyValue =
+      "Transparent";
+
+    for (const id of ["#spShield_routeColor", "#spShield_designationColor"]) {
+      document.querySelector(id).dataset.emptyValue = "Unset";
+    }
+
+    colorDropdown.addEventListener("click", (event) => {
+      const colorItem = event.target.closest(".smColorDropdownItem");
+      if (
+        !colorItem ||
+        event.target.closest(".smColorDropdownEditBtn") ||
+        !activeColorButton
+      ) {
+        return;
+      }
+
+      const selectedColor =
+        colorItem.dataset.color === ""
+          ? activeColorButton.dataset.emptyValue
+          : colorItem.dataset.color;
+
+      activeColorButton.dataset.color = selectedColor;
+
+      if (activeColorButton.closest("#shieldEditorModal")) {
+        ShieldEditor.readForm();
+      } else {
+        formHandler.readForm();
+      }
+    });
+
+    // close events
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        colorDropdown.classList.add("hidden");
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        !event.target.closest("#smColorDropdownHolder") &&
+        !event.target.closest(".smColorDropdownButton")
+      ) {
+        colorDropdown.classList.add("hidden");
+      }
+    });
+
+    // search
     colorSearch.addEventListener("input", () => {
       const query = colorSearch.value.toLowerCase().trim();
       for (const colorOption of colorDropdown.querySelectorAll(
@@ -1859,6 +1939,17 @@ const FormNavigation = (() => {
       .querySelector("#smColorName")
       .addEventListener("change", (event) => {
         currentColorSetttings.name = event.target.value;
+
+        if (
+          ColorLibrary.isDefaultColor(currentColorSetttings.name) ||
+          (ColorLibrary.colorLibrary[currentColorSetttings.name] &&
+            currentColorSetttings.name !== oldColorName)
+        ) {
+          document.querySelector("#smColorDropdownUpdate").style.display =
+            "none";
+        } else {
+          document.querySelector("#smColorDropdownUpdate").style.display = "";
+        }
       });
 
     document
@@ -1870,11 +1961,13 @@ const FormNavigation = (() => {
     document
       .querySelector("#smColorDropdownUpdate")
       .addEventListener("click", () => {
-        if (ColorLibrary.colorLibrary[currentColorSetttings.name]) {
+        if (oldColorName) {
           ColorLibrary.updateColor(
+            oldColorName,
             currentColorSetttings.name,
             currentColorSetttings.color,
           );
+          oldColorName = null;
         } else {
           ColorLibrary.addColor(
             currentColorSetttings.name,
@@ -1883,15 +1976,63 @@ const FormNavigation = (() => {
         }
         document.querySelector(".smColorDropdownEdit").style.display = "none";
         formHandler.updateForm();
+        SavesNTemplates.updateAutoSave(post);
+        HistoryManager.addToUndoStack(post);
       });
 
     document
       .querySelector("#smColorDropdownRemove")
       .addEventListener("click", () => {
-        ColorLibrary.deleteColor(currentColorSetttings.name);
+        ColorLibrary.removeColor(oldColorName);
+        oldColorName = null;
         document.querySelector(".smColorDropdownEdit").style.display = "none";
         formHandler.updateForm();
+        SavesNTemplates.updateAutoSave(post);
+        HistoryManager.addToUndoStack(post);
       });
+
+    const colorAddButton = colorDropdown.querySelector("#smColorAddColor");
+    colorAddButton.addEventListener("click", () => {
+      promptColorEdit();
+    });
+
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type !== "attributes" ||
+          mutation.attributeName != "data-color"
+        ) {
+          continue;
+        }
+
+        if (!mutation.target.classList.contains("smColorDropdownButton")) {
+          continue;
+        }
+
+        let target = mutation.target;
+        if (target.dataset.color === "") {
+          target.style.backgroundColor = "";
+          target.style.color = "";
+          target.textContent = target.dataset.emptyValue || "";
+        } else {
+          target.style.backgroundColor =
+            ColorLibrary.colorLibrary[target.dataset.color] ||
+            target.dataset.color;
+          target.style.color = ColorLibrary.checkForContrast(
+            target.dataset.color,
+          )
+            ? "black"
+            : "white";
+          target.textContent = target.dataset.color;
+        }
+      }
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["data-color"],
+    });
   };
 
   return {

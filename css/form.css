@@ -1851,10 +1851,11 @@ button#sdShieldGroup_OpenShieldEditor {
   align-items: center;
   padding: 0;
   border: 1px solid black;
+  background: rgb(var(--baseColor),.3);
 }
 
 #shieldLibraryListHolder > button.selected {
-  background-color: rgb(var(--baseColor));
+  background-color: rgb(var(--baseColor),.75);
 }
 
 #shieldLibraryListHolder > button.selected > span {
@@ -3121,10 +3122,11 @@ summary:hover {
 #signMakerSettings {
   width: 80%;
   height: 100%;
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 0.5rem;
   background: none;
+  padding: 0;
 }
 
 #signMakerSettings > div {
@@ -3250,6 +3252,21 @@ summary:hover {
   padding: 1rem;
 }
 
+.mutcdSlideInfo > a {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(var(--baseColorInv), 0.1);
+  padding: 0.25rem 0.5rem;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.mutcdSlideInfo > a:hover {
+  background: rgb(var(--baseColorInv), 0.3);
+}
+
 .mutcdBottom {
   margin-top: auto;
   font-size: 1rem;
@@ -3281,12 +3298,31 @@ summary:hover {
 
 #smColorDropdownHolder {
   position: fixed;
-  top: 50%;
-  left: 1rem;
+  inset: 0;
+  margin: 0;
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
   z-index: 9999;
+  width: max-content;
+  height: max-content;
+}
+
+#smColorDropdownHolder.hidden {
+  display: none;
+}
+
+.smColorDropdownButton {
+  display: inline-block;
+  min-width: 6rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--colorButtonText, white);
+  background-color: var(--colorButtonBackground, var(--hotbarColor));
+  border: 1px solid rgb(var(--baseColorInv));
+}
+
+.smColorDropdownButton:hover {
+  filter: brightness(120%);
 }
 
 #smColorDropdownHolder > div {
@@ -3298,20 +3334,28 @@ summary:hover {
 #smColorDropdownItems {
   display: flex;
   flex-direction: column;
-  width: 10rem;
-  margin: .5rem 0;
+  width: 100%;
+  margin: 0.5rem 0;
   height: 10rem;
   overflow: auto;
 }
 
 #smColorDropdownItems > button {
   width: 100%;
-  padding: 0.25rem 0;
   font-size: 1rem;
-  background-color: green;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
 }
 
-#smColorDropdownUpdate, #smColorDropdownRemove {
+#smColorDropdownItems > button > span {
+  flex-grow: 1;
+  padding: 0.25rem 0;
+}
+
+#smColorDropdownUpdate,
+#smColorDropdownRemove {
   flex-grow: 1;
   margin: 0;
   padding: 0.25rem;
@@ -3325,7 +3369,7 @@ summary:hover {
 }
 
 #smColorDropdownRemove {
-  background-color: rgb(255,0,0,.8)
+  background-color: rgb(255, 0, 0, 0.8);
 }
 
 .smColorDropdownEdit {
@@ -3341,18 +3385,18 @@ summary:hover {
 }
 
 .smColorDropdownEdit > div:has(input) {
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 .smColorDropdownEdit > div > input {
   flex-grow: 1;
 }
 
-.smColorDropdownEdit > div > span {
+.smColorDropdownEdit > span {
   font-size: 16px;
 }
 
-.smColorDropdownEdit > div:nth-child(3) {
+.smColorDropdownEdit > div:nth-child(4) {
   margin-top: auto;
   gap: 0.5rem;
 }
@@ -3364,5 +3408,20 @@ summary:hover {
 
 #smColorAddColor {
   width: 100%;
-  padding: .33rem;
+  padding: 0.33rem;
+}
+
+.smColorDropdownEditBtn {
+  margin-left: auto;
+  height: stretch;
+  margin: 0;
+}
+
+.smColorDropdownEmptyButton {
+  padding: 0.25rem 0 !important;
+  justify-content: center !important;
+}
+
+#smColorAddColor {
+  padding: .5rem 0;
 }

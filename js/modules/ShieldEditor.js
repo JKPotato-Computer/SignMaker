@@ -12,7 +12,7 @@ const ShieldEditor = (() => {
       "#selectedShieldBacks",
     ).checked;
     baseShield.shieldBackColor =
-      document.querySelector("#selectedBackColor").value;
+      document.querySelector("#selectedBackColor").dataset.color;
     baseShield.shieldBackRadius = parseFloat(
       document.querySelector("#selectedBackRoudness").value,
     );
@@ -42,7 +42,7 @@ const ShieldEditor = (() => {
     ).value;
     baseShield.customShields.route_color = document.querySelector(
       "#spShield_routeColor",
-    ).value;
+    ).dataset.color;
     baseShield.customShields.designation_scale = parseFloat(
       document.querySelector("#spShield_designationScale").value,
     );
@@ -60,7 +60,7 @@ const ShieldEditor = (() => {
     ).value;
     baseShield.customShields.designation_color = document.querySelector(
       "#spShield_designationColor",
-    ).value;
+    ).dataset.color;
     baseShield.horizMargin = parseFloat(
       document.querySelector("#spShield_horizMargins").value,
     );
@@ -126,7 +126,7 @@ const ShieldEditor = (() => {
     document.querySelector("#shieldBackOptions").style.display =
       !baseShield.shieldBacks ? "none" : "";
 
-    document.querySelector("#selectedBackColor").value =
+    document.querySelector("#selectedBackColor").dataset.color =
       baseShield.shieldBackColor;
     document.querySelector("#selectedBackRoudness").value =
       baseShield.shieldBackRadius;
@@ -134,16 +134,16 @@ const ShieldEditor = (() => {
       baseShield.routeNumber;
     document.querySelector("#spShield_routeFontFamily").value =
       baseShield.customShields.route_fontFamily;
-    document.querySelector("#spShield_routeColor").value =
-      baseShield.customShields.route_color;
+    document.querySelector("#spShield_routeColor").textContent =
+      baseShield.customShields.route_color || "Unset";
     document.querySelector("#spShield_routeSpacing").value =
       baseShield.customShields.route_letterSpacing;
     document.querySelector("#spShield_designation").value =
       baseShield.designation;
     document.querySelector("#spShield_designationFontFamily").value =
       baseShield.customShields.designation_fontFamily;
-    document.querySelector("#spShield_designationColor").value =
-      baseShield.customShields.designation_color;
+    document.querySelector("#spShield_designationColor").textContent =
+      baseShield.customShields.designation_color || "Unset";
     document.querySelector("#spShield_designationSpacing").value =
       baseShield.customShields.designation_letterSpacing;
     document.querySelector("#spShield_scale").value = baseShield.scale;
@@ -238,6 +238,9 @@ const ShieldEditor = (() => {
         shieldEditorModal.style.display = "none";
         holder.style.display = "none";
         cleanupListeners();
+        document.appendChild(
+          shieldEditorModal.querySelector("#smColorDropdownHolder") || null,
+        );
         if (returnFunction) returnFunction(value);
         resolve(value);
       };
@@ -248,7 +251,7 @@ const ShieldEditor = (() => {
 
       trackListener(shieldEditorModal, "cancel", (event) => {
         event.preventDefault();
-        () => closeFunction(null);
+        closeFunction(null);
       });
 
       trackListener(document.querySelector("#setShield"), "click", () =>
@@ -373,6 +376,9 @@ const ShieldEditor = (() => {
       holder.style.display = "flex";
       shieldEditorModal.style.display = "flex";
       shieldEditorModal.showModal();
+      shieldEditorModal.appendChild(
+        document.querySelector("#smColorDropdownHolder") || null,
+      );
 
       updateForm();
       redrawShield();

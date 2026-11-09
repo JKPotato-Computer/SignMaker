@@ -144,6 +144,7 @@
   display: block;
   padding: 0rem;
   position: relative;
+  background: var(--bgColor);
 }
 
 #postContainer.postVariantRural .panel {
@@ -157,87 +158,6 @@
   display: none;
 }
 
-.panel.green {
-  --bg-color: rgb(0, 95, 77);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.blue {
-  --bg-color: rgb(0, 67, 123);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.brown {
-  --bg-color: rgb(98, 51, 30);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.black {
-  --bg-color: rgb(0, 0, 0);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.red {
-  --bg-color: rgb(255, 0, 0);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.purple {
-  --bg-color: rgb(102, 0, 153);
-  --fg-color: rgb(255, 255, 255);
-}
-
-.panel.white {
-  --bg-color: rgb(255, 255, 255);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.yellow {
-  --bg-color: rgb(252, 207, 52);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.orange {
-  --bg-color: rgb(255, 89, 4);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.fluorescent.pink {
-  --bg-color: rgb(255, 51, 204);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.fluorescent.yellow-green {
-  --bg-color: rgb(153, 255, 0);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.avarian.green {
-  --bg-color: rgb(0, 64, 64);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.blue {
-  --bg-color: rgb(0, 47, 108);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.blue {
-  --bg-color: rgb(0, 47, 108);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.brown {
-  --bg-color: rgb(105, 63, 35);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.red {
-  --bg-color: rgb(175, 39, 47);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.purple {
-  --bg-color: rgb(105, 13, 163);
-  --fg-color: rgb(255, 255, 255);
-}
-.panel.avarian.yellow {
-  --bg-color: rgb(254, 209, 65);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.avarian.orange {
-  --bg-color: rgb(229, 114, 0);
-  --fg-color: rgb(0, 0, 0);
-}
-.panel.avarian.coral {
-  --bg-color: rgb(223, 70, 97);
-  --fg-color: rgb(255, 255, 255);
-}
 .panel :is(.signCorner, .signHolder, .guideArrows) {
   background-color: var(--bg-color);
 }
@@ -284,11 +204,6 @@
 
 .signContainer {
   width: max-content;
-}
-
-.sign {
-  display: block;
-  position: relative;
 }
 
 .signHolder {

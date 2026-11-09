@@ -15,6 +15,10 @@ const ColorLibrary = (() => {
       ...MUTCDVariants[mutcdVariant].VariantInfo.ColorPalette,
     };
 
+    for (const color in colorLibrary) {
+      delete colorLibrary[color];
+    }
+
     defaultColors = Object.keys(colorsList);
 
     for (const color in colorsList) {
@@ -39,26 +43,44 @@ const ColorLibrary = (() => {
     if (colorLibrary[colorName] || defaultColors.includes(colorName)) {
       return;
     }
+
+    if (colorName.trim() == "") {
+      return;
+    }
+
+    if (!/^#[0-9A-F]{6}$/i.test(colorValue)) {
+      return;
+    }
+
     colorLibrary[colorName] = colorValue;
     post.userColors[colorName] = colorValue;
   };
 
-  const updateColor = (colorName, colorValue) => {
+  const updateColor = (oldColorName, newColorName, newColorValue) => {
     const post = App.getPost();
     if (!post) {
       return;
     }
 
-    if (!colorLibrary[colorName]) {
+    if (!colorLibrary[oldColorName]) {
       return;
     }
 
-    if (defaultColors.includes(colorName)) {
+    if (colorLibrary[newColorName]) {
       return;
     }
 
-    colorLibrary[colorName] = colorValue;
-    post.userColors[colorName] = colorValue;
+    if (defaultColors.includes(oldColorName)) {
+      return;
+    }
+
+    if (oldColorName !== newColorName) {
+      delete colorLibrary[oldColorName];
+      delete post.userColors[oldColorName];
+    }
+
+    colorLibrary[newColorName] = newColorValue;
+    post.userColors[newColorName] = newColorValue;
   };
 
   const removeColor = (colorName) => {
@@ -82,7 +104,7 @@ const ColorLibrary = (() => {
   const checkForContrast = (color) => {
     let col = colorLibrary[color] || color;
 
-    if (!col.startsWith("#") || col.length != 7) {
+    if (!/^#[0-9A-F]{6}$/i.test(col)) {
       return;
     }
 

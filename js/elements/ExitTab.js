@@ -39,14 +39,14 @@ class ExitTab {
     if (this.backgroundColor != "inherit") {
       exitTabHolder.style.setProperty(
         "--backgroundColor",
-        lib.colors[
+        ColorLibrary.colorLibrary[
           this.backgroundColor.replace(/\p{L}+/gu, (word) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
           })
-        ] || this.backgroundColor.toLowerCase(),
+        ] || this.backgroundColor,
       );
 
-      if (lib.checkForContrast(this.backgroundColor.toLowerCase())) {
+      if (ColorLibrary.checkForContrast(this.backgroundColor)) {
         exitTabElement.style.color = "black";
         exitTabElement.style.borderColor = "black";
       }
@@ -397,15 +397,16 @@ class ExitTab {
       imageHolder.appendChild(imageElement);
 
       if (
-        iconSettings.iconBackgroundConfiguration.backgroundColor !=
-        "Transparent"
+        !["Transparent", "Inherit"].includes(
+          iconSettings.iconBackgroundConfiguration.backgroundColor,
+        )
       ) {
         imageHolder.style.setProperty(
           "--iconBackgroundColor",
-          lib.colors[
+          ColorLibrary.colorLibrary[
             iconSettings.iconBackgroundConfiguration.backgroundColor
           ] ||
-            iconSettings.iconBackgroundConfiguration.backgroundColor.toLowerCase(),
+            iconSettings.iconBackgroundConfiguration.backgroundColor,
         );
         imageHolder.style.setProperty(
           "--iconBackgroundHorizontalPadding",
@@ -421,8 +422,8 @@ class ExitTab {
         );
 
         if (
-          lib.checkForContrast(
-            iconSettings.iconBackgroundConfiguration.backgroundColor.toLowerCase(),
+          ColorLibrary.checkForContrast(
+            iconSettings.iconBackgroundConfiguration.backgroundColor,
           ) &&
           !iconSettings.isTollIcon
         ) {
@@ -511,7 +512,6 @@ delete ExitTab.prototype.defaultExitTabConfig.subTextContent;
 delete ExitTab.prototype.defaultExitTabConfig.shields;
 delete ExitTab.prototype.defaultExitTabConfig.variant;
 
-ExitTab.backgroundColors = ["Inherit"].concat(Object.keys(lib.colors));
 ExitTab.borderStyles = ["Round", "Square"];
 ExitTab.fontFamilies = TextElement.fontFamilies;
 ExitTab.numeralFontFamilies = ["Inherit"].concat(...ExitTab.fontFamilies);
@@ -530,8 +530,6 @@ ExitTab.variants = [
 ];
 
 ExitTab.iconVariantAddons = ["None", "Only", "Or Variant"];
-ExitTab.tollIconBackgrounds = ["Transparent"].concat(Object.keys(lib.colors));
-
 class ExitTabRow {
   constructor(options = {}) {
     const {

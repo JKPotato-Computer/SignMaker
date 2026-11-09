@@ -381,10 +381,7 @@
                     <label for="selectedBackColor" class="noLabelAlignment"
                       >Color:</label
                     >
-                    <select
-                      id="selectedBackColor"
-                      onchange="ShieldEditor.readForm()"
-                    ></select>
+                    <button type="button" id="selectedBackColor" class="smColorDropdownButton" data-color="White">White</button>
                     <br />
                     <label for="selectedBackRoundness" class="noLabelAlignment"
                       >Roundness (px):</label
@@ -452,10 +449,7 @@
               onchange="ShieldEditor.readForm()"
             ></select>
             <label for="spShield_routeColor">Color:</label>
-            <select
-              id="spShield_routeColor"
-              onchange="ShieldEditor.readForm()"
-            ></select>
+            <button type="button" id="spShield_routeColor" class="smColorDropdownButton" data-color="White">White</button>
             <br />
             <label for="spShield_routeSpacing">Letter Spacing (px):</label>
             <input
@@ -494,10 +488,7 @@
               onchange="ShieldEditor.readForm()"
             ></select>
             <label for="spShield_designationColor">Color:</label>
-            <select
-              id="spShield_designationColor"
-              onchange="ShieldEditor.readForm()"
-            ></select>
+            <button type="button" id="spShield_designationColor" class="smColorDropdownButton" data-color="White">White</button>
             <br />
             <label for="spShield_designationSpacing"
               >Letter Spacing (px):</label
@@ -1083,9 +1074,15 @@
             <div>
               <button type="button" id="importDiagram">
                 <span class="material-symbols-outlined">upload</span>
+                JSON
               </button>
-              <button type="button" id="exportDiagram">
+              <button type="button" id="exportDiagramImage">
                 <span class="material-symbols-outlined">download</span>
+                Image
+              </button>
+              <button type="button" id="exportDiagramJSON">
+                <span class="material-symbols-outlined">download</span>
+                JSON
               </button>
               <button type="button" id="diagramUse">Use Diagram</button>
             </div>
@@ -1202,6 +1199,7 @@
                       * Contrary to the cover image, This uses the in-progress
                       version of the Standard Highway Sign designs.
                     </p>
+                    <a href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"><span class="material-symbols-outlined">open_in_new</span>View the MUTCD Here</a>
 
                     <span class="mutcdBottom">Click to select</span>
                   </div>
@@ -1217,6 +1215,18 @@
                       devices. This version in particular is TXDOT's Standard
                       Highway Sign Designs (SHSD) which adopts the Clearview
                       typeface as a part of its official signage.
+                    </p>
+
+                    <span class="mutcdBottom">Click to select</span>
+                  </div>
+                </button>
+                 <button class="mutcdImage" data-variant="NVUTCDG">
+                  <img src="assets/form/mutcd/NVUTCDG.png" />
+                  <div class="mutcdSlideInfo">
+                    <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines</h2>
+                    <p>2026 Edition</p>
+                    <p>
+                      Placeholder Description :3
                     </p>
 
                     <span class="mutcdBottom">Click to select</span>
@@ -1285,7 +1295,7 @@
                 data-toolTip="Sets the color of the posts and supports."
                 >Color:
               </label>
-              <select id="postColor" onchange="formHandler.readForm()"></select>
+              <select id="postColor"></select>
               <br />
               <label for="postThicknessValue">Thickness (rem):</label>
               <input
@@ -1363,10 +1373,7 @@
             <div id="sMPanelAppearance">
               <div>
                 <label for="panelColor">Panel Color: </label>
-                <select
-                  id="panelColor"
-                  onchange="formHandler.readForm()"
-                ></select>
+                <button type="button" id="panelColor" class="smColorDropdownButton" data-color="Green">Green</button>
                 <br />
                 <label for="panelCorner">Panel Corners: </label>
                 <select
@@ -1722,10 +1729,7 @@
                 <label for="smET_iconBackground" class="checkboxLabel">
                   Icon BG:
                 </label>
-                <select
-                  id="smET_iconBackground"
-                  onchange="formHandler.readForm()"
-                ></select>
+                <button type="button" id="smET_iconBackground" class="smColorDropdownButton" data-color="Transparent">Transparent</button>
                 <br />
                 <div
                   id="smET_iconBackgroundConfigurations"
@@ -2182,11 +2186,7 @@
                 <legend>Container</legend>
 
                 <label for="sMET_backgroundColor">Background Color:</label>
-                <select
-                  id="sMET_backgroundColor"
-                  name="sMET_backgroundColor"
-                  onchange="formHandler.readForm()"
-                ></select>
+                <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
 
                 <label for="sMET_minimumHeight">Minimum Height (rem):</label>
                 <input
@@ -3012,18 +3012,9 @@
                     />
                     <br />
                     <label for="sdCtrlText_backgroundColor">BG:</label>
-                    <div
-                      class="smColorDropdownElement"
-                      id="sdCtrlText_backgroundColor"
-                    >
-                      <button class="smColorDropdownButton">
-                        <div class="smColorDropdownPreviewBox"></div>
+                    <button id="sdCtrlText_backgroundColor" class="smColorDropdownButton" data-color="Inherit" type="button">
                         Inherit
-                      </button>
-                    </div>
-                    <select
-                      id="sdCtrlText_backgroundColor2"
-                    ></select>
+                    </button>
                     <label for="sdCtrlText_fontFamily">Font:</label>
                     <select id="sdCtrlText_fontFamily"></select>
                     <br />
@@ -3167,10 +3158,7 @@
                     />
                     <br />
                     <label for="sdBlocker_dividerColor">Color:</label>
-                    <select
-                      id="sdBlocker_dividerColor"
-                      class="sdTextEditorSmall"
-                    ></select>
+                    <select id="sdBlocker_dividerColor" class="sdTextEditorSmall"></select>
                     <label for="sdBlocker_alignment">Alignment: </label>
                     <select id="sdBlocker_alignment"></select>
                     <br />
@@ -3213,7 +3201,7 @@
                     />
                     <br />
                     <label for="sdAdvisory_backgroundColor">BG:</label>
-                    <select id="sdAdvisory_backgroundColor"></select>
+                    <button type="button" id="sdAdvisory_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
                     <label for="sdAdvisory_fontFamily">Font:</label>
                     <select id="sdAdvisory_fontFamily"></select>
                     <br />
@@ -3273,13 +3261,7 @@
                       step="1"
                       class="hidden"
                     />
-                    <select
-                      id="sdAdvisory_borderColor"
-                      data-toolTip="Border Color (px)"
-                      min="0"
-                      step="1"
-                      class="hidden"
-                    ></select>
+                    <button type="button" id="sdAdvisory_borderColor" class="smColorDropdownButton hidden" data-color="White">White</button>
                     <br />
                     <label for="sdAdvisory_useNumeralFormatting"
                       >Enlarge Numerals:</label
@@ -3430,15 +3412,12 @@
                     <br />
 
                     <label for="sdIcon_backgroundColor">BG Color: </label>
-                    <select id="sdIcon_backgroundColor"></select>
+                    <button type="button" id="sdIcon_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
                     <br />
 
                     <label for="sdIcon_border">Border: </label>
                     <input type="checkbox" id="sdIcon_border" />
-                    <select
-                      id="sdIcon_borderColor"
-                      data-toolTip="Border Color"
-                    ></select>
+                    <button type="button" id="sdIcon_borderColor" class="smColorDropdownButton" data-color="White">White</button>
                     <input
                       type="number"
                       id="sdIcon_borderRadius"
@@ -3705,7 +3684,7 @@
                       <label for="sdTollLogo_backgroundColor"
                         >Background Color:</label
                       >
-                      <select id="sdTollLogo_backgroundColor"></select>
+                      <button type="button" id="sdTollLogo_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
                       <br />
                       <label for="sdTollLogo_tollBorderRadius"
                         >BG Roundness (px):</label
@@ -3816,7 +3795,7 @@
                       <label for="sdTollLogo_containerBackgroundColor"
                         >Container BG Color:</label
                       >
-                      <select id="sdTollLogo_containerBackgroundColor"></select>
+                      <button type="button" id="sdTollLogo_containerBackgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
                       <label for="sdTollLogo_containerBorderWidth"
                         >Border Width (px):</label
                       >
@@ -3863,7 +3842,7 @@
                     />
                     <br />
                     <label for="sdActionMessage_backgroundColor">BG:</label>
-                    <select id="sdActionMessage_backgroundColor"></select>
+                    <button type="button" id="sdActionMessage_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
                     <label for="sdActionMessage_fontFamily">Font:</label>
                     <select id="sdActionMessage_fontFamily"></select>
                     <br />
@@ -4130,10 +4109,7 @@
                       value="5"
                       data-toolTip="Border Width (px)"
                     />
-                    <select
-                      id="sdGroup_borderColor"
-                      data-toolTip="Border Color"
-                    ></select>
+                    <button type="button" id="sdGroup_borderColor" class="smColorDropdownButton" data-color="White">White</button>
                   </div>
                 </div>
                 <fieldset id="smSPBlockProperties">
@@ -4307,10 +4283,7 @@
                   </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
-                  <select
-                    id="sdBlock_backgroundColor"
-                    onchange="formHandler.readForm()"
-                  ></select>
+                  <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
                   <label for="sdBlock_backgroundFullWidth"
                     >BG Full Width:</label
                   >
@@ -4946,10 +4919,7 @@
                 />
                 <br />
                 <label for="exitOnlyBGColor">Container BG Color:</label>
-                <select
-                  id="exitOnlyBGColor"
-                  onchange="formHandler.readForm()"
-                ></select>
+                <button type="button" id="exitOnlyBGColor" class="smColorDropdownButton" data-color="Yellow">Yellow</button>
                 <label for="exitOnlyRoundCorners">Round All Corners:</label>
                 <input
                   type="checkbox"
@@ -5235,15 +5205,6 @@
       </nav>
 
       <nav id="sMMiniToolbar">
-        <a
-          class="mutcd-link sMConfigOption"
-          href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="material-symbols-outlined">open_in_new</span>
-          MUTCD
-        </a>
         <button
           type="button"
           id="undoButton"
@@ -5376,10 +5337,7 @@
             value="ONLY"
           />
           <span>BG Color:</span>
-          <select
-            onchange="formHandler.readForm()"
-            class="smAPL_bgColor"
-          ></select>
+          <select onchange="formHandler.readForm()" class="smAPL_bgColor"></select>
           <br />
           <span>Font:</span>
           <select onchange="formHandler.readForm()" class="smAPL_font"></select>
@@ -5482,11 +5440,7 @@
               onchange="formHandler.readForm()"
               placeholder="BANNER"
             />
-            <select
-              class="smSPBanner_bgColor"
-              onchange="formHandler.readForm()"
-              data-toolTip="Background Color"
-            ></select>
+            <button type="button" class="smColorDropdownButton smSPBanner_bgColor" data-color="Inherit">Inherit</button>
             <select
               class="smSPBanner_fontFamily"
               onchange="formHandler.readForm()"
@@ -5589,7 +5543,7 @@
       </div>
     </template>
 
-    <div id="smColorDropdownHolder">
+    <div id="smColorDropdownHolder" class="hidden">
       <div class="smColorDropdownList">
         <input
           type="search"
@@ -5617,6 +5571,7 @@
         <button id="smColorAddColor">+ Add Color</button>
       </div>
       <div class="smColorDropdownEdit">
+        <span id="smColorEditingLabel">Editing:</span>
         <div>
           <span>Name:</span>
           <input
