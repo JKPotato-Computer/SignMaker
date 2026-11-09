@@ -49,6 +49,9 @@ class ExitTab {
       if (ColorLibrary.checkForContrast(this.backgroundColor)) {
         exitTabElement.style.color = "black";
         exitTabElement.style.borderColor = "black";
+      } else {
+        exitTabElement.style.color = "white";
+        exitTabElement.style.borderColor = "white";
       }
     }
 
