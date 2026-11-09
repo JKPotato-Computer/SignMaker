@@ -225,6 +225,85 @@
   font-display: swap;
 }
 
+/* Overpass, in Series */
+@font-face {
+  font-family: "Overpass 4";
+  src: url("../fonts/Overpass/overpass-regular.eot");
+  src:
+    url("../fonts/Overpass/overpass-regular.eot?#iefix")
+      format("embedded-opentype"),
+    url("../fonts/Overpass/overpass-regular.woff2") format("woff2"),
+    url("../fonts/Overpass/overpass-regular.woff") format("woff"),
+    url("../fonts/Overpass/overpass-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Overpass 5";
+  src: url("../fonts/Overpass/overpass-semibold.eot");
+  src:
+    url("../fonts/Overpass/overpass-semibold.eot?#iefix")
+      format("embedded-opentype"),
+    url("../fonts/Overpass/overpass-semibold.woff2") format("woff2"),
+    url("../fonts/Overpass/overpass-semibold.woff") format("woff"),
+    url("../fonts/Overpass/overpass-semibold.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Overpass 6";
+  src: url("../fonts/Overpass/overpass-bold.eot");
+  src:
+    url("../fonts/Overpass/overpass-bold.eot?#iefix")
+      format("embedded-opentype"),
+    url("../fonts/Overpass/overpass-bold.woff2") format("woff2"),
+    url("../fonts/Overpass/overpass-bold.woff") format("woff"),
+    url("../fonts/Overpass/overpass-bold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Overpass 7";
+  src: url("../fonts/Overpass/overpass-extrabold.eot");
+  src:
+    url("../fonts/Overpass/overpass-extrabold.eot?#iefix")
+      format("embedded-opentype"),
+    url("../fonts/Overpass/overpass-extrabold.woff2") format("woff2"),
+    url("../fonts/Overpass/overpass-extrabold.woff") format("woff"),
+    url("../fonts/Overpass/overpass-extrabold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Overpass 8";
+  src: url("../fonts/Overpass/overpass-heavy.eot");
+  src:
+    url("../fonts/Overpass/overpass-heavy.eot?#iefix")
+      format("embedded-opentype"),
+    url("../fonts/Overpass/overpass-heavy.woff2") format("woff2"),
+    url("../fonts/Overpass/overpass-heavy.woff") format("woff"),
+    url("../fonts/Overpass/overpass-heavy.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* LLM Lettering */
+@font-face {
+  font-family: "LLM Normal";
+  font-style: normal;
+  src: url("../fonts/LLMLettering/LLMNormal.ttf") format("truetype");
+}
+@font-face {
+  font-family: "LLM Narrow";
+  font-style: normal;
+  src: url("../fonts/LLMLettering/LLMNarrow.ttf") format("truetype");
+}
+
 /* Inter */
 @font-face {
   font-family: "Inter";

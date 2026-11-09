@@ -175,7 +175,6 @@
   color: var(--fg-color);
   border-color: var(--fg-color);
 }
-
 .panel:is(.white, .orange, .yellow, .fluorescent) .dividerElement {
   background-color: black;
 }

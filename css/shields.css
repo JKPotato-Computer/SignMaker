@@ -105,24 +105,48 @@
   top: 0.08em;
 }
 
-/* US Route, Nova Scotia, Circle, Ellipse, Rectangle 1, Rectangle 2 */
-.shield.US .routeNumber,
+/* US Route, Nova Scotia, Circle (Kentucky, Iowa, Vermont Local), Ellipse (Deleware, Mississippi), Rectangle 1 (Massachussets, Maine, Wisconsin County), Rectangle 2 (West Virginia) */
 .shield.NS.TwoDigit .routeNumber,
 .shield.NS.OneDigit .routeNumber,
-.shield.cir .routeNumber,
-.shield.elp .routeNumber,
-.shield.rec .routeNumber,
-.shield.rec2 .routeNumber {
+.shield:is(
+    .US,
+    .cir,
+    .elp,
+    .rec,
+    .rec2,
+    .KY,
+    .MA,
+    .ME,
+    .WICO,
+    .DE,
+    .IA,
+    .MS,
+    .VT2,
+    .WV
+  )
+  .routeNumber {
   color: rgb(0, 0, 0);
   font-family: "Series D";
   font-size: 1.8em;
   top: 0.15em;
 }
 
-.shield.cir.ThreeDigit .routeNumber,
-.shield.elp.ThreeDigit .routeNumber,
-.shield.rec.ThreeDigit .routeNumber,
-.shield.rec2.ThreeDigit .routeNumber {
+.shield:is(
+    .cir,
+    .elp,
+    .rec,
+    .rec2,
+    .KY,
+    .MA,
+    .ME,
+    .WICO,
+    .DE,
+    .IA,
+    .MS,
+    .VT2,
+    .WV
+  ).ThreeDigit
+  .routeNumber {
   color: rgb(0, 0, 0);
   font-family: "Series C";
   font-size: 1.8em;
