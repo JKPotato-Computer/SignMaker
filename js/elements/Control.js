@@ -221,6 +221,13 @@ TextElement.fontFamilies = [
   "Arial",
   "Arial Bold",
   "Transport",
+  "LLM Normal",
+  "LLM Narrow",
+  "Overpass 4",
+  "Overpass 5",
+  "Overpass 6",
+  "Overpass 7",
+  "Overpass 8",
 ];
 
 TextElement.alignments = ["Left", "Center", "Right"];
