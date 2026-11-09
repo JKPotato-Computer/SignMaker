@@ -24,6 +24,8 @@ const MUTCDVariants = (() => {
           Red: "#ff0000",
           "Fluorescent Pink": "#ff33cc",
           "Fluorescent Yellow-Green": "#99ff00",
+          Coral: "#cc0033",
+          "Light Blue": "#71b1dd",
         },
       },
       APLArrow: {
