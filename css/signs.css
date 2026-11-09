@@ -335,7 +335,7 @@
 }
 
 .guideArrows.exit_only.full_black_border {
-  border-top: 0.2rem solid black;
+  border-top: 0.2rem solid;
 }
 
 .guideArrows.exit_only.white_border {
