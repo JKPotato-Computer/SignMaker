@@ -1333,6 +1333,12 @@ const formHandler = (() => {
       ],
     );
     toggleVisibility(
+      document.querySelector("#sdCtrlText_smallCapitals"),
+      [
+        document.querySelector("#sdCtrlText_capitalSize"),
+      ],
+    );
+    toggleVisibility(
       document.querySelector("#sdActionMessage_useNumeralFormatting"),
       [
         document.querySelector("#sdActionMessage_numeralFormattingSize"),

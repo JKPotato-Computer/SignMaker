@@ -161,6 +161,7 @@ const MUTCDVariants = (() => {
       },
       ControlTextElement: {
         smallCapitals: false,
+        capitalSize: 200,
       },
       ActionMessageElement: {
         fontSize: 70,

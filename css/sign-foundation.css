@@ -2935,3 +2935,7 @@ main#smRender.wide #postContainer {
 .bE-groupElementsCover.squarepixels {
   background-image: repeating-conic-gradient(transparent 0% 25%, black 0% 50%);
 }
+
+.bE-capital {
+  font-size: var(--capitalSize);
+}

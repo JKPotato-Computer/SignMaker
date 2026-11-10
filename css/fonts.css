@@ -722,15 +722,15 @@
 }
 
 @font-face {
-  font-family: "Transport Heavby";
-  src: url("../fonts/Transport Heavby.ttf") format("truetype");
+  font-family: "Transport Heavy";
+  src: url("../fonts/Transport Heavy.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-* Overpass,
-in Series */ @font-face {
+/* Overpass in Series */
+@font-face {
   font-family: "Overpass 4";
   src: url("../fonts/Overpass/overpass-regular.eot");
   src:

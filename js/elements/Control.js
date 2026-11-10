@@ -220,11 +220,12 @@ TextElement.fontFamilies = [
   "Arial",
   "Arial Bold",
   "Transport",
+  "Transport Heavy",
   "Transport Medium",
   "Motorway Bold",
-  "Motorway Semibold",
+  "Motorway SemiBold",
   "Engschrift",
-  "Mittleschrift",
+  "Mittelschrift",
   "LLM Normal",
   "LLM Narrow",
   "Overpass 4",
@@ -238,18 +239,38 @@ TextElement.alignments = ["Left", "Center", "Right"];
 
 class ControlTextElement extends TextElement {
   constructor(options = {}) {
-    const { smallCapitals, wordSpacing } = MUTCDVariants.get(
+    const { smallCapitals, capitalSize, wordSpacing } = MUTCDVariants.get(
       "ControlTextElement",
       options,
     );
     super();
     this.smallCapitals = smallCapitals;
+    this.capitalSize = capitalSize;
     this.wordSpacing = wordSpacing;
   }
 
   createElement() {
     const newText = super.createElement();
-    newText.style.fontVariant = this.smallCapitals ? "small-caps" : "normal";
+    
+    if (this.smallCapitals) {
+      for (const beText of newText.querySelectorAll(".bE-text")) {
+        // split by spaces and find the first letter per segment
+        const textContent = beText.textContent;
+        const splitText = textContent.split(/\s/g);
+        const capitalSize =
+          1.75 * ((this.fontSize / 100) * (this.capitalSize / 100)) + "rem";
+        beText.innerHTML = splitText
+          .map((segment) => {
+            const firstLetter = segment.charAt(0);
+            return (
+              `<span class="bE-capital" style="--capitalSize: ${capitalSize}">${firstLetter}</span>` +
+              segment.slice(1)
+            );
+          })
+          .join(" ");
+      }
+    }
+
     newText.classList.add("bE-controlTextElement");
     return newText;
   }
