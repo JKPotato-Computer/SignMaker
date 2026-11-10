@@ -147,12 +147,6 @@ class Shield {
       this.customShields.route_yOffset + "%",
     );
 
-    if (this.customShields.route_color != "") {
-      routeNumberElmt.style.color =
-        ColorLibrary.colorLibrary[this.customShields.route_color] ||
-        this.customShields.route_color;
-    }
-
     if (this.customShields.route_letterSpacing != 0) {
       routeNumberElmt.style.letterSpacing =
         this.customShields.route_letterSpacing + "px";
@@ -177,12 +171,6 @@ class Shield {
         "--designationYOffset",
         this.customShields.designation_yOffset + "%",
       );
-
-      if (this.customShields.designation_color != "") {
-        designationElmt.style.color =
-          ColorLibrary.colorLibrary[this.customShields.designation_color] ||
-          this.customShields.designation_color;
-      }
 
       if (this.customShields.designation_letterSpacing != 0) {
         designationElmt.style.letterSpacing =
