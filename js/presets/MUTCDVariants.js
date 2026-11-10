@@ -161,7 +161,7 @@ const MUTCDVariants = (() => {
       },
       ControlTextElement: {
         smallCapitals: false,
-        capitalSize: 200,
+        capitalSize: 150,
       },
       ActionMessageElement: {
         fontSize: 70,
@@ -444,6 +444,8 @@ const MUTCDVariants = (() => {
         verticalMargin: 0,
         borderRadius: 4,
         fontFamily: "Series E",
+        letterSpacing: 0,
+        wordSpacing: 0,
         tagToReplace: ["fontFamily"],
       },
     },

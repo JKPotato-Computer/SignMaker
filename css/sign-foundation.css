@@ -533,6 +533,8 @@ main#smRender.wide #postContainer {
   background-color: var(--bgColor);
   padding: var(--verticalPadding) var(--horizontalPadding);
   margin: var(--verticalMargin) var(--horizontalMargin);
+  letter-spacing: var(--letterSpacing);
+  word-spacing: var(--wordSpacing);
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
 }

@@ -420,6 +420,8 @@ const formHandler = (() => {
             parseFloat(
               bannerElement.querySelector(".smSPBanner_verticalPadding").value,
             ) || 0;
+          banner.wordSpacing = parseInt(bannerElement.querySelector(".smSPBanner_wordSpacing").value);
+          banner.letterSpacing = parseInt(bannerElement.querySelector(".smSPBanner_letterSpacing").value);
         }
       }
     }
@@ -2370,11 +2372,17 @@ const formHandler = (() => {
           banner.verticalMargin;
         bannerElement.querySelector(".smSPBanner_borderRadius").value =
           banner.borderRadius;
+        bannerElement.querySelector(".smSPBanner_borderRadius").style.display = (banner.backgroundColor == "Inherit") ? "none" : "";
+        bannerElement.querySelector(".smSPBanner_borderRadiusLabel").style.display = (banner.backgroundColor == "Inherit") ? "none" : "";
         bannerElement.querySelector(".smSPBanner_horizontalPadding").value =
           banner.horizontalPadding;
         bannerElement.querySelector(".smSPBanner_verticalPadding").value =
           banner.verticalPadding;
         bannerElement.querySelector(".smSPBanner_position").value = alignment;
+        bannerElement.querySelector(".smSPBanner_letterSpacing").value =
+          banner.letterSpacing;
+        bannerElement.querySelector(".smSPBanner_wordSpacing").value =
+          banner.wordSpacing;
 
         bannerElement
           .querySelector(".smSP_deleteBanner")

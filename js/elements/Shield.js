@@ -328,6 +328,8 @@ class Banner {
       verticalMargin,
       borderRadius,
       fontFamily,
+      letterSpacing,
+      wordSpacing
     } = MUTCDVariants.get("Banner", options);
     this.textContent = textContent;
     this.firstLetterSize = firstLetterSize;
@@ -339,6 +341,8 @@ class Banner {
     this.fontFamily = fontFamily;
     this.horizontalMargin = horizontalMargin;
     this.verticalMargin = verticalMargin;
+    this.letterSpacing = letterSpacing;
+    this.wordSpacing = wordSpacing;
   }
 
   createElement() {
@@ -373,6 +377,14 @@ class Banner {
     bannerElmt.style.setProperty(
       "--verticalMargin",
       this.verticalMargin + "px",
+    );
+    bannerElmt.style.setProperty(
+      "--letterSpacing",
+      this.letterSpacing + "px",
+    );
+    bannerElmt.style.setProperty(
+      "--wordSpacing",
+      this.wordSpacing + "px",
     );
 
     if (

@@ -5527,12 +5527,32 @@
             </div>
             <div>
               <div>
-                <span>Roundness (px):</span>
+                <span class="smSPBanner_borderRadiusLabel">Roundness (px):</span>
                 <input
                   type="number"
                   class="smSPBanner_borderRadius"
-                  placeholder="120"
-                  value="120"
+                  placeholder="10"
+                  value="10"
+                  min="0"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <span>Letter Spacing (px):</span>
+                <input
+                  type="number"
+                  class="smSPBanner_letterSpacing"
+                  placeholder="0"
+                  value="0"
+                  min="0"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <span>Word Spacing (px):</span>
+                <input
+                  type="number"
+                  class="smSPBanner_wordSpacing"
+                  placeholder="0"
+                  value="0"
                   min="0"
                   step="1"
                   onchange="formHandler.readForm()"
