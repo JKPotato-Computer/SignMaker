@@ -2454,23 +2454,30 @@ const App = (() => {
   };
 
   const recheckWidth = () => {
-    let minTop = 0;
+    let minTop = Infinity;
     let maxBottom = 0;
     document.querySelector("#smRender").style.height = "";
+    const renderRect = document
+      .querySelector("#smRender")
+      .getBoundingClientRect();
+
     for (const panelGroupContainer of document.querySelectorAll(
       ".panelGroupContainer",
     )) {
       minTop = Math.min(
         minTop,
-        panelGroupContainer.getBoundingClientRect().top + window.scrollY,
+        panelGroupContainer.getBoundingClientRect().top - renderRect.top,
       );
       maxBottom = Math.max(
         maxBottom,
         panelGroupContainer.getBoundingClientRect().top +
-          panelGroupContainer.getBoundingClientRect().height +
-          window.scrollY,
+          panelGroupContainer.getBoundingClientRect().height -
+          renderRect.top,
       );
     }
+
+    if (minTop == Infinity) minTop = 0;
+
     document.querySelector("#smRender").style.height =
       Math.max(
         (maxBottom - minTop) * 1.5,
@@ -2571,6 +2578,10 @@ const App = (() => {
         historyVars.currentlySelectedStandardArrow;
     }
   };
+
+  window.addEventListener("resize", () => {
+    requestAnimationFrame(recheckWidth);
+  });
 
   return {
     init,

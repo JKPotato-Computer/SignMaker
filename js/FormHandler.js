@@ -514,7 +514,7 @@ const formHandler = (() => {
       app.vars.currentlySelectedRowIndex
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor",
-    ).value;
+    ).dataset.color;
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].backgroundFullWidth = document.querySelector(
@@ -2345,12 +2345,13 @@ const formHandler = (() => {
         const banner = currentShield.banners[alignment][i];
         const template = document.querySelector("#smSP_templateBannerElement");
         const clone = template.content.cloneNode(true);
-        const bannerElement = clone.querySelector(".smSP_bannerElement");
+        const bannerElement = clone.firstElementChild;
+        document.querySelector("#smSP_bannerMaster").appendChild(clone);
 
         bannerElement.querySelector(".smSPBanner_textContent").value =
           banner.textContent;
-        const bannerColor = bannerElement.querySelector(".smSPBanner_bgColor");
-        bannerColor.dataset.color = banner.backgroundColor;
+        bannerElement.querySelector(".smSPBanner_bgColor").dataset.color =
+          banner.backgroundColor;
         bannerElement.querySelector(".smSPBanner_fontFamily").value =
           banner.fontFamily;
         bannerElement.querySelector(".smSPBanner_firstLetterScale").value =
@@ -2377,7 +2378,6 @@ const formHandler = (() => {
             updateShieldSubform();
             app.redraw();
           });
-        document.querySelector("#smSP_bannerMaster").appendChild(clone);
       }
     }
 

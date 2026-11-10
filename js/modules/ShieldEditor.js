@@ -238,7 +238,7 @@ const ShieldEditor = (() => {
         shieldEditorModal.style.display = "none";
         holder.style.display = "none";
         cleanupListeners();
-        document.appendChild(
+        document.body.appendChild(
           shieldEditorModal.querySelector("#smColorDropdownHolder") || null,
         );
         if (returnFunction) returnFunction(value);
@@ -377,7 +377,7 @@ const ShieldEditor = (() => {
       shieldEditorModal.style.display = "flex";
       shieldEditorModal.showModal();
       shieldEditorModal.appendChild(
-        document.querySelector("#smColorDropdownHolder") || null,
+        document.body.querySelector("#smColorDropdownHolder") || null,
       );
 
       updateForm();

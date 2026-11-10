@@ -449,7 +449,7 @@
               onchange="ShieldEditor.readForm()"
             ></select>
             <label for="spShield_routeColor">Color:</label>
-            <button type="button" id="spShield_routeColor" class="smColorDropdownButton" data-color="White">White</button>
+            <button type="button" id="spShield_routeColor" class="smColorDropdownButton" data-color="Unset" data-empty-value="Unset">Unset</button>
             <br />
             <label for="spShield_routeSpacing">Letter Spacing (px):</label>
             <input
@@ -488,7 +488,7 @@
               onchange="ShieldEditor.readForm()"
             ></select>
             <label for="spShield_designationColor">Color:</label>
-            <button type="button" id="spShield_designationColor" class="smColorDropdownButton" data-color="White">White</button>
+            <button type="button" id="spShield_designationColor" class="smColorDropdownButton" data-color="Unset" data-empty-value="Unset">Unset</button>
             <br />
             <label for="spShield_designationSpacing"
               >Letter Spacing (px):</label
@@ -1729,7 +1729,7 @@
                 <label for="smET_iconBackground" class="checkboxLabel">
                   Icon BG:
                 </label>
-                <button type="button" id="smET_iconBackground" class="smColorDropdownButton" data-color="Transparent">Transparent</button>
+                <button type="button" id="smET_iconBackground" class="smColorDropdownButton" data-color="Transparent" data-empty-value="Transparent">Transparent</button>
                 <br />
                 <div
                   id="smET_iconBackgroundConfigurations"
@@ -2186,7 +2186,7 @@
                 <legend>Container</legend>
 
                 <label for="sMET_backgroundColor">Background Color:</label>
-                <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
 
                 <label for="sMET_minimumHeight">Minimum Height (rem):</label>
                 <input
@@ -3012,7 +3012,7 @@
                     />
                     <br />
                     <label for="sdCtrlText_backgroundColor">BG:</label>
-                    <button id="sdCtrlText_backgroundColor" class="smColorDropdownButton" data-color="Inherit" type="button">
+                    <button id="sdCtrlText_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit" type="button">
                         Inherit
                     </button>
                     <label for="sdCtrlText_fontFamily">Font:</label>
@@ -3201,7 +3201,7 @@
                     />
                     <br />
                     <label for="sdAdvisory_backgroundColor">BG:</label>
-                    <button type="button" id="sdAdvisory_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                    <button type="button" id="sdAdvisory_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <label for="sdAdvisory_fontFamily">Font:</label>
                     <select id="sdAdvisory_fontFamily"></select>
                     <br />
@@ -3412,7 +3412,7 @@
                     <br />
 
                     <label for="sdIcon_backgroundColor">BG Color: </label>
-                    <button type="button" id="sdIcon_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                    <button type="button" id="sdIcon_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <br />
 
                     <label for="sdIcon_border">Border: </label>
@@ -3684,7 +3684,7 @@
                       <label for="sdTollLogo_backgroundColor"
                         >Background Color:</label
                       >
-                      <button type="button" id="sdTollLogo_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                      <button type="button" id="sdTollLogo_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                       <br />
                       <label for="sdTollLogo_tollBorderRadius"
                         >BG Roundness (px):</label
@@ -3795,7 +3795,7 @@
                       <label for="sdTollLogo_containerBackgroundColor"
                         >Container BG Color:</label
                       >
-                      <button type="button" id="sdTollLogo_containerBackgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                      <button type="button" id="sdTollLogo_containerBackgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                       <label for="sdTollLogo_containerBorderWidth"
                         >Border Width (px):</label
                       >
@@ -3842,7 +3842,7 @@
                     />
                     <br />
                     <label for="sdActionMessage_backgroundColor">BG:</label>
-                    <button type="button" id="sdActionMessage_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                    <button type="button" id="sdActionMessage_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <label for="sdActionMessage_fontFamily">Font:</label>
                     <select id="sdActionMessage_fontFamily"></select>
                     <br />
@@ -4283,7 +4283,7 @@
                   </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
-                  <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                  <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                   <label for="sdBlock_backgroundFullWidth"
                     >BG Full Width:</label
                   >
@@ -5440,7 +5440,7 @@
               onchange="formHandler.readForm()"
               placeholder="BANNER"
             />
-            <button type="button" class="smColorDropdownButton smSPBanner_bgColor" data-color="Inherit">Inherit</button>
+            <button type="button" class="smColorDropdownButton smSPBanner_bgColor" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
             <select
               class="smSPBanner_fontFamily"
               onchange="formHandler.readForm()"
@@ -5554,7 +5554,7 @@
           <button
             type="button"
             class="smColorDropdownItem"
-            data-color="inherit"
+            data-color="inherit" data-empty-value="Inherit"
           >
             <span>Inherit</span>
           </button>

@@ -1463,7 +1463,7 @@ const FormNavigation = (() => {
       document.querySelector("#spShield_designationFontFamily"),
     ];
     for (const select of shieldFontSelect) {
-      lib.appendOption(select, "", {text: "Unset"});
+      lib.appendOption(select, "", { text: "Unset" });
       for (const fontFamily of TextElement.fontFamilies) {
         lib.appendOption(select, fontFamily);
       }
@@ -1855,26 +1855,6 @@ const FormNavigation = (() => {
       }
     });
 
-    for (const id of [
-      "#sMET_backgroundColor",
-      "#sdCtrlText_backgroundColor",
-      "#sdAdvisory_backgroundColor",
-      "#sdBlock_backgroundColor",
-      "#sdIcon_backgroundColor",
-      "#sdTollLogo_backgroundColor",
-      "#sdTollLogo_containerBackgroundColor",
-      "#sdActionMessage_backgroundColor",
-    ]) {
-      document.querySelector(id).dataset.emptyValue = "Inherit";
-    }
-
-    document.querySelector("#smET_iconBackground").dataset.emptyValue =
-      "Transparent";
-
-    for (const id of ["#spShield_routeColor", "#spShield_designationColor"]) {
-      document.querySelector(id).dataset.emptyValue = "Unset";
-    }
-
     colorDropdown.addEventListener("click", (event) => {
       const colorItem = event.target.closest(".smColorDropdownItem");
       if (
@@ -2010,6 +1990,11 @@ const FormNavigation = (() => {
         }
 
         let target = mutation.target;
+
+        if (!target.isConnected) {
+          continue;
+        }
+
         if (target.dataset.color === "") {
           target.style.backgroundColor = "";
           target.style.color = "";
