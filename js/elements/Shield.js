@@ -151,6 +151,17 @@ class Shield {
       routeNumberElmt.style.letterSpacing =
         this.customShields.route_letterSpacing + "px";
     }
+
+    if (
+      this.customShields.route_color != "" &&
+      this.customShields.route_color != "Unset"
+    ) {
+      console.log(this.customShields.route_color);
+      routeNumberElmt.style.color =
+        ColorLibrary.colorLibrary[this.customShields.route_color] ||
+        this.customShields.route_color;
+    }
+
     if (this.customShields.route_fontFamily != "") {
       routeNumberElmt.style.fontFamily =
         '"' + this.customShields.route_fontFamily + '"';
@@ -179,6 +190,15 @@ class Shield {
       if (this.customShields.designation_fontFamily != "") {
         designationElmt.style.fontFamily =
           '"' + this.customShields.designation_fontFamily + '"';
+      }
+
+      if (
+        this.customShields.designation_color != "" &&
+        this.customShields.route_color != "Unset"
+      ) {
+        designationElmt.style.color =
+          ColorLibrary.colorLibrary[this.customShields.designation_color] ||
+          this.customShields.designation_color;
       }
 
       designationElmt.textContent = this.designation;
