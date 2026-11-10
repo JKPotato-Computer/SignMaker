@@ -1371,8 +1371,8 @@ const App = (() => {
         segment.style.backgroundColor = ColorLibrary.checkForContrast(
           targetColor,
         )
-          ? "white"
-          : "black";
+          ? "black"
+          : "white";
       }
 
       divider.appendChild(segment);
@@ -1396,8 +1396,8 @@ const App = (() => {
       firstSegment.style.backgroundColor = ColorLibrary.checkForContrast(
         firstColor,
       )
-        ? "white"
-        : "black";
+        ? "black"
+        : "white";
       divider.appendChild(firstSegment);
     }
 
@@ -1569,6 +1569,135 @@ const App = (() => {
     }
   };
 
+  const recolorBorder = (signHolder, subpanelList) => {
+    class Point {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+      }
+
+      static dist(p1, p2) {
+        return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+      }
+    }
+
+    const originalPointerEvents = signHolder.style.pointerEvents;
+    signHolder.style.pointerEvents = "none";
+    signHolder.style.borderColor = "transparent";
+
+    const signHolderRect = signHolder.getBoundingClientRect();
+
+    const centerX = signHolderRect.left + signHolderRect.width / 2;
+    const centerY = signHolderRect.top + signHolderRect.height / 2;
+
+    const topCenterPoint = new Point(centerX, signHolderRect.top);
+    const topRightPoint = new Point(signHolderRect.right, signHolderRect.top);
+    const rightCenterPoint = new Point(signHolderRect.right, centerY);
+    const bottomRightPoint = new Point(
+      signHolderRect.right,
+      signHolderRect.bottom,
+    );
+    const bottomCenterPoint = new Point(centerX, signHolderRect.bottom);
+    const bottomLeftPoint = new Point(
+      signHolderRect.left,
+      signHolderRect.bottom,
+    );
+    const leftCenterPoint = new Point(signHolderRect.left, centerY);
+    const topLeftPoint = new Point(signHolderRect.left, signHolderRect.top);
+
+    const angleToPosition = (angle) => {
+      const angleRatio = (angle % 90) / 90;
+
+      let point1Reference, point1Point5Reference, point2Reference;
+      if (angle >= 0 && angle < 90) {
+        point1Reference = topCenterPoint;
+        point1Point5Reference = topRightPoint;
+        point2Reference = rightCenterPoint;
+      } else if (angle >= 90 && angle < 180) {
+        point1Reference = rightCenterPoint;
+        point1Point5Reference = bottomRightPoint;
+        point2Reference = bottomCenterPoint;
+      } else if (angle >= 180 && angle < 270) {
+        point1Reference = bottomCenterPoint;
+        point1Point5Reference = bottomLeftPoint;
+        point2Reference = leftCenterPoint;
+      } else if (angle >= 270 && angle < 360) {
+        point1Reference = leftCenterPoint;
+        point1Point5Reference = topLeftPoint;
+        point2Reference = topCenterPoint;
+      }
+
+      const totalDistance =
+        Point.dist(point1Reference, point1Point5Reference) +
+        Point.dist(point1Point5Reference, point2Reference);
+      const p1to1Point5Ratio =
+        Point.dist(point1Reference, point1Point5Reference) / totalDistance;
+
+      let x, y;
+      if (angleRatio < p1to1Point5Ratio) {
+        const ratio = angleRatio / p1to1Point5Ratio;
+        x =
+          point1Reference.x +
+          (point1Point5Reference.x - point1Reference.x) * ratio;
+        y =
+          point1Reference.y +
+          (point1Point5Reference.y - point1Reference.y) * ratio;
+      } else {
+        const ratio = (angleRatio - p1to1Point5Ratio) / (1 - p1to1Point5Ratio);
+        x =
+          point1Point5Reference.x +
+          (point2Reference.x - point1Point5Reference.x) * ratio;
+        y =
+          point1Point5Reference.y +
+          (point2Reference.y - point1Point5Reference.y) * ratio;
+      }
+
+      // Push OUTWARD past the bounding box edge by a few pixels (e.g., 6px)
+      // so it samples what's surrounding the yellow box.
+      const outset = 6;
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+      if (distFromCenter > 0) {
+        x += (dx / distFromCenter) * outset;
+        y += (dy / distFromCenter) * outset;
+      }
+
+      return new Point(x, y);
+    };
+
+    let conicGradientPoints = [];
+
+    for (let angle = 0; angle < 360; angle += 2) {
+      let positionPoint = angleToPosition(angle);
+      let overlappingBlocks = document
+        .elementsFromPoint(positionPoint.x, positionPoint.y)
+        .filter((el) => !signHolder.contains(el) && el !== signHolder); // ensure we skip the signHolder itself
+
+      if (overlappingBlocks.length > 0) {
+        const block = overlappingBlocks[0];
+        const blockColor = window
+          .getComputedStyle(block)
+          .getPropertyValue("background-color");
+
+        if (
+          blockColor &&
+          blockColor !== "rgba(0, 0, 0, 0)" &&
+          ColorLibrary.checkForContrast(blockColor)
+        ) {
+          conicGradientPoints.push(`${blockColor} ${angle}deg`);
+        }
+      }
+    }
+
+    signHolder.style.pointerEvents = originalPointerEvents;
+
+    if (conicGradientPoints.length > 0) {
+      signHolder.style.borderImage = `conic-gradient(${conicGradientPoints.join(", ")}) 1`;
+    }
+  };
+
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
     panelElmt.className = `panel ${panel.corner.toLowerCase()}`;
@@ -1705,6 +1834,9 @@ const App = (() => {
       bottomLeftSignCorner,
       bottomRightSignCorner,
     ]);
+    requestAnimationFrame(() => {
+      //recolorBorder(signHolderElmt, subpanelList);
+    });
 
     signHolderElmt.appendChild(sideRightArrowElmt);
 
@@ -1891,7 +2023,7 @@ const App = (() => {
           if (!autoJustify) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
           }
-            if (ColorLibrary.checkForContrast(panel.color)) {
+          if (ColorLibrary.checkForContrast(panel.color)) {
             arrowElmt.style.filter = "invert(1)";
           }
 
@@ -1992,7 +2124,7 @@ const App = (() => {
         }
         case "Side Right": {
           sideRightArrowElmt.style.display = "block";
-            if (ColorLibrary.checkForContrast(panel.color)) {
+          if (ColorLibrary.checkForContrast(panel.color)) {
             sideRightArrowElmt.style.filter = "invert(1)";
           }
           break;
@@ -2036,7 +2168,7 @@ const App = (() => {
             ? "visible"
             : "hidden";
           if (ColorLibrary.checkForContrast(panel.color)) {
-           secondArrow.style.filter = "invert(1)";
+            secondArrow.style.filter = "invert(1)";
           }
           arrowContElmt.appendChild(secondArrow);
         }

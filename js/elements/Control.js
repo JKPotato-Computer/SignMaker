@@ -866,7 +866,7 @@ class ArrowElement {
     this.marginVertical = marginVertical;
   }
 
-  createElement() {
+  createElement(panel, _, blockProperties) {
     const container = document.createElement("div");
     container.className = "bE-arrowElement";
     container.style.setProperty(
@@ -879,6 +879,17 @@ class ArrowElement {
     );
 
     const arrow = this.standardArrow.createElement();
+    if (ColorLibrary.checkForContrast(blockProperties.backgroundColor)) {
+      arrow.style.filter = "invert(1)";
+    }
+
+    if (
+      ColorLibrary.checkForContrast(panel.color) &&
+      ColorLibrary.checkForContrast(blockProperties.backgroundColor)
+    ) {
+      arrow.style.filter = "invert(1)";
+    }
+
     container.appendChild(arrow);
 
     return container;
@@ -1417,7 +1428,9 @@ class Control {
           default:
         }
 
-        lastKnownAlignment.appendChild(elem.createElement(panel, subPanel));
+        lastKnownAlignment.appendChild(
+          elem.createElement(panel, subPanel, properties),
+        );
       }
 
       leftAlignment.style.flexGrow =

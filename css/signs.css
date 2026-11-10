@@ -394,6 +394,7 @@
 .subDivider {
   width: 0.2rem;
   display: flex;
+  min-width: 4px;
   flex-direction: column;
 }
 
