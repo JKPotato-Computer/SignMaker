@@ -156,7 +156,6 @@ class Shield {
       this.customShields.route_color != "" &&
       this.customShields.route_color != "Unset"
     ) {
-      console.log(this.customShields.route_color);
       routeNumberElmt.style.color =
         ColorLibrary.colorLibrary[this.customShields.route_color] ||
         this.customShields.route_color;

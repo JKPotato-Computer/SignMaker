@@ -1208,7 +1208,7 @@ const formHandler = (() => {
           element.dataset.color = color;
         } else if (element.tagName === "SELECT") {
           element.value = currentBlockElem[propertyName];
-          element.addEventListener("blur", readForm);
+          element.addEventListener("change", readForm);
         } else {
           element.value = currentBlockElem[propertyName];
           element.addEventListener(

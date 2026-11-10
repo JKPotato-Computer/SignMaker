@@ -1995,7 +1995,10 @@ const FormNavigation = (() => {
           continue;
         }
 
-        if (target.dataset.color === "") {
+        if (
+          target.dataset.color === "" ||
+          target.dataset.color == target.dataset.emptyValue
+        ) {
           target.style.backgroundColor = "";
           target.style.color = "";
           target.textContent = target.dataset.emptyValue || "";
