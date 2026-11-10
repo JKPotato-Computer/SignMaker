@@ -119,7 +119,7 @@ class Post {
 
 Post.polePositions = ["Left", "Right", "Overhead"];
 
-Post.colors = ["Silver", "Black", "Brown", "Red"];
+Post.colors = ["Silver", "Black", "Brown", "Red", "Blue"];
 
 Post.postVariants = ["Standard", "Curved", "Curved 2", "Rural", "Center"];
 
