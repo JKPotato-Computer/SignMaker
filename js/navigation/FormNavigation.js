@@ -1749,9 +1749,17 @@ const FormNavigation = (() => {
               !Array.isArray(obj[key])
             ) {
               const recursiveHelper = (o, mutcdRecursive) => {
+                if (Array.isArray(o)) {
+                  for (const item of o) {
+                    recursiveHelper(item, mutcdRecursive);
+                  }
+                }
+
                 const valKeys = Object.keys(o).filter(
                   (k) => k !== "constructor" && k !== "prototype",
                 );
+
+                console.log("-", o, "-");
 
                 for (const k of valKeys) {
                   if (tagsToReplace.includes(k)) {
@@ -1772,8 +1780,6 @@ const FormNavigation = (() => {
                       }
                     }
 
-                    console.log(k, currentValue, newValue, mutcdRecursive);
-
                     if (newValue !== undefined && newValue !== currentValue) {
                       o[k] = newValue;
                     }
@@ -1783,6 +1789,20 @@ const FormNavigation = (() => {
                     !Array.isArray(o[k])
                   ) {
                     recursiveHelper(o[k], [...mutcdRecursive, k]);
+                  } else if (Array.isArray(o[k])) {
+                    for (const item of o[k]) {
+                      if (
+                        typeof item === "object" &&
+                        !lib.isClass(item.constructor) &&
+                        !Array.isArray(item)
+                      ) {
+                        recursiveHelper(item, [...mutcdRecursive, k]);
+                      } else if (window[item?.constructor?.name]) {
+                        replaceRecursive(item);
+                      }
+                    }
+                  } else if (window[o[k]?.constructor?.name]) {
+                    replaceRecursive(obj[k]);
                   }
                 }
               };

@@ -1,4 +1,4 @@
- const MUTCDVariants = (() => {
+const MUTCDVariants = (() => {
   const variants = {
     // tagToReplace: if promopted to update elements to a new configuration, ONLY change those variables.
     // note: pls do not change MUTCD - the code sees these variables as the source of truth so don't like delete anything or else idk the entire program explodes
@@ -298,8 +298,8 @@
         borderRadius: 0.5,
         roundBottomBorder: true,
         useFullBorder: true,
-        horizontalPadding: 1.2,
-        verticalPadding: 0.6,
+        horizontalPadding: 2,
+        verticalPadding: 0.5,
         minimumHeight: 2.25,
         holderPadding: 0,
         fontSize: 20,
@@ -307,7 +307,7 @@
         enlargeNumerals: true,
         enlargeNumeralsSize: 150,
         spaceLettersNumerals: true,
-        numeralWordSpacing: 0.25,
+        numeralWordSpacing: 0.75,
         offsetNonNumerals: false,
         fontFamily: "Series E",
         numeralFontFamily: "Inherit",
@@ -474,6 +474,7 @@
         fontFamily: "Clearview 4W",
         useTrimFormat: false,
         useFullBorder: true,
+        numeralWordSpacing: 0.25,
         horizontalPadding: 0.5,
         verticalPadding: 0.5,
         borderStyle: "round",
@@ -484,6 +485,7 @@
           "useFullBorder",
           "horizontalPadding",
           "verticalPadding",
+          "numeralWordSpacing",
         ],
       },
     },
