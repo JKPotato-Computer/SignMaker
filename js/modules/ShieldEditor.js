@@ -104,7 +104,7 @@ const ShieldEditor = (() => {
     if (baseShield.shieldBacks) {
       document
         .querySelector(".selectedShieldPreview")
-        .style.setProperty("--shieldBackColor", baseShield.shieldBackColor);
+        .style.setProperty("--shieldBackColor", ColorLibrary.colorLibrary[baseShield.shieldBackColor]);
       document
         .querySelector(".selectedShieldPreview")
         .style.setProperty(
