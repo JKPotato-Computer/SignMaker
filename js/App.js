@@ -1891,6 +1891,9 @@ const App = (() => {
           if (!autoJustify) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
           }
+            if (ColorLibrary.checkForContrast(panel.color)) {
+            arrowElmt.style.filter = "invert(1)";
+          }
 
           aplHolder.appendChild(arrowElmt);
 
@@ -1982,10 +1985,16 @@ const App = (() => {
       switch (standardVariant) {
         case "Side Left": {
           sideLeftArrowElmt.style.display = "block";
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            sideLeftArrowElmt.style.filter = "invert(1)";
+          }
           break;
         }
         case "Side Right": {
           sideRightArrowElmt.style.display = "block";
+            if (ColorLibrary.checkForContrast(panel.color)) {
+            sideRightArrowElmt.style.filter = "invert(1)";
+          }
           break;
         }
         case "Custom": {
@@ -2000,6 +2009,9 @@ const App = (() => {
               ? "space-between"
               : standardArrowConfig.customConfig.justify.toLowerCase(),
           );
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            arrowContElmt.style.filter = "invert(1)";
+          }
           guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
 
           for (const arrow of standardArrowConfig.arrowList) {
@@ -2023,6 +2035,9 @@ const App = (() => {
             .displayOutsideArrow
             ? "visible"
             : "hidden";
+          if (ColorLibrary.checkForContrast(panel.color)) {
+           secondArrow.style.filter = "invert(1)";
+          }
           arrowContElmt.appendChild(secondArrow);
         }
         case "Split Exit Only":
