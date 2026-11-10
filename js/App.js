@@ -1652,8 +1652,6 @@ const App = (() => {
           (point2Reference.y - point1Point5Reference.y) * ratio;
       }
 
-      // Push OUTWARD past the bounding box edge by a few pixels (e.g., 6px)
-      // so it samples what's surrounding the yellow box.
       const outset = 6;
       const dx = x - centerX;
       const dy = y - centerY;
@@ -1673,7 +1671,7 @@ const App = (() => {
       let positionPoint = angleToPosition(angle);
       let overlappingBlocks = document
         .elementsFromPoint(positionPoint.x, positionPoint.y)
-        .filter((el) => !signHolder.contains(el) && el !== signHolder); // ensure we skip the signHolder itself
+        .filter((el) => !signHolder.contains(el) && el !== signHolder); 
 
       if (overlappingBlocks.length > 0) {
         const block = overlappingBlocks[0];
