@@ -433,59 +433,62 @@
 }
 
 /* FHWA Series */
-
 @font-face {
   font-family: "Series B";
-  src: url("../fonts/FHWASeries/FHWASeriesB.otf") format("opentype");
+  src:
+    url("../fonts/FHWASeries/HighwayGothicFamilyB.woff2") format("woff2"),
+    url("../fonts/FHWASeries/HighwayGothicFamilyB.woff") format("woff");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Series C";
-  src: url("../fonts/FHWASeries/FHWASeriesC.otf") format("opentype");
+  src:
+    url("../fonts/FHWASeries/HighwayGothicFamilyC.woff2") format("woff2"),
+    url("../fonts/FHWASeries/HighwayGothicFamilyC.woff") format("woff");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Series D";
-  src: url("../fonts/FHWASeries/FHWASriesD.otf") format("opentype");
+  src:
+    url("../fonts/FHWASeries/HighwayGothicFamilyD.woff2") format("woff2"),
+    url("../fonts/FHWASeries/HighwayGothicFamilyD.woff") format("woff");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Series E";
-  src: url("../fonts/FHWASeries/FHWASeriesE.otf") format("opentype");
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Series D";
-  src: url("../fonts/FHWASeries/FHWASeriesD.otf") format("opentype");
+  src:
+    url("../fonts/FHWASeries/HighwayGothicFamilyE.woff2") format("woff2"),
+    url("../fonts/FHWASeries/HighwayGothicFamilyE.woff") format("woff");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Series EM";
-  src: url("../fonts/FHWASeries/FHWASeriesEMod.otf") format("opentype");
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Series D";
-  src: url("../fonts/FHWASeries/FHWASeriesD.otf") format("opentype");
+  src:
+    url("../fonts/FHWASeries/HighwayGothicFamilyEMod.woff2") format("woff2"),
+    url("../fonts/FHWASeries/HighwayGothicFamilyEMod.woff") format("woff");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Series F";
-  src: url("../fonts/FHWASeries/FHWASeriesF.otf") format("opentype");
+  src:
+    url("../fonts/FHWASeries/HighwayGothicFamilyF.woff2") format("woff2"),
+    url("../fonts/FHWASeries/HighwayGothicFamilyF.woff") format("woff");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
