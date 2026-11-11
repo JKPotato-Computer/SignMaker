@@ -1209,12 +1209,9 @@ main#smRender.wide #postContainer {
 
 .sMGA_APLHolder.auto {
   justify-content: space-between;
-  gap: unset;
 }
 
-.sMGA_APLHolder.auto.right {
-  flex-direction: row-reverse;
-}
+.sMGA_APLHolder.auto.right {justify-content: right;}
 
 .sMGA_APLHolder.center {
   justify-content: center;
@@ -2730,8 +2727,7 @@ main#smRender.wide #postContainer {
 }
 
 .sMGA_APLHolder.auto {
-  justify-content: space-between;
-  gap: unset;
+  justify-content: left;
 }
 
 .sMGA_APLHolder.auto.right {

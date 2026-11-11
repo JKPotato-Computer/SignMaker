@@ -1671,7 +1671,7 @@ const App = (() => {
       let positionPoint = angleToPosition(angle);
       let overlappingBlocks = document
         .elementsFromPoint(positionPoint.x, positionPoint.y)
-        .filter((el) => !signHolder.contains(el) && el !== signHolder); 
+        .filter((el) => !signHolder.contains(el) && el !== signHolder);
 
       if (overlappingBlocks.length > 0) {
         const block = overlappingBlocks[0];
@@ -2035,6 +2035,12 @@ const App = (() => {
           }
         }
 
+        if (subpanel && autoJustify) {
+          let subpanelWidth =
+            subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel;
+          aplHolder.style.gap = `${subpanelWidth / 4}px`;
+        }
+
         if (!autoJustify && subpanel) {
           aplHolder.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0 ? 1 : 0))}px`;
         } else if (autoJustify && subpanel) {
@@ -2046,7 +2052,7 @@ const App = (() => {
           } else if (aplArrows.length > 0) {
             aplHolder.style.width = panel.sign.lanePanelSize + "px";
           } else {
-            aplHolder.style.width = `${panel.sign.lanePanelSize / 2}px`;
+            //aplHolder.style.width = `${panel.sign.lanePanelSize / 2}px`;
           }
         }
         guideArrowsElmt.appendChild(aplHolder);
