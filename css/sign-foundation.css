@@ -1217,10 +1217,6 @@ main#smRender.wide #postContainer {
   justify-content: center;
 }
 
-.sMGA_APLHolder.right:not(.auto) {
-  justify-content: right;
-}
-
 .sMGA_APLArrow {
   height: var(--arrowSize);
   aspect-ratio: 1 / 1;

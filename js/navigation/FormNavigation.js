@@ -908,16 +908,6 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const justify of APLArrow.prototype.justifyAPLs) {
-      lib.appendOption(
-        document
-          .querySelector("#smAPL_templateAPLContainer")
-          .content.querySelector(".smAPLCat_justifyAPLs"),
-        justify.toLowerCase(),
-        { text: justify },
-      );
-    }
-
     for (const justify of Sign.prototype.standardArrowJustify) {
       lib.appendOption(
         document.querySelector("#standardArrows_justify"),

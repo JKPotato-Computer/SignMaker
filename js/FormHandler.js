@@ -98,7 +98,11 @@ const formHandler = (() => {
     // Panel
     currentPanel.color = form["panelColor"].dataset.color;
     currentPanel.corner = form["panelCorner"].value;
-    currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
+    if (readProperties && readProperties["aplLanePanelSizeChange"]) {
+      currentPanel.sign.lanePanelSize = form["smAPL_LaneSize"].value;
+    } else {
+      currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
+    }
 
     currentPanel.borderRadius = Math.max(0, form["panelBorderRadius"].value);
 
@@ -652,6 +656,7 @@ const formHandler = (() => {
       apl.verticalBottomPadding = parseFloat(
         form["smAPL_VertBottomPadding"].value,
       );
+      apl.gap = parseFloat(form["smAPL_Gap"].value);
 
       let containerIndex = 0;
       for (let i = 0; i <= currentPanel.sign.subPanels.length - 1; i += 0.5) {
@@ -674,20 +679,6 @@ const formHandler = (() => {
 
         if (!aplContainer || !aplList) {
           continue;
-        }
-
-        if (i % 1 == 0 && apl.subpanelConfigs[i]) {
-          apl.subpanelConfigs[i].justify = aplContainer.querySelector(
-            ".smAPLCat_justifyAPLs",
-          ).value;
-        } else if (
-          i % 1 != 0 &&
-          apl.subpanelConfigs[i] &&
-          currentPanel.sign.lanePanelSize == 0
-        ) {
-          apl.subpanelConfigs[i].minWidth = parseFloat(
-            aplContainer.querySelector(".smAPLCat_minWidth").value,
-          );
         }
 
         aplList.forEach((arrow, arrowIndex) => {
@@ -2736,6 +2727,12 @@ const formHandler = (() => {
         arrows.verticalTopPadding;
       document.querySelector("#smAPL_VertBottomPadding").value =
         arrows.verticalBottomPadding;
+      document.querySelector("#smAPL_Gap").value = arrows.gap;
+      document.querySelector("#smAPL_Gap").style.display = (sign.lanePanelSize > 0) ? "none" : "";
+      document.querySelector(`label[for="smAPL_Gap"]`).style.display = (sign.lanePanelSize > 0) ? "none" : "";
+
+      document.querySelector("#smAPL_LaneSize").value =
+        sign.lanePanelSize;
       document.querySelector("#sMAPL_APLCat").innerHTML = "";
 
       const subpanels = app.getCurrentPanel().sign.subPanels;
@@ -2752,33 +2749,12 @@ const formHandler = (() => {
           i % 1 == 0 ? "Subpanel " + (i + 1) : "Divider";
 
         if (i % 1 != 0) {
-          aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
-
           aplContHolder.querySelector(".smAPLCat_numLanesLabel").remove();
           aplContHolder.querySelector(".smAPLCat_numLanes").remove();
-
-          if (sign.lanePanelSize != 0) {
-            aplContHolder.querySelector(".smAPLCat_minWidthLabel").remove();
-            aplContHolder.querySelector(".smAPLCat_minWidth").remove();
-          } else {
-            aplContHolder.querySelector(".smAPLCat_minWidth").value =
-              arrows.subpanelConfigs[i]?.minWidth;
-            aplContHolder.querySelector(".smAPLCat_minWidth").disabled =
-              !arrows.subpanelConfigs[i];
-          }
+        } else if (sign.lanePanelSize <= 0) {
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").remove();
+          aplContHolder.querySelector(".smAPLCat_numLanes").remove();
         } else {
-          aplContHolder.querySelector(".smAPLCat_minWidthLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_minWidth").remove();
-
-          if (!arrows.subpanelConfigs[i]) {
-            aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
-            aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
-          } else {
-            aplContHolder.querySelector(".smAPLCat_justifyAPLs").value =
-              arrows.subpanelConfigs[i].justify;
-          }
-
           aplContHolder.querySelector(".smAPLCat_numLanes").value =
             subpanels[i].laneWidth;
         }

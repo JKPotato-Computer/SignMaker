@@ -25,6 +25,9 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+
     <script type="module">
       // compatability w/ npx vite
       import terminal from "virtual:terminal";
@@ -4997,6 +5000,25 @@
                 value="0.5"
               />
               <br />
+              <label for="smAPL_Gap">Arrow Gap (rem):</label>
+              <input
+                type="number"
+                id="smAPL_Gap"
+                onchange="formHandler.readForm()"
+                min="0"
+                step=".01"
+                value="0"
+              />
+              <label for="smAPL_LaneSize">Lane Size (px):</label>
+              <input
+                type="number"
+                id="smAPL_LaneSize"
+                onchange="formHandler.readForm({ aplLanePanelSizeChange: true })"
+                min="0"
+                step="1"
+                value="0"
+              />
+              <br />
               <div id="sMAPL_APLCat"></div>
             </div>
             <div id="sMDiagrammic" class="tabHidden">
@@ -5402,20 +5424,6 @@
         <span class="smAPLCat_title">Subpanel 1</span>
         <div class="smAPLCat_options">
           <button type="button" class="smAPLCat_addArrow">Add Arrow</button>
-          <span class="smAPLCat_justifyLabel">Justify:</span>
-          <select
-            class="smAPLCat_justifyAPLs"
-            onchange="formHandler.readForm()"
-          ></select>
-          <span class="smAPLCat_minWidthLabel">Width (rem):</span>
-          <input
-            type="number"
-            class="smAPLCat_minWidth"
-            min="0"
-            step=".01"
-            value="0"
-            onchange="formHandler.readForm()"
-          />
           <span class="smAPLCat_numLanesLabel">Num Lanes:</span>
           <input
             type="number"

@@ -1977,8 +1977,6 @@ const App = (() => {
     }
 
     if (arrows.arrowMode == "apl") {
-      let autoJustify = panel.sign.lanePanelSize == 0;
-
       guideArrowsElmt.style.setProperty(
         "--horizontalPadding",
         arrowVariant.horizontalPadding + "rem",
@@ -1991,34 +1989,24 @@ const App = (() => {
         "--verticalBottomPadding",
         arrowVariant.verticalBottomPadding + "rem",
       );
-
-      let dividerElements = [];
-      let arrowElements = [];
+      guideArrowsElmt.style.setProperty(
+        "--arrowGap",
+        (panel.sign.lanePanelSize > 0 ? 0 : arrowVariant.gap || 0) + "rem",
+      );
 
       for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
-        let aplArrows = arrowVariant.subpanels[i] || [];
-        let subpanel = i % 1 == 0 && subpanelList[i];
+        const aplArrows = arrowVariant.subpanels[i] || [];
+        const subpanel = i % 1 == 0 && subpanelList[i];
         const aplHolder = document.createElement("div");
         if (i % 1 == 0) {
-          aplHolder.className =
-            "sMGA_APLHolder " +
-            ((arrowVariant.subpanelConfigs[i] &&
-              arrowVariant.subpanelConfigs[i].justify) ||
-              "left") +
-            " " +
-            (autoJustify && i % 1 == 0 ? "auto" : "");
+          aplHolder.className = "sMGA_APLHolder left";
         } else {
-          aplHolder.className =
-            "sMGA_APLHolder center " +
-            (autoJustify && i % 1 == 0 ? "auto" : "");
-          aplHolder.style.width = "0";
+          aplHolder.className = "sMGA_APLHolder center";
         }
 
-        let pair = [];
-        let ind = 0;
         for (const arrow of aplArrows) {
           const arrowElmt = arrow.createElement();
-          if (!autoJustify) {
+          if (panel.sign.lanePanelSize > 0) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
           }
           if (ColorLibrary.checkForContrast(panel.color)) {
@@ -2026,13 +2014,6 @@ const App = (() => {
           }
 
           aplHolder.appendChild(arrowElmt);
-
-          pair[ind++] = arrowElmt;
-          if (ind == 2) {
-            arrowElements.push(pair);
-            pair = [];
-            ind = 0;
-          }
         }
 
         if (subpanel && autoJustify) {
@@ -2043,25 +2024,36 @@ const App = (() => {
 
         if (!autoJustify && subpanel) {
           aplHolder.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0 ? 1 : 0))}px`;
-        } else if (autoJustify && subpanel) {
+        } else if (subpanel) {
           aplHolder.style.width = `max-content`;
           aplHolder.style.minWidth = `${subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         } else if (!subpanel) {
-          if (autoJustify && aplArrows.length > 0) {
-            dividerElements.push(aplHolder);
-          } else if (aplArrows.length > 0) {
+          if (panel.sign.lanePanelSize > 0) {
             aplHolder.style.width = panel.sign.lanePanelSize + "px";
           } else {
             //aplHolder.style.width = `${panel.sign.lanePanelSize / 2}px`;
           }
         }
         guideArrowsElmt.appendChild(aplHolder);
-      }
 
-      for (let i = 0; i < dividerElements.length; i++) {
-        const holder = dividerElements[i];
-        const divider = dividerList[i];
-        holder.style.marginLeft = `${(divider.getBoundingClientRect().left - holder.getBoundingClientRect().left) / formHandler.vars.zoomLevel}px`;
+        if (!subpanel && arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length > 0) {
+          // if the next apl has arrows, set marginRight to current arrow width (if present) + gap
+          if (
+            arrowVariant.subpanels[i + 0.5] &&
+            arrowVariant.subpanels[i + 0.5].length > 0
+          ) {
+            const arrowWidth = aplHolder.querySelector(".sMGA_APLArrowHolder").getBoundingClientRect().width / formHandler.vars.zoomLevel;
+            aplHolder.style.marginRight = `calc(${arrowWidth / 2}px + ${arrowVariant.gap}rem)`;
+          }
+        }
+
+        if (subpanel) {
+          console.log(aplHolder.getBoundingClientRect().width, subpanel.getBoundingClientRect().width);
+        }
+        if (subpanel && aplHolder.getBoundingClientRect().width > subpanel.getBoundingClientRect().width) {
+          subpanel.style.width = aplHolder.getBoundingClientRect().width + "px";
+          subpanel.style.flex = "0 0 " + aplHolder.getBoundingClientRect().width + "px";
+        }
       }
     }
 
