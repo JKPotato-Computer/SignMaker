@@ -1283,11 +1283,29 @@ const App = (() => {
           panel.sign.arrows.arrowMode == "apl" &&
           panel.sign.lanePanelSize > 0 &&
           panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0 &&
-          !hasShifted
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0
         ) {
-          hasShifted = true;
           subDivider.style.marginLeft = `${panel.sign.lanePanelSize / 2 - 2}px`;
+
+          const subPanelRect = signContentContainerElmt.getBoundingClientRect();
+          const subDividerRect = subDivider.getBoundingClientRect();
+
+          const midpointViewport =
+            (subPanelRect.left + subDividerRect.left) / 2;
+          const panelCenterViewport =
+            subPanelRect.left + subPanelRect.width / 2;
+
+          const offsetViewport = midpointViewport - panelCenterViewport;
+          const leftOffset = offsetViewport / formHandler.vars.zoomLevel;
+
+          signContentContainerElmt.style.left = `${leftOffset}px`;
+        } else if (
+          panel.sign.arrows.arrowMode == "apl" &&
+          panel.sign.lanePanelSize == 0 &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0
+        ) {
+          subDivider.style.marginLeft = `${panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5][0].size / 2 + panel.sign.arrows.apl.gap / 2 + 0.5}rem`;
 
           const subPanelRect = signContentContainerElmt.getBoundingClientRect();
           const subDividerRect = subDivider.getBoundingClientRect();
@@ -1978,10 +1996,6 @@ const App = (() => {
 
     if (arrows.arrowMode == "apl") {
       guideArrowsElmt.style.setProperty(
-        "--horizontalPadding",
-        arrowVariant.horizontalPadding + "rem",
-      );
-      guideArrowsElmt.style.setProperty(
         "--verticalTopPadding",
         arrowVariant.verticalTopPadding + "rem",
       );
@@ -1993,6 +2007,11 @@ const App = (() => {
         "--arrowGap",
         (panel.sign.lanePanelSize > 0 ? 0 : arrowVariant.gap || 0) + "rem",
       );
+
+      if (panel.sign.lanePanelSize == 0) {
+        guideArrowsElmt.style.paddingLeft = ".5rem";
+        guideArrowsElmt.style.paddingRight = ".5rem";
+      }
 
       for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
         const aplArrows = arrowVariant.subpanels[i] || [];
@@ -2008,6 +2027,9 @@ const App = (() => {
           const arrowElmt = arrow.createElement();
           if (panel.sign.lanePanelSize > 0) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
+          } else if (panel.sign.lanePanelSize == 0 && i % 1 != 0) {
+            aplHolder.style.width = arrow.size + "rem";
+            aplHolder.style.margin = `0 ${arrowVariant.gap / 2}rem`;
           }
           if (ColorLibrary.checkForContrast(panel.color)) {
             arrowElmt.style.filter = "invert(1)";
@@ -2016,43 +2038,66 @@ const App = (() => {
           aplHolder.appendChild(arrowElmt);
         }
 
-        if (subpanel && autoJustify) {
-          let subpanelWidth =
-            subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel;
-          aplHolder.style.gap = `${subpanelWidth / 4}px`;
-        }
-
-        if (!autoJustify && subpanel) {
+        if (panel.sign.lanePanelSize > 0 && subpanel) {
           aplHolder.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0 ? 1 : 0))}px`;
         } else if (subpanel) {
           aplHolder.style.width = `max-content`;
           aplHolder.style.minWidth = `${subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         } else if (!subpanel) {
-          if (panel.sign.lanePanelSize > 0) {
+          if (
+            panel.sign.lanePanelSize > 0 &&
+            arrowVariant.subpanels[i] &&
+            arrowVariant.subpanels[i].length > 0
+          ) {
             aplHolder.style.width = panel.sign.lanePanelSize + "px";
-          } else {
-            //aplHolder.style.width = `${panel.sign.lanePanelSize / 2}px`;
+          } else if (
+            (panel.sign.lanePanelSize == 0 && !arrowVariant.subpanels[i]) ||
+            (arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length == 0)
+          ) {
+            aplHolder.style.width = `4px`;
           }
         }
+
         guideArrowsElmt.appendChild(aplHolder);
 
-        if (!subpanel && arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length > 0) {
-          // if the next apl has arrows, set marginRight to current arrow width (if present) + gap
-          if (
-            arrowVariant.subpanels[i + 0.5] &&
-            arrowVariant.subpanels[i + 0.5].length > 0
-          ) {
-            const arrowWidth = aplHolder.querySelector(".sMGA_APLArrowHolder").getBoundingClientRect().width / formHandler.vars.zoomLevel;
-            aplHolder.style.marginRight = `calc(${arrowWidth / 2}px + ${arrowVariant.gap}rem)`;
-          }
+        if (panel.sign.lanePanelSize == 0) {
+          aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         }
 
-        if (subpanel) {
-          console.log(aplHolder.getBoundingClientRect().width, subpanel.getBoundingClientRect().width);
+        // auto readjust
+
+        if (
+          subpanel &&
+          aplHolder.getBoundingClientRect().width +
+            (arrowVariant.subpanels[i - 0.5] &&
+            arrowVariant.subpanels[i - 0.5].length > 0
+              ? arrowVariant.gap *
+                parseFloat(getComputedStyle(document.documentElement).fontSize)
+              : 0) >
+            subpanel.getBoundingClientRect().width &&
+          panel.sign.lanePanelSize == 0
+        ) {
+          let newWidth =
+            aplHolder.getBoundingClientRect().width +
+            (arrowVariant.subpanels[i - 0.5] &&
+            arrowVariant.subpanels[i - 0.5].length > 0
+              ? arrowVariant.gap *
+                parseFloat(getComputedStyle(document.documentElement).fontSize)
+              : 0);
+          subpanel.style.width = newWidth + "px";
+          subpanel.style.flex = "0 0 " + newWidth + "px";
         }
-        if (subpanel && aplHolder.getBoundingClientRect().width > subpanel.getBoundingClientRect().width) {
-          subpanel.style.width = aplHolder.getBoundingClientRect().width + "px";
-          subpanel.style.flex = "0 0 " + aplHolder.getBoundingClientRect().width + "px";
+
+        if (
+          subpanel &&
+          i % 1 == 0 &&
+          arrowVariant.subpanels[i] &&
+          arrowVariant.subpanels[i].length > 0 &&
+          arrowVariant.subpanels[i - 0.5] &&
+          arrowVariant.subpanels[i - 0.5].length > 0 &&
+          panel.sign.lanePanelSize > 0
+        ) {
+          subpanel.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - 0.5)}px`;
         }
       }
     }

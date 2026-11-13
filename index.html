@@ -25,8 +25,6 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
 
     <script type="module">
       // compatability w/ npx vite
@@ -4965,13 +4963,13 @@
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">
-              <label for="smAPL_HorizPadding">Horizontal Padding (rem):</label>
+              <label for="smAPL_Gap">Arrow Gap (rem):</label>
               <input
                 type="number"
-                id="smAPL_HorizPadding"
+                id="smAPL_Gap"
+                name="smAPL_Gap"
                 onchange="formHandler.readForm()"
                 min="0"
-                max="10"
                 step=".01"
                 value="0"
               />
@@ -5000,15 +4998,6 @@
                 value="0.5"
               />
               <br />
-              <label for="smAPL_Gap">Arrow Gap (rem):</label>
-              <input
-                type="number"
-                id="smAPL_Gap"
-                onchange="formHandler.readForm()"
-                min="0"
-                step=".01"
-                value="0"
-              />
               <label for="smAPL_LaneSize">Lane Size (px):</label>
               <input
                 type="number"

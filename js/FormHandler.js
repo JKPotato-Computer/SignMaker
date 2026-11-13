@@ -424,8 +424,12 @@ const formHandler = (() => {
             parseFloat(
               bannerElement.querySelector(".smSPBanner_verticalPadding").value,
             ) || 0;
-          banner.wordSpacing = parseInt(bannerElement.querySelector(".smSPBanner_wordSpacing").value);
-          banner.letterSpacing = parseInt(bannerElement.querySelector(".smSPBanner_letterSpacing").value);
+          banner.wordSpacing = parseInt(
+            bannerElement.querySelector(".smSPBanner_wordSpacing").value,
+          );
+          banner.letterSpacing = parseInt(
+            bannerElement.querySelector(".smSPBanner_letterSpacing").value,
+          );
         }
       }
     }
@@ -651,7 +655,6 @@ const formHandler = (() => {
       // currentPanel.sign.oSNum = form["oSNum"].value;
     } else if (currentPanel.sign.arrows.arrowMode == "apl") {
       const apl = currentPanel.sign.arrows.apl;
-      apl.horizontalPadding = parseFloat(form["smAPL_HorizPadding"].value);
       apl.verticalTopPadding = parseFloat(form["smAPL_VertTopPadding"].value);
       apl.verticalBottomPadding = parseFloat(
         form["smAPL_VertBottomPadding"].value,
@@ -1325,12 +1328,9 @@ const formHandler = (() => {
         document.querySelector("#sdCtrlText_spaceNumeralsLetters"),
       ],
     );
-    toggleVisibility(
-      document.querySelector("#sdCtrlText_smallCapitals"),
-      [
-        document.querySelector("#sdCtrlText_capitalSize"),
-      ],
-    );
+    toggleVisibility(document.querySelector("#sdCtrlText_smallCapitals"), [
+      document.querySelector("#sdCtrlText_capitalSize"),
+    ]);
     toggleVisibility(
       document.querySelector("#sdActionMessage_useNumeralFormatting"),
       [
@@ -2363,8 +2363,11 @@ const formHandler = (() => {
           banner.verticalMargin;
         bannerElement.querySelector(".smSPBanner_borderRadius").value =
           banner.borderRadius;
-        bannerElement.querySelector(".smSPBanner_borderRadius").style.display = (banner.backgroundColor == "Inherit") ? "none" : "";
-        bannerElement.querySelector(".smSPBanner_borderRadiusLabel").style.display = (banner.backgroundColor == "Inherit") ? "none" : "";
+        bannerElement.querySelector(".smSPBanner_borderRadius").style.display =
+          banner.backgroundColor == "Inherit" ? "none" : "";
+        bannerElement.querySelector(
+          ".smSPBanner_borderRadiusLabel",
+        ).style.display = banner.backgroundColor == "Inherit" ? "none" : "";
         bannerElement.querySelector(".smSPBanner_horizontalPadding").value =
           banner.horizontalPadding;
         bannerElement.querySelector(".smSPBanner_verticalPadding").value =
@@ -2721,18 +2724,17 @@ const formHandler = (() => {
     }
 
     if (sign.arrows.arrowMode == "apl") {
-      document.querySelector("#smAPL_HorizPadding").value =
-        arrows.horizontalPadding;
       document.querySelector("#smAPL_VertTopPadding").value =
         arrows.verticalTopPadding;
       document.querySelector("#smAPL_VertBottomPadding").value =
         arrows.verticalBottomPadding;
       document.querySelector("#smAPL_Gap").value = arrows.gap;
-      document.querySelector("#smAPL_Gap").style.display = (sign.lanePanelSize > 0) ? "none" : "";
-      document.querySelector(`label[for="smAPL_Gap"]`).style.display = (sign.lanePanelSize > 0) ? "none" : "";
+      document.querySelector("#smAPL_Gap").style.display =
+        sign.lanePanelSize > 0 ? "none" : "";
+      document.querySelector(`label[for="smAPL_Gap"]`).style.display =
+        sign.lanePanelSize > 0 ? "none" : "";
 
-      document.querySelector("#smAPL_LaneSize").value =
-        sign.lanePanelSize;
+      document.querySelector("#smAPL_LaneSize").value = sign.lanePanelSize;
       document.querySelector("#sMAPL_APLCat").innerHTML = "";
 
       const subpanels = app.getCurrentPanel().sign.subPanels;
@@ -2818,7 +2820,11 @@ const formHandler = (() => {
         document.querySelector("#smAPL_APLCat").appendChild(aplContTemplate);
 
         if (
-          (i % 1 != 0 && aplList.length > 0) ||
+          (i % 1 != 0 &&
+            (aplList.length > 0 ||
+              (aplList.length == 0 && arrows.subpanels[i + 0.5] &&
+                arrows.subpanels[i + 0.5].length ==
+                  subpanels[i + 0.5].laneWidth))) ||
           (app.getCurrentPanel().sign.lanePanelSize > 0 &&
             i % 1 == 0 &&
             aplList.length >=

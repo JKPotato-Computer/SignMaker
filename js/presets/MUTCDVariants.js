@@ -587,7 +587,6 @@ const MUTCDVariants = (() => {
             },
           },
           apl: {
-            horizontalPadding: 0,
             verticalTopPadding: 0,
             verticalBottomPadding: 0.25,
             subpanels: {},
