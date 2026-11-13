@@ -2822,7 +2822,7 @@ const formHandler = (() => {
         if (
           (i % 1 != 0 &&
             (aplList.length > 0 ||
-              (aplList.length == 0 && arrows.subpanels[i + 0.5] &&
+              (app.getCurrentPanel().sign.lanePanelSize > 0 && aplList.length == 0 && arrows.subpanels[i + 0.5] &&
                 arrows.subpanels[i + 0.5].length ==
                   subpanels[i + 0.5].laneWidth))) ||
           (app.getCurrentPanel().sign.lanePanelSize > 0 &&
