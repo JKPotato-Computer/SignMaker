@@ -1406,6 +1406,7 @@ main#smRender.wide #postContainer {
   justify-content: center;
   align-items: end;
   min-width: 0;
+  position: relative;
 }
 
 .ET-shieldHolder {

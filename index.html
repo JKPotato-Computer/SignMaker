@@ -25,7 +25,10 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
-
+     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+  </script>
     <script type="module">
       // compatability w/ npx vite
       import terminal from "virtual:terminal";
@@ -5421,6 +5424,12 @@
             step="1"
             value="0"
             onchange="formHandler.readForm({ aplSubpanelConfigChange: true })"
+          />
+          <span class="smAPLCat_alignRightLabel">Align Right:</span>
+          <input
+            type="checkbox"
+            class="smAPLCat_alignRight"
+            onchange="formHandler.readForm()"
           />
         </div>
         <div class="smAPLCat_aplList"></div>

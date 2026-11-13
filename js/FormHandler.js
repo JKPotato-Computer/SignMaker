@@ -684,6 +684,13 @@ const formHandler = (() => {
           continue;
         }
 
+        if (
+          i == currentPanel.sign.subPanels.length - 1 &&
+          currentPanel.sign.lanePanelSize == 0
+        ) {
+          apl.subpanelConfigs[i].justify = aplContainer.querySelector(".smAPLCat_alignRight").checked;
+        }
+
         aplList.forEach((arrow, arrowIndex) => {
           const arrowElement =
             aplContainer.querySelectorAll(".smAPLCat_apl")[arrowIndex];
@@ -2751,14 +2758,22 @@ const formHandler = (() => {
           i % 1 == 0 ? "Subpanel " + (i + 1) : "Divider";
 
         if (i % 1 != 0) {
-          aplContHolder.querySelector(".smAPLCat_numLanesLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_numLanes").remove();
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_numLanes").style.display = "none";
         } else if (sign.lanePanelSize <= 0) {
-          aplContHolder.querySelector(".smAPLCat_numLanesLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_numLanes").remove();
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_numLanes").style.display = "none";
         } else {
           aplContHolder.querySelector(".smAPLCat_numLanes").value =
             subpanels[i].laneWidth;
+        }
+
+        if (i != subpanels.length - 1 || sign.lanePanelSize != 0) {
+          aplContHolder.querySelector(".smAPLCat_alignRightLabel").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_alignRight").style.display = "none";
+        } else if (arrows.subpanelConfigs[i]) {
+          aplContHolder.querySelector(".smAPLCat_alignRight").checked =
+            arrows.subpanelConfigs[i].justify;
         }
 
         for (let j = 0; j < aplList.length; j++) {

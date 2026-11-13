@@ -2013,6 +2013,7 @@ const App = (() => {
         guideArrowsElmt.style.paddingRight = ".5rem";
       }
 
+      const dividerAplHolder = [];
       for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
         const aplArrows = arrowVariant.subpanels[i] || [];
         const subpanel = i % 1 == 0 && subpanelList[i];
@@ -2023,13 +2024,26 @@ const App = (() => {
           aplHolder.className = "sMGA_APLHolder center";
         }
 
+        if (
+          i == subpanelList.length - 1 &&
+          panel.sign.lanePanelSize == 0 && arrowVariant.subpanelConfigs[i] &&
+          arrowVariant.subpanelConfigs[i].justify == true
+        ) {
+          aplHolder.style.justifyContent = "right";
+        }
+
         for (const arrow of aplArrows) {
           const arrowElmt = arrow.createElement();
           if (panel.sign.lanePanelSize > 0) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
           } else if (panel.sign.lanePanelSize == 0 && i % 1 != 0) {
             aplHolder.style.width = arrow.size + "rem";
-            aplHolder.style.margin = `0 ${arrowVariant.gap / 2}rem`;
+            if (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0) {
+              aplHolder.style.marginLeft = `${arrowVariant.gap / 2}rem`;
+            }
+            if (arrowVariant.subpanels[i + 0.5] && arrowVariant.subpanels[i + 0.5].length > 0) {
+              aplHolder.style.marginRight = `${arrowVariant.gap / 2}rem`;
+            }
           }
           if (ColorLibrary.checkForContrast(panel.color)) {
             arrowElmt.style.filter = "invert(1)";
@@ -2099,6 +2113,19 @@ const App = (() => {
         ) {
           subpanel.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - 0.5)}px`;
         }
+
+        if (panel.sign.lanePanelSize == 0 && i % 1 != 0 && arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length > 0) {
+          dividerAplHolder.push({holder: aplHolder, ind: i});
+        }
+      }
+
+      for (const {holder: aplHolder, ind} of dividerAplHolder) {
+        const dividerToMoveTo = dividerList[ind - 0.5];
+        const dividerBounds = dividerToMoveTo.getBoundingClientRect();
+        const aplBounds = aplHolder.getBoundingClientRect();
+        const aplCenterX = aplBounds.left + aplBounds.width / 2;
+        const dividerCenterX = dividerBounds.left + dividerBounds.width / 2;
+        aplHolder.style.transform = `translateX(${dividerCenterX - aplCenterX}px)`;
       }
     }
 
