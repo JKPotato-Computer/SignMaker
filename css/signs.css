@@ -163,11 +163,14 @@
 }
 
 .panel.round .signCorner,
-.panel.round .guideArrowsHolder {
+.panel.round .guideArrowsHolder,
+.panel.double-struck .signCorner,
+.panel.double-struck .guideArrowsHolder {
   background-color: transparent !important;
 }
 
-.panel:not(.round) .guideArrowsHolder:has(.guideArrows.apl) {
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.apl),
+.panel:not(.double-struck) .guideArrowsHolder:has(.guideArrows.apl) {
   background-color: var(--bg-color);
 }
 
@@ -307,11 +310,18 @@
   z-index: 3;
 }
 
-.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only.white_border) {
+.panel:not(.round) .guideArrowsHolder:has(.guideArrows.exit_only.white_border),
+.panel:not(.double-struck)
+  .guideArrowsHolder:has(.guideArrows.exit_only.white_border) {
   background-color: rgb(0, 95, 77);
 }
 
 .panel:not(.round)
+  .guideArrowsHolder:has(
+    .guideArrows.exit_only.partial_black_border,
+    .guideArrows.exit_only.full_black_border
+  ),
+.panel:not(.double-struck)
   .guideArrowsHolder:has(
     .guideArrows.exit_only.partial_black_border,
     .guideArrows.exit_only.full_black_border

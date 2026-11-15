@@ -1414,13 +1414,19 @@ main#smRender.wide #postContainer {
   background-image: repeating-conic-gradient(transparent 0% 25%, black 0% 50%);
 }
 
-/* veridian panel type */
-.panel.veridian {
-  --signBorderRadius: 0em !important;
-  box-sizing: border-box;
-  border: var(--bg-color) 0.2rem solid;
+/* double struck panel type */
+.panel.double-struck .sign {
+  box-shadow: 0 0 0 0.2rem var(--bg-color) !important;
+  border-radius: var(--signBorderRadius);
 }
-
+.panel.double-struck .top .ET-tab {
+  box-shadow: 0 0 0 var(--borderThickness) var(--backgroundColor) !important;
+  z-index: 1;
+  margin-bottom: calc(0.2rem + var(--borderThickness));
+}
+.panel.double-struck .top .ET-tab:not(.fullBorder) {
+  margin-bottom: var(--borderThickness);
+}
 /* sign-foundation.css
 Serves as the most minimum needed to support sign making before adopting MUTCDs
 */
@@ -1920,7 +1926,8 @@ main#smRender.wide #postContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  transform: translateX(var(--routeXOffset, 0%)) translateY(var(--routeYOffset, 0%));
+  transform: translateX(var(--routeXOffset, 0%))
+    translateY(var(--routeYOffset, 0%));
   height: stretch;
 }
 .designation {
