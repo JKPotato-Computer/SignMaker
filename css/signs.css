@@ -217,7 +217,7 @@
   border-radius: var(--signBorderRadius, 0.75rem);
   border: 0.2rem solid;
   clear: both;
-  overflow: hidden;
+  overflow: visible;
   visibility: visible;
   z-index: 2;
   position: relative;
@@ -396,6 +396,8 @@
   display: flex;
   min-width: 4px;
   flex-direction: column;
+  z-index: 2;
+  position: relative;
 }
 
 .subDividerSegment {

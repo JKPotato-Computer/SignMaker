@@ -51,30 +51,6 @@ main#smRender.wide #postContainer {
     var(--blockPaddingBottom) var(--blockPaddingLeft);
 }
 
-.blockElementRow.fullBleed {
-  margin: calc(
-      -1 * var(--blockBleedTop) + var(--marginTop) + var(--marginBorderTop)
-    )
-    calc(-1 * var(--blockBleedRight) + var(--marginBorderRight))
-    calc(
-      -1 * var(--blockBleedBottom) + var(--marginBottom) +
-        var(--marginBorderBottom)
-    )
-    calc(-1 * var(--blockBleedLeft) + var(--marginBorderLeft));
-  padding: calc(var(--blockPaddingTop) + var(--blockBleedTop))
-    calc(var(--blockBleedRight) + var(--blockPaddingRight))
-    calc(var(--blockBleedBottom) + var(--blockPaddingBottom))
-    calc(var(--blockBleedLeft) + var(--blockPaddingLeft));
-  /* width: calc(
-    100% + var(--blockBleedLeft) + var(--blockBleedRight) -
-      var(--marginBorderLeft) - var(--marginBorderRight)
-  ); */
-  border-top-left-radius: calc(var(--blockBorderRadiusTopLeft));
-  border-top-right-radius: calc(var(--blockBorderRadiusTopRight));
-  border-bottom-left-radius: calc(var(--blockBorderRadiusBottomLeft));
-  border-bottom-right-radius: calc(var(--blockBorderRadiusBottomRight));
-}
-
 .lineElement {
   display: flex;
   flex-direction: row;
@@ -291,16 +267,12 @@ main#smRender.wide #postContainer {
   height: var(--dividerHeight);
   position: relative;
   z-index: 3;
-  pointer-events: none;
 }
 
-.dividerElement.fullBleed {
-  width: calc(
-    var(--dividerWidth, 100%) + var(--dividerBleedLeft, 0rem) +
-      var(--dividerBleedRight, 0rem)
-  );
-  margin-left: calc(-1 * var(--dividerBleedLeft, 0rem));
-  margin-right: calc(-1 * var(--dividerBleedRight, 0rem));
+.dividerElement.fullWidth {
+  width: calc(var(--dividerWidth) + 0.4rem);
+  margin-left: -0.2rem;
+  margin-right: -0.2rem;
   flex-grow: 1;
 }
 
@@ -1293,8 +1265,7 @@ main#smRender.wide #postContainer {
   display: flex;
   flex-direction: row;
   justify-content: left;
-  padding: var(--verticalTopPadding) 0
-    var(--verticalBottomPadding);
+  padding: var(--verticalTopPadding) 0 var(--verticalBottomPadding);
   height: max-content;
 }
 

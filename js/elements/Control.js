@@ -251,7 +251,7 @@ class ControlTextElement extends TextElement {
 
   createElement() {
     const newText = super.createElement();
-    
+
     if (this.smallCapitals) {
       for (const beText of newText.querySelectorAll(".bE-text")) {
         // split by spaces and find the first letter per segment
@@ -543,26 +543,12 @@ class DividerElement {
       this.dividerWidth + this.dividerMeasurement,
     );
     newDivider.style.setProperty("--dividerHeight", this.dividerHeight + "rem");
-    newDivider.style.marginTop = "0";
-    newDivider.style.marginBottom = "0";
 
-    if (this.dividerColor && this.dividerColor !== "Default") {
-      const resolvedColor =
-        ColorLibrary.colorLibrary[this.dividerColor] || this.dividerColor || "";
-      if (resolvedColor) {
-        newDivider.style.backgroundColor = resolvedColor;
-      }
-    }
+    newDivider.style.backgroundColor =
+      ColorLibrary.colorLibrary[this.dividerColor];
 
     if (this.fullBleed) {
-      newDivider.classList.add("fullBleed");
-
-      newDivider.style.setProperty("--dividerBleedLeft", `${0.2}rem`);
-      newDivider.style.setProperty("--dividerBleedRight", `${0.2}rem`);
-    } else {
-      newDivider.classList.remove("fullBleed");
-      newDivider.style.setProperty("--dividerBleedLeft", "0rem");
-      newDivider.style.setProperty("--dividerBleedRight", "0rem");
+      newDivider.classList.add("fullWidth");
     }
 
     return newDivider;
@@ -1154,7 +1140,6 @@ class Block {
       leftPadding,
       rightPadding,
       backgroundColor,
-      backgroundFullWidth,
       width,
       stretchLeft,
       stretchCenter,
@@ -1165,7 +1150,6 @@ class Block {
     this.bottomMargin = bottomMargin;
     this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
-    this.backgroundFullWidth = backgroundFullWidth;
     this.width = width;
     this.stretchLeft = stretchLeft;
     this.stretchCenter = stretchCenter;
@@ -1378,42 +1362,10 @@ class Control {
           ? ColorLibrary.colorLibrary[panel.color] || panel.color
           : ColorLibrary.colorLibrary[properties.backgroundColor] ||
             properties.backgroundColor;
-      const usesBlackBorder =
-        ColorLibrary.checkForContrast(blockBackgroundColor);
       flexRow.dataset.blockBackgroundColor = blockBackgroundColor;
-      flexRow.dataset.blockBorderColor = usesBlackBorder ? "black" : "white";
 
-      if (
-        properties.backgroundFullWidth &&
-        panel.sign.arrows.arrowMode != "diagrammic"
-      ) {
-        flexRow.classList.add("fullBleed");
-
-        flexRow.style.setProperty(
-          "--blockBleedLeft",
-          `${properties.leftPadding}rem`,
-        );
-        flexRow.style.setProperty(
-          "--blockBleedRight",
-          `${properties.rightPadding}rem`,
-        );
-        flexRow.style.setProperty(
-          "--blockBleedTop",
-          i == 0 ? `${properties.topPadding}rem` : "0rem",
-        );
-        flexRow.style.setProperty(
-          "--blockBleedBottom",
-          i == totalRows - 1 ? `${properties.bottomPadding}rem` : "0rem",
-        );
-
-        flexRow.style.setProperty("--marginBorderLeft", "0rem");
-        flexRow.style.setProperty("--marginBorderRight", "0rem");
-        flexRow.style.setProperty("--marginBorderTop", "0rem");
-        flexRow.style.setProperty("--marginBorderBottom", "0rem");
-      } else {
-        flexRow.style.width =
-          properties.width == 0 ? "" : properties.width + "rem";
-      }
+      flexRow.style.width =
+        properties.width == 0 ? "" : properties.width + "rem";
 
       if (
         ColorLibrary.checkForContrast(

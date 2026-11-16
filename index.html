@@ -25,10 +25,6 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
-     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-  <script>
-    eruda.init();
-  </script>
     <script type="module">
       // compatability w/ npx vite
       import terminal from "virtual:terminal";
@@ -4289,15 +4285,6 @@
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
                   <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
-                  <label for="sdBlock_backgroundFullWidth"
-                    >BG Full Width:</label
-                  >
-                  <input
-                    type="checkbox"
-                    id="sdBlock_backgroundFullWidth"
-                    onchange="formHandler.readForm()"
-                  />
-                  <br />
                   <label
                     for="sdBlock_width"
                     data-toolTip="Width of the block, set to 0 to automatically resize"

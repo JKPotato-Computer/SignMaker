@@ -525,11 +525,6 @@ const formHandler = (() => {
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor",
     ).dataset.color;
-    blockElements.blockProperties[
-      app.vars.currentlySelectedRowIndex
-    ].backgroundFullWidth = document.querySelector(
-      "#sdBlock_backgroundFullWidth",
-    ).checked;
     blockElements.blockProperties[app.vars.currentlySelectedRowIndex].width =
       document.querySelector("#sdBlock_width").value;
     blockElements.blockProperties[
@@ -1302,11 +1297,6 @@ const formHandler = (() => {
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].backgroundColor;
-
-    document.querySelector("#sdBlock_backgroundFullWidth").checked =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].backgroundFullWidth;
 
     document.querySelector("#sdBlock_width").value =
       app.getCurrentBlockElements().blockProperties[

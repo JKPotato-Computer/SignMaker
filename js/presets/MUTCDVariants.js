@@ -269,7 +269,6 @@ const MUTCDVariants = (() => {
         leftPadding: 0.75,
         rightPadding: 0.75,
         backgroundColor: "Inherit",
-        backgroundFullWidth: true,
         width: 0,
         stretchLeft: true,
         stretchCenter: true,

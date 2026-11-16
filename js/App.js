@@ -18,6 +18,9 @@ const App = (() => {
   let currentlySelectedShieldIndex = -1;
   let currentlySelectedStandardArrow = -1;
 
+  const borderThicknessToPx =
+    0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+
   // Glboal Acessor Methods
   const getCurrentPanel = () => {
     return post.panels[currentlySelectedPanelGroupIndex][
@@ -1326,392 +1329,195 @@ const App = (() => {
     return [subpanelList, dividerList];
   };
 
-  const setSubDividerSegments = (
-    divider,
-    leftSubpanel,
-    rightSubpanel,
-    panel,
-  ) => {
-    const rows = [
-      ...leftSubpanel.querySelectorAll(".blockElementRow.fullBleed"),
-    ];
-    const dividerRect = divider.getBoundingClientRect();
-    const boundaries = new Set([0, dividerRect.height]);
-
-    for (const row of rows) {
-      const rowRect = row.getBoundingClientRect();
-      const top = Math.max(
-        0,
-        Math.min(dividerRect.height, rowRect.top - dividerRect.top),
-      );
-      const bottom = Math.max(
-        0,
-        Math.min(dividerRect.height, rowRect.bottom - dividerRect.top),
-      );
-      boundaries.add(top);
-      boundaries.add(bottom);
-    }
-
-    const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-    divider.innerHTML = "";
-
-    for (let i = 0; i < sortedBoundaries.length - 1; i++) {
-      const top = sortedBoundaries[i];
-      const bottom = sortedBoundaries[i + 1];
-
-      if (bottom <= top) {
-        continue;
-      }
-
-      const midpoint = dividerRect.top + (top + bottom) / 2;
-      const adjacentRows = rows.filter((row) => {
-        const rowRect = row.getBoundingClientRect();
-        return rowRect.top <= midpoint && rowRect.bottom >= midpoint;
-      });
-
-      const adjacentRow = adjacentRows[adjacentRows.length - 1] || null;
-      const segment = document.createElement("div");
-      segment.className = "subDividerSegment";
-      segment.style.height = `${bottom - top}px`;
-
-      const targetColor = adjacentRow
-        ? adjacentRow.dataset.blockBorderColor ||
-          adjacentRow.dataset.blockBackgroundColor
-        : panel.color;
-
-      if (targetColor == panel.color) {
-        segment.style.backgroundColor = ColorLibrary.checkForContrast(
-          targetColor,
-        )
-          ? "black"
-          : "white";
-      } else {
-        segment.style.backgroundColor = ColorLibrary.checkForContrast(
-          targetColor,
-        )
-          ? "black"
-          : "white";
-      }
-
-      divider.appendChild(segment);
-    }
-
-    // First segment: based on the very first row
-    if (rows.length > 0) {
-      const firstRow = rows[0];
-      const firstColor =
-        firstRow?.dataset.blockBorderColor ||
-        firstRow?.dataset.blockBackgroundColor ||
-        ColorLibrary.colorLibrary[panel.color] ||
-        panel.color;
-
-      const firstSegment = document.createElement("div");
-      firstSegment.className = "subDividerSegment";
-      firstSegment.style.height = ".2rem";
-      firstSegment.style.width = ".2rem";
-      firstSegment.style.position = "absolute";
-      firstSegment.style.top = "-.2rem";
-      firstSegment.style.backgroundColor = ColorLibrary.checkForContrast(
-        firstColor,
-      )
-        ? "black"
-        : "white";
-      divider.appendChild(firstSegment);
-    }
-
-    // Final segment: based on the very last row
-    if (
-      rows.length > 0 &&
-      panel.sign.arrows.arrowMode != "apl" &&
-      panel.sign.arrows.arrowMode == "standard" &&
-      panel.sign.arrows.standard.variant == "none"
-    ) {
-      const lastRow = rows[rows.length - 1];
-      const lastColor =
-        lastRow?.dataset.blockBorderColor ||
-        lastRow?.dataset.blockBackgroundColor ||
-        ColorLibrary.colorLibrary[panel.color] ||
-        panel.color;
-
-      const finalSegment = document.createElement("div");
-      finalSegment.className = "subDividerSegment";
-      finalSegment.style.height = ".2rem";
-      finalSegment.style.width = ".2rem";
-      finalSegment.style.position = "absolute";
-      finalSegment.style.bottom = "-.2rem";
-      finalSegment.style.backgroundColor = ColorLibrary.checkForContrast(
-        lastColor,
-      )
-        ? "white"
-        : "black";
-      divider.appendChild(finalSegment);
-    }
-  };
-
-  const updateSubpanelEdges = (
-    panel,
+  const recolorBorder = (
+    signHolder,
     subpanelList,
     dividerList,
+    panel,
     signCorners,
   ) => {
-    const blockMasters = subpanelList.map((subpanel) =>
-      subpanel.querySelector(".blockElementMaster:not(.bE-groupElement)"),
-    );
-    const masterRects = blockMasters.map((master) =>
-      master.getBoundingClientRect(),
-    );
-    const minLeft = Math.min(...masterRects.map((rect) => rect.left));
-    const maxRight = Math.max(...masterRects.map((rect) => rect.right));
-    const maxBottom = Math.max(...masterRects.map((rect) => rect.bottom));
-    const minTop = Math.min(...masterRects.map((rect) => rect.top));
-    const edgeTolerance = 1;
-
-    for (let i = 0; i < blockMasters.length; i++) {
-      const rows = Array.from(
-        subpanelList[i].querySelectorAll(".blockElementRow.fullBleed"),
-      );
-      const lastRow = rows[rows.length - 1];
-      const firstRow = rows[0];
-      const masterRect = masterRects[i];
-
-      for (const row of rows) {
-        const rowRect = row.getBoundingClientRect();
-        const leftBoundary =
-          i == 0 ? minLeft : dividerList[i - 1].getBoundingClientRect().right;
-        const rightBoundary =
-          i == blockMasters.length - 1
-            ? maxRight
-            : dividerList[i].getBoundingClientRect().left;
-        const touchesLeft = rowRect.left <= leftBoundary + edgeTolerance;
-        const touchesRight = rowRect.right >= rightBoundary - edgeTolerance;
-        const touchesTop =
-          row === firstRow && rowRect.top <= minTop + edgeTolerance;
-        const touchesBottom =
-          row === lastRow && rowRect.bottom >= maxBottom - edgeTolerance;
-
-        if (!touchesLeft) {
-          row.style.setProperty("--blockBleedLeft", "0rem");
-          row.style.setProperty("--blockBorderRadiusTopLeft", "0");
-          row.style.setProperty("--blockBorderRadiusBottomLeft", "0");
-          row.style.borderLeft = "none";
-        }
-
-        if (!touchesRight) {
-          row.style.setProperty("--blockBleedRight", "0rem");
-          row.style.setProperty("--blockBorderRadiusTopRight", "0");
-          row.style.setProperty("--blockBorderRadiusBottomRight", "0");
-          row.style.borderRight = "none";
-        }
-
-        if (!touchesTop) {
-          row.style.setProperty("--blockBleedTop", "0rem");
-          row.style.setProperty("--blockBorderRadiusTopLeft", "0");
-          row.style.setProperty("--blockBorderRadiusTopRight", "0");
-        }
-
-        if (!touchesBottom) {
-          row.style.setProperty("--blockBleedBottom", "0rem");
-          row.style.setProperty("--blockBorderRadiusBottomLeft", "0");
-          row.style.setProperty("--blockBorderRadiusBottomRight", "0");
-        }
-      }
-
-      if (
-        lastRow &&
-        (masterRect.bottom < maxBottom ||
-          lastRow.getBoundingClientRect().bottom < maxBottom)
-      ) {
-        lastRow.style.borderBottom = "none";
-        lastRow.style.setProperty("--blockBorderRadiusBottomLeft", "0");
-        lastRow.style.setProperty("--blockBorderRadiusBottomRight", "0");
-      }
-
-      if (
-        firstRow &&
-        (masterRect.top > minTop ||
-          firstRow.getBoundingClientRect().top > minTop)
-      ) {
-        firstRow.style.borderTop = "none";
-        firstRow.style.setProperty("--blockBorderRadiusTopLeft", "0");
-        firstRow.style.setProperty("--blockBorderRadiusTopRight", "0");
-      }
-    }
-
-    for (let i = 0; i < dividerList.length; i++) {
-      setSubDividerSegments(
-        dividerList[i],
-        subpanelList[i],
-        subpanelList[i + 1],
-        panel,
-      );
-    }
-
-    const parentColor = ColorLibrary.colorLibrary[panel.color] || panel.color;
-    const cornerRows = [
-      Array.from(
-        subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
-      )[0],
-      Array.from(
-        subpanelList[subpanelList.length - 1].querySelectorAll(
-          ".blockElementRow.fullBleed",
-        ),
-      )[0],
-      Array.from(
-        subpanelList[0].querySelectorAll(".blockElementRow.fullBleed"),
-      ).slice(-1)[0],
-      Array.from(
-        subpanelList[subpanelList.length - 1].querySelectorAll(
-          ".blockElementRow.fullBleed",
-        ),
-      ).slice(-1)[0],
-    ];
-    const cornerTouchesPanel = [
-      cornerRows[0] &&
-        masterRects[0].top <= minTop &&
-        cornerRows[0].getBoundingClientRect().top <= minTop,
-      cornerRows[1] &&
-        masterRects[masterRects.length - 1].top <= minTop &&
-        cornerRows[1].getBoundingClientRect().top <= minTop,
-      cornerRows[2] &&
-        masterRects[0].bottom >= maxBottom &&
-        cornerRows[2].getBoundingClientRect().bottom >= maxBottom,
-      cornerRows[3] &&
-        masterRects[masterRects.length - 1].bottom >= maxBottom &&
-        cornerRows[3].getBoundingClientRect().bottom >= maxBottom,
-    ];
-
-    for (let i = 0; i < signCorners.length; i++) {
-      signCorners[i].style.backgroundColor = cornerTouchesPanel[i]
-        ? cornerRows[i].dataset.blockBackgroundColor
-        : parentColor;
-    }
-  };
-
-  const recolorBorder = (signHolder, subpanelList) => {
-    class Point {
-      constructor(x, y) {
-        this.x = x;
-        this.y = y;
-      }
-
-      static dist(p1, p2) {
-        return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-      }
-    }
-
-    const originalPointerEvents = signHolder.style.pointerEvents;
-    signHolder.style.pointerEvents = "none";
-    signHolder.style.borderColor = "transparent";
-
+    // sign border
     const signHolderRect = signHolder.getBoundingClientRect();
-
-    const centerX = signHolderRect.left + signHolderRect.width / 2;
-    const centerY = signHolderRect.top + signHolderRect.height / 2;
-
-    const topCenterPoint = new Point(centerX, signHolderRect.top);
-    const topRightPoint = new Point(signHolderRect.right, signHolderRect.top);
-    const rightCenterPoint = new Point(signHolderRect.right, centerY);
-    const bottomRightPoint = new Point(
-      signHolderRect.right,
-      signHolderRect.bottom,
-    );
-    const bottomCenterPoint = new Point(centerX, signHolderRect.bottom);
-    const bottomLeftPoint = new Point(
-      signHolderRect.left,
-      signHolderRect.bottom,
-    );
-    const leftCenterPoint = new Point(signHolderRect.left, centerY);
-    const topLeftPoint = new Point(signHolderRect.left, signHolderRect.top);
-
-    const angleToPosition = (angle) => {
-      const angleRatio = (angle % 90) / 90;
-
-      let point1Reference, point1Point5Reference, point2Reference;
-      if (angle >= 0 && angle < 90) {
-        point1Reference = topCenterPoint;
-        point1Point5Reference = topRightPoint;
-        point2Reference = rightCenterPoint;
-      } else if (angle >= 90 && angle < 180) {
-        point1Reference = rightCenterPoint;
-        point1Point5Reference = bottomRightPoint;
-        point2Reference = bottomCenterPoint;
-      } else if (angle >= 180 && angle < 270) {
-        point1Reference = bottomCenterPoint;
-        point1Point5Reference = bottomLeftPoint;
-        point2Reference = leftCenterPoint;
-      } else if (angle >= 270 && angle < 360) {
-        point1Reference = leftCenterPoint;
-        point1Point5Reference = topLeftPoint;
-        point2Reference = topCenterPoint;
-      }
-
-      const totalDistance =
-        Point.dist(point1Reference, point1Point5Reference) +
-        Point.dist(point1Point5Reference, point2Reference);
-      const p1to1Point5Ratio =
-        Point.dist(point1Reference, point1Point5Reference) / totalDistance;
-
-      let x, y;
-      if (angleRatio < p1to1Point5Ratio) {
-        const ratio = angleRatio / p1to1Point5Ratio;
-        x =
-          point1Reference.x +
-          (point1Point5Reference.x - point1Reference.x) * ratio;
-        y =
-          point1Reference.y +
-          (point1Point5Reference.y - point1Reference.y) * ratio;
-      } else {
-        const ratio = (angleRatio - p1to1Point5Ratio) / (1 - p1to1Point5Ratio);
-        x =
-          point1Point5Reference.x +
-          (point2Reference.x - point1Point5Reference.x) * ratio;
-        y =
-          point1Point5Reference.y +
-          (point2Reference.y - point1Point5Reference.y) * ratio;
-      }
-
-      const outset = 6;
-      const dx = x - centerX;
-      const dy = y - centerY;
-      const distFromCenter = Math.sqrt(dx * dx + dy * dy);
-
-      if (distFromCenter > 0) {
-        x += (dx / distFromCenter) * outset;
-        y += (dy / distFromCenter) * outset;
-      }
-
-      return new Point(x, y);
+    const innerEdges = {
+      top: signHolderRect.top + borderThicknessToPx,
+      right: signHolderRect.right - borderThicknessToPx,
+      bottom: signHolderRect.bottom - borderThicknessToPx,
+      left: signHolderRect.left + borderThicknessToPx,
     };
 
-    let conicGradientPoints = [];
+    const rows = subpanelList.flatMap((subpanel) =>
+      Array.from(subpanel.querySelectorAll(".blockElementRow")),
+    );
 
-    for (let angle = 0; angle < 360; angle += 2) {
-      let positionPoint = angleToPosition(angle);
-      let overlappingBlocks = document
-        .elementsFromPoint(positionPoint.x, positionPoint.y)
-        .filter((el) => !signHolder.contains(el) && el !== signHolder);
+    // dividers
+    for (const divider of dividerList) {
+      const dividerRect = divider.getBoundingClientRect();
+      const defaultColor = ColorLibrary.checkForContrast(panel.color)
+        ? "black"
+        : "white";
 
-      if (overlappingBlocks.length > 0) {
-        const block = overlappingBlocks[0];
-        const blockColor = window
-          .getComputedStyle(block)
-          .getPropertyValue("background-color");
+      let isFirstOppositeColor = null;
+      let isLastOppositeColor = null;
 
-        if (
-          blockColor &&
-          blockColor !== "rgba(0, 0, 0, 0)" &&
-          ColorLibrary.checkForContrast(blockColor)
-        ) {
-          conicGradientPoints.push(`${blockColor} ${angle}deg`);
+      const intersectingRows = rows
+        .filter((row) => {
+          const rowRect = row.getBoundingClientRect();
+          const minXOverlap = dividerRect.left - 5;
+          const maxXOverlap = dividerRect.right + 5;
+
+          const isVerticalOverlap =
+            rowRect.bottom >= dividerRect.top &&
+            rowRect.top <= dividerRect.bottom;
+          const isHorizontalOverlap =
+            rowRect.left <= maxXOverlap && rowRect.right >= minXOverlap;
+
+          return isVerticalOverlap && isHorizontalOverlap;
+        })
+        .sort(
+          (a, b) =>
+            a.getBoundingClientRect().top - b.getBoundingClientRect().top,
+        );
+
+      let currentY = dividerRect.top;
+
+      
+
+      const createChunk = (startY, endY, color) => {
+        const height = endY - startY;
+        if (height <= 0) return;
+
+        const subRect = document.createElement("div");
+        subRect.className = "subdividerRect";
+        subRect.style.height = `${height}px`;
+        subRect.style.backgroundColor = color;
+        divider.appendChild(subRect);
+
+        if (color !== defaultColor) {
+          if (!isFirstOppositeColor && currentY === dividerRect.top) {
+            isFirstOppositeColor = subRect;
+          }
+
+          const relativeBottom = endY - dividerRect.top;
+          if (
+            relativeBottom >=
+            signHolderRect.height - borderThicknessToPx * 2
+          ) {
+            isLastOppositeColor = subRect;
+          }
         }
+      };
+
+      for (const row of intersectingRows) {
+        const rowRect = row.getBoundingClientRect();
+
+        if (rowRect.top > currentY) {
+          createChunk(currentY, rowRect.top, defaultColor);
+        }
+
+        // Determine row background color
+        const bgColor = row.dataset.blockBackgroundColor;
+        const blockColor = ColorLibrary.checkForContrast(bgColor)
+          ? "black"
+          : "white";
+
+        // Fill the span of this row
+        const chunkTop = Math.max(dividerRect.top, rowRect.top);
+        const chunkBottom = Math.min(dividerRect.bottom, rowRect.bottom);
+
+        createChunk(chunkTop, chunkBottom, blockColor);
+
+        currentY = Math.max(currentY, rowRect.bottom);
+      }
+
+      // 5. Fill any remaining space at the bottom of the divider
+      if (currentY < dividerRect.bottom) {
+        createChunk(currentY, dividerRect.bottom, defaultColor);
+      }
+
+      if (isFirstOppositeColor) {
+        const dividerAbsElmt = document.createElement("div");
+        dividerAbsElmt.className = "subdividerRect";
+        dividerAbsElmt.style.position = "absolute";
+        dividerAbsElmt.style.top = "-0.2rem";
+        dividerAbsElmt.style.left = "0";
+        dividerAbsElmt.style.width = "100%";
+        dividerAbsElmt.style.height = "0.2rem";
+        dividerAbsElmt.style.backgroundColor =
+          isFirstOppositeColor.style.backgroundColor;
+        divider.appendChild(dividerAbsElmt);
+      }
+
+      if (isLastOppositeColor) {
+        const dividerAbsElmt = document.createElement("div");
+        dividerAbsElmt.className = "subdividerRect";
+        dividerAbsElmt.style.position = "absolute";
+        dividerAbsElmt.style.bottom = "-0.2rem";
+        dividerAbsElmt.style.left = "0";
+        dividerAbsElmt.style.width = "100%";
+        dividerAbsElmt.style.height = "0.2rem";
+        dividerAbsElmt.style.backgroundColor =
+          isLastOppositeColor.style.backgroundColor;
+        divider.appendChild(dividerAbsElmt);
       }
     }
 
-    signHolder.style.pointerEvents = originalPointerEvents;
+    for (const row of rows) {
+      row.style.border = "none";
+      row.style.boxSizing = "border-box";
 
-    if (conicGradientPoints.length > 0) {
-      signHolder.style.borderImage = `conic-gradient(${conicGradientPoints.join(", ")}) 1`;
+      const rowRect = row.getBoundingClientRect();
+      const touchesTop = Math.abs(rowRect.top - innerEdges.top) <= 1;
+      const touchesRight = Math.abs(rowRect.right - innerEdges.right) <= 1;
+      const touchesBottom = Math.abs(rowRect.bottom - innerEdges.bottom) <= 1;
+      const touchesLeft = Math.abs(rowRect.left - innerEdges.left) <= 1;
+
+      const blockBackgroundColor = row.dataset.blockBackgroundColor;
+      const blockBorderColor =
+        ColorLibrary.checkForContrast(blockBackgroundColor);
+
+      if (blockBorderColor != ColorLibrary.checkForContrast(panel.color)) {
+        if (touchesTop) {
+          row.style.borderTop = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
+          row.style.marginTop = `-0.2rem`;
+        }
+        if (touchesRight) {
+          row.style.borderRight = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
+          row.style.marginRight = `-0.2rem`;
+          row.style.width = `calc(100% + 0.2rem)`;
+        }
+        if (touchesBottom) {
+          row.style.borderBottom = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
+          row.style.marginBottom = `-0.2rem`;
+        }
+        if (touchesLeft) {
+          row.style.borderLeft = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
+          row.style.marginLeft = `-0.2rem`;
+          row.style.width = `calc(100% + 0.2rem)`;
+        }
+      }
+
+      if (touchesTop && touchesRight) {
+        row.style.borderTopRightRadius = `${panel.borderRadius}rem`;
+        signCorners[0].style.backgroundColor = blockBackgroundColor;
+      }
+
+      if (touchesTop && touchesLeft) {
+        row.style.borderTopLeftRadius = `${panel.borderRadius}rem`;
+        signCorners[1].style.backgroundColor = blockBackgroundColor;
+      }
+
+      if (touchesBottom && touchesRight) {
+        row.style.borderBottomRightRadius = `${panel.borderRadius}rem`;
+        signCorners[2].style.backgroundColor = blockBackgroundColor;
+      }
+
+      if (touchesBottom && touchesLeft) {
+        row.style.borderBottomLeftRadius = `${panel.borderRadius}rem`;
+        signCorners[3].style.backgroundColor = blockBackgroundColor;
+      }
     }
+
+    return;
   };
 
   const redrawPanel = (panel, panelContainerElmt, index) => {
@@ -1844,14 +1650,13 @@ const App = (() => {
     }
 
     const [subpanelList, dividerList] = redrawSubPanels(panel, signHolderElmt);
-    updateSubpanelEdges(panel, subpanelList, dividerList, [
-      topLeftSignCorner,
-      topRightSignCorner,
-      bottomLeftSignCorner,
-      bottomRightSignCorner,
-    ]);
     requestAnimationFrame(() => {
-      //recolorBorder(signHolderElmt, subpanelList);
+      recolorBorder(signHolderElmt, subpanelList, dividerList, panel, [
+        topRightSignCorner,
+        topLeftSignCorner,
+        bottomRightSignCorner,
+        bottomLeftSignCorner,
+      ]);
     });
 
     signHolderElmt.appendChild(sideRightArrowElmt);
@@ -2026,7 +1831,8 @@ const App = (() => {
 
         if (
           i == subpanelList.length - 1 &&
-          panel.sign.lanePanelSize == 0 && arrowVariant.subpanelConfigs[i] &&
+          panel.sign.lanePanelSize == 0 &&
+          arrowVariant.subpanelConfigs[i] &&
           arrowVariant.subpanelConfigs[i].justify == true
         ) {
           aplHolder.style.justifyContent = "right";
@@ -2038,10 +1844,16 @@ const App = (() => {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
           } else if (panel.sign.lanePanelSize == 0 && i % 1 != 0) {
             aplHolder.style.width = arrow.size + "rem";
-            if (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0) {
+            if (
+              arrowVariant.subpanels[i - 0.5] &&
+              arrowVariant.subpanels[i - 0.5].length > 0
+            ) {
               aplHolder.style.marginLeft = `${arrowVariant.gap / 2}rem`;
             }
-            if (arrowVariant.subpanels[i + 0.5] && arrowVariant.subpanels[i + 0.5].length > 0) {
+            if (
+              arrowVariant.subpanels[i + 0.5] &&
+              arrowVariant.subpanels[i + 0.5].length > 0
+            ) {
               aplHolder.style.marginRight = `${arrowVariant.gap / 2}rem`;
             }
           }
@@ -2114,12 +1926,17 @@ const App = (() => {
           subpanel.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - 0.5)}px`;
         }
 
-        if (panel.sign.lanePanelSize == 0 && i % 1 != 0 && arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length > 0) {
-          dividerAplHolder.push({holder: aplHolder, ind: i});
+        if (
+          panel.sign.lanePanelSize == 0 &&
+          i % 1 != 0 &&
+          arrowVariant.subpanels[i] &&
+          arrowVariant.subpanels[i].length > 0
+        ) {
+          dividerAplHolder.push({ holder: aplHolder, ind: i });
         }
       }
 
-      for (const {holder: aplHolder, ind} of dividerAplHolder) {
+      for (const { holder: aplHolder, ind } of dividerAplHolder) {
         const dividerToMoveTo = dividerList[ind - 0.5];
         const dividerBounds = dividerToMoveTo.getBoundingClientRect();
         const aplBounds = aplHolder.getBoundingClientRect();
