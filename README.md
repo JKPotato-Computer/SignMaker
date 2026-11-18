@@ -1,4 +1,4 @@
-![SignMaker Preview Thumbnail](assets/other-symbols/Banner.png)
+![SignMaker Preview Thumbnail](assets/other-symbols/SignMakerBanner.png)
 
 # <img src="assets/other-symbols/SignMakerIconRotated.png" height="80"> Highway SignMaker
 Version: 2.2_indev
@@ -14,6 +14,7 @@ SignMaker is a JavaScript-based web application designed to render realistic hig
 6. Saving / Loading / Exporting
 
 ## Contributing TBD
+
 
 ## Sources Used TBD
 

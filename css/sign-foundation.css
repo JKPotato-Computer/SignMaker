@@ -1149,27 +1149,7 @@ main#smRender.wide #postContainer {
   border-bottom-left-radius: 0;
 }
 
-.signContainer:has(
-    .exitTabContainer.bottom .ET-row.meet-corners:last-child .center:not(:empty)
-  )
-  .signHolder,
-.signContainer:has(
-    .exitTabContainer.bottom
-      .ET-row.meet-corners:last-child
-      .right
-      .ET-tabHolder.full
-  )
-  .signHolder,
-.signContainer:has(
-    .exitTabContainer.bottom .ET-row.meet-corners:last-child,
-    .left .ET-tabHolder.full
-  )
-  .signHolder,
-.signContainer:has(
-    .exitTabContainer.bottom .ET-row.merge:last-child,
-    .ET-tabHolder.full
-  )
-  .signHolder {
+.signContainer:has( .exitTabContainer.bottom .ET-row.meet-corners:last-child .center:not(:empty) ) .signHolder, .signContainer:has( .exitTabContainer.bottom .ET-row.meet-corners:last-child .right .ET-tabHolder.full ) .signHolder, .signContainer:has( .exitTabContainer.bottom .ET-row.meet-corners:last-child  .left .ET-tabHolder.full ) .signHolder, .signContainer:has( .exitTabContainer.bottom .ET-row.merge:last-child .ET-tabHolder.full ) .signHolder {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
