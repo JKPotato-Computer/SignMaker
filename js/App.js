@@ -387,6 +387,10 @@ const App = (() => {
     post.newPanel(currentlySelectedPanelGroupIndex);
     currentlySelectedPanelIndex =
       post.panels[currentlySelectedPanelGroupIndex].length - 1;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+
     formHandler.updateForm();
     redraw();
   };
@@ -1377,62 +1381,39 @@ const App = (() => {
           (a, b) =>
             a.getBoundingClientRect().top - b.getBoundingClientRect().top,
         );
-
-      let currentY = dividerRect.top;
-
       
+      // for each one, only filter for items that use a different color than checkForContrast(panel.color)
+      const filteredRows = intersectingRows.filter((row) => {
+        const rowColor = ColorLibrary.checkForContrast(row.dataset.blockBackgroundColor);
+        const panelColor = ColorLibrary.checkForContrast(panel.color);
+        return rowColor !== panelColor;
+      });
 
-      const createChunk = (startY, endY, color) => {
-        const height = endY - startY;
-        if (height <= 0) return;
+      let dividerHeight = dividerRect.height;
 
-        const subRect = document.createElement("div");
-        subRect.className = "subdividerRect";
-        subRect.style.height = `${height}px`;
-        subRect.style.backgroundColor = color;
-        divider.appendChild(subRect);
+      for (let i = 0; i < filteredRows.length; i++) {
+        const currentRow = filteredRows[i];
+        const nextRow = filteredRows[i + 1] || null;
 
-        if (color !== defaultColor) {
-          if (!isFirstOppositeColor && currentY === dividerRect.top) {
-            isFirstOppositeColor = subRect;
-          }
-
-          const relativeBottom = endY - dividerRect.top;
-          if (
-            relativeBottom >=
-            signHolderRect.height - borderThicknessToPx * 2
-          ) {
-            isLastOppositeColor = subRect;
-          }
-        }
-      };
-
-      for (const row of intersectingRows) {
-        const rowRect = row.getBoundingClientRect();
-
-        if (rowRect.top > currentY) {
-          createChunk(currentY, rowRect.top, defaultColor);
-        }
-
-        // Determine row background color
-        const bgColor = row.dataset.blockBackgroundColor;
-        const blockColor = ColorLibrary.checkForContrast(bgColor)
+        const color = ColorLibrary.checkForContrast(currentRow.dataset.blockBackgroundColor)
           ? "black"
           : "white";
 
-        // Fill the span of this row
-        const chunkTop = Math.max(dividerRect.top, rowRect.top);
-        const chunkBottom = Math.min(dividerRect.bottom, rowRect.bottom);
+        const height = (!nextRow ? dividerHeight : nextRow.getBoundingClientRect().top - currentRow.getBoundingClientRect().top) - currentRow.getBoundingClientRect().height;
+        const dividerAbsElmt = document.createElement("div");
+        dividerAbsElmt.className = "subdividerRect";
+        dividerAbsElmt.style.width = "100%";
+        dividerAbsElmt.style.height = `${Math.min(height, dividerHeight)}px`;
+        dividerAbsElmt.style.backgroundColor = color;
+        divider.appendChild(dividerAbsElmt);
 
-        createChunk(chunkTop, chunkBottom, blockColor);
+        dividerHeight -= height;
 
-        currentY = Math.max(currentY, rowRect.bottom);
+        if (dividerHeight <= 0) {
+          break;
+        }
       }
 
-      // 5. Fill any remaining space at the bottom of the divider
-      if (currentY < dividerRect.bottom) {
-        createChunk(currentY, dividerRect.bottom, defaultColor);
-      }
 
       if (isFirstOppositeColor) {
         const dividerAbsElmt = document.createElement("div");
@@ -1493,6 +1474,10 @@ const App = (() => {
           row.style.borderLeft = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
           row.style.marginLeft = `-0.2rem`;
           row.style.width = `calc(100% + 0.2rem)`;
+        }
+
+        if (touchesLeft && touchesRight) {
+          row.style.width = `calc(100% + 0.4rem)`;
         }
       }
 

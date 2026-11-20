@@ -1705,11 +1705,16 @@ const FormNavigation = (() => {
           let objectType = obj.constructor.name;
           const validClassNames = MUTCDVariants.getClassNames(objectType);
           let tagsToReplace = [];
+          let tagsToSkip = [];
 
           for (const className of validClassNames) {
             const classTags =
               MUTCDVariants[post.mutcdVariant][className]?.tagToReplace || [];
             tagsToReplace = [...tagsToReplace, ...classTags];
+
+            const skipTags = MUTCDVariants["MUTCD"][className]?.tagToSkip || [];
+            tagsToSkip = [...tagsToSkip, ...skipTags];
+
           }
 
           const validKeys = Object.keys(obj).filter(
@@ -1717,6 +1722,10 @@ const FormNavigation = (() => {
           );
 
           for (const key of validKeys) {
+            if (tagsToSkip.includes(key)) {
+              continue;
+            }
+
             if (tagsToReplace.includes(key)) {
               const currentValue = obj[key];
               let newValue;
@@ -1749,9 +1758,11 @@ const FormNavigation = (() => {
                   (k) => k !== "constructor" && k !== "prototype",
                 );
 
-                console.log("-", o, "-");
-
                 for (const k of valKeys) {
+                  if (tagsToSkip.includes(k)) {
+                    continue;
+                  }
+
                   if (tagsToReplace.includes(k)) {
                     const currentValue = o[k];
                     let newValue;

@@ -72,8 +72,8 @@ const MUTCDVariants = (() => {
         corner: "Sharp",
         borderRadius: 0.75,
         tagToReplace: ["corner", "borderRadius"],
-      },
-      Sign: {
+    },
+    Sign: {
         arrows: {
           arrowMode: "standard",
           standard: {
@@ -135,6 +135,7 @@ const MUTCDVariants = (() => {
         oSNum: "",
         subPanels: [],
         lanePanelSize: 0,
+        tagToSkip: ["diagramData"]
       },
       SubPanels: {
         laneWidth: 0,
@@ -602,10 +603,6 @@ const MUTCDVariants = (() => {
         oSNum: "",
         subPanels: [],
         lanePanelSize: 0,
-        paddingLeft: 0.75,
-        paddingRight: 0.75,
-        paddingTop: 0.3,
-        paddingBottom: 0.3,
         tagToReplace: ["borderMode", "fontFamily", "backgroundColor"],
       },
       SubPanels: {
