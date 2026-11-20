@@ -1149,7 +1149,28 @@ main#smRender.wide #postContainer {
   border-bottom-left-radius: 0;
 }
 
-.signContainer:has( .exitTabContainer.bottom .ET-row.meet-corners:last-child .center:not(:empty) ) .signHolder, .signContainer:has( .exitTabContainer.bottom .ET-row.meet-corners:last-child .right .ET-tabHolder.full ) .signHolder, .signContainer:has( .exitTabContainer.bottom .ET-row.meet-corners:last-child  .left .ET-tabHolder.full ) .signHolder, .signContainer:has( .exitTabContainer.bottom .ET-row.merge:last-child .ET-tabHolder.full ) .signHolder {
+.signContainer:has(
+    .exitTabContainer.bottom .ET-row.meet-corners:last-child .center:not(:empty)
+  )
+  .signHolder,
+.signContainer:has(
+    .exitTabContainer.bottom
+      .ET-row.meet-corners:last-child
+      .right
+      .ET-tabHolder.full
+  )
+  .signHolder,
+.signContainer:has(
+    .exitTabContainer.bottom
+      .ET-row.meet-corners:last-child
+      .left
+      .ET-tabHolder.full
+  )
+  .signHolder,
+.signContainer:has(
+    .exitTabContainer.bottom .ET-row.merge:last-child .ET-tabHolder.full
+  )
+  .signHolder {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -1466,4 +1487,17 @@ main#smRender.wide #postContainer {
   --signBorderRadius: 0em !important;
   box-sizing: border-box;
   border: var(--bg-color) 0.2rem solid;
+}
+
+.subDividerHolder {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.subdividerRect.absolutePositioning {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 0.2rem;
 }
