@@ -105,7 +105,7 @@
   top: 0.08em;
 }
 
-/* US Route, Nova Scotia, Circle (Kentucky, Iowa, Vermont Local), Ellipse (Deleware, Mississippi), Rectangle 1 (Massachussets, Maine, Wisconsin County), Rectangle 2 (West Virginia) */
+/* US Route, Nova Scotia, Circle (Kentucky, Iowa, Vermont Local), Ellipse (Deleware, Mississippi), Rectangle 1 (Massachussets, Maine, Wisconsin County), Rectangle 2 (West Virginia), Connecticut */
 .shield.NS.TwoDigit .routeNumber,
 .shield.NS.OneDigit .routeNumber,
 .shield:is(
@@ -114,6 +114,7 @@
     .elp,
     .rec,
     .rec2,
+    .CT,
     .KY,
     .MA,
     .ME,

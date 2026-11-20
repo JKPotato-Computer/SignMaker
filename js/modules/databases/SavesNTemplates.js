@@ -175,20 +175,21 @@ const SavesNTemplates = (() => {
         .appendChild(templateItem);
 
       loadBtn.addEventListener("click", () => {
+        const signData = template.data;
         if (
-          !confirm(
+          signData &&
+          confirm(
             "Are you sure you want to load this template? Unsaved changes will be lost.",
           )
         ) {
-          return;
-        }
+          document.querySelector("#sMCreationsFileName").value =
+            template.name;
+          App.setPost(ImportExport.jsonToSign(signData));
 
-        Object.assign(
-          App.getCurrentPanel(),
-          ImportExport.jsonToSign(template.data)[0],
-        );
-        formHandler.updateForm();
-        App.redraw();
+          App.resetSelectors();
+          formHandler.updateForm();
+          App.redraw();
+        }
       });
     }
   };
