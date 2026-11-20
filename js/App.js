@@ -1229,7 +1229,6 @@ const App = (() => {
   const redrawSubPanels = (panel, signHolderElmt) => {
     const subpanelList = [];
     const dividerList = [];
-    let hasShifted = false;
 
     for (
       let subPanelIndex = 0;
@@ -1269,6 +1268,11 @@ const App = (() => {
       if (subPanelIndex < panel.sign.subPanels.length - 1) {
         const subDivider = document.createElement("div");
         subDivider.className = "subDivider";
+
+        const subDividerHolder = document.createElement("div");
+        subDividerHolder.className = "subDividerHolder";
+        subDivider.appendChild(subDividerHolder);
+
         if (subPanel.dividerHeight && subPanel.dividerHeightUnit == "rem") {
           subDivider.style.height =
             subPanel.dividerHeight + subPanel.dividerHeightUnit;
@@ -1282,6 +1286,11 @@ const App = (() => {
             (subPanel.dividerHeight / 100)
           }px`;
         }
+        subDivider.style.backgroundColor = ColorLibrary.checkForContrast(
+          panel.color,
+        )
+          ? "black"
+          : "white";
 
         dividerList.push(subDivider);
         signHolderElmt.appendChild(subDivider);
@@ -1360,9 +1369,6 @@ const App = (() => {
         ? "black"
         : "white";
 
-      let isFirstOppositeColor = null;
-      let isLastOppositeColor = null;
-
       const intersectingRows = rows
         .filter((row) => {
           const rowRect = row.getBoundingClientRect();
@@ -1381,63 +1387,75 @@ const App = (() => {
           (a, b) =>
             a.getBoundingClientRect().top - b.getBoundingClientRect().top,
         );
-      
-      // for each one, only filter for items that use a different color than checkForContrast(panel.color)
-      const filteredRows = intersectingRows.filter((row) => {
-        const rowColor = ColorLibrary.checkForContrast(row.dataset.blockBackgroundColor);
-        const panelColor = ColorLibrary.checkForContrast(panel.color);
-        return rowColor !== panelColor;
+
+      const oppositeColorRows = intersectingRows.filter((row) => {
+        const blockBackgroundColor = row.dataset.blockBackgroundColor;
+        const blockBorderColor =
+          ColorLibrary.checkForContrast(blockBackgroundColor);
+        return blockBorderColor != ColorLibrary.checkForContrast(panel.color);
       });
 
-      let dividerHeight = dividerRect.height;
-
-      for (let i = 0; i < filteredRows.length; i++) {
-        const currentRow = filteredRows[i];
-        const nextRow = filteredRows[i + 1] || null;
-
-        const color = ColorLibrary.checkForContrast(currentRow.dataset.blockBackgroundColor)
+      for (const row of oppositeColorRows) {
+        const dividerBlock = document.createElement("div");
+        dividerBlock.className = "subdividerRect";
+        dividerBlock.style.position = "absolute";
+        dividerBlock.style.top = `${row.getBoundingClientRect().top - dividerRect.top}px`;
+        dividerBlock.style.width = "100%";
+        dividerBlock.style.height = row.getBoundingClientRect().height;
+        dividerBlock.style.backgroundColor = ColorLibrary.checkForContrast(
+          row.dataset.blockBackgroundColor,
+        )
           ? "black"
           : "white";
-
-        const height = (!nextRow ? dividerHeight : nextRow.getBoundingClientRect().top - currentRow.getBoundingClientRect().top) - currentRow.getBoundingClientRect().height;
-        const dividerAbsElmt = document.createElement("div");
-        dividerAbsElmt.className = "subdividerRect";
-        dividerAbsElmt.style.width = "100%";
-        dividerAbsElmt.style.height = `${Math.min(height, dividerHeight)}px`;
-        dividerAbsElmt.style.backgroundColor = color;
-        divider.appendChild(dividerAbsElmt);
-
-        dividerHeight -= height;
-
-        if (dividerHeight <= 0) {
-          break;
-        }
+        divider.querySelector(".subDividerHolder").appendChild(dividerBlock);
       }
 
-
-      if (isFirstOppositeColor) {
+      if (dividerRect.top <= innerEdges.top && oppositeColorRows.length > 0) {
         const dividerAbsElmt = document.createElement("div");
-        dividerAbsElmt.className = "subdividerRect";
-        dividerAbsElmt.style.position = "absolute";
+        dividerAbsElmt.className = "subdividerRect absolutePositioning";
         dividerAbsElmt.style.top = "-0.2rem";
-        dividerAbsElmt.style.left = "0";
-        dividerAbsElmt.style.width = "100%";
-        dividerAbsElmt.style.height = "0.2rem";
-        dividerAbsElmt.style.backgroundColor =
-          isFirstOppositeColor.style.backgroundColor;
+
+        const touchingRow = oppositeColorRows.find((row) => {
+          const rowRect = row.getBoundingClientRect();
+          return Math.abs(rowRect.top - innerEdges.top) <= 1;
+        });
+
+        if (touchingRow) {
+          dividerAbsElmt.style.backgroundColor = ColorLibrary.checkForContrast(
+            touchingRow.dataset.blockBackgroundColor,
+          )
+            ? "black"
+            : "white";
+        } else {
+          dividerAbsElmt.style.backgroundColor = defaultColor;
+        }
+
         divider.appendChild(dividerAbsElmt);
       }
 
-      if (isLastOppositeColor) {
+      if (
+        dividerRect.bottom >= innerEdges.bottom &&
+        oppositeColorRows.length > 0
+      ) {
         const dividerAbsElmt = document.createElement("div");
-        dividerAbsElmt.className = "subdividerRect";
-        dividerAbsElmt.style.position = "absolute";
+        dividerAbsElmt.className = "subdividerRect absolutePositioning";
         dividerAbsElmt.style.bottom = "-0.2rem";
-        dividerAbsElmt.style.left = "0";
-        dividerAbsElmt.style.width = "100%";
-        dividerAbsElmt.style.height = "0.2rem";
-        dividerAbsElmt.style.backgroundColor =
-          isLastOppositeColor.style.backgroundColor;
+
+        const touchingRow = oppositeColorRows.find((row) => {
+          const rowRect = row.getBoundingClientRect();
+          return Math.abs(rowRect.bottom - innerEdges.bottom) <= 1;
+        });
+
+        if (touchingRow) {
+          dividerAbsElmt.style.backgroundColor = ColorLibrary.checkForContrast(
+            touchingRow.dataset.blockBackgroundColor,
+          )
+            ? "black"
+            : "white";
+        } else {
+          dividerAbsElmt.style.backgroundColor = defaultColor;
+        }
+
         divider.appendChild(dividerAbsElmt);
       }
     }
