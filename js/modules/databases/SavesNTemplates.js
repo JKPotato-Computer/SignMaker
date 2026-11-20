@@ -136,7 +136,7 @@ const SavesNTemplates = (() => {
         let list = TemplatePresets[category];
         for (const templateName in list) {
           let clone = {
-            name: `(${category}) ${templateName}`,
+            name: `(${category}) ${templateName.split("_")[1]}`,
             id: templateName,
             data: list[templateName],
           };
@@ -147,7 +147,7 @@ const SavesNTemplates = (() => {
       let list = TemplatePresets[currentTemplateCategory];
       for (const templateName in list) {
         let clone = {
-          name: templateName,
+          name: templateName.split("_")[1],
           id: templateName,
           data: list[templateName],
         };
@@ -179,14 +179,19 @@ const SavesNTemplates = (() => {
         if (
           signData &&
           confirm(
-            "Are you sure you want to load this template? Unsaved changes will be lost.",
+            "Are you sure you want to load this " + (template.id.includes("POST_") ? "template" : "panel") + "? Unsaved changes will be lost.",
           )
         ) {
           document.querySelector("#sMCreationsFileName").value =
             template.name;
-          App.setPost(ImportExport.jsonToSign(signData));
-
-          App.resetSelectors();
+          
+          if (template.id.startsWith("PANEL_")) {
+            console.log(template.id, App.getCurrentPanel());
+            Object.assign(App.getCurrentPanel(), ImportExport.jsonToSign(signData)[0]);
+          } else {
+            App.setPost(ImportExport.jsonToSign(signData));
+            App.resetSelectors();
+          }
           formHandler.updateForm();
           App.redraw();
         }
