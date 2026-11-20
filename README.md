@@ -12,7 +12,7 @@ First envisioned by [Kurumi](https://www.kurumi.com/) in creating [SignMaker v2.
 This version of SignMaker aims to continue modernizing Highway Sign Maker with additional graphic features that align to the current version of the [Manual on Uniform Traffic Control Devices (MUTCD)](https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf). What are they, you may ask? Here's a small collection of items:
 
 ## Features
-![Block Element System](assets\form\readme\BlockElements.gif)
+![Block Element System](assets/form/readme/BlockElements.gif)
 SignMaker features a dedicated block-based editor system compared to being limited to a single Control Text and/or Action Message, allowing you to create virtually any sign combination imaginable. There are over 11 different elements to choose from, all with their own unique settings and configurations. Oh yeah, these are draggable too.
 
  ![Image](image.png)
