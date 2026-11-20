@@ -1349,13 +1349,26 @@ const App = (() => {
     panel,
     signCorners,
   ) => {
+    const zoomScale = formHandler.vars.zoomLevel;
+    const getScaledRect = (element) => {
+      const rect = element.getBoundingClientRect();
+      return {
+        top: rect.top / zoomScale,
+        right: rect.right / zoomScale,
+        bottom: rect.bottom / zoomScale,
+        left: rect.left / zoomScale,
+        width: rect.width / zoomScale,
+        height: rect.height / zoomScale,
+      };
+    };
+
     // sign border
-    const signHolderRect = signHolder.getBoundingClientRect();
+    const signHolderRect = getScaledRect(signHolder);
     const innerEdges = {
-      top: signHolderRect.top + borderThicknessToPx,
-      right: signHolderRect.right - borderThicknessToPx,
-      bottom: signHolderRect.bottom - borderThicknessToPx,
-      left: signHolderRect.left + borderThicknessToPx,
+      top: signHolderRect.top + borderThicknessToPx / zoomScale,
+      right: signHolderRect.right - borderThicknessToPx / zoomScale,
+      bottom: signHolderRect.bottom - borderThicknessToPx / zoomScale,
+      left: signHolderRect.left + borderThicknessToPx / zoomScale,
     };
 
     const rows = subpanelList.flatMap((subpanel) =>
@@ -1364,14 +1377,14 @@ const App = (() => {
 
     // dividers
     for (const divider of dividerList) {
-      const dividerRect = divider.getBoundingClientRect();
+      const dividerRect = getScaledRect(divider);
       const defaultColor = ColorLibrary.checkForContrast(panel.color)
         ? "black"
         : "white";
 
       const intersectingRows = rows
         .filter((row) => {
-          const rowRect = row.getBoundingClientRect();
+          const rowRect = getScaledRect(row);
           const minXOverlap = dividerRect.left - 5;
           const maxXOverlap = dividerRect.right + 5;
 
@@ -1385,7 +1398,7 @@ const App = (() => {
         })
         .sort(
           (a, b) =>
-            a.getBoundingClientRect().top - b.getBoundingClientRect().top,
+            getScaledRect(a).top - getScaledRect(b).top,
         );
 
       const oppositeColorRows = intersectingRows.filter((row) => {
@@ -1399,9 +1412,9 @@ const App = (() => {
         const dividerBlock = document.createElement("div");
         dividerBlock.className = "subdividerRect";
         dividerBlock.style.position = "absolute";
-        dividerBlock.style.top = `${row.getBoundingClientRect().top - dividerRect.top}px`;
+        dividerBlock.style.top = `${getScaledRect(row).top - dividerRect.top}px`;
         dividerBlock.style.width = "100%";
-        dividerBlock.style.height = row.getBoundingClientRect().height;
+        dividerBlock.style.height = getScaledRect(row).height;
         dividerBlock.style.backgroundColor = ColorLibrary.checkForContrast(
           row.dataset.blockBackgroundColor,
         )
@@ -1410,14 +1423,14 @@ const App = (() => {
         divider.querySelector(".subDividerHolder").appendChild(dividerBlock);
       }
 
-      if (dividerRect.top <= innerEdges.top && oppositeColorRows.length > 0) {
+      if (Math.abs(dividerRect.top - innerEdges.top) <= 5 && oppositeColorRows.length > 0) {
         const dividerAbsElmt = document.createElement("div");
         dividerAbsElmt.className = "subdividerRect absolutePositioning";
         dividerAbsElmt.style.top = "-0.2rem";
 
         const touchingRow = oppositeColorRows.find((row) => {
-          const rowRect = row.getBoundingClientRect();
-          return Math.abs(rowRect.top - innerEdges.top) <= 1;
+          const rowRect = getScaledRect(row);
+          return Math.abs(rowRect.top - innerEdges.top) <= 5;
         });
 
         if (touchingRow) {
@@ -1434,7 +1447,7 @@ const App = (() => {
       }
 
       if (
-        dividerRect.bottom >= innerEdges.bottom &&
+        Math.abs(dividerRect.bottom - innerEdges.bottom) <= 5 &&
         oppositeColorRows.length > 0
       ) {
         const dividerAbsElmt = document.createElement("div");
@@ -1442,8 +1455,8 @@ const App = (() => {
         dividerAbsElmt.style.bottom = "-0.2rem";
 
         const touchingRow = oppositeColorRows.find((row) => {
-          const rowRect = row.getBoundingClientRect();
-          return Math.abs(rowRect.bottom - innerEdges.bottom) <= 1;
+          const rowRect = getScaledRect(row);
+          return Math.abs(rowRect.bottom - innerEdges.bottom) <= 5;
         });
 
         if (touchingRow) {
@@ -1464,11 +1477,11 @@ const App = (() => {
       row.style.border = "none";
       row.style.boxSizing = "border-box";
 
-      const rowRect = row.getBoundingClientRect();
-      const touchesTop = Math.abs(rowRect.top - innerEdges.top) <= 1;
-      const touchesRight = Math.abs(rowRect.right - innerEdges.right) <= 1;
-      const touchesBottom = Math.abs(rowRect.bottom - innerEdges.bottom) <= 1;
-      const touchesLeft = Math.abs(rowRect.left - innerEdges.left) <= 1;
+      const rowRect = getScaledRect(row);
+      const touchesTop = Math.abs(rowRect.top - innerEdges.top) <= 5;
+      const touchesRight = Math.abs(rowRect.right - innerEdges.right) <= 5;
+      const touchesBottom = Math.abs(rowRect.bottom - innerEdges.bottom) <= 5;
+      const touchesLeft = Math.abs(rowRect.left - innerEdges.left) <= 5;
 
       const blockBackgroundColor = row.dataset.blockBackgroundColor;
       const blockBorderColor =
