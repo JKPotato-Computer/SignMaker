@@ -80,6 +80,13 @@
   top: 0.35em;
 }
 
+.shield.I.ThreeDigitAlt .routeNumber,
+.shield.I-BUS.ThreeDigitAlt .routeNumber {
+  font-family: "Series D";
+  font-size: 1.4em;
+  top: 0.1em;
+}
+
 .shield.I-BUS .banner {
   display: none;
 }

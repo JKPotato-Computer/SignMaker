@@ -1,11 +1,11 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta  content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta name="author" content="Brendon Strowe, Maplou, JK_Potato/Computer" />
+    <meta  content="Brendon Strowe, Maplou, JK_Potato/Computer" />
     <meta
-      name="description"
+      
       content="The ULTIMATE Sign Maker for highways, expressways, and everything!"
     />
     <title>Highway Sign Maker</title>
@@ -235,17 +235,17 @@
               </button>
             </div>
             <br />
-            <label for="downloadImageScale">Scale:</label>
+            <label for="downloadImageScaleSlider">Scale:</label>
             <input
               type="range"
               min="1"
               value="2"
               max="10"
               step="1"
-              id="downloadImageScale"
+              id="downloadImageScaleSlider"
               onchange="
                 ImportExport.setImageScale(this.value);
-                document.querySelector('#downloadImageScaleVal').value =
+                document.querySelector('#downloadImageScale').value =
                   this.value;
                 ImportExport.updatePreview();
               "
@@ -257,10 +257,10 @@
               placeholder="2"
               max="10"
               step="1"
-              id="downloadImageScaleVal"
+              id="downloadImageScale"
               oninput="
                 ImportExport.setImageScale(this.value);
-                document.querySelector('#downloadImageScale').value =
+                document.querySelector('#downloadImageScaleSlider').value =
                   this.value;
                 ImportExport.updatePreview();
               "
@@ -270,7 +270,7 @@
             <input
               type="checkbox"
               id="entirePost"
-              name="entirePost"
+              
               value="entirePost"
               onchange="
                 ImportExport.toggleEntirePost(this.checked);
@@ -324,7 +324,7 @@
             <button class="material-symbols-outlined" id="downloadImageZoomOut">
               zoom_out
             </button>
-            <span id="downloadImageZoomValue">100%</span>
+            <span id="downloadImageZoom">100%</span>
             <button class="material-symbols-outlined" id="downloadImageZoomIn">
               zoom_in
             </button>
@@ -519,24 +519,26 @@
           </details>
           <details>
             <summary>Position</summary>
-            <label for="spShield_scale">Shield Scale (%):</label>
+            <label for="spShield_scaleSlider">Shield Scale (%):</label>
             <input
               type="range"
               min="0"
               max="300"
               step="1"
               value="100"
-              id="spShield_scale"
-              oninput="ShieldEditor.readForm()"
+              id="spShield_scaleSlider"
+              onchange="
+                document.querySelector('#spShield_scale').value = this.value;
+                ShieldEditor.readForm();
+              "
             />
             <input
-              id="spShield_scaleVal"
+              id="spShield_scale"
               class="smallVal"
               type="number"
               value="100"
               step="1"
-              onchange="
-                document.querySelector('#spShield_scale').value = this.value;
+              oninput="
                 ShieldEditor.readForm();
               "
             />
@@ -1216,6 +1218,7 @@
                       Highway Sign Designs (SHSD) which adopts the Clearview
                       typeface as a part of its official signage.
                     </p>
+                    <a href="https://www.txdot.gov/content/dam/docs/division/trf/shsd/complete.pdf"><span class="material-symbols-outlined">open_in_new</span>View the MUTCD Here</a>
 
                     <span class="mutcdBottom">Click to select</span>
                   </div>
@@ -1226,7 +1229,7 @@
                     <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines</h2>
                     <p>2026 Edition</p>
                     <p>
-                      Placeholder Description :3
+                      Placeholder Description :3 Designed by @vivribbon
                     </p>
 
                     <span class="mutcdBottom">Click to select</span>
@@ -1297,10 +1300,10 @@
               </label>
               <select id="postColor" onchange="formHandler.readForm();"></select>
               <br />
-              <label for="postThicknessValue">Thickness (rem):</label>
+              <label for="postThickness">Thickness (rem):</label>
               <input
                 type="number"
-                id="postThicknessValue"
+                id="postThickness"
                 min="0"
                 step=".01"
                 value="1"
@@ -1323,7 +1326,7 @@
               <input
                 type="checkbox"
                 id="showPost"
-                name="showPost"
+                
                 value="showPost"
                 onchange="formHandler.readForm()"
               />
@@ -1385,7 +1388,7 @@
                 <input
                   type="number"
                   id="panelBorderRadius"
-                  name="panelBorderRadius"
+                  
                   value=".75"
                   min="0"
                   max="5"
@@ -1397,7 +1400,7 @@
                 <input
                   type="number"
                   id="panelLaneSize"
-                  name="panelLaneSize"
+                  
                   value="0"
                   min="0"
                   max="1000"
@@ -1528,7 +1531,7 @@
                 <input
                   type="checkbox"
                   id="smET_hideTopBorder"
-                  name="smET_hideTopBorder"
+                  
                   onchange="formHandler.readForm()"
                 />
               </label>
@@ -1537,7 +1540,7 @@
                 <input
                   type="checkbox"
                   id="smET_hideBottomBorder"
-                  name="smET_hideBottomBorder"
+                  
                   onchange="formHandler.readForm()"
                 />
               </label>
@@ -1646,7 +1649,7 @@
                   <input
                     type="checkbox"
                     id="sMET_variantIsTollIcon"
-                    name="sMET_variantIsTollIcon"
+                    
                     onchange="formHandler.readForm()"
                   />
                   Toll Icon
@@ -1655,7 +1658,7 @@
                   <input
                     type="checkbox"
                     id="sMET_variantIsTextBased"
-                    name="sMET_variantIsTextBased"
+                    
                     onchange="formHandler.readForm()"
                   />
                   Text Based
@@ -1665,7 +1668,7 @@
                 <label for="sMET_variantAddon">Addon:</label>
                 <select
                   id="sMET_variantAddon"
-                  name="sMET_variantAddon"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
                 <label for="sMET_variantFontFamily" class="noLabelAlignment"
@@ -1673,43 +1676,40 @@
                 >
                 <select
                   id="sMET_variantFontFamily"
-                  name="sMET_variantFontFamily"
+                  
                   value="Series E"
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="sMET_variantIconSize">Icon Size (rem):</label>
+                <label for="sMET_variantIconSizeSlider">Icon Size (rem):</label>
                 <input
                   type="range"
-                  id="sMET_variantIconSize"
-                  name="sMET_variantIconSize"
+                  id="sMET_variantIconSizeSlider"
+                  
                   min="0"
                   max="10"
                   step="0.1"
                   value="3"
-                  oninput="
-                    document.getElementById('sMET_variantIconSizeVal').value =
-                      this.value
-                  "
-                  onchange="formHandler.readForm()"
-                />
-                <input
-                  id="sMET_variantIconSizeVal"
-                  class="smallVal"
-                  type="number"
-                  name="sMET_variantIconSizeVal"
-                  value="3"
-                  step="0.1"
                   onchange="
                     document.getElementById('sMET_variantIconSize').value =
-                      this.value
+                      this.value;
+                    formHandler.readForm();
                   "
+                />
+                <input
+                  id="sMET_variantIconSize"
+                  class="smallVal"
+                  type="number"
+                  
+                  value="3"
+                  step="0.1"
+                  oninput="formHandler.readForm()"
                 />
                 <label for="sMET_variantIsSquareIcon" class="checkboxLabel">
                   <input
                     type="checkbox"
                     id="sMET_variantIsSquareIcon"
-                    name="sMET_variantIsSquareIcon"
+                    
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -1720,7 +1720,7 @@
                   <input
                     type="checkbox"
                     id="smET_showBackground"
-                    name="smET_showBackground"
+                    
                     onchange="formHandler.readForm()"
                     checked
                   />
@@ -1776,7 +1776,7 @@
                 <input
                   type="number"
                   id="sMET_variantOnlyHorizontalPadding"
-                  name="sMET_variantOnlyHorizontalPadding"
+                  
                   min="0"
                   step="0.05"
                   value="0.25"
@@ -1786,7 +1786,7 @@
                 <input
                   type="number"
                   id="sMET_variantPbmPadding"
-                  name="sMET_variantPbmPadding"
+                  
                   min="0"
                   step="0.05"
                   value="0.25"
@@ -1796,7 +1796,7 @@
                   <input
                     type="checkbox"
                     id="smET_variantIsSquare"
-                    name="smET_variantIsSquare"
+                    
                     onchange="formHandler.readForm()"
                   />
                   Square Text
@@ -1805,7 +1805,7 @@
                 <input
                   type="number"
                   id="smET_variantFontSize"
-                  name="smET_variantFontSize"
+                  
                   value="0"
                   min="0"
                   step="0.05"
@@ -1816,7 +1816,7 @@
                   <input
                     type="checkbox"
                     id="sMET_variantUnderline"
-                    name="sMET_variantUnderline"
+                    
                     onchange="formHandler.readForm()"
                   />
                   Underline
@@ -1830,7 +1830,7 @@
                 <input
                   type="number"
                   id="smET_fullLeftMinimumWidth"
-                  name="smET_fullLeftMinimumWidth"
+                  
                   value="7"
                   min="0"
                   max="20"
@@ -1840,7 +1840,7 @@
                 <label for="smET_fullLeftFontFamily">Font Family:</label>
                 <select
                   id="smET_fullLeftFontFamily"
-                  name="smET_fullLeftFontFamily"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
@@ -1850,7 +1850,7 @@
                 <input
                   type="number"
                   id="smET_fullLeftLetterSpacing"
-                  name="smET_fullLeftLetterSpacing"
+                  
                   value="1"
                   min="0"
                   max="50"
@@ -1861,7 +1861,7 @@
                 <input
                   type="number"
                   id="smET_fullLeftBottomSpacing"
-                  name="smET_fullLeftBottomSpacing"
+                  
                   value="1.25"
                   min="0"
                   max="20"
@@ -1873,7 +1873,7 @@
                 <input
                   type="checkbox"
                   id="smET_fullLeftFlipJustify"
-                  name="smET_fullLeftFlipJustify"
+                  
                   onchange="formHandler.readForm()"
                 />
               </fieldset>
@@ -1883,7 +1883,7 @@
                   <input
                     type="checkbox"
                     id="smET_partialLeftCheckbox"
-                    name="smET_partialLeftCheckbox"
+                    
                     onchange="formHandler.readForm()"
                     checked
                   />
@@ -1895,7 +1895,7 @@
                 <input
                   type="number"
                   id="smET_partialLeftMinWidth"
-                  name="smET_partialLeftMinWidth"
+                  
                   value="7"
                   min="0"
                   max="20"
@@ -1906,7 +1906,7 @@
                 <input
                   type="number"
                   id="smET_partialLeftSpacing"
-                  name="smET_partialLeftSpacing"
+                  
                   value="1.5"
                   min="0"
                   max="20"
@@ -1915,7 +1915,7 @@
                 />
 
                 <br />
-                <label for="smET_partialLeftHorizontalPadding"
+                <label for="smET_partialLeftHorizontalPaddingSlider"
                   >Horizontal Padding (rem):</label
                 >
                 <input
@@ -1924,30 +1924,28 @@
                   max="5"
                   value="0.6"
                   step=".01"
-                  oninput="
+                  id="smET_partialLeftHorizontalPaddingSlider"
+                  onchange="
                     document.querySelector(
-                      '#smET_partialLeftHorizontalPaddingVal',
-                    ).value = this.value
+                      '#smET_partialLeftHorizontalPadding',
+                    ).value = this.value;
+                    formHandler.readForm();
                   "
-                  id="smET_partialLeftHorizontalPadding"
-                  onchange="formHandler.readForm()"
                 />
                 <input
                   type="number"
-                  id="smET_partialLeftHorizontalPaddingVal"
-                  name="smET_partialLeftHorizontalPaddingVal"
+                  id="smET_partialLeftHorizontalPadding"
+                  
                   min="0"
                   max="5"
                   value="0.6"
                   step=".01"
                   class="smallVal"
                   oninput="
-                    document.querySelector(
-                      '#smET_partialLeftHorizontalPadding',
-                    ).value = this.value
+                    formHandler.readForm();
                   "
                 />
-                <label for="smET_partialLeftVerticalPadding"
+                <label for="smET_partialLeftVerticalPaddingSlider"
                   >Vertical Padding (rem):</label
                 >
                 <input
@@ -1956,28 +1954,26 @@
                   max="5"
                   value="0.3"
                   step=".01"
-                  id="smET_partialLeftVerticalPadding"
-                  name="smET_partialLeftVerticalPadding"
-                  oninput="
+                  id="smET_partialLeftVerticalPaddingSlider"
+                  
+                  onchange="
                     document.querySelector(
-                      '#smET_partialLeftVerticalPaddingVal',
-                    ).value = this.value
+                      '#smET_partialLeftVerticalPadding',
+                    ).value = this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
                   type="number"
-                  name="smET_partialLeftVerticalPaddingVal"
-                  id="smET_partialLeftVerticalPaddingVal"
+                  
+                  id="smET_partialLeftVerticalPadding"
                   min="0"
                   max="5"
                   value="0.3"
                   step=".01"
                   class="smallVal"
                   oninput="
-                    document.querySelector(
-                      '#smET_partialLeftVerticalPadding',
-                    ).value = this.value
+                    formHandler.readForm();
                   "
                 />
                 <br />
@@ -1987,7 +1983,7 @@
                 <input
                   type="number"
                   id="smET_partialLeftLetterSpacing"
-                  name="smET_partialLeftLetterSpacing"
+                  
                   value="0"
                   min="0"
                   max="20"
@@ -1997,7 +1993,7 @@
                 <label for="smET_partialLeftFontFamily"> Font Family: </label>
                 <select
                   id="smET_partialLeftFontFamily"
-                  name="smET_partialLeftFontFamily"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
@@ -2007,7 +2003,7 @@
                 <input
                   type="number"
                   id="smET_partialLeftBorderRadius"
-                  name="smET_partialLeftBorderRadius"
+                  
                   value="4"
                   min="0"
                   max="50"
@@ -2130,7 +2126,7 @@
               <input
                 type="text"
                 id="sMET_textContent"
-                name="sMET_textContent"
+                
                 placeholder="Text Content"
                 oninput="formHandler.readForm()"
               />
@@ -2140,7 +2136,7 @@
               <input
                 type="text"
                 id="sMET_subTextContent"
-                name="sMET_subTextContent"
+                
                 placeholder="Sub Text Content"
                 oninput="formHandler.readForm()"
               />
@@ -2155,7 +2151,7 @@
                 <input
                   type="number"
                   id="smET_shieldGap"
-                  name="smET_shieldGap"
+                  
                   value="0.25"
                   min="0"
                   step=".01"
@@ -2164,7 +2160,7 @@
                 <label for="smET_shieldsDirection">Shield Direction:</label>
                 <select
                   id="smET_shieldsDirection"
-                  name="smET_shieldsDirection"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
@@ -2174,7 +2170,7 @@
                 <input
                   type="number"
                   id="smET_shieldWordSpacing"
-                  name="smET_shieldWordSpacing"
+                  
                   value="0.25"
                   min="0"
                   step=".01"
@@ -2188,93 +2184,89 @@
                 <label for="sMET_backgroundColor">Background Color:</label>
                 <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
 
-                <label for="sMET_minimumHeight">Minimum Height (rem):</label>
+                <label for="sMET_minimumHeightSlider">Minimum Height (rem):</label>
                 <input
                   type="range"
-                  id="sMET_minimumHeight"
-                  name="sMET_minimumHeight"
+                  id="sMET_minimumHeightSlider"
+                  
                   min="0"
                   max="5"
                   step="0.05"
                   value="2.25"
-                  oninput="
-                    document.getElementById('sMET_minimumHeightVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_minimumHeight').value =
+                      this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_minimumHeightVal"
+                  id="sMET_minimumHeight"
                   class="smallVal"
                   type="number"
-                  name="sMET_minimumHeightVal"
+                  
                   value="2.25"
                   step="0.05"
                   oninput="
-                    document.getElementById('sMET_minimumHeight').value =
-                      this.value
+                    formHandler.readForm();
                   "
                 />
                 <br />
 
                 <!-- Horizontal  Vertical Padding -->
-                <label for="sMET_horizontalPadding"
+                <label for="sMET_horizontalPaddingSlider"
                   >Horizontal Padding (rem):</label
                 >
                 <input
                   type="range"
-                  id="sMET_horizontalPadding"
-                  name="sMET_horizontalPadding"
+                  id="sMET_horizontalPaddingSlider"
+                  
                   min="0"
                   max="10"
                   step="0.1"
                   value="0"
-                  oninput="
-                    document.getElementById('sMET_horizontalPaddingVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_horizontalPadding').value =
+                      this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_horizontalPaddingVal"
+                  id="sMET_horizontalPadding"
                   class="smallVal"
                   type="number"
-                  name="sMET_horizontalPaddingVal"
+                  
                   value="0"
                   step="0.1"
-                  oninput="
-                    document.getElementById('sMET_horizontalPadding').value =
-                      this.value
+                  oninput="formHandler.readForm();
                   "
                 />
 
-                <label for="sMET_verticalPadding"
+                <label for="sMET_verticalPaddingSlider"
                   >Vertical Padding (rem):</label
                 >
                 <input
                   type="range"
-                  id="sMET_verticalPadding"
-                  name="sMET_verticalPadding"
+                  id="sMET_verticalPaddingSlider"
+                  
                   min="0"
                   max="10"
                   step="0.1"
                   value="0"
-                  oninput="
-                    document.getElementById('sMET_verticalPaddingVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_verticalPadding').value =
+                      this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_verticalPaddingVal"
+                  id="sMET_verticalPadding"
                   class="smallVal"
                   type="number"
-                  name="sMET_verticalPaddingVal"
+                  
                   value="0"
                   step="0.1"
-                  oninput="
-                    document.getElementById('sMET_verticalPadding').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
                 <br />
@@ -2282,41 +2274,41 @@
                 <label for="sMET_width">Width:</label>
                 <select
                   id="sMET_width"
-                  name="sMET_width"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
 
                 <label
-                  for="sMET_widthSize"
+                  for="sMET_widthSizeSlider"
                   id="sMET_widthSizeLabel"
                   class="hidden"
                   >Width Size (rem):</label
                 >
                 <input
                   type="range"
-                  id="sMET_widthSize"
-                  name="sMET_widthSize"
+                  id="sMET_widthSizeSlider"
+                  
                   class="hidden"
                   min="0"
                   max="20"
                   step="0.1"
                   value="0"
-                  oninput="
-                    document.getElementById('sMET_widthSizeVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_widthSize').value =
+                      this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_widthSizeVal"
+                  id="sMET_widthSize"
                   class="smallVal"
                   type="number"
-                  name="sMET_widthSizeVal"
+                  
                   class="hidden"
                   value="0"
                   step="0.1"
-                  oninput="
-                    document.getElementById('sMET_widthSize').value = this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
                 <br />
@@ -2325,14 +2317,14 @@
                 <label for="sMET_alignment">Alignment:</label>
                 <select
                   id="sMET_alignment"
-                  name="sMET_alignment"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
 
                 <label for="sMET_contentDirection">Content Direction:</label>
                 <select
                   id="sMET_contentDirection"
-                  name="sMET_contentDirection"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
@@ -2357,7 +2349,7 @@
                 <label for="sMET_borderStyle">Border Style:</label>
                 <select
                   id="sMET_borderStyle"
-                  name="sMET_borderStyle"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
 
@@ -2365,7 +2357,7 @@
                   <input
                     type="checkbox"
                     id="sMET_useFullBorder"
-                    name="sMET_useFullBorder"
+                    
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -2376,7 +2368,7 @@
                   <input
                     type="checkbox"
                     id="sMET_roundBottomBorder"
-                    name="sMET_roundBottomBorder"
+                    
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -2385,61 +2377,57 @@
                 <br />
 
                 <!-- Border Thickness  Roundness -->
-                <label for="sMET_borderThickness"
+                <label for="sMET_borderThicknessSlider"
                   >Border Thickness (rem):</label
                 >
                 <input
                   type="range"
-                  id="sMET_borderThickness"
-                  name="sMET_borderThickness"
+                  id="sMET_borderThicknessSlider"
+                  
                   min="0"
                   max="0.5"
                   step="0.01"
                   value="0.2"
-                  oninput="
-                    document.getElementById('sMET_borderThicknessVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_borderThickness').value =
+                      this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_borderThicknessVal"
+                  id="sMET_borderThickness"
                   class="smallVal"
                   type="number"
-                  name="sMET_borderThicknessVal"
+                  
                   value="0.2"
                   step="0.01"
-                  oninput="
-                    document.getElementById('sMET_borderThickness').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
 
-                <label for="sMET_borderRadius">Roundness (rem):</label>
+                <label for="sMET_borderRadiusSlider">Roundness (rem):</label>
                 <input
                   type="range"
-                  id="sMET_borderRadius"
-                  name="sMET_borderRadius"
+                  id="sMET_borderRadiusSlider"
+                  
                   min="0"
                   max="2"
                   step="0.1"
                   value="0.5"
-                  oninput="
-                    document.getElementById('sMET_borderRadiusVal').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_borderRadiusVal"
+                  id="sMET_borderRadius"
                   class="smallVal"
                   type="number"
-                  name="sMET_borderRadiusVal"
+                  
                   value="0.5"
                   step="0.1"
-                  oninput="
-                    document.getElementById('sMET_borderRadius').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
               </fieldset>
@@ -2447,119 +2435,115 @@
               <fieldset>
                 <legend>Text</legend>
 
-                <label for="sMET_fontSize">Text Size (px):</label>
+                <label for="sMET_fontSizeSlider">Text Size (px):</label>
                 <input
                   type="range"
-                  id="sMET_fontSize"
-                  name="sMET_fontSize"
+                  id="sMET_fontSizeSlider"
+                  
                   min="10"
                   max="100"
                   step="1"
                   value="16"
-                  oninput="
-                    document.getElementById('sMET_fontSizeVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_fontSize').value =
+                      this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_fontSizeVal"
+                  id="sMET_fontSize"
                   class="smallVal"
                   type="number"
-                  name="sMET_fontSizeVal"
+                  
                   value="16"
                   step="1"
-                  oninput="
-                    document.getElementById('sMET_fontSize').value = this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
 
-                <label for="sMET_lineHeight">Line Height (%):</label>
+                <label for="sMET_lineHeightSlider">Line Height (%):</label>
                 <input
                   type="range"
-                  id="sMET_lineHeight"
-                  name="sMET_lineHeight"
+                  id="sMET_lineHeightSlider"
+                  
                   min="0"
                   max="400"
                   step="1"
                   value="100"
-                  onchange="formHandler.readForm()"
-                  oninput="
-                    document.getElementById('sMET_lineHeightVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_lineHeight').value =
+                      this.value;
+                    formHandler.readForm();
                   "
                 />
                 <input
-                  id="sMET_lineHeightVal"
+                  id="sMET_lineHeight"
                   class="smallVal"
                   type="number"
-                  name="sMET_lineHeightVal"
+                  
                   value="100"
                   step="1"
-                  oninput="
-                    document.getElementById('sMET_lineHeight').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
                 <br />
 
                 <!-- Letter Spacing  Numeral Letter Spacing -->
-                <label for="sMET_letterSpacing">Letter Spacing (rem):</label>
+                <label for="sMET_letterSpacingSlider">Letter Spacing (rem):</label>
                 <input
                   type="range"
-                  id="sMET_letterSpacing"
-                  name="sMET_letterSpacing"
+                  id="sMET_letterSpacingSlider"
+                  
                   min="-1"
                   max="1"
                   step="0.01"
                   value="0"
-                  oninput="
-                    document.getElementById('sMET_letterSpacingVal').value =
-                      this.value
+                  onchange="
+                    document.getElementById('sMET_letterSpacing').value = this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_letterSpacingVal"
+                  id="sMET_letterSpacing"
                   class="smallVal"
                   type="number"
-                  name="sMET_letterSpacingVal"
+                  
                   value="0"
                   step="0.01"
-                  oninput="
-                    document.getElementById('sMET_letterSpacing').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
 
-                <label for="sMET_numeralLetterSpacing"
+                <label for="sMET_numeralLetterSpacingSlider"
                   >Numeral Letter Spacing (rem):</label
                 >
                 <input
                   type="range"
-                  id="sMET_numeralLetterSpacing"
-                  name="sMET_numeralLetterSpacing"
+                  id="sMET_numeralLetterSpacingSlider"
+                  
                   min="-1"
                   max="1"
                   step="0.01"
                   value="0"
-                  oninput="
+                  onchange="
                     document.getElementById(
-                      'sMET_numeralLetterSpacingVal',
-                    ).value = this.value
+                      'sMET_numeralLetterSpacing',
+                    ).value = this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_numeralLetterSpacingVal"
+                  id="sMET_numeralLetterSpacing"
                   class="smallVal"
                   type="number"
-                  name="sMET_numeralLetterSpacingVal"
+                  
                   value="0"
                   step="0.01"
-                  oninput="
-                    document.getElementById('sMET_numeralLetterSpacing').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
                 <br />
@@ -2583,7 +2567,7 @@
                   <input
                     type="checkbox"
                     id="sMET_enlargeNumerals"
-                    name="sMET_enlargeNumerals"
+                    
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -2593,7 +2577,7 @@
                   id="sMET_enlargeNumeralsSize"
                   class="smallVal"
                   type="number"
-                  name="sMET_enlargeNumeralsSize"
+                  
                   value="150"
                   step="1"
                   onchange="formHandler.readForm()"
@@ -2603,7 +2587,7 @@
                   <input
                     type="checkbox"
                     id="sMET_spaceLettersNumerals"
-                    name="sMET_spaceLettersNumerals"
+                    
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -2613,7 +2597,7 @@
                   <input
                     type="checkbox"
                     id="smET_useTrimFormat"
-                    name="smET_useTrimFormat"
+                    
                     checked=""
                     onchange="formHandler.readForm()"
                   />
@@ -2625,40 +2609,39 @@
                   <input
                     type="checkbox"
                     id="sMET_offsetNonNumerals"
-                    name="sMET_offsetNonNumerals"
+                    
                     onchange="formHandler.readForm()"
                   />
                   Offset Non-Numerals Vertically
                 </label>
 
-                <label for="sMET_numeralWordSpacing"
+                <label for="sMET_numeralWordSpacingSlider"
                   >Numeral Word Gap (rem):</label
                 >
                 <input
                   type="range"
-                  id="sMET_numeralWordSpacing"
-                  name="sMET_numeralWordSpacing"
+                  id="sMET_numeralWordSpacingSlider"
+                  
                   min="0"
                   max="2"
                   step="0.01"
                   value="0"
-                  oninput="
+                  onchange="
                     document.getElementById(
-                      'sMET_numeralWordSpacingVal',
-                    ).value = this.value
+                      'sMET_numeralWordSpacing',
+                    ).value = this.value;
+                    formHandler.readForm();
                   "
-                  onchange="formHandler.readForm()"
                 />
                 <input
-                  id="sMET_numeralWordSpacingVal"
+                  id="sMET_numeralWordSpacing"
                   class="smallVal"
                   type="number"
-                  name="sMET_numeralWordSpacingVal"
+                  
                   value="0"
                   step="0.01"
-                  oninput="
-                    document.getElementById('sMET_numeralWordSpacing').value =
-                      this.value
+                  onchange="
+                    formHandler.readForm();
                   "
                 />
               </fieldset>
@@ -2853,7 +2836,7 @@
                         oninput="formHandler.readForm()"
                       />
                       <br />
-                      <label for="spShieldQuick_scale">Scale: </label>
+                      <label for="spShieldQuick_scaleSlider">Scale: </label>
                       <input
                         type="range"
                         min="0"
@@ -2861,18 +2844,20 @@
                         step="1"
                         ,
                         max="300"
-                        id="spShieldQuick_scale"
-                        oninput="formHandler.readForm()"
+                        id="spShieldQuick_scaleSlider"
+                        onchange="
+                          document.querySelector('#spShieldQuick_scale').value =
+                            this.value;
+                          formHandler.readForm();
+                        "
                       />
                       <input
-                        id="spShieldQuick_scaleVal"
+                        id="spShieldQuick_scale"
                         class="smallVal"
                         type="number"
                         value="1"
                         step="1"
                         oninput="
-                          document.querySelector('#spShieldQuick_scale').value =
-                            this.value;
                           formHandler.readForm();
                         "
                       />
@@ -3003,13 +2988,16 @@
                 <div id="smSPProperties">
                   <div data-property="sdCtrlText" class="">
                     <label for="sdCtrlText_textContent">Content:</label>
-                    <input
-                      type="text"
+                    <textarea
                       id="sdCtrlText_textContent"
                       class="sdTextEditorWide"
-                      placeholder="New Sign"
-                      value="New Sign"
-                    />
+                    >New Sign</textarea>
+                    <div class="sdTextAreaHint">
+                      <ul>
+                        <li>Use \t for tab spacing, and \n to jump to a new line manually</li>
+                        <li class="hintOnlyShowWithBanner">Use [DIRECTION] to format a custom direction beyond the <u data-toolTip="Arterial, North, East, South, West, Jct, Begin, End, Spur, Alt, Truck, Trunk, Business, Bypass, Loop, Express, Local, Inner, Outer, Future, Toll, City, Conn, To">presets.</u></li>
+                      </ul>
+                    </div>
                     <br />
                     <label for="sdCtrlText_backgroundColor">BG:</label>
                     <button id="sdCtrlText_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit" type="button">
@@ -3039,22 +3027,22 @@
                     <label for="sdCtrlText_alignment">Alignment: </label>
                     <select id="sdCtrlText_alignment"></select>
                     <br />
-                    <label for="sdCtrlText_lineHeight">Line Height (%): </label>
+                    <label for="sdCtrlText_lineHeightSlider">Line Height (%): </label>
                     <input
                       type="range"
                       min="0"
                       max="300"
                       value="100"
                       step="1"
-                      id="sdCtrlText_lineHeight"
+                      id="sdCtrlText_lineHeightSlider"
                     />
                     <input
-                      id="sdCtrlText_lineHeightVal"
+                      id="sdCtrlText_lineHeight"
                       class="smallVal"
                       type="number"
                       value="100"
                     />
-                    <label for="sdCtrlText_wordSpacing"
+                    <label for="sdCtrlText_wordSpacingSlider"
                       >Word Spacing (rem):</label
                     >
                     <input
@@ -3063,10 +3051,10 @@
                       max="1"
                       value="0"
                       step="0.01"
-                      id="sdCtrlText_wordSpacing"
+                      id="sdCtrlText_wordSpacingSlider"
                     />
                     <input
-                      id="sdCtrlText_wordSpacingVal"
+                      id="sdCtrlText_wordSpacing"
                       class="smallVal"
                       type="number"
                       value="0"
@@ -3189,17 +3177,22 @@
                       value=".5"
                       step=".01"
                     />
+                    <label for="sdShieldGroup_inlineShields">Inline Shields:</label>
+                    <input type="checkbox" id="sdShieldGroup_inlineShields" />
                   </div>
 
                   <div data-property="sdAdvisory" class="hidden">
                     <label for="sdAdvisory_textContent">Content:</label>
-                    <input
-                      type="text"
+                    <textarea
                       id="sdAdvisory_textContent"
                       class="sdTextEditorWide"
-                      placeholder="New Sign"
-                      value="New Sign"
-                    />
+                    >New Sign</textarea>
+                    <div class="sdTextAreaHint">
+                      <ul>
+                        <li>Use \t for tab spacing, and \n to jump to a new line manually</li>
+                        <li class="hintOnlyShowWithBanner">Use [DIRECTION] to format a custom direction beyond the <u data-toolTip="Arterial, North, East, South, West, Jct, Begin, End, Spur, Alt, Truck, Trunk, Business, Bypass, Loop, Express, Local, Inner, Outer, Future, Toll, City, Conn, To">presets.</u></li>
+                      </ul>
+                    </div>
                     <br />
                     <label for="sdAdvisory_backgroundColor">BG:</label>
                     <button type="button" id="sdAdvisory_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
@@ -3219,7 +3212,7 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdAdvisory_wordSpacing"
+                    <label for="sdAdvisory_wordSpacingSlider"
                       >Word Spacing (rem):</label
                     >
                     <input
@@ -3228,10 +3221,10 @@
                       max="1"
                       value="0"
                       step="0.01"
-                      id="sdAdvisory_wordSpacing"
+                      id="sdAdvisory_wordSpacingSlider"
                     />
                     <input
-                      id="sdAdvisory_wordSpacingVal"
+                      id="sdAdvisory_wordSpacing"
                       class="smallVal"
                       type="number"
                       value="0"
@@ -3319,7 +3312,7 @@
                       value="120"
                     />
                     <br />
-                    <label for="sdAdvisory_horizPadding"
+                    <label for="sdAdvisory_horizPaddingSlider"
                       >Horizontal Padding (rem):
                     </label>
                     <input
@@ -3328,17 +3321,17 @@
                       max="3"
                       value=".3"
                       step=".1"
-                      id="sdAdvisory_horizPadding"
+                      id="sdAdvisory_horizPaddingSlider"
                     />
                     <input
-                      id="sdAdvisory_horizPaddingVal"
+                      id="sdAdvisory_horizPadding"
                       class="smallVal"
                       type="number"
                       value=".3"
                       step="0.1"
                     />
 
-                    <label for="sdAdvisory_vertPadding"
+                    <label for="sdAdvisory_vertPaddingSlider"
                       >Vertical Padding (rem):
                     </label>
                     <input
@@ -3347,10 +3340,10 @@
                       max="3"
                       value=".3"
                       step=".1"
-                      id="sdAdvisory_vertPadding"
+                      id="sdAdvisory_vertPaddingSlider"
                     />
                     <input
-                      id="sdAdvisory_vertPaddingVal"
+                      id="sdAdvisory_vertPadding"
                       class="smallVal"
                       type="number"
                       value=".3"
@@ -3486,17 +3479,17 @@
                       </div>
                     </div>
                     <br />
-                    <label for="sdArrow_rotation">Rotation (deg):</label>
+                    <label for="sdArrow_rotationSlider">Rotation (deg):</label>
                     <input
                       type="range"
-                      id="sdArrow_rotation"
+                      id="sdArrow_rotationSlider"
                       min="0"
                       max="360"
                       step="1"
                       value="0"
                     />
                     <input
-                      id="sdArrow_rotationVal"
+                      id="sdArrow_rotation"
                       class="smallVal"
                       type="number"
                       value="0"
@@ -3834,13 +3827,16 @@
 
                   <div data-property="sdActionMessage" class="hidden">
                     <label for="sdActionMessage_textContent">Content:</label>
-                    <input
-                      type="text"
+                    <textarea
                       id="sdActionMessage_textContent"
                       class="sdTextEditorWide"
-                      placeholder="New Sign"
-                      value="New Sign"
-                    />
+                    >New Sign</textarea>
+                    <div class="sdTextAreaHint">
+                      <ul>
+                        <li>Use \t for tab spacing, and \n to jump to a new line manually</li>
+                        <li class="hintOnlyShowWithBanner">Use [DIRECTION] to format a custom direction beyond the <u data-toolTip="Arterial, North, East, South, West, Jct, Begin, End, Spur, Alt, Truck, Trunk, Business, Bypass, Loop, Express, Local, Inner, Outer, Future, Toll, City, Conn, To">presets.</u></li>
+                      </ul>
+                    </div>
                     <br />
                     <label for="sdActionMessage_backgroundColor">BG:</label>
                     <button type="button" id="sdActionMessage_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
@@ -3854,7 +3850,7 @@
                     >
                     <select id="sdActionMessage_textAlign"></select>
                     <br />
-                    <label for="sdActionMessage_lineHeight"
+                    <label for="sdActionMessage_lineHeightSlider"
                       >Line Height (%):
                     </label>
                     <input
@@ -3863,10 +3859,10 @@
                       max="300"
                       value="100"
                       step="1"
-                      id="sdActionMessage_lineHeight"
+                      id="sdActionMessage_lineHeightSlider"
                     />
                     <input
-                      id="sdActionMessage_lineHeightVal"
+                      id="sdActionMessage_lineHeight"
                       class="smallVal"
                       type="number"
                       value="100"
@@ -3882,7 +3878,7 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdActionMessage_wordSpacing"
+                    <label for="sdActionMessage_wordSpacingSlider"
                       >Word Spacing (rem):</label
                     >
                     <input
@@ -3891,10 +3887,10 @@
                       max="1"
                       value="0"
                       step="0.01"
-                      id="sdActionMessage_wordSpacing"
+                      id="sdActionMessage_wordSpacingSlider"
                     />
                     <input
-                      id="sdActionMessage_wordSpacingVal"
+                      id="sdActionMessage_wordSpacing"
                       class="smallVal"
                       type="number"
                       value="0"
@@ -3959,13 +3955,15 @@
 
                   <div data-property="sdElectronicSign" class="hidden">
                     <label for="sdElectronicSign_textContent">Content:</label>
-                    <input
-                      type="text"
+                    <textarea
                       id="sdElectronicSign_textContent"
                       class="sdTextEditorWide"
-                      placeholder="New Sign"
-                      value="New Sign"
-                    />
+                    >New Sign</textarea>
+                    <div class="sdTextAreaHint">
+                      <ul>
+                        <li>Use \t for tab spacing, and \n to jump to a new line manually</li>
+                      </ul>
+                    </div>
                     <br />
                     <label for="sdElectronicSign_fontFamily">Font:</label>
                     <select id="sdElectronicSign_fontFamily"></select>
@@ -3982,7 +3980,7 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdElectronicSign_wordSpacing"
+                    <label for="sdElectronicSign_wordSpacingSlider"
                       >Word Spacing (rem):</label
                     >
                     <input
@@ -3991,10 +3989,10 @@
                       max="1"
                       value="0"
                       step="0.01"
-                      id="sdElectronicSign_wordSpacing"
+                      id="sdElectronicSign_wordSpacingSlider"
                     />
                     <input
-                      id="sdElectronicSign_wordSpacingVal"
+                      id="sdElectronicSign_wordSpacing"
                       class="smallVal"
                       type="number"
                       value="0"
@@ -4017,7 +4015,7 @@
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
                     <br />
-                    <label for="sdElectronicSign_vertPadding"
+                    <label for="sdElectronicSign_vertPaddingSlider"
                       >Vertical Padding (rem):
                     </label>
                     <input
@@ -4026,16 +4024,16 @@
                       max="10"
                       value=".5"
                       step=".01"
-                      id="sdElectronicSign_vertPadding"
+                      id="sdElectronicSign_vertPaddingSlider"
                     />
                     <input
-                      id="sdElectronicSign_vertPaddingVal"
+                      id="sdElectronicSign_vertPadding"
                       class="smallVal"
                       type="number"
                       value=".5"
                       step=".01"
                     />
-                    <label for="sdElectronicSign_horizPadding"
+                    <label for="sdElectronicSign_horizPaddingSlider"
                       >Horizontal Padding (rem):
                     </label>
                     <input
@@ -4044,10 +4042,10 @@
                       max="10"
                       value=".5"
                       step=".01"
-                      id="sdElectronicSign_horizPadding"
+                      id="sdElectronicSign_horizPaddingSlider"
                     />
                     <input
-                      id="sdElectronicSign_horizPaddingVal"
+                      id="sdElectronicSign_horizPadding"
                       class="smallVal"
                       type="number"
                       value=".5"
@@ -4116,7 +4114,7 @@
                 <fieldset id="smSPBlockProperties">
                   <legend>Block Properties</legend>
                   <div>
-                    <label for="sdBlock_topMargin" class="noLabelAlignment"
+                    <label for="sdBlock_topMarginSlider" class="noLabelAlignment"
                       >Top Margin (rem):
                     </label>
                     <div>
@@ -4126,24 +4124,23 @@
                         max="3"
                         value="0"
                         step=".01"
-                        id="sdBlock_topMargin"
-                        onchange="formHandler.readForm()"
+                        id="sdBlock_topMarginSlider"
+                        onchange="
+                            document.querySelector('#sdBlock_topMargin').value = this.value; 
+                            formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_topMarginVal"
+                        id="sdBlock_topMargin"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
-                        oninput="
-                          document.querySelector('#sdBlock_topMargin').value =
-                            this.value
-                        "
+                        onchange="formHandler.readForm()"
                       />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_bottomMargin" class="noLabelAlignment"
+                    <label for="sdBlock_bottomMarginSlider" class="noLabelAlignment"
                       >Bottom Margin (rem):
                     </label>
                     <div>
@@ -4153,109 +4150,99 @@
                         max="3"
                         value="0"
                         step=".01"
-                        id="sdBlock_bottomMargin"
-                        onchange="formHandler.readForm()"
+                        id="sdBlock_bottomMarginSlider"
+                        onchange="
+                            document.querySelector('#sdBlock_bottomMargin').value = this.value; 
+                            formHandler.readForm()
+                          "
                       />
                       <input
-                        id="sdBlock_bottomMarginVal"
+                        id="sdBlock_bottomMargin"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
-                        oninput="
-                          document.querySelector(
-                            '#sdBlock_bottomMargin',
-                          ).value = this.value
-                        "
+                        onchange="formHandler.readForm()"
                       />
                     </div>
                   </div>
                   <br />
                   <div>
-                    <label for="sdBlock_topPadding" class="noLabelAlignment"
+                    <label for="sdBlock_topPaddingSlider" class="noLabelAlignment"
                       >Top Padding (rem):
                     </label>
                     <div>
                       <input
                         type="range"
                         min="0"
-                        max="3"
+                        max="10"
                         value="0"
                         step=".01"
-                        id="sdBlock_topPadding"
-                        onchange="formHandler.readForm()"
+                        id="sdBlock_topPaddingSlider"
+                        onchange="document.querySelector('#sdBlock_topPadding').value =
+                            this.value; formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_topPaddingVal"
+                        id="sdBlock_topPadding"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
-                        oninput="
-                          document.querySelector('#sdBlock_topPadding').value =
-                            this.value
-                        "
+                        onchange="formHandler.readForm()"
                       />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_bottomPadding" class="noLabelAlignment"
+                    <label for="sdBlock_bottomPaddingSlider" class="noLabelAlignment"
                       >Bottom Padding (rem):
                     </label>
                     <div>
                       <input
                         type="range"
                         min="0"
-                        max="3"
+                        max="10"
                         value="0"
                         step=".01"
-                        id="sdBlock_bottomPadding"
-                        onchange="formHandler.readForm()"
+                        id="sdBlock_bottomPaddingSlider"
+                        onchange="document.querySelector('#sdBlock_bottomPadding').value = this.value; formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_bottomPaddingVal"
+                        id="sdBlock_bottomPadding"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
-                        oninput="
-                          document.querySelector(
-                            '#sdBlock_bottomPadding',
-                          ).value = this.value
-                        "
+                        onchange="formHandler.readForm()"
                       />
                     </div>
                   </div>
                   <br />
                   <div>
-                    <label for="sdBlock_leftPadding" class="noLabelAlignment"
+                    <label for="sdBlock_leftPaddingSlider" class="noLabelAlignment"
                       >Left Padding (rem):
                     </label>
                     <div>
                       <input
                         type="range"
                         min="0"
-                        max="3"
+                        max="6"
                         value="0"
                         step=".01"
-                        id="sdBlock_leftPadding"
-                        onchange="formHandler.readForm()"
+                        id="sdBlock_leftPaddingSlider"
+                        onchange="document.querySelector('#sdBlock_leftPadding').value = this.value; formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_leftPaddingVal"
+                        id="sdBlock_leftPadding"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
-                        oninput="
-                          document.querySelector('#sdBlock_leftPadding').value =
-                            this.value
-                        "
+                        onchange="formHandler.readForm()"
                       />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_rightPadding" class="noLabelAlignment"
+                    <label for="sdBlock_rightPaddingSlider" class="noLabelAlignment"
                       >Right Padding (rem):
                     </label>
                     <div>
@@ -4265,20 +4252,16 @@
                         max="3"
                         value="0"
                         step=".01"
-                        id="sdBlock_rightPadding"
-                        onchange="formHandler.readForm()"
+                        id="sdBlock_rightPaddingSlider"
+                        onchange="document.querySelector('#sdBlock_rightPadding').value = this.value; formHandler.readForm()"
                       />
                       <input
-                        id="sdBlock_rightPaddingVal"
+                        id="sdBlock_rightPadding"
                         class="smallVal"
                         type="number"
                         value="0"
                         step=".01"
-                        oninput="
-                          document.querySelector(
-                            '#sdBlock_rightPadding',
-                          ).value = this.value
-                        "
+                        onchange="formHandler.readForm()"
                       />
                     </div>
                   </div>
@@ -4338,7 +4321,7 @@
               <input
                 type="number"
                 id="subPanelLength"
-                name="subPanelLength"
+                
                 min="0"
                 step="1"
                 value="0"
@@ -4355,12 +4338,12 @@
               <label for="subpanelDividerHeight">Divider Height:</label>
               <select
                 id="subpanelDividerHeightUnit"
-                name="subpanelDividerHeightUnit"
+                
                 onchange="formHandler.readForm()"
               ></select>
               <input
                 id="subpanelDividerHeight"
-                name="subpanelDividerHeight"
+                
                 type="number"
                 min="0"
                 step=".1"
@@ -4594,7 +4577,7 @@
                 <label for="standardArrows_justify">Align:</label>
                 <select
                   id="standardArrows_justify"
-                  name="standardArrows_justify"
+                  
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
@@ -4755,7 +4738,7 @@
                   <input
                     type="text"
                     id="exitOnlyText"
-                    name="exitOnlyText"
+                    
                     placeholder="EXIT ONLY"
                     oninput="formHandler.readForm()"
                   />
@@ -4928,7 +4911,7 @@
                 <input
                   type="text"
                   id="oSNum"
-                  name="oSNum"
+                  
                   placeholder="Exit Num"
                   data-toolTip="Exit Number"
                   onblur="formHandler.readForm()"
@@ -4938,7 +4921,7 @@
                 <input
                   type="text"
                   id="additionalActionMessage"
-                  name="additionalActionMessage"
+                  
                   placeholder="Action Message"
                   onblur="formHandler.readForm()"
                 />
@@ -4957,7 +4940,7 @@
               <input
                 type="number"
                 id="smAPL_Gap"
-                name="smAPL_Gap"
+                
                 onchange="formHandler.readForm()"
                 min="0"
                 step=".01"
@@ -5124,29 +5107,26 @@
             </div>
             <div id="panelList" class="panelList"></div>
             <div class="panelSpacingControl">
-              <label for="panelSpacing">Spacing</label>
+              <label for="panelSpacingSlider">Spacing</label>
               <div class="panelSpacingInputs">
                 <input
                   type="range"
+                  id="panelSpacingSlider"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  value="0"
+                  onchange="document.getElementById('panelSpacing').value = this.value; formHandler.readForm()"
+                />
+                <input
+                  type="number"
+                  class="num"
                   id="panelSpacing"
                   min="0"
                   max="4"
                   step="0.25"
                   value="0"
-                  onchange="formHandler.readForm()"
-                />
-                <input
-                  type="number"
-                  class="num"
-                  id="panelSpacingValue"
-                  min="0"
-                  max="4"
-                  step="0.25"
-                  value="0"
-                  onchange="
-                    document.querySelector('#panelSpacing').value = this.value;
-                    formHandler.readForm();
-                  "
+                  oninput="formHandler.readForm()"
                 />
               </div>
             </div>

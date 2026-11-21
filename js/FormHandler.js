@@ -69,7 +69,7 @@ const formHandler = (() => {
     post.variant = form["postVariant"].value;
     post.color = form["postColor"].value;
     post.showPost = form["showPost"].checked;
-    post.thickness = form["postThicknessValue"].value;
+    post.thickness = form["postThickness"].value;
     post.panelSpacing = form["panelSpacing"].value;
 
     if (post.variant === "Standard") {
@@ -683,7 +683,9 @@ const formHandler = (() => {
           i == currentPanel.sign.subPanels.length - 1 &&
           currentPanel.sign.lanePanelSize == 0
         ) {
-          apl.subpanelConfigs[i].justify = aplContainer.querySelector(".smAPLCat_alignRight").checked;
+          apl.subpanelConfigs[i].justify = aplContainer.querySelector(
+            ".smAPLCat_alignRight",
+          ).checked;
         }
 
         aplList.forEach((arrow, arrowIndex) => {
@@ -791,8 +793,8 @@ const formHandler = (() => {
     document.getElementById("postCornerRadius").value = post.cornerRadius;
     document.getElementById("postSpacing").value = post.spacing || 1;
     document.getElementById("panelSpacing").value = post.panelSpacing;
-    document.getElementById("panelSpacingValue").value = post.panelSpacing;
-    document.getElementById("postThicknessValue").value = post.thickness;
+    document.getElementById("panelSpacing").value = post.panelSpacing;
+    document.getElementById("postThickness").value = post.thickness;
 
     ColorLibrary.updateDefaultColors();
     document.getElementById("postColor").value = post.color;
@@ -1191,7 +1193,8 @@ const formHandler = (() => {
     for (const propertyName in currentBlockElem) {
       const elementId = `${blockElemType}_${propertyName}`;
       const element = document.getElementById(elementId);
-      const displayElement = document.getElementById(elementId + "Val");
+      const displayElement = document.getElementById(`${elementId}Slider`);
+
       if (element) {
         if (element.type === "checkbox") {
           element.checked = currentBlockElem[propertyName];
@@ -1207,42 +1210,51 @@ const formHandler = (() => {
         } else if (element.tagName === "SELECT") {
           element.value = currentBlockElem[propertyName];
           element.addEventListener("change", readForm);
+        } else if (element.tagName === "TEXTAREA") {
+          element.textContent = currentBlockElem[propertyName];
+          element.addEventListener("input", readForm);
         } else {
           element.value = currentBlockElem[propertyName];
-          element.addEventListener(
-            element.type === "text" ? "input" : "change",
-            readForm,
-          );
-          if (
-            element.type === "range" &&
-            displayElement &&
-            !displayElement.dataset.paired
-          ) {
-            displayElement.dataset.paired = "true";
-            element.addEventListener("input", () => {
-              displayElement.value = element.value;
-            });
-          }
+          element.addEventListener("change", readForm);
         }
       }
 
       if (displayElement) {
-        if (
-          displayElement.tagName === "INPUT" &&
-          displayElement.type === "number"
-        ) {
-          displayElement.value = currentBlockElem[propertyName];
-        } else {
-          displayElement.textContent = currentBlockElem[propertyName];
+        displayElement.value = currentBlockElem[propertyName];
+
+        if (!displayElement.dataset.paired) {
+          displayElement.addEventListener("input", () => {
+            element.value = displayElement.value;
+            readForm();
+          });
+          displayElement.dataset.paired = true;
         }
       }
     }
+
+    document.querySelector("#sdBlock_topPaddingSlider").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].topPadding;
+
+    document.querySelector("#sdBlock_bottomPaddingSlider").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].bottomPadding;
+
+    document.querySelector("#sdBlock_leftPaddingSlider").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].leftPadding;
+    document.querySelector("#sdBlock_rightPaddingSlider").value =
+      app.getCurrentBlockElements().blockProperties[
+        app.vars.currentlySelectedRowIndex
+      ].rightPadding;
 
     document.querySelector("#sdBlock_topPadding").value =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].topPadding;
-
     document.querySelector("#sdBlock_bottomPadding").value =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
@@ -1257,38 +1269,20 @@ const formHandler = (() => {
         app.vars.currentlySelectedRowIndex
       ].rightPadding;
 
-    document.querySelector("#sdBlock_topPaddingVal").value =
+    document.querySelector("#sdBlock_topMarginSlider").value =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
-      ].topPadding;
-    document.querySelector("#sdBlock_bottomPaddingVal").value =
+      ].topMargin;
+    document.querySelector("#sdBlock_bottomMarginSlider").value =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
-      ].bottomPadding;
-
-    document.querySelector("#sdBlock_leftPaddingVal").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].leftPadding;
-    document.querySelector("#sdBlock_rightPaddingVal").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].rightPadding;
+      ].bottomMargin;
 
     document.querySelector("#sdBlock_topMargin").value =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].topMargin;
     document.querySelector("#sdBlock_bottomMargin").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].bottomMargin;
-
-    document.querySelector("#sdBlock_topMarginVal").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].topMargin;
-    document.querySelector("#sdBlock_bottomMarginVal").value =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].bottomMargin;
@@ -1685,13 +1679,13 @@ const formHandler = (() => {
       currentExitTab.backgroundColor;
     document.querySelector("#sMET_borderStyle").value =
       currentExitTab.borderStyle;
+    document.querySelector("#sMET_borderThicknessSlider").value =
+      currentExitTab.borderThickness;
     document.querySelector("#sMET_borderThickness").value =
       currentExitTab.borderThickness;
-    document.querySelector("#sMET_borderThicknessVal").value =
-      currentExitTab.borderThickness;
-    document.querySelector("#sMET_borderRadius").value =
+    document.querySelector("#sMET_borderRadiusSlider").value =
       currentExitTab.borderRadius;
-    document.querySelector("#sMET_borderRadiusVal").value =
+    document.querySelector("#sMET_borderRadius").value =
       currentExitTab.borderRadius;
     document.querySelector("#sMET_useFullBorder").checked =
       currentExitTab.useFullBorder;
@@ -1700,23 +1694,24 @@ const formHandler = (() => {
     document.querySelector(
       "label[for='sMET_roundBottomBorder']",
     ).style.display = currentExitTab.useFullBorder ? "" : "none";
+    document.querySelector("#sMET_horizontalPaddingSlider").value =
+      currentExitTab.horizontalPadding;
     document.querySelector("#sMET_horizontalPadding").value =
       currentExitTab.horizontalPadding;
-    document.querySelector("#sMET_horizontalPaddingVal").value =
-      currentExitTab.horizontalPadding;
+    document.querySelector("#sMET_verticalPaddingSlider").value =
+      currentExitTab.verticalPadding;
     document.querySelector("#sMET_verticalPadding").value =
       currentExitTab.verticalPadding;
-    document.querySelector("#sMET_verticalPaddingVal").value =
-      currentExitTab.verticalPadding;
+    document.querySelector("#sMET_minimumHeightSlider").value =
+      currentExitTab.minimumHeight;
     document.querySelector("#sMET_minimumHeight").value =
       currentExitTab.minimumHeight;
-    document.querySelector("#sMET_minimumHeightVal").value =
-      currentExitTab.minimumHeight;
+    document.querySelector("#sMET_fontSizeSlider").value =
+      currentExitTab.fontSize;
     document.querySelector("#sMET_fontSize").value = currentExitTab.fontSize;
-    document.querySelector("#sMET_fontSizeVal").value = currentExitTab.fontSize;
-    document.querySelector("#sMET_lineHeight").value =
+    document.querySelector("#sMET_lineHeightSlider").value =
       currentExitTab.lineHeight;
-    document.querySelector("#sMET_lineHeightVal").value =
+    document.querySelector("#sMET_lineHeight").value =
       currentExitTab.lineHeight;
     document.querySelector("#sMET_enlargeNumerals").checked =
       currentExitTab.enlargeNumerals;
@@ -1724,9 +1719,9 @@ const formHandler = (() => {
       currentExitTab.enlargeNumeralsSize;
     document.querySelector("#sMET_spaceLettersNumerals").checked =
       currentExitTab.spaceLettersNumerals;
-    document.querySelector("#sMET_numeralWordSpacing").value =
+    document.querySelector("#sMET_numeralWordSpacingSlider").value =
       currentExitTab.numeralWordSpacing;
-    document.querySelector("#sMET_numeralWordSpacingVal").value =
+    document.querySelector("#sMET_numeralWordSpacing").value =
       currentExitTab.numeralWordSpacing;
     document.querySelector("#sMET_offsetNonNumerals").checked =
       currentExitTab.offsetNonNumerals;
@@ -1734,19 +1729,19 @@ const formHandler = (() => {
       currentExitTab.useTrimFormat;
     document.querySelector("#smET_lineHeight").disabled =
       currentExitTab.useTrimFormat;
-    document.querySelector("#smET_lineHeightVal").disabled =
+    document.querySelector("#smET_lineHeight").disabled =
       currentExitTab.useTrimFormat;
     document.querySelector("#sMET_fontFamily").value =
       currentExitTab.fontFamily;
     document.querySelector("#sMET_numeralFontFamily").value =
       currentExitTab.numeralFontFamily;
+    document.querySelector("#sMET_letterSpacingSlider").value =
+      currentExitTab.letterSpacing;
     document.querySelector("#sMET_letterSpacing").value =
       currentExitTab.letterSpacing;
-    document.querySelector("#sMET_letterSpacingVal").value =
-      currentExitTab.letterSpacing;
-    document.querySelector("#sMET_numeralLetterSpacing").value =
+    document.querySelector("#sMET_numeralLetterSpacingSlider").value =
       currentExitTab.numeralLetterSpacing;
-    document.querySelector("#sMET_numeralLetterSpacingVal").value =
+    document.querySelector("#sMET_numeralLetterSpacing").value =
       currentExitTab.numeralLetterSpacing;
     document.querySelector("#sMET_contentDirection").value =
       currentExitTab.contentDirection;
@@ -1766,40 +1761,44 @@ const formHandler = (() => {
       if (currentExitTab.width.toLowerCase().includes("percent")) {
         document.querySelector("#sMET_widthSizeLabel").textContent =
           "Width Size (%):";
-        document.querySelector("#sMET_widthSize").max = 100;
+        document.querySelector("#sMET_widthSizeSlider").max = 100;
       } else {
         document.querySelector("#sMET_widthSizeLabel").textContent =
           "Width Size (rem):";
-        document.querySelector("#sMET_widthSize").max = 20;
+        document.querySelector("#sMET_widthSizeSlider").max = 20;
       }
 
+      document.querySelector("#sMET_widthSizeSlider").value =
+        currentExitTab.widthSize;
       document.querySelector("#sMET_widthSize").value =
         currentExitTab.widthSize;
-      document.querySelector("#sMET_widthSizeVal").value =
-        currentExitTab.widthSize;
       document.querySelector("#sMET_widthSizeLabel").classList.remove("hidden");
+      document
+        .querySelector("#sMET_widthSizeSlider")
+        .classList.remove("hidden");
       document.querySelector("#sMET_widthSize").classList.remove("hidden");
-      document.querySelector("#sMET_widthSizeVal").classList.remove("hidden");
     } else {
       document.querySelector("#sMET_widthSizeLabel").classList.add("hidden");
+      document.querySelector("#sMET_widthSizeSlider").classList.add("hidden");
       document.querySelector("#sMET_widthSize").classList.add("hidden");
-      document.querySelector("#sMET_widthSizeVal").classList.add("hidden");
     }
 
     if (currentExitTab.borderStyle == "square") {
       document
-        .querySelector('label[for="sMET_borderRadius"]')
+        .querySelector('label[for="sMET_borderRadiusSlider"]')
+        .classList.add("hidden");
+      document
+        .querySelector("#sMET_borderRadiusSlider")
         .classList.add("hidden");
       document.querySelector("#sMET_borderRadius").classList.add("hidden");
-      document.querySelector("#sMET_borderRadiusVal").classList.add("hidden");
     } else {
       document
-        .querySelector('label[for="sMET_borderRadius"]')
+        .querySelector('label[for="sMET_borderRadiusSlider"]')
+        .classList.remove("hidden");
+      document
+        .querySelector("#sMET_borderRadiusSlider")
         .classList.remove("hidden");
       document.querySelector("#sMET_borderRadius").classList.remove("hidden");
-      document
-        .querySelector("#sMET_borderRadiusVal")
-        .classList.remove("hidden");
     }
 
     for (const elem of document.querySelectorAll(
@@ -1831,13 +1830,13 @@ const formHandler = (() => {
         ? "none"
         : "";
 
+      document.querySelector("#smET_partialLeftHorizontalPaddingSlider").value =
+        currentExitTab.variantSettings.partialLeft.horizontalPadding;
+      document.querySelector("#smET_partialLeftVerticalPaddingSlider").value =
+        currentExitTab.variantSettings.partialLeft.verticalPadding;
       document.querySelector("#smET_partialLeftHorizontalPadding").value =
         currentExitTab.variantSettings.partialLeft.horizontalPadding;
       document.querySelector("#smET_partialLeftVerticalPadding").value =
-        currentExitTab.variantSettings.partialLeft.verticalPadding;
-      document.querySelector("#smET_partialLeftHorizontalPaddingVal").value =
-        currentExitTab.variantSettings.partialLeft.horizontalPadding;
-      document.querySelector("#smET_partialLeftVerticalPaddingVal").value =
         currentExitTab.variantSettings.partialLeft.verticalPadding;
       document.querySelector("#smET_partialLeftMinWidth").value =
         currentExitTab.variantSettings.partialLeft.minWidth;
@@ -1911,9 +1910,9 @@ const formHandler = (() => {
       document.querySelector("#sMET_variantAddon").value =
         currentExitTab.variantSettings.icon.addon;
 
-      document.querySelector("#sMET_variantIconSize").value =
+      document.querySelector("#sMET_variantIconSizeSlider").value =
         currentExitTab.variantSettings.icon.iconSize;
-      document.querySelector("#sMET_variantIconSizeVal").value =
+      document.querySelector("#sMET_variantIconSize").value =
         currentExitTab.variantSettings.icon.iconSize;
       document.querySelector(
         'label[for="sMET_variantIsTextBased"]',
@@ -2212,9 +2211,9 @@ const formHandler = (() => {
       currentShield.routeNumber;
     document.getElementById("spShieldQuick_designation").value =
       currentShield.designation;
-    document.getElementById("spShieldQuick_scale").value = currentShield.scale;
-    document.getElementById("spShieldQuick_scaleVal").value =
+    document.getElementById("spShieldQuick_scaleSlider").value =
       currentShield.scale;
+    document.getElementById("spShieldQuick_scale").value = currentShield.scale;
     document.getElementById("spShieldQuick_horizMargins").value =
       currentShield.horizMargin;
     document.getElementById("spShieldQuick_vertMargins").value =
@@ -2748,19 +2747,26 @@ const formHandler = (() => {
           i % 1 == 0 ? "Subpanel " + (i + 1) : "Divider";
 
         if (i % 1 != 0) {
-          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display = "none";
-          aplContHolder.querySelector(".smAPLCat_numLanes").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display =
+            "none";
+          aplContHolder.querySelector(".smAPLCat_numLanes").style.display =
+            "none";
         } else if (sign.lanePanelSize <= 0) {
-          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display = "none";
-          aplContHolder.querySelector(".smAPLCat_numLanes").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display =
+            "none";
+          aplContHolder.querySelector(".smAPLCat_numLanes").style.display =
+            "none";
         } else {
           aplContHolder.querySelector(".smAPLCat_numLanes").value =
             subpanels[i].laneWidth;
         }
 
         if (i != subpanels.length - 1 || sign.lanePanelSize != 0) {
-          aplContHolder.querySelector(".smAPLCat_alignRightLabel").style.display = "none";
-          aplContHolder.querySelector(".smAPLCat_alignRight").style.display = "none";
+          aplContHolder.querySelector(
+            ".smAPLCat_alignRightLabel",
+          ).style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_alignRight").style.display =
+            "none";
         } else if (arrows.subpanelConfigs[i]) {
           aplContHolder.querySelector(".smAPLCat_alignRight").checked =
             arrows.subpanelConfigs[i].justify;
@@ -2827,7 +2833,9 @@ const formHandler = (() => {
         if (
           (i % 1 != 0 &&
             (aplList.length > 0 ||
-              (app.getCurrentPanel().sign.lanePanelSize > 0 && aplList.length == 0 && arrows.subpanels[i + 0.5] &&
+              (app.getCurrentPanel().sign.lanePanelSize > 0 &&
+                aplList.length == 0 &&
+                arrows.subpanels[i + 0.5] &&
                 arrows.subpanels[i + 0.5].length ==
                   subpanels[i + 0.5].laneWidth))) ||
           (app.getCurrentPanel().sign.lanePanelSize > 0 &&

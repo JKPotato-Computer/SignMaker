@@ -41,11 +41,11 @@ class TextElement {
     const numeralPattern = /(\d+\/\d+)|(\d\S*)|[\u00BC-\u00BE\u2150-\u2189]/g;
 
     const bannerPattern = new RegExp(
-      `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)`,
+      `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)|(\\s*)(\\[\\w+\\])(\\s*)`,
       "gi",
     );
     const lightBannerPattern = new RegExp(
-      `(\\b(?:${Shield.bannerTypes.join("|")})\\b)`,
+      `(\\b(?:${Shield.bannerTypes.join("|")})\\b)|(\\[\\w+\\])`,
       "gi",
     );
 
@@ -124,6 +124,8 @@ class TextElement {
       newText.style.color = "white";
     }
 
+    this.textContent = this.textContent.replace(/\n/g, "\\n");
+
     for (const text of this.textContent.split("\\n")) {
       const lineElement = document.createElement("div");
       lineElement.className = "lineElement";
@@ -185,7 +187,16 @@ class TextElement {
         } else {
           const newTextFragment = document.createElement("span");
           newTextFragment.className = "bE-" + text.type;
-          newTextFragment.textContent = text.value;
+
+          if (
+            text.type == "banner" &&
+            text.value.startsWith("[") &&
+            text.value.endsWith("]")
+          ) {
+            newTextFragment.textContent = text.value.slice(1, -1);
+          } else {
+            newTextFragment.textContent = text.value;
+          }
 
           lineElement.appendChild(newTextFragment);
         }
@@ -254,7 +265,6 @@ class ControlTextElement extends TextElement {
 
     if (this.smallCapitals) {
       for (const beText of newText.querySelectorAll(".bE-text")) {
-        // split by spaces and find the first letter per segment
         const textContent = beText.textContent;
         const splitText = textContent.split(/\s/g);
         const capitalSize =
@@ -441,16 +451,14 @@ ElectronicSignElement.prototype.textFormats = [
 ];
 
 class ShieldGroupElement {
-  f;
   constructor(options = {}) {
-    const { shields, alignment, direction, gap } = MUTCDVariants.get(
-      "ShieldGroupElement",
-      options,
-    );
+    const { shields, alignment, direction, gap, inlineShields } =
+      MUTCDVariants.get("ShieldGroupElement", options);
     this.shields = shields;
     this.alignment = alignment;
     this.direction = direction;
     this.gap = gap;
+    this.inlineShields = inlineShields;
   }
 
   newShield() {
@@ -488,6 +496,9 @@ class ShieldGroupElement {
 
     let lastGroup = null;
     let lastGroupInd = -1;
+
+    const shieldContainerGroups = [];
+
     for (const shield of this.shields) {
       if (shield.group == 0) {
         lastGroup = null;
@@ -496,6 +507,7 @@ class ShieldGroupElement {
         const bannerShieldContainerElmt = shield.createBannerShieldElement();
         bannerShieldContainerElmt.appendChild(shield.createElement());
         shieldGroupElem.appendChild(bannerShieldContainerElmt);
+        shieldContainerGroups.push(bannerShieldContainerElmt);
       } else if (shield.group != lastGroupInd) {
         const [bannerShieldContainerElmt, groupedShieldElement] =
           shield.createBannerShieldElement(true);
@@ -504,9 +516,53 @@ class ShieldGroupElement {
 
         lastGroup.appendChild(shield.createElement());
         shieldGroupElem.appendChild(bannerShieldContainerElmt);
+        shieldContainerGroups.push(bannerShieldContainerElmt);
       } else if (shield.group == lastGroupInd) {
         lastGroup.appendChild(shield.createElement());
       }
+    }
+
+    if (this.inlineShields) {
+      shieldGroupElem.style.visibility = "hidden";
+      shieldGroupElem.style.position = "fixed";
+      document.body.appendChild(shieldGroupElem);
+
+      const centerLine =
+        shieldGroupElem.getBoundingClientRect().top +
+        shieldGroupElem.getBoundingClientRect().height / 2;
+      let maxShiftTop = 0;
+      let maxShiftBottom = 0;
+
+      for (const shieldGroup of shieldContainerGroups) {
+        const shieldElements =
+          shieldGroup.querySelector(":scope > .shieldGroupContainer") ||
+          shieldGroup.querySelector(":scope > .shield");
+        const shieldElementRect = shieldElements.getBoundingClientRect();
+
+        if (
+          shieldElementRect.top + shieldElementRect.height / 2 !=
+          centerLine
+        ) {
+          const shift =
+            centerLine - (shieldElementRect.top + shieldElementRect.height / 2);
+
+          shieldGroup.style.top = shift + "px";
+          if (shift < 0) {
+            maxShiftTop = Math.max(maxShiftTop, -shift);
+          } else {
+            maxShiftBottom = Math.max(maxShiftBottom, shift);
+          }
+        }
+      }
+
+      // apply a margin-top on the shieldGroupElem with maxShiftTop, or 0
+      shieldGroupElem.style.marginTop = maxShiftTop - maxShiftBottom + "px";
+      shieldGroupElem.style.marginBottom = maxShiftBottom - maxShiftTop + "px";
+
+      // unappend and revert
+      document.body.removeChild(shieldGroupElem);
+      shieldGroupElem.style.visibility = "";
+      shieldGroupElem.style.position = "";
     }
 
     return shieldGroupElem;
@@ -755,7 +811,7 @@ IconElement.icons = {
 };
 
 // the following code segment is an embarassment to humanity
-// authored by DuskDarf1
+// authored by DuskDarf1 (plus Codex :P)
 class BeaconElement {
   constructor(options = {}) {
     const { size, alignment, flashDuration, color, backplate, flashOpposite } =

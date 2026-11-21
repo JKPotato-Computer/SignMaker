@@ -708,12 +708,7 @@ input[type="button"]:disabled {
   cursor: pointer;
 }
 
-textarea {
-  min-width: 15rem;
-  min-height: 5rem;
-  max-width: 25rem;
-  transition: none;
-}
+textarea {background: rgb(var(--inputColor));margin: 0 .25rem;color: var(--textColor);height: 5rem;vertical-align: top;}
 
 #currentPanel {
   width: auto;
@@ -3242,7 +3237,7 @@ summary:hover {
   left: 0;
   top: 0;
   transition: 0.125s ease-in-out;
-  background: rgb(var(--baseColorInv), 0.15);
+  background: rgb(255,255,255, 0.15);
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -3253,7 +3248,7 @@ summary:hover {
 }
 
 .mutcdSlideInfo > a {
-  color: white;
+  color: var(--textColor);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -3358,6 +3353,7 @@ summary:hover {
   margin: 0;
   padding: 0.25rem;
   background-color: rgb(0, 0, 255);
+  color: white;
 }
 
 .smColorDropdownColor {
@@ -3422,4 +3418,17 @@ summary:hover {
 
 #smColorAddColor {
   padding: .5rem 0;
+}
+
+.sdTextAreaHint {
+  font-size: 16px;
+  margin-left: 6rem;
+  width: max-content;
+  margin-top: -.5rem;
+  margin-bottom: -1rem;
+  display: none;
+}
+
+.sdTextAreaHint > ul {
+  list-style-type: "-";
 }

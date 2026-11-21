@@ -79,9 +79,8 @@
 
 #postContainer.postVariantRural #panelContainer {
   position: relative;
-  background-image:
-    linear-gradient(
-      90deg,
+  background-image: linear-gradient(
+     90deg,
       var(--post-color-mid) 0%,
       var(--post-color-light) 40%,
       var(--post-color-dark) 100%
@@ -93,12 +92,10 @@
       var(--post-color-dark) 100%
     );
   background-repeat: no-repeat;
-  background-size:
-    var(--postThickness, 1rem) 24rem,
-    var(--postThickness, 1rem) 24rem;
-  background-position:
-    left 1rem bottom,
-    right 1rem bottom;
+  background-size: var(--postThickness, 1rem) 20rem,
+    var(--postThickness, 1rem) 20rem;
+  background-position: left 4rem bottom,
+    right 4rem bottom;
   margin-top: 20rem;
   height: 10rem;
 }
@@ -396,7 +393,6 @@
   min-width: 4px;
   z-index: 2;
   position: relative;
-  overflow: hidden;
 }
 
 .subDividerSegment {

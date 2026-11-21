@@ -397,9 +397,13 @@ main#smRender.wide #postContainer {
 
 .bannerShieldContainer {
   display: grid;
-  grid-template-areas: ". topBanners ." "leftBanners shield rightBanners" ". bottomBanners .";
+  grid-template-areas:
+    ". topBanners ."
+    "leftBanners shield rightBanners"
+    ". bottomBanners .";
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .bannerGroupElem {

@@ -76,9 +76,24 @@ const FormNavigation = (() => {
           holder.style.display = "block";
 
           if (window.innerWidth > 768) {
-            let width = holder.getBoundingClientRect().left;
+            let width =
+              holder.getBoundingClientRect().left +
+              holder.getBoundingClientRect().width / 2;
             document.querySelector("#smRender").style.transform =
-              `translateX(${width}px)`;
+              `translateX(calc(-50% + ${width}px))`;
+
+            const rightWidth = document
+              .querySelector("#smRender")
+              .getBoundingClientRect().right;
+            if (rightWidth > document.documentElement.clientWidth) {
+              const difference =
+                rightWidth - document.documentElement.clientWidth;
+              const proportion =
+                rightWidth / document.documentElement.clientWidth;
+              document.querySelector("#smRender").style.transform =
+                `translateX(calc(-50% + ${width}px - ${difference}px)) scale(${1 / proportion})`;
+            }
+
             isModalOpen = true;
           }
         } else {
@@ -871,6 +886,30 @@ const FormNavigation = (() => {
 
     for (const format of GroupElement.boxFormats) {
       lib.appendOption(document.querySelector("#sdGroup_boxFormat"), format);
+    }
+
+    for (const element of [
+      "#sdCtrlText_textContent",
+      "#sdAdvisory_textContent",
+      "#sdActionMessage_textContent",
+      "#sdElectronicSign_textContent",
+    ]) {
+      document.querySelector(element).addEventListener("focus", () => {
+        const hint = document.querySelector(element).nextElementSibling;
+        hint.style.display = "block";
+
+        if (element != "#sdElectronicSign_textContent") {
+          hint.querySelector(".hintOnlyShowWithBanner").style.display =
+            !document.querySelector("#sdCtrlText_useBannerFormatting").checked
+              ? "none"
+              : "";
+        }
+      });
+
+      document.querySelector(element).addEventListener("blur", () => {
+        const hint = document.querySelector(element).nextElementSibling;
+        hint.style.display = "";
+      });
     }
   };
 
@@ -1714,7 +1753,6 @@ const FormNavigation = (() => {
 
             const skipTags = MUTCDVariants["MUTCD"][className]?.tagToSkip || [];
             tagsToSkip = [...tagsToSkip, ...skipTags];
-
           }
 
           const validKeys = Object.keys(obj).filter(
@@ -1817,6 +1855,33 @@ const FormNavigation = (() => {
         replaceRecursive(post);
         formHandler.updateForm();
         App.redraw();
+      });
+
+    document
+      .querySelector("#smSettings_searchVariant")
+      .addEventListener("input", () => {
+        let searchParameters = document
+          .querySelector("#smSettings_searchVariant")
+          .value.toLowerCase()
+          .trim();
+
+        for (const image of document.querySelectorAll(".mutcdImage")) {
+          const variantName = image.dataset.variant;
+          const searchTags = [
+            MUTCDVariants[
+              variantName
+            ].VariantInfo.FullName.toLowerCase().trim(),
+            ...MUTCDVariants[variantName].VariantInfo.Tags.map((tag) =>
+              tag.toLowerCase().trim(),
+            ),
+          ];
+
+          if (!searchTags.some((tag) => tag.includes(searchParameters))) {
+            image.style.display = "none";
+          } else {
+            image.style.display = "";
+          }
+        }
       });
   };
 
@@ -2018,7 +2083,8 @@ const FormNavigation = (() => {
 
         if (
           target.dataset.color === "" ||
-          target.dataset.color == target.dataset.emptyValue
+          target.dataset.color.toLowerCase() ==
+            target.dataset.emptyValue.toLowerCase()
         ) {
           target.style.backgroundColor = "";
           target.style.color = "";

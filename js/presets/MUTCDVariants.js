@@ -72,8 +72,8 @@ const MUTCDVariants = (() => {
         corner: "Sharp",
         borderRadius: 0.75,
         tagToReplace: ["corner", "borderRadius"],
-    },
-    Sign: {
+      },
+      Sign: {
         arrows: {
           arrowMode: "standard",
           standard: {
@@ -135,7 +135,7 @@ const MUTCDVariants = (() => {
         oSNum: "",
         subPanels: [],
         lanePanelSize: 0,
-        tagToSkip: ["diagramData"]
+        tagToSkip: ["diagramData"],
       },
       SubPanels: {
         laneWidth: 0,
@@ -196,6 +196,7 @@ const MUTCDVariants = (() => {
         alignment: "Center",
         direction: "Horizontal",
         gap: 0.5,
+        inlineShields: true,
       },
       DividerElement: {
         dividerWidth: 100,
@@ -609,7 +610,7 @@ const MUTCDVariants = (() => {
         laneWidth: 0,
         blockElements: null,
         verticalAlign: "Start",
-        dividerHeight: 50,
+        dividerHeight: 100,
         dividerHeightUnit: "%",
       },
       TextElement: {

@@ -150,7 +150,6 @@ const ShieldEditor = (() => {
     document.querySelector("#spShield_designationSpacing").value =
       baseShield.customShields.designation_letterSpacing;
     document.querySelector("#spShield_scale").value = baseShield.scale;
-    document.querySelector("#spShield_scaleVal").value = baseShield.scale;
     document.querySelector("#spShield_routeXOffset").value =
       baseShield.customShields.route_xOffset;
     document.querySelector("#spShield_routeYOffset").value =
