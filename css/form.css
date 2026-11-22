@@ -21,6 +21,9 @@ nav#sMMiniToolbar {
   height: max-content;
   z-index: 1;
   transition: 0.1s ease-in-out opacity;
+  transform-origin: bottom left;
+  scale: var(
+  --uiScale);
 }
 
 nav#sMMiniToolbar {
@@ -28,6 +31,8 @@ nav#sMMiniToolbar {
   right: 1rem;
   left: unset;
   transform: unset;
+  transform-origin: top right;
+  scale: var(--uiScale);
 }
 
 :root[data-theme="dark"] .sMConfigOption:not(.selected, :disabled) {
@@ -44,11 +49,12 @@ nav#sMMiniToolbar {
   gap: 0.25rem;
   transition: 0.25s ease-in-out;
   cursor: pointer;
-  position: relative; /* for tooltips / mini menus */
+  position: relative;
   font-family: "Overpass";
   color: var(--textColor);
   line-height: 0;
   font-size: 1rem;
+  height: stretch;
 }
 
 .sMConfigOption.selected {
@@ -82,6 +88,8 @@ nav#sMMiniToolbar {
   height: max-content;
   max-height: calc(100% - 5rem);
   z-index: 4;
+  transform-origin: top left;
+  scale: var(--uiScale);
 }
 
 span.toolTip {
@@ -94,7 +102,6 @@ span.toolTip {
   opacity: 1;
   transition: 0.25s ease-in-out opacity;
   z-index: 10;
-  font-family: "Inter";
   width: max-content;
   max-width: 200px;
   transform: translateX(-50%);
@@ -148,7 +155,7 @@ label span.toolTip,
   gap: 0.5rem;
   z-index: 2;
   border-radius: 0;
-  font-family: "Overpass", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .panelPopoverHint {
@@ -201,11 +208,6 @@ label span.toolTip,
   cursor: grab;
   position: relative;
   user-select: none;
-}
-
-.panelListButton.active {
-  border-color: var(--selectedColor);
-  background: rgba(var(--baseColor), 0.6);
 }
 
 .panelGroup {
@@ -279,7 +281,6 @@ label span.toolTip,
   opacity: 1;
   width: auto;
   text-align: left;
-  font-family: "Inter", sans-serif;
   font-weight: 500;
 }
 
@@ -307,6 +308,11 @@ label span.toolTip,
   height: 2rem;
 }
 
+.scrollMenu button.active,
+.panelList button.active {
+  background-color: var(--selectedColor) !important;
+}
+
 /* Minimalistic scrollbar for Firefox */
 /* Note: Firefox styling options are more limited */
 * {
@@ -316,7 +322,7 @@ label span.toolTip,
 
 .sMModalContent > div:not(#sMSPSettings),
 #sMSPSettings > div {
-  width: max-content;
+  width: 100%;
   flex-grow: 1;
   height: 100%;
 }
@@ -572,13 +578,12 @@ textarea {
   margin: 0.25rem;
   padding: 0.25rem;
   border: none;
-  font-family: "Inter";
   font-weight: 600;
   transition: 0.15s ease-in-out;
+  font-family: inherit;
 }
 
 label {
-  font-family: "Inter", sans-serif;
   font-size: 0.8rem;
   font-weight: 500;
   width: 7.5rem;
@@ -639,10 +644,8 @@ input[type="button"] {
   text-align: center;
   cursor: pointer;
   transition: 0.15s ease-in-out;
-  border: 0;
   width: max-content;
-  background-color: rgb(var(--inputColor));
-  font-family: "Inter";
+  font-family: inherit;
   font-weight: 500;
   color: var(--textColor);
 }
@@ -708,7 +711,13 @@ input[type="button"]:disabled {
   cursor: pointer;
 }
 
-textarea {background: rgb(var(--inputColor));margin: 0 .25rem;color: var(--textColor);height: 5rem;vertical-align: top;}
+textarea {
+  background: rgb(var(--inputColor));
+  margin: 0 0.25rem;
+  color: var(--textColor);
+  height: 5rem;
+  vertical-align: top;
+}
 
 #currentPanel {
   width: auto;
@@ -1640,6 +1649,8 @@ dialog:not([open]) {
   transition: 0.1s ease-in-out opacity;
   position: fixed;
   z-index: 3;
+  transform-origin: top left;
+  scale: var(--uiScale);
 }
 
 #zoomControl:hover {
@@ -1846,11 +1857,11 @@ button#sdShieldGroup_OpenShieldEditor {
   align-items: center;
   padding: 0;
   border: 1px solid black;
-  background: rgb(var(--baseColor),.3);
+  background: rgb(var(--baseColor), 0.3);
 }
 
 #shieldLibraryListHolder > button.selected {
-  background-color: rgb(var(--baseColor),.75);
+  background-color: rgb(var(--baseColor), 0.75);
 }
 
 #shieldLibraryListHolder > button.selected > span {
@@ -3169,7 +3180,11 @@ summary:hover {
   background-color: rgb(var(--baseColor), 0.15);
 }
 
-#signMakerTabOptions > button:hover {
+#signMakerTabOptions > button.selected {
+  background-color: rgb(var(--baseColor), 1);
+}
+
+#signMakerTabOptions > button:hover:not(.selected) {
   background-color: rgb(var(--baseColorInv), 0.3);
 }
 
@@ -3237,7 +3252,7 @@ summary:hover {
   left: 0;
   top: 0;
   transition: 0.125s ease-in-out;
-  background: rgb(255,255,255, 0.15);
+  background: rgb(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -3417,18 +3432,43 @@ summary:hover {
 }
 
 #smColorAddColor {
-  padding: .5rem 0;
+  padding: 0.5rem 0;
 }
 
 .sdTextAreaHint {
   font-size: 16px;
   margin-left: 6rem;
   width: max-content;
-  margin-top: -.5rem;
+  margin-top: -0.5rem;
   margin-bottom: -1rem;
   display: none;
 }
 
 .sdTextAreaHint > ul {
   list-style-type: "-";
+}
+
+div#smSettings_userTheme {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+div#smSettings_userTheme > button {
+  width: 7rem;
+  padding: 0.5rem;
+}
+
+#smSettings_userTheme > button.selected {
+  background-color: rgb(var(--baseColorInv), 0.15);
+}
+
+:where(:not(:root[data-theme="kurumi"]) button),
+:where(:not(:root[data-theme="kurumi"]) input[type="button"]) {
+  border: 0;
+  background-color: rgb(var(--inputColor));
+}
+
+#modalHolder > dialog {
+  scale: var(--uiScale);
+  transform-origin: top left;
 }

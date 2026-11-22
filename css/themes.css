@@ -1,0 +1,237 @@
+/* kurumi theme! */
+/* no i didn't use ai you dingus */
+
+:root[data-theme="kurumi"] label > .toolTip {
+  font-family: unset;
+}
+
+:root[data-theme="kurumi"] .sMConfigOption {
+  background: #f0f0f0;
+}
+
+:root[data-theme="kurumi"] .sMConfigOption {
+  font-family: unset;
+}
+
+:root[data-theme="kurumi"] #panelSelect {
+  font-family: inherit;
+  font-weight: 700;
+}
+
+:where(:root[data-theme="kurumi"] button),
+:where(:root[data-theme="kurumi"] input[type="button"]) {
+  border-bottom: 3px ridge #666666;
+  border-right: 3px ridge #666666;
+  border-left: 3px ridge #e4e4e4;
+  border-top: 3px ridge #e4e4e4;
+  background-color: #f0f0f0;
+  box-shadow: inset 0px 0px 0 2px #e6e6e6;
+  padding: 0.25rem 0.5rem;
+}
+
+:root[data-theme="kurumi"] #sMConfigBar,
+:root[data-theme="kurumi"] #sMMiniToolbar {
+  background-color: #ffffff;
+  border-bottom: 6px ridge #e4e4e4;
+  border-right: 6px ridge #e4e4e4;
+  border-left: 6px groove #ffffff;
+  border-top: 6px groove #ffffff;
+}
+
+:root[data-theme="kurumi"] .sMModal {
+  border: 3px solid #797979;
+}
+
+:root[data-theme="kurumi"] .sMModalContent > div > div > div {
+  border: 1px solid #b2b2b2;
+  background: linear-gradient(180deg, #ecf2f7 0%, #ffffff 25%, #eaecee 100%);
+}
+
+:root[data-theme="kurumi"] select {
+  border: 1.5px solid #737373;
+}
+
+:root[data-theme="kurumi"]
+  input:not([type="button"]):not([type="range"]):not([type="checkbox"]),
+:root[data-theme="kurumi"] textarea {
+  border-bottom: 3px ridge #e4e4e4;
+  border-right: 3px ridge #e4e4e4;
+  border-left: 3px groove #ffffff;
+  border-top: 3px groove #ffffff;
+  box-shadow: inset 0 0 0 2px #e6e6e6;
+}
+
+:root[data-theme="kurumi"] #panelSelector {
+  border-bottom: 6px ridge #e4e4e4;
+  border-right: 6px ridge #e4e4e4;
+  border-left: 6px groove #ffffff;
+  border-top: 6px groove #ffffff;
+  box-shadow: inset 0 0 0 2px #e6e6e6;
+}
+
+:root[data-theme="kurumi"] input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  border: 2px solid #81909e;
+  background: linear-gradient(180deg, #ecf2f7 0%, #ffffff 25%, #c5d8ea 100%);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+}
+
+:root[data-theme="kurumi"] input[type="checkbox"]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background-color: #000000;
+  transform: scale(0);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+:root[data-theme="kurumi"] input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+:root[data-theme="kurumi"] input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  top: 5px;
+  background: none;
+}
+
+:root[data-theme="kurumi"] input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(180deg, #ecf2f7 0%, #ffffff 25%, #c5d8ea 100%);
+  border: 2px solid #81909e;
+  height: 10px;
+}
+
+:root[data-theme="kurumi"] input[type="range"]::-moz-range-track {
+  background: linear-gradient(180deg, #ecf2f7 0%, #ffffff 25%, #c5d8ea 100%);
+  border: 2px solid #81909e;
+  height: 10px;
+}
+
+:root[data-theme="kurumi"] input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(180deg, #ecf2f7 0%, #ffffff 25%, #c5d8ea 100%);
+  border-radius: 5px;
+  border: 2.5px solid #6b89c2;
+  margin-top: -9px;
+}
+
+:root[data-theme="kurumi"] .listNav > .scrollMenu button {
+  background-color: #808080;
+  color: white;
+}
+
+:root[data-theme="kurumi"] .scrollMenu button.active {
+  color: black;
+}
+
+:root[data-theme="kurumi"] .scrollMenu button.active::before {
+  content: ">";
+  padding-right: 4px;
+}
+
+:root[data-theme="kurumi"] .scrollMenu button.active::after {
+  content: "<";
+  padding-left: 4px;
+}
+
+:root[data-theme="kurumi"] legend {
+  font-family: inherit;
+  font-weight: 400;
+  background: transparent;
+  padding: 0 8px;
+  color: blue;
+}
+
+:root[data-theme="kurumi"] fieldset {
+  border-color: #b2b2b2;
+  background: linear-gradient(180deg, #ecf2f7 0%, #ffffff 25%, #eaecee 100%);
+}
+
+:root[data-theme="kurumi"]
+  nav.sMModalBar
+  *:not(.material-symbols-outlined, select, button, input) {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+:root[data-theme="kurumi"] summary {
+  font-family: inherit;
+  border-bottom: 3px ridge #e4e4e4;
+  border-right: 3px ridge #e4e4e4;
+  border-left: 3px groove #ffffff;
+  border-top: 3px groove #ffffff;
+  box-shadow: inset 0 0 0 2px #e6e6e6;
+}
+
+:root[data-theme="kurumi"] .sMControlRow {
+  border-bottom: 3px ridge #e4e4e4;
+  border-right: 3px ridge #e4e4e4;
+  border-left: 3px groove #ffffff;
+  border-top: 3px groove #ffffff;
+  box-shadow: inset 0 0 0 2px #e6e6e6;
+}
+
+:root[data-theme="kurumi"] h1,
+:root[data-theme="kurumi"] h2,
+:root[data-theme="kurumi"] h3,
+:root[data-theme="kurumi"] h4,
+:root[data-theme="kurumi"] h5,
+:root[data-theme="kurumi"] h6 {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+:root[data-theme="kurumi"] .diagramEditorCol > div > span {
+  color: blue;
+}
+
+:root[data-theme="kurumi"] #diagrammicDrawing,
+:root[data-theme="kurumi"] #welcomeToSignMaker,
+:root[data-theme="kurumi"] #downloadContent,
+:root[data-theme="kurumi"]
+  #shieldEditorModal
+  :root[data-theme="kurumi"]
+  #signMakerSettings
+  > div {
+  border: 3px solid #b2b2b2;
+}
+
+:root[data-theme="kurumi"] span.toolTip {
+  background: rgba(255, 255, 255);
+  color: black;
+  border: 1px solid #b2b2b2;
+  font-family: inherit;
+}
+
+:root[data-theme="kurumi"] .smColorDropdownButton {
+  font-weight: 700;
+}
+
+:root[data-theme="kurumi"] .sMModalSubBar {
+  border-bottom: 2px solid #b2b2b2;
+}
+
+:root[data-theme="kurumi"] .sMModalTab.selected {
+  color: blue;
+}
+
+:root[data-theme="kurumi"] #zoomControl {
+  border-bottom: 3px ridge #e4e4e4;
+  border-right: 3px ridge #e4e4e4;
+  border-left: 3px groove #ffffff;
+  border-top: 3px groove #ffffff;
+  box-shadow: inset 0 0 0 2px #e6e6e6;
+}

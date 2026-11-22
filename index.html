@@ -21,6 +21,7 @@
     <link href="css/signs.css" rel="stylesheet" type="text/css" />
     <link href="css/shields.css" rel="stylesheet" type="text/css" />
     <link href="css/form.css" rel="stylesheet" type="text/css" />
+    <link href="css/themes.css" rel="stylesheet" type="text/css" />
     <link href="css/sign-foundation.css" rel="stylesheet" type="text/css" />
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
@@ -116,17 +117,18 @@
     ></script>
     <script src="js/App.js" type="text/javascript"></script>
     <script>
-      const applyTheme = (theme) => {
-        document.documentElement.dataset.theme = theme;
-        localStorage.setItem("userTheme", theme);
-      };
-
-      applyTheme(
-        localStorage.getItem("userTheme") ||
-          (window.matchMedia("(prefers-color-scheme: dark)").matches
+      switch (theme = StorageManager.getItem("signMakerTheme") || "system") {
+        case "system":
+          document.documentElement.dataset.theme = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches
             ? "dark"
-            : "light"),
-      );
+            : "light";
+          break;
+        default:
+          document.documentElement.dataset.theme =
+            theme;
+      }
     </script>
   </head>
   <body onload="App.init()">
@@ -324,7 +326,7 @@
             <button class="material-symbols-outlined" id="downloadImageZoomOut">
               zoom_out
             </button>
-            <span id="downloadImageZoom">100%</span>
+            <span id="downloadImageZoomValue">100%</span>
             <button class="material-symbols-outlined" id="downloadImageZoomIn">
               zoom_in
             </button>
@@ -1172,13 +1174,28 @@
             <button type="button" id="signMakerSettingsClose">Close</button>
           </header>
           <nav id="signMakerTabOptions">
-            <button class="signMakerTabOption">General</button>
-            <button class="signMakerTabOption" id="smSettingsBtn_MUTCDVariants">
+            <button class="signMakerTabOption smSettingsBtn" id="smSettingsBtn_General">General</button>
+            <button class="signMakerTabOption smSettingsBtn" id="smSettingsBtn_MUTCDVariants">
               Reference Guides
             </button>
           </nav>
         </div>
         <div id="signMakerSettingsContent">
+          <div id="sMSettings_General">
+            <label for="smSettings_userTheme">Theme:</label>
+            <div id="smSettings_userTheme">
+              <button class="smSettings_userThemeBtn">Dark</button>
+              <button class="smSettings_userThemeBtn">Light</button>
+              <button class="smSettings_userThemeBtn">System</button>
+              <button class="smSettings_userThemeBtn">Kurumi</button>
+            </div>
+            <label for="smSettings_uiScale">UI Scale:</label>
+            <input type="range" id="smSettings_uiScaleSlider" min=".5" max="2" step=".1" onchange="
+            document.getElementById('smSettings_uiScale').value = this.value;
+            document.getElementById('smSettings_uiScale').dispatchEvent(new Event('change'));
+            " /> 
+            <input type="number" id="smSettings_uiScale" min=".5" max="1" step=".1" value="1" placeholder="1.0" />
+          </div>
           <div id="sMSettings_MUTCDVariants">
             <span id="smSettings_selectedMUTCDVariant"
               >Selected: MUTCD: Standard Highway Designs</span
@@ -4072,8 +4089,8 @@
 
                   <div data-property="sdGroup" class="hidden">
                     <button id="sdGroup_editGroup">Edit Block Elements</button>
-                    <label for="sdGroup_direction">Direction:</label>
-                    <select id="sdGroup_direction"></select>
+                    <label for="sdGroup_alignment">Alignment:</label>
+                    <select id="sdGroup_alignment"></select>
                     <label for="sdGroup_width" data-tooltip="Set to 0 for auto"
                       >Width (rem):</label
                     >

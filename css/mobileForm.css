@@ -125,12 +125,12 @@
 }
 
 @media (max-width: 768px) {
-  input {
-    padding: .75rem;
+  input:not([type="checkbox"]) {
+    padding: .5rem .25rem;
   }
 
   select {
-    padding: .75rem;
+    padding: .5rem;
   }
 
   button, input[type="button"] {
@@ -306,5 +306,38 @@
 
   #sMSettings_MUTCDVariants {
     flex-direction: column-reverse;
+  }
+
+  :root[data-theme="kurumi"] input[type="checkbox"]::before {
+    width: 16px;
+    height: 16px;
+  }
+
+  input[type="number"]:not(.smallval) {
+    width: 8rem;
+  }
+  
+  .smallVal {
+    width: 4rem;
+  }
+
+  label:not(.noLabelAlignment) {
+    width: 4rem;
+  }
+
+  .sMModalContent {
+    padding: 0.25rem;
+  }
+
+  div#subPanelList {
+    padding: 0;
+  }
+
+  .exitTabButton {
+    height: stretch;
+  }
+
+  .exitTabNestedButton {
+    height: 90%;
   }
 }

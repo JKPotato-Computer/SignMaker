@@ -38,23 +38,53 @@ const FormNavigation = (() => {
     });
   };
 
-  const setupThemeAndWelcome = () => {
-    const applyTheme = (theme) => {
-      document.documentElement.dataset.theme = theme;
-      localStorage.setItem("userTheme", theme);
-      document.querySelector("#nightMode").dataset.tooltip =
-        theme == "dark" ? "Day Mode" : "Night Mode";
-      document.querySelector("#nightMode").innerHTML =
-        `<span class="material-symbols-outlined"> ${theme == "dark" ? "light_mode" : "dark_mode"} </span>`;
-    };
+  const changeTheme = (theme) => {
+    switch (theme) {
+      case "light":
+      case "dark":
+        document.querySelector("#nightMode").dataset.tooltip =
+          theme == "dark" ? "Day Mode" : "Night Mode";
+        document.querySelector("#nightMode").innerHTML =
+          `<span class="material-symbols-outlined"> ${theme == "dark" ? "light_mode" : "dark_mode"} </span>`;
+      default:
+        document.documentElement.dataset.theme =
+          theme == "system"
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+            : theme;
 
+        for (const button of document.querySelectorAll(
+          "#smSettings_userTheme > button",
+        )) {
+          if (button.textContent.toLowerCase() == theme) {
+            button.classList.add("selected");
+          } else {
+            button.classList.remove("selected");
+          }
+        }
+    }
+
+    StorageManager.setItem("signMakerTheme", theme);
+  };
+
+  const setupThemeAndWelcome = () => {
     document.querySelector("#nightMode").addEventListener("click", () => {
       const nextTheme =
         document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      applyTheme(nextTheme);
+      changeTheme(nextTheme);
     });
 
-    applyTheme(document.documentElement.dataset.theme);
+    document.documentElement.dataset.theme =
+      StorageManager.getItem("signMakerTheme") || "system";
+    document.documentElement.style.setProperty(
+      "--uiScale",
+      StorageManager.getItem("signMakerUIScale") || 1,
+    );
+    document.querySelector("#smSettings_uiScale").value =
+      StorageManager.getItem("signMakerUIScale") || 1;
+
+    changeTheme(document.documentElement.dataset.theme);
 
     if (!localStorage.getItem("closedWelcome")) {
       document.querySelector("#modalHolder").style.display = "flex";
@@ -308,10 +338,13 @@ const FormNavigation = (() => {
 
         tooltip.style.opacity = 1;
 
-        if (sMConfigBar.contains(element)) {
+        if (
+          sMConfigBar.contains(element) &&
+          document.documentElement.dataset.theme != "kurumi"
+        ) {
           tooltip.style.fontFamily = "Overpass";
         } else {
-          tooltip.style.fontFamily = "Inter";
+          tooltip.style.fontFamily = "";
         }
       });
 
@@ -745,6 +778,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdCtrlText_textAlign"),
       document.querySelector("#sdActionMessage_textAlign"),
       document.querySelector("#sdAdvisory_textAlign"),
+      document.querySelector("#sdGroup_alignment"),
     ];
     for (const elem of textElem_alignmentSelects) {
       for (const alignment of TextElement.alignments) {
@@ -879,10 +913,6 @@ const FormNavigation = (() => {
       };
       valEl.addEventListener("change", onChange);
     });
-
-    for (const direction of GroupElement.prototype.blockDirection) {
-      lib.appendOption(document.querySelector("#sdGroup_direction"), direction);
-    }
 
     for (const format of GroupElement.boxFormats) {
       lib.appendOption(document.querySelector("#sdGroup_boxFormat"), format);
@@ -1883,6 +1913,59 @@ const FormNavigation = (() => {
           }
         }
       });
+
+    // settings navigation
+    let currentTab = "General";
+    const redisplayPage = () => {
+      for (const page of document.querySelectorAll(
+        "#signMakerSettingsContent > div",
+      )) {
+        if (page.id === "sMSettings_" + currentTab) {
+          page.style.display = "";
+        } else {
+          page.style.display = "none";
+        }
+      }
+    };
+
+    for (const button of document.querySelectorAll(".smSettingsBtn")) {
+      button.addEventListener("click", () => {
+        currentTab = button.id.replace("smSettingsBtn_", "");
+        for (const btn of document.querySelectorAll(".smSettingsBtn")) {
+          if (btn.id === button.id) {
+            btn.classList.add("selected");
+          } else {
+            btn.classList.remove("selected");
+          }
+        }
+        redisplayPage();
+      });
+    }
+
+    redisplayPage();
+
+    // themes
+    for (const button of document.querySelectorAll(
+      "#smSettings_userTheme > button",
+    )) {
+      button.addEventListener("click", () => {
+        changeTheme(button.textContent.toLowerCase());
+      });
+    }
+
+    // scale
+    document
+      .querySelector("#smSettings_uiScale")
+      .addEventListener("change", () => {
+        document.documentElement.style.setProperty(
+          "--uiScale",
+          parseFloat(document.querySelector("#smSettings_uiScale").value),
+        );
+        StorageManager.setItem(
+          "signMakerUIScale",
+          parseFloat(document.querySelector("#smSettings_uiScale").value),
+        );
+      });
   };
 
   let oldColorName = null;
@@ -2083,8 +2166,9 @@ const FormNavigation = (() => {
 
         if (
           target.dataset.color === "" ||
-          target.dataset.color.toLowerCase() ==
-            target.dataset.emptyValue.toLowerCase()
+          (target.dataset.emptyValue &&
+            target.dataset.color.toLowerCase() ==
+              target.dataset.emptyValue.toLowerCase())
         ) {
           target.style.backgroundColor = "";
           target.style.color = "";

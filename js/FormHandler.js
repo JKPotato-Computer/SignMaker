@@ -1086,6 +1086,8 @@ const formHandler = (() => {
     document.querySelector("#smSPDeleteSelectedBlock").disabled =
       app.getCurrentBlockElements().rows.length == 1 &&
       app.getCurrentBlockRow().length == 1;
+    document.querySelector("#smSPExitGroupedBlock").style.display =
+      app.vars.currentlySelectedGroupIndex == -1 ? "none" : "";
     document.querySelector("#smSPExitGroupedBlock").disabled =
       app.vars.currentlySelectedGroupIndex == -1;
 

@@ -20,6 +20,17 @@
   --inputColor: 15, 15, 15;
 }
 
+:root[data-theme="kurumi"] {
+  --backgroundColor: #45d9ff;
+  --hotbarColor: #eaeaea;
+  --textColor: rgb(0, 0, 0);
+  --selectedColor: rgb(53, 255, 113);
+  --hoverColor: rgba(205, 205, 205, 0.5);
+  --baseColor: 255, 255, 255;
+  --baseColorInv: 0, 0, 0;
+  --inputColor: 240, 240, 240;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -35,6 +46,14 @@ body {
   font-family: "Inter";
   font-size: 20px;
   color: var(--textColor);
+}
+
+:root[data-theme="kurumi"],
+:root[data-theme="kurumi"] body {
+  font-family:
+    "Lucida Grande", "Arial", "Liberation Sans", "DejaVu Sans", sans-serif;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -162,7 +181,6 @@ h6 {
   background-color: rgb(252, 207, 52);
   padding: 6px;
   font-weight: bold;
-  font-family: "Inter";
   font-weight: 400;
   font-size: 16px;
   margin: 16px;

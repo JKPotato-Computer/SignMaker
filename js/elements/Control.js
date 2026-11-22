@@ -1220,7 +1220,7 @@ class GroupElement {
   constructor(options = {}) {
     const {
       blockElements,
-      direction,
+      alignment,
       width,
       boxFormat,
       formatSize,
@@ -1236,7 +1236,7 @@ class GroupElement {
     }
 
     this.blockElements.isGroup = true;
-    this.direction = direction;
+    this.alignment = alignment;
     this.width = width;
     this.border = border;
     this.borderWidth = borderWidth;

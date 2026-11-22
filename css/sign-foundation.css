@@ -96,6 +96,7 @@ main#smRender.wide #postContainer {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: calc(var(--fontSize) / 4);
 }
 
 .bE-advisoryMessage span {
