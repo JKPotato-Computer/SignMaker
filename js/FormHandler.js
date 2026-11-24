@@ -98,7 +98,11 @@ const formHandler = (() => {
     // Panel
     currentPanel.color = form["panelColor"].dataset.color;
     currentPanel.corner = form["panelCorner"].value;
-    currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
+    if (readProperties && readProperties["aplLanePanelSizeChange"]) {
+      currentPanel.sign.lanePanelSize = form["smAPL_LaneSize"].value;
+    } else {
+      currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
+    }
 
     currentPanel.borderRadius = Math.max(0, form["panelBorderRadius"].value);
 
@@ -420,6 +424,12 @@ const formHandler = (() => {
             parseFloat(
               bannerElement.querySelector(".smSPBanner_verticalPadding").value,
             ) || 0;
+          banner.wordSpacing = parseInt(
+            bannerElement.querySelector(".smSPBanner_wordSpacing").value,
+          );
+          banner.letterSpacing = parseInt(
+            bannerElement.querySelector(".smSPBanner_letterSpacing").value,
+          );
         }
       }
     }
@@ -514,7 +524,7 @@ const formHandler = (() => {
       app.vars.currentlySelectedRowIndex
     ].backgroundColor = document.querySelector(
       "#sdBlock_backgroundColor",
-    ).value;
+    ).dataset.color;
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].backgroundFullWidth = document.querySelector(
@@ -645,11 +655,11 @@ const formHandler = (() => {
       // currentPanel.sign.oSNum = form["oSNum"].value;
     } else if (currentPanel.sign.arrows.arrowMode == "apl") {
       const apl = currentPanel.sign.arrows.apl;
-      apl.horizontalPadding = parseFloat(form["smAPL_HorizPadding"].value);
       apl.verticalTopPadding = parseFloat(form["smAPL_VertTopPadding"].value);
       apl.verticalBottomPadding = parseFloat(
         form["smAPL_VertBottomPadding"].value,
       );
+      apl.gap = parseFloat(form["smAPL_Gap"].value);
 
       let containerIndex = 0;
       for (let i = 0; i <= currentPanel.sign.subPanels.length - 1; i += 0.5) {
@@ -674,18 +684,11 @@ const formHandler = (() => {
           continue;
         }
 
-        if (i % 1 == 0 && apl.subpanelConfigs[i]) {
-          apl.subpanelConfigs[i].justify = aplContainer.querySelector(
-            ".smAPLCat_justifyAPLs",
-          ).value;
-        } else if (
-          i % 1 != 0 &&
-          apl.subpanelConfigs[i] &&
+        if (
+          i == currentPanel.sign.subPanels.length - 1 &&
           currentPanel.sign.lanePanelSize == 0
         ) {
-          apl.subpanelConfigs[i].minWidth = parseFloat(
-            aplContainer.querySelector(".smAPLCat_minWidth").value,
-          );
+          apl.subpanelConfigs[i].justify = aplContainer.querySelector(".smAPLCat_alignRight").checked;
         }
 
         aplList.forEach((arrow, arrowIndex) => {
@@ -1208,7 +1211,7 @@ const formHandler = (() => {
           element.dataset.color = color;
         } else if (element.tagName === "SELECT") {
           element.value = currentBlockElem[propertyName];
-          element.addEventListener("blur", readForm);
+          element.addEventListener("change", readForm);
         } else {
           element.value = currentBlockElem[propertyName];
           element.addEventListener(
@@ -1332,6 +1335,9 @@ const formHandler = (() => {
         document.querySelector("#sdCtrlText_spaceNumeralsLetters"),
       ],
     );
+    toggleVisibility(document.querySelector("#sdCtrlText_smallCapitals"), [
+      document.querySelector("#sdCtrlText_capitalSize"),
+    ]);
     toggleVisibility(
       document.querySelector("#sdActionMessage_useNumeralFormatting"),
       [
@@ -2345,12 +2351,13 @@ const formHandler = (() => {
         const banner = currentShield.banners[alignment][i];
         const template = document.querySelector("#smSP_templateBannerElement");
         const clone = template.content.cloneNode(true);
-        const bannerElement = clone.querySelector(".smSP_bannerElement");
+        const bannerElement = clone.firstElementChild;
+        document.querySelector("#smSP_bannerMaster").appendChild(clone);
 
         bannerElement.querySelector(".smSPBanner_textContent").value =
           banner.textContent;
-        const bannerColor = bannerElement.querySelector(".smSPBanner_bgColor");
-        bannerColor.dataset.color = banner.backgroundColor;
+        bannerElement.querySelector(".smSPBanner_bgColor").dataset.color =
+          banner.backgroundColor;
         bannerElement.querySelector(".smSPBanner_fontFamily").value =
           banner.fontFamily;
         bannerElement.querySelector(".smSPBanner_firstLetterScale").value =
@@ -2363,11 +2370,20 @@ const formHandler = (() => {
           banner.verticalMargin;
         bannerElement.querySelector(".smSPBanner_borderRadius").value =
           banner.borderRadius;
+        bannerElement.querySelector(".smSPBanner_borderRadius").style.display =
+          banner.backgroundColor == "Inherit" ? "none" : "";
+        bannerElement.querySelector(
+          ".smSPBanner_borderRadiusLabel",
+        ).style.display = banner.backgroundColor == "Inherit" ? "none" : "";
         bannerElement.querySelector(".smSPBanner_horizontalPadding").value =
           banner.horizontalPadding;
         bannerElement.querySelector(".smSPBanner_verticalPadding").value =
           banner.verticalPadding;
         bannerElement.querySelector(".smSPBanner_position").value = alignment;
+        bannerElement.querySelector(".smSPBanner_letterSpacing").value =
+          banner.letterSpacing;
+        bannerElement.querySelector(".smSPBanner_wordSpacing").value =
+          banner.wordSpacing;
 
         bannerElement
           .querySelector(".smSP_deleteBanner")
@@ -2377,7 +2393,6 @@ const formHandler = (() => {
             updateShieldSubform();
             app.redraw();
           });
-        document.querySelector("#smSP_bannerMaster").appendChild(clone);
       }
     }
 
@@ -2716,12 +2731,17 @@ const formHandler = (() => {
     }
 
     if (sign.arrows.arrowMode == "apl") {
-      document.querySelector("#smAPL_HorizPadding").value =
-        arrows.horizontalPadding;
       document.querySelector("#smAPL_VertTopPadding").value =
         arrows.verticalTopPadding;
       document.querySelector("#smAPL_VertBottomPadding").value =
         arrows.verticalBottomPadding;
+      document.querySelector("#smAPL_Gap").value = arrows.gap;
+      document.querySelector("#smAPL_Gap").style.display =
+        sign.lanePanelSize > 0 ? "none" : "";
+      document.querySelector(`label[for="smAPL_Gap"]`).style.display =
+        sign.lanePanelSize > 0 ? "none" : "";
+
+      document.querySelector("#smAPL_LaneSize").value = sign.lanePanelSize;
       document.querySelector("#sMAPL_APLCat").innerHTML = "";
 
       const subpanels = app.getCurrentPanel().sign.subPanels;
@@ -2738,35 +2758,22 @@ const formHandler = (() => {
           i % 1 == 0 ? "Subpanel " + (i + 1) : "Divider";
 
         if (i % 1 != 0) {
-          aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
-
-          aplContHolder.querySelector(".smAPLCat_numLanesLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_numLanes").remove();
-
-          if (sign.lanePanelSize != 0) {
-            aplContHolder.querySelector(".smAPLCat_minWidthLabel").remove();
-            aplContHolder.querySelector(".smAPLCat_minWidth").remove();
-          } else {
-            aplContHolder.querySelector(".smAPLCat_minWidth").value =
-              arrows.subpanelConfigs[i]?.minWidth;
-            aplContHolder.querySelector(".smAPLCat_minWidth").disabled =
-              !arrows.subpanelConfigs[i];
-          }
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_numLanes").style.display = "none";
+        } else if (sign.lanePanelSize <= 0) {
+          aplContHolder.querySelector(".smAPLCat_numLanesLabel").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_numLanes").style.display = "none";
         } else {
-          aplContHolder.querySelector(".smAPLCat_minWidthLabel").remove();
-          aplContHolder.querySelector(".smAPLCat_minWidth").remove();
-
-          if (!arrows.subpanelConfigs[i]) {
-            aplContHolder.querySelector(".smAPLCat_justifyLabel").remove();
-            aplContHolder.querySelector(".smAPLCat_justifyAPLs").remove();
-          } else {
-            aplContHolder.querySelector(".smAPLCat_justifyAPLs").value =
-              arrows.subpanelConfigs[i].justify;
-          }
-
           aplContHolder.querySelector(".smAPLCat_numLanes").value =
             subpanels[i].laneWidth;
+        }
+
+        if (i != subpanels.length - 1 || sign.lanePanelSize != 0) {
+          aplContHolder.querySelector(".smAPLCat_alignRightLabel").style.display = "none";
+          aplContHolder.querySelector(".smAPLCat_alignRight").style.display = "none";
+        } else if (arrows.subpanelConfigs[i]) {
+          aplContHolder.querySelector(".smAPLCat_alignRight").checked =
+            arrows.subpanelConfigs[i].justify;
         }
 
         for (let j = 0; j < aplList.length; j++) {
@@ -2828,7 +2835,11 @@ const formHandler = (() => {
         document.querySelector("#smAPL_APLCat").appendChild(aplContTemplate);
 
         if (
-          (i % 1 != 0 && aplList.length > 0) ||
+          (i % 1 != 0 &&
+            (aplList.length > 0 ||
+              (app.getCurrentPanel().sign.lanePanelSize > 0 && aplList.length == 0 && arrows.subpanels[i + 0.5] &&
+                arrows.subpanels[i + 0.5].length ==
+                  subpanels[i + 0.5].laneWidth))) ||
           (app.getCurrentPanel().sign.lanePanelSize > 0 &&
             i % 1 == 0 &&
             aplList.length >=

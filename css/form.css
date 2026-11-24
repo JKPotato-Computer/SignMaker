@@ -3316,9 +3316,7 @@ summary:hover {
   display: inline-block;
   min-width: 6rem;
   padding: 0.25rem 0.5rem;
-  color: var(--colorButtonText, white);
-  background-color: var(--colorButtonBackground, var(--hotbarColor));
-  border: 1px solid rgb(var(--baseColorInv));
+  color: var(--textColor);
 }
 
 .smColorDropdownButton:hover {

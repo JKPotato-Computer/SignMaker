@@ -908,16 +908,6 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const justify of APLArrow.prototype.justifyAPLs) {
-      lib.appendOption(
-        document
-          .querySelector("#smAPL_templateAPLContainer")
-          .content.querySelector(".smAPLCat_justifyAPLs"),
-        justify.toLowerCase(),
-        { text: justify },
-      );
-    }
-
     for (const justify of Sign.prototype.standardArrowJustify) {
       lib.appendOption(
         document.querySelector("#standardArrows_justify"),
@@ -1463,7 +1453,7 @@ const FormNavigation = (() => {
       document.querySelector("#spShield_designationFontFamily"),
     ];
     for (const select of shieldFontSelect) {
-      lib.appendOption(select, "", {text: "Unset"});
+      lib.appendOption(select, "", { text: "Unset" });
       for (const fontFamily of TextElement.fontFamilies) {
         lib.appendOption(select, fontFamily);
       }
@@ -1749,9 +1739,17 @@ const FormNavigation = (() => {
               !Array.isArray(obj[key])
             ) {
               const recursiveHelper = (o, mutcdRecursive) => {
+                if (Array.isArray(o)) {
+                  for (const item of o) {
+                    recursiveHelper(item, mutcdRecursive);
+                  }
+                }
+
                 const valKeys = Object.keys(o).filter(
                   (k) => k !== "constructor" && k !== "prototype",
                 );
+
+                console.log("-", o, "-");
 
                 for (const k of valKeys) {
                   if (tagsToReplace.includes(k)) {
@@ -1772,8 +1770,6 @@ const FormNavigation = (() => {
                       }
                     }
 
-                    console.log(k, currentValue, newValue, mutcdRecursive);
-
                     if (newValue !== undefined && newValue !== currentValue) {
                       o[k] = newValue;
                     }
@@ -1783,6 +1779,20 @@ const FormNavigation = (() => {
                     !Array.isArray(o[k])
                   ) {
                     recursiveHelper(o[k], [...mutcdRecursive, k]);
+                  } else if (Array.isArray(o[k])) {
+                    for (const item of o[k]) {
+                      if (
+                        typeof item === "object" &&
+                        !lib.isClass(item.constructor) &&
+                        !Array.isArray(item)
+                      ) {
+                        recursiveHelper(item, [...mutcdRecursive, k]);
+                      } else if (window[item?.constructor?.name]) {
+                        replaceRecursive(item);
+                      }
+                    }
+                  } else if (window[o[k]?.constructor?.name]) {
+                    replaceRecursive(obj[k]);
                   }
                 }
               };
@@ -1854,26 +1864,6 @@ const FormNavigation = (() => {
         }
       }
     });
-
-    for (const id of [
-      "#sMET_backgroundColor",
-      "#sdCtrlText_backgroundColor",
-      "#sdAdvisory_backgroundColor",
-      "#sdBlock_backgroundColor",
-      "#sdIcon_backgroundColor",
-      "#sdTollLogo_backgroundColor",
-      "#sdTollLogo_containerBackgroundColor",
-      "#sdActionMessage_backgroundColor",
-    ]) {
-      document.querySelector(id).dataset.emptyValue = "Inherit";
-    }
-
-    document.querySelector("#smET_iconBackground").dataset.emptyValue =
-      "Transparent";
-
-    for (const id of ["#spShield_routeColor", "#spShield_designationColor"]) {
-      document.querySelector(id).dataset.emptyValue = "Unset";
-    }
 
     colorDropdown.addEventListener("click", (event) => {
       const colorItem = event.target.closest(".smColorDropdownItem");
@@ -2010,7 +2000,15 @@ const FormNavigation = (() => {
         }
 
         let target = mutation.target;
-        if (target.dataset.color === "") {
+
+        if (!target.isConnected) {
+          continue;
+        }
+
+        if (
+          target.dataset.color === "" ||
+          target.dataset.color == target.dataset.emptyValue
+        ) {
           target.style.backgroundColor = "";
           target.style.color = "";
           target.textContent = target.dataset.emptyValue || "";

@@ -39,6 +39,12 @@
   --post-color-dark: rgb(120, 16, 16);
 }
 
+#postContainer.postColorBlue {
+  --post-color-mid: rgb(38, 79, 193);
+  --post-color-light: rgb(110, 141, 235);
+  --post-color-dark: rgb(16, 59, 120);
+}
+
 #postContainer.polePositionOverhead .post {
   visibility: visible;
 }
@@ -345,7 +351,7 @@
 }
 
 .guideArrows.exit_only.full_black_border {
-  border-top: 0.2rem solid black;
+  border-top: 0.2rem solid;
 }
 
 .guideArrows.exit_only.white_border {
@@ -398,6 +404,7 @@
 .subDivider {
   width: 0.2rem;
   display: flex;
+  min-width: 4px;
   flex-direction: column;
 }
 

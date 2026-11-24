@@ -104,7 +104,10 @@ const ShieldEditor = (() => {
     if (baseShield.shieldBacks) {
       document
         .querySelector(".selectedShieldPreview")
-        .style.setProperty("--shieldBackColor", baseShield.shieldBackColor);
+        .style.setProperty(
+          "--shieldBackColor",
+          ColorLibrary.colorLibrary[baseShield.shieldBackColor],
+        );
       document
         .querySelector(".selectedShieldPreview")
         .style.setProperty(
@@ -238,7 +241,7 @@ const ShieldEditor = (() => {
         shieldEditorModal.style.display = "none";
         holder.style.display = "none";
         cleanupListeners();
-        document.appendChild(
+        document.body.appendChild(
           shieldEditorModal.querySelector("#smColorDropdownHolder") || null,
         );
         if (returnFunction) returnFunction(value);
@@ -377,7 +380,7 @@ const ShieldEditor = (() => {
       shieldEditorModal.style.display = "flex";
       shieldEditorModal.showModal();
       shieldEditorModal.appendChild(
-        document.querySelector("#smColorDropdownHolder") || null,
+        document.body.querySelector("#smColorDropdownHolder") || null,
       );
 
       updateForm();

@@ -25,6 +25,10 @@
     <link href="css/material-symbols.css" rel="stylesheet" type="text/css" />
     <link href="css/mobileForm.css" rel="stylesheet" type="text/css" />
     <!-- Page Links -->
+     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+  </script>
     <script type="module">
       // compatability w/ npx vite
       import terminal from "virtual:terminal";
@@ -449,7 +453,7 @@
               onchange="ShieldEditor.readForm()"
             ></select>
             <label for="spShield_routeColor">Color:</label>
-            <button type="button" id="spShield_routeColor" class="smColorDropdownButton" data-color="White">White</button>
+            <button type="button" id="spShield_routeColor" class="smColorDropdownButton" data-color="Unset" data-empty-value="Unset">Unset</button>
             <br />
             <label for="spShield_routeSpacing">Letter Spacing (px):</label>
             <input
@@ -488,7 +492,7 @@
               onchange="ShieldEditor.readForm()"
             ></select>
             <label for="spShield_designationColor">Color:</label>
-            <button type="button" id="spShield_designationColor" class="smColorDropdownButton" data-color="White">White</button>
+            <button type="button" id="spShield_designationColor" class="smColorDropdownButton" data-color="Unset" data-empty-value="Unset">Unset</button>
             <br />
             <label for="spShield_designationSpacing"
               >Letter Spacing (px):</label
@@ -712,7 +716,7 @@
         <header>
           <h2>
             <span class="material-symbols-outlined">draw</span>
-            Diagrammic Drawing
+            Diagrammatic Drawing
           </h2>
           <div class="diagrammicDrawingHeaderActions">
             <button
@@ -1138,7 +1142,7 @@
         </dialog>
         <dialog id="diagramPresets" class="diagramSubModal diagramPresetsModal">
           <header>
-            <h3>Diagrammic Presets</h3>
+            <h3>Diagrammatic Presets</h3>
             <button type="button" data-diagram-modal-close>Close</button>
           </header>
           <div id="diagramPresetGallery"></div>
@@ -1223,12 +1227,21 @@
                  <button class="mutcdImage" data-variant="NVUTCDG">
                   <img src="assets/form/mutcd/NVUTCDG.png" />
                   <div class="mutcdSlideInfo">
-                    <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines</h2>
-                    <p>2026 Edition</p>
+                    <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines*</h2>
+                    <p>2024 Edition: Revision 3 Tredec† 2024</p>
                     <p>
-                      Placeholder Description :3
+                      The NVUTCDG (North Veridian Universal Traffic Control Device Guidelines)
+                      are the national standard for traffic control devices of many countries on Avaris.* 
+                      This version is based off the latest revision by
+                      the Veridian Road Convention, from Tredecember† 2024.
                     </p>
-
+                    <p>
+                      * This is a fictional MUTCD.
+                      If you are aiming for realism, use another MUTCD.
+                    </p>
+                    <p>
+                      † The calendar used has thirteen months. Tredecember is the thirteenth.
+                    </p>
                     <span class="mutcdBottom">Click to select</span>
                   </div>
                 </button>
@@ -1295,7 +1308,7 @@
                 data-toolTip="Sets the color of the posts and supports."
                 >Color:
               </label>
-              <select id="postColor"></select>
+              <select id="postColor" onchange="formHandler.readForm();"></select>
               <br />
               <label for="postThicknessValue">Thickness (rem):</label>
               <input
@@ -1729,7 +1742,7 @@
                 <label for="smET_iconBackground" class="checkboxLabel">
                   Icon BG:
                 </label>
-                <button type="button" id="smET_iconBackground" class="smColorDropdownButton" data-color="Transparent">Transparent</button>
+                <button type="button" id="smET_iconBackground" class="smColorDropdownButton" data-color="Transparent" data-empty-value="Transparent">Transparent</button>
                 <br />
                 <div
                   id="smET_iconBackgroundConfigurations"
@@ -2186,7 +2199,7 @@
                 <legend>Container</legend>
 
                 <label for="sMET_backgroundColor">Background Color:</label>
-                <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
 
                 <label for="sMET_minimumHeight">Minimum Height (rem):</label>
                 <input
@@ -3012,7 +3025,7 @@
                     />
                     <br />
                     <label for="sdCtrlText_backgroundColor">BG:</label>
-                    <button id="sdCtrlText_backgroundColor" class="smColorDropdownButton" data-color="Inherit" type="button">
+                    <button id="sdCtrlText_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit" type="button">
                         Inherit
                     </button>
                     <label for="sdCtrlText_fontFamily">Font:</label>
@@ -3035,6 +3048,7 @@
                       >Small Capitals:</label
                     >
                     <input type="checkbox" id="sdCtrlText_smallCapitals" />
+                    <input type="number" id='sdCtrlText_capitalSize' class="hidden smallVal" min="0" step="1" data-toolTip="Relative Size"/>
                     <label for="sdCtrlText_alignment">Alignment: </label>
                     <select id="sdCtrlText_alignment"></select>
                     <br />
@@ -3201,7 +3215,7 @@
                     />
                     <br />
                     <label for="sdAdvisory_backgroundColor">BG:</label>
-                    <button type="button" id="sdAdvisory_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                    <button type="button" id="sdAdvisory_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <label for="sdAdvisory_fontFamily">Font:</label>
                     <select id="sdAdvisory_fontFamily"></select>
                     <br />
@@ -3412,7 +3426,7 @@
                     <br />
 
                     <label for="sdIcon_backgroundColor">BG Color: </label>
-                    <button type="button" id="sdIcon_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                    <button type="button" id="sdIcon_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <br />
 
                     <label for="sdIcon_border">Border: </label>
@@ -3684,7 +3698,7 @@
                       <label for="sdTollLogo_backgroundColor"
                         >Background Color:</label
                       >
-                      <button type="button" id="sdTollLogo_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                      <button type="button" id="sdTollLogo_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                       <br />
                       <label for="sdTollLogo_tollBorderRadius"
                         >BG Roundness (px):</label
@@ -3795,7 +3809,7 @@
                       <label for="sdTollLogo_containerBackgroundColor"
                         >Container BG Color:</label
                       >
-                      <button type="button" id="sdTollLogo_containerBackgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                      <button type="button" id="sdTollLogo_containerBackgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                       <label for="sdTollLogo_containerBorderWidth"
                         >Border Width (px):</label
                       >
@@ -3842,7 +3856,7 @@
                     />
                     <br />
                     <label for="sdActionMessage_backgroundColor">BG:</label>
-                    <button type="button" id="sdActionMessage_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                    <button type="button" id="sdActionMessage_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <label for="sdActionMessage_fontFamily">Font:</label>
                     <select id="sdActionMessage_fontFamily"></select>
                     <br />
@@ -4283,7 +4297,7 @@
                   </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
-                  <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit">Inherit</button>
+                  <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                   <label for="sdBlock_backgroundFullWidth"
                     >BG Full Width:</label
                   >
@@ -4397,7 +4411,7 @@
               >APL (Arrow-Per-Lane)</a
             >
             <a tabindex="0" data-tab="sMDiagrammic" class="smModalTab"
-              >Diagrammic</a
+              >Diagrammatic</a
             >
           </nav>
           <div class="sMModalContent">
@@ -4422,7 +4436,7 @@
                     class="sMA_typeVisual"
                     src="./assets/form/arrowVariants/Diagrammic.png"
                   />
-                  <span class="sMA_typeLabel">Diagrammic</span>
+                  <span class="sMA_typeLabel">Diagrammatic</span>
                 </button>
               </div>
             </div>
@@ -4961,13 +4975,13 @@
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">
-              <label for="smAPL_HorizPadding">Horizontal Padding (rem):</label>
+              <label for="smAPL_Gap">Arrow Gap (rem):</label>
               <input
                 type="number"
-                id="smAPL_HorizPadding"
+                id="smAPL_Gap"
+                name="smAPL_Gap"
                 onchange="formHandler.readForm()"
                 min="0"
-                max="10"
                 step=".01"
                 value="0"
               />
@@ -4996,12 +5010,22 @@
                 value="0.5"
               />
               <br />
+              <label for="smAPL_LaneSize">Lane Size (px):</label>
+              <input
+                type="number"
+                id="smAPL_LaneSize"
+                onchange="formHandler.readForm({ aplLanePanelSizeChange: true })"
+                min="0"
+                step="1"
+                value="0"
+              />
+              <br />
               <div id="sMAPL_APLCat"></div>
             </div>
             <div id="sMDiagrammic" class="tabHidden">
               <div>
                 <button type="button" id="sMDiagrammicOpenEditor">
-                  Open Diagrammic Drawing Editor
+                  Open Diagrammatic Drawing Editor
                 </button>
                 <button type="button" id="sMDiagrammicOpenEditorPresets">
                   Edit Existing Presets
@@ -5401,20 +5425,6 @@
         <span class="smAPLCat_title">Subpanel 1</span>
         <div class="smAPLCat_options">
           <button type="button" class="smAPLCat_addArrow">Add Arrow</button>
-          <span class="smAPLCat_justifyLabel">Justify:</span>
-          <select
-            class="smAPLCat_justifyAPLs"
-            onchange="formHandler.readForm()"
-          ></select>
-          <span class="smAPLCat_minWidthLabel">Width (rem):</span>
-          <input
-            type="number"
-            class="smAPLCat_minWidth"
-            min="0"
-            step=".01"
-            value="0"
-            onchange="formHandler.readForm()"
-          />
           <span class="smAPLCat_numLanesLabel">Num Lanes:</span>
           <input
             type="number"
@@ -5423,6 +5433,12 @@
             step="1"
             value="0"
             onchange="formHandler.readForm({ aplSubpanelConfigChange: true })"
+          />
+          <span class="smAPLCat_alignRightLabel">Align Right:</span>
+          <input
+            type="checkbox"
+            class="smAPLCat_alignRight"
+            onchange="formHandler.readForm()"
           />
         </div>
         <div class="smAPLCat_aplList"></div>
@@ -5440,7 +5456,7 @@
               onchange="formHandler.readForm()"
               placeholder="BANNER"
             />
-            <button type="button" class="smColorDropdownButton smSPBanner_bgColor" data-color="Inherit">Inherit</button>
+            <button type="button" class="smColorDropdownButton smSPBanner_bgColor" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
             <select
               class="smSPBanner_fontFamily"
               onchange="formHandler.readForm()"
@@ -5526,12 +5542,32 @@
             </div>
             <div>
               <div>
-                <span>Roundness (px):</span>
+                <span class="smSPBanner_borderRadiusLabel">Roundness (px):</span>
                 <input
                   type="number"
                   class="smSPBanner_borderRadius"
-                  placeholder="120"
-                  value="120"
+                  placeholder="10"
+                  value="10"
+                  min="0"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <span>Letter Spacing (px):</span>
+                <input
+                  type="number"
+                  class="smSPBanner_letterSpacing"
+                  placeholder="0"
+                  value="0"
+                  min="0"
+                  step="1"
+                  onchange="formHandler.readForm()"
+                />
+                <span>Word Spacing (px):</span>
+                <input
+                  type="number"
+                  class="smSPBanner_wordSpacing"
+                  placeholder="0"
+                  value="0"
                   min="0"
                   step="1"
                   onchange="formHandler.readForm()"
@@ -5554,7 +5590,7 @@
           <button
             type="button"
             class="smColorDropdownItem"
-            data-color="inherit"
+            data-color="inherit" data-empty-value="Inherit"
           >
             <span>Inherit</span>
           </button>

@@ -1283,11 +1283,29 @@ const App = (() => {
           panel.sign.arrows.arrowMode == "apl" &&
           panel.sign.lanePanelSize > 0 &&
           panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0 &&
-          !hasShifted
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0
         ) {
-          hasShifted = true;
           subDivider.style.marginLeft = `${panel.sign.lanePanelSize / 2 - 2}px`;
+
+          const subPanelRect = signContentContainerElmt.getBoundingClientRect();
+          const subDividerRect = subDivider.getBoundingClientRect();
+
+          const midpointViewport =
+            (subPanelRect.left + subDividerRect.left) / 2;
+          const panelCenterViewport =
+            subPanelRect.left + subPanelRect.width / 2;
+
+          const offsetViewport = midpointViewport - panelCenterViewport;
+          const leftOffset = offsetViewport / formHandler.vars.zoomLevel;
+
+          signContentContainerElmt.style.left = `${leftOffset}px`;
+        } else if (
+          panel.sign.arrows.arrowMode == "apl" &&
+          panel.sign.lanePanelSize == 0 &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
+          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0
+        ) {
+          subDivider.style.marginLeft = `${panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5][0].size / 2 + panel.sign.arrows.apl.gap / 2 + 0.5}rem`;
 
           const subPanelRect = signContentContainerElmt.getBoundingClientRect();
           const subDividerRect = subDivider.getBoundingClientRect();
@@ -1371,8 +1389,8 @@ const App = (() => {
         segment.style.backgroundColor = ColorLibrary.checkForContrast(
           targetColor,
         )
-          ? "white"
-          : "black";
+          ? "black"
+          : "white";
       }
 
       divider.appendChild(segment);
@@ -1396,8 +1414,8 @@ const App = (() => {
       firstSegment.style.backgroundColor = ColorLibrary.checkForContrast(
         firstColor,
       )
-        ? "white"
-        : "black";
+        ? "black"
+        : "white";
       divider.appendChild(firstSegment);
     }
 
@@ -1569,6 +1587,133 @@ const App = (() => {
     }
   };
 
+  const recolorBorder = (signHolder, subpanelList) => {
+    class Point {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+      }
+
+      static dist(p1, p2) {
+        return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+      }
+    }
+
+    const originalPointerEvents = signHolder.style.pointerEvents;
+    signHolder.style.pointerEvents = "none";
+    signHolder.style.borderColor = "transparent";
+
+    const signHolderRect = signHolder.getBoundingClientRect();
+
+    const centerX = signHolderRect.left + signHolderRect.width / 2;
+    const centerY = signHolderRect.top + signHolderRect.height / 2;
+
+    const topCenterPoint = new Point(centerX, signHolderRect.top);
+    const topRightPoint = new Point(signHolderRect.right, signHolderRect.top);
+    const rightCenterPoint = new Point(signHolderRect.right, centerY);
+    const bottomRightPoint = new Point(
+      signHolderRect.right,
+      signHolderRect.bottom,
+    );
+    const bottomCenterPoint = new Point(centerX, signHolderRect.bottom);
+    const bottomLeftPoint = new Point(
+      signHolderRect.left,
+      signHolderRect.bottom,
+    );
+    const leftCenterPoint = new Point(signHolderRect.left, centerY);
+    const topLeftPoint = new Point(signHolderRect.left, signHolderRect.top);
+
+    const angleToPosition = (angle) => {
+      const angleRatio = (angle % 90) / 90;
+
+      let point1Reference, point1Point5Reference, point2Reference;
+      if (angle >= 0 && angle < 90) {
+        point1Reference = topCenterPoint;
+        point1Point5Reference = topRightPoint;
+        point2Reference = rightCenterPoint;
+      } else if (angle >= 90 && angle < 180) {
+        point1Reference = rightCenterPoint;
+        point1Point5Reference = bottomRightPoint;
+        point2Reference = bottomCenterPoint;
+      } else if (angle >= 180 && angle < 270) {
+        point1Reference = bottomCenterPoint;
+        point1Point5Reference = bottomLeftPoint;
+        point2Reference = leftCenterPoint;
+      } else if (angle >= 270 && angle < 360) {
+        point1Reference = leftCenterPoint;
+        point1Point5Reference = topLeftPoint;
+        point2Reference = topCenterPoint;
+      }
+
+      const totalDistance =
+        Point.dist(point1Reference, point1Point5Reference) +
+        Point.dist(point1Point5Reference, point2Reference);
+      const p1to1Point5Ratio =
+        Point.dist(point1Reference, point1Point5Reference) / totalDistance;
+
+      let x, y;
+      if (angleRatio < p1to1Point5Ratio) {
+        const ratio = angleRatio / p1to1Point5Ratio;
+        x =
+          point1Reference.x +
+          (point1Point5Reference.x - point1Reference.x) * ratio;
+        y =
+          point1Reference.y +
+          (point1Point5Reference.y - point1Reference.y) * ratio;
+      } else {
+        const ratio = (angleRatio - p1to1Point5Ratio) / (1 - p1to1Point5Ratio);
+        x =
+          point1Point5Reference.x +
+          (point2Reference.x - point1Point5Reference.x) * ratio;
+        y =
+          point1Point5Reference.y +
+          (point2Reference.y - point1Point5Reference.y) * ratio;
+      }
+
+      const outset = 6;
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+      if (distFromCenter > 0) {
+        x += (dx / distFromCenter) * outset;
+        y += (dy / distFromCenter) * outset;
+      }
+
+      return new Point(x, y);
+    };
+
+    let conicGradientPoints = [];
+
+    for (let angle = 0; angle < 360; angle += 2) {
+      let positionPoint = angleToPosition(angle);
+      let overlappingBlocks = document
+        .elementsFromPoint(positionPoint.x, positionPoint.y)
+        .filter((el) => !signHolder.contains(el) && el !== signHolder);
+
+      if (overlappingBlocks.length > 0) {
+        const block = overlappingBlocks[0];
+        const blockColor = window
+          .getComputedStyle(block)
+          .getPropertyValue("background-color");
+
+        if (
+          blockColor &&
+          blockColor !== "rgba(0, 0, 0, 0)" &&
+          ColorLibrary.checkForContrast(blockColor)
+        ) {
+          conicGradientPoints.push(`${blockColor} ${angle}deg`);
+        }
+      }
+    }
+
+    signHolder.style.pointerEvents = originalPointerEvents;
+
+    if (conicGradientPoints.length > 0) {
+      signHolder.style.borderImage = `conic-gradient(${conicGradientPoints.join(", ")}) 1`;
+    }
+  };
+
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
     panelElmt.className = `panel ${panel.corner.toLowerCase()}`;
@@ -1705,6 +1850,9 @@ const App = (() => {
       bottomLeftSignCorner,
       bottomRightSignCorner,
     ]);
+    requestAnimationFrame(() => {
+      //recolorBorder(signHolderElmt, subpanelList);
+    });
 
     signHolderElmt.appendChild(sideRightArrowElmt);
 
@@ -1847,12 +1995,6 @@ const App = (() => {
     }
 
     if (arrows.arrowMode == "apl") {
-      let autoJustify = panel.sign.lanePanelSize == 0;
-
-      guideArrowsElmt.style.setProperty(
-        "--horizontalPadding",
-        arrowVariant.horizontalPadding + "rem",
-      );
       guideArrowsElmt.style.setProperty(
         "--verticalTopPadding",
         arrowVariant.verticalTopPadding + "rem",
@@ -1861,68 +2003,129 @@ const App = (() => {
         "--verticalBottomPadding",
         arrowVariant.verticalBottomPadding + "rem",
       );
+      guideArrowsElmt.style.setProperty(
+        "--arrowGap",
+        (panel.sign.lanePanelSize > 0 ? 0 : arrowVariant.gap || 0) + "rem",
+      );
 
-      let dividerElements = [];
-      let arrowElements = [];
+      if (panel.sign.lanePanelSize == 0) {
+        guideArrowsElmt.style.paddingLeft = ".5rem";
+        guideArrowsElmt.style.paddingRight = ".5rem";
+      }
 
+      const dividerAplHolder = [];
       for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
-        let aplArrows = arrowVariant.subpanels[i] || [];
-        let subpanel = i % 1 == 0 && subpanelList[i];
+        const aplArrows = arrowVariant.subpanels[i] || [];
+        const subpanel = i % 1 == 0 && subpanelList[i];
         const aplHolder = document.createElement("div");
         if (i % 1 == 0) {
-          aplHolder.className =
-            "sMGA_APLHolder " +
-            ((arrowVariant.subpanelConfigs[i] &&
-              arrowVariant.subpanelConfigs[i].justify) ||
-              "left") +
-            " " +
-            (autoJustify && i % 1 == 0 ? "auto" : "");
+          aplHolder.className = "sMGA_APLHolder left";
         } else {
-          aplHolder.className =
-            "sMGA_APLHolder center " +
-            (autoJustify && i % 1 == 0 ? "auto" : "");
-          aplHolder.style.width = "0";
+          aplHolder.className = "sMGA_APLHolder center";
         }
 
-        let pair = [];
-        let ind = 0;
+        if (
+          i == subpanelList.length - 1 &&
+          panel.sign.lanePanelSize == 0 && arrowVariant.subpanelConfigs[i] &&
+          arrowVariant.subpanelConfigs[i].justify == true
+        ) {
+          aplHolder.style.justifyContent = "right";
+        }
+
         for (const arrow of aplArrows) {
           const arrowElmt = arrow.createElement();
-          if (!autoJustify) {
+          if (panel.sign.lanePanelSize > 0) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
+          } else if (panel.sign.lanePanelSize == 0 && i % 1 != 0) {
+            aplHolder.style.width = arrow.size + "rem";
+            if (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0) {
+              aplHolder.style.marginLeft = `${arrowVariant.gap / 2}rem`;
+            }
+            if (arrowVariant.subpanels[i + 0.5] && arrowVariant.subpanels[i + 0.5].length > 0) {
+              aplHolder.style.marginRight = `${arrowVariant.gap / 2}rem`;
+            }
+          }
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            arrowElmt.style.filter = "invert(1)";
           }
 
           aplHolder.appendChild(arrowElmt);
-
-          pair[ind++] = arrowElmt;
-          if (ind == 2) {
-            arrowElements.push(pair);
-            pair = [];
-            ind = 0;
-          }
         }
 
-        if (!autoJustify && subpanel) {
+        if (panel.sign.lanePanelSize > 0 && subpanel) {
           aplHolder.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0 ? 1 : 0))}px`;
-        } else if (autoJustify && subpanel) {
+        } else if (subpanel) {
           aplHolder.style.width = `max-content`;
           aplHolder.style.minWidth = `${subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         } else if (!subpanel) {
-          if (autoJustify && aplArrows.length > 0) {
-            dividerElements.push(aplHolder);
-          } else if (aplArrows.length > 0) {
+          if (
+            panel.sign.lanePanelSize > 0 &&
+            arrowVariant.subpanels[i] &&
+            arrowVariant.subpanels[i].length > 0
+          ) {
             aplHolder.style.width = panel.sign.lanePanelSize + "px";
-          } else {
-            aplHolder.style.width = `${panel.sign.lanePanelSize / 2}px`;
+          } else if (
+            (panel.sign.lanePanelSize == 0 && !arrowVariant.subpanels[i]) ||
+            (arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length == 0)
+          ) {
+            aplHolder.style.width = `4px`;
           }
         }
+
         guideArrowsElmt.appendChild(aplHolder);
+
+        if (panel.sign.lanePanelSize == 0) {
+          aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+        }
+
+        // auto readjust
+
+        if (
+          subpanel &&
+          aplHolder.getBoundingClientRect().width +
+            (arrowVariant.subpanels[i - 0.5] &&
+            arrowVariant.subpanels[i - 0.5].length > 0
+              ? arrowVariant.gap *
+                parseFloat(getComputedStyle(document.documentElement).fontSize)
+              : 0) >
+            subpanel.getBoundingClientRect().width &&
+          panel.sign.lanePanelSize == 0
+        ) {
+          let newWidth =
+            aplHolder.getBoundingClientRect().width +
+            (arrowVariant.subpanels[i - 0.5] &&
+            arrowVariant.subpanels[i - 0.5].length > 0
+              ? arrowVariant.gap *
+                parseFloat(getComputedStyle(document.documentElement).fontSize)
+              : 0);
+          subpanel.style.width = newWidth + "px";
+          subpanel.style.flex = "0 0 " + newWidth + "px";
+        }
+
+        if (
+          subpanel &&
+          i % 1 == 0 &&
+          arrowVariant.subpanels[i] &&
+          arrowVariant.subpanels[i].length > 0 &&
+          arrowVariant.subpanels[i - 0.5] &&
+          arrowVariant.subpanels[i - 0.5].length > 0 &&
+          panel.sign.lanePanelSize > 0
+        ) {
+          subpanel.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - 0.5)}px`;
+        }
+
+        if (panel.sign.lanePanelSize == 0 && i % 1 != 0 && arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length > 0) {
+          dividerAplHolder.push({holder: aplHolder, ind: i});
+        }
       }
 
-      for (let i = 0; i < dividerElements.length; i++) {
-        const holder = dividerElements[i];
-        const divider = dividerList[i];
-        holder.style.marginLeft = `${(divider.getBoundingClientRect().left - holder.getBoundingClientRect().left) / formHandler.vars.zoomLevel}px`;
+      for (const {holder: aplHolder, ind} of dividerAplHolder) {
+        const dividerToMoveTo = dividerList[ind - 0.5];
+        const dividerBounds = dividerToMoveTo.getBoundingClientRect();
+        const aplBounds = aplHolder.getBoundingClientRect();
+        const aplCenterX = aplBounds.left + aplBounds.width / 2;
+        const dividerCenterX = dividerBounds.left + dividerBounds.width / 2;
+        aplHolder.style.transform = `translateX(${dividerCenterX - aplCenterX}px)`;
       }
     }
 
@@ -1982,10 +2185,16 @@ const App = (() => {
       switch (standardVariant) {
         case "Side Left": {
           sideLeftArrowElmt.style.display = "block";
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            sideLeftArrowElmt.style.filter = "invert(1)";
+          }
           break;
         }
         case "Side Right": {
           sideRightArrowElmt.style.display = "block";
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            sideRightArrowElmt.style.filter = "invert(1)";
+          }
           break;
         }
         case "Custom": {
@@ -2000,6 +2209,9 @@ const App = (() => {
               ? "space-between"
               : standardArrowConfig.customConfig.justify.toLowerCase(),
           );
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            arrowContElmt.style.filter = "invert(1)";
+          }
           guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
 
           for (const arrow of standardArrowConfig.arrowList) {
@@ -2023,6 +2235,9 @@ const App = (() => {
             .displayOutsideArrow
             ? "visible"
             : "hidden";
+          if (ColorLibrary.checkForContrast(panel.color)) {
+            secondArrow.style.filter = "invert(1)";
+          }
           arrowContElmt.appendChild(secondArrow);
         }
         case "Split Exit Only":
@@ -2454,23 +2669,30 @@ const App = (() => {
   };
 
   const recheckWidth = () => {
-    let minTop = 0;
+    let minTop = Infinity;
     let maxBottom = 0;
     document.querySelector("#smRender").style.height = "";
+    const renderRect = document
+      .querySelector("#smRender")
+      .getBoundingClientRect();
+
     for (const panelGroupContainer of document.querySelectorAll(
       ".panelGroupContainer",
     )) {
       minTop = Math.min(
         minTop,
-        panelGroupContainer.getBoundingClientRect().top + window.scrollY,
+        panelGroupContainer.getBoundingClientRect().top - renderRect.top,
       );
       maxBottom = Math.max(
         maxBottom,
         panelGroupContainer.getBoundingClientRect().top +
-          panelGroupContainer.getBoundingClientRect().height +
-          window.scrollY,
+          panelGroupContainer.getBoundingClientRect().height -
+          renderRect.top,
       );
     }
+
+    if (minTop == Infinity) minTop = 0;
+
     document.querySelector("#smRender").style.height =
       Math.max(
         (maxBottom - minTop) * 1.5,
@@ -2571,6 +2793,10 @@ const App = (() => {
         historyVars.currentlySelectedStandardArrow;
     }
   };
+
+  window.addEventListener("resize", () => {
+    requestAnimationFrame(recheckWidth);
+  });
 
   return {
     init,
