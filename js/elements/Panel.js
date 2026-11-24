@@ -1,14 +1,26 @@
 class Panel {
   constructor(options = {}) {
-    const { sign, color, exitTabs, corner, borderRadius } = MUTCDVariants.get(
-      "Panel",
-      options,
-    );
+    const {
+      sign,
+      color,
+      exitTabs,
+      corner,
+      borderRadius,
+      panelAppearance,
+      appearanceBorderThickness,
+      appearancePadding,
+      appearancePixelSize,
+    } = MUTCDVariants.get("Panel", options);
     this.color = color;
     this.corner = corner;
     this.sign = sign;
     this.exitTabs = exitTabs;
     this.borderRadius = borderRadius;
+    this.panelAppearance = panelAppearance;
+
+    this.appearanceBorderThickness = appearanceBorderThickness;
+    this.appearancePadding = appearancePadding;
+    this.appearancePixelSize = appearancePixelSize;
   }
 
   newExitTabRow() {
@@ -37,7 +49,12 @@ class Panel {
   duplicateExitTabRow(index) {}
 }
 
+<<<<<<< HEAD
 Panel.prototype.cornerType = ["Sharp", "Round", "Double-Struck"];
 Panel.prototype.defaultBorderRadius = 0.75;
+=======
+Panel.prototype.cornerType = ["Sharp", "Round", "Square"];
+Panel.panelAppearance = ["Standard", "Circle Pixels", "Square Pixels"];
+>>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856
 
 window.Panel = Panel;

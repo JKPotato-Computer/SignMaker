@@ -45,6 +45,7 @@ class Shield {
       route_scale: 100,
       route_xOffset: 0,
       route_yOffset: 0,
+      route_rotation: 0,
       route_letterSpacing: 0,
       route_fontFamily: "",
       route_color: "",
@@ -52,6 +53,7 @@ class Shield {
       designation_scale: 100,
       designation_xOffset: 0,
       designation_yOffset: 0,
+      designation_rotation: 0,
       designation_letterSpacing: 0,
       designation_fontFamily: "",
       designation_color: "",
@@ -126,6 +128,7 @@ class Shield {
       this.horizMargin + "px",
     );
     shieldElmt.style.fontSize = this.scale / 100 + "rem";
+    shieldElmt.style.rotate = this.customShields.route_rotation + "deg";
     shieldElmt.style.setProperty("--vertShieldMargin", this.vertMargin + "px");
 
     const shieldImgElmt = document.createElement("img");
@@ -169,6 +172,8 @@ class Shield {
     if (this.designation != "") {
       const designationElmt = document.createElement("span");
       designationElmt.className = "designation";
+      designationElmt.style.rotate =
+        this.customShields.designation_rotation + "deg";
       designationElmt.style.setProperty(
         "--designationScale",
         this.customShields.designation_scale / 100,
@@ -329,7 +334,7 @@ class Banner {
       borderRadius,
       fontFamily,
       letterSpacing,
-      wordSpacing
+      wordSpacing,
     } = MUTCDVariants.get("Banner", options);
     this.textContent = textContent;
     this.firstLetterSize = firstLetterSize;
@@ -378,14 +383,8 @@ class Banner {
       "--verticalMargin",
       this.verticalMargin + "px",
     );
-    bannerElmt.style.setProperty(
-      "--letterSpacing",
-      this.letterSpacing + "px",
-    );
-    bannerElmt.style.setProperty(
-      "--wordSpacing",
-      this.wordSpacing + "px",
-    );
+    bannerElmt.style.setProperty("--letterSpacing", this.letterSpacing + "px");
+    bannerElmt.style.setProperty("--wordSpacing", this.wordSpacing + "px");
 
     if (
       ColorLibrary.checkForContrast(
@@ -871,7 +870,7 @@ Shield.prototype.shieldDirectory = {
       I: {
         type: "shield",
         name: "Interstate",
-        variants: ["2 Digit", "3 Digit"],
+        variants: ["2 Digit", "3 Digit", "3 Digit Alt"],
         supportsAuto: true,
       },
       "I-F": {
@@ -883,7 +882,7 @@ Shield.prototype.shieldDirectory = {
       "I-BUS": {
         type: "shield",
         name: "Interstate (Business)",
-        variants: ["2 Digit", "3 Digit"],
+        variants: ["2 Digit", "3 Digit", "3 Digit Alt"],
         supportsAuto: true,
       },
       "I-BL": {
@@ -2372,9 +2371,9 @@ Shield.prototype.shieldDirectory = {
     },
   },
 };
+
 // SHIELD FORM
 Shield.bannerTypes = [
-  "None",
   "Arterial",
   "North",
   "East",
@@ -2388,7 +2387,7 @@ Shield.bannerTypes = [
   "Truck",
   "Trunk",
   "Business",
-  "Byp",
+  "Bypass",
   "Loop",
   "Express",
   "Local",

@@ -1,30 +1,37 @@
-![SignMaker Preview Thumbnail](https://github.com/JKPotato-Computer/SignMaker/blob/main/assets/other-symbols/Banner.png)
+![SignMaker Preview Thumbnail](assets/other-symbols/SignMakerBanner.png)
 
-SignMaker is a JavaScript-based app for creating highway guide signs. Based off of [Kurumi's Sign Maker](http://www.kurumi.com/roads/signmaker). Allows for the creation of highway guide signs in the style defined by the United States FHWA in their [MUTCD](https://mutcd.fhwa.dot.gov/kno_2009r1r2.htm).
+# <img src="assets/other-symbols/SignMakerIconRotated.png" height="80"> Highway SignMaker
+Version: 2.2_indev
 
-While the other versions (dki-os/SignMaker) and its forks do exist, this fork attempts to recreate (most) of the existing signs inside the US. Features include:
+SignMaker is a JavaScript-based web application designed to render realistic highway guide signage for all states and any MUTCD-adjacent countries. 
 
-- Clearview font (some states use Clearview on their signs)
-- Realistic arrows (Uses PNGs of Arrows rather than fonts)
-- Subpanels (multiple panels in a panel)
-- Advanced Exit Tabs (allow multiple exit tabs at once and more options)
-- Two Shield Banners
-- Panel Padding (make the infamous Katy Freeway signs)
-- and more to come soon..
+**History**
 
-## Acknowledgements
+First envisioned by [Kurumi](https://www.kurumi.com/) in creating [SignMaker v2.3.1](https://www.kurumi.com/roads/signmaker/signmaker.html), SignMaker started off as a Java Applet (back when it was supported within web browsers!) and was quite revolutionary for its era, winning Yahoo's "Pick of the Week" in April 1998.<sup>[1](https://www.kurumi.com/roads/signmaker/index.html)</sup> In late 2019, [BrenStro](https://github.com/BrenStro/SignMaker) would create the first port of SignMaker, aiming to recreate most of Kurumi's features in a modern web browser context. This would be further expanded by [dki-os](https://github.com/dki-os/SignMaker) with the addition of Quebec Exit Tabs, Action/Advisory Messages, a couple extra shields, and additonal Exit Tabs. 
 
-Forked from [dki-os/SignMaker](https://https://github.com/dki-os/SignMaker).
-Originally created by [Brendon Strowe](https://github.com/BrenStro).
+This version of SignMaker aims to continue modernizing Highway Sign Maker with additional graphic features that align to the current version of the [Manual on Uniform Traffic Control Devices (MUTCD)](https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf). What are they, you may ask? Here's a small collection of items:
 
-Typefaces sourced from the:
+## Features
+![Block Element System](assets/form/readme/BlockElements.gif)
+SignMaker features a dedicated block-based editor system compared to being limited to a single Control Text and/or Action Message, allowing you to create virtually any sign combination imaginable. There are over 11 different elements to choose from, all with their own unique settings and configurations. Oh yeah, these are draggable too.
 
-- [Roadgeek 2005 Font Family by Michael Adams](https://n1en.org/roadgeek-fonts/)
-- [ClearviewHwy by Don Meeker and James Montalbano](https://cofonts.com/clearview-font/)
-- [Highway Gothic by Ash Pikachu Font](https://www.dafont.com/highway-gothic.font)
+ ![Image](image.png)
 
-Route shields are sourced from [Wikipedia](https://en.wikipedia.org/wiki/Numbered_highways_in_the_United_States), created by tweaking those shields, or created by hand.
+It's best if you discover this yourself rather than me telling you each of these items individually. :)
 
-## License
+2. Shield Editor System
+3. Guide Arrows / APL / Diagrammic
+4. Exit Tabs
+5. SubPanel System
+6. Saving / Loading / Exporting / Templates
 
-[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.txt)
+## Contributing TBD
+
+
+## Sources Used TBD
+
+(c) BrenStro 2020.
+(c) dki-os 2024.
+(c) JK_Potato/Computer and contributors 2026.
+
+Licensed under the [GNU License](https://www.gnu.org/licenses/gpl-3.0.txt), see [LICENSE](LICENSE) for details.

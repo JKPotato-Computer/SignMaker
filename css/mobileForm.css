@@ -127,12 +127,21 @@
 }
 
 @media (max-width: 768px) {
+<<<<<<< HEAD
   input {
     padding: 0.75rem;
   }
 
   select {
     padding: 0.75rem;
+=======
+  input:not([type="checkbox"]) {
+    padding: .5rem .25rem;
+  }
+
+  select {
+    padding: .5rem;
+>>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856
   }
 
   button,
@@ -314,4 +323,41 @@
   #sMSettings_MUTCDVariants {
     flex-direction: column-reverse;
   }
+<<<<<<< HEAD
 }
+=======
+
+  :root[data-theme="kurumi"] input[type="checkbox"]::before {
+    width: 16px;
+    height: 16px;
+  }
+
+  input[type="number"]:not(.smallval) {
+    width: 8rem;
+  }
+  
+  .smallVal {
+    width: 4rem;
+  }
+
+  label:not(.noLabelAlignment) {
+    width: 4rem;
+  }
+
+  .sMModalContent {
+    padding: 0.25rem;
+  }
+
+  div#subPanelList {
+    padding: 0;
+  }
+
+  .exitTabButton {
+    height: stretch;
+  }
+
+  .exitTabNestedButton {
+    height: 90%;
+  }
+}
+>>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856

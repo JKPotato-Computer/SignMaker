@@ -408,8 +408,7 @@ class ExitTab {
           "--iconBackgroundColor",
           ColorLibrary.colorLibrary[
             iconSettings.iconBackgroundConfiguration.backgroundColor
-          ] ||
-            iconSettings.iconBackgroundConfiguration.backgroundColor,
+          ] || iconSettings.iconBackgroundConfiguration.backgroundColor,
         );
         imageHolder.style.setProperty(
           "--iconBackgroundHorizontalPadding",
@@ -488,6 +487,10 @@ class ExitTab {
           textElement.textContent += "\n" + this.subTextContent;
         }
 
+        if (this.contentDirection == "horizontal") {
+          exitTabElement.style.flexDirection = "row-reverse";
+        }
+
         exitTabElement.appendChild(textElement);
 
         if (
@@ -509,8 +512,12 @@ class ExitTab {
   }
 }
 
-ExitTab.prototype.defaultExitTabConfig = MUTCDVariants.get("ExitTab");
+ExitTab.prototype.defaultExitTabConfig = structuredClone(
+  MUTCDVariants.MUTCD.ExitTab,
+);
 delete ExitTab.prototype.defaultExitTabConfig.textContent;
+delete ExitTab.prototype.defaultExitTabConfig.fontFamily;
+delete ExitTab.prototype.defaultExitTabConfig.numeralFontFamily;
 delete ExitTab.prototype.defaultExitTabConfig.subTextContent;
 delete ExitTab.prototype.defaultExitTabConfig.shields;
 delete ExitTab.prototype.defaultExitTabConfig.variant;

@@ -71,6 +71,10 @@ const MUTCDVariants = (() => {
         exitTabs: [],
         corner: "Sharp",
         borderRadius: 0.75,
+        panelAppearance: "Standard",
+        appearanceBorderThickness: 8,
+        appearancePadding: 2,
+        appearancePixelSize: 0.05,
         tagToReplace: ["corner", "borderRadius"],
       },
       Sign: {
@@ -132,15 +136,24 @@ const MUTCDVariants = (() => {
           },
         },
         otherSymbol: "None",
-        oSNum: "",
+        oSNum: 0,
+        oSArrow: -1,
+        oSArrowPositioning: "Right",
+
+        actionMessage: "",
+        actionMessageArrow: -1,
+        actionMessagePositioning: "Right",
+
         subPanels: [],
         lanePanelSize: 0,
+
+        tagToSkip: ["diagramData"],
       },
       SubPanels: {
         laneWidth: 0,
         blockElements: null,
         verticalAlign: "Start",
-        dividerHeight: 50,
+        dividerHeight: 100,
         dividerHeightUnit: "%",
       },
       TextElement: {
@@ -163,8 +176,10 @@ const MUTCDVariants = (() => {
       ControlTextElement: {
         smallCapitals: false,
         capitalSize: 150,
+        fontFamily: "Series EM",
       },
       ActionMessageElement: {
+        fontFamily: "Series E",
         fontSize: 70,
         useNumeralFormatting: true,
       },
@@ -195,6 +210,7 @@ const MUTCDVariants = (() => {
         alignment: "Center",
         direction: "Horizontal",
         gap: 0.5,
+        inlineShields: true,
       },
       DividerElement: {
         dividerWidth: 100,
@@ -212,9 +228,12 @@ const MUTCDVariants = (() => {
         iconSize: 100,
         backgroundColor: "Inherit",
         border: false,
+        isSquare: false,
         borderRadius: 4,
+        borderThickness: 4,
         borderColor: "White",
-        spacing: 4,
+        spacing: 0,
+        alignment: "Center",
       },
       BeaconElement: {
         size: 2,
@@ -269,7 +288,6 @@ const MUTCDVariants = (() => {
         leftPadding: 0.75,
         rightPadding: 0.75,
         backgroundColor: "Inherit",
-        backgroundFullWidth: true,
         width: 0,
         stretchLeft: true,
         stretchCenter: true,
@@ -277,7 +295,7 @@ const MUTCDVariants = (() => {
       },
       GroupElement: {
         blockElements: null,
-        direction: "Vertical",
+        alignment: "Center",
         width: 0,
         boxFormat: "Normal",
         formatSize: 0.04,
@@ -409,8 +427,8 @@ const MUTCDVariants = (() => {
         banners: {},
         bannerSettings: {
           top: { alignment: "start", gap: 0 },
-          left: { alignment: "start", gap: 0, inset: 0.9 },
-          right: { alignment: "start", gap: 0, inset: 0.9 },
+          left: { alignment: "start", gap: 0, inset: 0.7 },
+          right: { alignment: "start", gap: 0, inset: 0.7 },
           bottom: { alignment: "end", gap: 0 },
         },
         group: 0,
@@ -469,6 +487,10 @@ const MUTCDVariants = (() => {
         fontFamily: "Clearview 5WR",
         lineHeight: 100,
         tagToReplace: ["fontFamily", "lineHeight"],
+      },
+      ActionMessageElement: {
+        fontFamily: "Clearview 5WR",
+        tagToReplace: ["fontFamily"],
       },
       Banner: {
         fontFamily: "Clearview 5WR",
@@ -604,22 +626,13 @@ const MUTCDVariants = (() => {
         oSNum: "",
         subPanels: [],
         lanePanelSize: 0,
-        paddingLeft: 0.75,
-        paddingRight: 0.75,
-        paddingTop: 0.3,
-        paddingBottom: 0.3,
-        tagToReplace: [
-          "borderMode",
-          "fontFamily",
-          "backgroundColor",
-          "exitOnlyText",
-        ],
+        tagToReplace: ["borderMode", "fontFamily", "backgroundColor"],
       },
       SubPanels: {
         laneWidth: 0,
         blockElements: null,
         verticalAlign: "Start",
-        dividerHeight: 50,
+        dividerHeight: 100,
         dividerHeightUnit: "%",
       },
       TextElement: {
@@ -762,38 +775,7 @@ const MUTCDVariants = (() => {
         shieldName: "Interlink",
         shieldValue: "ILG",
         variant: "Auto",
-        shieldBacks: false,
         shieldBackColor: "White",
-        shieldBackRadius: 4,
-        imageType: "",
-        imageData: "",
-        banners: {},
-        bannerSettings: {
-          top: { alignment: "start", gap: 0 },
-          left: { alignment: "start", gap: 0, inset: 0.5 },
-          right: { alignment: "start", gap: 0, inset: 0.5 },
-          bottom: { alignment: "end", gap: 0 },
-        },
-        group: 0,
-        designation: "",
-        routeNumber: "10",
-        scale: 100,
-        horizMargin: 8,
-        vertMargin: 8,
-        customShields: {
-          route_scale: 100,
-          route_xOffset: 0,
-          route_yOffset: 0,
-          route_letterSpacing: 0,
-          route_fontFamily: "",
-          route_color: "",
-          designation_scale: 100,
-          designation_xOffset: 0,
-          designation_yOffset: 0,
-          designation_letterSpacing: 0,
-          designation_fontFamily: "",
-          designation_color: "",
-        },
       },
       Banner: {
         textContent: "WEST",
@@ -881,7 +863,7 @@ const MUTCDVariants = (() => {
 
   const get = (className, options = {}) => {
     const guide =
-      typeof App !== "undefined" && App.getPost()
+      typeof App !== "undefined" && App != null && App.getPost()
         ? App.getPost().mutcdVariant
         : "MUTCD";
     return merge(getDefaults(className, guide), options);
@@ -898,6 +880,7 @@ const MUTCDVariants = (() => {
     }
     return [...variableNames];
   };
+  variants.getDefaults = getDefaults;
 
   return variants;
 })();

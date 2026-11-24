@@ -295,6 +295,15 @@ const ImportExport = (() => {
             }),
           }),
         ]);
+      } else {
+        const blob = await fileExportDetails.snapdomData.toBlob({
+          format: fileExportDetails.fileType.toLowerCase(),
+        });
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            [`image/${fileExportDetails.fileType.toLowerCase()}`]: blob,
+          }),
+        ]);
       }
     } else {
       let signName = prompt("Enter a name for the sign file:", "MySign");
@@ -417,6 +426,7 @@ document.querySelector("#importSign").addEventListener("click", async () => {
               : signContent.map((panel) => [panel]);
         }
 
+        App.resetSelectors();
         formHandler.updateForm();
         App.redraw();
       };

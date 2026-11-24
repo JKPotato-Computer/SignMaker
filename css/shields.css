@@ -80,6 +80,13 @@
   top: 0.35em;
 }
 
+.shield.I.ThreeDigitAlt .routeNumber,
+.shield.I-BUS.ThreeDigitAlt .routeNumber {
+  font-family: "Series D";
+  font-size: 1.4em;
+  top: 0.1em;
+}
+
 .shield.I-BUS .banner {
   display: none;
 }
@@ -105,7 +112,7 @@
   top: 0.08em;
 }
 
-/* US Route, Nova Scotia, Circle (Kentucky, Iowa, Vermont Local), Ellipse (Deleware, Mississippi), Rectangle 1 (Massachussets, Maine, Wisconsin County), Rectangle 2 (West Virginia) */
+/* US Route, Nova Scotia, Circle (Kentucky, Iowa, Vermont Local), Ellipse (Deleware, Mississippi), Rectangle 1 (Massachussets, Maine, Wisconsin County), Rectangle 2 (West Virginia), Connecticut */
 .shield.NS.TwoDigit .routeNumber,
 .shield.NS.OneDigit .routeNumber,
 .shield:is(
@@ -114,6 +121,7 @@
     .elp,
     .rec,
     .rec2,
+    .CT,
     .KY,
     .MA,
     .ME,
@@ -788,6 +796,13 @@
   top: 0.075em;
 }
 
+.shield.TXEXPRESS .designation,
+.shield.TXTollCTMRA .designation,
+.shield.TXTollNTTA .designation,
+.shield.TXTOLL .designation {
+  top: 3rem;
+}
+
 /* Utah */
 .shield.UT .routeNumber {
   color: rgb(0, 0, 0);
@@ -1052,7 +1067,7 @@
 }
 
 .shield.QC.ThreeDigit .routeNumber {
-  font-family: "Series C";
+  font-family: "Series E";
 }
 
 .shield.QC2 .routeNumber {

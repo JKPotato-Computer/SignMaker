@@ -28,6 +28,9 @@ const ShieldEditor = (() => {
     baseShield.customShields.route_scale = parseFloat(
       document.querySelector("#spShield_routeScale").value,
     );
+    baseShield.customShields.route_rotation = parseInt(
+      document.querySelector("#spShield_routeRotation").value,
+    );
     baseShield.customShields.route_xOffset = parseFloat(
       document.querySelector("#spShield_routeXOffset").value,
     );
@@ -51,6 +54,9 @@ const ShieldEditor = (() => {
     );
     baseShield.customShields.designation_yOffset = parseFloat(
       document.querySelector("#spShield_designationYOffset").value,
+    );
+    baseShield.customShields.designation_rotation = parseInt(
+      document.querySelector("#spShield_designationRotation").value,
     );
     baseShield.customShields.designation_letterSpacing = parseFloat(
       document.querySelector("#spShield_designationSpacing").value,
@@ -150,7 +156,6 @@ const ShieldEditor = (() => {
     document.querySelector("#spShield_designationSpacing").value =
       baseShield.customShields.designation_letterSpacing;
     document.querySelector("#spShield_scale").value = baseShield.scale;
-    document.querySelector("#spShield_scaleVal").value = baseShield.scale;
     document.querySelector("#spShield_routeXOffset").value =
       baseShield.customShields.route_xOffset;
     document.querySelector("#spShield_routeYOffset").value =

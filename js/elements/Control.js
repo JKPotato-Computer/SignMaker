@@ -41,11 +41,11 @@ class TextElement {
     const numeralPattern = /(\d+\/\d+)|(\d\S*)|[\u00BC-\u00BE\u2150-\u2189]/g;
 
     const bannerPattern = new RegExp(
-      `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)`,
+      `(\\s*)(\\b(?:${Shield.bannerTypes.join("|")})\\b)(\\s*)|(\\s*)(\\[\\w+\\])(\\s*)`,
       "gi",
     );
     const lightBannerPattern = new RegExp(
-      `(\\b(?:${Shield.bannerTypes.join("|")})\\b)`,
+      `(\\b(?:${Shield.bannerTypes.join("|")})\\b)|(\\[\\w+\\])`,
       "gi",
     );
 
@@ -124,6 +124,8 @@ class TextElement {
       newText.style.color = "white";
     }
 
+    this.textContent = this.textContent.replace(/\n/g, "\\n");
+
     for (const text of this.textContent.split("\\n")) {
       const lineElement = document.createElement("div");
       lineElement.className = "lineElement";
@@ -185,7 +187,16 @@ class TextElement {
         } else {
           const newTextFragment = document.createElement("span");
           newTextFragment.className = "bE-" + text.type;
-          newTextFragment.textContent = text.value;
+
+          if (
+            text.type == "banner" &&
+            text.value.startsWith("[") &&
+            text.value.endsWith("]")
+          ) {
+            newTextFragment.textContent = text.value.slice(1, -1);
+          } else {
+            newTextFragment.textContent = text.value;
+          }
 
           lineElement.appendChild(newTextFragment);
         }
@@ -243,7 +254,7 @@ class ControlTextElement extends TextElement {
       "ControlTextElement",
       options,
     );
-    super();
+    super(options);
     this.smallCapitals = smallCapitals;
     this.capitalSize = capitalSize;
     this.wordSpacing = wordSpacing;
@@ -251,10 +262,9 @@ class ControlTextElement extends TextElement {
 
   createElement() {
     const newText = super.createElement();
-    
+
     if (this.smallCapitals) {
       for (const beText of newText.querySelectorAll(".bE-text")) {
-        // split by spaces and find the first letter per segment
         const textContent = beText.textContent;
         const splitText = textContent.split(/\s/g);
         const capitalSize =
@@ -278,12 +288,11 @@ class ControlTextElement extends TextElement {
 
 class ActionMessageElement extends TextElement {
   constructor(options = {}) {
-    const { fontSize, useNumeralFormatting, wordSpacing } = MUTCDVariants.get(
-      "ActionMessageElement",
-      options,
-    );
-    super();
+    const { fontSize, useNumeralFormatting, wordSpacing, fontFamily } =
+      MUTCDVariants.get("ActionMessageElement", options);
+    super(options);
     this.fontSize = fontSize;
+    this.fontFamily = fontFamily;
     this.useNumeralFormatting = useNumeralFormatting;
     this.wordSpacing = wordSpacing;
   }
@@ -309,7 +318,7 @@ class AdvisoryMessageElement extends TextElement {
       vertPadding,
       wordSpacing,
     } = MUTCDVariants.get("AdvisoryMessageElement", options);
-    super();
+    super(options);
     this.borderColor = borderColor;
     this.backgroundColor = backgroundColor;
     this.fontFamily = fontFamily;
@@ -352,7 +361,7 @@ class ElectronicSignElement extends TextElement {
       setWidth,
       wordSpacing,
     } = MUTCDVariants.get("ElectronicSignElement", options);
-    super();
+    super(options);
     this.fontFamily = fontFamily;
     this.textColor = textColor;
     this.useNumeralFormatting = false;
@@ -395,9 +404,9 @@ class ElectronicSignElement extends TextElement {
     ) {
       newText.style.background =
         this.textFormat == "Circle Pixels"
-          ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
-          : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
-      newText.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
+          ? `radial-gradient(circle, var(--textColor) ${this.formatSize}rem, black ${this.formatSize}rem)`
+          : `linear-gradient(to right, transparent ${this.formatSize}rem, black ${this.formatSize}rem), linear-gradient(to bottom, var(--textColor) ${this.formatSize}rem, black ${this.formatSize}rem)`;
+      newText.style.backgroundSize = `${this.formatSize * 3}rem ${this.formatSize * 3}rem`;
       newText.style.setProperty("--horizPadding", 0);
       newText.style.setProperty("--vertPadding", 0);
       newText.style.setProperty("--textShadow", "");
@@ -428,12 +437,6 @@ ElectronicSignElement.fontFamilies = TextElement.fontFamilies.concat([
   "Electronic Highway Sign",
   "VCR Mono",
 ]);
-ElectronicSignElement.prototype.textColors = [
-  "Orange",
-  "White",
-  "Yellow",
-  "Red",
-];
 ElectronicSignElement.prototype.textFormats = [
   "Full Text",
   "Circle Pixels",
@@ -441,16 +444,14 @@ ElectronicSignElement.prototype.textFormats = [
 ];
 
 class ShieldGroupElement {
-  f;
   constructor(options = {}) {
-    const { shields, alignment, direction, gap } = MUTCDVariants.get(
-      "ShieldGroupElement",
-      options,
-    );
+    const { shields, alignment, direction, gap, inlineShields } =
+      MUTCDVariants.get("ShieldGroupElement", options);
     this.shields = shields;
     this.alignment = alignment;
     this.direction = direction;
     this.gap = gap;
+    this.inlineShields = inlineShields;
   }
 
   newShield() {
@@ -488,6 +489,9 @@ class ShieldGroupElement {
 
     let lastGroup = null;
     let lastGroupInd = -1;
+
+    const shieldContainerGroups = [];
+
     for (const shield of this.shields) {
       if (shield.group == 0) {
         lastGroup = null;
@@ -496,6 +500,7 @@ class ShieldGroupElement {
         const bannerShieldContainerElmt = shield.createBannerShieldElement();
         bannerShieldContainerElmt.appendChild(shield.createElement());
         shieldGroupElem.appendChild(bannerShieldContainerElmt);
+        shieldContainerGroups.push(bannerShieldContainerElmt);
       } else if (shield.group != lastGroupInd) {
         const [bannerShieldContainerElmt, groupedShieldElement] =
           shield.createBannerShieldElement(true);
@@ -504,9 +509,53 @@ class ShieldGroupElement {
 
         lastGroup.appendChild(shield.createElement());
         shieldGroupElem.appendChild(bannerShieldContainerElmt);
+        shieldContainerGroups.push(bannerShieldContainerElmt);
       } else if (shield.group == lastGroupInd) {
         lastGroup.appendChild(shield.createElement());
       }
+    }
+
+    if (this.inlineShields) {
+      shieldGroupElem.style.visibility = "hidden";
+      shieldGroupElem.style.position = "fixed";
+      document.body.appendChild(shieldGroupElem);
+
+      const centerLine =
+        shieldGroupElem.getBoundingClientRect().top +
+        shieldGroupElem.getBoundingClientRect().height / 2;
+      let maxShiftTop = 0;
+      let maxShiftBottom = 0;
+
+      for (const shieldGroup of shieldContainerGroups) {
+        const shieldElements =
+          shieldGroup.querySelector(":scope > .shieldGroupContainer") ||
+          shieldGroup.querySelector(":scope > .shield");
+        const shieldElementRect = shieldElements.getBoundingClientRect();
+
+        if (
+          shieldElementRect.top + shieldElementRect.height / 2 !=
+          centerLine
+        ) {
+          const shift =
+            centerLine - (shieldElementRect.top + shieldElementRect.height / 2);
+
+          shieldGroup.style.top = shift + "px";
+          if (shift < 0) {
+            maxShiftTop = Math.max(maxShiftTop, -shift);
+          } else {
+            maxShiftBottom = Math.max(maxShiftBottom, shift);
+          }
+        }
+      }
+
+      // apply a margin-top on the shieldGroupElem with maxShiftTop, or 0
+      shieldGroupElem.style.marginTop = maxShiftTop - maxShiftBottom + "px";
+      shieldGroupElem.style.marginBottom = maxShiftBottom - maxShiftTop + "px";
+
+      // unappend and revert
+      document.body.removeChild(shieldGroupElem);
+      shieldGroupElem.style.visibility = "";
+      shieldGroupElem.style.position = "";
     }
 
     return shieldGroupElem;
@@ -543,26 +592,12 @@ class DividerElement {
       this.dividerWidth + this.dividerMeasurement,
     );
     newDivider.style.setProperty("--dividerHeight", this.dividerHeight + "rem");
-    newDivider.style.marginTop = "0";
-    newDivider.style.marginBottom = "0";
 
-    if (this.dividerColor && this.dividerColor !== "Default") {
-      const resolvedColor =
-        ColorLibrary.colorLibrary[this.dividerColor] || this.dividerColor || "";
-      if (resolvedColor) {
-        newDivider.style.backgroundColor = resolvedColor;
-      }
-    }
+    newDivider.style.backgroundColor =
+      ColorLibrary.colorLibrary[this.dividerColor];
 
     if (this.fullBleed) {
-      newDivider.classList.add("fullBleed");
-
-      newDivider.style.setProperty("--dividerBleedLeft", `${0.2}rem`);
-      newDivider.style.setProperty("--dividerBleedRight", `${0.2}rem`);
-    } else {
-      newDivider.classList.remove("fullBleed");
-      newDivider.style.setProperty("--dividerBleedLeft", "0rem");
-      newDivider.style.setProperty("--dividerBleedRight", "0rem");
+      newDivider.classList.add("fullWidth");
     }
 
     return newDivider;
@@ -570,10 +605,8 @@ class DividerElement {
 }
 
 DividerElement.dividerMeasurements = ["%", "rem"];
-DividerElement.prototype.dividerColors = [
-  { value: "White", label: "White" },
-  { value: "Black", label: "Black" },
-];
+DividerElement.dividerColors = ["White", "Black"];
+
 class IconElement {
   constructor(options = {}) {
     const {
@@ -584,8 +617,11 @@ class IconElement {
       backgroundColor,
       border,
       borderRadius,
+      borderThickness,
       borderColor,
       spacing,
+      alignment,
+      isSquare,
     } = MUTCDVariants.get("IconElement", options);
     this.icon = icon;
     this.iconType = iconType;
@@ -595,7 +631,10 @@ class IconElement {
     this.border = border;
     this.borderRadius = borderRadius;
     this.borderColor = borderColor;
+    this.borderThickness = borderThickness;
     this.spacing = spacing;
+    this.alignment = alignment;
+    this.isSquare = isSquare;
   }
 
   createElement() {
@@ -614,10 +653,18 @@ class IconElement {
         "--iconBorderColor",
         ColorLibrary.colorLibrary[this.borderColor] || this.borderColor,
       );
+      iconHolder.style.setProperty(
+        "--iconBorderThickness",
+        this.borderThickness + "px",
+      );
     }
 
     if (this.iconType == "custom") {
       iconHolder.style.aspectRatio = "unset";
+    }
+
+    if (this.isSquare) {
+      iconHolder.style.aspectRatio = "1 / 1";
     }
 
     iconHolder.style.setProperty(
@@ -769,7 +816,7 @@ IconElement.icons = {
 };
 
 // the following code segment is an embarassment to humanity
-// authored by DuskDarf1
+// authored by DuskDarf1 (plus Codex :P)
 class BeaconElement {
   constructor(options = {}) {
     const { size, alignment, flashDuration, color, backplate, flashOpposite } =
@@ -906,7 +953,11 @@ class ArrowElement {
 
     if (
       ColorLibrary.checkForContrast(panel.color) &&
-      ColorLibrary.checkForContrast(blockProperties.backgroundColor)
+      ColorLibrary.checkForContrast(
+        blockProperties.backgroundColor == "Inherit"
+          ? panel.color
+          : blockProperties.backgroundColor,
+      )
     ) {
       arrow.style.filter = "invert(1)";
     }
@@ -1154,7 +1205,6 @@ class Block {
       leftPadding,
       rightPadding,
       backgroundColor,
-      backgroundFullWidth,
       width,
       stretchLeft,
       stretchCenter,
@@ -1165,7 +1215,6 @@ class Block {
     this.bottomMargin = bottomMargin;
     this.bottomPadding = bottomPadding;
     this.backgroundColor = backgroundColor;
-    this.backgroundFullWidth = backgroundFullWidth;
     this.width = width;
     this.stretchLeft = stretchLeft;
     this.stretchCenter = stretchCenter;
@@ -1180,7 +1229,7 @@ class GroupElement {
   constructor(options = {}) {
     const {
       blockElements,
-      direction,
+      alignment,
       width,
       boxFormat,
       formatSize,
@@ -1196,7 +1245,7 @@ class GroupElement {
     }
 
     this.blockElements.isGroup = true;
-    this.direction = direction;
+    this.alignment = alignment;
     this.width = width;
     this.border = border;
     this.borderWidth = borderWidth;
@@ -1261,8 +1310,23 @@ class Control {
   addElement(element, properties, row, column) {
     let newElement = new element(properties);
     if (!this.rows[row]) {
+      const blockProperties = new Block();
+      if (row < this.rows.length - 1) {
+        blockProperties.bottomPadding = 0;
+      }
+
+      if (row > 0) {
+        blockProperties.topPadding = 0;
+        if (
+          this.blockProperties[row - 1] &&
+          this.blockProperties[row - 1].bottomPadding >= 0
+        ) {
+          this.blockProperties[row - 1].bottomPadding = 0;
+        }
+      }
+
       this.rows[row] = [];
-      this.blockProperties[row] = new Block();
+      this.blockProperties[row] = blockProperties;
     }
 
     if (column) {
@@ -1303,8 +1367,23 @@ class Control {
 
   addRow(row, element) {
     if (this.rows[row] && this.rows[row].length != 0) {
+      const blockProperties = new Block();
+      if (row < this.rows.length) {
+        blockProperties.bottomPadding = 0;
+      }
+
+      if (row > 0) {
+        blockProperties.topPadding = 0;
+        if (
+          this.blockProperties[row - 1] &&
+          this.blockProperties[row - 1].bottomPadding >= 0
+        ) {
+          this.blockProperties[row - 1].bottomPadding = 0;
+        }
+      }
+
       this.rows.splice(row, 0, []);
-      this.blockProperties.splice(row, 0, new Block());
+      this.blockProperties.splice(row, 0, blockProperties);
     }
     this.addElement(Control.prototype.blockToClassElems[element], {}, row, 0);
   }
@@ -1378,42 +1457,10 @@ class Control {
           ? ColorLibrary.colorLibrary[panel.color] || panel.color
           : ColorLibrary.colorLibrary[properties.backgroundColor] ||
             properties.backgroundColor;
-      const usesBlackBorder =
-        ColorLibrary.checkForContrast(blockBackgroundColor);
       flexRow.dataset.blockBackgroundColor = blockBackgroundColor;
-      flexRow.dataset.blockBorderColor = usesBlackBorder ? "black" : "white";
 
-      if (
-        properties.backgroundFullWidth &&
-        panel.sign.arrows.arrowMode != "diagrammic"
-      ) {
-        flexRow.classList.add("fullBleed");
-
-        flexRow.style.setProperty(
-          "--blockBleedLeft",
-          `${properties.leftPadding}rem`,
-        );
-        flexRow.style.setProperty(
-          "--blockBleedRight",
-          `${properties.rightPadding}rem`,
-        );
-        flexRow.style.setProperty(
-          "--blockBleedTop",
-          i == 0 ? `${properties.topPadding}rem` : "0rem",
-        );
-        flexRow.style.setProperty(
-          "--blockBleedBottom",
-          i == totalRows - 1 ? `${properties.bottomPadding}rem` : "0rem",
-        );
-
-        flexRow.style.setProperty("--marginBorderLeft", "0rem");
-        flexRow.style.setProperty("--marginBorderRight", "0rem");
-        flexRow.style.setProperty("--marginBorderTop", "0rem");
-        flexRow.style.setProperty("--marginBorderBottom", "0rem");
-      } else {
-        flexRow.style.width =
-          properties.width == 0 ? "" : properties.width + "rem";
-      }
+      flexRow.style.width =
+        properties.width == 0 ? "" : properties.width + "rem";
 
       if (
         ColorLibrary.checkForContrast(

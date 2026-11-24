@@ -22,6 +22,7 @@ const canvasProperties = {
   canvasHeight: ctx.canvas.width,
   laneWidth: 40,
   roadMarkingSize: 36,
+  roadMarkingWidth: 4,
 };
 
 const editorProperties = {
@@ -176,9 +177,9 @@ class Road {
       enabled: false,
       arrowHeight: 120,
       arrowWidth: 0,
-      bottomOffset: 40,
-      roundness: 5,
-      pointedTip: false,
+      bottomOffset: 20,
+      roundness: 2,
+      pointedTip: true,
       ...arrows,
     };
 
@@ -891,7 +892,7 @@ class Road {
         canvasProperties.roadMarkingSize,
       ]);
       ctx.strokeStyle = "black";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = canvasProperties.roadMarkingWidth;
 
       for (let i = 0; i < this.numLanes - 1; i++) {
         let laneStep = i - (this.numLanes - 1) / 2 + 0.5;
@@ -1078,6 +1079,58 @@ const loadArrowPresets = async () => {
       !currentlySelectedDiagram;
   });
 
+  for (const [presetName, presetData] of Object.entries(DiagrammaticPresets)) {
+    const jsonData = JSON.parse(presetData);
+    const presetDataToUse = structuredClone(jsonData);
+
+    const preset = {
+      ...presetDataToUse,
+      diagramName: presetName,
+      isPreset: true,
+    };
+
+    const diagramPresetCard = document.createElement("button");
+    diagramPresetCard.className = "diagramPresetCard";
+    diagramPresetCard.dataset.name = presetName;
+
+    const diagramPresetLabel = document.createElement("span");
+    diagramPresetLabel.className = "diagramPresetLabel";
+    diagramPresetLabel.textContent = `(PRESET) ${presetName}`;
+
+    const diagramImage = document.createElement("img");
+    diagramImage.src = await DiagramDrawing.diagramDataToImage(
+      presetDataToUse,
+      false,
+    );
+
+    diagramPresetCard.appendChild(diagramPresetLabel);
+    diagramPresetCard.appendChild(diagramImage);
+    document
+      .querySelector("#diagramPresetGallery")
+      .appendChild(diagramPresetCard);
+
+    diagramPresetCard.addEventListener("click", () => {
+      currentlySelectedDiagram =
+        currentlySelectedDiagram === preset ? null : preset;
+
+      document.querySelectorAll(".diagramPresetCard").forEach((card) => {
+        card.classList.toggle(
+          "selected",
+          currentlySelectedDiagram &&
+            card.dataset.name == currentlySelectedDiagram.diagramName,
+        );
+      });
+
+      const presetSelected = currentlySelectedDiagram?.isPreset === true;
+      document.querySelector("#diagramPresetRename").disabled =
+        !currentlySelectedDiagram || presetSelected;
+      document.querySelector("#diagramPresetUse").disabled =
+        !currentlySelectedDiagram;
+      document.querySelector("#diagramPresetDelete").disabled =
+        !currentlySelectedDiagram || presetSelected;
+    });
+  }
+
   document.querySelectorAll(".diagramPresetCard").forEach((card) => {
     if (
       currentlySelectedDiagram &&
@@ -1089,12 +1142,13 @@ const loadArrowPresets = async () => {
     }
   });
 
+  const presetSelected = currentlySelectedDiagram?.isPreset === true;
   document.querySelector("#diagramPresetRename").disabled =
-    !currentlySelectedDiagram;
+    !currentlySelectedDiagram || presetSelected;
   document.querySelector("#diagramPresetUse").disabled =
     !currentlySelectedDiagram;
   document.querySelector("#diagramPresetDelete").disabled =
-    !currentlySelectedDiagram;
+    !currentlySelectedDiagram || presetSelected;
 };
 
 const initializeDiagramModals = () => {
@@ -1145,6 +1199,8 @@ const DiagramDrawing = (() => {
       DiagrammicDrawingHolder.querySelector("#roadLaneSize").value;
     canvasProperties.roadMarkingSize =
       DiagrammicDrawingHolder.querySelector("#roadMarkingSize").value;
+    canvasProperties.roadMarkingWidth =
+      DiagrammicDrawingHolder.querySelector("#roadMarkingWidth").value;
 
     if (!selectedRoad) {
       renderDrawing();
@@ -1336,6 +1392,8 @@ const DiagramDrawing = (() => {
       canvasProperties.laneWidth;
     DiagrammicDrawingHolder.querySelector("#roadMarkingSize").value =
       canvasProperties.roadMarkingSize;
+    DiagrammicDrawingHolder.querySelector("#roadMarkingWidth").value =
+      canvasProperties.roadMarkingWidth;
 
     document.querySelector(".diagramObjectProperties").style.display =
       editorProperties.selectedRoad ? "" : "none";
@@ -1866,7 +1924,7 @@ const DiagramDrawing = (() => {
         node.subpanel.direction = null;
         for (const direction of ["left", "right", "top", "bottom"]) {
           let hitDetected = false;
-          for (let offset = 0; offset <= 100; offset += 5) {
+          for (let offset = 0; offset <= 250; offset += 5) {
             let samplePoint = new Point(node.subpanel.x, node.subpanel.y);
 
             if (direction === "left") samplePoint.x -= offset;
@@ -2694,7 +2752,7 @@ const DiagramDrawing = (() => {
         document.querySelector("#diagramPresetRename"),
         "click",
         async () => {
-          if (!currentlySelectedDiagram) {
+          if (!currentlySelectedDiagram || currentlySelectedDiagram.isPreset) {
             return;
           }
 
@@ -2719,7 +2777,7 @@ const DiagramDrawing = (() => {
         document.querySelector("#diagramPresetDelete"),
         "click",
         async () => {
-          if (!currentlySelectedDiagram) {
+          if (!currentlySelectedDiagram || currentlySelectedDiagram.isPreset) {
             return;
           }
 

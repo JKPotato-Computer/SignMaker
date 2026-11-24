@@ -1,7 +1,20 @@
 class Sign {
   constructor(options = {}) {
-    const { arrows, otherSymbol, oSNum, subPanels, lanePanelSize } =
-      MUTCDVariants.get("Sign", options);
+    const {
+      arrows,
+
+      otherSymbol,
+      oSNum,
+      oSArrow,
+      oSArrowPositioning,
+
+      actionMessage,
+      actionMessageArrow,
+      actionMessagePositioning,
+
+      subPanels,
+      lanePanelSize,
+    } = MUTCDVariants.get("Sign", options);
     if (
       arrows.standard?.exitOnlyConfigs?.arrow &&
       !(arrows.standard.exitOnlyConfigs.arrow instanceof StandardArrow)
@@ -12,6 +25,11 @@ class Sign {
     }
     this.otherSymbol = otherSymbol;
     this.oSNum = oSNum;
+    this.oSArrow = oSArrow;
+    this.oSArrowPositioning = oSArrowPositioning;
+    this.actionMessage = actionMessage;
+    this.actionMessageArrow = actionMessageArrow;
+    this.actionMessagePositioning = actionMessagePositioning;
     this.subPanels = subPanels;
     this.arrows = arrows;
     this.lanePanelSize = lanePanelSize;
@@ -120,8 +138,7 @@ class Sign {
   }
 }
 
-Sign.prototype.shieldPositions = ["Left", "Above", "Right"];
-Sign.prototype.guideArrows = [
+Sign.guideArrows = [
   "None",
   "Side Left",
   "Side Right",
@@ -131,24 +148,24 @@ Sign.prototype.guideArrows = [
   "Custom",
 ];
 
-Sign.prototype.standardArrowJustify = [
-  "Left",
-  "Center",
-  "Right",
-  "Space Between",
-];
-Sign.prototype.exitOnlyJustify = ["Left", "Center", "Right"];
+Sign.standardArrowJustify = ["Left", "Center", "Right", "Space Between"];
+Sign.exitOnlyJustify = ["Left", "Center", "Right"];
 
-Sign.prototype.otherSymbols = [
-  "None",
-  "Quebec-Style Exit Marker",
-  "Quebec-Left",
-];
+Sign.otherSymbols = ["None", "Quebec-Style Exit Marker", "Quebec-Left"];
 
-Sign.prototype.exitOnlyBorderTypes = [
+Sign.exitOnlyBorderTypes = [
   "Full Black Border",
   "Partial Black Border",
+  "Ontario Black Border",
   "White Border",
 ];
+
+Sign.otherSymbols = [
+  "None",
+  "Quebec-Style Exit Marker",
+  "Quebec-Style LEFT Exit Marker",
+];
+
+Sign.otherSymbolsPositioning = ["Left", "Right"];
 
 window.Sign = Sign;
