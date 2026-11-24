@@ -91,6 +91,13 @@ const DiagrammicLibrary = (() => {
       return null;
     }
 
+    if (diagramName.startsWith("preset_")) {
+      const presetName = diagramName.split("preset_")[1];
+      if (DiagrammaticPresets[presetName]) {
+        return JSON.parse(DiagrammaticPresets[presetName]);
+      }
+    }
+
     try {
       return await db.get(diagramName);
     } catch (err) {

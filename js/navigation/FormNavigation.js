@@ -1060,8 +1060,9 @@ const FormNavigation = (() => {
         await DiagramDrawing.promptDraw(
           (retValue) => {
             if (retValue) {
-              arrows.diagramData = retValue;
-              arrows.preset = "None";
+              app.getCurrentPanel().sign.arrows.diagrammic.diagramData =
+                retValue;
+              app.getCurrentPanel().sign.arrows.diagrammic.preset = "None";
               document.querySelector("#sMDiagrammicPreset").value = "None";
               formHandler.readForm();
             }
@@ -1077,8 +1078,9 @@ const FormNavigation = (() => {
         await DiagramDrawing.promptDraw(
           (retValue) => {
             if (retValue) {
-              arrows.diagramData = retValue;
-              arrows.preset = "None";
+              app.getCurrentPanel().sign.arrows.diagrammic.diagramData =
+                retValue;
+              app.getCurrentPanel().sign.arrows.diagrammic.preset = "None";
               document.querySelector("#sMDiagrammicPreset").value = "None";
               formHandler.readForm();
             }
@@ -2083,6 +2085,57 @@ const FormNavigation = (() => {
     };
 
     renderREADME();
+
+    // reset
+    document
+      .querySelector("#resetLocalStorage")
+      .addEventListener("click", () => {
+        if (
+          confirm(
+            "Are you sure you want to reset all local storage? (This will reset saved signs AND your autosave, non-built-in exit-tab presets, and the selected theme. Not much, really.)",
+          )
+        ) {
+          localStorage.clear();
+          location.reload();
+        }
+      });
+
+    document.querySelector("#resetDatabase").addEventListener("click", () => {
+      if (
+        confirm(
+          "Are you sure you want to reset all IndexedDB data? (This will reset custom shields, diagrammatic arrows, and custom images.)",
+        )
+      ) {
+        const request = indexedDB.deleteDatabase("SignMakerDB");
+        request.onsuccess = () => {
+          console.log("IndexedDB deleted successfully.");
+          location.reload();
+        };
+        request.onerror = (event) => {
+          console.error("Error deleting IndexedDB:", event.target.error);
+        };
+      }
+    });
+
+    document.querySelector("#resetAll").addEventListener("click", () => {
+      if (
+        confirm(
+          "Are you sure you want to reset all data? (This will reset EVERYTHING, if it wasn't obvious.)",
+        ) &&
+        confirm("Are you REALLY sure?")
+      ) {
+        StorageManager.clear();
+        const request = indexedDB.deleteDatabase("SignMakerDB");
+        request.onsuccess = () => {
+          console.log("IndexedDB deleted successfully.");
+          location.reload();
+        };
+
+        request.onerror = (event) => {
+          console.error("Error deleting IndexedDB:", event.target.error);
+        };
+      }
+    });
   };
 
   let oldColorName = null;

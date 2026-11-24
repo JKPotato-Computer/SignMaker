@@ -762,6 +762,7 @@ const formHandler = (() => {
         readProperties &&
         readProperties["diagrammicPresetChange"]
       ) {
+        console.log("t");
         DiagrammicLibrary.getDiagramByName(
           currentPanel.sign.arrows.diagrammic.preset,
         ).then((diagramData) => {
@@ -3004,12 +3005,21 @@ const formHandler = (() => {
       const diagrammicPreset = document.querySelector("#sMDiagrammicPreset");
       const populatePresetOptions = async () => {
         const presetNames = await DiagrammicLibrary.getAllDiagramNames();
+        const builtInPresets = Object.keys(DiagrammaticPresets);
+
         diagrammicPreset.innerHTML = "";
 
         lib.appendOption(diagrammicPreset, "None", {
           selected: arrows.preset === "None",
           text: "None",
         });
+
+        for (const presetName of builtInPresets) {
+          lib.appendOption(diagrammicPreset, "preset_" + presetName, {
+            selected: arrows.preset === "preset_" + presetName,
+            text: "(PRESET) " + presetName,
+          });
+        }
 
         for (const presetName of presetNames) {
           lib.appendOption(diagrammicPreset, presetName, {

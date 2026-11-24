@@ -1079,6 +1079,58 @@ const loadArrowPresets = async () => {
       !currentlySelectedDiagram;
   });
 
+  for (const [presetName, presetData] of Object.entries(DiagrammaticPresets)) {
+    const jsonData = JSON.parse(presetData);
+    const presetDataToUse = structuredClone(jsonData);
+
+    const preset = {
+      ...presetDataToUse,
+      diagramName: presetName,
+      isPreset: true,
+    };
+
+    const diagramPresetCard = document.createElement("button");
+    diagramPresetCard.className = "diagramPresetCard";
+    diagramPresetCard.dataset.name = presetName;
+
+    const diagramPresetLabel = document.createElement("span");
+    diagramPresetLabel.className = "diagramPresetLabel";
+    diagramPresetLabel.textContent = `(PRESET) ${presetName}`;
+
+    const diagramImage = document.createElement("img");
+    diagramImage.src = await DiagramDrawing.diagramDataToImage(
+      presetDataToUse,
+      false,
+    );
+
+    diagramPresetCard.appendChild(diagramPresetLabel);
+    diagramPresetCard.appendChild(diagramImage);
+    document
+      .querySelector("#diagramPresetGallery")
+      .appendChild(diagramPresetCard);
+
+    diagramPresetCard.addEventListener("click", () => {
+      currentlySelectedDiagram =
+        currentlySelectedDiagram === preset ? null : preset;
+
+      document.querySelectorAll(".diagramPresetCard").forEach((card) => {
+        card.classList.toggle(
+          "selected",
+          currentlySelectedDiagram &&
+            card.dataset.name == currentlySelectedDiagram.diagramName,
+        );
+      });
+
+      const presetSelected = currentlySelectedDiagram?.isPreset === true;
+      document.querySelector("#diagramPresetRename").disabled =
+        !currentlySelectedDiagram || presetSelected;
+      document.querySelector("#diagramPresetUse").disabled =
+        !currentlySelectedDiagram;
+      document.querySelector("#diagramPresetDelete").disabled =
+        !currentlySelectedDiagram || presetSelected;
+    });
+  }
+
   document.querySelectorAll(".diagramPresetCard").forEach((card) => {
     if (
       currentlySelectedDiagram &&
@@ -1090,12 +1142,13 @@ const loadArrowPresets = async () => {
     }
   });
 
+  const presetSelected = currentlySelectedDiagram?.isPreset === true;
   document.querySelector("#diagramPresetRename").disabled =
-    !currentlySelectedDiagram;
+    !currentlySelectedDiagram || presetSelected;
   document.querySelector("#diagramPresetUse").disabled =
     !currentlySelectedDiagram;
   document.querySelector("#diagramPresetDelete").disabled =
-    !currentlySelectedDiagram;
+    !currentlySelectedDiagram || presetSelected;
 };
 
 const initializeDiagramModals = () => {
@@ -2699,7 +2752,7 @@ const DiagramDrawing = (() => {
         document.querySelector("#diagramPresetRename"),
         "click",
         async () => {
-          if (!currentlySelectedDiagram) {
+          if (!currentlySelectedDiagram || currentlySelectedDiagram.isPreset) {
             return;
           }
 
@@ -2724,7 +2777,7 @@ const DiagramDrawing = (() => {
         document.querySelector("#diagramPresetDelete"),
         "click",
         async () => {
-          if (!currentlySelectedDiagram) {
+          if (!currentlySelectedDiagram || currentlySelectedDiagram.isPreset) {
             return;
           }
 

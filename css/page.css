@@ -61,6 +61,44 @@ body {
   transition: 0.15s ease-in-out background-color;
 }
 
+#signMakerLoadingScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--backgroundColor);
+  transition: opacity 0.75s ease-out;
+  width: 100%;
+  height: 100%;
+}
+
+#signMakerLoadingScreen.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.signMakerLoadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(18rem, 70vw);
+}
+
+.signMakerLoadingContent img {
+  width: 10rem;
+  max-width: 70vw;
+  height: auto;
+  transition: transform 0.75s ease-out;
+}
+
+.signMakerLoadingContent progress {
+  width: 100%;
+  height: 0.75rem;
+}
+
 main,
 footer {
   z-index: 0;

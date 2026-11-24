@@ -59,6 +59,8 @@
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
     <script src="js/presets/TemplatePresets.js" type="text/javascript"></script>
     <script src="js/presets/MUTCDVariants.js" type="text/javascript"></script>
+    <script src="js/presets/DiagrammaticPresets.js" type="text/javascript"></script>
+    <script src="js/navigation/setup.js" type="text/javascript" defer></script>
 
     <script src="js/modules/History.js" type="text/javascript"></script>
     <script src="js/modules/StorageManager.js" type="text/javascript"></script>
@@ -134,6 +136,13 @@
     </script>
   </head>
   <body onload="App.init()">
+    <div id="signMakerLoadingScreen">
+      <div class="signMakerLoadingContent">
+        <img src="assets/other-symbols/SignMakerIconRotated.png" alt="SignMaker v2.2" />
+        <progress id="signMakerLoadingProgress" value="0" max="100"></progress>
+      </div>
+    </div>
+
     <div id="zoomControl">
       <span>Zoom</span>
       <button type="button" id="zoomOut" onclick="formHandler.zoom(-0.25)">
@@ -1214,6 +1223,12 @@
             document.getElementById('smSettings_uiScale').dispatchEvent(new Event('change'));
             " /> 
             <input type="number" id="smSettings_uiScale" min=".5" max="1" step=".1" value="1" placeholder="1.0" />
+            <br />
+            <div class="resetOptions">
+              <button id="resetLocalStorage" class="redButton">Reset Local Storage</button>
+              <button id="resetDatabase" class="redButton">Reset IndexedDB</button>
+              <button id="resetAll" class="redButton">Clear EVERYTHING</button>
+            </div>
           </div>
           <div id="sMSettings_MUTCDVariants">
             <span id="smSettings_selectedMUTCDVariant"
@@ -1343,7 +1358,7 @@
                 <p>
                   However, I'm sure you are aware of where things stand right now when it comes to the use of generative large language models, which everyone commonly umbrellas the term into "artificial intelligence" including 
                   all the non-generative models. Now, I'm not a complete opponent of artificial intelligence (At least within the realm of coding. If it's asset, image, model, audio, or visual generation? Hell no.), and I'll be upfront: 
-                  SignMaker was partially developed with the help of AI. Setting aside the debates when it comes to the data center water usage and noise pollution, how the United States is regulating (or promoting, if you will) AI data centers, 
+                  SignMaker was partially developed with the help of AI. Setting aside the debates when it comes to data center water usage and noise pollution, how the United States is regulating (or promoting, if you will) AI data centers, 
                   or using AI to solve million-dollar questions like the Riemann Hypothesis and Navier-Stocks, AI, as a tool, is capable and has been proven to help speed up development in creating games, software, and recreational projects like SignMaker. 
                   Is it inevitable that I will have to start incorporating AI to meet demands and tasks in the workforce? Probably. Is what we call the "AI bubble"  going to burst and magically free us from an AI dilemma, assuming we don't immediately undergo 
                   an economic recession? Unlikely.
@@ -5803,6 +5818,9 @@
           <button id="smColorDropdownUpdate">Update</button>
           <button id="smColorDropdownRemove">Remove</button>
       </div>
+      </div>
     </div>
+
+
   </body>
 </html>

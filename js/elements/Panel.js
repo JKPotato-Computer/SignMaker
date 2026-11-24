@@ -50,11 +50,6 @@ class Panel {
 }
 
 Panel.prototype.cornerType = ["Sharp", "Round", "Square"];
-Panel.panelAppearance = [
-  "Standard",
-  "Retro-reflective",
-  "Circle Pixels",
-  "Square Pixels",
-];
+Panel.panelAppearance = ["Standard", "Circle Pixels", "Square Pixels"];
 
 window.Panel = Panel;

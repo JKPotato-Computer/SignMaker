@@ -1317,9 +1317,11 @@ button[data-diagram-modal-close] {
 #shieldEditorClose:hover,
 #shieldImgLibraryClose:hover,
 #diagrammicDrawingClose:hover,
+#customImagePickerClose:hover,
+#signMakerSettingsClose:hover,
 button[data-diagram-modal-close]:hover,
 .redButton:hover {
-  background-color: rgb(255, 0, 0, 0.6);
+  background-color: rgb(255, 0, 0, 0.6) !important;
 }
 
 .shieldLibrary > nav {
@@ -3536,4 +3538,15 @@ input#additionalActionMessage {
   float: left;
   height: 24rem;
   margin: 1rem 1rem 1rem 16px;
+}
+
+.resetOptions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.resetOptions > button {
+  padding: 0.5rem 1rem;
 }

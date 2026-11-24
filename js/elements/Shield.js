@@ -45,6 +45,7 @@ class Shield {
       route_scale: 100,
       route_xOffset: 0,
       route_yOffset: 0,
+      route_rotation: 0,
       route_letterSpacing: 0,
       route_fontFamily: "",
       route_color: "",
@@ -52,6 +53,7 @@ class Shield {
       designation_scale: 100,
       designation_xOffset: 0,
       designation_yOffset: 0,
+      designation_rotation: 0,
       designation_letterSpacing: 0,
       designation_fontFamily: "",
       designation_color: "",
@@ -126,6 +128,7 @@ class Shield {
       this.horizMargin + "px",
     );
     shieldElmt.style.fontSize = this.scale / 100 + "rem";
+    shieldElmt.style.rotate = this.customShields.route_rotation + "deg";
     shieldElmt.style.setProperty("--vertShieldMargin", this.vertMargin + "px");
 
     const shieldImgElmt = document.createElement("img");
@@ -169,6 +172,8 @@ class Shield {
     if (this.designation != "") {
       const designationElmt = document.createElement("span");
       designationElmt.className = "designation";
+      designationElmt.style.rotate =
+        this.customShields.designation_rotation + "deg";
       designationElmt.style.setProperty(
         "--designationScale",
         this.customShields.designation_scale / 100,

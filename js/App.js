@@ -1527,7 +1527,6 @@ const App = (() => {
     panelElmt.className = `panel ${panel.corner.toLowerCase()} ${panel.panelAppearance.toLowerCase()}`;
 
     if (panel.panelAppearance.includes("Pixels")) {
-      console.log(panel.panelAppearance);
       panelElmt.style.padding = `${panel.appearancePadding}rem`;
       panelElmt.style.border = `${panel.appearanceBorderThickness}px solid black`;
       panelElmt.style.backgroundColor = `#444444`;
