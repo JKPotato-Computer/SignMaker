@@ -322,17 +322,12 @@
 .panel:not(.round)
   .guideArrowsHolder:has(
     .guideArrows.exit_only.partial_black_border,
-<<<<<<< HEAD
     .guideArrows.exit_only.full_black_border
   ),
 .panel:not(.double-struck)
   .guideArrowsHolder:has(
     .guideArrows.exit_only.partial_black_border,
     .guideArrows.exit_only.full_black_border
-=======
-    .guideArrows.exit_only.full_black_border,
-    .guideArrows.exit_only.ontario_black_border
->>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856
   ) {
   background-color: var(--bgColor);
 }

@@ -127,21 +127,12 @@
 }
 
 @media (max-width: 768px) {
-<<<<<<< HEAD
-  input {
-    padding: 0.75rem;
-  }
-
-  select {
-    padding: 0.75rem;
-=======
   input:not([type="checkbox"]) {
-    padding: .5rem .25rem;
+    padding: 0.5rem 0.25rem;
   }
 
   select {
-    padding: .5rem;
->>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856
+    padding: 0.5rem;
   }
 
   button,
@@ -323,9 +314,6 @@
   #sMSettings_MUTCDVariants {
     flex-direction: column-reverse;
   }
-<<<<<<< HEAD
-}
-=======
 
   :root[data-theme="kurumi"] input[type="checkbox"]::before {
     width: 16px;
@@ -335,7 +323,7 @@
   input[type="number"]:not(.smallval) {
     width: 8rem;
   }
-  
+
   .smallVal {
     width: 4rem;
   }
@@ -360,4 +348,3 @@
     height: 90%;
   }
 }
->>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856

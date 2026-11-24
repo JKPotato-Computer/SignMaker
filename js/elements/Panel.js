@@ -49,12 +49,8 @@ class Panel {
   duplicateExitTabRow(index) {}
 }
 
-<<<<<<< HEAD
-Panel.prototype.cornerType = ["Sharp", "Round", "Double-Struck"];
+Panel.prototype.cornerType = ["Sharp", "Round", "Square", "Double-Struck"];
 Panel.prototype.defaultBorderRadius = 0.75;
-=======
-Panel.prototype.cornerType = ["Sharp", "Round", "Square"];
 Panel.panelAppearance = ["Standard", "Circle Pixels", "Square Pixels"];
->>>>>>> 6e2e4cb4162eb25e1ab93928a13578fc02c90856
 
 window.Panel = Panel;
