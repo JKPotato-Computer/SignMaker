@@ -71,6 +71,10 @@ const MUTCDVariants = (() => {
         exitTabs: [],
         corner: "Sharp",
         borderRadius: 0.75,
+        panelAppearance: "Standard",
+        appearanceBorderThickness: 8,
+        appearancePadding: 2,
+        appearancePixelSize: 0.05,
         tagToReplace: ["corner", "borderRadius"],
       },
       Sign: {
@@ -132,16 +136,24 @@ const MUTCDVariants = (() => {
           },
         },
         otherSymbol: "None",
-        oSNum: "",
+        oSNum: 0,
+        oSArrow: -1,
+        oSArrowPositioning: "Right",
+
+        actionMessage: "",
+        actionMessageArrow: -1,
+        actionMessagePositioning: "Right",
+
         subPanels: [],
         lanePanelSize: 0,
+
         tagToSkip: ["diagramData"],
       },
       SubPanels: {
         laneWidth: 0,
         blockElements: null,
         verticalAlign: "Start",
-        dividerHeight: 50,
+        dividerHeight: 100,
         dividerHeightUnit: "%",
       },
       TextElement: {
@@ -164,8 +176,10 @@ const MUTCDVariants = (() => {
       ControlTextElement: {
         smallCapitals: false,
         capitalSize: 150,
+        fontFamily: "Series EM",
       },
       ActionMessageElement: {
+        fontFamily: "Series E",
         fontSize: 70,
         useNumeralFormatting: true,
       },
@@ -214,9 +228,12 @@ const MUTCDVariants = (() => {
         iconSize: 100,
         backgroundColor: "Inherit",
         border: false,
+        isSquare: false,
         borderRadius: 4,
+        borderThickness: 4,
         borderColor: "White",
-        spacing: 4,
+        spacing: 0,
+        alignment: "Center",
       },
       BeaconElement: {
         size: 2,
@@ -471,6 +488,10 @@ const MUTCDVariants = (() => {
         lineHeight: 100,
         tagToReplace: ["fontFamily", "lineHeight"],
       },
+      ActionMessageElement: {
+        fontFamily: "Clearview 5WR",
+        tagToReplace: ["fontFamily"],
+      },
       Banner: {
         fontFamily: "Clearview 5WR",
         tagToReplace: ["fontFamily"],
@@ -540,7 +561,7 @@ const MUTCDVariants = (() => {
         sign: null,
         color: "Purple",
         exitTabs: [],
-        corner: "Veridian",
+        corner: "Square",
         borderRadius: 0.0,
         tagToReplace: ["color"],
       },
@@ -840,7 +861,7 @@ const MUTCDVariants = (() => {
 
   const get = (className, options = {}) => {
     const guide =
-      typeof App !== "undefined" && App.getPost()
+      typeof App !== "undefined" && App != null && App.getPost()
         ? App.getPost().mutcdVariant
         : "MUTCD";
     return merge(getDefaults(className, guide), options);
@@ -857,6 +878,7 @@ const MUTCDVariants = (() => {
     }
     return [...variableNames];
   };
+  variants.getDefaults = getDefaults;
 
   return variants;
 })();

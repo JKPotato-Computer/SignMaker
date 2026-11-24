@@ -97,7 +97,6 @@ const SavesNTemplates = (() => {
           document.querySelector("#sMCreationsFileName").value =
             saveFile.fileName;
           App.setPost(ImportExport.jsonToSign(signData));
-
           App.resetSelectors();
           formHandler.updateForm();
           App.redraw();
@@ -179,15 +178,19 @@ const SavesNTemplates = (() => {
         if (
           signData &&
           confirm(
-            "Are you sure you want to load this " + (template.id.includes("POST_") ? "template" : "panel") + "? Unsaved changes will be lost.",
+            "Are you sure you want to load this " +
+              (template.id.includes("POST_") ? "template" : "panel") +
+              "? Unsaved changes will be lost.",
           )
         ) {
-          document.querySelector("#sMCreationsFileName").value =
-            template.name;
-          
+          document.querySelector("#sMCreationsFileName").value = template.name;
+
           if (template.id.startsWith("PANEL_")) {
             console.log(template.id, App.getCurrentPanel());
-            Object.assign(App.getCurrentPanel(), ImportExport.jsonToSign(signData)[0]);
+            Object.assign(
+              App.getCurrentPanel(),
+              ImportExport.jsonToSign(signData)[0],
+            );
           } else {
             App.setPost(ImportExport.jsonToSign(signData));
             App.resetSelectors();

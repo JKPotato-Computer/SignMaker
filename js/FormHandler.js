@@ -104,7 +104,21 @@ const formHandler = (() => {
       currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
     }
 
-    currentPanel.borderRadius = Math.max(0, form["panelBorderRadius"].value);
+    currentPanel.borderRadius = Math.max(
+      0,
+      parseFloat(form["panelBorderRadius"].value),
+    );
+
+    currentPanel.panelAppearance = form["panelAppearance"].value;
+    currentPanel.appearanceBorderThickness = parseFloat(
+      form["appearanceBorderThickness"].value,
+    );
+    currentPanel.appearancePadding = parseFloat(
+      form["appearancePadding"].value,
+    );
+    currentPanel.appearancePixelSize = parseFloat(
+      form["appearancePixelSize"].value,
+    );
 
     // Exit Tab
     if (app.vars.currentlySelectedExitTabRowIndex != -1) {
@@ -646,8 +660,17 @@ const formHandler = (() => {
 
       standardArrowConfig.variant = form["guideArrow"].value;
 
-      // currentPanel.sign.otherSymbol = form["otherSymbol"].value;
-      // currentPanel.sign.oSNum = form["oSNum"].value;
+      currentPanel.sign.oSArrow = parseInt(form["otherSymbolPlacement"].value);
+      currentPanel.sign.oSArrowPositioning =
+        form["otherSymbolArrowPositioning"].value;
+      currentPanel.sign.otherSymbol = form["otherSymbol"].value;
+      currentPanel.sign.oSNum = form["oSNum"].value;
+      currentPanel.sign.actionMessage = form["additionalActionMessage"].value;
+      currentPanel.sign.actionMessageArrow = parseInt(
+        form["actionMessagePlacement"].value,
+      );
+      currentPanel.sign.actionMessagePositioning =
+        form["actionMessageArrowPositioning"].value;
     } else if (currentPanel.sign.arrows.arrowMode == "apl") {
       const apl = currentPanel.sign.arrows.apl;
       apl.verticalTopPadding = parseFloat(form["smAPL_VertTopPadding"].value);
@@ -768,7 +791,7 @@ const formHandler = (() => {
     post = app.getPost();
 
     const panel = app.getCurrentPanel();
-    const sign = panel.sign.subPanels[app.vars.currentlySelectedSubPanelIndex];
+    const sign = panel.sign;
 
     const panelList = document.getElementById("panelList");
     const subPanelList = document.getElementById("subPanelList");
@@ -783,9 +806,7 @@ const formHandler = (() => {
       selectedPanelLabel = Math.floor(selectedPanelLabel / 26);
     }
     document.querySelector("#currentlySelectedPanel").textContent =
-      app.vars.currentlySelectedPanelIndex == -1
-        ? `Group ${app.vars.currentlySelectedPanelGroupIndex + 1}`
-        : `Panel ${selectedPanelName}`;
+      `Panel ${app.vars.currentlySelectedPanelGroupIndex + 1}${selectedPanelName}`;
 
     document.getElementById("postPosition").value = post.polePosition;
     document.getElementById("showPost").checked = post.showPost;
@@ -799,6 +820,17 @@ const formHandler = (() => {
     ColorLibrary.updateDefaultColors();
     document.getElementById("postColor").value = post.color;
     document.getElementById("panelColor").dataset.color = panel.color;
+    document.querySelector("#panelAppearance").value = panel.panelAppearance;
+
+    document.querySelector("#panelAppearanceOptions").style.display =
+      panel.panelAppearance.includes("Pixels") ? "" : "none";
+    document.querySelector("#appearanceBorderThickness").value =
+      panel.appearanceBorderThickness;
+    document.querySelector("#appearancePadding").value =
+      panel.appearancePadding;
+    document.querySelector("#appearancePixelSize").value =
+      panel.appearancePixelSize;
+
     // reload color dropdown
     const colorDropdown = document.querySelector("#smColorDropdownItems");
     colorDropdown.innerHTML = "";
@@ -928,7 +960,7 @@ const formHandler = (() => {
     }
 
     for (
-      let subPanelIndex = 0, subPanelsLength = panel.sign.subPanels.length;
+      let subPanelIndex = 0, subPanelsLength = sign.subPanels.length;
       subPanelIndex < subPanelsLength;
       subPanelIndex++
     ) {
@@ -1015,9 +1047,8 @@ const formHandler = (() => {
 
     // Panel Setting Config
     document.getElementById("panelCorner").value = panel.corner;
-    document.getElementById("panelBorderRadius").value =
-      panel.borderRadius || 0.5;
-    document.getElementById("panelLaneSize").value = panel.sign.lanePanelSize;
+    document.getElementById("panelBorderRadius").value = panel.borderRadius;
+    document.getElementById("panelLaneSize").value = sign.lanePanelSize;
 
     // Exit Tabs
     updateExitTabSubform();
@@ -1121,10 +1152,6 @@ const formHandler = (() => {
           Control.prototype.blockElements[blockElement.constructor.name];
         sMControlRow.appendChild(textEditorBlock);
         textEditorBlock.addEventListener("click", () => {
-          console.log(
-            textEditorBlock.dataset.row,
-            textEditorBlock.dataset.block,
-          );
           app.setSelectedRow(parseInt(textEditorBlock.dataset.row));
           app.setSelectedControlElem(parseInt(textEditorBlock.dataset.block));
         });
@@ -1190,6 +1217,16 @@ const formHandler = (() => {
           standardArrow.rotation == parseFloat(button.dataset.degrees),
         );
       });
+    } else if (blockElemType === "sdIcon") {
+      if (currentBlockElem.iconType !== "custom") {
+        document.querySelector('label[for="sdIcon_isSquare"]').style.display =
+          "none";
+        document.querySelector("#sdIcon_isSquare").style.display = "none";
+      } else {
+        document.querySelector('label[for="sdIcon_isSquare"]').style.display =
+          "";
+        document.querySelector("#sdIcon_isSquare").style.display = "";
+      }
     }
 
     for (const propertyName in currentBlockElem) {
@@ -2020,9 +2057,6 @@ const formHandler = (() => {
   };
 
   const updateShieldSubform = () => {
-    const panel = app.getCurrentPanel();
-    const sign = panel.sign.subPanels[app.vars.currentlySelectedSubPanelIndex];
-
     const shieldGroup = app.getCurrentBlockElem();
     const selectedShieldIndex = app.vars.currentlySelectedShieldIndex;
     const currentShield =
@@ -2421,6 +2455,34 @@ const formHandler = (() => {
       }
     }
 
+    for (const e of document.querySelectorAll(
+      ".sMModal.guideArrowConfig > .sMModalContent > div",
+    )) {
+      if (e.classList.contains("tabHidden")) {
+        continue;
+      }
+
+      if (e.id == "sMArrowType") {
+        continue;
+      }
+
+      if (e.id.split("sM")[1].toLowerCase() !== sign.arrows.arrowMode) {
+        for (const tab of document.querySelectorAll(
+          ".sMModal.guideArrowConfig > .sMModalBar > a",
+        )) {
+          if (
+            tab.dataset.tab.split("sM")[1].toLowerCase() ===
+            (sign.arrows.arrowMode === "standard"
+              ? "standardarrows"
+              : sign.arrows.arrowMode)
+          ) {
+            tab.click();
+            break;
+          }
+        }
+      }
+    }
+
     document.querySelector("#guideArrow").value = sign.arrows.standard.variant;
 
     if (sign.arrows.arrowMode == "standard") {
@@ -2454,7 +2516,71 @@ const formHandler = (() => {
         (selectedIndex === -1 ? "None" : "Arrow " + (selectedIndex + 1));
 
       if (isSimpleVariant) {
+        document.querySelector("#otherBottomSymbols").style.display = "none";
         return;
+      }
+      document.querySelector("#otherBottomSymbols").style.display = "";
+
+      // other symbols
+      document.querySelector("#otherSymbol").value = sign.otherSymbol;
+      document.querySelector("#oSNum").value = sign.oSNum;
+      document.querySelector("#otherSymbolArrowPositioning").value =
+        sign.oSArrowPositioning;
+      document.querySelector("#otherSymbolPlacement").innerHTML = "";
+
+      document.querySelector("#additionalActionMessage").value =
+        sign.actionMessage;
+      document.querySelector("#actionMessageArrowPositioning").value =
+        sign.actionMessagePositioning;
+      document.querySelector("#actionMessagePlacement").innerHTML = "";
+
+      const arrowLength =
+        (isExitOnly
+          ? exitOnlyConfigs.numArrows
+          : standardArrowConfig.arrowList.length) || 0;
+
+      lib.appendOption(document.querySelector("#otherSymbolPlacement"), -1, {
+        text: "Outer",
+        selected: sign.oSArrow == -1,
+      });
+
+      lib.appendOption(document.querySelector("#actionMessagePlacement"), -1, {
+        text: "Outer",
+        selected: sign.actionMessageArrow == -1,
+      });
+
+      for (let i = 0; i < arrowLength; i++) {
+        lib.appendOption(document.querySelector("#otherSymbolPlacement"), i, {
+          text: "Arrow " + (i + 1),
+          selected: sign.oSArrow == i,
+        });
+
+        lib.appendOption(document.querySelector("#actionMessagePlacement"), i, {
+          text: "Arrow " + (i + 1),
+          selected: sign.actionMessageArrow == i,
+        });
+      }
+
+      if (sign.otherSymbol != "None") {
+        document
+          .querySelector("#otherSymbolPositioning")
+          .classList.remove("hidden");
+        document.querySelector("#oSNum").style.display = "";
+      } else {
+        document
+          .querySelector("#otherSymbolPositioning")
+          .classList.add("hidden");
+        document.querySelector("#oSNum").style.display = "none";
+      }
+
+      if (sign.actionMessage !== "") {
+        document
+          .querySelector("#actionMessagePositioning")
+          .classList.remove("hidden");
+      } else {
+        document
+          .querySelector("#actionMessagePositioning")
+          .classList.add("hidden");
       }
 
       if (variant === "Custom") {
@@ -2561,7 +2687,7 @@ const formHandler = (() => {
         const arrowLocations = document.querySelector("#arrowLocations");
         arrowLocations.innerHTML = "";
 
-        for (const alignment of Sign.prototype.exitOnlyJustify) {
+        for (const alignment of Sign.exitOnlyJustify) {
           if (variant == "Half Exit Only" && alignment == "Center") {
             if (standardArrowConfig.exitOnlyConfigs.arrowLocation == "Center") {
               standardArrowConfig.exitOnlyConfigs.arrowLocation = "Right";
@@ -2687,14 +2813,26 @@ const formHandler = (() => {
 
         document.querySelector("#exitOnlyGap").value = exitOnlyConfigs.gap;
         document.querySelector("#exitOnlyTextGap").style.display =
-          exitOnlyConfigs.numArrows < 1 ? "none" : "";
+          exitOnlyConfigs.numArrows < 1 ||
+          exitOnlyConfigs.exitOnlyText.length === 0
+            ? "none"
+            : "";
         document.querySelector('label[for="exitOnlyTextGap"]').style.display =
-          exitOnlyConfigs.numArrows < 1 ? "none" : "";
+          exitOnlyConfigs.numArrows < 1 ||
+          exitOnlyConfigs.exitOnlyText.length === 0
+            ? "none"
+            : "";
 
         document.querySelector("#exitOnlyGap").style.display =
-          exitOnlyConfigs.numArrows <= 2 ? "none" : "";
+          exitOnlyConfigs.numArrows <= 2 &&
+          exitOnlyConfigs.exitOnlyText.length > 0
+            ? "none"
+            : "";
         document.querySelector('label[for="exitOnlyGap"]').style.display =
-          exitOnlyConfigs.numArrows <= 2 ? "none" : "";
+          exitOnlyConfigs.numArrows <= 2 &&
+          exitOnlyConfigs.exitOnlyText.length > 0
+            ? "none"
+            : "";
 
         document.querySelector("#exitOnlyTextGap").value =
           exitOnlyConfigs.textGap;
@@ -2863,46 +3001,6 @@ const formHandler = (() => {
     }
 
     if (sign.arrows.arrowMode == "diagrammic") {
-      if (
-        !document.querySelector("#sMDiagrammicOpenEditor").dataset.connected
-      ) {
-        document.querySelector("#sMDiagrammicOpenEditor").dataset.connected =
-          true;
-        document
-          .querySelector("#sMDiagrammicOpenEditor")
-          .addEventListener("click", async () => {
-            await DiagramDrawing.promptDraw(
-              (retValue) => {
-                if (retValue) {
-                  arrows.diagramData = retValue;
-                  arrows.preset = "None";
-                  document.querySelector("#sMDiagrammicPreset").value = "None";
-                  formHandler.readForm();
-                }
-              },
-              false,
-              sign.arrows.diagrammic.diagramData,
-            );
-          });
-
-        document
-          .querySelector("#sMDiagrammicOpenEditorPresets")
-          .addEventListener("click", async () => {
-            await DiagramDrawing.promptDraw(
-              (retValue) => {
-                if (retValue) {
-                  arrows.diagramData = retValue;
-                  arrows.preset = "None";
-                  document.querySelector("#sMDiagrammicPreset").value = "None";
-                  formHandler.readForm();
-                }
-              },
-              true,
-              sign.arrows.diagrammic.diagramData,
-            );
-          });
-      }
-
       const diagrammicPreset = document.querySelector("#sMDiagrammicPreset");
       const populatePresetOptions = async () => {
         const presetNames = await DiagrammicLibrary.getAllDiagramNames();

@@ -88,7 +88,7 @@ main#smRender.modalOpen {
   transform: translateX(50%);
 }
 
-body > footer img {
+body > footer > div:nth-child(1) > img {
   height: 100px;
   margin: -10px 0 -10px -10px;
 }
@@ -112,7 +112,7 @@ body > footer > div:nth-child(2) {
   gap: 0.5rem;
 }
 
-body > footer div:nth-child(1) {
+body > footer > div:nth-child(1) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,24 +121,27 @@ body > footer div:nth-child(1) {
   padding: 0.5rem 1rem;
 }
 
+footer > div > a > div:nth-child(1) {
+  padding: 0.5rem 0 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 body > footer a {
   color: var(--textColor);
 }
 
 body > footer > div:nth-child(2) a {
   border-radius: 0.1rem;
-
   background-color: rgb(255, 255, 255, 0.15);
   text-decoration: none;
-
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem;
   height: 100%;
-  width: 10rem;
-
+  width: 15rem;
   transition: 0.2s;
   font-size: 16px;
   text-align: right;
@@ -173,10 +176,6 @@ h6 {
   font-weight: 600;
 }
 
-#oSNum {
-  display: none;
-}
-
 .warning {
   background-color: rgb(252, 207, 52);
   padding: 6px;
@@ -192,4 +191,39 @@ h6 {
 
 input[type="checkbox"] {
   width: auto;
+}
+
+.iconLink {
+  height: 32px;
+  aspect-ratio: 1 / 1;
+}
+
+:root[data-theme="light"] a:not(.discordInvite) .iconLink,
+:root[data-theme="kurumi"] a:not(.discordInvite) .iconLink {
+  filter: invert(1);
+}
+
+#githubStars,
+#discordMembers {
+  height: stretch;
+  padding: 0 0.5rem;
+  background-color: rgb(var(--baseColor), 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--textColor);
+}
+
+a.discordInvite {
+  background-color: #5865f2 !important;
+  color: white;
+}
+
+a.discordInvite:hover {
+  background-color: #b4bbff !important;
+}
+
+hr {
+  border-style: solid;
+  color: rgb(var(--baseColor));
 }

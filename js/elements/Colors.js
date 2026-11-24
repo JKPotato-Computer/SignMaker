@@ -66,11 +66,11 @@ const ColorLibrary = (() => {
       return;
     }
 
-    if (colorLibrary[newColorName]) {
+    if (colorLibrary[newColorName] && oldColorName !== newColorName) {
       return;
     }
 
-    if (defaultColors.includes(oldColorName)) {
+    if (defaultColors.includes(oldColorName) || defaultColors.includes(newColorName)) {
       return;
     }
 

@@ -796,6 +796,13 @@
   top: 0.075em;
 }
 
+.shield.TXEXPRESS .designation,
+.shield.TXTollCTMRA .designation,
+.shield.TXTollNTTA .designation,
+.shield.TXTOLL .designation {
+  top: 3rem;
+}
+
 /* Utah */
 .shield.UT .routeNumber {
   color: rgb(0, 0, 0);
@@ -1060,7 +1067,7 @@
 }
 
 .shield.QC.ThreeDigit .routeNumber {
-  font-family: "Series C";
+  font-family: "Series E";
 }
 
 .shield.QC2 .routeNumber {

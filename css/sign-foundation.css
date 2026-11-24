@@ -450,6 +450,7 @@ main#smRender.wide #postContainer {
   margin: var(--vertShieldMargin) var(--horizShieldMargin);
   position: relative;
   font-family: "Series C";
+  color: white;
 }
 
 .shieldImg.shieldBacks {
@@ -478,6 +479,7 @@ main#smRender.wide #postContainer {
     translateY(var(--routeYOffset, 0%));
   height: stretch;
 }
+
 .designation {
   position: absolute;
   position-anchor: --routeNumberAnchor;
@@ -487,13 +489,17 @@ main#smRender.wide #postContainer {
   font-family: "Series E";
   transform: translate(
     var(--designationXOffset, 0%),
-    var(--designationYOffset, 0%)
+    calc(var(--designationYOffset, 0%) - 50%)
   );
   scale: var(--designationScale);
   text-wrap: nowrap;
   word-spacing: -0.2rem;
   justify-self: center;
   align-self: start;
+  display: flex;
+  height: calc(3rem * var(--shieldScale));
+  justify-content: center;
+  align-items: center;
 }
 
 .shieldGroupContainer {
@@ -523,7 +529,7 @@ main#smRender.wide #postContainer {
 .bE-iconElement {
   aspect-ratio: 1 / 1;
   height: calc(3rem * var(--iconSize) / 100);
-  border: 4px solid var(--iconBorderColor);
+  border: var(--iconBorderThickness) solid var(--iconBorderColor);
   border-radius: var(--iconBorderRadius);
   background-color: var(--iconBackgroundColor);
   padding: var(--iconPadding);
@@ -1481,14 +1487,20 @@ main#smRender.wide #postContainer {
 }
 
 .bE-groupElementsCover.squarepixels {
-  background-image: repeating-conic-gradient(transparent 0% 25%, black 0% 50%);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent var(--pixelSize),
+      black var(--pixelSize)
+    ),
+    linear-gradient(transparent var(--pixelSize), black var(--pixelSize));
 }
 
 .bE-capital {
   font-size: var(--capitalSize);
 }
 
-.panel.veridian {
+.panel.square {
   --signBorderRadius: 0em !important;
   box-sizing: border-box;
   border: var(--bg-color) 0.2rem solid;
@@ -1505,4 +1517,12 @@ main#smRender.wide #postContainer {
   left: 0;
   width: 100%;
   height: 0.2rem;
+}
+
+.panelPixelOverlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
 }

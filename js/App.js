@@ -1169,20 +1169,6 @@ const App = (() => {
     redraw();
   };
 
-  const resetSelectors = () => {
-    currentlySelectedPanelGroupIndex = 0;
-    currentlySelectedPanelIndex = 0;
-    currentlySelectedSubPanelIndex = 0;
-    currentlySelectedRowIndex = 0;
-    currentlySelectedBlockIndex = 0;
-    currentlySelectedGroupIndex = -1;
-    currentlySelectedExitTabIndex = -1;
-    currentlySelectedExitTabRowIndex = -1;
-    currentlySelectedShieldIndex = -1;
-    currentlySelectedShieldGroupId = -1;
-    currentlySelectedStandardArrow = -1;
-  };
-
   // Redraw Methods
   const redrawExitTabs = (
     panel,
@@ -1396,10 +1382,7 @@ const App = (() => {
 
           return isVerticalOverlap && isHorizontalOverlap;
         })
-        .sort(
-          (a, b) =>
-            getScaledRect(a).top - getScaledRect(b).top,
-        );
+        .sort((a, b) => getScaledRect(a).top - getScaledRect(b).top);
 
       const oppositeColorRows = intersectingRows.filter((row) => {
         const blockBackgroundColor = row.dataset.blockBackgroundColor;
@@ -1423,7 +1406,10 @@ const App = (() => {
         divider.querySelector(".subDividerHolder").appendChild(dividerBlock);
       }
 
-      if (Math.abs(dividerRect.top - innerEdges.top) <= 5 && oppositeColorRows.length > 0) {
+      if (
+        Math.abs(dividerRect.top - innerEdges.top) <= 5 &&
+        oppositeColorRows.length > 0
+      ) {
         const dividerAbsElmt = document.createElement("div");
         dividerAbsElmt.className = "subdividerRect absolutePositioning";
         dividerAbsElmt.style.top = "-0.2rem";
@@ -1538,7 +1524,23 @@ const App = (() => {
 
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
-    panelElmt.className = `panel ${panel.corner.toLowerCase()}`;
+    panelElmt.className = `panel ${panel.corner.toLowerCase()} ${panel.panelAppearance.toLowerCase()}`;
+
+    if (panel.panelAppearance.includes("Pixels")) {
+      console.log(panel.panelAppearance);
+      panelElmt.style.padding = `${panel.appearancePadding}rem`;
+      panelElmt.style.border = `${panel.appearanceBorderThickness}px solid black`;
+      panelElmt.style.backgroundColor = `#444444`;
+
+      const panelOverlay = document.createElement("div");
+      panelOverlay.className = "panelPixelOverlay";
+      panelOverlay.style.background =
+        panel.panelAppearance === "Circle Pixels"
+          ? `radial-gradient(circle, transparent ${panel.appearancePixelSize}rem, black ${panel.appearancePixelSize}rem)`
+          : `linear-gradient(to right, transparent ${panel.appearancePixelSize}rem, black ${panel.appearancePixelSize}rem), linear-gradient(to bottom, transparent ${panel.appearancePixelSize}rem, black ${panel.appearancePixelSize}rem)`;
+      panelOverlay.style.backgroundSize = `${panel.appearancePixelSize * 3}rem ${panel.appearancePixelSize * 3}rem`;
+      panelElmt.appendChild(panelOverlay);
+    }
 
     panelElmt.style.setProperty(
       "--bg-color",
@@ -1963,21 +1965,51 @@ const App = (() => {
     }
 
     if (arrows.arrowMode == "standard") {
+      const createOtherSymbol = (otherSymbolType) => {
+        switch (otherSymbolType) {
+          case "actionMessage":
+            const actionMessage = new ActionMessageElement({
+              textContent: panel.sign.actionMessage,
+              fontSize: 50,
+            });
+            return actionMessage.createElement();
+          case "Quebec-Style Exit Marker":
+          case "Quebec-Style LEFT Exit Marker":
+            const otherSymbolsElmt = document.createElement("div");
+            otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol
+              .replace(/\s/g, "_")
+              .toLowerCase()}`;
+            guideArrowsElmt.appendChild(otherSymbolsElmt);
+
+            const oSNumElmt = document.createElement("div");
+            oSNumElmt.className = `oSNum`;
+            oSNumElmt.textContent = panel.sign.oSNum;
+
+            switch (oSNumElmt.textContent.length) {
+              case 1:
+              case 2:
+                oSNumElmt.classList.add("two");
+                break;
+              case 3:
+                oSNumElmt.classList.add("three");
+                break;
+              case 4:
+              case 5:
+              default:
+                oSNumElmt.classList.add("five");
+            }
+
+            otherSymbolsElmt.appendChild(oSNumElmt);
+
+            return otherSymbolsElmt;
+          default:
+            return null;
+        }
+      };
+
       const standardArrowConfig = panel.sign.arrows.standard;
       const standardVariant = standardArrowConfig.variant;
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
-      /*
-      const otherSymbolsElmt = document.createElement("div");
-      otherSymbolsElmt.className = `otherSymbols ${panel.sign.otherSymbol
-        .replace("/", "-")
-        .replace(" ", "_")
-        .toLowerCase()}`;
-      guideArrowsElmt.appendChild(otherSymbolsElmt);
-
-      const oSNumElmt = document.createElement("div");
-      oSNumElmt.className = `oSNum`;
-      otherSymbolsElmt.appendChild(oSNumElmt);
-      */
 
       const arrowContElmt = document.createElement("div");
       arrowContElmt.className = `arrowContainer`;
@@ -2047,13 +2079,69 @@ const App = (() => {
           }
           guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
 
+          let arrowIndex = 0;
+
           for (const arrow of standardArrowConfig.arrowList) {
             const arrowElement = arrow.createElement();
             if (panel.sign.lanePanelSize > 0) {
               arrowElement.style.width = panel.sign.lanePanelSize + "px";
             }
+
             arrowContElmt.appendChild(arrowElement);
+
+            if (
+              arrowIndex == panel.sign.oSArrow &&
+              panel.sign.otherSymbol != "None"
+            ) {
+              const otherSymbolElement = createOtherSymbol(
+                panel.sign.otherSymbol,
+              );
+              if (panel.sign.oSArrowPositioning == "Left") {
+                arrowElement.before(otherSymbolElement);
+              } else {
+                arrowElement.after(otherSymbolElement);
+              }
+            }
+
+            if (
+              arrowIndex == panel.sign.actionMessageArrow &&
+              panel.sign.actionMessage != ""
+            ) {
+              const actionMessage = createOtherSymbol("actionMessage");
+              if (panel.sign.actionMessagePositioning == "Left") {
+                arrowElement.before(actionMessage);
+              } else {
+                arrowElement.after(actionMessage);
+              }
+            }
+
+            arrowIndex++;
           }
+
+          if (
+            -1 == panel.sign.actionMessageArrow &&
+            panel.sign.actionMessage != ""
+          ) {
+            const actionMessage = createOtherSymbol("actionMessage");
+            if (panel.sign.actionMessagePositioning == "Left") {
+              arrowContElmt.prepend(actionMessage);
+            } else {
+              arrowContElmt.appendChild(actionMessage);
+            }
+          }
+
+          if (-1 == panel.sign.oSArrow && panel.sign.otherSymbol != "None") {
+            const otherSymbolElement = createOtherSymbol(
+              panel.sign.otherSymbol,
+            );
+
+            if (panel.sign.oSArrowPositioning == "Left") {
+              arrowContElmt.prepend(otherSymbolElement);
+            } else {
+              arrowContElmt.appendChild(otherSymbolElement);
+            }
+          }
+
           break;
         }
         case "Half Exit Only": {
@@ -2157,8 +2245,31 @@ const App = (() => {
             exitOnlyContainer.style.setProperty("--arrowJustify", "Center");
             exitOnlyContainer.style.flexDirection =
               exitOnlyConfig.exitOnlyTextPosition === "Left"
-                ? "row"
-                : "row-reverse";
+                ? "row-reverse"
+                : "row";
+
+            if (0 == panel.sign.oSArrow && panel.sign.otherSymbol != "None") {
+              const otherSymbolElement = createOtherSymbol(
+                panel.sign.otherSymbol,
+              );
+              if (panel.sign.oSArrowPositioning == "Left") {
+                arrowElement.before(otherSymbolElement);
+              } else {
+                arrowElement.after(otherSymbolElement);
+              }
+            }
+
+            if (
+              0 == panel.sign.actionMessageArrow &&
+              panel.sign.actionMessage != ""
+            ) {
+              const actionMessage = createOtherSymbol("actionMessage");
+              if (panel.sign.actionMessagePositioning == "Left") {
+                arrowElement.before(actionMessage);
+              } else {
+                arrowElement.after(actionMessage);
+              }
+            }
           } else if (
             numArrows === 1 &&
             exitOnlyConfig.exitOnlyTextPosition === "Center"
@@ -2230,7 +2341,51 @@ const App = (() => {
                   textElement.className = "SM-ExitOnlyTextElement";
                   exitOnlyContainer.appendChild(textElement);
                 }
-                exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+                const arrowClone = arrowElement.cloneNode(true);
+                exitOnlyContainer.appendChild(arrowClone);
+
+                if (
+                  i == panel.sign.oSArrow &&
+                  panel.sign.otherSymbol != "None"
+                ) {
+                  const otherSymbolElement = createOtherSymbol(
+                    panel.sign.otherSymbol,
+                  );
+                  if (panel.sign.oSArrowPositioning == "Left") {
+                    arrowClone.before(otherSymbolElement);
+                  } else {
+                    arrowClone.after(otherSymbolElement);
+                  }
+                }
+
+                if (
+                  i == panel.sign.actionMessageArrow &&
+                  panel.sign.actionMessage != ""
+                ) {
+                  const actionMessage = createOtherSymbol("actionMessage");
+                  actionMessage.style.setProperty(
+                    "--fontFamily",
+                    `"${exitOnlyConfig.fontFamily}"`,
+                  );
+                  actionMessage.style.setProperty(
+                    "--fontSize",
+                    `${exitOnlyConfig.fontSize}px`,
+                  );
+                  actionMessage.style.setProperty(
+                    "--letterSpacing",
+                    `"${exitOnlyConfig.letterSpacing}px"`,
+                  );
+                  actionMessage.style.setProperty(
+                    "--wordSpacing",
+                    `"${exitOnlyConfig.wordSpacing}px"`,
+                  );
+
+                  if (panel.sign.actionMessagePositioning == "Left") {
+                    arrowClone.before(actionMessage);
+                  } else {
+                    arrowClone.after(actionMessage);
+                  }
+                }
               }
             } else {
               for (let i = 0; i < numArrows; i++) {
@@ -2264,7 +2419,51 @@ const App = (() => {
                   textElement.className = "SM-ExitOnlyTextElement";
                   exitOnlyContainer.appendChild(textElement);
                 }
-                exitOnlyContainer.appendChild(arrowElement.cloneNode(true));
+                const arrowClone = arrowElement.cloneNode(true);
+                exitOnlyContainer.appendChild(arrowClone);
+
+                if (
+                  i == panel.sign.oSArrow &&
+                  panel.sign.otherSymbol != "None"
+                ) {
+                  const otherSymbolElement = createOtherSymbol(
+                    panel.sign.otherSymbol,
+                  );
+                  if (panel.sign.oSArrowPositioning == "Left") {
+                    arrowClone.before(otherSymbolElement);
+                  } else {
+                    arrowClone.after(otherSymbolElement);
+                  }
+                }
+
+                if (
+                  i == panel.sign.actionMessageArrow &&
+                  panel.sign.actionMessage != ""
+                ) {
+                  const actionMessage = createOtherSymbol("actionMessage");
+                  actionMessage.style.setProperty(
+                    "--fontFamily",
+                    `"${exitOnlyConfig.fontFamily}"`,
+                  );
+                  actionMessage.style.setProperty(
+                    "--fontSize",
+                    `${exitOnlyConfig.fontSize}px`,
+                  );
+                  actionMessage.style.setProperty(
+                    "--letterSpacing",
+                    `"${exitOnlyConfig.letterSpacing}px"`,
+                  );
+                  actionMessage.style.setProperty(
+                    "--wordSpacing",
+                    `${exitOnlyConfig.wordSpacing}px`,
+                  );
+
+                  if (panel.sign.actionMessagePositioning == "Left") {
+                    arrowClone.before(actionMessage);
+                  } else {
+                    arrowClone.after(actionMessage);
+                  }
+                }
               }
             }
 
@@ -2282,6 +2481,47 @@ const App = (() => {
               textElement.style.marginLeft = `-${exitOnlyConfig.gap - exitOnlyConfig.textGap}rem`;
               textElement.className = "SM-ExitOnlyTextElement";
               exitOnlyContainer.appendChild(textElement);
+            }
+          }
+
+          if (
+            -1 == panel.sign.actionMessageArrow &&
+            panel.sign.actionMessage != ""
+          ) {
+            const actionMessage = createOtherSymbol("actionMessage");
+            actionMessage.style.setProperty(
+              "--fontFamily",
+              `"${exitOnlyConfig.fontFamily}"`,
+            );
+            actionMessage.style.setProperty(
+              "--fontSize",
+              `${exitOnlyConfig.fontSize}px`,
+            );
+            actionMessage.style.setProperty(
+              "--letterSpacing",
+              `${exitOnlyConfig.letterSpacing}px`,
+            );
+            actionMessage.style.setProperty(
+              "--wordSpacing",
+              `${exitOnlyConfig.wordSpacing}px`,
+            );
+
+            if (panel.sign.actionMessagePositioning == "Left") {
+              exitOnlyContainer.prepend(actionMessage);
+            } else {
+              exitOnlyContainer.appendChild(actionMessage);
+            }
+          }
+
+          if (-1 == panel.sign.oSArrow && panel.sign.otherSymbol != "None") {
+            const otherSymbolElement = createOtherSymbol(
+              panel.sign.otherSymbol,
+            );
+
+            if (panel.sign.oSArrowPositioning == "Left") {
+              exitOnlyContainer.prepend(otherSymbolElement);
+            } else {
+              exitOnlyContainer.appendChild(otherSymbolElement);
             }
           }
 
@@ -2402,53 +2642,6 @@ const App = (() => {
           break;
         }
       }
-
-      // Bottom Symbols
-      /*
-      if (panel.sign.oSNum != "" && panel.sign.otherSymbol != "None") {
-        signElmt.style.borderBottomLeftRadius = "0";
-        signElmt.style.borderBottomRightRadius = "0";
-        signElmt.style.borderBottomWidth = "0";
-        guideArrowsElmt.style.display = "block";
-        guideArrowsElmt.style.visibility = "visible";
-        oSNumElmt.style.visibility = "visible";
-        oSNumElmt.className = `oSNum`;
-        oSNumElmt.appendChild(document.createTextNode(panel.sign.oSNum));
-        switch (panel.sign.oSNum.length) {
-          case 1:
-            oSNumElmt.className += " short";
-            break;
-          case 2:
-            oSNumElmt.className += " short";
-            break;
-          case 3:
-            oSNumElmt.className += " three";
-            break;
-          case 5:
-            oSNumElmt.className += " five";
-            break;
-          default:
-            oSNumElmt.className += " three";
-            break;
-        }
-      } else {
-        otherSymbolsElmt.style.display = "none";
-      }
-
-      switch (panel.sign.otherSymbol) {
-        case "Quebec-Style Exit Marker": //Fallthrough
-        case "Quebec-Left":
-          const markerElmt = document.createElement("object");
-          markerElmt.className = "markerImg";
-          markerElmt.type = "image/svg+xml";
-          markerElmt.data = "assets/other-symbols/QC-Exit.svg";
-          if (panel.sign.otherSymbol == "Quebec-Left") {
-            otherSymbolsElmt.className += " left";
-          }
-          otherSymbolsElmt.appendChild(markerElmt);
-        default:
-      }
-      */
     }
 
     // redraw exit tab widths
@@ -2555,17 +2748,30 @@ const App = (() => {
     if (post.panels.length > 0 && !Array.isArray(post.panels[0])) {
       post.panels = post.panels.map((panel) => [panel]);
     }
+  };
 
+  const resetSelectors = () => {
     currentlySelectedPanelGroupIndex = clamp(
       currentlySelectedPanelGroupIndex,
       0,
       post.panels.length - 1,
     );
-    currentlySelectedPanelIndex = clamp(
-      currentlySelectedPanelIndex,
-      0,
-      post.panels[currentlySelectedPanelGroupIndex]?.length - 1,
-    );
+    currentlySelectedPanelIndex =
+      clamp(
+        currentlySelectedPanelIndex,
+        0,
+        post.panels[currentlySelectedPanelGroupIndex]?.length - 1,
+      ) || 0;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+    currentlySelectedShieldGroupId = -1;
+    currentlySelectedShieldIndex = -1;
+    currentlySelectedStandardArrow = -1;
+    ColorLibrary.updateDefaultColors();
   };
 
   // i guess w ai efficiency :sob:

@@ -21,6 +21,7 @@ const FormNavigation = (() => {
     setupDropdownElements();
     setupSettings();
     setupColorHandler();
+    setupMisc();
 
     const changeEvent = new Event("change", { bubbles: true });
 
@@ -82,6 +83,8 @@ const FormNavigation = (() => {
       StorageManager.getItem("signMakerUIScale") || 1,
     );
     document.querySelector("#smSettings_uiScale").value =
+      StorageManager.getItem("signMakerUIScale") || 1;
+    document.querySelector("#smSettings_uiScaleSlider").value =
       StorageManager.getItem("signMakerUIScale") || 1;
 
     changeTheme(document.documentElement.dataset.theme);
@@ -472,7 +475,7 @@ const FormNavigation = (() => {
 
     // Guide arrow options
     const guideArrowSelectElmt = document.querySelector("#guideArrow");
-    for (const guideArrow of Sign.prototype.guideArrows) {
+    for (const guideArrow of Sign.guideArrows) {
       const display = guideArrow.split(":")[0];
       lib.appendOption(guideArrowSelectElmt, display);
     }
@@ -489,6 +492,10 @@ const FormNavigation = (() => {
         document.querySelector("#subpanelDividerHeightUnit"),
         unit,
       );
+    }
+
+    for (const appearance of Panel.panelAppearance) {
+      lib.appendOption(document.querySelector("#panelAppearance"), appearance);
     }
   };
 
@@ -711,15 +718,29 @@ const FormNavigation = (() => {
 
       if (selectedPreset == "None") {
         for (const key in ExitTab.prototype.defaultExitTabConfig) {
-          currentExitTab[key] = ExitTab.prototype.defaultExitTabConfig[key];
+          if (key == "variantSettings") {
+            const preset = currentExitTab.variant;
+            currentExitTab[key][preset.toLowerCase()] =
+              ExitTab.prototype.defaultExitTabConfig[key][preset.toLowerCase()];
+          } else {
+            currentExitTab[key] = ExitTab.prototype.defaultExitTabConfig[key];
+          }
         }
       } else {
         for (const key in isInPresetsLibrary
           ? presetsLibrary[currentExitTab.variant][selectedPreset]
           : exitTabPresets[currentExitTab.variant][selectedPreset]) {
-          currentExitTab[key] = isInPresetsLibrary
-            ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
-            : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+          if (key == "variantSettings") {
+            const preset = currentExitTab.variant;
+            currentExitTab[key][preset.toLowerCase()] =
+              exitTabPresets[currentExitTab.variant][selectedPreset][key][
+                preset.toLowerCase()
+              ];
+          } else {
+            currentExitTab[key] = isInPresetsLibrary
+              ? presetsLibrary[currentExitTab.variant][selectedPreset][key]
+              : exitTabPresets[currentExitTab.variant][selectedPreset][key];
+          }
         }
       }
 
@@ -779,6 +800,7 @@ const FormNavigation = (() => {
       document.querySelector("#sdActionMessage_textAlign"),
       document.querySelector("#sdAdvisory_textAlign"),
       document.querySelector("#sdGroup_alignment"),
+      document.querySelector("#sdIcon_alignment"),
     ];
     for (const elem of textElem_alignmentSelects) {
       for (const alignment of TextElement.alignments) {
@@ -833,14 +855,6 @@ const FormNavigation = (() => {
       lib.appendOption(eSignFontSelect, fontFamily);
     }
 
-    // Electronic sign text colors
-    const eSignColorSelect = document.querySelector(
-      "#sdElectronicSign_textColor",
-    );
-    for (const textColor of ElectronicSignElement.prototype.textColors) {
-      lib.appendOption(eSignColorSelect, textColor);
-    }
-
     for (const format of ElectronicSignElement.prototype.textFormats) {
       lib.appendOption(
         document.querySelector("#sdElectronicSign_textFormat"),
@@ -856,11 +870,10 @@ const FormNavigation = (() => {
       lib.appendOption(divider_widthMeasurement, measurement);
     }
 
-    for (const { value, label } of DividerElement.prototype.dividerColors) {
+    for (const color of DividerElement.dividerColors) {
       lib.appendOption(
         document.querySelector("#sdBlocker_dividerColor"),
-        value,
-        { text: label },
+        color,
       );
     }
 
@@ -875,8 +888,10 @@ const FormNavigation = (() => {
     }
 
     // Arrow rotation slider
-    const arrowRotationSlider = document.querySelector("#sdArrow_rotation");
-    const arrowRotationVal = document.querySelector("#sdArrow_rotationVal");
+    const arrowRotationSlider = document.querySelector(
+      "#sdArrow_rotationSlider",
+    );
+    const arrowRotationVal = document.querySelector("#sdArrow_rotation");
     arrowRotationSlider.addEventListener("input", () => {
       arrowRotationVal.value = arrowRotationSlider.value;
     });
@@ -977,7 +992,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const justify of Sign.prototype.standardArrowJustify) {
+    for (const justify of Sign.standardArrowJustify) {
       lib.appendOption(
         document.querySelector("#standardArrows_justify"),
         justify,
@@ -985,7 +1000,7 @@ const FormNavigation = (() => {
       );
     }
 
-    for (const position of Sign.prototype.exitOnlyJustify) {
+    for (const position of Sign.exitOnlyJustify) {
       lib.appendOption(
         document.querySelector("#exitOnlyTextPosition"),
         position,
@@ -1014,13 +1029,64 @@ const FormNavigation = (() => {
       });
     }
 
-    for (const borderMode of Sign.prototype.exitOnlyBorderTypes) {
+    for (const borderMode of Sign.exitOnlyBorderTypes) {
       lib.appendOption(
         document.querySelector("#exitOnlyBorderMode"),
         borderMode,
         { selected: borderMode == "Partial Black Border" },
       );
     }
+
+    for (const otherSymbol of Sign.otherSymbols) {
+      lib.appendOption(document.querySelector("#otherSymbol"), otherSymbol);
+    }
+
+    for (const positioning of Sign.otherSymbolsPositioning) {
+      lib.appendOption(
+        document.querySelector("#actionMessageArrowPositioning"),
+        positioning,
+        { selected: positioning == "Left" },
+      );
+      lib.appendOption(
+        document.querySelector("#otherSymbolArrowPositioning"),
+        positioning,
+        { selected: positioning == "Left" },
+      );
+    }
+
+    document
+      .querySelector("#sMDiagrammicOpenEditor")
+      .addEventListener("click", async () => {
+        await DiagramDrawing.promptDraw(
+          (retValue) => {
+            if (retValue) {
+              arrows.diagramData = retValue;
+              arrows.preset = "None";
+              document.querySelector("#sMDiagrammicPreset").value = "None";
+              formHandler.readForm();
+            }
+          },
+          false,
+          app.getCurrentPanel().sign.arrows.diagrammic.diagramData,
+        );
+      });
+
+    document
+      .querySelector("#sMDiagrammicOpenEditorPresets")
+      .addEventListener("click", async () => {
+        await DiagramDrawing.promptDraw(
+          (retValue) => {
+            if (retValue) {
+              arrows.diagramData = retValue;
+              arrows.preset = "None";
+              document.querySelector("#sMDiagrammicPreset").value = "None";
+              formHandler.readForm();
+            }
+          },
+          true,
+          app.getCurrentPanel().sign.arrows.diagrammic.diagramData,
+        );
+      });
   };
 
   const setupLimonEasterEgg = () => {
@@ -1916,11 +1982,23 @@ const FormNavigation = (() => {
 
     // settings navigation
     let currentTab = "General";
+    let aboutTab = "readme";
+
     const redisplayPage = () => {
       for (const page of document.querySelectorAll(
         "#signMakerSettingsContent > div",
       )) {
         if (page.id === "sMSettings_" + currentTab) {
+          page.style.display = "";
+        } else {
+          page.style.display = "none";
+        }
+      }
+
+      for (const page of document.querySelectorAll(
+        "#sMSettingsAboutPages > div",
+      )) {
+        if (page.id === "smSettingsAbout_" + aboutTab) {
           page.style.display = "";
         } else {
           page.style.display = "none";
@@ -1932,6 +2010,20 @@ const FormNavigation = (() => {
       button.addEventListener("click", () => {
         currentTab = button.id.replace("smSettingsBtn_", "");
         for (const btn of document.querySelectorAll(".smSettingsBtn")) {
+          if (btn.id === button.id) {
+            btn.classList.add("selected");
+          } else {
+            btn.classList.remove("selected");
+          }
+        }
+        redisplayPage();
+      });
+    }
+
+    for (const button of document.querySelectorAll(".smAboutBtn")) {
+      button.addEventListener("click", () => {
+        aboutTab = button.id.replace("smAboutBtn_", "");
+        for (const btn of document.querySelectorAll(".smAboutBtn")) {
           if (btn.id === button.id) {
             btn.classList.add("selected");
           } else {
@@ -1957,15 +2049,40 @@ const FormNavigation = (() => {
     document
       .querySelector("#smSettings_uiScale")
       .addEventListener("change", () => {
-        document.documentElement.style.setProperty(
-          "--uiScale",
-          parseFloat(document.querySelector("#smSettings_uiScale").value),
+        const newScale = Math.max(
+          0.5,
+          Math.min(
+            1,
+            parseFloat(document.querySelector("#smSettings_uiScale").value),
+          ),
         );
-        StorageManager.setItem(
-          "signMakerUIScale",
-          parseFloat(document.querySelector("#smSettings_uiScale").value),
-        );
+        document.documentElement.style.setProperty("--uiScale", newScale);
+        StorageManager.setItem("signMakerUIScale", newScale);
+        document.querySelector("#smSettings_uiScaleSlider").value = newScale;
+        document.querySelector("#smSettings_uiScale").value = newScale;
       });
+
+    // renderer
+    const renderREADME = async () => {
+      try {
+        const readMeContents = await fetch(
+          "https://raw.githubusercontent.com/jkpotato-computer/SignMaker/main/README.md",
+        );
+        let data = await readMeContents.text();
+
+        data = data.replaceAll(
+          "https://github.com/JKPotato-Computer/SignMaker/blob/",
+          "https://raw.githubusercontent.com/JKPotato-Computer/SignMaker/",
+        );
+
+        const readMeContainer = document.querySelector("#readMeRenderer");
+        readMeContainer.innerHTML = marked.parse(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    renderREADME();
   };
 
   let oldColorName = null;
@@ -2192,6 +2309,47 @@ const FormNavigation = (() => {
       subtree: true,
       attributeFilter: ["data-color"],
     });
+  };
+
+  const setupMisc = () => {
+    // github star counter
+    const githubStarCounter = document.querySelector("#githubStars");
+
+    const updateStarCount = async () => {
+      try {
+        const response = await fetch(
+          "https://api.github.com/repos/jkpotato-computer/SignMaker/stargazers/count",
+        );
+        const data = await response.json();
+        githubStarCounter.textContent = data.count + " ⭐";
+      } catch (error) {
+        console.error("Error fetching GitHub star count:", error);
+        githubStarCounter.textContent = "?";
+      }
+    };
+
+    updateStarCount();
+    setTimeout(updateStarCount, 10000);
+
+    // update discord count
+    const discordMemberCounter = document.querySelector("#discordMembers");
+
+    const updateDiscordCount = async () => {
+      try {
+        const response = await fetch(
+          "https://discord.com/api/v9/invites/qDeyaKTV6q?with_counts=true",
+        );
+        const data = await response.json();
+        discordMemberCounter.textContent =
+          data.approximate_member_count + " 👥";
+      } catch (error) {
+        console.error("Error fetching Discord member count:", error);
+        discordMemberCounter.textContent = "?";
+      }
+    };
+
+    updateDiscordCount();
+    setTimeout(updateDiscordCount, 10000);
   };
 
   return {

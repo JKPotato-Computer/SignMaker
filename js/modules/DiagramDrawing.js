@@ -22,6 +22,7 @@ const canvasProperties = {
   canvasHeight: ctx.canvas.width,
   laneWidth: 40,
   roadMarkingSize: 36,
+  roadMarkingWidth: 4,
 };
 
 const editorProperties = {
@@ -176,9 +177,9 @@ class Road {
       enabled: false,
       arrowHeight: 120,
       arrowWidth: 0,
-      bottomOffset: 40,
-      roundness: 5,
-      pointedTip: false,
+      bottomOffset: 20,
+      roundness: 2,
+      pointedTip: true,
       ...arrows,
     };
 
@@ -891,7 +892,7 @@ class Road {
         canvasProperties.roadMarkingSize,
       ]);
       ctx.strokeStyle = "black";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = canvasProperties.roadMarkingWidth;
 
       for (let i = 0; i < this.numLanes - 1; i++) {
         let laneStep = i - (this.numLanes - 1) / 2 + 0.5;
@@ -1145,6 +1146,8 @@ const DiagramDrawing = (() => {
       DiagrammicDrawingHolder.querySelector("#roadLaneSize").value;
     canvasProperties.roadMarkingSize =
       DiagrammicDrawingHolder.querySelector("#roadMarkingSize").value;
+    canvasProperties.roadMarkingWidth =
+      DiagrammicDrawingHolder.querySelector("#roadMarkingWidth").value;
 
     if (!selectedRoad) {
       renderDrawing();
@@ -1336,6 +1339,8 @@ const DiagramDrawing = (() => {
       canvasProperties.laneWidth;
     DiagrammicDrawingHolder.querySelector("#roadMarkingSize").value =
       canvasProperties.roadMarkingSize;
+    DiagrammicDrawingHolder.querySelector("#roadMarkingWidth").value =
+      canvasProperties.roadMarkingWidth;
 
     document.querySelector(".diagramObjectProperties").style.display =
       editorProperties.selectedRoad ? "" : "none";
@@ -1866,7 +1871,7 @@ const DiagramDrawing = (() => {
         node.subpanel.direction = null;
         for (const direction of ["left", "right", "top", "bottom"]) {
           let hitDetected = false;
-          for (let offset = 0; offset <= 100; offset += 5) {
+          for (let offset = 0; offset <= 250; offset += 5) {
             let samplePoint = new Point(node.subpanel.x, node.subpanel.y);
 
             if (direction === "left") samplePoint.x -= offset;

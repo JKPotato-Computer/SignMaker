@@ -254,7 +254,7 @@ class ControlTextElement extends TextElement {
       "ControlTextElement",
       options,
     );
-    super();
+    super(options);
     this.smallCapitals = smallCapitals;
     this.capitalSize = capitalSize;
     this.wordSpacing = wordSpacing;
@@ -288,12 +288,11 @@ class ControlTextElement extends TextElement {
 
 class ActionMessageElement extends TextElement {
   constructor(options = {}) {
-    const { fontSize, useNumeralFormatting, wordSpacing } = MUTCDVariants.get(
-      "ActionMessageElement",
-      options,
-    );
-    super();
+    const { fontSize, useNumeralFormatting, wordSpacing, fontFamily } =
+      MUTCDVariants.get("ActionMessageElement", options);
+    super(options);
     this.fontSize = fontSize;
+    this.fontFamily = fontFamily;
     this.useNumeralFormatting = useNumeralFormatting;
     this.wordSpacing = wordSpacing;
   }
@@ -319,7 +318,7 @@ class AdvisoryMessageElement extends TextElement {
       vertPadding,
       wordSpacing,
     } = MUTCDVariants.get("AdvisoryMessageElement", options);
-    super();
+    super(options);
     this.borderColor = borderColor;
     this.backgroundColor = backgroundColor;
     this.fontFamily = fontFamily;
@@ -362,7 +361,7 @@ class ElectronicSignElement extends TextElement {
       setWidth,
       wordSpacing,
     } = MUTCDVariants.get("ElectronicSignElement", options);
-    super();
+    super(options);
     this.fontFamily = fontFamily;
     this.textColor = textColor;
     this.useNumeralFormatting = false;
@@ -405,9 +404,9 @@ class ElectronicSignElement extends TextElement {
     ) {
       newText.style.background =
         this.textFormat == "Circle Pixels"
-          ? `radial-gradient(circle, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`
-          : `linear-gradient(to right, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"}), linear-gradient(to bottom, var(--textColor) ${this.formatSize + "rem"}, black ${this.formatSize + "rem"})`;
-      newText.style.backgroundSize = `${this.formatSize * 3 + "rem"} ${this.formatSize * 3 + "rem"}`;
+          ? `radial-gradient(circle, var(--textColor) ${this.formatSize}rem, black ${this.formatSize}rem)`
+          : `linear-gradient(to right, transparent ${this.formatSize}rem, black ${this.formatSize}rem), linear-gradient(to bottom, var(--textColor) ${this.formatSize}rem, black ${this.formatSize}rem)`;
+      newText.style.backgroundSize = `${this.formatSize * 3}rem ${this.formatSize * 3}rem`;
       newText.style.setProperty("--horizPadding", 0);
       newText.style.setProperty("--vertPadding", 0);
       newText.style.setProperty("--textShadow", "");
@@ -438,12 +437,6 @@ ElectronicSignElement.fontFamilies = TextElement.fontFamilies.concat([
   "Electronic Highway Sign",
   "VCR Mono",
 ]);
-ElectronicSignElement.prototype.textColors = [
-  "Orange",
-  "White",
-  "Yellow",
-  "Red",
-];
 ElectronicSignElement.prototype.textFormats = [
   "Full Text",
   "Circle Pixels",
@@ -612,10 +605,8 @@ class DividerElement {
 }
 
 DividerElement.dividerMeasurements = ["%", "rem"];
-DividerElement.prototype.dividerColors = [
-  { value: "White", label: "White" },
-  { value: "Black", label: "Black" },
-];
+DividerElement.dividerColors = ["White", "Black"];
+
 class IconElement {
   constructor(options = {}) {
     const {
@@ -626,8 +617,11 @@ class IconElement {
       backgroundColor,
       border,
       borderRadius,
+      borderThickness,
       borderColor,
       spacing,
+      alignment,
+      isSquare,
     } = MUTCDVariants.get("IconElement", options);
     this.icon = icon;
     this.iconType = iconType;
@@ -637,7 +631,10 @@ class IconElement {
     this.border = border;
     this.borderRadius = borderRadius;
     this.borderColor = borderColor;
+    this.borderThickness = borderThickness;
     this.spacing = spacing;
+    this.alignment = alignment;
+    this.isSquare = isSquare;
   }
 
   createElement() {
@@ -656,10 +653,18 @@ class IconElement {
         "--iconBorderColor",
         ColorLibrary.colorLibrary[this.borderColor] || this.borderColor,
       );
+      iconHolder.style.setProperty(
+        "--iconBorderThickness",
+        this.borderThickness + "px",
+      );
     }
 
     if (this.iconType == "custom") {
       iconHolder.style.aspectRatio = "unset";
+    }
+
+    if (this.isSquare) {
+      iconHolder.style.aspectRatio = "1 / 1";
     }
 
     iconHolder.style.setProperty(
@@ -948,7 +953,11 @@ class ArrowElement {
 
     if (
       ColorLibrary.checkForContrast(panel.color) &&
-      ColorLibrary.checkForContrast(blockProperties.backgroundColor)
+      ColorLibrary.checkForContrast(
+        blockProperties.backgroundColor == "Inherit"
+          ? panel.color
+          : blockProperties.backgroundColor,
+      )
     ) {
       arrow.style.filter = "invert(1)";
     }
@@ -1301,8 +1310,23 @@ class Control {
   addElement(element, properties, row, column) {
     let newElement = new element(properties);
     if (!this.rows[row]) {
+      const blockProperties = new Block();
+      if (row < this.rows.length - 1) {
+        blockProperties.bottomPadding = 0;
+      }
+
+      if (row > 0) {
+        blockProperties.topPadding = 0;
+        if (
+          this.blockProperties[row - 1] &&
+          this.blockProperties[row - 1].bottomPadding >= 0
+        ) {
+          this.blockProperties[row - 1].bottomPadding = 0;
+        }
+      }
+
       this.rows[row] = [];
-      this.blockProperties[row] = new Block();
+      this.blockProperties[row] = blockProperties;
     }
 
     if (column) {
@@ -1343,8 +1367,23 @@ class Control {
 
   addRow(row, element) {
     if (this.rows[row] && this.rows[row].length != 0) {
+      const blockProperties = new Block();
+      if (row < this.rows.length) {
+        blockProperties.bottomPadding = 0;
+      }
+
+      if (row > 0) {
+        blockProperties.topPadding = 0;
+        if (
+          this.blockProperties[row - 1] &&
+          this.blockProperties[row - 1].bottomPadding >= 0
+        ) {
+          this.blockProperties[row - 1].bottomPadding = 0;
+        }
+      }
+
       this.rows.splice(row, 0, []);
-      this.blockProperties.splice(row, 0, new Block());
+      this.blockProperties.splice(row, 0, blockProperties);
     }
     this.addElement(Control.prototype.blockToClassElems[element], {}, row, 0);
   }

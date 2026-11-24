@@ -417,6 +417,7 @@ document.querySelector("#importSign").addEventListener("click", async () => {
               : signContent.map((panel) => [panel]);
         }
 
+        App.resetSelectors();
         formHandler.updateForm();
         App.redraw();
       };

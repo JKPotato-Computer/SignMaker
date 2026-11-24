@@ -79,8 +79,9 @@
 
 #postContainer.postVariantRural #panelContainer {
   position: relative;
-  background-image: linear-gradient(
-     90deg,
+  background-image:
+    linear-gradient(
+      90deg,
       var(--post-color-mid) 0%,
       var(--post-color-light) 40%,
       var(--post-color-dark) 100%
@@ -92,9 +93,11 @@
       var(--post-color-dark) 100%
     );
   background-repeat: no-repeat;
-  background-size: var(--postThickness, 1rem) 20rem,
+  background-size:
+    var(--postThickness, 1rem) 20rem,
     var(--postThickness, 1rem) 20rem;
-  background-position: left 4rem bottom,
+  background-position:
+    left 4rem bottom,
     right 4rem bottom;
   margin-top: 20rem;
   height: 10rem;
@@ -245,60 +248,57 @@
   position: relative;
 }
 
-.otherSymbols {
+.otherSymbols.quebec-style_exit_marker,
+.otherSymbols.quebec-style_left_exit_marker {
   display: inline-flex;
-  flex-direction: column;
-  margin-right: auto;
-  margin-left: auto;
-  padding: 0.1rem;
-  position: relative;
-  margin-bottom: 0.5rem;
+  background-image: url("../assets/other-symbols/QC-Exit.svg");
+  background-repeat: no-repeat;
+  width: 4rem;
+  height: 2rem;
+  background-size: contain;
+  background-position: center;
+  align-items: center;
+  justify-content: left;
+  flex-direction: row;
 }
+
+.otherSymbols.quebec-style_left_exit_marker {
+  transform: scaleX(-1);
+}
+
+.otherSymbols.quebec-style_left_exit_marker .oSNum {
+  transform: scaleX(-1);
+}
+
 .oSNum {
-  /* Add .left and .right */
   font-family: "Series EM";
-  position: absolute;
-  width: 100%;
-  z-index: 1;
-  text-align: center;
-  top: 0.1rem;
-  font-size: 1.25em;
-  left: -0.3rem;
   color: black;
+  width: 80%;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+  font-size: 1.3rem;
 }
-.left .oSNum {
-  left: 0.3rem;
+
+.otherSymbols.quebec-style_exit_marker:has(.oSNum.five),
+.otherSymbols.quebec-style_left_exit_marker:has(.oSNum.five) {
+  height: 2.5rem;
+  width: 5rem;
 }
-.oSNum.short {
-  letter-spacing: 0.1rem;
+
+.oSNum.two {
+  font-family: "Series EM";
 }
-.oSNum.five {
+
+.osNum.three {
+  font-family: "Series D";
+}
+
+.osNum.five {
   font-family: "Series C";
-  top: 0.29rem;
-  font-size: 1.2em;
-}
-
-.streetName {
-  border: solid rgb(255, 255, 255) 0.15rem;
-  border-radius: 0.25rem;
-  margin-bottom: 0.5rem;
-  padding: 0 1rem;
-}
-.streetName:last-child {
-  margin-bottom: 0;
-}
-.streetName,
-.controlText {
-  font-family: "Clearview 5WR";
-  font-size: 1.75rem;
-  line-height: 2rem;
-  white-space: pre-wrap;
-}
-
-.controlText {
-  --fhwaBaselineOffset: 0px;
-  position: relative;
-  top: var(--fhwaBaselineOffset);
+  font-size: 1.15rem;
+  width: 82.5%;
+  text-wrap: nowrap;
+  letter-spacing: -0.05em;
 }
 
 .guideArrows {
@@ -317,9 +317,15 @@
 .panel:not(.round)
   .guideArrowsHolder:has(
     .guideArrows.exit_only.partial_black_border,
-    .guideArrows.exit_only.full_black_border
+    .guideArrows.exit_only.full_black_border,
+    .guideArrows.exit_only.ontario_black_border
   ) {
   background-color: var(--bgColor);
+}
+
+.panel:not(.round)
+  .guideArrowsHolder:has(.guideArrows.exit_only.ontario_black_border) {
+  padding: 0 0.2rem 0.2rem;
 }
 
 .guideArrowsHolder:has(
@@ -331,10 +337,17 @@
 }
 
 .guideArrows.exit_only.partial_black_border,
-.guideArrows.exit_only.full_black_border {
+.guideArrows.exit_only.full_black_border,
+.guideArrows.exit_only.ontario_black_border {
   border-color: inherit;
   color: inherit;
   background-color: var(--bgColor);
+}
+
+.guideArrows.exit_only.ontario_black_border {
+  border-radius: 0;
+  border-width: 0.2rem;
+  border-top: 0;
 }
 
 .guideArrows.exit_only.full_black_border {

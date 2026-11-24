@@ -53,7 +53,9 @@
       });
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
     <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script>
+
     <script src="js/presets/ExitTabPresets.js" type="text/javascript"></script>
     <script src="js/presets/TemplatePresets.js" type="text/javascript"></script>
     <script src="js/presets/MUTCDVariants.js" type="text/javascript"></script>
@@ -604,7 +606,7 @@
               value="0"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_designationYOffset">Designation Y (%):</label>
+            <label for="spShield_designationYOffset" style="display: none;" data-toolTip="Messed up the shields so this isn't working and I don't feel like fixing it... unless anyone wants to fix the designations per shield? :)">Designation Y (%):</label>
             <input
               type="number"
               id="spShield_designationYOffset"
@@ -613,6 +615,8 @@
               max="50"
               step="1"
               value="0"
+              disabled 
+              style="display: none;"
               onchange="ShieldEditor.readForm()"
             />
             <br />
@@ -757,8 +761,9 @@
                   onchange="DiagramDrawing.readForm()"
                 />
                 <br />
-                <label for="roadMarkingSize">Marking Size (px):</label>
-                <input
+                <label for="roadMarkingSize">Marking Size / Width (px):</label>
+                <div>
+                  <input
                   type="number"
                   id="roadMarkingSize"
                   min="0"
@@ -767,6 +772,17 @@
                   step="1"
                   onchange="DiagramDrawing.readForm()"
                 />
+                <span>/</span>
+                <input
+                  type="number"
+                  id="roadMarkingWidth"
+                  min="0"
+                  max="64"
+                  value="4"
+                  step="1"
+                  onchange="DiagramDrawing.readForm()"
+                />
+                </div>
               </div>
               <div class="diagramObjectList">
                 <span>Object List</span>
@@ -1173,10 +1189,13 @@
             </h2>
             <button type="button" id="signMakerSettingsClose">Close</button>
           </header>
-          <nav id="signMakerTabOptions">
-            <button class="signMakerTabOption smSettingsBtn" id="smSettingsBtn_General">General</button>
+          <nav class="signMakerTabOptions">
+            <button class="signMakerTabOption smSettingsBtn selected" id="smSettingsBtn_General">General</button>
             <button class="signMakerTabOption smSettingsBtn" id="smSettingsBtn_MUTCDVariants">
               Reference Guides
+            </button>
+            <button class="signMakerTabOption smSettingsBtn" id="smSettingsBtn_About">
+              About
             </button>
           </nav>
         </div>
@@ -1190,7 +1209,7 @@
               <button class="smSettings_userThemeBtn">Kurumi</button>
             </div>
             <label for="smSettings_uiScale">UI Scale:</label>
-            <input type="range" id="smSettings_uiScaleSlider" min=".5" max="2" step=".1" onchange="
+            <input type="range" id="smSettings_uiScaleSlider" min=".5" max="1" step=".1" onchange="
             document.getElementById('smSettings_uiScale').value = this.value;
             document.getElementById('smSettings_uiScale').dispatchEvent(new Event('change'));
             " /> 
@@ -1270,6 +1289,119 @@
               </button>
             </div>
           </div>
+          <div id="sMSettings_About">
+            <nav class="signMakerTabOptions">
+              <button class="signMakerTabOption smAboutBtn" id="smAboutBtn_readme">README</button>
+              <button class="signMakerTabOption smAboutBtn" id="smAboutBtn_credits">Credits / Contributors</button>
+              <button class="signMakerTabOption smAboutBtn" id="smAboutBtn_aiUsage">AI Usage Disclosure</button>
+            </nav>
+            <div id="sMSettingsAboutPages">
+              <div id="smSettingsAbout_readme" class="smAboutPage">
+                <div id="readMeRenderer">
+                </div>
+              </div>
+              <div id="smSettingsAbout_credits" class="smCreditsPage">
+                <span>TODO: Scroller :D</span>
+              </div>
+              <div id="smSettingsAbout_aiUsage" class="smAIUsagePage">
+                <h3>Hey, let's talk about AI for a second… and that involves sharing a backstory.</h3>
+                <img src="./assets/other-symbols/ui/NoAI.svg" alt="No AI Sticker" class="noAiSticker"/>
+                <blockquote>
+                  "I do not need AI to create a for loop that does nothing inside of it.
+                  I do not need AI to compare a boolean and a string, okay?
+                  That is MY truth, MY reality, MY decision, and I am fed up 
+                  with everyone thinking I use ChatGPT to generate 
+                  ✨real human creativity.✨" 
+                  <br />
+                  - Alberta Tech (who kind of has a semi-contradictory relationship with AI once she is sponsored… just some thoughts)
+                </blockquote>
+                <p>
+                  TL;DR: You do not get a TL;DR, I am forcing you to read my subjectively nerdy backstory and listen to my beliefs/perspectives about AI for my own entertainment. And if you don't want to, well that's too darn bad! :)
+                  <br />
+                  <small>No sections of this was generated with artificial intelligence. I am a native English speaker.</small>
+                </p>
+                <p>
+                  When I first envisioned the idea of SignMaker back in February 2022, it wasn't meant to be the "next-generation" or "successor" of 
+                  Kurumi's Sign Maker as I like to frame it as sometimes. No, I literally just wanted to add the Clearview typeface to the dki-os version 
+                  of SignMaker. Huge advocate for the Clearview font, by the way (I know it has a license to use, shush.) Anyways, I barely had web development 
+                  experience beyond a few lessons on HTML and CSS in a middle school coding class (which is basically nothing), so it took me hours to figure it out. 
+                  At last, I managed to get it working and learned how <code>@font-face</code> and web font embedding actually worked on websites. 
+                </p>
+                <img src="./assets/other-symbols/ui/speech_supplementary/Clearview.png" alt="Learning how to create @font-faces in HTML" class="clearviewImageSupplemental"/>
+                <p>
+                  And that one discovery led me the next: swapping out arrows created with characters in the Roadgeek Arrows 1 typeface with actual vector-based images, 
+                  adding secondary banners on a shield and discovering flexbox (praise the CSS Working Group), creating multi-dimensional arrays for exit and nested exit tabs, 
+                  image exporting and outsourcing work with modules, and, altogether over the span of two years, building out the version you've been familiar with before this update. I've 
+                  learned a lot in the process: understanding frontend web development and discovering my interest in urban planning alongside computer science. At the same time, I don't 
+                  believe I've discovered everything in detail: refusing to touch ReactJS (terrible, by the way), and having to face a contradiction with my love for highway signs and the harsh realities 
+                  of the Interstate Highway System. Either way, I am proud that I got to share my "sign-making" journey with y'all: seeing the signs and whole highway networks mapped out in the Discord 
+                  server, seeing projects on Roblox being built out and YouTube videos being recorded with SignMaker assets, and occasionally spotting a few uses from across the Internet. It's the main reason 
+                  why I chose to give this site a massive overhaul and dedicate <b>well over 250 to 300+ hours</b> into building SignMaker v2.2, even numerous half-asleep nights to piece together the diagrammatic editor 
+                  and exit tab system.
+                </p>
+                <img src="./assets/other-symbols/ui/speech_supplementary/DiagrammicDrawingIndevScreenshot.png" alt="Diagrammic System back in July 2026" class="diagrammicImageSupplemental"/>
+                <p>
+                  However, I'm sure you are aware of where things stand right now when it comes to the use of generative large language models, which everyone commonly umbrellas the term into "artificial intelligence" including 
+                  all the non-generative models. Now, I'm not a complete opponent of artificial intelligence (At least within the realm of coding. If it's asset, image, model, audio, or visual generation? Hell no.), and I'll be upfront: 
+                  SignMaker was partially developed with the help of AI. Setting aside the debates when it comes to the data center water usage and noise pollution, how the United States is regulating (or promoting, if you will) AI data centers, 
+                  or using AI to solve million-dollar questions like the Riemann Hypothesis and Navier-Stocks, AI, as a tool, is capable and has been proven to help speed up development in creating games, software, and recreational projects like SignMaker. 
+                  Is it inevitable that I will have to start incorporating AI to meet demands and tasks in the workforce? Probably. Is what we call the "AI bubble"  going to burst and magically free us from an AI dilemma, assuming we don't immediately undergo 
+                  an economic recession? Unlikely.
+                </p>
+                <p>
+                  But this isn't a project for the DOTs. I'm not even being paid for this. This is a hobby, a personal project that I used to learn web development. Out of respect for me, Kurumi, Brenstro, dki-os, and everyone who has built their own unique versions of 
+                  SignMaker and predating the existence of AI, I think I will follow the same project building principle. When building SignMaker v2.2, all contributors (including me) agreed to the following rule:
+                </p>
+                <p>
+                  <b>You are NOT to rely on artificial intelligence or any generative large language models as the main pilot of your code. YOU are the sole author of your code, and you respect other contributors who, too, are not using AI in their process. SignMaker is a work of authenticity, human obsession, and nerdiness - and that CANNOT be replaced by machine in any way, shape, or form.</b>
+                </p>
+                <p>
+                  It's simple: why would I let AI write awful code when I could write terrible code myself? If you are a JavaScript expert and have looked through this repository or the last version, you'd notice numerous examples: a recursive method that calls another 
+                  recursive method within itself (that ALSO calls it upwards), counting subpanels in increments of .5 instead of 1, and "raytracing" by searching 250 pixels in each direction individually for diagrammatic subpanel positioning. And my old codebase was worse: nested 
+                  exit tabs that were Exit Tab objects placed within Exit Tabs, overly complicated ways to search for "special shield variants" based on route length (that didn't even work half the time), and a terrible padding interface (seriously, who used the visual method of padding?) Sure, all of this code sucks - but that's the beauty of it. Cause I wrote it, and I can look back and say "Wow, that was a dumb decision!"
+                  Besides, why would I circumvent learning JavaScript and the basics of web development by using AI? What's the fun in building a project where I don't even get to build it myself? "Oh no, it'll be too difficult!" or "Oh no, I don't know how to build this!" Well, maybe that's the entire point. What meaning do you actually get from finishing something easy? From taking the shortcut? Just a hollow sense of completion? If all we cared about was getting a finished product through the easiest shortcut possible, why even bother having a national education system or taking AP® courses (ignoring the monopoly and graduation requirements)? Or are we replacing it with AI, too? Wait, we already are. You and I care about the outcome, but I also care about the process - and all the contributors who have made SignMaker v2.2 possible do, too.
+                </p>
+                <p>
+                  That being said, I will indicate the places where AI has been used. This is not an exhaustive list, nor does it mean that the rest of the codebase is AI-generated. I can confidently say that roughly 2-4% of the codebase has been written by AI, and if you want that number to be 0%, 
+                  consider submitting a pull request and clear out the AI remnants yourself. Much appreciated. :)
+                  <ul>
+                    <li>MUTCD Variants (transferring over them and creating the merge logic, though I modified it to fit with my program's standards)</li>
+                    <li>Custom Images</li>
+                    <li>Undo/Redo specifically with preserving <code>current...</code> variable history</li>
+                    <li>Divider/Border coloring, but specifically the "getBoundingClientRect()" portions</li>
+                    <li>Shield Directory (converting the directory in assets/shields over to shieldDirectory)</li>
+                    <li>Exit Tab System (specifically writing all the variables into inputs and back)</li>
+                    <li>A few Regexes, but most of them I wrote myself</li>
+                    <li>Anything that could possibly be made with the use of the GitHub Student Plan (so autocomplete, practically). What, do you think money grows on binary search trees? Why would I pay $20 a month for something to write the same terrible code as me, but I can't even read it?</li>
+                  </ul>
+                </p>
+                <p>
+                  Let me make this clear: <b>your opinions about AI usage will not change how I build SignMaker.</b> If you want to fork my repository to build an entirely AI generated version of SignMaker, go out to others bragging about how much effort you put into and shaming prior work, crown yourself as a 
+                  "community reviver," and believe that you are saving me time with your 150k+ code repository, then by all means - go for it. Just remember this: <a href="https://media.cadc.uscourts.gov/opinions/docs/2025/03/23-5233.pdf">Thaler v. Perlmutter (2025)</a> - AI slop is not grounds for copyright protection, 
+                  and you should probably give me credit. Don't ask me to give you credit though: you have zero grounds for it. Besides, you didn't build SignMaker. You didn't code SignMaker. AI coded SignMaker for you. You stole AI's work and ran with the credit. If you truly cared and were so "passionate" and "for the community", 
+                  you'd make sure that both the product and the underlying code could be expanded upon in the future for generations to come, right? Clean, readable code that you worked hard to authentically write, understand, and develop over the span of two years, and not just turn it into a 150k+ line codebase of unreadable slop 
+                  that I doubt you even understand yourself, right? And you expect, no, REQUIRE me to approve your "contribution" and give you the upmost fanfare and fame because of how much "work" you put in, right? Until you prove to me that you understand every corner of your code without having to be [dependent on] an AI agent, 
+                  I don't care about your opinion. And by the way, don't even bother sneaking into my spaces to do so either - especially don't spam 243 invite links in my Discord server as "retaliation." Sorry, not sorry. (Also, search up what the GNU License stands for before you use that against me.)
+                </p>
+                <p>
+                  If you actually want to contribute to SignMaker, by all means feel free to! Contributions are open to everyone, and every pull request will be manually reviewed by us. As stated in our server, these are our exact guidelines:
+                  <ul>
+                    <li>AUTHENTICITY: All submitted pull requests must NOT be entirely AI-generated / "vibecoded". While this ruling is entirely subjective, the baseline is: your code may be AI-assisted and written with the help of AI; however, AI should not have taken full lead of your code submission. A project maintainer should be able to read your code without any complications given a reasonable amount of time.</li>
+                    <li>LENGTH: Pull requests should generally focus on 1-3 features and not attempt to restructure entire codebases to implement features. IF the latter case is proven to be necessary, your code will REALLY be reviewed in detail before any  approval is made.</li>
+                    <li>DESCRIPTION: ALL changes MUST be highlighted directly on the pull request on GitHub, NOT in a Discord message unless given permission to do so. Both would be preferable, but the former is required.</li>
+                  </ul>
+                </p>
+                <p>
+                  This is how SignMaker will be built and maintained, and how pull requests will work. AI is purely a tool, it is not something that can replace human creativity or  human suffering. It sounds sad that I want to suffer by writing in JavaScript. Trust me, it sucks (but it's not as bad as Java). But I'd rather take ownership of my awful code than let someone else do it for me, because then I'd at least have a 
+                  good reason to laugh at myself about years later. I hope that my codebase helps beginners like me learn from a repository that (mostly) makes logical sense and is straightforward, just like how I learned web development from the dki-os version of SignMaker. So to all the past maintainers, thank you for putting in time, work, and effort to build a solid foundation that made this version of SignMaker possible. 
+                  And if you didn't just scroll all the way to the end or ping me with a "not reading allat" GIF in the server, thank you for taking the time to read this. <b>Keep challenging yourself, strive to learn, and use tools to support your education path, because at the end of the day, the people that will come ahead of the AI crisis and, when the bubble eventually bursts and we are sent to the pre-AI "Stone Age", are those who have the skills to build it out from scratch.</b>
+                </p>
+                <p>
+                  - JK_Potato / Computer (11/22/2026)
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </dialog>
     </div>
@@ -1324,7 +1456,7 @@
                 min="0"
                 step=".01"
                 value="1"
-                onblur="formHandler.readForm()"
+                onchange="formHandler.readForm()"
               />
               <label for="postCornerRadius" id="postCornerRadiusLabel"
                 >Corner Radius (%):</label
@@ -1336,7 +1468,7 @@
                 max="50"
                 step="1"
                 value="30"
-                onblur="formHandler.readForm()"
+                onchange="formHandler.readForm()"
               />
               <br />
               <label for="showPost"> Post Visibility:</label>
@@ -1368,7 +1500,7 @@
                 min=".5"
                 step=".01"
                 value="1"
-                onblur="formHandler.readForm()"
+                onchange="formHandler.readForm()"
               />
             </div>
           </div>
@@ -1392,6 +1524,22 @@
           <div class="sMModalContent">
             <div id="sMPanelAppearance">
               <div>
+                <label for="panelAppearance">Panel Appearance: </label>
+                <select
+                  id="panelAppearance"
+                  onchange="formHandler.readForm()"
+                ></select>
+                <div id="panelAppearanceOptions">
+                  <label for="appearanceBorderThickness">Border Thickness (px):</label>
+                  <input type="number" min="0" id="appearanceBorderThickness" step="1" onchange="formHandler.readForm()" />
+                  <br />
+                  <label for="appearancePadding">Padding (rem):</label>
+                  <input type="number" min="0" id="appearancePadding" step=".01" onchange="formHandler.readForm()" />
+                  <br />
+                  <label for="appearancePixelSize">Pixel Size (rem):</label>
+                  <input type="number" min="0" id="appearancePixelSize" step=".001" onchange="formHandler.readForm()" />
+                </div>
+                <br />
                 <label for="panelColor">Panel Color: </label>
                 <button type="button" id="panelColor" class="smColorDropdownButton" data-color="Green">Green</button>
                 <br />
@@ -1410,7 +1558,7 @@
                   min="0"
                   max="5"
                   step=".05"
-                  onblur="formHandler.readForm()"
+                  onchange="formHandler.readForm()"
                 />
                 <br />
                 <label for="panelLaneSize">Lane Size (px):</label>
@@ -1698,6 +1846,8 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
+                <fieldset>
+                  <legend>Icon Settings</legend>
                 <label for="sMET_variantIconSizeSlider">Icon Size (rem):</label>
                 <input
                   type="range"
@@ -1787,19 +1937,22 @@
                     onchange="formHandler.readForm()"
                   />
                 </div>
-                <label for="sMET_variantOnlyHorizontalPadding">
-                  ONLY Padding (rem):</label
-                >
-                <input
-                  type="number"
-                  id="sMET_variantOnlyHorizontalPadding"
-                  
-                  min="0"
-                  step="0.05"
-                  value="0.25"
-                  onchange="formHandler.readForm()"
-                />
-                <label for="sMET_variantPbmPadding">Text Padding (rem):</label>
+                </fieldset>
+                <fieldset>
+                  <legend>Addon Settings</legend>
+                  <label for="sMET_variantOnlyHorizontalPadding">
+                    ONLY Horizontal Padding (rem):</label
+                  >
+                  <input
+                    type="number"
+                    id="sMET_variantOnlyHorizontalPadding"
+                    
+                    min="0"
+                    step="0.05"
+                    value="0.25"
+                    onchange="formHandler.readForm()"
+                  />
+                  <label for="sMET_variantPbmPadding">Text Padding (rem):</label>
                 <input
                   type="number"
                   id="sMET_variantPbmPadding"
@@ -1838,6 +1991,7 @@
                   />
                   Underline
                 </label>
+                </fieldset>
               </fieldset>
               <fieldset id="smET_FullLeftVariant" class="hidden">
                 <legend>Full Left</legend>
@@ -1930,8 +2084,9 @@
                   step=".01"
                   onchange="formHandler.readForm()"
                 />
-
-                <br />
+                <fieldset>
+                  <legend>LEFT Formatting</legend>
+                   
                 <label for="smET_partialLeftHorizontalPaddingSlider"
                   >Horizontal Padding (rem):</label
                 >
@@ -2027,6 +2182,7 @@
                   step="1"
                   onchange="formHandler.readForm()"
                 />
+                </fieldset>
               </fieldset>
               <fieldset id="smET_HOVVariant1Variant" class="hidden">
                 <legend>HOV Variant 1</legend>
@@ -2254,7 +2410,7 @@
                   
                   value="0"
                   step="0.1"
-                  oninput="formHandler.readForm();
+                  onchange="formHandler.readForm();
                   "
                 />
 
@@ -3168,7 +3324,7 @@
                     <label for="sdBlocker_alignment">Alignment: </label>
                     <select id="sdBlocker_alignment"></select>
                     <br />
-                    <label for="sdBlocker_fullBleed">Full Width:</label>
+                    <label for="sdBlocker_fullBleed">Include Block Padding in Width:</label>
                     <input type="checkbox" id="sdBlocker_fullBleed" />
                     <label for="sdBlocker_visible">Visibility:</label>
                     <input type="checkbox" id="sdBlocker_visible" />
@@ -3250,30 +3406,6 @@
                     <label for="sdAdvisory_textAlign">Text Alignment:</label>
                     <select id="sdAdvisory_textAlign"></select>
                     <br />
-                    <label for="sdAdvisory_borderRadius"
-                      >Roundness (px):
-                    </label>
-                    <input
-                      type="number"
-                      id="sdAdvisory_borderRadius"
-                      placeholder="4"
-                      max="16"
-                      min="0"
-                      step="1"
-                      value="4"
-                    />
-                    <label for="sdAdvisory_border">Border: </label>
-                    <input type="checkbox" id="sdAdvisory_border" />
-                    <input
-                      type="number"
-                      id="sdAdvisory_borderWidth"
-                      data-toolTip="Border Width (px)"
-                      min="0"
-                      step="1"
-                      class="hidden"
-                    />
-                    <button type="button" id="sdAdvisory_borderColor" class="smColorDropdownButton hidden" data-color="White">White</button>
-                    <br />
                     <label for="sdAdvisory_useNumeralFormatting"
                       >Enlarge Numerals:</label
                     >
@@ -3329,7 +3461,33 @@
                       value="120"
                     />
                     <br />
-                    <label for="sdAdvisory_horizPaddingSlider"
+                    <fieldset>
+                      <legend>Container Settings</legend>
+                      <label for="sdAdvisory_borderRadius"
+                      >Roundness (px):
+                    </label>
+                    <input
+                      type="number"
+                      id="sdAdvisory_borderRadius"
+                      placeholder="4"
+                      max="16"
+                      min="0"
+                      step="1"
+                      value="4"
+                    />
+                    <label for="sdAdvisory_border">Border: </label>
+                    <input type="checkbox" id="sdAdvisory_border" />
+                    <input
+                      type="number"
+                      id="sdAdvisory_borderWidth"
+                      data-toolTip="Border Width (px)"
+                      min="0"
+                      step="1"
+                      class="hidden"
+                    />
+                    <button type="button" id="sdAdvisory_borderColor" class="smColorDropdownButton hidden" data-color="White">White</button>
+                    <br />
+<label for="sdAdvisory_horizPaddingSlider"
                       >Horizontal Padding (rem):
                     </label>
                     <input
@@ -3366,6 +3524,7 @@
                       value=".3"
                       step="0.1"
                     />
+                    </fieldset>
                   </div>
 
                   <div data-property="sdIcon" class="hidden">
@@ -3420,8 +3579,6 @@
                       step="1"
                       value="100"
                     />
-                    <br />
-
                     <label for="sdIcon_backgroundColor">BG Color: </label>
                     <button type="button" id="sdIcon_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                     <br />
@@ -3438,7 +3595,16 @@
                       placeholder="4"
                       step="1"
                       min="0"
-                      max="8"
+                    />
+                    <input
+                      type="number"
+                      id="sdIcon_borderThickness"
+                      data-toolTip="Thickness"
+                      class="sdTextEditorSmall"
+                      value="4"
+                      placeholder="4"
+                      step="1"
+                      min="0"
                     />
                     <br />
 
@@ -3451,6 +3617,11 @@
                       value="4"
                       placeholder="4"
                     />
+                    <label for="sdIcon_isSquare">Square Image:</label>
+                    <input type="checkbox" id="sdIcon_isSquare" />
+                    <br />
+                    <label for="sdIcon_alignment">Alignment:</label>
+                    <select id="sdIcon_alignment"></select>
                   </div>
 
                   <div data-property="sdBeacon" class="hidden">
@@ -4016,23 +4187,28 @@
                       step="0.01"
                     />
                     <label for="sdElectronicSign_textColor">Text Color:</label>
-                    <select id="sdElectronicSign_textColor"></select>
+                    <button class="smColorDropdownButton" data-color="Orange" id="sdElectronicSign_textColor"></button>
                     <br />
-                    <label for="sdElectronicSign_textFormat">Format:</label>
-                    <select id="sdElectronicSign_textFormat"></select>
-                    <input
-                      type="number"
-                      id="sdElectronicSign_formatSize"
-                      min="0"
-                      step=".01"
-                      value=".1"
-                      class="sdTextEditorSmall"
-                      data-toolTip="Pixel Size (px)"
-                    />
                     <label for="sdElectronicSign_glow">Glow:</label>
                     <input type="checkbox" id="sdElectronicSign_glow" />
                     <br />
-                    <label for="sdElectronicSign_vertPaddingSlider"
+                    <fieldset>
+                      <legend>Container Formatting</legend>
+                       <label for="sdElectronicSign_textFormat">Format:</label>
+                      <select id="sdElectronicSign_textFormat"></select>
+                      <input
+                        type="number"
+                        id="sdElectronicSign_formatSize"
+                        min="0"
+                        step=".01"
+                        value=".1"
+                        class="sdTextEditorSmall"
+                        data-toolTip="Pixel Size (px)"
+                      />
+                      <label for="sdElectronicSign_alignment">Alignment: </label>
+                      <select id="sdElectronicSign_alignment"></select>
+                      <br />
+                       <label for="sdElectronicSign_vertPaddingSlider"
                       >Vertical Padding (rem):
                     </label>
                     <input
@@ -4083,8 +4259,7 @@
                       step=".5"
                       value="0"
                     />
-                    <label for="sdElectronicSign_alignment">Alignment: </label>
-                    <select id="sdElectronicSign_alignment"></select>
+                    </fieldset>
                   </div>
 
                   <div data-property="sdGroup" class="hidden">
@@ -4918,7 +5093,8 @@
                   id="exitOnlyRoundCorners"
                   onchange="formHandler.readForm()"
                 />
-
+              </div>
+              <div id="otherBottomSymbols">
                 <hr />
                 <label for="otherSymbol">Other Bottom Symbol:</label>
                 <select
@@ -4931,25 +5107,42 @@
                   
                   placeholder="Exit Num"
                   data-toolTip="Exit Number"
-                  onblur="formHandler.readForm()"
+                  style="display: none;"
+                  oninput="formHandler.readForm()"
                 />
+                <div id="otherSymbolPositioning" class="hidden">
+                  <label for="otherSymbolPlacement">Placement:</label>
+                  <select
+                    id="otherSymbolPlacement"
+                    onchange="formHandler.readForm()"
+                  ></select>
+                  <label for="otherSymbolArrowPositioning">Arrow Positioning:</label>
+                  <select
+                    id="otherSymbolArrowPositioning"
+                    onchange="formHandler.readForm()"
+                  ></select>
+                </div>
                 <br />
-                <label for="additionalActionMessage">Action Message:</label>
+                <label for="additionalActionMessage">Additional Action Message:</label>
                 <input
                   type="text"
                   id="additionalActionMessage"
                   
                   placeholder="Action Message"
-                  onblur="formHandler.readForm()"
+                  oninput="formHandler.readForm()"
                 />
-                <select
-                  id="actionMessagePlacement"
-                  data-toolTip="Placement"
-                ></select>
-                <select
-                  id="actionMessageArrowPositioning"
-                  data-toolTip="Arrow Positioning"
-                ></select>
+                <div id="actionMessagePositioning" class="hidden">
+                  <label for="actionMessagePlacement">Placement:</label>
+                  <select
+                    id="actionMessagePlacement"
+                    onchange="formHandler.readForm()"
+                  ></select>
+                  <label for="actionMessageArrowPositioning">Arrow Positioning:</label>
+                  <select
+                    id="actionMessageArrowPositioning"
+                    onchange="formHandler.readForm()"
+                  ></select>
+                </div>
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">
@@ -5252,15 +5445,25 @@
           href="https://github.com/JKPotato-Computer/SignMaker"
           target="_blank"
         >
-          <span class="material-symbols-outlined">folder_code</span>GitHub
-          Page</a
-        >
-        <a
-          href="https://github.com/JKPotato-Computer/SignMaker/wiki"
+        <div>
+          <img src="./assets/other-symbols/ui/GitHub.svg" class="iconLink"/>
+        <span>Github Repo</span>
+        
+        </div>
+        <div id="githubStars">0</div>
+      </a>
+      <a
+          href="https://discord.gg/qDeyaKTV6q"
           target="_blank"
+          class="discordInvite"
         >
-          <span class="material-symbols-outlined">docs</span>Documentation</a
-        >
+        <div>
+          <img src="./assets/other-symbols/ui/Discord.svg" class="iconLink"/>
+        <span>Discord Server</span>
+        
+        </div>
+        <div id="discordMembers">0</div>
+      </a>
       </div>
     </footer>
 

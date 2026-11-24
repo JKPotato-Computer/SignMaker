@@ -7,10 +7,11 @@
 
 :root[data-theme="kurumi"] .sMConfigOption {
   background: #f0f0f0;
+  font-family: unset;
 }
 
-:root[data-theme="kurumi"] .sMConfigOption {
-  font-family: unset;
+:root[data-theme="kurumi"] .sMConfigOption.selected {
+  background: var(--selectedColor);
 }
 
 :root[data-theme="kurumi"] #panelSelect {
@@ -26,7 +27,6 @@
   border-top: 3px ridge #e4e4e4;
   background-color: #f0f0f0;
   box-shadow: inset 0px 0px 0 2px #e6e6e6;
-  padding: 0.25rem 0.5rem;
 }
 
 :root[data-theme="kurumi"] #sMConfigBar,
@@ -153,6 +153,7 @@
   background: transparent;
   padding: 0 8px;
   color: blue;
+  margin-left: 1.5rem;
 }
 
 :root[data-theme="kurumi"] fieldset {
@@ -234,4 +235,10 @@
   border-left: 3px groove #ffffff;
   border-top: 3px groove #ffffff;
   box-shadow: inset 0 0 0 2px #e6e6e6;
+}
+
+:root[data-theme="kurumi"] select,
+:root[data-theme="light"] select {
+  background: rgb(240, 240, 240) url("../assets/other-symbols/select_inv.svg")
+    no-repeat right;
 }
