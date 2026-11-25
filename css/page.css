@@ -7,6 +7,8 @@
   --baseColor: 255, 255, 255;
   --baseColorInv: 0, 0, 0;
   --inputColor: 240, 240, 240;
+  --linkColor: rgb(0, 0, 238);
+  --visitedLinkColor: rgb(85, 26, 139);
 }
 
 :root[data-theme="dark"] {
@@ -18,6 +20,8 @@
   --baseColor: 0, 0, 0;
   --baseColorInv: 255, 255, 255;
   --inputColor: 15, 15, 15;
+  --linkColor: #d3daec;
+  --visitedLinkColor: #cdc5e6;
 }
 
 :root[data-theme="kurumi"] {
@@ -29,6 +33,8 @@
   --baseColor: 255, 255, 255;
   --baseColorInv: 0, 0, 0;
   --inputColor: 240, 240, 240;
+  --linkColor: rgb(0, 0, 238);
+  --visitedLinkColor: rgb(85, 26, 139);
 }
 
 * {
@@ -264,4 +270,12 @@ a.discordInvite:hover {
 hr {
   border-style: solid;
   color: rgb(var(--baseColor));
+}
+
+#sMSettings_About a {
+  color: var(--linkColor);
+}
+
+#sMSettings_About a:visited {
+  color: var(--visitedLinkColor);
 }
