@@ -1272,83 +1272,92 @@ const formHandler = (() => {
       }
     }
 
-    document.querySelector("#sdBlock_topPaddingSlider").value =
+    const currentBlockProperties =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
-      ].topPadding;
-
-    document.querySelector("#sdBlock_bottomPaddingSlider").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].bottomPadding;
-
-    document.querySelector("#sdBlock_leftPaddingSlider").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].leftPadding;
-    document.querySelector("#sdBlock_rightPaddingSlider").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].rightPadding;
-
-    document.querySelector("#sdBlock_topPadding").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].topPadding;
-    document.querySelector("#sdBlock_bottomPadding").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].bottomPadding;
-
-    document.querySelector("#sdBlock_leftPadding").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].leftPadding;
-    document.querySelector("#sdBlock_rightPadding").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].rightPadding;
-
-    document.querySelector("#sdBlock_topMarginSlider").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].topMargin;
-    document.querySelector("#sdBlock_bottomMarginSlider").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].bottomMargin;
-
-    document.querySelector("#sdBlock_topMargin").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].topMargin;
-    document.querySelector("#sdBlock_bottomMargin").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].bottomMargin;
-
-    document.querySelector("#sdBlock_backgroundColor").dataset.color =
+      ];
+    const bgColor =
       app.getCurrentBlockElements().blockProperties[
         app.vars.currentlySelectedRowIndex
       ].backgroundColor;
+    const contrastColor = ColorLibrary.checkForContrast(
+      bgColor === "Initial" ? panel.color : bgColor,
+    )
+      ? "black"
+      : "white";
+
+    document.querySelector("#blockPreview").style.backgroundColor =
+      contrastColor === "black" ? "white" : "black";
+    document.querySelector("#blockPreview_blockItself").style.backgroundColor =
+      ColorLibrary.colorLibrary[
+        bgColor === "Inherit" ? panel.color : bgColor
+      ] || "white";
+    document.querySelector("#blockPreview_blockItself").style.borderColor =
+      contrastColor;
+    document.querySelector(
+      "#blockPreview_contentItself",
+    ).style.backgroundColor =
+      contrastColor === "black" ? "rgb(0,0,0,.25)" : "rgb(255,255,255,.25)";
+    document.querySelector("#blockPreview_paddingTop").style.height =
+      currentBlockProperties.topPadding + "rem";
+    document.querySelector("#blockPreview_paddingLeft").style.width =
+      currentBlockProperties.rightPadding + "rem";
+    document.querySelector("#blockPreview_paddingRight").style.width =
+      currentBlockProperties.leftPadding + "rem";
+    document.querySelector("#blockPreview_paddingBottom").style.height =
+      currentBlockProperties.bottomPadding + "rem";
+    document.querySelector("#blockPreview_marginTop").style.height =
+      currentBlockProperties.topMargin + "rem";
+    document.querySelector("#blockPreview_marginBottom").style.height =
+      currentBlockProperties.bottomMargin + "rem";
+    document.querySelector("#blockPreview_marginTop").style.width =
+      `${5 + parseFloat(currentBlockProperties.leftPadding) + parseFloat(currentBlockProperties.rightPadding)}rem`;
+    document.querySelector("#blockPreview_marginBottom").style.width =
+      `${5 + parseFloat(currentBlockProperties.leftPadding) + parseFloat(currentBlockProperties.rightPadding)}rem`;
+
+    document.querySelector("#sdBlock_topPaddingSlider").value =
+      currentBlockProperties.topPadding;
+
+    document.querySelector("#sdBlock_bottomPaddingSlider").value =
+      currentBlockProperties.bottomPadding;
+
+    document.querySelector("#sdBlock_leftPaddingSlider").value =
+      currentBlockProperties.leftPadding;
+    document.querySelector("#sdBlock_rightPaddingSlider").value =
+      currentBlockProperties.rightPadding;
+
+    document.querySelector("#sdBlock_topPadding").value =
+      currentBlockProperties.topPadding;
+    document.querySelector("#sdBlock_bottomPadding").value =
+      currentBlockProperties.bottomPadding;
+
+    document.querySelector("#sdBlock_leftPadding").value =
+      currentBlockProperties.leftPadding;
+    document.querySelector("#sdBlock_rightPadding").value =
+      currentBlockProperties.rightPadding;
+
+    document.querySelector("#sdBlock_topMarginSlider").value =
+      currentBlockProperties.topMargin;
+    document.querySelector("#sdBlock_bottomMarginSlider").value =
+      currentBlockProperties.bottomMargin;
+
+    document.querySelector("#sdBlock_topMargin").value =
+      currentBlockProperties.topMargin;
+    document.querySelector("#sdBlock_bottomMargin").value =
+      currentBlockProperties.bottomMargin;
+
+    document.querySelector("#sdBlock_backgroundColor").dataset.color =
+      currentBlockProperties.backgroundColor;
 
     document.querySelector("#sdBlock_width").value =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].width;
+      currentBlockProperties.width;
 
     document.querySelector("#sdBlock_stretchLeft").checked =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].stretchLeft;
+      currentBlockProperties.stretchLeft;
     document.querySelector("#sdBlock_stretchCenter").checked =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].stretchCenter;
+      currentBlockProperties.stretchCenter;
     document.querySelector("#sdBlock_stretchRight").checked =
-      app.getCurrentBlockElements().blockProperties[
-        app.vars.currentlySelectedRowIndex
-      ].stretchRight;
+      currentBlockProperties.stretchRight;
 
     updateGuideArrowsSubform();
 
@@ -1767,9 +1776,7 @@ const formHandler = (() => {
       currentExitTab.offsetNonNumerals;
     document.querySelector("#smET_useTrimFormat").checked =
       currentExitTab.useTrimFormat;
-    document.querySelector("#smET_lineHeight").disabled =
-      currentExitTab.useTrimFormat;
-    document.querySelector("#smET_lineHeight").disabled =
+    document.querySelector("#sMET_lineHeight").disabled =
       currentExitTab.useTrimFormat;
     document.querySelector("#sMET_fontFamily").value =
       currentExitTab.fontFamily;
@@ -1849,6 +1856,53 @@ const formHandler = (() => {
       } else {
         elem.classList.add("hidden");
       }
+    }
+
+    const isHOVVariant1 = currentExitTab.variant === "HOVVariant1";
+    const exitTabFieldsets = document.querySelectorAll(
+      "#sMET_VariantProperties fieldset, #sMExitTabProperties > fieldset",
+    );
+    const borderFieldset = Array.from(
+      document.querySelectorAll("#sMExitTabProperties > fieldset"),
+    ).find(
+      (fieldset) =>
+        fieldset.querySelector("legend").textContent.trim() === "Border",
+    );
+    const shieldsFieldset = Array.from(
+      document.querySelectorAll("#sMExitTabProperties > fieldset"),
+    ).find(
+      (fieldset) =>
+        fieldset.querySelector("legend").textContent.trim() === "Shields",
+    );
+
+    for (const fieldset of exitTabFieldsets) {
+      const isAvailable = !isHOVVariant1 || fieldset === borderFieldset;
+      fieldset.disabled = !isAvailable;
+      fieldset.style.display = isAvailable ? "" : "none";
+    }
+
+    if (shieldsFieldset && currentExitTab.variant === "Icon") {
+      shieldsFieldset.style.display = "none";
+    }
+
+    if (isHOVVariant1) {
+      document.querySelector("#sMET_textContent").disabled = true;
+      document.querySelector("#smET_subTextContent").disabled = true;
+    }
+
+    const iconDisabledInputIds = [
+      "sMET_numeralLetterSpacingSlider",
+      "sMET_numeralLetterSpacing",
+      "sMET_enlargeNumerals",
+      "sMET_enlargeNumeralsSize",
+      "sMET_spaceLettersNumerals",
+      "sMET_offsetNonNumerals",
+      "sMET_numeralWordSpacingSlider",
+      "sMET_numeralWordSpacing",
+    ];
+    for (const inputId of iconDisabledInputIds) {
+      document.querySelector(`#${inputId}`).disabled =
+        currentExitTab.variant === "Icon";
     }
 
     if (currentExitTab.variant == "PartialLeft") {

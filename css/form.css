@@ -337,7 +337,7 @@ fieldset {
 
 #sMET_subTextContent,
 #sMET_textContent {
-  width: 40%;
+  width: 39%;
   margin-bottom: 1rem;
 }
 
@@ -1672,7 +1672,91 @@ div#subPanelList {
 }
 
 #smSPBlockProperties > div {
-  width: 49%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#blockPreview {
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: stretch;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+#blockSpacingSettings {
+  flex-grow: 1;
+  height: stretch;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+#blockPreview_blockItself {
+  display: grid;
+  border: 1px solid black;
+  grid-template-areas: "1 top 2" "left content right" "3 bottom 4";
+}
+
+#blockPreview_paddingTop,
+#blockPreview_paddingLeft,
+#blockPreview_paddingRight,
+#blockPreview_paddingBottom {
+  background-color: rgb(0, 0, 255, 0.5);
+}
+
+#blockPreview_paddingTop.focus,
+#blockPreview_paddingLeft.focus,
+#blockPreview_paddingRight.focus,
+#blockPreview_paddingBottom.focus {
+  background-color: rgb(0, 0, 255, 1);
+}
+
+#blockPreview_marginTop,
+#blockPreview_marginBottom {
+  background-color: rgb(255, 170, 0, 0.5);
+}
+
+#blockPreview_marginTop.focus,
+#blockPreview_marginBottom.focus {
+  background-color: rgb(255, 170, 0, 1);
+}
+
+#blockPreview_paddingTop {
+  grid-area: top;
+  width: 100%;
+}
+
+#blockPreview_paddingLeft {
+  grid-area: left;
+  height: 100%;
+}
+
+#blockPreview_paddingRight {
+  grid-area: right;
+  height: 100%;
+}
+
+#blockPreview_paddingBottom {
+  grid-area: bottom;
+  width: 100%;
+}
+
+#blockPreview_contentItself {
+  grid-area: content;
+  width: 5rem;
+  height: 2.5rem;
+}
+
+#blockSpacingSettings > div {
+  width: 100%;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -3543,4 +3627,8 @@ input#additionalActionMessage {
 
 .resetOptions > button {
   padding: 0.5rem 1rem;
+}
+
+#blockSpacingSettings > div > div > input[type="range"] {
+  width: 50%;
 }

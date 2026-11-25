@@ -519,7 +519,7 @@ const MUTCDVariants = (() => {
       VariantInfo: {
         FullName:
           "NVUTCDG: North Veridian Universal Traffic Control Device Guidelines",
-        Tags: ["NVUTCDG"],
+        Tags: ["NVUTCDG", "Veridia", "Selenitia"],
         ColorPalette: {
           Green: "#004040",
           Blue: "#002f6c",
@@ -529,6 +529,7 @@ const MUTCDVariants = (() => {
           Orange: "#e57200",
           Red: "#af272f",
           Coral: "#df4661",
+          "Light Blue": "#3957b8",
         },
       },
       APLArrow: {
@@ -547,7 +548,7 @@ const MUTCDVariants = (() => {
         tagToReplace: ["exitTextContent", "exitBGColor", "fontFamily"],
       },
       StandardArrow: {
-        arrow: "TYPE_A",
+        arrow: "TYPE_B",
         rotation: 180,
         size: 1.75,
         marginHorizontal: 0,
@@ -561,9 +562,9 @@ const MUTCDVariants = (() => {
         sign: null,
         color: "Purple",
         exitTabs: [],
-        corner: "Square",
+        corner: "Double-Struck",
         borderRadius: 0.0,
-        tagToReplace: ["color"],
+        tagToReplace: ["color", "corner", "borderRadius"],
       },
       Sign: {
         arrows: {
@@ -601,7 +602,7 @@ const MUTCDVariants = (() => {
                 marginVertical: 0,
                 flip: false,
               },
-              numArrows: 0,
+              numArrows: 1,
               gap: 4,
               textGap: 0.5,
               displayOutsideArrow: true,
@@ -710,7 +711,7 @@ const MUTCDVariants = (() => {
         variant: "Normal",
         variantSettings: {
           icon: {
-            icon: "AIRPORT",
+            icon: "AIRPORT (VERIDIA)",
             iconType: "preset",
             iconData: "",
             tollIcon: "VeriTag",
@@ -774,19 +775,20 @@ const MUTCDVariants = (() => {
         shieldName: "Interlink",
         shieldValue: "ILG",
         variant: "Auto",
+        shieldBackColor: "White",
       },
       Banner: {
-        textContent: "NORTH",
+        textContent: "WEST",
         firstLetterSize: 125,
-        fontSize: 0.8,
+        fontSize: 1.1,
         backgroundColor: "Inherit",
         horizontalPadding: 0,
         verticalPadding: 0,
         horizontalMargin: 0,
         verticalMargin: 0,
         borderRadius: 4,
-        fontFamily: "Series EEM",
-        tagToReplace: ["fontFamily"],
+        fontFamily: "Overpass 7",
+        tagToReplace: ["fontFamily", "fontSize"],
       },
     },
   };

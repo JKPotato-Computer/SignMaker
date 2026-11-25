@@ -577,7 +577,19 @@ main#smRender.wide #postContainer {
 .panel.sharp .guideArrowsHolder:has(.guidearrows.custom) {
   background-color: var(--bg-color);
 }
-
+/* double struck panel type */
+.panel.double-struck .sign {
+  box-shadow: 0 0 0 0.2rem var(--bg-color) !important;
+  border-radius: var(--signBorderRadius);
+}
+.panel.double-struck .top .ET-tab {
+  box-shadow: 0 0 0 var(--borderThickness) var(--backgroundColor) !important;
+  z-index: 1;
+  margin-bottom: calc(0.2rem + var(--borderThickness));
+}
+.panel.double-struck .top .ET-tab:not(.fullBorder) {
+  margin-bottom: var(--borderThickness);
+}
 .exitTabContainer.within .ET-tabHolder {
   background: none;
 }
@@ -703,6 +715,7 @@ main#smRender.wide #postContainer {
   line-height: var(--lineHeight);
   flex-direction: var(--direction);
   position: relative;
+  letter-spacing: var(--letterSpacing);
 }
 
 .ET-tab.icon {

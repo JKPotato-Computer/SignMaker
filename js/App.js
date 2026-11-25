@@ -1525,7 +1525,10 @@ const App = (() => {
         ColorLibrary.checkForContrast(blockBackgroundColor);
 
       if (blockBorderColor != ColorLibrary.checkForContrast(panel.color)) {
-        if (touchesTop) {
+        if (
+          touchesTop &&
+          window.getComputedStyle(signHolder).borderTopWidth > 0
+        ) {
           row.style.borderTop = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
           row.style.marginTop = `-0.2rem`;
         }
@@ -1534,7 +1537,10 @@ const App = (() => {
           row.style.marginRight = `-0.2rem`;
           row.style.width = `calc(100% + 0.2rem)`;
         }
-        if (touchesBottom) {
+        if (
+          touchesBottom &&
+          window.getComputedStyle(signHolder).borderBottomWidth > 0
+        ) {
           row.style.borderBottom = `0.2rem solid ${blockBorderColor ? "black" : "white"}`;
           row.style.marginBottom = `-0.2rem`;
         }
@@ -1549,22 +1555,38 @@ const App = (() => {
         }
       }
 
-      if (touchesTop && touchesRight) {
+      if (
+        touchesTop &&
+        touchesRight &&
+        window.getComputedStyle(signHolder).borderTopWidth > 0
+      ) {
         row.style.borderTopRightRadius = `${panel.borderRadius}rem`;
         signCorners[0].style.backgroundColor = blockBackgroundColor;
       }
 
-      if (touchesTop && touchesLeft) {
+      if (
+        touchesTop &&
+        touchesLeft &&
+        window.getComputedStyle(signHolder).borderTopidth > 0
+      ) {
         row.style.borderTopLeftRadius = `${panel.borderRadius}rem`;
         signCorners[1].style.backgroundColor = blockBackgroundColor;
       }
 
-      if (touchesBottom && touchesRight) {
+      if (
+        touchesBottom &&
+        touchesRight &&
+        window.getComputedStyle(signHolder).borderBottomWidth > 0
+      ) {
         row.style.borderBottomRightRadius = `${panel.borderRadius}rem`;
         signCorners[2].style.backgroundColor = blockBackgroundColor;
       }
 
-      if (touchesBottom && touchesLeft) {
+      if (
+        touchesBottom &&
+        touchesLeft &&
+        window.getComputedStyle(signHolder).borderBottomWidth > 0
+      ) {
         row.style.borderBottomLeftRadius = `${panel.borderRadius}rem`;
         signCorners[3].style.backgroundColor = blockBackgroundColor;
       }
@@ -2306,7 +2328,7 @@ const App = (() => {
               if (panel.sign.oSArrowPositioning == "Left") {
                 arrowElement.before(otherSymbolElement);
               } else {
-                arrowElement.after(otherSymbolElement);
+                exitOnlyContainer.appendChild(otherSymbolElement);
               }
             }
 
@@ -2318,7 +2340,7 @@ const App = (() => {
               if (panel.sign.actionMessagePositioning == "Left") {
                 arrowElement.before(actionMessage);
               } else {
-                arrowElement.after(actionMessage);
+                exitOnlyContainer.appendChild(actionMessage);
               }
             }
           } else if (
@@ -2351,6 +2373,29 @@ const App = (() => {
               );
               textElement2.className = "SM-ExitOnlyTextElement";
               exitOnlyContainer.appendChild(textElement2);
+            }
+
+            if (0 == panel.sign.oSArrow && panel.sign.otherSymbol != "None") {
+              const otherSymbolElement = createOtherSymbol(
+                panel.sign.otherSymbol,
+              );
+              if (panel.sign.oSArrowPositioning == "Left") {
+                arrowElement.before(otherSymbolElement);
+              } else {
+                exitOnlyContainer.appendChild(otherSymbolElement);
+              }
+            }
+
+            if (
+              0 == panel.sign.actionMessageArrow &&
+              panel.sign.actionMessage != ""
+            ) {
+              const actionMessage = createOtherSymbol("actionMessage");
+              if (panel.sign.actionMessagePositioning == "Left") {
+                arrowElement.before(actionMessage);
+              } else {
+                exitOnlyContainer.appendChild(actionMessage);
+              }
             }
           } else {
             if (

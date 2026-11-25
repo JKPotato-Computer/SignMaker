@@ -82,8 +82,9 @@ const SignMakerSetup = (() => {
 
     introSlide.querySelector(".welcomeAnim_signHolder > img").style.visibility =
       "hidden";
-    introSlide.querySelector(".welcomeAnim_signHolder > span").style.display =
-      "none";
+    introSlide.querySelector(
+      ".welcomeAnim_signHolder > span",
+    ).style.visibility = "hidden";
 
     introSlide.querySelector(".welcomeAnim_poleGantry.left").style.left = "5%";
     introSlide.querySelector(".welcomeAnim_poleGantry.left").style.top = "125%";
@@ -158,31 +159,34 @@ const SignMakerSetup = (() => {
           introSlide.querySelector(
             ".welcomeAnim_signHolder > img",
           ).style.opacity = "1";
+          introSlide.querySelector(
+            ".welcomeAnim_signHolder > span",
+          ).style.visibility = "";
+          introSlide.style.transition = "";
+          introSlide.querySelector(
+            ".welcomeAnim_signHolder > span",
+          ).style.opacity = "1";
+
+          introSlide.style.transition = "none";
+          introSlide.style.backgroundColor = `rgb(166, 196, 255)`;
           setTimeout(() => {
-            introSlide.style.transition = "none";
-            introSlide.style.backgroundColor = `rgb(166, 196, 255)`;
-            introSlide.querySelector(
-              ".welcomeAnim_signHolder > span",
-            ).style.display = "";
+            introSlide.style.transition = "";
+            introSlide.style.backgroundColor = `rgb(128, 171, 255)`;
+          }, 100);
+
+          setTimeout(() => {
+            document.querySelector("#introSlide_continue").style.display = "";
             setTimeout(() => {
-              introSlide.style.transition = "";
-              introSlide.style.backgroundColor = `rgb(128, 171, 255)`;
-              introSlide.querySelector(
-                ".welcomeAnim_signHolder > span",
-              ).style.opacity = "1";
+              document.querySelector("#introSlide_continue").style.opacity =
+                "1";
+            }, 10);
 
-              setTimeout(() => {
-                document.querySelector("#introSlide_continue").style.display =
-                  "";
-
-                document
-                  .querySelector("#introSlide_continue")
-                  .addEventListener("click", () => {
-                    introSlide.style.display = "none";
-                    document.querySelector("#welcomeSlide").style.display = "";
-                  });
-              }, 1000);
-            }, 5);
+            document
+              .querySelector("#introSlide_continue")
+              .addEventListener("click", () => {
+                introSlide.style.display = "none";
+                document.querySelector("#welcomeSlide").style.display = "";
+              });
           }, 1000);
         }, 1000);
       }, 250);
@@ -190,9 +194,19 @@ const SignMakerSetup = (() => {
   };
 
   document.querySelector("#takeMeOnATour").addEventListener("click", () => {
+    if (
+      !localStorage.getItem("closedWelcome") ||
+      localStorage.getItem("closedWelcome") !== "true"
+    ) {
+      App.setPost(new Post(Post.polePositions[0]));
+      App.resetSelectors();
+      App.newPanel();
+    }
+
     localStorage.setItem("closedWelcome", true);
     document.querySelector("#modalHolder").style.display = "none";
     document.querySelector("#welcomeToSignMaker").close();
+    document.querySelector("#subPanelConfig").click();
   });
 
   loadingScreen();

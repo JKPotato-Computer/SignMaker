@@ -87,6 +87,30 @@ const FormNavigation = (() => {
     document.querySelector("#smSettings_uiScaleSlider").value =
       StorageManager.getItem("signMakerUIScale") || 1;
 
+    for (const mutcdVariant in MUTCDVariants) {
+      if (typeof MUTCDVariants[mutcdVariant] === "function") {
+        continue;
+      }
+
+      lib.appendOption(
+        document.querySelector("#selectMUTCDVersion"),
+        mutcdVariant,
+        {
+          selected: mutcdVariant === post?.mutcdVariant || "MUTCD",
+        },
+      );
+    }
+
+    document
+      .querySelector("#selectMUTCDVersion")
+      .addEventListener("change", (event) => {
+        let realPost = App.getPost();
+        realPost.mutcdVariant = event.target.value;
+
+        formHandler.updateForm();
+        App.redraw();
+      });
+
     changeTheme(document.documentElement.dataset.theme);
   };
 
@@ -359,9 +383,11 @@ const FormNavigation = (() => {
       element.addEventListener("blur", hideToolTip);
 
       if (
-        element.tagName === "LABEL" &&
-        element.htmlFor &&
-        !document.querySelector(`#${element.htmlFor}`).dataset.toolTip
+        (element.tagName === "LABEL" &&
+          element.htmlFor &&
+          !document.querySelector(`#${element.htmlFor}`)) ||
+        (document.querySelector(`#${element.htmlFor}`) &&
+          !document.querySelector(`#${element.htmlFor}`).dataset.toolTip)
       ) {
         document
           .querySelector(`#${element.htmlFor}`)
@@ -927,27 +953,6 @@ const FormNavigation = (() => {
       });
     }
 
-    // Small value inputs
-    document.querySelectorAll(".smallVal").forEach((valEl) => {
-      const onChange = () => {
-        const id = valEl.id || "";
-        if (id.endsWith("Val")) {
-          const controlId = id.slice(0, -3);
-          const control = document.getElementById(controlId);
-          const isSuitable =
-            control.type === "range" ||
-            control.type === "number" ||
-            control.tagName === "INPUT" ||
-            control.tagName === "SELECT";
-          if (isSuitable) {
-            control.value = valEl.value;
-          }
-        }
-        formHandler.readForm();
-      };
-      valEl.addEventListener("change", onChange);
-    });
-
     for (const format of GroupElement.boxFormats) {
       lib.appendOption(document.querySelector("#sdGroup_boxFormat"), format);
     }
@@ -970,10 +975,36 @@ const FormNavigation = (() => {
         }
       });
 
-      document.querySelector(element).addEventListener("blur", () => {
-        const hint = document.querySelector(element).nextElementSibling;
-        hint.style.display = "";
-      });
+      const pairs = {
+        topMargin: "marginTop",
+        bottomMargin: "marginBottom",
+        leftPadding: "paddingLeft",
+        rightPadding: "paddingRight",
+        topPadding: "paddingTop",
+        bottomPadding: "paddingBottom",
+      };
+
+      for (const key in pairs) {
+        const slider = document.querySelector("#sdBlock_" + key + "Slider");
+        const input = document.querySelector("#sdBlock_" + key);
+        const preview = document.querySelector("#blockPreview_" + pairs[key]);
+
+        slider.addEventListener("focus", () => {
+          preview.classList.add("focus");
+        });
+
+        slider.addEventListener("blur", () => {
+          preview.classList.remove("focus");
+        });
+
+        input.addEventListener("focus", () => {
+          preview.classList.add("focus");
+        });
+
+        input.addEventListener("blur", () => {
+          preview.classList.remove("focus");
+        });
+      }
     }
   };
 
@@ -1111,8 +1142,54 @@ const FormNavigation = (() => {
   };
 
   const setupEasterEggs = () => {
+    const update = () => {
+      const easterEggs = ["limon", "eight"];
+      let discovered = 0;
+
+      for (const egg of easterEggs) {
+        if (StorageManager.getItem(`smEasterEggs_${egg}`)) {
+          discovered++;
+        }
+      }
+
+      document.querySelector("#smEasterEggs").style.display =
+        discovered > 0 ? "" : "none";
+
+      for (const egg of easterEggs) {
+        const checkElem = document.querySelector(`#smSettings_${egg}EE`);
+        const labelFor = document.querySelector(
+          `label[for="smSettings_${egg}EE"]`,
+        );
+
+        if (StorageManager.getItem(`smEasterEggs_${egg}`)) {
+          labelFor.style.display = "";
+          checkElem.style.display = "";
+        } else {
+          labelFor.style.display = "none";
+          checkElem.style.display = "none";
+        }
+
+        checkElem.checked =
+          StorageManager.getItem(`smEasterEggs_${egg}Enabled`) === "true";
+        checkElem.addEventListener("change", () => {
+          StorageManager.setItem(
+            `smEasterEggs_${egg}Enabled`,
+            checkElem.checked ? "true" : "false",
+          );
+        });
+      }
+    };
+
     document.addEventListener("input", (event) => {
       const target = event.target;
+
+      if (
+        StorageManager.getItem("smEasterEggs_limon") &&
+        !StorageManager.getItem("smEasterEggs_limonEnabled")
+      ) {
+        return;
+      }
+
       if (!target.matches("input[type='text'], textarea")) {
         return;
       }
@@ -1122,6 +1199,10 @@ const FormNavigation = (() => {
           return;
         }
         target.dataset.limonTriggered = "true";
+
+        StorageManager.setItem("smEasterEggs_limon", "true");
+        StorageManager.setItem("smEasterEggs_limonEnabled", "true");
+        update();
 
         const audio = new Audio(
           "assets/other-symbols/easter-eggs/limon/limon.mp3",
@@ -1159,7 +1240,13 @@ const FormNavigation = (() => {
     });
 
     document.addEventListener("keydown", (event) => {
-      // are we selecting an input / textarea element
+      if (
+        StorageManager.getItem("smEasterEggs_eight") &&
+        !StorageManager.getItem("smEasterEggs_eightEnabled")
+      ) {
+        return;
+      }
+
       if (!event.target.matches("input, textarea")) {
         return;
       }
@@ -1167,6 +1254,10 @@ const FormNavigation = (() => {
       if (event.key !== "8") {
         return;
       }
+
+      StorageManager.setItem("smEasterEggs_eight", "true");
+      StorageManager.setItem("smEasterEggs_eightEnabled", "true");
+      update();
 
       requestAnimationFrame(() => {
         const electronicSignElems = [];
@@ -1199,6 +1290,8 @@ const FormNavigation = (() => {
         }
       });
     });
+
+    update();
   };
 
   const positionDropdown = (dropdownHolder, trigger) => {

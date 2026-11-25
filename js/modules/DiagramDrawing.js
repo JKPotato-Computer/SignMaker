@@ -147,9 +147,9 @@ class Road {
       enabled: false, // boolean, are arrows enabled
       arrowHeight: 0, // number, height of arrow (0 = auto)
       arrowWidth: 0, // number, width of arrow (0 = auto)
-      bottomOffset: 40, // number, how "dented" the arrow base is
-      roundness: 5, // number, how "round" the corners are
-      pointedTip: false,
+      bottomOffset: 20, // number, how "dented" the arrow base is
+      roundness: 2, // number, how "round" the corners are
+      pointedTip: true,
     },
     subpanel = {
       enabled: false, // boolean, where the road is
@@ -174,19 +174,10 @@ class Road {
     this.curveIntensity = curveIntensity;
 
     this.arrows = {
-      enabled: false,
-      arrowHeight: 120,
-      arrowWidth: 0,
-      bottomOffset: 20,
-      roundness: 2,
-      pointedTip: true,
       ...arrows,
     };
 
     this.subpanel = {
-      enabled: false,
-      x: -999,
-      y: -999,
       ...subpanel,
     };
 

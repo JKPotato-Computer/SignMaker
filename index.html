@@ -194,7 +194,8 @@
           <img src="./assets/other-symbols/SignMakerBanner.png" class="welcomeSignMakerBanner" />
           <div>
             <h2>Welcome to SignMaker v2.2! (at last!)</h2>
-            <p>After nearly 250+ hours of development, weeks of procrastination, and years since SignMaker v2.1 released, I am proud to announce that SignMaker v2.2 is now CANON and real. Hope y'all enjoy!</p>
+            <p>After over <b>250-300+ hours of development</b>, weeks of procrastination, and years since SignMaker v2.1 released, I am proud to announce that SignMaker v2.2 is now CANON and real. Hope y'all enjoy! - jkpotato-computer
+            </p>
             <p>SignMaker is a web-based sign designing tool that allows for the recreation of standardized, official highway signage (primarily in the United States / MUTCD-compliant countries.)</p>
           </div>
           <div>
@@ -1218,6 +1219,15 @@
             " data-toolTip="Adjusts the interface size." />
             <input type="number" id="smSettings_uiScale" min=".5" max="1" step=".1" value="1" placeholder="1.0" />
             <br />
+            <fieldset id="smEasterEggs">
+              <legend>Easter Eggs</legend>
+              <label for="smSettings_limonEE" data-toolTip="Control City Freak is an interesting meme in our Discord server, and one of the most iconic things about him is his deep hatred for 'Limon,' specifically because it's found on overhead signage and not just on the side. Some people believe that being a junction of major routes qualifies it to be an overhead sign, others believe the population is too small. But who cares? LIMON!">Enable Limon Jumpscare</label>
+              <input type="checkbox" id="smSettings_limonEE" />
+              <br />
+              <label for="smSettings_eightEE" data-toolTip="No sign-making backstory here, I just really like the Stanley Parable. Eight.">
+                Enable Eight Jumpscare</label>
+              <input type="checkbox" id="smSettings_eightEE" />
+            </fieldset>
             <div class="resetOptions">
               <button id="resetLocalStorage" class="redButton">Reset Local Storage</button>
               <button id="resetDatabase" class="redButton">Reset IndexedDB</button>
@@ -1241,10 +1251,6 @@
                       United States. This version in particular is FHWA's
                       Standard Highway Signs, the official standard for
                       U.S-based highway sigange.
-                    </p>
-                    <p>
-                      * Contrary to the cover image, This uses the in-progress
-                      version of the Standard Highway Sign designs.
                     </p>
                     <a href="https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf"><span class="material-symbols-outlined">open_in_new</span>View the MUTCD Here</a>
 
@@ -1271,12 +1277,21 @@
                  <button class="mutcdImage" data-variant="NVUTCDG">
                   <img src="assets/form/mutcd/NVUTCDG.png" />
                   <div class="mutcdSlideInfo">
-                    <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines</h2>
-                    <p>2026 Edition</p>
+                    <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines*</h2>
+                    <p>2024 Edition: Revision 3 Tredec† 2024</p>
                     <p>
-                      Placeholder Description :3 Designed by @vivribbon
+                      The NVUTCDG (North Veridian Universal Traffic Control Device Guidelines)
+                      are the national standard for traffic control devices of many countries on Avaris.* 
+                      This version is based off the latest revision by
+                      the Veridian Road Convention, from Tredecember† 2024.
                     </p>
-
+                    <p>
+                      * This is a fictional MUTCD.
+                      If you are aiming for realism, use another MUTCD.
+                    </p>
+                    <p>
+                      † The calendar used has thirteen months. Tredecember is the thirteenth.
+                    </p>
                     <span class="mutcdBottom">Click to select</span>
                   </div>
                 </button>
@@ -2349,7 +2364,7 @@
                   max="5"
                   step="0.05"
                   value="2.25"
-                  onchange="
+                  oninput="
                     document.getElementById('sMET_minimumHeight').value =
                       this.value;
                     formHandler.readForm();
@@ -2362,7 +2377,7 @@
                   
                   value="2.25"
                   step="0.05"
-                  oninput="
+                  onchange="
                     formHandler.readForm();
                   " />
                 <br />
@@ -3019,7 +3034,7 @@
                   <div id="smSPShieldBannerConfig">
                     <div id="smSP_bannerMaster"></div>
                     <div class="smSPShieldBannerController">
-                      <label for="smSPShieldBannerAlignment" data-toolTip="Next alignment of added banner.">Alignment:</label>
+                      <label for="smSPShieldBannerAlignment" data-toolTip="Next alignment of added banner.">Next Alignment:</label>
                       <select id="smSPShieldBannerAlignment"></select>
                       <button type="button" id="smSPShieldAddBanner">
                         Add Banner
@@ -3610,7 +3625,7 @@
                           type="search"
                           class="smDropdownSearch"
                           placeholder="Search arrows"
-                          autocomplete="off" " />
+                          autocomplete="off" />
                         <div class="smDropdownList"></div>
                       </div>
                     </div>
@@ -4224,7 +4239,20 @@
                 <fieldset id="smSPBlockProperties">
                   <legend>Block Properties</legend>
                   <div>
-                    <label for="sdBlock_topMarginSlider" class="noLabelAlignment" data-toolTip="Sets the spacing between this block element and one above it / the panel.">Top Margin (rem):
+                  <div id="blockPreview">
+                    <div id="blockPreview_marginTop"></div>
+                    <div id="blockPreview_blockItself">
+                      <div id="blockPreview_paddingTop"></div>
+                      <div id="blockPreview_paddingLeft"></div>
+                      <div id="blockPreview_paddingRight"></div>
+                      <div id="blockPreview_paddingBottom"></div>
+                      <div id="blockPreview_contentItself"></div>
+                    </div>
+                    <div id="blockPreview_marginBottom"></div>
+                  </div>
+                  <div id="blockSpacingSettings">
+                     <div>
+                    <label for="sdBlock_topMarginSlider" class="noLabelAlignment">Top Margin (rem):
                     </label>
                     <div>
                       <input
@@ -4234,7 +4262,7 @@
                         value="0"
                         step=".01"
                         id="sdBlock_topMarginSlider"
-                        onchange="
+                        oninput="
                             document.querySelector('#sdBlock_topMargin').value = this.value; 
                             formHandler.readForm()"
                       />
@@ -4246,123 +4274,123 @@
                         step=".01"
                         onchange="formHandler.readForm()" />
                     </div>
-                  </div>
-                  <div>
-                    <label for="sdBlock_bottomMarginSlider" class="noLabelAlignment" data-toolTip="Sets the spacing between this block element and one below it / the panel.">Bottom Margin (rem):
-                    </label>
+                    </div>
                     <div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="3"
-                        value="0"
-                        step=".01"
-                        id="sdBlock_bottomMarginSlider"
-                        onchange="
-                            document.querySelector('#sdBlock_bottomMargin').value = this.value; 
-                            formHandler.readForm()
-                          "
-                      />
-                      <input
-                        id="sdBlock_bottomMargin"
-                        class="smallVal"
-                        type="number"
-                        value="0"
-                        step=".01"
-                        onchange="formHandler.readForm()" />
+                      <label for="sdBlock_bottomMarginSlider" class="noLabelAlignment">Bottom Margin (rem):
+                      </label>
+                      <div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="3"
+                          value="0"
+                          step=".01"
+                          id="sdBlock_bottomMarginSlider"
+                          oninput="
+                              document.querySelector('#sdBlock_bottomMargin').value = this.value; 
+                              formHandler.readForm()
+                            "
+                        />
+                        <input
+                          id="sdBlock_bottomMargin"
+                          class="smallVal"
+                          type="number"
+                          value="0"
+                          step=".01"
+                          onchange="formHandler.readForm()" />
+                      </div>
+                    </div>
+                    <div>
+                      <label for="sdBlock_topPaddingSlider" class="noLabelAlignment">Top Padding (rem):
+                      </label>
+                      <div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          value="0"
+                          step=".01"
+                          id="sdBlock_topPaddingSlider"
+                          oninput="document.querySelector('#sdBlock_topPadding').value =
+                              this.value; formHandler.readForm()"
+                        />
+                        <input
+                          id="sdBlock_topPadding"
+                          class="smallVal"
+                          type="number"
+                          value="0"
+                          step=".01"
+                          onchange="formHandler.readForm()" />
+                      </div>
+                    </div>
+                    <div>
+                      <label for="sdBlock_bottomPaddingSlider" class="noLabelAlignment">Bottom Padding (rem):
+                      </label>
+                      <div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          value="0"
+                          step=".01"
+                          id="sdBlock_bottomPaddingSlider"
+                          oninput="document.querySelector('#sdBlock_bottomPadding').value = this.value; formHandler.readForm()"
+                        />
+                        <input
+                          id="sdBlock_bottomPadding"
+                          class="smallVal"
+                          type="number"
+                          value="0"
+                          step=".01"
+                          onchange="formHandler.readForm()" />
+                      </div>
+                    </div>
+                    <div>
+                      <label for="sdBlock_leftPaddingSlider" class="noLabelAlignment">Left Padding (rem):
+                      </label>
+                      <div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="6"
+                          value="0"
+                          step=".01"
+                          id="sdBlock_leftPaddingSlider"
+                          oninput="document.querySelector('#sdBlock_leftPadding').value = this.value; formHandler.readForm()"
+                        />
+                        <input
+                          id="sdBlock_leftPadding"
+                          class="smallVal"
+                          type="number"
+                          value="0"
+                          step=".01"
+                          onchange="formHandler.readForm()" />
+                      </div>
+                    </div>
+                    <div>
+                      <label for="sdBlock_rightPaddingSlider" class="noLabelAlignment">Right Padding (rem):
+                      </label>
+                      <div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="3"
+                          value="0"
+                          step=".01"
+                          id="sdBlock_rightPaddingSlider"
+                          oninput="document.querySelector('#sdBlock_rightPadding').value = this.value; formHandler.readForm()"
+                        />
+                        <input
+                          id="sdBlock_rightPadding"
+                          class="smallVal"
+                          type="number"
+                          value="0"
+                          step=".01"
+                          onchange="formHandler.readForm()" />
+                      </div>
                     </div>
                   </div>
-                  <br />
-                  <div>
-                    <label for="sdBlock_topPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the top padding.">Top Padding (rem):
-                    </label>
-                    <div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value="0"
-                        step=".01"
-                        id="sdBlock_topPaddingSlider"
-                        onchange="document.querySelector('#sdBlock_topPadding').value =
-                            this.value; formHandler.readForm()"
-                      />
-                      <input
-                        id="sdBlock_topPadding"
-                        class="smallVal"
-                        type="number"
-                        value="0"
-                        step=".01"
-                        onchange="formHandler.readForm()" />
-                    </div>
-                  </div>
-                  <div>
-                    <label for="sdBlock_bottomPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the bottom padding.">Bottom Padding (rem):
-                    </label>
-                    <div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value="0"
-                        step=".01"
-                        id="sdBlock_bottomPaddingSlider"
-                        onchange="document.querySelector('#sdBlock_bottomPadding').value = this.value; formHandler.readForm()"
-                      />
-                      <input
-                        id="sdBlock_bottomPadding"
-                        class="smallVal"
-                        type="number"
-                        value="0"
-                        step=".01"
-                        onchange="formHandler.readForm()" />
-                    </div>
-                  </div>
-                  <br />
-                  <div>
-                    <label for="sdBlock_leftPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the left padding.">Left Padding (rem):
-                    </label>
-                    <div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="6"
-                        value="0"
-                        step=".01"
-                        id="sdBlock_leftPaddingSlider"
-                        onchange="document.querySelector('#sdBlock_leftPadding').value = this.value; formHandler.readForm()"
-                      />
-                      <input
-                        id="sdBlock_leftPadding"
-                        class="smallVal"
-                        type="number"
-                        value="0"
-                        step=".01"
-                        onchange="formHandler.readForm()" />
-                    </div>
-                  </div>
-                  <div>
-                    <label for="sdBlock_rightPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the right padding.">Right Padding (rem):
-                    </label>
-                    <div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="3"
-                        value="0"
-                        step=".01"
-                        id="sdBlock_rightPaddingSlider"
-                        onchange="document.querySelector('#sdBlock_rightPadding').value = this.value; formHandler.readForm()"
-                      />
-                      <input
-                        id="sdBlock_rightPadding"
-                        class="smallVal"
-                        type="number"
-                        value="0"
-                        step=".01"
-                        onchange="formHandler.readForm()" />
-                    </div>
-                  </div>
+                </div>
                   <br />
                   <label for="sdBlock_backgroundColor">BG:</label>
                   <button type="button" id="sdBlock_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
@@ -5196,7 +5224,7 @@
                 class="dup"
                 onclick="App.duplicatePanel()"
               >
-                Duplicate Panel Group
+                Duplicate Panel
               </button>
               <button
                 type="button"

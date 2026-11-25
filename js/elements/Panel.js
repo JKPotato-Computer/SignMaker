@@ -56,7 +56,8 @@ class Panel {
   }
 }
 
-Panel.prototype.cornerType = ["Sharp", "Round", "Square"];
+Panel.prototype.cornerType = ["Sharp", "Round", "Square", "Double-Struck"];
+Panel.prototype.defaultBorderRadius = 0.75;
 Panel.panelAppearance = ["Standard", "Circle Pixels", "Square Pixels"];
 
 window.Panel = Panel;
