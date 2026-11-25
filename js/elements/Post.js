@@ -66,6 +66,15 @@ class Post {
     this.panels[panelGroupIndex].push(newPanel);
   }
 
+  duplicatePanel([panelGroupIndex, panelIndex]) {
+    const panelGroup = this.panels[panelGroupIndex];
+    if (!panelGroup || !panelGroup[panelIndex]) {
+      return;
+    }
+
+    panelGroup.splice(panelIndex + 1, 0, lib.clone(panelGroup[panelIndex]));
+  }
+
   deletePanel(panelIndex) {
     this.panels[panelIndex[0]].splice(panelIndex[1], 1);
   }

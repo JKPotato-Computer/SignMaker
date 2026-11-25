@@ -162,28 +162,48 @@
     </main>
     <div id="modalHolder">
       <dialog id="welcomeToSignMaker">
-        <img src="assets/other-symbols/Banner.png" />
-        <h3>
-          Welcome to SignMaker! <span class="warning">WORK IN PROGRESS</span>
-        </h3>
-        <p>
-          SignMaker is a web-based program that allows you to make realistic
-          highway signs that exist in the United States and Canada! We are based
-          off the roots of Kurumi's Sign Maker, designed to be easy and
-          efficient; only this time, with a <b>whole lot more features.</b> I
-          hope you enjoy my little creation!
-        </p>
-        <div class="options">
-          <a href="https://github.com/JKPotato-Computer/SignMaker/releases">
-            <button type="button" id="changelog">Changelog</button>
-          </a>
-          <a href="https://discord.gg/yJBWggf7p4">
-            <button type="button" id="joinDiscordServer">Discord Server</button>
-          </a>
-          <a href="https://github.com/JKPotato-Computer/SignMaker/wiki">
-            <button type="button" id="viewTutorial">Guide / Tutorial</button>
-          </a>
-          <button type="button" id="closeWelcome">Get signing!</button>
+        <div id="introSlide">
+          <button id="introSlide_continue" style="display: none;">Continue</button>
+          <div id="welcomeAnim_gantry">
+              <div class="welcomeAnim_poleGantry left"></div>
+              <div class="welcomeAnim_poleHorizontal top"></div>
+              <div class="welcomeAnim_poleHorizontal bottom"></div>
+              <div id="welcomeAnim_sign">
+          <div class="welcomeAnim_signOverlay"></div>
+                  <div class="welcomeAnim_signHolder">
+                      <img src="./assets/other-symbols/SignMakerIcon.png" id="welcomeAnim_signLogo">
+                      <span>Welcome to SignMaker!</span>
+                  </div>
+              </div>
+              <div class="welcomeAnim_poleGantry right"></div>
+          </div>
+          <div id="welcomeAnim_background">
+          </div>
+          <div id="welcomeAnim_grass">
+              <div id="welcomeAnim_road">
+                  <div class="welcomeAnim_laneMarking solid yellow"></div>
+                  <div class="welcomeAnim_laneMarking dashed white"></div>
+                  <div class="welcomeAnim_laneMarking dashed white"></div>
+                  <div class="welcomeAnim_laneMarking dashed white"></div>
+                  <div class="welcomeAnim_laneMarking solid white"></div>
+                  <div class="welcomeAnim_uncoverRoad"></div>
+              </div>
+          </div>
+        </div>
+        <div id="welcomeSlide" style="display: none;">
+          <img src="./assets/other-symbols/SignMakerBanner.png" class="welcomeSignMakerBanner" />
+          <div>
+            <h2>Welcome to SignMaker v2.2! (at last!)</h2>
+            <p>After nearly 250+ hours of development, weeks of procrastination, and years since SignMaker v2.1 released, I am proud to announce that SignMaker v2.2 is now CANON and real. Hope y'all enjoy!</p>
+            <p>SignMaker is a web-based sign designing tool that allows for the recreation of standardized, official highway signage (primarily in the United States / MUTCD-compliant countries.)</p>
+          </div>
+          <div>
+            <div>
+               <label for="selectMUTCDVersion" class="noLabelAlignment">MUTCD:</label>
+               <select id="selectMUTCDVersion"></select>
+            </div>
+           <button id="takeMeOnATour">Get signing!</button>
+          </div>
         </div>
       </dialog>
       <dialog id="customImagePicker">
@@ -195,10 +215,10 @@
           <div id="customImageUploadField">
             <span class="material-symbols-outlined">attach_file</span>
             <span>Drag and drop a file or click to upload</span>
-            <input id="customImageFile" type="file" accept="image/*" />
+            <input id="customImageFile" type="file" accept="image/*" data-toolTip="Choose an image file to upload." />
           </div>
           <div class="customImageUrlUpload">
-            <label for="customImageUrl">OR Image URL:</label>
+            <label for="customImageUrl" data-toolTip="Load an image from this URL.">OR Image URL:</label>
             <input id="customImageUrl" type="url" placeholder="Image URL" />
           </div>
           <hr />
@@ -215,7 +235,7 @@
             </h3>
             <label for="exportAsPNG">File Type:</label>
             <div id="fileTypeOptions">
-              <button
+                  <button
                 type="button"
                 class="selected"
                 id="exportAsPNG"
@@ -248,7 +268,7 @@
               </button>
             </div>
             <br />
-            <label for="downloadImageScaleSlider">Scale:</label>
+            <label for="downloadImageScaleSlider" data-toolTip="Sets the scale of the exported image.">Scale:</label>
             <input
               type="range"
               min="1"
@@ -276,10 +296,9 @@
                 document.querySelector('#downloadImageScaleSlider').value =
                   this.value;
                 ImportExport.updatePreview();
-              "
-            />
+              " />
             <br />
-            <label for="entirePost" id="entirePostLabel">Entire Post:</label>
+            <label for="entirePost" id="entirePostLabel" data-toolTip="Exports the entire post, including its panels.">Entire Post:</label>
             <input
               type="checkbox"
               id="entirePost"
@@ -381,8 +400,7 @@
                     id="selectedShieldVariant"
                     onchange="ShieldEditor.readForm()"
                   ></select>
-                  <label for="selectedShieldBacks" class="noLabelAlignment"
-                    >Shield Backs:</label
+                  <label for="selectedShieldBacks" class="noLabelAlignment" data-toolTip="Includes the backs of selected shields.">Shield Backs:</label
                   >
                   <input
                     type="checkbox"
@@ -405,8 +423,7 @@
                       min="0"
                       step="1"
                       placeholder="4"
-                      onchange="ShieldEditor.readForm()"
-                    />
+                      onchange="ShieldEditor.readForm()" data-toolTip="Sets the roundness of the selected shield back." />
                   </div>
                 </div>
               </div>
@@ -419,14 +436,13 @@
               <input
                 type="search"
                 id="presetShieldSearch"
-                placeholder="Search for presets"
-              />
+                placeholder="Search for presets" />
               <div id="presetShieldList"></div>
               <div id="uploadShield">
                 <div id="shieldUploadField">
                   <span class="material-symbols-outlined">attach_file</span>
                   <span>Drag and drop a file or click to upload</span>
-                  <input type="file" id="uploadCustomShield" />
+                  <input type="file" id="uploadCustomShield" data-toolTip="Choose a custom shield image to upload." />
                 </div>
                 <div class="shieldUploadDisclaimer">
                   Files are only saved <b>on the client side</b> using
@@ -436,8 +452,7 @@
                     is anything really lol)</b
                   >
                 </div>
-                <label for="linkUpload" class="noLabelAlignment"
-                  >OR Image URL:</label
+                <label for="linkUpload" class="noLabelAlignment" data-toolTip="Load a shield image from this URL.">OR Image URL:</label
                 >
                 <input type="text" id="linkUpload" placeholder="Image URL" />
                 <hr />
@@ -448,7 +463,7 @@
           </details>
           <details>
             <summary>Text</summary>
-            <label for="spShield_routeNumber">Route Number:</label>
+            <label for="spShield_routeNumber" data-toolTip="Sets the route number shown on the shield.">Route Number:</label>
             <input
               type="text"
               placeholder="0"
@@ -464,7 +479,7 @@
             <label for="spShield_routeColor">Color:</label>
             <button type="button" id="spShield_routeColor" class="smColorDropdownButton" data-color="Unset" data-empty-value="Unset">Unset</button>
             <br />
-            <label for="spShield_routeSpacing">Letter Spacing (px):</label>
+            <label for="spShield_routeSpacing" data-toolTip="Adjusts spacing between letters in the route number.">Letter Spacing (px):</label>
             <input
               type="number"
               id="spShield_routeSpacing"
@@ -475,7 +490,7 @@
               value="0"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_routeWordSpacing">Word Spacing (px):</label>
+            <label for="spShield_routeWordSpacing" data-toolTip="Adjusts spacing between words in the route number.">Word Spacing (px):</label>
             <input
               type="number"
               id="spShield_routeWordSpacing"
@@ -487,7 +502,7 @@
               onchange="ShieldEditor.readForm()"
             />
             <br />
-            <label for="spShield_designation">Designation:</label>
+            <label for="spShield_designation" data-toolTip="Sets the shield banner text, such as NORTH or SOUTH.">Designation:</label>
             <input
               type="text"
               placeholder=""
@@ -503,8 +518,7 @@
             <label for="spShield_designationColor">Color:</label>
             <button type="button" id="spShield_designationColor" class="smColorDropdownButton" data-color="Unset" data-empty-value="Unset">Unset</button>
             <br />
-            <label for="spShield_designationSpacing"
-              >Letter Spacing (px):</label
+            <label for="spShield_designationSpacing" data-toolTip="Adjusts spacing between letters in the shield banner.">Letter Spacing (px):</label
             >
             <input
               type="number"
@@ -516,8 +530,7 @@
               value="0"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_designationWordSpacing"
-              >Word Spacing (px):</label
+            <label for="spShield_designationWordSpacing" data-toolTip="Adjusts spacing between words in the shield banner.">Word Spacing (px):</label
             >
             <input
               type="number"
@@ -532,7 +545,7 @@
           </details>
           <details>
             <summary>Position</summary>
-            <label for="spShield_scaleSlider">Shield Scale (%):</label>
+            <label for="spShield_scaleSlider" data-toolTip="Sets the shield scale.">Shield Scale (%):</label>
             <input
               type="range"
               min="0"
@@ -553,10 +566,9 @@
               step="1"
               oninput="
                 ShieldEditor.readForm();
-              "
-            />
+              " />
             <br />
-            <label for="spShield_routeXOffset">Route X (%):</label>
+            <label for="spShield_routeXOffset" data-toolTip="Moves the route number left or right on the shield.">Route X (%):</label>
             <input
               type="number"
               id="spShield_routeXOffset"
@@ -567,7 +579,7 @@
               value="0"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_routeYOffset">Route Y (%):</label>
+            <label for="spShield_routeYOffset" data-toolTip="Moves the route number up or down on the shield.">Route Y (%):</label>
             <input
               type="number"
               id="spShield_routeYOffset"
@@ -579,7 +591,7 @@
               onchange="ShieldEditor.readForm()"
             />
             <br />
-            <label for="spShield_routeScale">Route Number Scale (%):</label>
+            <label for="spShield_routeScale" data-toolTip="Sets the size of the route number on the shield.">Route Number Scale (%):</label>
             <input
               type="number"
               id="spShield_routeScale"
@@ -590,8 +602,7 @@
               value="100"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_routeRotation"
-              >Route Number Rotation (deg):</label
+            <label for="spShield_routeRotation" data-toolTip="Rotates the route number on the shield.">Route Number Rotation (deg):</label
             >
             <input
               type="number"
@@ -604,7 +615,7 @@
               onchange="ShieldEditor.readForm()"
             />
             <br />
-            <label for="spShield_designationXOffset">Designation X (%):</label>
+            <label for="spShield_designationXOffset" data-toolTip="Moves the banner left or right on the shield.">Designation X (%):</label>
             <input
               type="number"
               id="spShield_designationXOffset"
@@ -615,7 +626,7 @@
               value="0"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_designationYOffset" style="display: none;" data-toolTip="Messed up the shields so this isn't working and I don't feel like fixing it... unless anyone wants to fix the designations per shield? :)">Designation Y (%):</label>
+            <label for="spShield_designationYOffset" style="display: none;" data-toolTip="Moves the shield banner up or down.">Designation Y (%):</label>
             <input
               type="number"
               id="spShield_designationYOffset"
@@ -629,8 +640,7 @@
               onchange="ShieldEditor.readForm()"
             />
             <br />
-            <label for="spShield_designationScale"
-              >Designation Scale (%):</label
+            <label for="spShield_designationScale" data-toolTip="Sets the size of the shield banner text.">Designation Scale (%):</label
             >
             <input
               type="number"
@@ -642,8 +652,7 @@
               value="100"
               onchange="ShieldEditor.readForm()"
             />
-            <label for="spShield_designationRotation"
-              >Designation Rotation (deg):</label
+            <label for="spShield_designationRotation" data-toolTip="Rotates the shield banner text.">Designation Rotation (deg):</label
             >
             <input
               type="number"
@@ -656,8 +665,7 @@
               onchange="ShieldEditor.readForm()"
             />
             <br />
-            <label for="spShield_horizMargins"
-              >Horizontal Shield Padding (px):</label
+            <label for="spShield_horizMargins" data-toolTip="Sets the horizontal shield padding.">Horizontal Shield Padding (px):</label
             >
             <input
               id="spShield_horizMargins"
@@ -667,8 +675,7 @@
               onchange="ShieldEditor.readForm()"
               step="1"
             />
-            <label for="spShield_vertMargins"
-              >Vertical Shield Padding (px):</label
+            <label for="spShield_vertMargins" data-toolTip="Sets the vertical shield padding.">Vertical Shield Padding (px):</label
             >
             <input
               id="spShield_vertMargins"
@@ -713,8 +720,7 @@
             <input
               type="search"
               id="shieldLibrarySearch"
-              placeholder="Search shields in library"
-            />
+              placeholder="Search shields in library" />
             <div id="shieldLibraryListHolder"></div>
             <div id="shieldLibraryListOptions">
               <button type="button" id="shieldLibraryDelete" disabled>
@@ -748,7 +754,7 @@
               <div class="diagramProperties">
                 <span>Diagram Properties</span>
                 <br />
-                <label for="diagramCanvasSize">Square Size (px):</label>
+                <label for="diagramCanvasSize" data-toolTip="Sets the width and height of the diagram canvas.">Square Size (px):</label>
                 <input
                   type="number"
                   id="diagramCanvasSize"
@@ -759,7 +765,7 @@
                   onchange="DiagramDrawing.readForm()"
                 />
                 <br />
-                <label for="roadLaneSize">Lane Size (px):</label>
+                <label for="roadLaneSize" data-toolTip="Sets the width of each road lane in the diagram.">Lane Size (px):</label>
                 <input
                   type="number"
                   id="roadLaneSize"
@@ -770,7 +776,7 @@
                   onchange="DiagramDrawing.readForm()"
                 />
                 <br />
-                <label for="roadMarkingSize">Marking Size / Width (px):</label>
+                <label for="roadMarkingSize" data-toolTip="Sets the width of the lane markings in the diagram.">Marking Size / Width (px):</label>
                 <div>
                   <input
                   type="number"
@@ -789,8 +795,7 @@
                   max="64"
                   value="4"
                   step="1"
-                  onchange="DiagramDrawing.readForm()"
-                />
+                  onchange="DiagramDrawing.readForm()" data-toolTip="Sets the width of road markings." />
                 </div>
               </div>
               <div class="diagramObjectList">
@@ -812,8 +817,7 @@
             <div class="diagramEditorCol col2">
               <div class="diagramObjectProperties">
                 <span>Object Properties</span>
-                <label for="objectName" class="objectNameLabel"
-                  >Name:
+                <label for="objectName" class="objectNameLabel" data-toolTip="Sets the diagram element name.">Name:
                   <input
                     type="text"
                     id="objectName"
@@ -872,8 +876,7 @@
                 </div>
                 <fieldset>
                   <legend>Roadway</legend>
-                  <label for="objectEndPositionX"
-                    >End Pivot Transformation (x/y, px):</label
+                  <label for="objectEndPositionX" data-toolTip="Sets the end pivot horizontal position.">End Pivot Transformation (x/y, px):</label
                   >
                   <input
                     type="number"
@@ -890,10 +893,8 @@
                     class="smallVal"
                     value="0"
                     step="1"
-                    onchange="DiagramDrawing.readForm()"
-                  />
-                  <label for="objectStartPositionX"
-                    >Start Pivot Transformation (x/y, px):</label
+                    onchange="DiagramDrawing.readForm()" data-toolTip="Sets the end pivot vertical position." />
+                  <label for="objectStartPositionX" data-toolTip="Sets the start pivot horizontal position.">Start Pivot Transformation (x/y, px):</label
                   >
                   <input
                     type="number"
@@ -910,10 +911,9 @@
                     class="smallVal"
                     value="0"
                     step="1"
-                    onchange="DiagramDrawing.readForm()"
-                  />
+                    onchange="DiagramDrawing.readForm()" data-toolTip="Sets the start pivot vertical position." />
                   <br />
-                  <label for="roadwayNumberLanes"># Lanes:</label>
+                  <label for="roadwayNumberLanes" data-toolTip="Sets the number of lanes in the road segment."># Lanes:</label>
                   <input
                     type="number"
                     id="roadwayNumberLanes"
@@ -937,7 +937,7 @@
                     onchange="DiagramDrawing.readForm()"
                   />
                   <br />
-                  <label for="roadwayCurveIntensity">Curve Intensity:</label>
+                  <label for="roadwayCurveIntensity" data-toolTip="Sets how sharply the road curves.">Curve Intensity:</label>
                   <input
                     type="number"
                     id="roadwayCurveIntensity"
@@ -947,7 +947,7 @@
                     step="1"
                     onchange="DiagramDrawing.readForm()"
                   />
-                  <label for="roadwayEndAngle">End Pivot Angle (deg):</label>
+                  <label for="roadwayEndAngle" data-toolTip="Sets the road segment end angle.">End Pivot Angle (deg):</label>
                   <input
                     type="number"
                     id="roadwayEndAngle"
@@ -964,10 +964,9 @@
                     <input
                       type="checkbox"
                       id="objectShowArrow"
-                      onchange="DiagramDrawing.readForm()"
-                    />
+                      onchange="DiagramDrawing.readForm()" data-toolTip="Shows or hides the arrow." />
                   </legend>
-                  <label for="objectArrowHeight">Height (px):</label>
+                  <label for="objectArrowHeight" data-toolTip="Sets the height.">Height (px):</label>
                   <input
                     type="number"
                     id="objectArrowHeight"
@@ -979,8 +978,7 @@
                     onchange="DiagramDrawing.readForm()"
                   />
 
-                  <label for="objectArrowWidth" class="noLabelAlignment"
-                    >Width (px):</label
+                  <label for="objectArrowWidth" class="noLabelAlignment" data-toolTip="Sets the width.">Width (px):</label
                   >
                   <input
                     type="number"
@@ -993,8 +991,7 @@
                     onchange="DiagramDrawing.readForm()"
                   />
                   <br />
-                  <label for="objectArrowBottomOffset"
-                    >Lower Verticies Offset (px):</label
+                  <label for="objectArrowBottomOffset" data-toolTip="Sets the lower verticies offset.">Lower Verticies Offset (px):</label
                   >
                   <input
                     type="number"
@@ -1005,8 +1002,7 @@
                     step="1"
                     onchange="DiagramDrawing.readForm()"
                   />
-                  <label for="objectArrowRoundness"
-                    >Arrow Roundness (px):</label
+                  <label for="objectArrowRoundness" data-toolTip="Sets the arrow roundness.">Arrow Roundness (px):</label
                   >
                   <input
                     type="number"
@@ -1031,8 +1027,7 @@
                     <input
                       type="checkbox"
                       id="objectShowSubpanel"
-                      onchange="DiagramDrawing.readForm()"
-                    />
+                      onchange="DiagramDrawing.readForm()" data-toolTip="Shows or hides the subpanel." />
                   </legend>
                   <label for="objectSubpanelNumber">Subpanel:</label>
                   <select
@@ -1056,7 +1051,7 @@
                     onchange="DiagramDrawing.readForm()"
                   ></select>
                   <br />
-                  <label for="objectSubpanelPositionX">Position (px):</label>
+                  <label for="objectSubpanelPositionX" data-toolTip="Sets the subpanel horizontal position.">Position (px):</label>
                   <input
                     type="number"
                     id="objectSubpanelPositionX"
@@ -1072,8 +1067,7 @@
                     class="smallVal"
                     value="0"
                     step="1"
-                    onchange="DiagramDrawing.readForm()"
-                  />
+                    onchange="DiagramDrawing.readForm()" data-toolTip="Sets the subpanel vertical position." />
                   <span class="objectSubpanelPositionDivider2">(y)</span>
                   <br />
                 </fieldset>
@@ -1091,7 +1085,7 @@
               <button type="button" id="diagramReset" class="redButton">
                 Reset
               </button>
-              <label for="diagramFileName">Name:</label>
+              <label for="diagramFileName" data-toolTip="Sets the name.">Name:</label>
               <input
                 type="text"
                 id="diagramFileName"
@@ -1217,11 +1211,11 @@
               <button class="smSettings_userThemeBtn">System</button>
               <button class="smSettings_userThemeBtn">Kurumi</button>
             </div>
-            <label for="smSettings_uiScale">UI Scale:</label>
+            <label for="smSettings_uiScale" data-toolTip="Adjusts the interface size.">UI Scale:</label>
             <input type="range" id="smSettings_uiScaleSlider" min=".5" max="1" step=".1" onchange="
             document.getElementById('smSettings_uiScale').value = this.value;
             document.getElementById('smSettings_uiScale').dispatchEvent(new Event('change'));
-            " /> 
+            " data-toolTip="Adjusts the interface size." />
             <input type="number" id="smSettings_uiScale" min=".5" max="1" step=".1" value="1" placeholder="1.0" />
             <br />
             <div class="resetOptions">
@@ -1290,8 +1284,7 @@
             </div>
             <div id="smSettings_Options">
               <div>
-                <label for="smSettings_searchVariant" class="noLabelAlignment"
-                  >Search:</label
+                <label for="smSettings_searchVariant" class="noLabelAlignment" 
                 >
                 <input
                   type="search"
@@ -1449,7 +1442,7 @@
               <br />
               <label
                 for="postPosition"
-                data-toolTip="Controls the kind of post or gantry that will display on the screen."
+                data-toolTip="Orientation/Pole position of the post."
                 id="postPositionLabel"
                 >Orientation:
               </label>
@@ -1464,7 +1457,7 @@
               </label>
               <select id="postColor" onchange="formHandler.readForm();"></select>
               <br />
-              <label for="postThickness">Thickness (rem):</label>
+              <label for="postThickness" data-toolTip="Sets the thickness of the supporting post.">Thickness (rem):</label>
               <input
                 type="number"
                 id="postThickness"
@@ -1473,8 +1466,7 @@
                 value="1"
                 onchange="formHandler.readForm()"
               />
-              <label for="postCornerRadius" id="postCornerRadiusLabel"
-                >Corner Radius (%):</label
+              <label for="postCornerRadius" id="postCornerRadiusLabel" data-toolTip="Sets the roundness of the panel corners.">Corner Radius (%):</label
               >
               <input
                 type="number"
@@ -1506,8 +1498,7 @@
                 onchange="formHandler.readForm()"
               />
               <br />
-              <label for="postSpacing" id="postSpacingLabel"
-                >Spacing Multiplier:</label
+              <label for="postSpacing" id="postSpacingLabel" data-toolTip="Sets the spacing between panels on the post.">Spacing Multiplier:</label
               >
               <input
                 type="number"
@@ -1545,26 +1536,26 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <div id="panelAppearanceOptions">
-                  <label for="appearanceBorderThickness">Border Thickness (px):</label>
+                  <label for="appearanceBorderThickness" data-toolTip="Sets the outer border thickness of the VMS signage.">Border Thickness (px):</label>
                   <input type="number" min="0" id="appearanceBorderThickness" step="1" onchange="formHandler.readForm()" />
                   <br />
-                  <label for="appearancePadding">Padding (rem):</label>
+                  <label for="appearancePadding" data-toolTip="Distance between border and actual panel.">Padding (rem):</label>
                   <input type="number" min="0" id="appearancePadding" step=".01" onchange="formHandler.readForm()" />
                   <br />
-                  <label for="appearancePixelSize">Pixel Size (rem):</label>
+                  <label for="appearancePixelSize" data-toolTip="Size of pixel 'gaps' between the panel and the border.">Pixel Size (rem):</label>
                   <input type="number" min="0" id="appearancePixelSize" step=".001" onchange="formHandler.readForm()" />
                 </div>
                 <br />
                 <label for="panelColor">Panel Color: </label>
                 <button type="button" id="panelColor" class="smColorDropdownButton" data-color="Green">Green</button>
                 <br />
-                <label for="panelCorner">Panel Corners: </label>
+                <label for="panelCorner" data-toolTip="Appearances of panel corners.">Panel Corners: </label>
                 <select
                   id="panelCorner"
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="panelBorderRadius">Sign Roundness (rem): </label>
+                <label for="panelBorderRadius" data-toolTip="Sets how rounded the sign panel corners appear.">Sign Roundness (rem): </label>
                 <input
                   type="number"
                   id="panelBorderRadius"
@@ -1576,7 +1567,7 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
-                <label for="panelLaneSize">Lane Size (px):</label>
+                <label for="panelLaneSize" data-toolTip="Sets lane size in pixels; use 0 to size automatically.">Lane Size (px):</label>
                 <input
                   type="number"
                   id="panelLaneSize"
@@ -1586,7 +1577,6 @@
                   max="1000"
                   step="1"
                   onchange="formHandler.readForm()"
-                  data-toolTip="Set to 0 for auto sizing"
                 />
               </div>
             </div>
@@ -1668,7 +1658,7 @@
                 onchange="formHandler.readForm()"
               ></select>
               <br />
-              <label for="sMET_Gap">Gap (rem):</label>
+              <label for="sMET_Gap" data-toolTip="Sets the spacing between exit tabs.">Gap (rem):</label>
               <input
                 onchange="formHandler.readForm()"
                 type="number"
@@ -1677,7 +1667,7 @@
                 min="0"
                 step=".05"
               />
-              <label for="sMET_Padding">Padding (rem):</label>
+              <label for="sMET_Padding" data-toolTip="Sets the horizontal padding from the edge of the panel to the exit tabs.">Padding (rem):</label>
               <input
                 onchange="formHandler.readForm()"
                 type="number"
@@ -1687,8 +1677,7 @@
                 step=".05"
               />
               <br />
-              <label for="smET_marginBottom" style="display: none"
-                >Margin Bottom (rem):</label
+              <label for="smET_marginBottom" style="display: none" data-toolTip="For Extend: How 'squished' inwards the exit tab is.">Margin Bottom (rem):</label
               >
               <input
                 onchange="formHandler.readForm()"
@@ -1700,7 +1689,7 @@
                 max="2"
                 step=".04"
               />
-              <label for="smET_independentWidth"> Ignore Width: </label>
+              <label for="smET_independentWidth" data-toolTip="Prevent the width of the exit tab from changing the sign."> Ignore Width: </label>
               <input
                 type="checkbox"
                 id="smET_independentWidth"
@@ -1793,8 +1782,7 @@
                       type="search"
                       class="smDropdownSearch"
                       placeholder="Search icons"
-                      autocomplete="off"
-                    />
+                      autocomplete="off"  />
                     <div class="smDropdownList"></div>
                     <button
                       type="button"
@@ -1820,8 +1808,7 @@
                       type="search"
                       class="smDropdownSearch"
                       placeholder="Search icons"
-                      autocomplete="off"
-                    />
+                      autocomplete="off" />
                     <div class="smDropdownList"></div>
                   </div>
                 </div>
@@ -1845,7 +1832,7 @@
                 </label>
                 <br />
 
-                <label for="sMET_variantAddon">Addon:</label>
+                <label for="sMET_variantAddon" data-toolTip="Additional Variants">Addon:</label>
                 <select
                   id="sMET_variantAddon"
                   
@@ -1863,7 +1850,7 @@
                 <br />
                 <fieldset>
                   <legend>Icon Settings</legend>
-                <label for="sMET_variantIconSizeSlider">Icon Size (rem):</label>
+                <label for="sMET_variantIconSize" data-toolTip="Size of icon (both height & width proportionally).">Icon Size (rem):</label>
                 <input
                   type="range"
                   id="sMET_variantIconSizeSlider"
@@ -1885,8 +1872,7 @@
                   
                   value="3"
                   step="0.1"
-                  oninput="formHandler.readForm()"
-                />
+                  oninput="formHandler.readForm()"/>
                 <label for="sMET_variantIsSquareIcon" class="checkboxLabel">
                   <input
                     type="checkbox"
@@ -1898,7 +1884,7 @@
                   Square Icon
                 </label>
                 <br />
-                <label for="smET_showBackground" class="checkboxLabel">
+                <label for="smET_showBackground" class="checkboxLabel" data-toolTip="Show a background on the image of the icon itself?">
                   <input
                     type="checkbox"
                     id="smET_showBackground"
@@ -1917,8 +1903,7 @@
                   id="smET_iconBackgroundConfigurations"
                   style="display: none"
                 >
-                  <label for="smET_iconBackgroundHorizPadding"
-                    >Horizontal Padding (rem):</label
+                  <label for="smET_iconBackgroundHorizPadding" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):</label
                   >
                   <input
                     type="number"
@@ -1928,8 +1913,7 @@
                     step="0.05"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="smET_iconBackgroundVertPadding"
-                    >Vertical Padding (rem):</label
+                  <label for="smET_iconBackgroundVertPadding" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                   >
                   <input
                     type="number"
@@ -1940,8 +1924,7 @@
                     onchange="formHandler.readForm()"
                   />
                   <br />
-                  <label for="smET_iconBackgroundBorderRadius"
-                    >Border Radius (px):</label
+                  <label for="smET_iconBackgroundBorderRadius" data-toolTip="Sets the border roundness.">Border Radius (px):</label
                   >
                   <input
                     type="number"
@@ -1955,7 +1938,7 @@
                 </fieldset>
                 <fieldset>
                   <legend>Addon Settings</legend>
-                  <label for="sMET_variantOnlyHorizontalPadding">
+                  <label for="sMET_variantOnlyHorizontalPadding" data-toolTip="Sets horizontal padding for the ONLY block.">
                     ONLY Horizontal Padding (rem):</label
                   >
                   <input
@@ -1967,7 +1950,7 @@
                     value="0.25"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="sMET_variantPbmPadding">Text Padding (rem):</label>
+                  <label for="sMET_variantPbmPadding" data-toolTip="Sets the text padding for the Additional Text block.">Text Padding (rem):</label>
                 <input
                   type="number"
                   id="sMET_variantPbmPadding"
@@ -1977,7 +1960,7 @@
                   value="0.25"
                   onchange="formHandler.readForm()"
                 />
-                <label for="smET_variantIsSquare" class="checkboxLabel">
+                <label for="smET_variantIsSquare" class="checkboxLabel" data-toolTip="Turn the Additional Text block into a square.">
                   <input
                     type="checkbox"
                     id="smET_variantIsSquare"
@@ -1986,7 +1969,7 @@
                   />
                   Square Text
                 </label>
-                <label for="smET_variantFontSize">Font Size (rem):</label>
+                <label for="smET_variantFontSize" data-toolTip="Sets the font size; use 0 to size automatically.">Font Size (rem):</label>
                 <input
                   type="number"
                   id="smET_variantFontSize"
@@ -1994,10 +1977,9 @@
                   value="0"
                   min="0"
                   step="0.05"
-                  data-tooltip="Set to 0 for auto"
                   onchange="formHandler.readForm()"
                 />
-                <label for="sMET_variantUnderline" class="checkboxLabel">
+                <label for="sMET_variantUnderline" class="checkboxLabel" data-toolTip="Line between the text and the icon.">
                   <input
                     type="checkbox"
                     id="sMET_variantUnderline"
@@ -2010,8 +1992,7 @@
               </fieldset>
               <fieldset id="smET_FullLeftVariant" class="hidden">
                 <legend>Full Left</legend>
-                <label for="smET_fullLeftMinimumWidth"
-                  >Minimum Width (rem):</label
+                <label for="smET_fullLeftMinimumWidth" data-toolTip="Sets the minimum width of the exit tab.">Minimum Width (rem):</label
                 >
                 <input
                   type="number"
@@ -2030,8 +2011,7 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="smET_fullLeftLetterSpacing"
-                  >Letter Spacing (px):</label
+                <label for="smET_fullLeftLetterSpacing" data-toolTip="Sets the letter spacing.">Letter Spacing (px):</label
                 >
                 <input
                   type="number"
@@ -2043,7 +2023,7 @@
                   step="1"
                   onchange="formHandler.readForm()"
                 />
-                <label for="smET_fullLeftBottomSpacing">Offset (rem): </label>
+                <label for="smET_fullLeftBottomSpacing" data-toolTip="Sets the offset.">Offset (rem): </label>
                 <input
                   type="number"
                   id="smET_fullLeftBottomSpacing"
@@ -2075,8 +2055,7 @@
                   />
                   Place on Separate Row
                 </label>
-                <label for="smET_partialLeftMinWidth"
-                  >Minimum Width (rem):</label
+                <label for="smET_partialLeftMinWidth" data-toolTip="Sets the minimum width of the exit tab.">Minimum Width (rem):</label
                 >
                 <input
                   type="number"
@@ -2088,7 +2067,7 @@
                   step=".01"
                   onchange="formHandler.readForm()"
                 />
-                <label for="smET_partialLeftSpacing">Offset (rem):</label>
+                <label for="smET_partialLeftSpacing" data-toolTip="Sets the verticial offset of LEFT from the actual exit tab elements.">Offset (rem):</label>
                 <input
                   type="number"
                   id="smET_partialLeftSpacing"
@@ -2102,8 +2081,7 @@
                 <fieldset>
                   <legend>LEFT Formatting</legend>
                    
-                <label for="smET_partialLeftHorizontalPaddingSlider"
-                  >Horizontal Padding (rem):</label
+                <label for="smET_partialLeftHorizontalPaddingSlider" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):</label
                 >
                 <input
                   type="range"
@@ -2130,10 +2108,8 @@
                   class="smallVal"
                   oninput="
                     formHandler.readForm();
-                  "
-                />
-                <label for="smET_partialLeftVerticalPaddingSlider"
-                  >Vertical Padding (rem):</label
+                  " />
+                <label for="smET_partialLeftVerticalPaddingSlider" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                 >
                 <input
                   type="range"
@@ -2161,11 +2137,9 @@
                   class="smallVal"
                   oninput="
                     formHandler.readForm();
-                  "
-                />
+                  " />
                 <br />
-                <label for="smET_partialLeftLetterSpacing"
-                  >Letter Spacing (px):</label
+                <label for="smET_partialLeftLetterSpacing" data-toolTip="Sets the letter spacing.">Letter Spacing (px):</label
                 >
                 <input
                   type="number"
@@ -2184,8 +2158,7 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="smET_partialLeftBorderRadius"
-                  >Border Radius (px):
+                <label for="smET_partialLeftBorderRadius" data-toolTip="Sets the border roundness.">Border Radius (px):
                 </label>
                 <input
                   type="number"
@@ -2230,8 +2203,7 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
-                <label for="smET_HOV1VerticalPadding"
-                  >Vertical Padding (rem):</label
+                <label for="smET_HOV1VerticalPadding" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                 >
                 <input
                   type="number"
@@ -2282,8 +2254,7 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
-                <label for="smET_HOV2VerticalPadding"
-                  >Vertical Padding (rem):</label
+                <label for="smET_HOV2VerticalPadding" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                 >
                 <input
                   type="number"
@@ -2308,8 +2279,7 @@
                 </button>
               </div>
               <br />
-              <label for="sMET_textContent" class="noLabelAlignment"
-                >Text:</label
+              <label for="sMET_textContent" class="noLabelAlignment" data-toolTip="Sets the text.">Text:</label
               >
               <input
                 type="text"
@@ -2318,8 +2288,7 @@
                 placeholder="Text Content"
                 oninput="formHandler.readForm()"
               />
-              <label for="sMET_subTextContent" class="noLabelAlignment"
-                >Sub Text:</label
+              <label for="sMET_subTextContent" class="noLabelAlignment" data-toolTip="Sets the sub text.">Sub Text:</label
               >
               <input
                 type="text"
@@ -2335,7 +2304,7 @@
                   Add New Shield
                 </button>
                 <div id="smET_shieldList"></div>
-                <label for="smET_shieldGap">Shield Spacing (rem):</label>
+                <label for="smET_shieldGap" data-toolTip="Sets the spaicng between shields.">Shield Spacing (rem):</label>
                 <input
                   type="number"
                   id="smET_shieldGap"
@@ -2352,8 +2321,7 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="smET_shieldWordSpacing"
-                  >Shield Word Gap (rem):</label
+                <label for="smET_shieldWordSpacing" data-toolTip="Distance between shields and exit tab text.">Shield Word Gap (rem):</label
                 >
                 <input
                   type="number"
@@ -2372,7 +2340,7 @@
                 <label for="sMET_backgroundColor">Background Color:</label>
                 <button type="button" id="sMET_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
 
-                <label for="sMET_minimumHeightSlider">Minimum Height (rem):</label>
+                <label for="sMET_minimumHeightSlider" data-toolTip="Sets the minimum height.">Minimum Height (rem):</label>
                 <input
                   type="range"
                   id="sMET_minimumHeightSlider"
@@ -2396,13 +2364,11 @@
                   step="0.05"
                   oninput="
                     formHandler.readForm();
-                  "
-                />
+                  " />
                 <br />
 
                 <!-- Horizontal  Vertical Padding -->
-                <label for="sMET_horizontalPaddingSlider"
-                  >Horizontal Padding (rem):</label
+                <label for="sMET_horizontalPaddingSlider" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):</label
                 >
                 <input
                   type="range"
@@ -2426,11 +2392,9 @@
                   value="0"
                   step="0.1"
                   onchange="formHandler.readForm();
-                  "
-                />
+                  " />
 
-                <label for="sMET_verticalPaddingSlider"
-                  >Vertical Padding (rem):</label
+                <label for="sMET_verticalPaddingSlider" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                 >
                 <input
                   type="range"
@@ -2455,8 +2419,7 @@
                   step="0.1"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
                 <br />
 
                 <label for="sMET_width">Width:</label>
@@ -2469,8 +2432,7 @@
                 <label
                   for="sMET_widthSizeSlider"
                   id="sMET_widthSizeLabel"
-                  class="hidden"
-                  >Width Size (rem):</label
+                  class="hidden" data-toolTip="Sets the width size.">Width Size (rem):</label
                 >
                 <input
                   type="range"
@@ -2497,8 +2459,7 @@
                   step="0.1"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
                 <br />
 
                 <!-- Alignment  Content Direction -->
@@ -2516,8 +2477,7 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="smET_containerHolderPadding"
-                  >Container Padding (px):</label
+                <label for="smET_containerHolderPadding" data-toolTip="Sets the container padding.">Container Padding (px):</label
                 >
                 <input
                   type="number"
@@ -2565,8 +2525,7 @@
                 <br />
 
                 <!-- Border Thickness  Roundness -->
-                <label for="sMET_borderThicknessSlider"
-                  >Border Thickness (rem):</label
+                <label for="sMET_borderThicknessSlider" data-toolTip="Sets the border thickness.">Border Thickness (rem):</label
                 >
                 <input
                   type="range"
@@ -2591,10 +2550,9 @@
                   step="0.01"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
 
-                <label for="sMET_borderRadiusSlider">Roundness (rem):</label>
+                <label for="sMET_borderRadiusSlider" data-toolTip="Rounds the exit tab corners.">Roundness (rem):</label>
                 <input
                   type="range"
                   id="sMET_borderRadiusSlider"
@@ -2616,14 +2574,13 @@
                   step="0.1"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
               </fieldset>
 
               <fieldset>
                 <legend>Text</legend>
 
-                <label for="sMET_fontSizeSlider">Text Size (px):</label>
+                <label for="sMET_fontSizeSlider" data-toolTip="Sets the text size.">Text Size (px):</label>
                 <input
                   type="range"
                   id="sMET_fontSizeSlider"
@@ -2647,10 +2604,9 @@
                   step="1"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
 
-                <label for="sMET_lineHeightSlider">Line Height (%):</label>
+                <label for="sMET_lineHeightSlider" data-toolTip="Sets the line height.">Line Height (%):</label>
                 <input
                   type="range"
                   id="sMET_lineHeightSlider"
@@ -2674,12 +2630,11 @@
                   step="1"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
                 <br />
 
                 <!-- Letter Spacing  Numeral Letter Spacing -->
-                <label for="sMET_letterSpacingSlider">Letter Spacing (rem):</label>
+                <label for="sMET_letterSpacingSlider" data-toolTip="Sets the letter spacing.">Letter Spacing (rem):</label>
                 <input
                   type="range"
                   id="sMET_letterSpacingSlider"
@@ -2702,11 +2657,9 @@
                   step="0.01"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
 
-                <label for="sMET_numeralLetterSpacingSlider"
-                  >Numeral Letter Spacing (rem):</label
+                <label for="sMET_numeralLetterSpacingSlider" data-toolTip="Sets the numeral letter spacing.">Numeral Letter Spacing (rem):</label
                 >
                 <input
                   type="range"
@@ -2732,8 +2685,7 @@
                   step="0.01"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
                 <br />
 
                 <!-- Word Font Family  Numeral Font Family -->
@@ -2768,10 +2720,9 @@
                   
                   value="150"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()"  />
 
-                <label for="sMET_spaceLettersNumerals" class="checkboxLabel">
+                <label for="sMET_spaceLettersNumerals" class="checkboxLabel" data-toolTip="Add a space between numerals and letters (ex: 123 A-B).">
                   <input
                     type="checkbox"
                     id="sMET_spaceLettersNumerals"
@@ -2781,7 +2732,7 @@
                   />
                   Space Letters Numerals
                 </label>
-                <label for="smET_useTrimFormat" class="checkboxLabel">
+                <label for="smET_useTrimFormat" class="checkboxLabel" data-toolTip="Turns precise text size on or off (disables line height)">
                   <input
                     type="checkbox"
                     id="smET_useTrimFormat"
@@ -2803,8 +2754,7 @@
                   Offset Non-Numerals Vertically
                 </label>
 
-                <label for="sMET_numeralWordSpacingSlider"
-                  >Numeral Word Gap (rem):</label
+                <label for="sMET_numeralWordSpacingSlider" data-toolTip="Distance between words and numerals.">Numeral Word Gap (rem):</label
                 >
                 <input
                   type="range"
@@ -2830,8 +2780,7 @@
                   step="0.01"
                   onchange="
                     formHandler.readForm();
-                  "
-                />
+                  " />
               </fieldset>
             </div>
           </div>
@@ -3004,8 +2953,7 @@
                     <div>
                       <span>Quick Edits</span>
                       <br />
-                      <label for="spShieldQuick_routeNumber"
-                        >Route Number:
+                      <label for="spShieldQuick_routeNumber" data-toolTip="Sets the route number.">Route Number:
                       </label>
                       <input
                         type="string"
@@ -3014,8 +2962,7 @@
                         oninput="formHandler.readForm()"
                       />
                       <br />
-                      <label for="spShieldQuick_designation"
-                        >Designation:
+                      <label for="spShieldQuick_designation" data-toolTip="Sets the designation.">Designation:
                       </label>
                       <input
                         type="string"
@@ -3024,7 +2971,7 @@
                         oninput="formHandler.readForm()"
                       />
                       <br />
-                      <label for="spShieldQuick_scaleSlider">Scale: </label>
+                      <label for="spShieldQuick_scaleSlider" data-toolTip="Sets the size of the shield in the quick editor.">Scale: </label>
                       <input
                         type="range"
                         min="0"
@@ -3047,11 +2994,9 @@
                         step="1"
                         oninput="
                           formHandler.readForm();
-                        "
-                      />
+                        " />
                       <br />
-                      <label for="spShieldQuick_horizMargins"
-                        >Horiz / Vert Padding: (px)</label
+                      <label for="spShieldQuick_horizMargins" data-toolTip="Padding between the shield and anything around it.">Horiz / Vert Padding: (px)</label
                       >
                       <input
                         id="spShieldQuick_horizMargins"
@@ -3068,14 +3013,13 @@
                         type="number"
                         value="8"
                         step="1"
-                        oninput="formHandler.readForm()"
-                      />
+                        oninput="formHandler.readForm()" />
                     </div>
                   </div>
                   <div id="smSPShieldBannerConfig">
                     <div id="smSP_bannerMaster"></div>
                     <div class="smSPShieldBannerController">
-                      <label for="smSPShieldBannerAlignment">Alignment:</label>
+                      <label for="smSPShieldBannerAlignment" data-toolTip="Next alignment of added banner.">Alignment:</label>
                       <select id="smSPShieldBannerAlignment"></select>
                       <button type="button" id="smSPShieldAddBanner">
                         Add Banner
@@ -3172,6 +3116,16 @@
                     >
                     Selected
                   </button>
+                   <button
+                    type="button"
+                    id="sMSPDuplicateBlock"
+                    onclick="App.duplicateControlElem()"
+                  >
+                    <span class="material-symbols-outlined" disabled
+                      >content_copy</span
+                    >
+                    Duplicate
+                  </button>
                 </div>
                 <div id="smSPProperties">
                   <div data-property="sdCtrlText" class="">
@@ -3194,9 +3148,9 @@
                     <label for="sdCtrlText_fontFamily">Font:</label>
                     <select id="sdCtrlText_fontFamily"></select>
                     <br />
-                    <label for="sdCtrlText_textAlign">Text Alignment:</label>
+                    <label for="sdCtrlText_textAlign" data-toolTip="Align the text itself, not its relative position.">Text Alignment:</label>
                     <select id="sdCtrlText_textAlign"></select>
-                    <label for="sdCtrlText_fontSize">Font Size (%):</label>
+                    <label for="sdCtrlText_fontSize" data-toolTip="Sets the font size.">Font Size (%):</label>
                     <input
                       type="number"
                       id="sdCtrlText_fontSize"
@@ -3207,15 +3161,14 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdCtrlText_smallCapitals"
-                      >Small Capitals:</label
+                    <label for="sdCtrlText_smallCapitals">Small Capitals:</label
                     >
                     <input type="checkbox" id="sdCtrlText_smallCapitals" />
                     <input type="number" id='sdCtrlText_capitalSize' class="hidden smallVal" min="0" step="1" data-toolTip="Relative Size"/>
-                    <label for="sdCtrlText_alignment">Alignment: </label>
+                    <label for="sdCtrlText_alignment" data-toolTip="Align block element relative to other elements.">Alignment: </label>
                     <select id="sdCtrlText_alignment"></select>
                     <br />
-                    <label for="sdCtrlText_lineHeightSlider">Line Height (%): </label>
+                    <label for="sdCtrlText_lineHeightSlider" data-toolTip="Sets the line height.">Line Height (%): </label>
                     <input
                       type="range"
                       min="0"
@@ -3228,10 +3181,8 @@
                       id="sdCtrlText_lineHeight"
                       class="smallVal"
                       type="number"
-                      value="100"
-                    />
-                    <label for="sdCtrlText_wordSpacingSlider"
-                      >Word Spacing (rem):</label
+                      value="100"/>
+                    <label for="sdCtrlText_wordSpacingSlider" data-toolTip="Sets the word spacing.">Word Spacing (rem):</label
                     >
                     <input
                       type="range"
@@ -3246,11 +3197,9 @@
                       class="smallVal"
                       type="number"
                       value="0"
-                      step="0.01"
-                    />
+                      step="0.01">
                     <br />
-                    <label for="sdCtrlText_useNumeralFormatting"
-                      >Enlarge Numerals:</label
+                    <label for="sdCtrlText_useNumeralFormatting">Enlarge Numerals:</label
                     >
                     <input
                       type="checkbox"
@@ -3271,11 +3220,9 @@
                       type="checkbox"
                       class="hidden"
                       id="sdCtrlText_spaceNumeralsLetters"
-                      data-toolTip="Space Numerals & Letters"
                     />
 
-                    <label for="sdCtrlText_useBannerFormatting"
-                      >Enlarge Banners:</label
+                    <label for="sdCtrlText_useBannerFormatting">Enlarge Banners:</label
                     >
                     <input
                       type="checkbox"
@@ -3306,7 +3253,7 @@
                   </div>
 
                   <div data-property="sdBlocker" class="hidden">
-                    <label for="sdBlocker_dividerWidth">Width: </label>
+                    <label for="sdBlocker_dividerWidth" data-toolTip="Sets the width of the divider.">Width: </label>
                     <input
                       type="number"
                       id="sdBlocker_dividerWidth"
@@ -3321,8 +3268,7 @@
                       data-toolTip="Unit (%/rem)"
                       class="sdTextEditorSmall"
                     ></select>
-                    <label for="sdBlocker_dividerHeight"
-                      >Height Height (rem):
+                    <label for="sdBlocker_dividerHeight" data-toolTip="Sets the divider height.">Divider Height (rem):
                     </label>
                     <input
                       type="number"
@@ -3341,7 +3287,7 @@
                     <br />
                     <label for="sdBlocker_fullBleed">Include Block Padding in Width:</label>
                     <input type="checkbox" id="sdBlocker_fullBleed" />
-                    <label for="sdBlocker_visible">Visibility:</label>
+                    <label for="sdBlocker_visible" data-toolTip="Shows or hides the divider.">Visibility:</label>
                     <input type="checkbox" id="sdBlocker_visible" />
                   </div>
 
@@ -3356,7 +3302,7 @@
                     </label>
                     <select id="sdShieldGroup_direction"></select>
                     <br />
-                    <label for="sdShieldGroup_gap">Gap: </label>
+                    <label for="sdShieldGroup_gap" data-toolTip="Sets the gap between shield elements.">Gap: </label>
                     <input
                       type="number"
                       id="sdShieldGroup_gap"
@@ -3365,7 +3311,7 @@
                       value=".5"
                       step=".01"
                     />
-                    <label for="sdShieldGroup_inlineShields">Inline Shields:</label>
+                    <label for="sdShieldGroup_inlineShields" data-toolTip="Displays the shields inline with other shields.">Inline Shields:</label>
                     <input type="checkbox" id="sdShieldGroup_inlineShields" />
                   </div>
 
@@ -3387,9 +3333,9 @@
                     <label for="sdAdvisory_fontFamily">Font:</label>
                     <select id="sdAdvisory_fontFamily"></select>
                     <br />
-                    <label for="sdAdvisory_alignment">Alignment: </label>
+                    <label for="sdAdvisory_alignment" data-toolTip="Sets the alignment relative to other block elements.">Alignment: </label>
                     <select id="sdAdvisory_alignment"></select>
-                    <label for="sdAdvisory_fontSize">Font Size (%):</label>
+                    <label for="sdAdvisory_fontSize" data-toolTip="Sets the font size.">Font Size (%):</label>
                     <input
                       type="number"
                       id="sdAdvisory_fontSize"
@@ -3400,8 +3346,7 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdAdvisory_wordSpacingSlider"
-                      >Word Spacing (rem):</label
+                    <label for="sdAdvisory_wordSpacingSlider" data-toolTip="Sets the word spacing.">Word Spacing (rem):</label
                     >
                     <input
                       type="range"
@@ -3416,13 +3361,11 @@
                       class="smallVal"
                       type="number"
                       value="0"
-                      step="0.01"
-                    />
+                      step="0.01" />
                     <label for="sdAdvisory_textAlign">Text Alignment:</label>
                     <select id="sdAdvisory_textAlign"></select>
                     <br />
-                    <label for="sdAdvisory_useNumeralFormatting"
-                      >Enlarge Numerals:</label
+                    <label for="sdAdvisory_useNumeralFormatting">Enlarge Numerals:</label
                     >
                     <input
                       type="checkbox"
@@ -3443,11 +3386,9 @@
                       type="checkbox"
                       class="hidden"
                       id="sdAdvisory_spaceNumeralsLetters"
-                      data-toolTip="Space Numerals & Letters"
                     />
 
-                    <label for="sdAdvisory_useBannerFormatting"
-                      >Enlarge Banners:</label
+                    <label for="sdAdvisory_useBannerFormatting">Enlarge Banners:</label
                     >
                     <input
                       type="checkbox"
@@ -3478,8 +3419,7 @@
                     <br />
                     <fieldset>
                       <legend>Container Settings</legend>
-                      <label for="sdAdvisory_borderRadius"
-                      >Roundness (px):
+                      <label for="sdAdvisory_borderRadius" data-toolTip="Sets the roundness.">Roundness (px):
                     </label>
                     <input
                       type="number"
@@ -3502,8 +3442,7 @@
                     />
                     <button type="button" id="sdAdvisory_borderColor" class="smColorDropdownButton hidden" data-color="White">White</button>
                     <br />
-<label for="sdAdvisory_horizPaddingSlider"
-                      >Horizontal Padding (rem):
+<label for="sdAdvisory_horizPaddingSlider" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):
                     </label>
                     <input
                       type="range"
@@ -3518,11 +3457,9 @@
                       class="smallVal"
                       type="number"
                       value=".3"
-                      step="0.1"
-                    />
+                      step="0.1" />
 
-                    <label for="sdAdvisory_vertPaddingSlider"
-                      >Vertical Padding (rem):
+                    <label for="sdAdvisory_vertPaddingSlider" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):
                     </label>
                     <input
                       type="range"
@@ -3537,8 +3474,7 @@
                       class="smallVal"
                       type="number"
                       value=".3"
-                      step="0.1"
-                    />
+                      step="0.1" />
                     </fieldset>
                   </div>
 
@@ -3572,8 +3508,7 @@
                           id="sdIcon_iconSearch"
                           class="smDropdownSearch"
                           placeholder="Search icons"
-                          autocomplete="off"
-                        />
+                          autocomplete="off"  />
                         <div class="smDropdownList"></div>
                         <button
                           type="button"
@@ -3585,7 +3520,7 @@
                       </div>
                     </div>
                     <br />
-                    <label for="sdIcon_iconSize">Size (%): </label>
+                    <label for="sdIcon_iconSize" data-toolTip="Sets the size.">Size (%): </label>
                     <input
                       type="number"
                       id="sdIcon_iconSize"
@@ -3623,11 +3558,10 @@
                     />
                     <br />
 
-                    <label for="sdIcon_spacing">Padding (px):</label>
+                    <label for="sdIcon_spacing" data-toolTip="Sets the padding around the icon.">Padding (px):</label>
                     <input
                       type="number"
                       id="sdIcon_spacing"
-                      data-toolTip="Spacing"
                       min="0"
                       value="4"
                       placeholder="4"
@@ -3640,7 +3574,7 @@
                   </div>
 
                   <div data-property="sdBeacon" class="hidden">
-                    <label for="sdBeacon_size">Size (rem): </label>
+                    <label for="sdBeacon_size" data-toolTip="Sets the size.">Size (rem): </label>
                     <input
                       type="number"
                       id="sdBeacon_size"
@@ -3676,13 +3610,12 @@
                           type="search"
                           class="smDropdownSearch"
                           placeholder="Search arrows"
-                          autocomplete="off"
-                        />
+                          autocomplete="off" " />
                         <div class="smDropdownList"></div>
                       </div>
                     </div>
                     <br />
-                    <label for="sdArrow_rotationSlider">Rotation (deg):</label>
+                    <label for="sdArrow_rotationSlider" data-toolTip="Rotates this block arrow.">Rotation (deg):</label>
                     <input
                       type="range"
                       id="sdArrow_rotationSlider"
@@ -3695,8 +3628,7 @@
                       id="sdArrow_rotation"
                       class="smallVal"
                       type="number"
-                      value="0"
-                    />
+                      value="0" />
                     <div class="sdArrow_rotationButtons">
                       <button
                         type="button"
@@ -3756,7 +3688,7 @@
                       </button>
                     </div>
                     <br />
-                    <label for="sdArrow_size">Size (rem):</label>
+                    <label for="sdArrow_size" data-toolTip="Sets the size.">Size (rem):</label>
                     <input
                       type="number"
                       id="sdArrow_size"
@@ -3769,8 +3701,7 @@
                     <label for="sdArrow_alignment">Alignment: </label>
                     <select id="sdArrow_alignment"></select>
                     <br />
-                    <label for="sdArrow_paddingHorizontal"
-                      >Horizontal Container Padding (rem):</label
+                    <label for="sdArrow_paddingHorizontal" data-toolTip="Sets the horizontal container padding.">Horizontal Container Padding (rem):</label
                     >
                     <input
                       type="number"
@@ -3781,8 +3712,7 @@
                       step="0.1"
                       value="0"
                     />
-                    <label for="sdArrow_paddingVertical"
-                      >Vertical Container Padding (rem):</label
+                    <label for="sdArrow_paddingVertical" data-toolTip="Sets the vertical container padding.">Vertical Container Padding (rem):</label
                     >
                     <input
                       type="number"
@@ -3794,8 +3724,7 @@
                       value="0"
                     />
                     <br />
-                    <label for="sdArrow_marginHorizontal"
-                      >Image Margin Horizontal (rem):</label
+                    <label for="sdArrow_marginHorizontal" data-toolTip="Sets the image margin horizontal.">Image Margin Horizontal (rem):</label
                     >
                     <input
                       type="number"
@@ -3804,8 +3733,7 @@
                       value="0"
                       step="0.1"
                     />
-                    <label for="sdArrow_marginVertical"
-                      >Image Margin Vertical (rem):</label
+                    <label for="sdArrow_marginVertical" data-toolTip="Sets the image margin vertical.">Image Margin Vertical (rem):</label
                     >
                     <input
                       type="number"
@@ -3837,13 +3765,13 @@
                           type="search"
                           class="smDropdownSearch"
                           placeholder="Search toll logos"
-                          autocomplete="off"
-                        />
+                          autocomplete="off" 
+                           />
                         <div class="smDropdownList"></div>
                       </div>
                     </div>
                     <br />
-                    <label for="sdTollLogo_logoHeight">Size (rem):</label>
+                    <label for="sdTollLogo_logoHeight" data-toolTip="Sets the size.">Size (rem):</label>
                     <input
                       type="number"
                       id="sdTollLogo_logoHeight"
@@ -3853,7 +3781,7 @@
                       step="0.1"
                       value="3"
                     />
-                    <label for="sdTollLogo_spacing">Spacing (rem):</label>
+                    <label for="sdTollLogo_spacing" data-toolTip="Sets the spacing.">Spacing (rem):</label>
                     <input
                       type="number"
                       id="sdTollLogo_spacing"
@@ -3871,8 +3799,7 @@
                     <br />
                     <label for="sdTollLogo_background">Background:</label>
                     <input type="checkbox" id="sdTollLogo_background" />
-                    <label for="sdTollLogo_showOnlyBlock"
-                      >Show Only Block</label
+                    <label for="sdTollLogo_showOnlyBlock">Show Only Block</label
                     >
                     <input type="checkbox" id="sdTollLogo_showOnlyBlock" />
                     <br />
@@ -3883,8 +3810,7 @@
                       >
                       <button type="button" id="sdTollLogo_backgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
                       <br />
-                      <label for="sdTollLogo_tollBorderRadius"
-                        >BG Roundness (px):</label
+                      <label for="sdTollLogo_tollBorderRadius" data-toolTip="Sets the bg roundness.">BG Roundness (px):</label
                       >
                       <input
                         type="number"
@@ -3894,7 +3820,7 @@
                         step="1"
                         value="8"
                       />
-                      <label for="sdTollLogo_border">Border Width (px):</label>
+                      <label for="sdTollLogo_border" data-toolTip="Sets the border width.">Border Width (px):</label>
                       <input
                         type="number"
                         id="sdTollLogo_border"
@@ -3904,8 +3830,7 @@
                         value="1"
                       />
                       <br />
-                      <label for="sdTollLogo_horizontalPadding"
-                        >Horizontal Padding (rem):</label
+                      <label for="sdTollLogo_horizontalPadding" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):</label
                       >
                       <input
                         type="number"
@@ -3913,8 +3838,7 @@
                         value=".2"
                         step=".001"
                       />
-                      <label for="sdTollLogo_verticalPadding"
-                        >Vertical Padding (rem):</label
+                      <label for="sdTollLogo_verticalPadding" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                       >
                       <input
                         type="number"
@@ -3929,8 +3853,7 @@
                         >Direction:</label
                       >
                       <select id="sdTollLogo_onlyBlockDirection"></select>
-                      <label for="sdTollLogo_onlyBlockSpacing"
-                        >Spacing (rem):</label
+                      <label for="sdTollLogo_onlyBlockSpacing" data-toolTip="Sets the spacing.">Spacing (rem):</label
                       >
                       <input
                         type="number"
@@ -3939,8 +3862,7 @@
                         step=".01"
                       />
                       <br />
-                      <label for="sdTollLogo_onlyBlockFontSize"
-                        >Font Size (px):</label
+                      <label for="sdTollLogo_onlyBlockFontSize" data-toolTip="Sets the font size.">Font Size (px):</label
                       >
                       <input
                         type="number"
@@ -3951,8 +3873,7 @@
                       <label for="sdTollLogo_fontFamily">Font Family:</label>
                       <select id="sdTollLogo_fontFamily"></select>
                       <br />
-                      <label for="sdTollLogo_onlyBlockHorizPadding"
-                        >Horizontal Padding (rem):</label
+                      <label for="sdTollLogo_onlyBlockHorizPadding" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):</label
                       >
                       <input
                         type="number"
@@ -3960,8 +3881,7 @@
                         value=".2"
                         step=".001"
                       />
-                      <label for="sdTollLogo_onlyBlockVertPadding"
-                        >Vertical Padding (rem):</label
+                      <label for="sdTollLogo_onlyBlockVertPadding" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):</label
                       >
                       <input
                         type="number"
@@ -3970,8 +3890,7 @@
                         step=".001"
                       />
                       <hr />
-                      <label for="sdTollLogo_containerHorizontalPadding"
-                        >Container Horiz. Padding (rem):</label
+                      <label for="sdTollLogo_containerHorizontalPadding" data-toolTip="Sets the container horiz. padding.">Container Horiz. Padding (rem):</label
                       >
                       <input
                         type="number"
@@ -3979,8 +3898,7 @@
                         value=".2"
                         step=".01"
                       />
-                      <label for="sdTollLogo_containerVerticalPadding"
-                        >Container Vert. Padding (rem):</label
+                      <label for="sdTollLogo_containerVerticalPadding" data-toolTip="Sets the container vert. padding.">Container Vert. Padding (rem):</label
                       >
                       <input
                         type="number"
@@ -3993,8 +3911,7 @@
                         >Container BG Color:</label
                       >
                       <button type="button" id="sdTollLogo_containerBackgroundColor" class="smColorDropdownButton" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
-                      <label for="sdTollLogo_containerBorderWidth"
-                        >Border Width (px):</label
+                      <label for="sdTollLogo_containerBorderWidth" data-toolTip="Sets the border width.">Border Width (px):</label
                       >
                       <input
                         type="number"
@@ -4004,8 +3921,7 @@
                         step="1"
                       />
                       <br />
-                      <label for="sdTollLogo_containerBorderRadius"
-                        >Container Roundness (px):</label
+                      <label for="sdTollLogo_containerBorderRadius" data-toolTip="Sets the container roundness.">Container Roundness (px):</label
                       >
                       <input
                         type="number"
@@ -4014,8 +3930,7 @@
                         min="0"
                         step="1"
                       />
-                      <label for="sdTollLogo_onlyBorderRadius"
-                        >Only Roundness (px):</label
+                      <label for="sdTollLogo_onlyBorderRadius" data-toolTip="Sets the only roundness.">Only Roundness (px):</label
                       >
                       <input
                         type="number"
@@ -4053,8 +3968,7 @@
                     >
                     <select id="sdActionMessage_textAlign"></select>
                     <br />
-                    <label for="sdActionMessage_lineHeightSlider"
-                      >Line Height (%):
+                    <label for="sdActionMessage_lineHeightSlider" data-toolTip="Sets the line height.">Line Height (%):
                     </label>
                     <input
                       type="range"
@@ -4068,9 +3982,8 @@
                       id="sdActionMessage_lineHeight"
                       class="smallVal"
                       type="number"
-                      value="100"
-                    />
-                    <label for="sdActionMessage_fontSize">Font Size (%):</label>
+                      value="100" />
+                    <label for="sdActionMessage_fontSize" data-toolTip="Sets the font size.">Font Size (%):</label>
                     <input
                       type="number"
                       id="sdActionMessage_fontSize"
@@ -4081,8 +3994,7 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdActionMessage_wordSpacingSlider"
-                      >Word Spacing (rem):</label
+                    <label for="sdActionMessage_wordSpacingSlider" data-toolTip="Sets the word spacing.">Word Spacing (rem):</label
                     >
                     <input
                       type="range"
@@ -4097,11 +4009,9 @@
                       class="smallVal"
                       type="number"
                       value="0"
-                      step="0.01"
-                    />
+                      step="0.01" />
                     <br />
-                    <label for="sdActionMessage_useNumeralFormatting"
-                      >Enlarge Numerals:</label
+                    <label for="sdActionMessage_useNumeralFormatting">Enlarge Numerals:</label
                     >
                     <input
                       type="checkbox"
@@ -4122,11 +4032,9 @@
                       type="checkbox"
                       class="hidden"
                       id="sdActionMessage_spaceNumeralsLetters"
-                      data-toolTip="Space Numerals & Letters"
                     />
 
-                    <label for="sdActionMessage_useBannerFormatting"
-                      >Enlarge Banners:</label
+                    <label for="sdActionMessage_useBannerFormatting">Enlarge Banners:</label
                     >
                     <input
                       type="checkbox"
@@ -4170,8 +4078,7 @@
                     <br />
                     <label for="sdElectronicSign_fontFamily">Font:</label>
                     <select id="sdElectronicSign_fontFamily"></select>
-                    <label for="sdElectronicSign_fontSize"
-                      >Font Size (%):</label
+                    <label for="sdElectronicSign_fontSize" data-toolTip="Sets the font size.">Font Size (%):</label
                     >
                     <input
                       type="number"
@@ -4183,8 +4090,7 @@
                       value="100"
                     />
                     <br />
-                    <label for="sdElectronicSign_wordSpacingSlider"
-                      >Word Spacing (rem):</label
+                    <label for="sdElectronicSign_wordSpacingSlider" data-toolTip="Sets the word spacing.">Word Spacing (rem):</label
                     >
                     <input
                       type="range"
@@ -4199,8 +4105,7 @@
                       class="smallVal"
                       type="number"
                       value="0"
-                      step="0.01"
-                    />
+                      step="0.01" />
                     <label for="sdElectronicSign_textColor">Text Color:</label>
                     <button class="smColorDropdownButton" data-color="Orange" id="sdElectronicSign_textColor"></button>
                     <br />
@@ -4223,8 +4128,7 @@
                       <label for="sdElectronicSign_alignment">Alignment: </label>
                       <select id="sdElectronicSign_alignment"></select>
                       <br />
-                       <label for="sdElectronicSign_vertPaddingSlider"
-                      >Vertical Padding (rem):
+                       <label for="sdElectronicSign_vertPaddingSlider" data-toolTip="Sets the vertical padding.">Vertical Padding (rem):
                     </label>
                     <input
                       type="range"
@@ -4239,10 +4143,8 @@
                       class="smallVal"
                       type="number"
                       value=".5"
-                      step=".01"
-                    />
-                    <label for="sdElectronicSign_horizPaddingSlider"
-                      >Horizontal Padding (rem):
+                      step=".01" />
+                    <label for="sdElectronicSign_horizPaddingSlider" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):
                     </label>
                     <input
                       type="range"
@@ -4257,8 +4159,7 @@
                       class="smallVal"
                       type="number"
                       value=".5"
-                      step="0.01"
-                    />
+                      step="0.01" />
                     <br />
                     <label
                       for="sdElectronicSign_setWidth"
@@ -4281,7 +4182,9 @@
                     <button id="sdGroup_editGroup">Edit Block Elements</button>
                     <label for="sdGroup_alignment">Alignment:</label>
                     <select id="sdGroup_alignment"></select>
-                    <label for="sdGroup_width" data-tooltip="Set to 0 for auto"
+                    <label
+                      for="sdGroup_width"
+                      data-toolTip="Sets group width; use 0 to size automatically."
                       >Width (rem):</label
                     >
                     <input
@@ -4321,8 +4224,7 @@
                 <fieldset id="smSPBlockProperties">
                   <legend>Block Properties</legend>
                   <div>
-                    <label for="sdBlock_topMarginSlider" class="noLabelAlignment"
-                      >Top Margin (rem):
+                    <label for="sdBlock_topMarginSlider" class="noLabelAlignment" data-toolTip="Sets the spacing between this block element and one above it / the panel.">Top Margin (rem):
                     </label>
                     <div>
                       <input
@@ -4342,13 +4244,11 @@
                         type="number"
                         value="0"
                         step=".01"
-                        onchange="formHandler.readForm()"
-                      />
+                        onchange="formHandler.readForm()" />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_bottomMarginSlider" class="noLabelAlignment"
-                      >Bottom Margin (rem):
+                    <label for="sdBlock_bottomMarginSlider" class="noLabelAlignment" data-toolTip="Sets the spacing between this block element and one below it / the panel.">Bottom Margin (rem):
                     </label>
                     <div>
                       <input
@@ -4369,14 +4269,12 @@
                         type="number"
                         value="0"
                         step=".01"
-                        onchange="formHandler.readForm()"
-                      />
+                        onchange="formHandler.readForm()" />
                     </div>
                   </div>
                   <br />
                   <div>
-                    <label for="sdBlock_topPaddingSlider" class="noLabelAlignment"
-                      >Top Padding (rem):
+                    <label for="sdBlock_topPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the top padding.">Top Padding (rem):
                     </label>
                     <div>
                       <input
@@ -4395,13 +4293,11 @@
                         type="number"
                         value="0"
                         step=".01"
-                        onchange="formHandler.readForm()"
-                      />
+                        onchange="formHandler.readForm()" />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_bottomPaddingSlider" class="noLabelAlignment"
-                      >Bottom Padding (rem):
+                    <label for="sdBlock_bottomPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the bottom padding.">Bottom Padding (rem):
                     </label>
                     <div>
                       <input
@@ -4419,14 +4315,12 @@
                         type="number"
                         value="0"
                         step=".01"
-                        onchange="formHandler.readForm()"
-                      />
+                        onchange="formHandler.readForm()" />
                     </div>
                   </div>
                   <br />
                   <div>
-                    <label for="sdBlock_leftPaddingSlider" class="noLabelAlignment"
-                      >Left Padding (rem):
+                    <label for="sdBlock_leftPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the left padding.">Left Padding (rem):
                     </label>
                     <div>
                       <input
@@ -4444,13 +4338,11 @@
                         type="number"
                         value="0"
                         step=".01"
-                        onchange="formHandler.readForm()"
-                      />
+                        onchange="formHandler.readForm()" />
                     </div>
                   </div>
                   <div>
-                    <label for="sdBlock_rightPaddingSlider" class="noLabelAlignment"
-                      >Right Padding (rem):
+                    <label for="sdBlock_rightPaddingSlider" class="noLabelAlignment" data-toolTip="Sets the right padding.">Right Padding (rem):
                     </label>
                     <div>
                       <input
@@ -4468,8 +4360,7 @@
                         type="number"
                         value="0"
                         step=".01"
-                        onchange="formHandler.readForm()"
-                      />
+                        onchange="formHandler.readForm()" />
                     </div>
                   </div>
                   <br />
@@ -4501,7 +4392,9 @@
                     id="sdBlock_stretchLeft"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="sdBlock_stretchLeft" class="noLabelAlignment"
+                  <label
+                    for="sdBlock_stretchLeft"
+                    class="noLabelAlignment"
                     >Left
                   </label>
                   <input
@@ -4509,22 +4402,20 @@
                     id="sdBlock_stretchCenter"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="sdBlock_stretchCenter" class="noLabelAlignment"
-                    >Center
+                  <label for="sdBlock_stretchCenter" class="noLabelAlignment">Center
                   </label>
                   <input
                     type="checkbox"
                     id="sdBlock_stretchRight"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="sdBlock_stretchRight" class="noLabelAlignment"
-                    >Right</label
+                  <label for="sdBlock_stretchRight" class="noLabelAlignment">Right</label
                   >
                 </fieldset>
               </div>
             </div>
             <div id="sMSPExtra" class="tabHidden">
-              <label for="subPanelLength">Subpanel Width (Lanes): </label>
+              <label for="subPanelLength" data-toolTip="Sets subpanel width in lanes; use 0 to size automatically.">Subpanel Width (Lanes): </label>
               <input
                 type="number"
                 id="subPanelLength"
@@ -4533,7 +4424,6 @@
                 step="1"
                 value="0"
                 onchange="formHandler.readForm()"
-                data-toolTip="Set to 0 for auto"
               />
               <br />
               <label for="subpanelAlign">Align Items:</label>
@@ -4542,7 +4432,7 @@
                 onchange="formHandler.readForm()"
               ></select>
               <br />
-              <label for="subpanelDividerHeight">Divider Height:</label>
+              <label for="subpanelDividerHeight" data-toolTip="Sets the divider height.">Divider Height:</label>
               <select
                 id="subpanelDividerHeightUnit"
                 
@@ -4657,14 +4547,12 @@
                         type="search"
                         class="smDropdownSearch"
                         placeholder="Search arrows"
-                        autocomplete="off"
-                      />
+                        autocomplete="off" />
                       <div class="smDropdownList"></div>
                     </div>
                   </div>
                   <br />
-                  <label for="guideStandardArrow_rotation"
-                    >Rotation (deg):</label
+                  <label for="guideStandardArrow_rotation" data-toolTip="Sets the rotation.">Rotation (deg):</label
                   >
                   <input
                     type="number"
@@ -4672,7 +4560,7 @@
                     value="0"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="guideStandardArrow_size">Size (rem):</label>
+                  <label for="guideStandardArrow_size" data-toolTip="Sets the size.">Size (rem):</label>
                   <input
                     type="number"
                     id="guideStandardArrow_size"
@@ -4740,8 +4628,7 @@
                     </button>
                   </div>
                   <br />
-                  <label for="guideStandardArrow_marginHorizontal"
-                    >Margin Horizontal (rem):</label
+                  <label for="guideStandardArrow_marginHorizontal" data-toolTip="Sets the margin horizontal.">Margin Horizontal (rem):</label
                   >
                   <input
                     type="number"
@@ -4751,8 +4638,7 @@
                     min="0"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="guideStandardArrow_marginVertical"
-                    >Margin Vertical (rem):</label
+                  <label for="guideStandardArrow_marginVertical" data-toolTip="Sets the margin vertical.">Margin Vertical (rem):</label
                   >
                   <input
                     type="number"
@@ -4772,7 +4658,7 @@
                 </div>
               </div>
               <div id="standardArrowGeneralSettings">
-                <label for="standardArrows_gap">Gap (rem):</label>
+                <label for="standardArrows_gap" data-toolTip="Sets the gap.">Gap (rem):</label>
                 <input
                   type="number"
                   id="standardArrows_gap"
@@ -4788,8 +4674,7 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="standardArrows_horizontalPadding"
-                  >Horizontal Padding (rem):</label
+                <label for="standardArrows_horizontalPadding" data-toolTip="Sets the horizontal padding.">Horizontal Padding (rem):</label
                 >
                 <input
                   type="number"
@@ -4809,8 +4694,7 @@
                   value="0"
                   step="0.01"
                   min="0"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()"  />
                 <span>/</span>
                 <input
                   type="number"
@@ -4819,8 +4703,7 @@
                   value=".5"
                   step="0.01"
                   min="0"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()"  />
               </div>
               <div id="standardArrowExitOnlySettings">
                 <fieldset id="standardArrowExitOnlyArrowProperties">
@@ -4839,13 +4722,12 @@
                         type="search"
                         class="smDropdownSearch"
                         placeholder="Search arrows"
-                        autocomplete="off"
-                      />
+                        autocomplete="off" />
                       <div class="smDropdownList"></div>
                     </div>
                   </div>
                   <br />
-                  <label for="exitOnlyArrowCount"># Arrows:</label>
+                  <label for="exitOnlyArrowCount" data-toolTip="Sets the number of arrows."># Arrows:</label>
                   <input
                     type="number"
                     id="exitOnlyArrowCount"
@@ -4853,7 +4735,7 @@
                     value="1"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="exitOnlyArrowSize">Arrow Size (rem):</label>
+                  <label for="exitOnlyArrowSize" data-toolTip="Sets the arrow size.">Arrow Size (rem):</label>
                   <input
                     type="number"
                     id="exitOnlyArrowSize"
@@ -4863,8 +4745,7 @@
                     onchange="formHandler.readForm()"
                   />
                   <br />
-                  <label for="exitOnlyArrowRotation"
-                    >Arrow Rotation (deg):</label
+                  <label for="exitOnlyArrowRotation" data-toolTip="Sets the arrow rotation.">Arrow Rotation (deg):</label
                   >
                   <input
                     type="number"
@@ -4941,7 +4822,7 @@
                 <br />
                 <fieldset id="standardArrowExitOnlyText">
                   <legend>Text</legend>
-                  <label for="exitOnlyText">Exit Only Text:</label>
+                  <label for="exitOnlyText" data-toolTip="Sets the exit only text.">Exit Only Text:</label>
                   <input
                     type="text"
                     id="exitOnlyText"
@@ -4964,7 +4845,7 @@
                     id="exitOnlyFontFamily"
                     onchange="formHandler.readForm()"
                   ></select>
-                  <label for="exitOnlyFontSize">Exit Only Font Size:</label>
+                  <label for="exitOnlyFontSize" data-toolTip="Sets the exit only font size.">Exit Only Font Size:</label>
                   <input
                     type="number"
                     id="exitOnlyFontSize"
@@ -4972,8 +4853,7 @@
                     onchange="formHandler.readForm()"
                   />
                   <br />
-                  <label for="exitOnlyWordSpacing"
-                    >Exit Only Word Spacing (rem):</label
+                  <label for="exitOnlyWordSpacing" data-toolTip="Sets the exit only word spacing.">Exit Only Word Spacing (rem):</label
                   >
                   <input
                     type="number"
@@ -4982,8 +4862,7 @@
                     step=".05"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="exitOnlyLetterSpacing"
-                    >Exit Only Letter Spacing (rem):</label
+                  <label for="exitOnlyLetterSpacing" data-toolTip="Sets the exit only letter spacing.">Exit Only Letter Spacing (rem):</label
                   >
                   <input
                     type="number"
@@ -4993,8 +4872,7 @@
                     onchange="formHandler.readForm()"
                   />
                   <br />
-                  <label for="splitExitOnlyHorizPadding"
-                    >Exit Only Horizontal Padding (rem):</label
+                  <label for="splitExitOnlyHorizPadding" data-toolTip="Sets the exit only horizontal padding.">Exit Only Horizontal Padding (rem):</label
                   >
                   <input
                     type="number"
@@ -5004,8 +4882,7 @@
                     step=".05"
                     onchange="formHandler.readForm()"
                   />
-                  <label for="splitExitOnlyVertPadding"
-                    >Exit Only Vertical Padding (rem):</label
+                  <label for="splitExitOnlyVertPadding" data-toolTip="Sets the exit only vertical padding.">Exit Only Vertical Padding (rem):</label
                   >
                   <input
                     type="number"
@@ -5016,8 +4893,7 @@
                     onchange="formHandler.readForm()"
                   />
                   <br />
-                  <label for="splitExitOnlyBorderRadius"
-                    >Exit Only Border Radius (px):</label
+                  <label for="splitExitOnlyBorderRadius" data-toolTip="Sets the exit only border radius.">Exit Only Border Radius (px):</label
                   >
                   <input
                     type="number"
@@ -5041,8 +4917,7 @@
                   onchange="formHandler.readForm()"
                 ></select>
                 <br />
-                <label for="exitOnlyHorizontalPadding"
-                  >Container Horizontal Padding (rem):</label
+                <label for="exitOnlyHorizontalPadding" data-toolTip="Sets the container horizontal padding.">Container Horizontal Padding (rem):</label
                 >
                 <input
                   type="number"
@@ -5052,8 +4927,7 @@
                   step=".05"
                   onchange="formHandler.readForm()"
                 />
-                <label for="exitOnlyVerticalPadding"
-                  >Container Vertical Padding (rem):</label
+                <label for="exitOnlyVerticalPadding" data-toolTip="Sets the container vertical padding.">Container Vertical Padding (rem):</label
                 >
                 <input
                   type="number"
@@ -5064,7 +4938,7 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
-                <label for="exitOnlyGap">Arrow Gap (rem):</label>
+                <label for="exitOnlyGap" data-toolTip="Sets the arrow gap.">Arrow Gap (rem):</label>
                 <input
                   type="number"
                   id="exitOnlyGap"
@@ -5073,7 +4947,7 @@
                   step=".05"
                   onchange="formHandler.readForm()"
                 />
-                <label for="exitOnlyTextGap">Text-Arrow Gap (rem):</label>
+                <label for="exitOnlyTextGap" data-toolTip="Sets the text-arrow gap.">Text-Arrow Gap (rem):</label>
                 <input
                   type="number"
                   id="exitOnlyTextGap"
@@ -5090,7 +4964,7 @@
                   checked
                   onchange="formHandler.readForm()"
                 />
-                <label for="exitOnlyOutsideGap">Outside Arrow Gap (rem):</label>
+                <label for="exitOnlyOutsideGap" data-toolTip="Sets the outside arrow gap.">Outside Arrow Gap (rem):</label>
                 <input
                   type="number"
                   id="exitOnlyOutsideGap"
@@ -5138,7 +5012,7 @@
                   ></select>
                 </div>
                 <br />
-                <label for="additionalActionMessage">Additional Action Message:</label>
+                <label for="additionalActionMessage" data-toolTip="Sets the additional action message.">Additional Action Message:</label>
                 <input
                   type="text"
                   id="additionalActionMessage"
@@ -5161,7 +5035,7 @@
               </div>
             </div>
             <div id="sMAPL" class="tabHidden">
-              <label for="smAPL_Gap">Arrow Gap (rem):</label>
+              <label for="smAPL_Gap" data-toolTip="Sets the space between arrows in each lane.">Arrow Gap (rem):</label>
               <input
                 type="number"
                 id="smAPL_Gap"
@@ -5171,8 +5045,7 @@
                 step=".01"
                 value="0"
               />
-              <label for="smAPL_VertTopPadding"
-                >Top/Bottom Padding (rem):</label
+              <label for="smAPL_VertTopPadding" data-toolTip="Sets the space above and below the lane arrows.">Top/Bottom Padding (rem):</label
               >
               <input
                 type="number"
@@ -5193,10 +5066,9 @@
                 min="0"
                 max="10"
                 step=".01"
-                value="0.5"
-              />
+                value="0.5" data-toolTip="Sets the space below the lane arrows." />
               <br />
-              <label for="smAPL_LaneSize">Lane Size (px):</label>
+              <label for="smAPL_LaneSize" data-toolTip="Sets lane width in pixels for arrow placement.">Lane Size (px):</label>
               <input
                 type="number"
                 id="smAPL_LaneSize"
@@ -5227,7 +5099,7 @@
                 <option value="None">None</option>
               </select>
               <br />
-              <label for="sMDiagrammicScale">Scale:</label>
+              <label for="sMDiagrammicScale" data-toolTip="Sets the scale.">Scale:</label>
               <input
                 type="number"
                 min="0"
@@ -5270,8 +5142,7 @@
                 <div>
                   <button id="sMCreationsReset" class="redButton">Reset</button>
                   <button id="sMCreationsSaveAs">Save As</button>
-                  <label for="sMCreationsFileName" class="noLabelAlignment"
-                    >Name:</label
+                  <label for="sMCreationsFileName" class="noLabelAlignment" data-toolTip="Sets the name.">Name:</label
                   >
                   <input
                     type="text"
@@ -5284,8 +5155,7 @@
               <input
                 type="search"
                 id="sMCreationsSearchList"
-                placeholder="Search for files"
-              />
+                placeholder="Search for files"  />
               <div id="sMCreationsSavedList"></div>
             </div>
             <div id="sMCreationsTemplates" class="tabHidden">
@@ -5295,8 +5165,7 @@
               <input
                 type="search"
                 id="sMCreationsTemplateSearch"
-                placeholder="Search for templates"
-              />
+                placeholder="Search for templates"  />
               <div id="sMCreationsTemplatesList"></div>
             </div>
           </div>
@@ -5321,18 +5190,25 @@
               <button type="button" class="new" onclick="App.newPanelGroup()">
                 Add Panel Group
               </button>
-              <!--<button type="button" id="duplicatePanel" class="dup">Duplicate</button>-->
+              <button
+                type="button"
+                id="duplicatePanel"
+                class="dup"
+                onclick="App.duplicatePanel()"
+              >
+                Duplicate Panel Group
+              </button>
               <button
                 type="button"
                 class="del"
                 onclick="App.deletePanelHelper()"
               >
-                Remove
+                Remove Panel Group
               </button>
             </div>
             <div id="panelList" class="panelList"></div>
             <div class="panelSpacingControl">
-              <label for="panelSpacingSlider">Spacing</label>
+              <label for="panelSpacingSlider" data-toolTip="Sets the gap between panels on the post.">Spacing</label>
               <div class="panelSpacingInputs">
                 <input
                   type="range"
@@ -5351,8 +5227,7 @@
                   max="4"
                   step="0.25"
                   value="0"
-                  oninput="formHandler.readForm()"
-                />
+                  oninput="formHandler.readForm()" />
               </div>
             </div>
           </div>
@@ -5503,8 +5378,7 @@
                 type="search"
                 class="smAPL_arrowSearch smDropdownSearch"
                 placeholder="Search arrows"
-                autocomplete="off"
-              />
+                autocomplete="off" />
               <div class="smDropdownList"></div>
             </div>
           </div>
@@ -5519,8 +5393,7 @@
             max="10"
             step=".01"
             value="0"
-            onchange="formHandler.readForm()"
-          />
+            onchange="formHandler.readForm()" />
           <span>Offset (px):</span>
           <input
             type="number"
@@ -5529,13 +5402,11 @@
             max="400"
             step="1"
             value="0"
-            onchange="formHandler.readForm()"
-          />
+            onchange="formHandler.readForm()" data-toolTip="Offsets the arrow horizontally." />
           <input
             onchange="formHandler.readForm()"
             class="smAPL_exitOnlyCheck"
-            type="checkbox"
-          />
+            type="checkbox"  />
           <span>Exit Only</span>
         </div>
         <div class="smAPLCat_aplRow3">
@@ -5544,15 +5415,13 @@
             class="halfSizeInput smAPL_leftText"
             type="text"
             onchange="formHandler.readForm()"
-            value="EXIT"
-          />
+            value="EXIT" data-toolTip="Text on the left side of the arrow." />
           <span>/</span>
           <input
             class="halfSizeInput smAPL_rightText"
             type="text"
             onchange="formHandler.readForm()"
-            value="ONLY"
-          />
+            value="ONLY" data-toolTip="Text on the right side of the arrow." />
           <span>BG Color:</span>
           <select onchange="formHandler.readForm()" class="smAPL_bgColor"></select>
           <br />
@@ -5566,8 +5435,7 @@
             min="2"
             max="64"
             step="1"
-            value="16"
-          />
+            value="16" />
           <span>Roundness (px):</span>
           <input
             class="halfSizeInput smAPL_roundness"
@@ -5576,8 +5444,7 @@
             min="0"
             max="32"
             step="1"
-            value="0"
-          />
+            value="0" data-toolTip="How much rounding on the text background?" />
           <br />
           <span>Horiz Padding (px):</span>
           <input
@@ -5587,8 +5454,7 @@
             min="0"
             max="100"
             step=".01"
-            value="5"
-          />
+            value="5" data-toolTip="Horizontal Spacing on the Text itself" />
           <span>L/R Margins (px):</span>
           <input
             class="halfSizeInput smAPL_leftMargins"
@@ -5597,8 +5463,7 @@
             min="-100"
             max="100"
             step="1"
-            value="0"
-          />
+            value="0" data-toolTip="How far the left text is from the arrow." />
           <span>/</span>
           <input
             class="halfSizeInput smAPL_rightMargins"
@@ -5607,8 +5472,7 @@
             min="-5"
             max="5"
             step="1"
-            value="0"
-          />
+            value="0" data-toolTip="How far the right text is from the arrow." />
         </div>
       </div>
     </template>
@@ -5625,14 +5489,12 @@
             min="0"
             step="1"
             value="0"
-            onchange="formHandler.readForm({ aplSubpanelConfigChange: true })"
-          />
+            onchange="formHandler.readForm({ aplSubpanelConfigChange: true })" data-toolTip="Sets how many lanes this subpanel of arrows spans." />
           <span class="smAPLCat_alignRightLabel">Align Right:</span>
           <input
             type="checkbox"
             class="smAPLCat_alignRight"
-            onchange="formHandler.readForm()"
-          />
+            onchange="formHandler.readForm()"  />
         </div>
         <div class="smAPLCat_aplList"></div>
       </div>
@@ -5647,8 +5509,7 @@
               type="text"
               class="smSPBanner_textContent"
               onchange="formHandler.readForm()"
-              placeholder="BANNER"
-            />
+              placeholder="BANNER" data-toolTip="Sets shield banner text, such as NORTH or SOUTH." />
             <button type="button" class="smColorDropdownButton smSPBanner_bgColor" data-color="Inherit" data-empty-value="Inherit">Inherit</button>
             <select
               class="smSPBanner_fontFamily"
@@ -5670,8 +5531,7 @@
                   class="smSPBanner_firstLetterScale"
                   placeholder="120"
                   value="120"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets the banner first letter size relative to the rest." />
               </div>
 
               <div>
@@ -5683,8 +5543,7 @@
                   value="1.2"
                   min="0"
                   step="0.01"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets the size of the shield banner lettering." />
               </div>
             </div>
             <div>
@@ -5697,8 +5556,7 @@
                   value="0"
                   min="-30"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets space outside the banner on the left and right." />
                 <span>/</span>
                 <input
                   type="number"
@@ -5707,8 +5565,7 @@
                   value="0"
                   min="-30"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets space outside the banner above and below." />
               </div>
               <div>
                 <span>Horiz/Vert Padding (px):</span>
@@ -5719,8 +5576,7 @@
                   value="0"
                   min="0"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets space between banner text and its background horizontally." />
                 <span>/</span>
                 <input
                   type="number"
@@ -5729,8 +5585,7 @@
                   value="0"
                   min="0"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets space between banner text and its background vertically." />
               </div>
             </div>
             <div>
@@ -5743,8 +5598,7 @@
                   value="10"
                   min="0"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Rounds the corners of the banner background." />
                 <span>Letter Spacing (px):</span>
                 <input
                   type="number"
@@ -5753,8 +5607,7 @@
                   value="0"
                   min="0"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets spacing between letters in the banner." />
                 <span>Word Spacing (px):</span>
                 <input
                   type="number"
@@ -5763,8 +5616,7 @@
                   value="0"
                   min="0"
                   step="1"
-                  onchange="formHandler.readForm()"
-                />
+                  onchange="formHandler.readForm()" data-toolTip="Sets spacing between words in the banner." />
               </div>
             </div>
           </div>
@@ -5777,8 +5629,7 @@
         <input
           type="search"
           id="smColorDropdownSearch"
-          placeholder="Search colors"
-        />
+          placeholder="Search colors" data-toolTip="Search for colors." />
         <div id="smColorDropdownItems">
           <button
             type="button"
@@ -5806,12 +5657,11 @@
           <input
             type="text"
             id="smColorName"
-            placeholder="Color Name"
-          />
+            placeholder="Color Name"  />
         </div>
         <div>
           <span>Color:</span>
-          <input type="color" id="smColorTheRealColor" value="#000000" />
+          <input type="color" id="smColorTheRealColor" value="#000000"  />
           <br />
         </div>
         <div>

@@ -54,8 +54,7 @@ class APLArrow {
         exitText.textContent = this.exitTextContent[i];
         exitText.style.setProperty(
           "--exitBGColor",
-          ColorLibrary.colorLibrary[this.exitBGColor] ||
-            this.exitBGColor,
+          ColorLibrary.colorLibrary[this.exitBGColor] || this.exitBGColor,
         );
         exitText.style.setProperty(
           "--exitTextRoundness",
@@ -138,25 +137,23 @@ class StandardArrow {
     this.marginHorizontal = marginHorizontal;
     this.marginVertical = marginVertical;
     this.flip = flip;
-    this.createElement = () => {
-      const img = document.createElement("img");
-      img.className = "bE-arrowImage";
-      img.src = this.arrows[this.arrow].src;
+  }
 
-      img.style.setProperty("--arrowRotation", this.rotation + "deg");
-      img.style.setProperty("--arrowSize", this.size + "rem");
-      img.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
-      img.style.setProperty(
-        "--arrowMarginHorizontal",
-        this.marginHorizontal + "rem",
-      );
-      img.style.setProperty(
-        "--arrowMarginVertical",
-        this.marginVertical + "rem",
-      );
+  createElement() {
+    const img = document.createElement("img");
+    img.className = "bE-arrowImage";
+    img.src = this.arrows[this.arrow].src;
 
-      return img;
-    };
+    img.style.setProperty("--arrowRotation", this.rotation + "deg");
+    img.style.setProperty("--arrowSize", this.size + "rem");
+    img.style.setProperty("--arrowFlip", this.flip ? "-1" : "1");
+    img.style.setProperty(
+      "--arrowMarginHorizontal",
+      this.marginHorizontal + "rem",
+    );
+    img.style.setProperty("--arrowMarginVertical", this.marginVertical + "rem");
+
+    return img;
   }
 }
 
@@ -180,11 +177,61 @@ StandardArrow.prototype.arrows = {
     defaultSize: 2.75,
   },
   DOWN_CA: {
-    label: "Down (CA)",
+    label: "Down (Ontario)",
     src: "assets/arrow/CanadaDown.svg",
     defaultSize: 2.75,
   },
-  UK: { label: "UK", src: "assets/arrow/ArrowUK.svg" },
+  UK: { label: "Up (United Kingdom)", src: "assets/arrow/ArrowUK.svg" },
+  ["Up Arrow"]: {
+    label: "Up Arrow",
+    src: "assets/arrow/APL_Up.svg",
+    flipped: false,
+  },
+  ["Choice Turning Arrow"]: {
+    label: "Choice Turning Arrow",
+    src: "assets/arrow/APL_Choice.svg",
+  },
+  ["ALT Up Arrow"]: {
+    label: "ALT Up Arrow",
+    src: "assets/arrow/APL_UpAlt.svg",
+  },
+  ["ALT Choice Turning Arrow"]: {
+    label: "ALT Choice Turning Arrow",
+    src: "assets/arrow/APL_ChoiceAlt.svg",
+  },
+  ["Turning Arrow"]: {
+    label: "Turning Arrow",
+    src: "assets/arrow/APL_Turn.svg",
+  },
+  ["ALT Turning Arrow"]: {
+    label: "ALT Turning Arrow",
+    src: "assets/arrow/APL_TurnAlt.svg",
+  },
+  ["Dual Turn"]: {
+    label: "Dual Turn",
+    src: "assets/arrow/APL_DualTurn.svg",
+  },
+  ["Split Turn"]: {
+    label: "Split Turn",
+    src: "assets/arrow/APL_Split.svg",
+    flipped: false,
+  },
+  ["ALT Dual Turn"]: {
+    label: "ALT Dual Turn",
+    src: "assets/arrow/APL_DualTurnAlt.svg",
+  },
+  ["CFX Choice Turning Arrow"]: {
+    label: "CFX Choice Turning Arrow",
+    src: "assets/arrow/APL_CFXChoice.svg",
+  },
+  ["CFX Turning Arrow"]: {
+    label: "CFX Turning Arrow",
+    src: "assets/arrow/APL_CFXTurn.svg",
+  },
+  ["CFX Up Arrow"]: {
+    label: "CFX Up Arrow",
+    src: "assets/arrow/APL_CFXUp.svg",
+  },
 };
 
 window.APLArrow = APLArrow;

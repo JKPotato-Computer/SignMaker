@@ -406,6 +406,12 @@ const App = (() => {
   };
 
   const duplicatePanel = () => {
+    const panelGroup = post.panels[currentlySelectedPanelGroupIndex];
+    if (!panelGroup || !panelGroup[currentlySelectedPanelIndex]) {
+      return;
+    }
+
+    HistoryManager.addToUndoStack(post);
     post.duplicatePanel([
       currentlySelectedPanelGroupIndex,
       currentlySelectedPanelIndex,
@@ -550,6 +556,11 @@ const App = (() => {
 
   const duplicateSubPanel = () => {
     const sign = getCurrentPanel().sign;
+    if (!sign.subPanels[currentlySelectedSubPanelIndex]) {
+      return;
+    }
+
+    HistoryManager.addToUndoStack(post);
     sign.duplicateSubPanel(currentlySelectedSubPanelIndex);
     currentlySelectedSubPanelIndex++;
     formHandler.updateForm();
@@ -594,6 +605,11 @@ const App = (() => {
 
   const duplicateExitTabRow = () => {
     const panel = getCurrentPanel();
+    if (!panel.exitTabs[currentlySelectedExitTabRowIndex]) {
+      return;
+    }
+
+    HistoryManager.addToUndoStack(post);
     panel.duplicateExitTabRow(currentlySelectedExitTabRowIndex);
     currentlySelectedExitTabRowIndex++;
 
@@ -654,6 +670,11 @@ const App = (() => {
   const duplicateExitTab = () => {
     const panel = getCurrentPanel();
     const exitTabRow = panel.exitTabs[currentlySelectedExitTabRowIndex];
+    if (!exitTabRow || !exitTabRow.exitTabs[currentlySelectedExitTabIndex]) {
+      return;
+    }
+
+    HistoryManager.addToUndoStack(post);
     exitTabRow.duplicateExitTab(currentlySelectedExitTabIndex);
 
     currentlySelectedExitTabIndex++;
@@ -687,7 +708,11 @@ const App = (() => {
 
   const dupRow = () => {
     let blockElems = getCurrentBlockElements();
+    if (!blockElems.rows[currentlySelectedRowIndex]) {
+      return;
+    }
 
+    HistoryManager.addToUndoStack(post);
     blockElems.duplicateRow(currentlySelectedRowIndex++);
 
     formHandler.updateForm();
@@ -770,6 +795,21 @@ const App = (() => {
         currentlySelectedBlockIndex - 1,
       );
     }
+
+    formHandler.updateForm();
+    redraw();
+  };
+
+  const duplicateControlElem = () => {
+    const blockRow = getCurrentBlockRow();
+    const blockElem = blockRow[currentlySelectedBlockIndex];
+    if (!blockElem) {
+      return;
+    }
+
+    HistoryManager.addToUndoStack(post);
+    blockRow.splice(currentlySelectedBlockIndex + 1, 0, lib.clone(blockElem));
+    currentlySelectedBlockIndex++;
 
     formHandler.updateForm();
     redraw();
@@ -1000,8 +1040,10 @@ const App = (() => {
     if (
       selectedShieldGroup &&
       selectedShieldGroup.constructor?.name === "ShieldGroupElement" &&
-      shieldIndex >= 0
+      shieldIndex >= 0 &&
+      shieldIndex < selectedShieldGroup.shields.length
     ) {
+      HistoryManager.addToUndoStack(post);
       selectedShieldGroup.duplicateShield(shieldIndex);
       currentlySelectedShieldIndex = shieldIndex + 1;
       formHandler.updateShieldSubform();
@@ -1154,6 +1196,15 @@ const App = (() => {
   };
 
   const duplicateStandardArrow = () => {
+    const arrowList = getCurrentPanel().sign.arrows.standard.arrowList;
+    if (
+      currentlySelectedStandardArrow < 0 ||
+      currentlySelectedStandardArrow >= arrowList.length
+    ) {
+      return;
+    }
+
+    HistoryManager.addToUndoStack(post);
     getCurrentPanel().sign.duplicateStandardArrow(
       currentlySelectedStandardArrow,
     );
@@ -2073,9 +2124,6 @@ const App = (() => {
               ? "space-between"
               : standardArrowConfig.customConfig.justify.toLowerCase(),
           );
-          if (ColorLibrary.checkForContrast(panel.color)) {
-            arrowContElmt.style.filter = "invert(1)";
-          }
           guideArrowsElmt.style.padding = `${standardArrowConfig.customConfig.verticalTopPadding}rem ${standardArrowConfig.customConfig.horizontalPadding}rem ${standardArrowConfig.customConfig.verticalBottomPadding}rem`;
 
           let arrowIndex = 0;
@@ -2112,6 +2160,10 @@ const App = (() => {
               } else {
                 arrowElement.after(actionMessage);
               }
+            }
+
+            if (ColorLibrary.checkForContrast(panel.color)) {
+              arrowElement.style.filter = "invert(1)";
             }
 
             arrowIndex++;
@@ -2666,7 +2718,7 @@ const App = (() => {
       document.querySelectorAll(".post"),
     );
 
-    lib.clearChildren(panelContainerElmt);
+    panelContainerElmt.innerHTML = "";
     panelContainerElmt.style.setProperty(
       "--panelSpacing",
       post.panelSpacing + "rem",
@@ -2875,6 +2927,7 @@ const App = (() => {
     delRow,
     newControlElem,
     delControlElem,
+    duplicateControlElem,
     replaceControlElem,
 
     recheckWidth,

@@ -108,9 +108,11 @@ class Sign {
 
   duplicateStandardArrow(arrowIndex) {
     const existingArrow = this.arrows.standard.arrowList[arrowIndex];
-    const newArrow = new StandardArrow({
-      ...existingArrow,
-    });
+    if (!existingArrow) {
+      return;
+    }
+
+    const newArrow = lib.clone(existingArrow);
     this.arrows.standard.arrowList.splice(arrowIndex + 1, 0, newArrow);
   }
 
@@ -126,15 +128,15 @@ class Sign {
 
   duplicateSubPanel(subPanelIndex) {
     const existingSubPanel = this.subPanels[subPanelIndex];
-    const new_SubPanel = new SubPanels({
-      controlText: existingSubPanel.controlText,
-      actionMessage: existingSubPanel.actionMessage,
-      shields: existingSubPanel.shields,
-      width: existingSubPanel.width,
-      height: existingSubPanel.height,
-      customDividerHeight: existingSubPanel.customDividerHeight,
-    });
-    this.subPanels.push(new_SubPanel);
+    if (!existingSubPanel) {
+      return;
+    }
+
+    this.subPanels.splice(
+      subPanelIndex + 1,
+      0,
+      lib.clone(existingSubPanel),
+    );
   }
 }
 

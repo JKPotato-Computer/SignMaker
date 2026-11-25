@@ -26,7 +26,9 @@ It's best if you discover this yourself rather than me telling you each of these
 6. Saving / Loading / Exporting / Templates
 
 ## Contributing TBD
-
+Thank you to the following contributors for helping out with the developemnt of SignMaker v2.2:
+- @vivribbon: Redoing pretty much every single shield in `shield.css`, NVUTCDG Guidelines
+- @theobsidianguy: 
 
 ## Sources Used TBD
 

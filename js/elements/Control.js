@@ -468,10 +468,7 @@ class ShieldGroupElement {
   duplicateShield(index) {
     if (index >= 0 && index < this.shields.length) {
       const shieldToDuplicate = this.shields[index];
-      const duplicatedShield = Object.assign(
-        shieldToDuplicate.constructor.prototype,
-        shieldToDuplicate,
-      );
+      const duplicatedShield = lib.clone(shieldToDuplicate);
       this.shields.splice(index + 1, 0, duplicatedShield);
     }
   }
@@ -1389,18 +1386,11 @@ class Control {
   }
 
   duplicateRow(row) {
-    let newRows = [];
-    for (const e of this.rows[row]) {
-      const blockElemType = Control.prototype.blockToClassElems.getElem(e);
-      let newObject = structuredClone(e);
-      newObject = Object.setPrototypeOf(
-        newObject,
-        Control.prototype.blockToClassElems[blockElemType].prototype,
-      );
-
-      newRows.push(newObject);
+    if (!this.rows[row]) {
+      return;
     }
-    this.rows.splice(row + 1, 0, newRows);
+
+    this.rows.splice(row + 1, 0, lib.clone(this.rows[row]));
     this.blockProperties.splice(row + 1, 0, new Block());
   }
 

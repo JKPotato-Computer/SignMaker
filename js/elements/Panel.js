@@ -46,7 +46,14 @@ class Panel {
     this.exitTabs.splice(index, 1);
   }
 
-  duplicateExitTabRow(index) {}
+  duplicateExitTabRow(index) {
+    const exitTab = this.exitTabs[index];
+    if (!exitTab) {
+      return;
+    }
+
+    this.exitTabs.splice(index + 1, 0, lib.clone(exitTab));
+  }
 }
 
 Panel.prototype.cornerType = ["Sharp", "Round", "Square"];

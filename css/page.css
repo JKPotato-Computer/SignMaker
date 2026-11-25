@@ -265,3 +265,304 @@ hr {
   border-style: solid;
   color: rgb(var(--baseColor));
 }
+
+div#introSlide {
+  background-color: rgb(162, 193, 255);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  transition: 1.25s ease-in-out;
+}
+
+div#welcomeAnim_gantry,
+div#welcomeAnim_background {
+  position: absolute;
+}
+
+div#welcomeAnim_gantry {
+  inset: 0;
+}
+
+div#welcomeAnim_grass {
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to bottom, rgb(0, 175, 0), green);
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+#welcomeAnim_signLogo {
+  height: 20svh;
+  width: 20svh;
+  aspect-ratio: 1 / 1;
+  rotate: 0deg;
+  opacity: 0;
+  transition: 1s ease-out;
+}
+
+#welcomeAnim_sign {
+  position: relative;
+  width: 70%;
+  left: 15%;
+  top: 10%;
+  height: 45%;
+  border: 1svh solid black;
+  background-color: #444444;
+  padding: 1svh;
+  z-index: 4;
+  transform-origin: center bottom;
+}
+
+.welcomeAnim_signHolder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1svh;
+  height: 100%;
+  background: black;
+}
+
+.welcomeAnim_signOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, transparent 0.109svh, black 0.109svh);
+  background-size: 0.24svh 0.24svh;
+  z-index: 4;
+}
+
+.welcomeAnim_signHolder > span {
+  font-family: "Series EEM";
+  font-size: 5svh;
+  color: white;
+  text-box-trim: trim-both;
+  text-box-edge: cap ex alphabetic;
+  opacity: 0;
+  transition: 0.5s ease-in-out;
+}
+
+.welcomeAnim_poleGantry {
+  height: 70%;
+  position: absolute;
+  width: 2%;
+  inset: 0;
+  top: 20%;
+  background: linear-gradient(
+    90deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  z-index: 4;
+}
+
+.welcomeAnim_poleHorizontal {
+  width: 80%;
+  height: 3%;
+  position: absolute;
+  inset: 0;
+  left: 10%;
+  background: linear-gradient(
+    0deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  z-index: 3;
+}
+
+.welcomeAnim_poleHorizontal.top {
+  top: 25%;
+}
+
+.welcomeAnim_poleHorizontal.bottom {
+  top: 40%;
+}
+
+.welcomeanim_poleGantry.left {
+  left: 10%;
+}
+
+.welcomeanim_poleGantry.right {
+  left: 90%;
+}
+
+#welcomeAnim_road {
+  background: #181818;
+  height: 100%;
+  width: 70%;
+  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcomeAnim_laneMarking {
+  height: 100%;
+  width: 1%;
+  position: absolute;
+  left: 50%;
+}
+
+.welcomeAnim_laneMarking.solid.white {
+  background-color: white;
+}
+
+.welcomeAnim_laneMarking.solid.yellow {
+  background-color: yellow;
+}
+
+.welcomeAnim_laneMarking.dashed {
+  background: linear-gradient(
+    to top,
+    white 0%,
+    white 24.9%,
+    transparent 25%,
+    transparent 49.9%,
+    white 50%,
+    white 74.9%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 100% 70%;
+  background-position-y: 40%;
+  width: 0.75%;
+}
+
+.welcomeAnim_laneMarking:nth-child(2) {
+  left: 30%;
+  rotate: 24deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_laneMarking:nth-child(3) {
+  height: 200%;
+  top: -47.5%;
+}
+
+.welcomeAnim_laneMarking:nth-child(4) {
+  left: 70%;
+  rotate: -24deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_laneMarking:nth-child(1) {
+  left: 12%;
+  rotate: 43deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_laneMarking:nth-child(5) {
+  left: 87%;
+  rotate: -43deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_triangle {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  position: absolute;
+  inset: 0;
+  align-self: end;
+  z-index: 0;
+  width: 50svh;
+  height: 30svh;
+  aspect-ratio: 1 / 2;
+  transform-origin: center bottom;
+}
+
+#welcomeAnim_background {
+  width: 100%;
+  top: 20%;
+  height: 50%;
+}
+
+.welcomeAnim_uncoverRoad.animate-out {
+  top: -100%;
+}
+
+#introSlide.animation-in-progress #welcomeAnim_background {
+  transition: 1.5s ease-in-out;
+}
+
+#introSlide.animation-in-progress #welcomeAnim_grass {
+  transition: 1.5s ease-in-out;
+}
+
+#introSlide.animation-in-progress .welcomeAnim_poleGantry {
+  transition: 1.25s ease-in-out;
+}
+
+#introSlide.animation-in-progress .welcomeAnim_poleHorizontal {
+  transition: 1.25s ease-in-out;
+}
+
+#introSlide.animation-in-progress #welcomeAnim_sign {
+  transition: 1.25s ease-in-out;
+}
+
+#introSlide_continue {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5svh 3svh;
+  z-index: 5;
+  background: white;
+  width: 40%;
+  font-size: 3svh;
+  top: 66%;
+}
+
+#welcomeSlide {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    "image image"
+    "left right";
+  grid-template-columns: 3fr 1fr;
+  gap: 0.5rem;
+}
+
+#welcomeSlide > img {
+  grid-area: image;
+}
+
+#welcomeSlide > div:nth-child(2) {
+  grid-area: left;
+}
+
+#welcomeSlide > div:nth-child(3) {
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcomeSignMakerBanner {
+  width: 100%;
+}
+
+#takeMeOnATour {
+  padding: 1rem 6rem;
+  font-size: 1.5rem;
+}

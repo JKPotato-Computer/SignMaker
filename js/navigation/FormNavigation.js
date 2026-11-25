@@ -17,7 +17,7 @@ const FormNavigation = (() => {
     setupControlSignElements();
     setupShields();
     setupGuideArrows();
-    setupLimonEasterEgg();
+    setupEasterEggs();
     setupDropdownElements();
     setupSettings();
     setupColorHandler();
@@ -88,17 +88,6 @@ const FormNavigation = (() => {
       StorageManager.getItem("signMakerUIScale") || 1;
 
     changeTheme(document.documentElement.dataset.theme);
-
-    if (!localStorage.getItem("closedWelcome")) {
-      document.querySelector("#modalHolder").style.display = "flex";
-      document.querySelector("#welcomeToSignMaker").showModal();
-    }
-
-    document.querySelector("#closeWelcome").addEventListener("click", () => {
-      localStorage.setItem("closedWelcome", true);
-      document.querySelector("#modalHolder").style.display = "none";
-      document.querySelector("#welcomeToSignMaker").close();
-    });
   };
 
   const setupNavigation = () => {
@@ -321,7 +310,10 @@ const FormNavigation = (() => {
     document.body.appendChild(tooltip);
 
     const bindTooltip = (element) => {
-      element.addEventListener("mouseover", () => {
+      const loadTooltip = () => {
+        const dialog = element.closest("dialog");
+        (dialog || document.body).appendChild(tooltip);
+
         const boundingRect = element.getBoundingClientRect();
         tooltip.textContent = element.dataset.tooltip;
         tooltip.style.left =
@@ -349,14 +341,41 @@ const FormNavigation = (() => {
         } else {
           tooltip.style.fontFamily = "";
         }
-      });
+      };
 
-      element.addEventListener("mouseout", () => {
+      const hideToolTip = () => {
         tooltip.style.opacity = 0;
         tooltip.style.left = "-100px";
         tooltip.style.top = 0;
         tooltip.textContent = "";
-      });
+        document.body.appendChild(tooltip);
+      };
+
+      element.addEventListener("mouseover", loadTooltip);
+
+      element.addEventListener("mouseout", hideToolTip);
+
+      element.addEventListener("focus", loadTooltip);
+      element.addEventListener("blur", hideToolTip);
+
+      if (
+        element.tagName === "LABEL" &&
+        element.htmlFor &&
+        !document.querySelector(`#${element.htmlFor}`).dataset.toolTip
+      ) {
+        document
+          .querySelector(`#${element.htmlFor}`)
+          .addEventListener("mouseover", loadTooltip);
+        document
+          .querySelector(`#${element.htmlFor}`)
+          .addEventListener("mouseout", hideToolTip);
+        document
+          .querySelector(`#${element.htmlFor}`)
+          .addEventListener("focus", loadTooltip);
+        document
+          .querySelector(`#${element.htmlFor}`)
+          .addEventListener("blur", hideToolTip);
+      }
     };
 
     for (const element of document.querySelectorAll("[data-tooltip]")) {
@@ -1091,49 +1110,27 @@ const FormNavigation = (() => {
       });
   };
 
-  const setupLimonEasterEgg = () => {
-    const isTextInputElement = (element) => {
-      if (!element || element.disabled || element.readOnly) {
-        return false;
-      }
-      const tagName = element.tagName;
-      if (tagName === "TEXTAREA") {
-        return true;
-      }
-      if (tagName === "INPUT") {
-        const type = (element.type || "").toLowerCase();
-        return (
-          type === "text" ||
-          type === "search" ||
-          type === "email" ||
-          type === "url" ||
-          type === "tel" ||
-          type === "password"
-        );
-      }
-      return false;
-    };
-
-    const handleLimonInput = (event) => {
+  const setupEasterEggs = () => {
+    document.addEventListener("input", (event) => {
       const target = event.target;
-      const LIMON_TRIGGER_VALUE = "limon";
-
-      if (!isTextInputElement(target)) {
+      if (!target.matches("input[type='text'], textarea")) {
         return;
       }
-      const trimmedValue = (target.value || "").trim().toLowerCase();
-      if (trimmedValue === LIMON_TRIGGER_VALUE) {
+
+      if (target.value.trim().toLowerCase() === "limon") {
         if (target.dataset.limonTriggered === "true") {
           return;
         }
         target.dataset.limonTriggered = "true";
 
-        const audio = new Audio("assets/other-symbols/limon/limon.mp3");
+        const audio = new Audio(
+          "assets/other-symbols/easter-eggs/limon/limon.mp3",
+        );
         audio.volume = 0.5;
         audio.play();
 
         const limonJump = document.createElement("img");
-        limonJump.src = "assets/other-symbols/limon/limon.png";
+        limonJump.src = "assets/other-symbols/easter-eggs/limon/limon.png";
         limonJump.style = `
           width: 100%;
           height: 100%;
@@ -1159,9 +1156,49 @@ const FormNavigation = (() => {
           audio.remove();
         }, 1500);
       }
-    };
+    });
 
-    document.addEventListener("input", handleLimonInput, true);
+    document.addEventListener("keydown", (event) => {
+      // are we selecting an input / textarea element
+      if (!event.target.matches("input, textarea")) {
+        return;
+      }
+
+      if (event.key !== "8") {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        const electronicSignElems = [];
+        for (const elm of document.querySelectorAll(".bE-electronicSign")) {
+          if (elm.style.width === "8rem") {
+            electronicSignElems.push(elm);
+          }
+        }
+
+        if (electronicSignElems.length === 0) {
+          return;
+        }
+
+        const eightSfx = new Audio(
+          "assets/other-symbols/easter-eggs/eight.mp3",
+        );
+        eightSfx.volume = 0.5;
+        eightSfx.play();
+
+        for (const sign of electronicSignElems) {
+          if (sign.textContent === "8") {
+            continue;
+          }
+
+          const originalText = sign.innerHTML;
+          sign.textContent = "8";
+          setTimeout(() => {
+            sign.innerHTML = originalText;
+          }, 250);
+        }
+      });
+    });
   };
 
   const positionDropdown = (dropdownHolder, trigger) => {

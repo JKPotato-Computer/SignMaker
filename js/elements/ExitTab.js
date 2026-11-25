@@ -614,8 +614,11 @@ class ExitTabRow {
 
   duplicateExitTab(index) {
     const exitTab = this.exitTabs[index];
-    const cloneExitTab = structuredClone(exitTab);
-    Object.setPrototypeOf(cloneExitTab, ExitTab.prototype);
+    if (!exitTab) {
+      return;
+    }
+
+    const cloneExitTab = lib.clone(exitTab);
     this.exitTabs.splice(index + 1, 0, cloneExitTab);
 
     return cloneExitTab;

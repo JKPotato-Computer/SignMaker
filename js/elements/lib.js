@@ -1,17 +1,4 @@
 const lib = (function () {
-  const clearChildren = function (parentElmt) {
-    while (parentElmt.firstChild) {
-      parentElmt.removeChild(parentElmt.firstChild);
-    }
-  };
-
-  /**
-   * Creates and appends an option element to a given Select element.
-   * @param {Element} selectElmt - Select element to be appended to.
-   * @param {string} value - Value to be held by the option.
-   * @param {boolean} [selected=false] - Whether or not the new option should be auto-selected.
-   * @param {string} [text] - Display text for the option.
-   */
   const appendOption = function (
     selectElmt,
     value,
@@ -35,9 +22,29 @@ const lib = (function () {
     );
   };
 
+  function clone(objToCopy) {
+    if (objToCopy === null || typeof objToCopy !== "object") {
+      return objToCopy;
+    }
+
+    if (Array.isArray(objToCopy)) {
+      return objToCopy.map(clone);
+    }
+
+    const newObj = Object.create(Object.getPrototypeOf(objToCopy));
+    for (const key of Object.keys(objToCopy)) {
+      if (key === "constructor") {
+        continue;
+      }
+      newObj[key] = clone(objToCopy[key]);
+    }
+
+    return newObj;
+  }
+
   return {
-    clearChildren,
     appendOption,
     isClass,
+    clone,
   };
 })();

@@ -523,14 +523,8 @@ dialog {
 }
 
 #welcomeToSignMaker {
-  width: 70%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-#welcomeToSignMaker img {
-  width: 100%;
+  width: 80%;
+  height: 80%;
 }
 
 #downloadContent .downloadSignFooter {
