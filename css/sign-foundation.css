@@ -490,7 +490,7 @@ main#smRender.wide #postContainer {
   font-family: "Series E";
   transform: translate(
     var(--designationXOffset, 0%),
-    calc(var(--designationYOffset, 0%) - 50%)
+    calc(var(--designationYOffset, 0%))
   );
   scale: var(--designationScale);
   text-wrap: nowrap;
@@ -498,7 +498,6 @@ main#smRender.wide #postContainer {
   justify-self: center;
   align-self: start;
   display: flex;
-  height: calc(3rem * var(--shieldScale));
   justify-content: center;
   align-items: center;
 }

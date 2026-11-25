@@ -558,6 +558,7 @@ div#welcomeAnim_grass {
     "image image"
     "left right";
   grid-template-columns: 3fr 1fr;
+  gap: 0.5rem;
 }
 
 #welcomeSlide > img {

@@ -1240,6 +1240,64 @@ const FormNavigation = (() => {
     });
 
     document.addEventListener("keydown", (event) => {
+      /*
+      My name is j. k. p. o. t. a. t. o. dash. c. o. m. p. u. t. e. r.
+
+      Synopsis: This joke reflects on the complex tropes of The Stanley Parable, a game that explores and tests the nature of 
+      choice (and the illusion of choice), free will, and non-linear storyline progression in video games. This moment specifically
+      refers to "The Stanley Parable Demo", released in October 10, 2013, where upon the Narrator revealing the
+      demonstration of "The Stanley Parable," the player is instead revealed a white, luminous room with
+      multiple panels surrounding a button with a red text written "8." Upon clicking this button, an
+      audiovisual phenomenon occurs, where the player is greeted with a sound effect representing the
+      appropriate wavelengths and frequencies that make up the word "8" followed by the display of the
+      number "8" on all electronic signs in the room. In this application, this "Easter Egg" is directly inspired by
+      the climax jokes of The Stanley Parable, where typing the number "8" in any text/number-based input will trigger a 
+      similar audiovisual phenomenon, where the number "8" will be displayed on certain block elements and the audial
+      representation of the number "8" will be played on your device.
+
+      Pre-Requisites: Please ensure that you are within 50 to 80 cm from your laptop screen, monitor, cellular device, or
+      any device that contains a visual output. Please also ensure that your immediate surrounding environment, whether
+      that is the comfort of your home, a workplace, or the outside, is 76*F (or 24.44*C) or cooler. You may assume that
+      the person, or in this case the program, making this joke has their left hand (or some representation of a hand) pointed
+      upwards at 15*.
+
+      Instructions: As the user of this website, upon typing the number "8" in any text/number-based input, you will
+      witness a similar phenomenon, where the number "8" will be displayed on all block elements that are Electronic
+      Signs and have a "set width" parameter set to exactly 8. You are instructed to laugh as soon as the number "8"
+      shows up on these electronic signs and the audial representation of the number "8" is transmitted to your speaker and
+      received by both ears, intercepted by the cochlea, and translated into electrical signals that are recognizable
+      within the auditory cortex of your brain. For best demonstrations of this joke, this will be repeated exactly 15
+      times; however, it suggested that at the rate of 1 "8" per second, you do not exceed 18 "8s" nor go under 13 "8s"
+      for the best demonstration of this joke. A demonstration of the joke will now be commensedat a rate of 1 "8" per second.
+
+      j. k. p. o. t. a. t. o. dash. c. o. m. p. u. t. e. r.
+
+      8. 8. 8. 8. 8. 8. 8. 8. 8. 8. 8. 8. 8. 8. 8.
+
+      I'M DONEY WITH THE FUNNY!
+
+      Post-Instructions: You may cease all laughter of this joke. Please complete the survey by pinging me on the
+      SignMaker Discord Community Server posted on this website with the :8ball: emoticon glyph. In your response, please complete 
+      the following survey responses in numerical order, followed by your response, so that jokes can be better conducted in the future:
+
+      Survey Questions:
+       Page 1 of 11) From a scale of 1-8 from (Terrible) to (Outstanding), please rate your experience with this joke.
+       Page 2 of 11) From a scale of 1-5 from (Unlikely) to (Very Likely), how likely are you to recommend this joke to a friend or family member?
+       Page 3 of 11) In your own demonstration of the joke (or, well, the program's demonstration of the joke to you), how many times did you hear the number "8"?
+       Page 4 of 11) From a scale of 1-8 from (Terrible) to (Outstanding), please rate your experience with this joke.
+       Page 5 of 11) Would you be opposed if the number being presented was not the number "8" but instead the number "9"? Please respond with a "Yes" or a "No," followed by your justifications.
+       Page 6 of 11) From a scale of 1-5 from (Unlikely) to (Very Likely), how likely are you to recommend this joke to a friend or family member?
+       Page 7 of 11) For every experience you heard the number "8", numerically categorized from 1 to the total amount of times you heard the number 8, please rank each experience of hearing the number "8" and/or
+         seeing the number "8" displayed on the electronic signs.
+       Page 8 of 11) Please provide any additional feedback you may have about this attempt of comedy, whether it be positive or negative.
+       Page 9 of 11) According to The Stanley Parable, you are recommended to make at least "Eight" choices per day. Do you believe that you have made at least "eight" choices by experiencing the "8"
+         phenomenon? Please respond with a "Yes" or a "No," followed by your justifications.
+       Page 10 of 11) On a scale of 1-5 from (Unlikely) to (Very Likely), how likely are you to complete the same joke with others, whether that is an in-person experience, virtually, or some platform where the joke
+          can be visually and audibly completed?
+       Page 11 of 11) Would you be opposed if the number being presented was not the number "8" but instead the number "9"? Please respond with a "Yes" or a "No," followed by your justifications.
+      
+      My goodness! Is it 4:30? I am supposed to be having a back, sack, and crack!
+       */
       if (
         StorageManager.getItem("smEasterEggs_eight") &&
         !StorageManager.getItem("smEasterEggs_eightEnabled")
