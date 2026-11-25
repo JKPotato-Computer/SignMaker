@@ -492,7 +492,7 @@ const formHandler = (() => {
         ) {
           nextValue = element.dataset.color;
         } else if (element.tagName === "TEXTAREA") {
-          nextValue = element.textContent;
+          nextValue = element.value;
         }
 
         currentBlockElem[propertyName] = nextValue;
@@ -1253,7 +1253,7 @@ const formHandler = (() => {
           element.value = currentBlockElem[propertyName];
           element.addEventListener("change", readForm);
         } else if (element.tagName === "TEXTAREA") {
-          element.textContent = currentBlockElem[propertyName];
+          element.value = currentBlockElem[propertyName];
           element.addEventListener("input", readForm);
         } else {
           element.value = currentBlockElem[propertyName];
