@@ -390,6 +390,8 @@ const App = (() => {
     currentlySelectedSubPanelIndex = 0;
     currentlySelectedExitTabIndex = -1;
     currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedRowIndex = 0;
 
     formHandler.updateForm();
     redraw();
@@ -401,6 +403,12 @@ const App = (() => {
     currentlySelectedPanelGroupIndex = post.panels.length - 1;
     post.newPanel(currentlySelectedPanelGroupIndex);
     currentlySelectedPanelIndex = 0;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedRowIndex = 0;
+
     formHandler.updateForm();
     redraw();
   };
@@ -417,6 +425,12 @@ const App = (() => {
       currentlySelectedPanelIndex,
     ]);
     currentlySelectedPanelIndex++;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedRowIndex = 0;
+
     formHandler.updateForm();
     redraw();
   };
@@ -438,6 +452,13 @@ const App = (() => {
       );
       currentlySelectedPanelIndex = 0;
     }
+
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedRowIndex = 0;
+
     if (post.panels.length == 0) {
       newPanel();
     } else {
@@ -456,7 +477,6 @@ const App = (() => {
     currentlySelectedRowIndex = 0;
     currentlySelectedBlockIndex = 0;
     currentlySelectedGroupIndex = -1;
-
     currentlySelectedExitTabIndex = -1;
     currentlySelectedExitTabRowIndex = -1;
 
@@ -470,7 +490,13 @@ const App = (() => {
       -1,
       currentlySelectedPanelGroupIndex - 1,
     );
-    currentlySelectedPanelIndex = 0;
+    currentlySelectedSubPanelIndex = 0;
+    currentlySelectedRowIndex = 0;
+    currentlySelectedBlockIndex = 0;
+    currentlySelectedGroupIndex = -1;
+    currentlySelectedExitTabIndex = -1;
+    currentlySelectedExitTabRowIndex = -1;
+
     if (post.panels.length == 0) {
       newPanel();
     } else {
@@ -563,6 +589,21 @@ const App = (() => {
     HistoryManager.addToUndoStack(post);
     sign.duplicateSubPanel(currentlySelectedSubPanelIndex);
     currentlySelectedSubPanelIndex++;
+
+    currentlySelectedRowIndex = clamp(
+      currentlySelectedRowIndex,
+      0,
+      getCurrentSubPanel().blockElements.rows.length - 1,
+    );
+    currentlySelectedBlockIndex = clamp(
+      currentlySelectedBlockIndex,
+      0,
+      getCurrentBlockRow().length - 1,
+    );
+    currentlySelectedShieldIndex = -1;
+    currentlySelectedShieldGroupId = -1;
+    currentlySelectedGroupIndex = -1;
+
     formHandler.updateForm();
     redraw();
   };

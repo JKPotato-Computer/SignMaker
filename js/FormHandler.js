@@ -491,6 +491,8 @@ const formHandler = (() => {
           element.classList.contains("smColorDropdownButton")
         ) {
           nextValue = element.dataset.color;
+        } else if (element.tagName === "TEXTAREA") {
+          nextValue = element.textContent;
         }
 
         currentBlockElem[propertyName] = nextValue;
