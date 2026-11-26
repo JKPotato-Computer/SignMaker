@@ -1317,20 +1317,8 @@ main#smRender.wide #postContainer {
   gap: var(--arrowGap);
 }
 
-.sMGA_APLHolder.auto {
-  justify-content: left;
-}
-
-.sMGA_APLHolder.auto.right {
-  flex-direction: row-reverse;
-}
-
-.sMGA_APLHolder.center {
+.sMGA_APLHolder.divider {
   justify-content: center;
-}
-
-.sMGA_APLHolder.right:not(.auto) {
-  justify-content: right;
 }
 
 .sMGA_APLArrow {
@@ -1554,4 +1542,23 @@ main#smRender.wide #postContainer {
   position: absolute;
   inset: 0;
   z-index: 10;
+}
+
+.sMGA_APLHolder {
+  outline: 1px solid white;
+}
+
+.sMGA_APLArrowHolder {
+  border-left: 1px solid blue;
+  border-right: 1px solid blue;
+}
+
+.sMGA_APLHolder:nth-child(odd) {
+  outline: 1px solid red;
+}
+
+.dividerParent {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }

@@ -127,7 +127,7 @@ const MUTCDVariants = (() => {
             horizontalPadding: 0,
             verticalTopPadding: 0,
             verticalBottomPadding: 0.25,
-            gap: 4,
+            gap: 6,
             subpanels: {},
             subpanelConfigs: {},
           },

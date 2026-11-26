@@ -128,18 +128,6 @@ const FormNavigation = (() => {
             document.querySelector("#smRender").style.transform =
               `translateX(calc(-50% + ${width}px))`;
 
-            const rightWidth = document
-              .querySelector("#smRender")
-              .getBoundingClientRect().right;
-            if (rightWidth > document.documentElement.clientWidth) {
-              const difference =
-                rightWidth - document.documentElement.clientWidth;
-              const proportion =
-                rightWidth / document.documentElement.clientWidth;
-              document.querySelector("#smRender").style.transform =
-                `translateX(calc(-50% + ${width}px - ${difference}px)) scale(${1 / proportion})`;
-            }
-
             isModalOpen = true;
           }
         } else {
@@ -1281,7 +1269,7 @@ const FormNavigation = (() => {
       representation of the number "8" will be played on your device.
 
       Pre-Requisites: Please ensure that you are within 50 to 80 cm from your laptop screen, monitor, cellular device, or
-      any device that contains a visual output. Please also ensure that your immediate surrounding environment, whether
+      any device that generates an audio-visual output. Please also ensure that your immediate surrounding environment, whether
       that is the comfort of your home, a workplace, or the outside, is 76*F (or 24.44*C) or cooler. You may assume that
       the person, or in this case the program, making this joke has their left hand (or some representation of a hand) pointed
       upwards at 15*.

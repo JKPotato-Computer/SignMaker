@@ -69,9 +69,9 @@ const formHandler = (() => {
     post.variant = form["postVariant"].value;
     post.color = form["postColor"].value;
     post.showPost = form["showPost"].checked;
-    post.thickness = form["postThickness"].value;
-    post.panelSpacing = form["panelSpacing"].value;
-    post.postPanelSpacing = form["postPanelSpacing"].value;
+    post.thickness = parseFloat(form["postThickness"].value);
+    post.panelSpacing = parseFloat(form["panelSpacing"].value);
+    post.postPanelSpacing = parseFloat(form["postPanelSpacing"].value);
     post.alignPanels = form["alignPanels"].value;
 
     if (post.variant === "Standard") {
@@ -80,12 +80,12 @@ const formHandler = (() => {
 
     // Handle corner radius for non-curved variants
     post.cornerRadius = Math.min(
-      Math.max(form["postCornerRadius"].value, 0),
+      Math.max(parseInt(form["postCornerRadius"].value, 10), 0),
       50,
     );
 
     // Handle spacing (only for OVERHEAD and Curved 2)
-    post.spacing = form["postSpacing"].value;
+    post.spacing = parseFloat(form["postSpacing"].value);
 
     // preliminary set post
     app.setPost(post);
@@ -99,9 +99,15 @@ const formHandler = (() => {
     currentPanel.color = form["panelColor"].dataset.color;
     currentPanel.corner = form["panelCorner"].value;
     if (readProperties && readProperties["aplLanePanelSizeChange"]) {
-      currentPanel.sign.lanePanelSize = form["smAPL_LaneSize"].value;
+      currentPanel.sign.lanePanelSize = parseInt(
+        form["smAPL_LaneSize"].value,
+        10,
+      );
     } else {
-      currentPanel.sign.lanePanelSize = form["panelLaneSize"].value;
+      currentPanel.sign.lanePanelSize = parseInt(
+        form["panelLaneSize"].value,
+        10,
+      );
     }
 
     currentPanel.borderRadius = Math.max(
@@ -110,8 +116,9 @@ const formHandler = (() => {
     );
 
     currentPanel.panelAppearance = form["panelAppearance"].value;
-    currentPanel.appearanceBorderThickness = parseFloat(
+    currentPanel.appearanceBorderThickness = parseInt(
       form["appearanceBorderThickness"].value,
+      10,
     );
     currentPanel.appearancePadding = parseFloat(
       form["appearancePadding"].value,
@@ -155,11 +162,12 @@ const formHandler = (() => {
           form["sMET_verticalPadding"].value,
         );
         exitTab.minimumHeight = parseFloat(form["sMET_minimumHeight"].value);
-        exitTab.fontSize = parseFloat(form["sMET_fontSize"].value);
-        exitTab.lineHeight = parseFloat(form["sMET_lineHeight"].value);
+        exitTab.fontSize = parseInt(form["sMET_fontSize"].value, 10);
+        exitTab.lineHeight = parseInt(form["sMET_lineHeight"].value, 10);
         exitTab.enlargeNumerals = form["sMET_enlargeNumerals"].checked;
-        exitTab.enlargeNumeralsSize = parseFloat(
+        exitTab.enlargeNumeralsSize = parseInt(
           form["sMET_enlargeNumeralsSize"].value,
+          10,
         );
         exitTab.spaceLettersNumerals =
           form["sMET_spaceLettersNumerals"].checked;
@@ -177,10 +185,15 @@ const formHandler = (() => {
         exitTab.contentDirection = form["sMET_contentDirection"].value;
         exitTab.alignment = form["sMET_alignment"].value;
         exitTab.width = form["sMET_width"].value;
-        exitTab.holderPadding = form["smET_containerHolderPadding"].value;
+        exitTab.holderPadding = parseInt(
+          form["smET_containerHolderPadding"].value,
+          10,
+        );
         exitTab.shieldsGap = parseFloat(form["smET_shieldGap"].value);
         exitTab.shieldsDirection = form["smET_shieldsDirection"].value;
-        exitTab.shieldWordSpacing = form["smET_shieldWordSpacing"].value;
+        exitTab.shieldWordSpacing = parseFloat(
+          form["smET_shieldWordSpacing"].value,
+        );
 
         if (exitTab.width.toLowerCase().includes("percent")) {
           exitTab.widthSize = Math.min(
@@ -197,20 +210,28 @@ const formHandler = (() => {
         if (exitTab.variant == "PartialLeft") {
           exitTab.variantSettings.partialLeft.separateRow =
             form["smET_partialLeftCheckbox"].checked;
-          exitTab.variantSettings.partialLeft.horizontalPadding =
-            form["smET_partialLeftHorizontalPadding"].value;
-          exitTab.variantSettings.partialLeft.verticalPadding =
-            form["smET_partialLeftVerticalPadding"].value;
-          exitTab.variantSettings.partialLeft.minWidth =
-            form["smET_partialLeftMinWidth"].value;
-          exitTab.variantSettings.partialLeft.letterSpacing =
-            form["smET_partialLeftLetterSpacing"].value;
-          exitTab.variantSettings.partialLeft.spacing =
-            form["smET_partialLeftSpacing"].value;
+          exitTab.variantSettings.partialLeft.horizontalPadding = parseFloat(
+            form["smET_partialLeftHorizontalPadding"].value,
+          );
+          exitTab.variantSettings.partialLeft.verticalPadding = parseFloat(
+            form["smET_partialLeftVerticalPadding"].value,
+          );
+          exitTab.variantSettings.partialLeft.minWidth = parseFloat(
+            form["smET_partialLeftMinWidth"].value,
+          );
+          exitTab.variantSettings.partialLeft.letterSpacing = parseInt(
+            form["smET_partialLeftLetterSpacing"].value,
+            10,
+          );
+          exitTab.variantSettings.partialLeft.spacing = parseFloat(
+            form["smET_partialLeftSpacing"].value,
+          );
           exitTab.variantSettings.partialLeft.fontFamily =
             form["smET_partialLeftFontFamily"].value;
-          exitTab.variantSettings.partialLeft.borderRadius =
-            form["smET_partialLeftBorderRadius"].value;
+          exitTab.variantSettings.partialLeft.borderRadius = parseInt(
+            form["smET_partialLeftBorderRadius"].value,
+            10,
+          );
         }
 
         if (
@@ -283,7 +304,7 @@ const formHandler = (() => {
           exitTab.variantSettings.icon.iconBackgroundConfiguration.verticalPadding =
             parseFloat(form["smET_iconBackgroundVertPadding"].value);
           exitTab.variantSettings.icon.iconBackgroundConfiguration.borderRadius =
-            parseFloat(form["smET_iconBackgroundBorderRadius"].value);
+            parseInt(form["smET_iconBackgroundBorderRadius"].value, 10);
 
           exitTab.variantSettings.icon.addon = form["sMET_variantAddon"].value;
           exitTab.variantSettings.icon.iconSize = parseFloat(
@@ -311,14 +332,18 @@ const formHandler = (() => {
         }
 
         if (exitTab.variant == "FullLeft") {
-          exitTab.variantSettings.fullLeft.minimumWidth =
-            form["smET_fullLeftMinimumWidth"].value;
+          exitTab.variantSettings.fullLeft.minimumWidth = parseFloat(
+            form["smET_fullLeftMinimumWidth"].value,
+          );
           exitTab.variantSettings.fullLeft.fontFamily =
             form["smET_fullLeftFontFamily"].value;
-          exitTab.variantSettings.fullLeft.letterSpacing =
-            form["smET_fullLeftLetterSpacing"].value;
-          exitTab.variantSettings.fullLeft.bottomSpacing =
-            form["smET_fullLeftBottomSpacing"].value;
+          exitTab.variantSettings.fullLeft.letterSpacing = parseInt(
+            form["smET_fullLeftLetterSpacing"].value,
+            10,
+          );
+          exitTab.variantSettings.fullLeft.bottomSpacing = parseFloat(
+            form["smET_fullLeftBottomSpacing"].value,
+          );
           exitTab.variantSettings.fullLeft.flipJustify =
             form["smET_fullLeftFlipJustify"].checked;
         }
@@ -341,10 +366,16 @@ const formHandler = (() => {
 
       currentShield.routeNumber = form["spShieldQuick_routeNumber"].value;
       currentShield.designation = form["spShieldQuick_designation"].value;
-      currentShield.scale = parseFloat(form["spShieldQuick_scale"].value);
+      currentShield.scale = parseInt(form["spShieldQuick_scale"].value, 10);
 
-      currentShield.horizMargin = form["spShieldQuick_horizMargins"].value;
-      currentShield.vertMargin = form["spShieldQuick_vertMargins"].value;
+      currentShield.horizMargin = parseInt(
+        form["spShieldQuick_horizMargins"].value,
+        10,
+      );
+      currentShield.vertMargin = parseInt(
+        form["spShieldQuick_vertMargins"].value,
+        10,
+      );
 
       const bannerElements = document.querySelectorAll(".smSP_bannerElement");
       let domIndex = bannerElements.length - 1;
@@ -409,40 +440,48 @@ const formHandler = (() => {
           ).value;
 
           banner.firstLetterSize =
-            parseFloat(
+            parseInt(
               bannerElement.querySelector(".smSPBanner_firstLetterScale").value,
+              10,
             ) || 0;
           banner.fontSize =
             parseFloat(
               bannerElement.querySelector(".smSPBanner_fontSize").value,
             ) || 0;
           banner.horizontalMargin =
-            parseFloat(
+            parseInt(
               bannerElement.querySelector(".smSPBanner_horizontalMargins")
                 .value,
+              10,
             ) || 0;
           banner.verticalMargin =
-            parseFloat(
+            parseInt(
               bannerElement.querySelector(".smSPBanner_verticalMargins").value,
+              10,
             ) || 0;
           banner.borderRadius =
-            parseFloat(
+            parseInt(
               bannerElement.querySelector(".smSPBanner_borderRadius").value,
+              10,
             ) || 0;
           banner.horizontalPadding =
-            parseFloat(
+            parseInt(
               bannerElement.querySelector(".smSPBanner_horizontalPadding")
                 .value,
+              10,
             ) || 0;
           banner.verticalPadding =
-            parseFloat(
+            parseInt(
               bannerElement.querySelector(".smSPBanner_verticalPadding").value,
+              10,
             ) || 0;
           banner.wordSpacing = parseInt(
             bannerElement.querySelector(".smSPBanner_wordSpacing").value,
+            10,
           );
           banner.letterSpacing = parseInt(
             bannerElement.querySelector(".smSPBanner_letterSpacing").value,
+            10,
           );
         }
       }
@@ -459,15 +498,19 @@ const formHandler = (() => {
       const standardArrow = currentBlockElem.standardArrow;
       standardArrow.arrow =
         document.getElementById("sdArrow_arrow").dataset.selectedOption;
-      standardArrow.rotation =
-        document.getElementById("sdArrow_rotation").value;
-      standardArrow.size = document.getElementById("sdArrow_size").value;
-      standardArrow.marginHorizontal = document.getElementById(
-        "sdArrow_marginHorizontal",
-      ).value;
-      standardArrow.marginVertical = document.getElementById(
-        "sdArrow_marginVertical",
-      ).value;
+      standardArrow.rotation = parseInt(
+        document.getElementById("sdArrow_rotation").value,
+        10,
+      );
+      standardArrow.size = parseFloat(
+        document.getElementById("sdArrow_size").value,
+      );
+      standardArrow.marginHorizontal = parseFloat(
+        document.getElementById("sdArrow_marginHorizontal").value,
+      );
+      standardArrow.marginVertical = parseFloat(
+        document.getElementById("sdArrow_marginVertical").value,
+      );
       standardArrow.flip = document.getElementById("sdArrow_flip").checked;
     }
 
@@ -478,7 +521,12 @@ const formHandler = (() => {
       if (element) {
         let nextValue = element.value;
 
-        if (element.type === "checkbox") {
+        if (element.type === "number" || element.type === "range") {
+          nextValue =
+            element.step === "any" || !Number.isInteger(Number(element.step))
+              ? parseFloat(element.value)
+              : parseInt(element.value, 10);
+        } else if (element.type === "checkbox") {
           nextValue = element.checked;
         } else if (element.type === "radio") {
           nextValue = element.checked
@@ -524,17 +572,25 @@ const formHandler = (() => {
 
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
-    ].topPadding = document.querySelector("#sdBlock_topPadding").value;
+    ].topPadding = parseFloat(
+      document.querySelector("#sdBlock_topPadding").value,
+    );
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
-    ].bottomPadding = document.querySelector("#sdBlock_bottomPadding").value;
+    ].bottomPadding = parseFloat(
+      document.querySelector("#sdBlock_bottomPadding").value,
+    );
 
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
-    ].topMargin = document.querySelector("#sdBlock_topMargin").value;
+    ].topMargin = parseFloat(
+      document.querySelector("#sdBlock_topMargin").value,
+    );
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
-    ].bottomMargin = document.querySelector("#sdBlock_bottomMargin").value;
+    ].bottomMargin = parseFloat(
+      document.querySelector("#sdBlock_bottomMargin").value,
+    );
 
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
@@ -542,7 +598,7 @@ const formHandler = (() => {
       "#sdBlock_backgroundColor",
     ).dataset.color;
     blockElements.blockProperties[app.vars.currentlySelectedRowIndex].width =
-      document.querySelector("#sdBlock_width").value;
+      parseFloat(document.querySelector("#sdBlock_width").value);
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].stretchLeft = document.querySelector("#sdBlock_stretchLeft").checked;
@@ -555,18 +611,22 @@ const formHandler = (() => {
 
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
-    ].leftPadding = document.querySelector("#sdBlock_leftPadding").value;
+    ].leftPadding = parseFloat(
+      document.querySelector("#sdBlock_leftPadding").value,
+    );
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
-    ].rightPadding = document.querySelector("#sdBlock_rightPadding").value;
+    ].rightPadding = parseFloat(
+      document.querySelector("#sdBlock_rightPadding").value,
+    );
     blockElements.blockProperties[app.vars.currentlySelectedRowIndex].gap =
-      document.querySelector("#sdBlock_gap").value;
+      parseFloat(document.querySelector("#sdBlock_gap").value);
 
     if (
       !readProperties ||
       (readProperties && !readProperties["aplSubpanelConfigChange"])
     ) {
-      subPanel.laneWidth = parseInt(form["subPanelLength"].value);
+      subPanel.laneWidth = parseInt(form["subPanelLength"].value, 10);
     }
 
     subPanel.verticalAlign = form["subpanelAlign"].value;
@@ -575,7 +635,7 @@ const formHandler = (() => {
         app.getCurrentPanel().sign.subPanels.length - 1 &&
       app.getCurrentPanel().sign.subPanels.length >= 2
     ) {
-      subPanel.dividerHeight = form["subpanelDividerHeight"].value;
+      subPanel.dividerHeight = parseFloat(form["subpanelDividerHeight"].value);
       subPanel.dividerHeightUnit = form["subpanelDividerHeightUnit"].value;
     }
 
@@ -586,15 +646,20 @@ const formHandler = (() => {
       const exitOnlyConfigs = standardArrowConfig.exitOnlyConfigs;
 
       if (standardArrowConfig.variant == "Custom") {
-        standardArrowConfig.customConfig.gap = form["standardArrows_gap"].value;
+        standardArrowConfig.customConfig.gap = parseFloat(
+          form["standardArrows_gap"].value,
+        );
         standardArrowConfig.customConfig.justify =
           form["standardArrows_justify"].value;
-        standardArrowConfig.customConfig.verticalTopPadding =
-          form["standardArrows_verticalTopPadding"].value;
-        standardArrowConfig.customConfig.verticalBottomPadding =
-          form["standardArrows_verticalBottomPadding"].value;
-        standardArrowConfig.customConfig.horizontalPadding =
-          form["standardArrows_horizontalPadding"].value;
+        standardArrowConfig.customConfig.verticalTopPadding = parseFloat(
+          form["standardArrows_verticalTopPadding"].value,
+        );
+        standardArrowConfig.customConfig.verticalBottomPadding = parseFloat(
+          form["standardArrows_verticalBottomPadding"].value,
+        );
+        standardArrowConfig.customConfig.horizontalPadding = parseFloat(
+          form["standardArrows_horizontalPadding"].value,
+        );
 
         const standardArrow =
           currentPanel.sign.arrows.standard.arrowList[
@@ -604,53 +669,72 @@ const formHandler = (() => {
           standardArrow.arrow = document.querySelector(
             "#guideStandardArrow",
           ).dataset.selectedOption;
-          standardArrow.rotation = document.querySelector(
-            "#guideStandardArrow_rotation",
-          ).value;
-          standardArrow.size = document.querySelector(
-            "#guideStandardArrow_size",
-          ).value;
-          standardArrow.marginHorizontal = document.querySelector(
-            "#guideStandardArrow_marginHorizontal",
-          ).value;
-          standardArrow.marginVertical = document.querySelector(
-            "#guideStandardArrow_marginVertical",
-          ).value;
+          standardArrow.rotation = parseInt(
+            document.querySelector("#guideStandardArrow_rotation").value,
+            10,
+          );
+          standardArrow.size = parseFloat(
+            document.querySelector("#guideStandardArrow_size").value,
+          );
+          standardArrow.marginHorizontal = parseFloat(
+            document.querySelector("#guideStandardArrow_marginHorizontal")
+              .value,
+          );
+          standardArrow.marginVertical = parseFloat(
+            document.querySelector("#guideStandardArrow_marginVertical").value,
+          );
           standardArrow.flip = document.querySelector(
             "#guideStandardArrow_flip",
           ).checked;
-        }
+        } 
       } else if (standardArrowConfig.variant.includes("Exit Only")) {
         // set arrows
         const exitOnlyArrow = exitOnlyConfigs.arrow;
         exitOnlyArrow.arrow =
           document.querySelector("#exitOnlyArrowType").dataset.selectedOption;
-        exitOnlyArrow.size = form["exitOnlyArrowSize"].value;
-        exitOnlyArrow.rotation = form["exitOnlyArrowRotation"].value;
+        exitOnlyArrow.size = parseFloat(form["exitOnlyArrowSize"].value);
+        exitOnlyArrow.rotation = parseInt(
+          form["exitOnlyArrowRotation"].value,
+          10,
+        );
         exitOnlyArrow.flip = form["exitOnlyArrowFlip"].checked;
 
         // set exit only configs
         exitOnlyConfigs.exitOnlyText = form["exitOnlyText"].value;
         exitOnlyConfigs.exitOnlyTextPosition =
           form["exitOnlyTextPosition"].value;
-        exitOnlyConfigs.horizontalPadding =
-          form["exitOnlyHorizontalPadding"].value;
-        exitOnlyConfigs.verticalPadding = form["exitOnlyVerticalPadding"].value;
+        exitOnlyConfigs.horizontalPadding = parseFloat(
+          form["exitOnlyHorizontalPadding"].value,
+        );
+        exitOnlyConfigs.verticalPadding = parseFloat(
+          form["exitOnlyVerticalPadding"].value,
+        );
         exitOnlyConfigs.fontFamily = form["exitOnlyFontFamily"].value;
-        exitOnlyConfigs.fontSize = form["exitOnlyFontSize"].value;
-        exitOnlyConfigs.wordSpacing = form["exitOnlyWordSpacing"].value;
-        exitOnlyConfigs.letterSpacing = form["exitOnlyLetterSpacing"].value;
+        exitOnlyConfigs.fontSize = parseInt(form["exitOnlyFontSize"].value, 10);
+        exitOnlyConfigs.wordSpacing = parseFloat(
+          form["exitOnlyWordSpacing"].value,
+        );
+        exitOnlyConfigs.letterSpacing = parseFloat(
+          form["exitOnlyLetterSpacing"].value,
+        );
         exitOnlyConfigs.borderMode = form["exitOnlyBorderMode"].value;
         exitOnlyConfigs.arrowLocation = form["arrowLocations"].value;
-        exitOnlyConfigs.numArrows = parseInt(form["exitOnlyArrowCount"].value);
+        exitOnlyConfigs.numArrows = parseInt(
+          form["exitOnlyArrowCount"].value,
+          10,
+        );
         exitOnlyConfigs.gap = parseFloat(form["exitOnlyGap"].value);
 
-        exitOnlyConfigs.splitHorizontalPadding =
-          form["splitExitOnlyHorizPadding"].value;
-        exitOnlyConfigs.splitVerticalPadding =
-          form["splitExitOnlyVertPadding"].value;
-        exitOnlyConfigs.splitBorderRadius =
-          form["splitExitOnlyBorderRadius"].value;
+        exitOnlyConfigs.splitHorizontalPadding = parseFloat(
+          form["splitExitOnlyHorizPadding"].value,
+        );
+        exitOnlyConfigs.splitVerticalPadding = parseFloat(
+          form["splitExitOnlyVertPadding"].value,
+        );
+        exitOnlyConfigs.splitBorderRadius = parseInt(
+          form["splitExitOnlyBorderRadius"].value,
+          10,
+        );
         exitOnlyConfigs.exitOnlyOutsideGap = parseFloat(
           form["exitOnlyOutsideGap"].value,
         );
@@ -664,7 +748,10 @@ const formHandler = (() => {
 
       standardArrowConfig.variant = form["guideArrow"].value;
 
-      currentPanel.sign.oSArrow = parseInt(form["otherSymbolPlacement"].value);
+      currentPanel.sign.oSArrow = parseInt(
+        form["otherSymbolPlacement"].value,
+        10,
+      );
       currentPanel.sign.oSArrowPositioning =
         form["otherSymbolArrowPositioning"].value;
       currentPanel.sign.otherSymbol = form["otherSymbol"].value;
@@ -672,6 +759,7 @@ const formHandler = (() => {
       currentPanel.sign.actionMessage = form["additionalActionMessage"].value;
       currentPanel.sign.actionMessageArrow = parseInt(
         form["actionMessagePlacement"].value,
+        10,
       );
       currentPanel.sign.actionMessagePositioning =
         form["actionMessageArrowPositioning"].value;
@@ -698,6 +786,7 @@ const formHandler = (() => {
           let subpanel = currentPanel.sign.subPanels[i];
           subpanel.laneWidth = parseInt(
             aplContainer.querySelector(".smAPLCat_numLanes").value,
+            10,
           );
           console.log(i + " " + subpanel.laneWidth);
         }
@@ -780,6 +869,7 @@ const formHandler = (() => {
 
       currentPanel.sign.arrows.diagrammic.scale = parseInt(
         document.querySelector("#sMDiagrammicScale").value,
+        10,
       );
     }
 

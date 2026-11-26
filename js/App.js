@@ -1372,48 +1372,6 @@ const App = (() => {
 
         dividerList.push(subDivider);
         signHolderElmt.appendChild(subDivider);
-
-        if (
-          panel.sign.arrows.arrowMode == "apl" &&
-          panel.sign.lanePanelSize > 0 &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0
-        ) {
-          subDivider.style.marginLeft = `${panel.sign.lanePanelSize / 2 - 2}px`;
-
-          const subPanelRect = signContentContainerElmt.getBoundingClientRect();
-          const subDividerRect = subDivider.getBoundingClientRect();
-
-          const midpointViewport =
-            (subPanelRect.left + subDividerRect.left) / 2;
-          const panelCenterViewport =
-            subPanelRect.left + subPanelRect.width / 2;
-
-          const offsetViewport = midpointViewport - panelCenterViewport;
-          const leftOffset = offsetViewport / formHandler.vars.zoomLevel;
-
-          signContentContainerElmt.style.left = `${leftOffset}px`;
-        } else if (
-          panel.sign.arrows.arrowMode == "apl" &&
-          panel.sign.lanePanelSize == 0 &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5] &&
-          panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5].length > 0
-        ) {
-          subDivider.style.marginLeft = `${panel.sign.arrows.apl.subpanels[subPanelIndex + 0.5][0].size / 2 + panel.sign.arrows.apl.gap / 2 + 0.5}rem`;
-
-          const subPanelRect = signContentContainerElmt.getBoundingClientRect();
-          const subDividerRect = subDivider.getBoundingClientRect();
-
-          const midpointViewport =
-            (subPanelRect.left + subDividerRect.left) / 2;
-          const panelCenterViewport =
-            subPanelRect.left + subPanelRect.width / 2;
-
-          const offsetViewport = midpointViewport - panelCenterViewport;
-          const leftOffset = offsetViewport / formHandler.vars.zoomLevel;
-
-          signContentContainerElmt.style.left = `${leftOffset}px`;
-        }
       }
     }
 
@@ -1947,184 +1905,320 @@ const App = (() => {
       if (panel.sign.lanePanelSize == 0) {
         guideArrowsElmt.style.paddingLeft = ".5rem";
         guideArrowsElmt.style.paddingRight = ".5rem";
+        signHolderElmt.style.paddingLeft = ".5rem";
+        signHolderElmt.style.paddingRight = ".5rem";
       }
 
-      const dividerAplHolder = [];
       const aplHolderList = [];
-      for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
-        const aplArrows = arrowVariant.subpanels[i] || [];
-        const subpanel = i % 1 == 0 && subpanelList[i];
-        const aplHolder = document.createElement("div");
-        if (i % 1 == 0) {
-          aplHolder.className = "sMGA_APLHolder left";
-        } else {
-          aplHolder.className = "sMGA_APLHolder center";
+
+      // duplicated code but i'd rather be able to figure something out bash mash my head into two identical yet different codes
+      if (parseInt(panel.sign.lanePanelSize) === 0) {
+        // uses arrow gap :(
+
+        const subpanelPreRects = [];
+        for (let i = 0; i < subpanelList.length; i++) {
+          subpanelPreRects[i] = subpanelList[i].getBoundingClientRect();
         }
 
-        if (
-          i == subpanelList.length - 1 &&
-          panel.sign.lanePanelSize == 0 &&
-          arrowVariant.subpanelConfigs[i] &&
-          arrowVariant.subpanelConfigs[i].justify == true
-        ) {
-          aplHolder.style.justifyContent = "right";
-        }
+        for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
+          const aplArrows = arrowVariant.subpanels[i] || [];
+          const subpanel = i % 1 == 0 && subpanelList[i];
+          const aplHolder = document.createElement("div");
+          aplHolder.className = "sMGA_APLHolder " + (subpanel ? "" : "divider");
 
-        for (let j = 0; j <= aplArrows.length - 1; j += 1) {
-          const arrow = aplArrows[j];
-          const arrowElmt = arrow.createElement();
-          let exitWidthLeft = 0;
-          let exitWidthRight = 0;
-          if (arrow.exitOnlyEnabled) {
-            let remConstant = parseFloat(getComputedStyle(document.documentElement).fontSize);
-            let exitWidthChecker = document.createElement("div");
-            guideArrowsElmt.appendChild(exitWidthChecker);
-            if (arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText left").length > 0) {
-              exitWidthChecker.appendChild(arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText left")[0].cloneNode(true));
-              exitWidthLeft = exitWidthChecker.getElementsByClassName("sMGA_APLArrow_exitText left")[0].offsetWidth / remConstant;
-            }
-            if (arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText right").length > 0) {
-              exitWidthChecker.appendChild(arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText right")[0].cloneNode(true));
-              console.log(exitWidthChecker);
-              exitWidthRight = exitWidthChecker.getElementsByClassName("sMGA_APLArrow_exitText right")[0].offsetWidth / remConstant;
-            }
-            exitWidthChecker.remove();
-          }
-          if (panel.sign.lanePanelSize > 0) {
-            arrowElmt.style.width = panel.sign.lanePanelSize + "px";
+          if (!subpanel) {
+            aplHolder.style.width = `${arrowVariant.gap * 2}rem`;
           } else {
-            if (i % 1 != 0) {
-              arrowElmt.style.width = arrow.size + "rem";
-              if (arrow.exitOnlyEnabled) {
-                arrowElmt.style.marginRight = `${arrowVariant.gap - exitWidthRight}rem`;
-              } else {
-                arrowElmt.style.marginRight = `${arrowVariant.gap}rem`;
-              }
-              if (arrow.exitOnlyEnabled) {
-                arrowElmt.style.marginLeft = `${arrowVariant.gap - exitWidthLeft}rem`;
-              } else {
-                arrowElmt.style.marginLeft = `${arrowVariant.gap}rem`;
-              }
-            } else {
-              if (i != 0 || j != 0) {
-                if (arrow.exitOnlyEnabled) {
-                 arrowElmt.style.marginLeft = `${(arrowVariant.gap / 2) - exitWidthLeft}rem`;
-                } else {
-                 arrowElmt.style.marginLeft = `${arrowVariant.gap / 2}rem`;
-                }
-              }
-              if (i != subpanelList.length - 1 || j != aplArrows.length - 1) {
-                if (arrow.exitOnlyEnabled) { 
-                  arrowElmt.style.marginRight = `${(arrowVariant.gap / 2) - exitWidthRight}rem`;
-                } else {
-                  arrowElmt.style.marginRight = `${arrowVariant.gap / 2}rem`;
-                }
-              }
-            }
+            aplHolder.style.width = `max-content`;
+            aplHolder.style.minWidth = `${subpanelPreRects[i].width / formHandler.vars.zoomLevel}px`;
           }
 
-          if (ColorLibrary.checkForContrast(panel.color)) {
+          aplHolderList.push(aplHolder);
+          guideArrowsElmt.appendChild(aplHolder);
+
+          for (let j = 0; j <= aplArrows.length - 1; j += 1) {
+            const arrow = aplArrows[j];
+            const arrowElmt = arrow.createElement();
+            arrowElmt.style.width = arrow.size / 2 + "rem";
+
+            if (ColorLibrary.checkForContrast(panel.color)) {
+              if (arrow.exitOnlyEnabled) {
+                arrowElmt.children[1].style.filter = "invert(1)";
+              } else {
+                arrowElmt.style.filter = "invert(1)";
+              }
+            }
+
             if (arrow.exitOnlyEnabled) {
-              arrowElmt.children[1].style.filter = "invert(1)";
-            } else {            
-              arrowElmt.style.filter = "invert(1)";
-            }
-          }
+              const exitWidthChecker = document.createElement("div");
+              document.body.appendChild(exitWidthChecker);
 
-          aplHolder.appendChild(arrowElmt);
+              exitWidthChecker.appendChild(arrowElmt);
+
+              const arrowRect = arrowElmt
+                .querySelector(".sMGA_APLArrow")
+                .getBoundingClientRect();
+              const arrowHolderRect = arrowElmt.getBoundingClientRect();
+
+              const distanceToCenter = Math.abs(
+                arrowRect.left +
+                  arrowRect.width / 2 -
+                  (arrowHolderRect.left + arrowHolderRect.width / 2),
+              );
+
+              if (j === 0 && arrowElmt.children[0].tagName === "DIV") {
+                const divRect = arrowElmt.children[0].getBoundingClientRect();
+                const divDistToCenter = arrowHolderRect.left - divRect.left;
+
+                aplHolder.style.paddingLeft = `${divDistToCenter / formHandler.vars.zoomLevel}px`;
+              }
+
+              if (
+                j === aplArrows.length - 1 &&
+                arrowElmt.children[2].tagName === "DIV"
+              ) {
+                const divRect = arrowElmt.children[2].getBoundingClientRect();
+                const divDistToCenter = divRect.right - arrowHolderRect.right;
+
+                aplHolder.style.paddingRight = `${divDistToCenter / formHandler.vars.zoomLevel}px`;
+              }
+
+              const sign =
+                arrowRect.left + arrowRect.width / 2 <
+                arrowHolderRect.left + arrowHolderRect.width / 2
+                  ? distanceToCenter
+                  : -distanceToCenter;
+              for (const child of arrowElmt.children) {
+                child.style.transform = `translateX(${sign / formHandler.vars.zoomLevel}px)`;
+              }
+
+              exitWidthChecker.remove();
+            }
+
+            aplHolder.appendChild(arrowElmt);
+          }
         }
 
-        if (panel.sign.lanePanelSize > 0 && subpanel) {
-          aplHolder.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - (arrowVariant.subpanels[i - 0.5] && arrowVariant.subpanels[i - 0.5].length > 0 ? 1 : 0))}px`;
-        } else if (subpanel) {
-          aplHolder.style.width = `max-content`;
-          aplHolder.style.minWidth = `${subpanel.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
-        } else if (!subpanel) {
+        console.log(aplHolderList);
+        console.log(subpanelList);
+
+        // assign a dividerParent yadaaydayaydya im going insaneeeee
+        for (let i = 0; i < dividerList.length; i++) {
+          const divider = dividerList[i];
+          const dividerParent = document.createElement("div");
+          const originalParent = divider.parentNode;
+          originalParent.replaceChild(dividerParent, divider);
+
+          dividerParent.className = "dividerParent";
+          dividerParent.style.width = `${arrowVariant.gap * 2}rem`;
+          dividerParent.style.flex = `0 0 ${arrowVariant.gap * 2}rem`;
+          dividerParent.appendChild(divider);
+
+          dividerList[i] = dividerParent;
+        }
+
+        // set each subpanel to be equal to the respective apl content
+        for (let i = 0; i < subpanelList.length; i++) {
+          const subpanel = subpanelList[i];
+          const aplHolder = aplHolderList[2 * i];
+          console.log(
+            subpanel,
+            aplHolder,
+            aplHolder.getBoundingClientRect().width,
+          );
+          subpanel.style.width = `${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+          subpanel.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+        }
+
+        const signHolderRects = signHolderElmt.getBoundingClientRect();
+        for (let i = 0; i < subpanelList.length; i++) {
+          const subpanel = subpanelList[i];
+
+          const currentBoundX =
+            subpanel.getBoundingClientRect().left / formHandler.vars.zoomLevel;
+          let leftBoundX;
+          let rightBoundX;
+
+          if (i == 0) {
+            leftBoundX = signHolderRects.left;
+            rightBoundX =
+              subpanelList.length === 1
+                ? signHolderRects.left + signHolderRects.width
+                : dividerList[i]
+                    .querySelector(".subDivider")
+                    .getBoundingClientRect().left;
+          } else if (i == subpanelList.length - 1) {
+            leftBoundX =
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().left +
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().width;
+            rightBoundX = signHolderRects.left + signHolderRects.width;
+          } else {
+            leftBoundX =
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().left +
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().width;
+            rightBoundX = dividerList[i]
+              .querySelector(".subDivider")
+              .getBoundingClientRect().left;
+          }
+
+          leftBoundX /= formHandler.vars.zoomLevel;
+          rightBoundX /= formHandler.vars.zoomLevel;
+
+          const newCenter = (leftBoundX + rightBoundX) / 2;
+          const newLeft =
+            newCenter - subpanel.getBoundingClientRect().width / 2;
+          const offset = newLeft - currentBoundX;
+
+          subpanel.style.transform = `translateX(${offset}px)`;
+        }
+      } else {
+        // uses lane panel size
+        for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
+          const aplArrows = arrowVariant.subpanels[i] || [];
+          const subpanel = i % 1 == 0 && subpanelList[i];
+          const aplHolder = document.createElement("div");
+          aplHolder.className = "sMGA_APLHolder";
+
+          // generate all arrows
+          for (let j = 0; j <= aplArrows.length - 1; j += 1) {
+            const arrow = aplArrows[j];
+            const arrowElmt = arrow.createElement();
+            arrowElmt.style.width = panel.sign.lanePanelSize + "px";
+
+            if (ColorLibrary.checkForContrast(panel.color)) {
+              if (arrow.exitOnlyEnabled) {
+                arrowElmt.children[1].style.filter = "invert(1)";
+              } else {
+                arrowElmt.style.filter = "invert(1)";
+              }
+            }
+
+            aplHolder.appendChild(arrowElmt);
+          }
+
+          aplHolderList.push(aplHolder);
+          guideArrowsElmt.appendChild(aplHolder);
+
+          if (subpanel) {
+            // subpanel
+            const holderSize =
+              panel.sign.lanePanelSize * panel.sign.subPanels[i].laneWidth;
+
+            if (
+              arrowVariant.subpanels[i - 0.5] &&
+              arrowVariant.subpanels[i - 0.5].length > 0
+            ) {
+              aplHolder.style.width = `${holderSize - panel.sign.lanePanelSize}px`;
+            } else {
+              aplHolder.style.width = `${holderSize}px`;
+            }
+            continue;
+          }
+
           if (
-            panel.sign.lanePanelSize > 0 &&
             arrowVariant.subpanels[i] &&
             arrowVariant.subpanels[i].length > 0
           ) {
+            // divider w/ arrow
             aplHolder.style.width = panel.sign.lanePanelSize + "px";
-          } else if (
-            (panel.sign.lanePanelSize == 0 && !arrowVariant.subpanels[i]) ||
-            (arrowVariant.subpanels[i] && arrowVariant.subpanels[i].length == 0)
-          ) {
-            aplHolder.style.width = `4px`;
+            continue;
           }
         }
 
-        aplHolderList.push(aplHolder);
-        guideArrowsElmt.appendChild(aplHolder);
+        // for each divider, create a dividerParent and reassign dividerList likewise
+        for (let i = 0; i < dividerList.length; i++) {
+          const divider = dividerList[i];
+          const dividerParent = document.createElement("div");
+          const originalParent = divider.parentNode;
+          originalParent.replaceChild(dividerParent, divider);
 
-        if (panel.sign.lanePanelSize == 0) {
-          aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+          dividerParent.className = "dividerParent";
+          dividerParent.style.width = panel.sign.lanePanelSize + "px";
+          dividerParent.appendChild(divider);
+
+          dividerList[i] = dividerParent;
         }
 
+        // get the correct widths
+        for (let i = 0; i < subpanelList.length; i++) {
+          const subpanel = subpanelList[i];
+          const aplHolder = aplHolderList[2 * i];
+
+          if (
+            (i > 0 && !arrowVariant.subpanels[i - 0.5]) ||
+            (arrowVariant.subpanels[i - 0.5] &&
+              arrowVariant.subpanels[i - 0.5].length == 0)
+          ) {
+            subpanel.style.width =
+              aplHolder.getBoundingClientRect().width /
+                formHandler.vars.zoomLevel -
+              panel.sign.lanePanelSize +
+              "px";
+          } else {
+            subpanel.style.width = aplHolder.style.width;
+          }
+        }
+
+        const signHolderRects = signHolderElmt.getBoundingClientRect();
+
+        // re-center each subpanel by either the left, dividers, or right signHolder
+        for (let i = 0; i < subpanelList.length; i++) {
+          const subpanel = subpanelList[i];
+
+          const currentBoundX =
+            subpanel.getBoundingClientRect().left / formHandler.vars.zoomLevel;
+          let leftBoundX;
+          let rightBoundX;
+
+          if (i == 0) {
+            leftBoundX = signHolderRects.left;
+            rightBoundX =
+              subpanelList.length === 1
+                ? signHolderRects.left + signHolderRects.width
+                : dividerList[i]
+                    .querySelector(".subDivider")
+                    .getBoundingClientRect().left;
+          } else if (i == subpanelList.length - 1) {
+            leftBoundX =
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().left +
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().width;
+            rightBoundX = signHolderRects.left + signHolderRects.width;
+          } else {
+            leftBoundX =
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().left +
+              dividerList[i - 1]
+                .querySelector(".subDivider")
+                .getBoundingClientRect().width;
+            rightBoundX = dividerList[i]
+              .querySelector(".subDivider")
+              .getBoundingClientRect().left;
+          }
+
+          leftBoundX /= formHandler.vars.zoomLevel;
+          rightBoundX /= formHandler.vars.zoomLevel;
+
+          const newCenter = (leftBoundX + rightBoundX) / 2;
+          const newLeft =
+            newCenter - subpanel.getBoundingClientRect().width / 2;
+          const offset = newLeft - currentBoundX;
+
+          subpanel.style.transform = `translateX(${offset}px)`;
+        }
       }
-
-      console.log(aplHolderList);
-      console.log(subpanelList);
-
-      for (let i = 0; i <= subpanelList.length - 1; i += 1) {
-        // auto readjust
-        const subpanel = subpanelList[i];
-        let j = 2 * i;
-        const aplHolder = aplHolderList[j];
-        if (
-          subpanel &&
-          aplHolder.getBoundingClientRect().width + 
-          (aplHolderList[1] ? aplHolderList[1].getBoundingClientRect().width/2 : 0)
-            /* (arrowVariant.subpanels[i - 0.5] &&
-            arrowVariant.subpanels[i - 0.5].length > 0
-              ? arrowVariant.gap *
-                parseFloat(getComputedStyle(document.documentElement).fontSize)
-              : 0) */ >
-            subpanel.getBoundingClientRect().width &&
-          panel.sign.lanePanelSize == 0
-        ) {
-          let newWidth =
-            aplHolder.getBoundingClientRect().width + 
-            (aplHolderList[1] ? aplHolderList[1].getBoundingClientRect().width/2 : 0);
-            /* (arrowVariant.subpanels[i - 0.5] &&
-            arrowVariant.subpanels[i - 0.5].length > 0
-              ? arrowVariant.gap *
-                parseFloat(getComputedStyle(document.documentElement).fontSize)
-              : 0); */
-          subpanel.style.width = newWidth + "px";
-          subpanel.style.flex = "0 0 " + newWidth + "px";
-        }
-
-        if (
-          subpanel &&
-          i % 1 == 0 &&
-          arrowVariant.subpanels[i] &&
-          arrowVariant.subpanels[i].length > 0 &&
-          arrowVariant.subpanels[i - 0.5] &&
-          arrowVariant.subpanels[i - 0.5].length > 0 &&
-          panel.sign.lanePanelSize > 0
-        ) {
-          subpanel.style.width = `${panel.sign.lanePanelSize * (panel.sign.subPanels[i].laneWidth - 0.5)}px`;
-        }
-
-        if (
-          panel.sign.lanePanelSize == 0 &&
-          i % 1 != 0 &&
-          arrowVariant.subpanels[i] &&
-          arrowVariant.subpanels[i].length > 0
-        ) {
-          dividerAplHolder.push({ holder: aplHolder, ind: i });
-        }
-      }
-
-      /* for (const { holder: aplHolder, ind } of dividerAplHolder) {
-        const dividerToMoveTo = dividerList[ind - 0.5];
-        const dividerBounds = dividerToMoveTo.getBoundingClientRect();
-        const aplBounds = aplHolder.getBoundingClientRect();
-        const aplCenterX = aplBounds.left + aplBounds.width / 2;
-        const dividerCenterX = dividerBounds.left + dividerBounds.width / 2;
-        aplHolder.style.transform = `translateX(${dividerCenterX - aplCenterX}px)`;
-      } */
     }
 
     if (arrows.arrowMode == "standard") {
