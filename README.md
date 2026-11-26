@@ -138,7 +138,7 @@ Enforcement Policy: If your PR does not follow these guidelines, it will NOT be 
 ## Contributors
 Thank you to the following contributors for helping out with the developemnt of SignMaker v2.2:
 
-- @vivribbon: Redoing pretty much every single shield in `shield.css`, NVUTCDG Guidelines
+- @vivribbon: Redoing pretty much every single shield in `shield.css`, Double-Stroke Borders, NVUTCDG Guidelines :P
 - @theobsidianguy: Fixing the APL system, inverting arrow colors, and general UI/UX
 - @cjc30: Australian shields
 
