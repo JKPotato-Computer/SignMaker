@@ -65,6 +65,7 @@ const MUTCDVariants = (() => {
         mutcdVariant: "MUTCD",
         panels: [],
         userColors: {},
+        panelSpacing: 0.5,
       },
       Panel: {
         sign: null,
@@ -76,8 +77,8 @@ const MUTCDVariants = (() => {
         appearanceBorderThickness: 8,
         appearancePadding: 2,
         appearancePixelSize: 0.05,
-        leftSpacing: .5,
-        rightSpacing: .5,
+        leftSpacing: 0.5,
+        rightSpacing: 0.5,
         tagToReplace: ["corner", "borderRadius"],
       },
       Sign: {

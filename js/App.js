@@ -1597,8 +1597,8 @@ const App = (() => {
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
     panelElmt.className = `panel ${panel.corner.toLowerCase()} ${panel.panelAppearance.toLowerCase()}`;
-    panelElmt.style.setProperty("--leftSpacing", panel.leftSpacing + "rem");
-    panelElmt.style.setProperty("--rightSpacing", panel.rightSpacing + "rem");
+    panelElmt.style.setProperty("--leftSpacing", (panel.useLeftSpacing ? panel.leftSpacing : post.panelSpacing) + "rem");
+    panelElmt.style.setProperty("--rightSpacing", (panel.useRightSpacing ? panel.rightSpacing : post.panelSpacing) + "rem");
 
     if (panel.panelAppearance.includes("Pixels")) {
       panelElmt.style.padding = `${panel.appearancePadding}rem`;

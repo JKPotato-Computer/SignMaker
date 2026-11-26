@@ -72,6 +72,7 @@ const formHandler = (() => {
     post.thickness = parseFloat(form["postThickness"].value);
     post.postPanelSpacing = parseFloat(form["postPanelSpacing"].value);
     post.alignPanels = form["alignPanels"].value;
+    post.panelSpacing = parseFloat(form["panelSpacing"].value);
 
     if (post.variant === "Standard") {
       post.offsetPost = form["offsetPost"].checked;
@@ -125,7 +126,9 @@ const formHandler = (() => {
     currentPanel.appearancePixelSize = parseFloat(
       form["appearancePixelSize"].value,
     );
+    currentPanel.useLeftSpacing = form["usePanelLeftSpacing"].checked;
     currentPanel.leftSpacing = parseFloat(form["panelLeftSpacing"].value);
+    currentPanel.useRightSpacing = form["usePanelRightSpacing"].checked;
     currentPanel.rightSpacing = parseFloat(form["panelRightSpacing"].value);
 
     // Exit Tab
@@ -910,6 +913,7 @@ const formHandler = (() => {
     document.getElementById("postCornerRadius").value = post.cornerRadius;
     document.getElementById("postSpacing").value = post.spacing || 1;
     document.getElementById("postThickness").value = post.thickness;
+    document.getElementById("panelSpacing").value = post.panelSpacing;
     document.getElementById("postPanelSpacing").value = post.postPanelSpacing;
     document.getElementById("alignPanels").value = post.alignPanels;
 
@@ -963,7 +967,9 @@ const formHandler = (() => {
       panel.appearancePadding;
     document.querySelector("#appearancePixelSize").value =
       panel.appearancePixelSize;
+    document.querySelector("#usePanelLeftSpacing").checked = panel.useLeftSpacing;
     document.querySelector("#panelLeftSpacing").value = panel.leftSpacing;
+    document.querySelector("#usePanelRightSpacing").checked = panel.useRightSpacing;
     document.querySelector("#panelRightSpacing").value = panel.rightSpacing;
 
     document.querySelector("#panelLeftSpacingSlider").value = panel.leftSpacing;
