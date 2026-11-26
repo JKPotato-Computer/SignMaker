@@ -1926,7 +1926,7 @@ const App = (() => {
           const aplHolder = document.createElement("div");
           aplHolder.className = "sMGA_APLHolder " + (subpanel ? "" : "divider");
 
-          if (arrowVariant.subpanelConfigs[i].justify) {
+          if (arrowVariant.subpanelConfigs[i].justify === true) {
             aplHolder.style.justifyContent = "right";
           }
 
@@ -1936,9 +1936,6 @@ const App = (() => {
             aplHolder.style.width = `max-content`;
             aplHolder.style.minWidth = `${subpanelPreRects[i].width / formHandler.vars.zoomLevel}px`;
           }
-
-          aplHolderList.push(aplHolder);
-          guideArrowsElmt.appendChild(aplHolder);
 
           for (let j = 0; j <= aplArrows.length - 1; j += 1) {
             const arrow = aplArrows[j];
@@ -2001,6 +1998,25 @@ const App = (() => {
 
             aplHolder.appendChild(arrowElmt);
           }
+
+          // flex test
+          const flexTest = document.createElement("div");
+          flexTest.style.setProperty("--arrowGap", arrowVariant.gap + "rem");
+          document.body.appendChild(flexTest);
+          flexTest.appendChild(aplHolder);
+
+          aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+
+          guideArrowsElmt.appendChild(aplHolder);
+          flexTest.remove();
+
+          aplHolderList.push(aplHolder);
+
+          if (aplArrows.length === 0 && subpanel) {
+            aplHolder.style.minWidth = `0`;
+            aplHolder.style.flex = `0`;
+          } else {
+          }
         }
 
         // assign a dividerParent yadaaydayaydya im going insaneeeee
@@ -2022,11 +2038,6 @@ const App = (() => {
         for (let i = 0; i < subpanelList.length; i++) {
           const subpanel = subpanelList[i];
           const aplHolder = aplHolderList[2 * i];
-          console.log(
-            subpanel,
-            aplHolder,
-            aplHolder.getBoundingClientRect().width,
-          );
           subpanel.style.width = `${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
           subpanel.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         }

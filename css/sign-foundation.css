@@ -1544,19 +1544,6 @@ main#smRender.wide #postContainer {
   z-index: 10;
 }
 
-.sMGA_APLHolder {
-  outline: 1px solid white;
-}
-
-.sMGA_APLArrowHolder {
-  border-left: 1px solid blue;
-  border-right: 1px solid blue;
-}
-
-.sMGA_APLHolder:nth-child(odd) {
-  outline: 1px solid red;
-}
-
 .dividerParent {
   display: flex;
   flex-direction: row;
