@@ -40,7 +40,19 @@ class APLArrow {
       (APLArrow.arrowTypes[this.arrowVariant].flipped ? "flipped" : "") +
       " " +
       this.arrowVariant.replace(/\s+/g, "-").toLowerCase();
-    image.style.setProperty("--arrowSize", `${this.size}rem`);
+
+    if (
+      this.arrowVariant == "Left Arrow" ||
+      this.arrowVariant == "Right Arrow" ||
+      this.arrowVariant == "ALT Left Arrow" ||
+      this.arrowVariant == "ALT Right Arrow" ||
+      this.arrowVariant == "CFX Left Arrow" ||
+      this.arrowVariant == "CFX Right Arrow"
+    ) {
+      image.style.setProperty("--arrowSize", `${this.size * 0.75}rem`);
+    } else {
+      image.style.setProperty("--arrowSize", `${this.size}rem`);
+    }
 
     holder.appendChild(image);
 

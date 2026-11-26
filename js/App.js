@@ -1950,6 +1950,7 @@ const App = (() => {
       }
 
       const dividerAplHolder = [];
+      const aplHolderList = [];
       for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
         const aplArrows = arrowVariant.subpanels[i] || [];
         const subpanel = i % 1 == 0 && subpanelList[i];
@@ -1969,27 +1970,65 @@ const App = (() => {
           aplHolder.style.justifyContent = "right";
         }
 
-        for (const arrow of aplArrows) {
+        for (let j = 0; j <= aplArrows.length - 1; j += 1) {
+          const arrow = aplArrows[j];
           const arrowElmt = arrow.createElement();
+          let exitWidthLeft = 0;
+          let exitWidthRight = 0;
+          if (arrow.exitOnlyEnabled) {
+            let remConstant = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            let exitWidthChecker = document.createElement("div");
+            guideArrowsElmt.appendChild(exitWidthChecker);
+            if (arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText left").length > 0) {
+              exitWidthChecker.appendChild(arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText left")[0].cloneNode(true));
+              exitWidthLeft = exitWidthChecker.getElementsByClassName("sMGA_APLArrow_exitText left")[0].offsetWidth / remConstant;
+            }
+            if (arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText right").length > 0) {
+              exitWidthChecker.appendChild(arrowElmt.getElementsByClassName("sMGA_APLArrow_exitText right")[0].cloneNode(true));
+              console.log(exitWidthChecker);
+              exitWidthRight = exitWidthChecker.getElementsByClassName("sMGA_APLArrow_exitText right")[0].offsetWidth / remConstant;
+            }
+            exitWidthChecker.remove();
+          }
           if (panel.sign.lanePanelSize > 0) {
             arrowElmt.style.width = panel.sign.lanePanelSize + "px";
-          } else if (panel.sign.lanePanelSize == 0 && i % 1 != 0) {
-            aplHolder.style.width = arrow.size + "rem";
-            if (
-              arrowVariant.subpanels[i - 0.5] &&
-              arrowVariant.subpanels[i - 0.5].length > 0
-            ) {
-              aplHolder.style.marginLeft = `${arrowVariant.gap / 2}rem`;
-            }
-            if (
-              arrowVariant.subpanels[i + 0.5] &&
-              arrowVariant.subpanels[i + 0.5].length > 0
-            ) {
-              aplHolder.style.marginRight = `${arrowVariant.gap / 2}rem`;
+          } else {
+            if (i % 1 != 0) {
+              arrowElmt.style.width = arrow.size + "rem";
+              if (arrow.exitOnlyEnabled) {
+                arrowElmt.style.marginRight = `${arrowVariant.gap - exitWidthRight}rem`;
+              } else {
+                arrowElmt.style.marginRight = `${arrowVariant.gap}rem`;
+              }
+              if (arrow.exitOnlyEnabled) {
+                arrowElmt.style.marginLeft = `${arrowVariant.gap - exitWidthLeft}rem`;
+              } else {
+                arrowElmt.style.marginLeft = `${arrowVariant.gap}rem`;
+              }
+            } else {
+              if (i != 0 || j != 0) {
+                if (arrow.exitOnlyEnabled) {
+                 arrowElmt.style.marginLeft = `${(arrowVariant.gap / 2) - exitWidthLeft}rem`;
+                } else {
+                 arrowElmt.style.marginLeft = `${arrowVariant.gap / 2}rem`;
+                }
+              }
+              if (i != subpanelList.length - 1 || j != aplArrows.length - 1) {
+                if (arrow.exitOnlyEnabled) { 
+                  arrowElmt.style.marginRight = `${(arrowVariant.gap / 2) - exitWidthRight}rem`;
+                } else {
+                  arrowElmt.style.marginRight = `${arrowVariant.gap / 2}rem`;
+                }
+              }
             }
           }
+
           if (ColorLibrary.checkForContrast(panel.color)) {
-            arrowElmt.style.filter = "invert(1)";
+            if (arrow.exitOnlyEnabled) {
+              arrowElmt.children[1].style.filter = "invert(1)";
+            } else {            
+              arrowElmt.style.filter = "invert(1)";
+            }
           }
 
           aplHolder.appendChild(arrowElmt);
@@ -2015,32 +2054,43 @@ const App = (() => {
           }
         }
 
+        aplHolderList.push(aplHolder);
         guideArrowsElmt.appendChild(aplHolder);
 
         if (panel.sign.lanePanelSize == 0) {
           aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         }
 
-        // auto readjust
+      }
 
+      console.log(aplHolderList);
+      console.log(subpanelList);
+
+      for (let i = 0; i <= subpanelList.length - 1; i += 1) {
+        // auto readjust
+        const subpanel = subpanelList[i];
+        let j = 2 * i;
+        const aplHolder = aplHolderList[j];
         if (
           subpanel &&
-          aplHolder.getBoundingClientRect().width +
-            (arrowVariant.subpanels[i - 0.5] &&
+          aplHolder.getBoundingClientRect().width + 
+          (aplHolderList[1] ? aplHolderList[1].getBoundingClientRect().width/2 : 0)
+            /* (arrowVariant.subpanels[i - 0.5] &&
             arrowVariant.subpanels[i - 0.5].length > 0
               ? arrowVariant.gap *
                 parseFloat(getComputedStyle(document.documentElement).fontSize)
-              : 0) >
+              : 0) */ >
             subpanel.getBoundingClientRect().width &&
           panel.sign.lanePanelSize == 0
         ) {
           let newWidth =
-            aplHolder.getBoundingClientRect().width +
-            (arrowVariant.subpanels[i - 0.5] &&
+            aplHolder.getBoundingClientRect().width + 
+            (aplHolderList[1] ? aplHolderList[1].getBoundingClientRect().width/2 : 0);
+            /* (arrowVariant.subpanels[i - 0.5] &&
             arrowVariant.subpanels[i - 0.5].length > 0
               ? arrowVariant.gap *
                 parseFloat(getComputedStyle(document.documentElement).fontSize)
-              : 0);
+              : 0); */
           subpanel.style.width = newWidth + "px";
           subpanel.style.flex = "0 0 " + newWidth + "px";
         }
@@ -2067,14 +2117,14 @@ const App = (() => {
         }
       }
 
-      for (const { holder: aplHolder, ind } of dividerAplHolder) {
+      /* for (const { holder: aplHolder, ind } of dividerAplHolder) {
         const dividerToMoveTo = dividerList[ind - 0.5];
         const dividerBounds = dividerToMoveTo.getBoundingClientRect();
         const aplBounds = aplHolder.getBoundingClientRect();
         const aplCenterX = aplBounds.left + aplBounds.width / 2;
         const dividerCenterX = dividerBounds.left + dividerBounds.width / 2;
         aplHolder.style.transform = `translateX(${dividerCenterX - aplCenterX}px)`;
-      }
+      } */
     }
 
     if (arrows.arrowMode == "standard") {
