@@ -1126,7 +1126,7 @@ class TollLogoElement {
       container.appendChild(onlyBlock);
       container.classList.add("hasOnlyBlock");
 
-      if (ColorLibrary.checkForContrast(this.backgroundColor)) {
+      if (ColorLibrary.checkForContrast(this.containerBackgroundColor)) {
         container.style.borderColor = "black";
         onlyBlock.style.color = "white";
         onlyBlock.style.backgroundColor = "black";

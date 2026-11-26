@@ -464,7 +464,7 @@ Shield.prototype.getDirectoryFromShield = (name, variant) => {
     }
     return null;
   };
-  directory += search(Shield.prototype.shieldDirectory, "", "");
+  directory += search(Shield.shieldDirectory, "", "");
   return directory;
 };
 
@@ -483,10 +483,10 @@ Shield.prototype.getPropertiesFromName = (name) => {
     }
     return null;
   };
-  return search(Shield.prototype.shieldDirectory, "", "");
+  return search(Shield.shieldDirectory, "", "");
 };
 
-Shield.prototype.shieldDirectory = {
+Shield.shieldDirectory = {
   Australia: {
     type: "category",
     ALPHANUM: {

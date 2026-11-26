@@ -335,6 +335,7 @@
 .panel:not(.round)
   .guideArrowsHolder:has(.guideArrows.exit_only.ontario_black_border) {
   padding: 0 0.2rem 0.2rem;
+  background: var(--bgColor);
 }
 
 .guideArrowsHolder:has(

@@ -83,7 +83,7 @@
 .shield.I.ThreeDigitAlt .routeNumber,
 .shield.I-BUS.ThreeDigitAlt .routeNumber {
   font-family: "Series D";
-  font-size: 1.4em;
+  font-size: 1.6em;
   top: 0.1em;
 }
 
@@ -772,7 +772,15 @@
   font-family: "Series E";
   font-size: 1.6em;
   left: -0.075em;
-  top: -0.6rem;
+  top: -0.8rem;
+}
+
+.shield.TXEXPRESS:has(.designation) .routeNumber,
+.shield.TXTollCTMRA:has(.designation) .routeNumber,
+.shield.TXTollNTTA:has(.designation) .routeNumber,
+.shield.TXTOLL:has(.designation) .routeNumber {
+  font-size: 1.45em;
+  top: -0.25em;
 }
 
 .shield.TXTollNTTA .routeNumber,
@@ -791,16 +799,18 @@
 .shield.TXEXPRESS .routeNumber {
   color: rgb(255, 255, 255);
   font-family: "Series D";
-  font-size: 1.4rem;
-  letter-spacing: -1px;
-  top: 0.075em;
+  font-size: 1.5rem;
+  letter-spacing: -2px;
+  top: .24em;
+  left: -1px;
 }
 
 .shield.TXEXPRESS .designation,
 .shield.TXTollCTMRA .designation,
 .shield.TXTollNTTA .designation,
 .shield.TXTOLL .designation {
-  top: 3rem;
+  top: 0.35rem;
+  font-size: 0.35em;
 }
 
 /* Utah */

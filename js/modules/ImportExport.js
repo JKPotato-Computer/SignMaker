@@ -29,7 +29,11 @@ const ImportExport = (() => {
 
         const validKeys = Object.keys(obj).filter(
           (key) =>
-            key !== "_type" && key !== "constructor" && key !== "prototype",
+            key !== "_type" &&
+            key !== "constructor" &&
+            key !== "prototype" &&
+            key !== "shieldDirectory" &&
+            key !== "tagToReplace",
         );
         for (const key of validKeys) {
           processedData[key] = copyRecursive(obj[key]);
@@ -65,7 +69,11 @@ const ImportExport = (() => {
         const processedData = {};
 
         const validKeys = Object.keys(data).filter(
-          (key) => key !== "constructor" && key !== "prototype",
+          (key) =>
+            key !== "constructor" &&
+            key !== "prototype" &&
+            key !== "shieldDirectory" &&
+            key !== "tagToReplace",
         );
         for (const key of validKeys) {
           processedData[key] = convert(data[key]);

@@ -1542,6 +1542,7 @@ const FormNavigation = (() => {
       }
 
       let debounce = false;
+      let lastValue = dropdownElement.dataset.selectedOption;
       const changeObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
           if (
@@ -1554,6 +1555,11 @@ const FormNavigation = (() => {
           if (debounce) {
             return;
           }
+
+          if (lastValue === dropdownElement.dataset.selectedOption) {
+            return;
+          }
+          lastValue = dropdownElement.dataset.selectedOption;
 
           debounce = true;
           changeFunction(dropdownElement.dataset.selectedOption);
@@ -1629,6 +1635,7 @@ const FormNavigation = (() => {
 
         switch (option) {
           case "DOWN":
+            console.log("triggered");
             currentPanel.sign.arrows.standard.arrowList[
               App.vars.currentlySelectedStandardArrow
             ].size = 1.75;
@@ -1864,7 +1871,7 @@ const FormNavigation = (() => {
       }
     };
 
-    createFromDir(Shield.prototype.shieldDirectory, presetShieldList);
+    createFromDir(Shield.shieldDirectory, presetShieldList);
 
     // Preset/Custom Shield Tabs
     document.querySelector("#presetShields").addEventListener("click", () => {
@@ -1927,7 +1934,7 @@ const FormNavigation = (() => {
           }
           return hasAnything;
         };
-        searchFromDir(Shield.prototype.shieldDirectory, presetShieldList);
+        searchFromDir(Shield.shieldDirectory, presetShieldList);
       });
 
     // Shield Library Search

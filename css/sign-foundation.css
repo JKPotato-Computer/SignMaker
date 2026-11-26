@@ -123,6 +123,7 @@ main#smRender.wide #postContainer {
   padding: var(--vertPadding) var(--horizPadding);
   line-height: calc(var(--fontSize) * ((var(--lineHeight) / 100)));
   min-height: calc(var(--fontSize) + (var(--vertPadding) * 2));
+  gap: calc(var(--fontSize) / 4);
 }
 
 .bE-numeral {

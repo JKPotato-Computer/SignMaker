@@ -352,7 +352,7 @@ const ShieldEditor = (() => {
                 }
 
                 searchFromDir(
-                  Shield.prototype.shieldDirectory,
+                  Shield.shieldDirectory,
                   document.querySelector("#presetShieldList"),
                   false,
                 );
@@ -367,7 +367,7 @@ const ShieldEditor = (() => {
 
       // Initial load of the shield directory item listeners
       searchFromDir(
-        Shield.prototype.shieldDirectory,
+        Shield.shieldDirectory,
         document.querySelector("#presetShieldList"),
         true,
       );
