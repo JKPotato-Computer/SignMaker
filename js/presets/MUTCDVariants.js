@@ -520,6 +520,19 @@ const MUTCDVariants = (() => {
         ],
       },
     },
+    CAMUTCD: {
+      VariantInfo: {
+        FullName: "CAMUTCD: California Sign Specification Drawings",
+        Tags: [
+          "CAMUTCD",
+          "SHSD",
+          "CALIFORNIA",
+          "CA DOT",
+          "California Highway Signage",
+          "California Highway Sign Designs",
+        ],
+      },
+    },
     NVUTCDG: {
       VariantInfo: {
         FullName:
