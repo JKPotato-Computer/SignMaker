@@ -1734,12 +1734,6 @@ const App = (() => {
     signCont.appendChild(guideArrowsHolderElmt);
     signCont.appendChild(exitTabContainerBottom);
 
-    if (exitTabContainerWithin.innerHTML != "") {
-      signHolderElmt.style.paddingTop =
-        exitTabContainerWithin.offsetHeight + "px";
-      signHolderElmt.style.minWidth = exitTabContainerWithin.offsetWidth + "px";
-    }
-
     const [subpanelList, dividerList] = redrawSubPanels(panel, signHolderElmt);
     requestAnimationFrame(() => {
       recolorBorder(signHolderElmt, subpanelList, dividerList, panel, [
