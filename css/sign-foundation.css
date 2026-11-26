@@ -22,7 +22,7 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   padding: 0 calc(var(--panelSpacing));
 }
 
-#panelContainer.start > .panelGroupContainer {
+#postContainer:not(.postVariantCurved-2)  #panelContainer.start > .panelGroupContainer {
   align-self: start;
   top: -50%;
 }
@@ -31,9 +31,17 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   align-self: center;
 }
 
-#panelContainer.end > .panelGroupContainer {
+#postContainer:not(.postVariantCurved-2) #panelContainer.end > .panelGroupContainer {
   align-self: end;
   top: 50%;
+}
+
+#postContainer.postVariantCurved-2 #panelContainer.start > .panelGroupContainer {
+  align-self: start;
+}
+
+#postContainer.postVariantCurved-2 #panelContainer.end > .panelGroupContainer {
+  align-self: end;
 }
 
 main#smRender.wide #postContainer {
