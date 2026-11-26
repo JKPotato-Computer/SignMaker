@@ -97,9 +97,10 @@ No longer do you have to restart everything when your page refreshes or you are 
 There's also a few templates, more will be made soon. For nostalgic purposes, here's the header page of the "Del Water Gap" sign on the dki-os/SignMaker README, which is now a template in SignMaker v2.2.
 ![Sign Library Image 1](assets/form/readme/SignLibrary_Image1.png)
 
-
 ![Importing & Exporting](assets/form/readme/ImportExport.png)
+
 ### 6. Importing & Exporting
+
 Last but not least, what's SignMaker without being able to export your signs? You can now export high-quality signs in PNG and SVG format. Additionally, you can share your signs in .SIGNMAKER (defiintely not .JSON) format with your friends, and they can share you signs to import into SignMaker v2.2! Talk about going full circle.
 
 Only compatible with SignMaker v2.2 signs.
@@ -107,19 +108,23 @@ Only compatible with SignMaker v2.2 signs.
 ![Export Menu](assets/form/readme/ImportExport_Image1.png)
 
 ## Setup
+
 SignMaker v2.2 can run entirely locally - there is NO webserver needed for SignMaker to function. (github-like instructions here)
 
 ### 1. Clone the repository from GitHub
+
 ```bash
 git clone https://github.com/JKPotato-Computer/SignMaker
 cd SignMaker
 ```
 
 ### 2. Run the project
+
 **Option A:** Open the `index.html` file in your web browser. (This will not support exporting images.)
 
 **Option B:** If you have [Node.js](https://nodejs.org) installed, you can start a local web server for SignMaker. This program uses Vite to start the development server; however, Python (`py -m http.server`) also sufficies. Run the following commands in the project directory:
 (npm install, create a vite.config.js file too with vite terminal)
+
 ```bash
 npm install
 # Ensure that you have vite.config.js installed and configured + node modules, then:
@@ -127,15 +132,17 @@ npx vite
 ```
 
 ## SignMaker Pull Request Policy
-(As follows in the Discord Server): Earlier variants of SignMaker were built WITHOUT the use of AI, and we will continue to honor these directions in the creation of the Official SignMaker project as best as possible. **The Official SignMaker has not been mass-generated or piloted with the use of AI**, and all code implementations/features have been meticulously designed by a human person. 
+
+(As follows in the Discord Server): Earlier variants of SignMaker were built WITHOUT the use of AI, and we will continue to honor these directions in the creation of the Official SignMaker project as best as possible. **The Official SignMaker has not been mass-generated or piloted with the use of AI**, and all code implementations/features have been meticulously designed by a human person.
 
 - **AUTHENTICITY:** All submitted pull requests must NOT be entirely AI-generated / "vibecoded". While this ruling is entirely subjective, the baseline is: your code may be AI-assisted and written with the help of AI; however, AI should not have taken full lead of your code submission. A project maintainer should be able to read your code without any complications given a reasonable amount of time.
-- **LENGTH:** Pull requests should generally focus on 1-3 features and not attempt to restructure entire codebases to implement features. IF the latter case is proven to be necessary, your code will REALLY be reviewed in detail before any  approval is made.
+- **LENGTH:** Pull requests should generally focus on 1-3 features and not attempt to restructure entire codebases to implement features. IF the latter case is proven to be necessary, your code will REALLY be reviewed in detail before any approval is made.
 - **DESCRIPTION:** ALL changes MUST be highlighted directly on the pull request on GitHub, NOT in a Discord message unless given permission to do so. Both would be preferable, but the former is required.
 
 Enforcement Policy: If your PR does not follow these guidelines, it will NOT be accepted.
 
 ## Contributors
+
 Thank you to the following contributors for helping out with the developemnt of SignMaker v2.2:
 
 - @vivribbon: Redoing pretty much every single shield in `shield.css`, Double-Stroke Borders, NVUTCDG Guidelines :P
@@ -145,7 +152,9 @@ Thank you to the following contributors for helping out with the developemnt of 
 And a massive thank you to the past maintainers [@dki_os](http://github.com/dki-os) and [@BrenStro](https://github.com/Brenstro) for even creating Highway Sign Maker in the first place. Hope this version of SignMaker can live up to your expectations and continue to improve upon your work, and maybe a little bit of nostalgia.
 
 ## Third-Party Sources
+
 **Font Faces**
+
 - Overpass / Inter typeface was sourced from [Google Fonts](https://fonts.google.com/specimen/Overpass) and is licensed under the [SIL Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
 - Clearview typeface was sourced from [Cofonts](https://cofonts.com/clearview-font/).
 - FHWA Series typeface was sourced from [Font Space](https://www.fontspace.com/highway-gothic-family-font-f151742) by Barry Stock and is public domain.
@@ -156,11 +165,18 @@ And a massive thank you to the past maintainers [@dki_os](http://github.com/dki-
 - VCR Mono was sourced from [Dafont](https://www.dafont.com/vcr-osd-mono.font).
 
 **Images**
+
 - All SignMaker v2.2 assets were hand-made by @JKPotato-Computer.
 - All UI icons were sourced from Google's [Material Symbols](https://fonts.google.com/icons) and are licensed under the [SIL Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
 - Other assets (icons, shields, etc.) were sourced from the [MUTCD](https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf) and other state DOTs.
 
+**Modules**
+
+- [snapdom.dev](https://snapdom.dev/) to capture PNG/SVG images of the sign for exporting, licensed under the [MIT License](https://opensource.org/license/mit)
+- [marked.js](https://marked.js.org/) for Markdown parsing, licensed under the [MIT License](https://opensource.org/license/mit)
+
 ## SignMaker Usage Disclaimer
+
 **DO NOT USE SIGNMAKER FOR ACTUAL SIGN-MAKING PURPOSES.** SignMaker is a tool for hobbyists and roadgeeks obsessed with the Interstate Highway System and does not comply with real-world measurements, MUTCD standards, and general regulations. SignMaker is not a replacement for professional CAD software and should not be used for any real-world sign-making purposes. Besides, if this statement applies to you, you're probably a State Transportation department, you definitely have enough money to afford CAD software. (Maybe from all the toll-revenue you've been collecting, talking to YOU Texas.)
 
 Signs made with the FHWA font face, Overpass, Electronic Highway Sign, VCR Mono (I think?), and/or LLM is under public domain and can be displayed on sites or used for commercial purposes. Signs made with the Transport or Clearview font technically are only allowed for personal use, but I can't really tell you what you can and can't do with them. So, I will pretend that I didn't see anything. :)

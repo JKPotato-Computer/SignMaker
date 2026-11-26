@@ -592,3 +592,58 @@ div#welcomeAnim_grass {
 #sMSettings_About a:visited {
   color: var(--visitedLinkColor);
 }
+
+div#smCredits_header {
+  width: 100%;
+  text-align: center;
+  background-color: rgb(var(--baseColor));
+  padding: 0.25rem 0;
+}
+
+div#smCredits_marqueeHolder {
+  width: 100%;
+  background: #333333;
+  border: 8px solid black;
+  padding: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+div#smCredits_marqueeHolder > div:nth-child(1) {
+  background: black;
+  overflow: hidden;
+  padding: .5rem;
+}
+
+div#smCredits_marqueeText {
+  width: max-content;
+  font-size: 2rem;
+  text-wrap: nowrap;
+  color: rgb(255, 100, 0);
+  position: relative;
+  left: 100%;
+  font-family: "Series D";
+  word-spacing: -.5rem;
+  animation: marqueeLeft 60s linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes marqueeLeft {
+  from {
+    left: 100%;
+  }
+
+  to {
+    left: -550%;
+  }
+}
+
+.smnCredits_marqueeElectronicOverlay {
+  background: radial-gradient(circle, transparent .05rem, black .05rem);
+  background-size: .12rem .12rem;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}

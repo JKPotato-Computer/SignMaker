@@ -3653,3 +3653,11 @@ input#additionalActionMessage {
 #blockPreview_stretchRight.focus {
   background-color: rgb(255, 0, 0, 1);
 }
+
+.diagramHelpContent details p {
+  margin: 16px;
+}
+
+.diagramHelpContent > p {
+  margin-bottom: 16px;
+}

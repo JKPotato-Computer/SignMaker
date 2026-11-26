@@ -1192,18 +1192,63 @@
           <div class="diagramHelpContent">
             <p>
               The Diagrammatic Drawing tool allows you to create custom
-              diagrammatic drawings for your signs. You can add roads, arrows,
-              and subpanels to create a visual representation of a road layout.
+              diagram-based signage. In short, roads are considered as "nodes" that make a
+              path for the diagram to follow.
             </p>
-            <p>
-              Use the object list to select and edit individual elements. You
-              can move, duplicate, or delete objects as needed. Adjust the
-              properties of each object using the controls in the right panel.
-            </p>
-            <p>
-              Remember to save your work frequently, and you can export your
-              diagram as an image or JSON file for later use.
-            </p>
+            <details open>
+              <summary>Creating New Roads</summary>
+              <p>
+                To create a new road, click the "New Road" button. This will create a road that
+                extends from the previous road in the hierarchy, as indicated by the indentations in the
+                "Object List" menu. Rule of thumb is: the more indented a road is, the further away it is from the "main road."
+              </p>
+              <p>
+                There are three types of roads, two of which you will use more frequently:
+                <ul>
+                  <li><b>Straight Road:</b> A road segment that generates a straight line path from the start to the ending point. Note that
+                    this road type isn't able to make previous roads "curve" into the path, so there is a visible gap between the two roads.
+                  </li>
+                  <li><b>Merge Road:</b> A road segment that allows you to specify the "curve" intensity (where positive is inwards to the bottom left and negative is outwards to the top right) and an ending position.
+                    Note that this road type doesn't guarantee that the ending road is a perfect 90* angle (or its multiples). This is typically used if you are merging out of an existing road configuration.</li>
+                  <li><b>Curve Road:</b> A road segment that allows you to specify the "ending" angle of the road along with its end position. This is what will more commonly be used in most cases.</li>
+                  </li>
+                </ul>
+                <p>
+                  <b>TIP:</b> Some diagrams do not have lane markings at the start (usually bottom-most point) of the diagram. To replicate this, turn OFF lane markings for the main road and make it at most the marking size.
+                  Create a "New Road" extending from the main road with the same # of lanes, but turn ON lane markings and continue drawing your diagram normally.
+                </p>
+              </p>
+            </details>
+            <details>
+              <summary>Adding Arrows</summary>
+              <p>
+                Arrows can be added to the end of road segments, if enabled. Arrows are automatically sized in width based on road size, but you are welcome to change it yourself. Some additional clarification for some parameters:
+                <ul>
+                  <li><b>Lower Verticies Offset:</b> These verticies are typically lower than where the main road actually ends, so this is where you specify how far it is (where 0 means that it is on the same perpendicular line as the main road.)
+                  </li>
+                  <li><b>Arrow Roundness:</b> Arrows can be rounded in their corners, and this utilizes a math-based algorithm (which is totally not just Beizer curves) to calculate how "round" the arrow is, so this is where you specify how far the "corner edges" of these arrows are from the actual corner (where 0 means there is no rounding applied.)
+                  </li>
+                  <li><b>Pointed Tip:</b> You can choose whether or not the topmost arrow point is rounded or not.
+                </ul>
+              </p>
+              <p>Default configurations for these variables are (Lower Verticies Offset) 20px, (Arrow Roundness) 2px, and (Pointed Tip) Enabled.
+              </p>
+            </details>
+            <details>
+              <summary>Integrating Subpanels</summary>
+              <p>
+                Each arrow can be assigned up to one subpanel, and no two arrows can occupy the same subpanel. Incase there isn't a subpanel for it 
+                but is already pre-determined (an example case of this is if you selected a Diagrammatic Preset), then it will be marked as "(PRESET)".
+              </p>
+              <p>
+                When a subpanel is selected, a yellow X crosshatch will appear representing where the subpanel will be positioned in the diagram.
+                There is also a tiny arrow next to the crosshatch that indicates which side the subpanel will be placed on (for left/top, the rightmost edge of the subpanel lies on the X. for right/bottom, the leftmost edge of the subpanel lies on the X). 
+                Note that subpanels will always be aligned AWAY from the diagram and never on top (unless if you force it to be...).
+              </p>
+              <p>
+                <b>NOTE:</b> A subpanel that isn't selected by any of the arrows will NOT appear. Padding will still work with panels, so consider using that!</p>
+              </p>
+            </details>
           </div>
         </dialog>
       </dialog>
@@ -1347,7 +1392,43 @@
                 </div>
               </div>
               <div id="smSettingsAbout_credits" class="smCreditsPage">
-                <span>TODO: Scroller :D</span>
+                <div id="smCredits_header">
+                  ♥ THANK YOU TO EVERYONE FOR MAKING SIGNMAKER V2.2 POSSIBLE!! ♥
+                </div>
+                <div id="smCredits_marqueeHolder">
+                  <div>
+                    <div id="smCredits_marqueeText">
+                      CONTRIBUTORS:
+                      @theobsidianguy
+                      @vivribbon
+                      @_poly2
+                      ---
+                      PAST MAINTAINERS:
+                      Kurumi
+                      Brenstro
+                      dki-os
+                      --
+                      BETA TESTERS:
+                      @_alexihexed
+                      @samesamasalways
+                      @1miximi
+                      @jyejulee
+                      ---
+                      SHOUTOUT TO THE AAROADS COMMUNITY!!!
+                      AND THE SIGNMAKER (V2.2) COMMUNITY FOR STICKING WITH ME!!!
+                      ---
+                      PROUDLY MADE WITHOUT THE OVER-RELIANCE ON ARTIFICIAL INTELLIGENCE :D
+                    </div>
+                  </div>
+                  <div class="smnCredits_marqueeElectronicOverlay"></div>
+                </div>
+                <div id="smCredits_gridArea">
+                  <div id="smCredits_contributorsBox">
+                  </div>
+                  <div id="smCredits_betaTestersBox">
+                  </div>
+                  <div id="smCredits_"
+                </div>
               </div>
               <div id="smSettingsAbout_aiUsage" class="smAIUsagePage">
                 <h3>Hey, let's talk about AI for a second… and that involves sharing a backstory.</h3>
