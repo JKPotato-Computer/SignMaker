@@ -967,9 +967,32 @@ const formHandler = (() => {
       panel.appearancePadding;
     document.querySelector("#appearancePixelSize").value =
       panel.appearancePixelSize;
-    document.querySelector("#usePanelLeftSpacing").checked = panel.useLeftSpacing;
+    document.querySelector("#usePanelLeftSpacing").checked =
+      panel.useLeftSpacing;
+    if (!panel.useLeftSpacing) {
+      document.querySelector("#panelLeftSpacing").style.display = "none";
+      document.querySelector('label[for="panelLeftSpacing"]').style.display =
+        "none";
+    } else {
+      document.querySelector("#panelLeftSpacing").style.display = "";
+      document.querySelector('label[for="panelLeftSpacing"]').style.display =
+        "";
+    }
+
     document.querySelector("#panelLeftSpacing").value = panel.leftSpacing;
-    document.querySelector("#usePanelRightSpacing").checked = panel.useRightSpacing;
+    document.querySelector("#usePanelRightSpacing").checked =
+      panel.useRightSpacing;
+
+    if (!panel.useRightSpacing) {
+      document.querySelector("#panelRightSpacing").style.display = "none";
+      document.querySelector('label[for="panelRightSpacing"]').style.display =
+        "none";
+    } else {
+      document.querySelector("#panelRightSpacing").style.display = "";
+      document.querySelector('label[for="panelRightSpacing"]').style.display =
+        "";
+    }
+
     document.querySelector("#panelRightSpacing").value = panel.rightSpacing;
 
     document.querySelector("#panelLeftSpacingSlider").value = panel.leftSpacing;

@@ -670,7 +670,7 @@ div#smCredits_contributorsBox {
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  padding: .5rem;
+  padding: 0.5rem;
   border-radius: 1rem;
   background-color: rgb(var(--baseColorInv), 0.05);
   justify-content: space-evenly;
@@ -691,28 +691,28 @@ div#smCredits_contributorsBox {
   border: 5px solid white;
   border-radius: 1rem;
   outline: 5px solid var(--baseColor);
-  transition: .125s ease-in-out;
+  transition: 0.125s ease-in-out;
 }
 
 .smCredits_contributor:nth-child(odd):hover {
-  scale: .975;
+  scale: 0.975;
   rotate: -2deg;
 }
 
 .smCredits_contributor:nth-child(even):hover {
-  scale: .975;
+  scale: 0.975;
   rotate: 2deg;
 }
 
 .smCredits_contributor > h2 {
   margin: 0;
   line-height: 100%;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 .smCredits_profilePicture {
-  height: 10rem;
-  width: 10rem;
+  width: 100%;
+  border-radius: 1rem;
   aspect-ratio: 1 / 1;
 }
 
@@ -722,13 +722,13 @@ div#smCredits_betaTestersBox {
   border: 4px solid black;
   outline: 4px solid #fccf34;
   border-radius: 1rem;
-  padding: .5rem;
+  padding: 0.5rem;
   color: black;
-  transition: .125s ease-in-out;
+  transition: 0.125s ease-in-out;
 }
 
 div#smCredits_betaTestersBox:hover {
-  scale: .95;
+  scale: 0.95;
   rotate: 2deg;
 }
 
@@ -738,13 +738,13 @@ div#smCredits_pastMaintainersBox {
   border: 4px solid black;
   outline: 4px solid white;
   border-radius: 1rem;
-  padding: .5rem;
+  padding: 0.5rem;
   color: black;
-  transition: .125s ease-in-out;
+  transition: 0.125s ease-in-out;
 }
 
 div#smCredits_pastMaintainersBox:hover {
-  scale: .95;
+  scale: 0.95;
   rotate: -2deg;
 }
 
