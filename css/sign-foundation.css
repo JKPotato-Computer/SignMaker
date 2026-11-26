@@ -18,7 +18,22 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   width: max-content;
   height: max-content;
   align-self: center;
-  padding: 0 calc(var(--panelSpacing) * 2);
+  position: relative;
+  padding: 0 calc(var(--panelSpacing));
+}
+
+#panelContainer.start > .panelGroupContainer {
+  align-self: start;
+  top: -50%;
+}
+
+#panelContainer.center > .panelGroupContainer {
+  align-self: center;
+}
+
+#panelContainer.end > .panelGroupContainer {
+  align-self: end;
+  top: 50%;
 }
 
 main#smRender.wide #postContainer {
@@ -285,7 +300,7 @@ main#smRender.wide #postContainer {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1rem;
+  gap: var(--gap, 1rem);
   flex-grow: 1;
   flex-basis: 0;
   min-width: max-content;

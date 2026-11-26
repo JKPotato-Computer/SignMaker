@@ -2805,10 +2805,18 @@ const App = (() => {
     );
 
     panelContainerElmt.innerHTML = "";
-    panelContainerElmt.style.setProperty(
-      "--panelSpacing",
-      post.panelSpacing + "rem",
-    );
+
+    if (post.variant != "Rural" && post.variant != "Center") {
+      panelContainerElmt.style.setProperty(
+        "--panelSpacing",
+        post.panelSpacing + "rem",
+      );
+      panelContainerElmt.style.setProperty(
+        "--postPanelSpacing",
+        post.postPanelSpacing + "rem",
+      );
+      panelContainerElmt.className = `${post.alignPanels}`;
+    }
 
     let ind = 0;
     for (const panelGroup of post.panels) {

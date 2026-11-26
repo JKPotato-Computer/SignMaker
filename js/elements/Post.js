@@ -12,6 +12,8 @@ class Post {
       spacing,
       mutcdVariant,
       userColors,
+      postPanelSpacing,
+      alignPanels,
     } = MUTCDVariants.get("Post", options);
     this.polePosition = polePosition;
     this.color = color;
@@ -24,6 +26,8 @@ class Post {
     this.spacing = spacing;
     this.mutcdVariant = mutcdVariant;
     this.userColors = userColors;
+    this.postPanelSpacing = postPanelSpacing;
+    this.alignPanels = alignPanels;
 
     if (Post.polePositions.includes(polePosition)) {
       this.polePosition = polePosition;
@@ -92,15 +96,14 @@ class Post {
     );
     postContainerElmt.style.setProperty(
       "--postOffset",
-      this.offsetPost ? "1rem" : "",
+      this.offsetPost && this.variant === "Standard" ? "1rem" : "",
     );
-    // Set curved post specific CSS variables
+
     const cornerRadVar = this.cornerRadius;
     const cornerRadVar2 = cornerRadVar * 2;
     postContainerElmt.style.setProperty("--cornerRad", cornerRadVar + "%");
     postContainerElmt.style.setProperty("--cornerRad2", cornerRadVar2 + "%");
 
-    // Set spacing multiplier (subtract 1 for CSS transform)
     const spacingMultiplier = (this.spacing || 1) - 1;
     postContainerElmt.style.setProperty(
       "--spacingMultiplier",
@@ -131,5 +134,6 @@ Post.polePositions = ["Left", "Right", "Overhead"];
 Post.colors = ["Silver", "Black", "Brown", "Red", "Blue"];
 
 Post.postVariants = ["Standard", "Curved", "Curved 2", "Rural", "Center"];
+Post.alignPanelOptions = ["Start", "Center", "End"];
 
 window.Post = Post;

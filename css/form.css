@@ -1753,6 +1753,8 @@ div#subPanelList {
   grid-area: content;
   width: 5rem;
   height: 2.5rem;
+  display: flex;
+  flex-direction: row;
 }
 
 #blockSpacingSettings > div {
@@ -3631,4 +3633,23 @@ input#additionalActionMessage {
 
 #blockSpacingSettings > div > div > input[type="range"] {
   width: 50%;
+}
+
+#blockPreview_stretchLeft,
+#blockPreview_stretchCenter,
+#blockPreview_stretchRight {
+  background-color: rgb(255, 0, 0, 0.5);
+  height: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: rgb(255, 255, 255, 0.5);
+}
+
+#blockPreview_stretchLeft.focus,
+#blockPreview_stretchCenter.focus,
+#blockPreview_stretchRight.focus {
+  background-color: rgb(255, 0, 0, 1);
 }

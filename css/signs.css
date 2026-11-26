@@ -77,6 +77,19 @@
   margin-top: var(--postOffset);
 }
 
+#postContainer.polePositionLeft #panelContainer {
+  padding-left: var(--postPanelSpacing);
+}
+
+#postContainer.polePositionRight #panelContainer {
+  padding-right: var(--postPanelSpacing);
+}
+
+#postContainer.polePositionOverhead #panelContainer {
+  padding-left: var(--postPanelSpacing);
+  padding-right: var(--postPanelSpacing);
+}
+
 #postContainer.postVariantRural #panelContainer {
   position: relative;
   background-image:

@@ -506,6 +506,13 @@ const FormNavigation = (() => {
         selected: variant === post.variant,
       });
     }
+
+    // Post alignments
+    for (const alignment of Post.alignPanelOptions) {
+      lib.appendOption(document.querySelector("#alignPanels"), alignment, {
+        selected: alignment === post.alignPanels,
+      });
+    }
   };
 
   const setupPanelOptions = () => {
@@ -982,20 +989,38 @@ const FormNavigation = (() => {
         rightPadding: "paddingRight",
         topPadding: "paddingTop",
         bottomPadding: "paddingBottom",
+        stretchLeft: "stretchLeft",
+        stretchCenter: "stretchCenter",
+        stretchRight: "stretchRight",
       };
 
       for (const key in pairs) {
         const slider = document.querySelector("#sdBlock_" + key + "Slider");
         const input = document.querySelector("#sdBlock_" + key);
+        const label = document.querySelector(
+          'label[for="sdBlock_' + key + '"]',
+        );
         const preview = document.querySelector("#blockPreview_" + pairs[key]);
 
-        slider.addEventListener("focus", () => {
-          preview.classList.add("focus");
-        });
+        if (slider) {
+          slider.addEventListener("focus", () => {
+            preview.classList.add("focus");
+          });
 
-        slider.addEventListener("blur", () => {
-          preview.classList.remove("focus");
-        });
+          slider.addEventListener("blur", () => {
+            preview.classList.remove("focus");
+          });
+        }
+
+        if (label) {
+          label.addEventListener("mouseover", () => {
+            preview.classList.add("focus");
+          });
+
+          label.addEventListener("mouseout", () => {
+            preview.classList.remove("focus");
+          });
+        }
 
         input.addEventListener("focus", () => {
           preview.classList.add("focus");

@@ -1206,6 +1206,7 @@ class Block {
       stretchLeft,
       stretchCenter,
       stretchRight,
+      gap,
     } = MUTCDVariants.get("Block", options);
     this.topMargin = topMargin;
     this.topPadding = topPadding;
@@ -1218,6 +1219,7 @@ class Block {
     this.stretchRight = stretchRight;
     this.leftPadding = leftPadding;
     this.rightPadding = rightPadding;
+    this.gap = gap;
   }
 }
 
@@ -1410,6 +1412,7 @@ class Control {
 
       const flexRow = document.createElement("div");
       flexRow.className = "blockElementRow";
+      flexRow.style.setProperty("--gap", `${properties.gap}rem`);
 
       flexRow.style.setProperty("--marginTop", `${properties.topMargin}rem`);
       flexRow.style.setProperty(

@@ -71,11 +71,11 @@ const formHandler = (() => {
     post.showPost = form["showPost"].checked;
     post.thickness = form["postThickness"].value;
     post.panelSpacing = form["panelSpacing"].value;
+    post.postPanelSpacing = form["postPanelSpacing"].value;
+    post.alignPanels = form["alignPanels"].value;
 
     if (post.variant === "Standard") {
       post.offsetPost = form["offsetPost"].checked;
-    } else {
-      post.offsetPost = false;
     }
 
     // Handle corner radius for non-curved variants
@@ -559,6 +559,8 @@ const formHandler = (() => {
     blockElements.blockProperties[
       app.vars.currentlySelectedRowIndex
     ].rightPadding = document.querySelector("#sdBlock_rightPadding").value;
+    blockElements.blockProperties[app.vars.currentlySelectedRowIndex].gap =
+      document.querySelector("#sdBlock_gap").value;
 
     if (
       !readProperties ||
@@ -819,6 +821,36 @@ const formHandler = (() => {
     document.getElementById("panelSpacing").value = post.panelSpacing;
     document.getElementById("panelSpacing").value = post.panelSpacing;
     document.getElementById("postThickness").value = post.thickness;
+    document.getElementById("postPanelSpacing").value = post.postPanelSpacing;
+    document.getElementById("alignPanels").value = post.alignPanels;
+
+    if (post.variant.includes("Curved")) {
+      document.querySelector("#postCornerRadiusLabel").style.display = "";
+      document.querySelector("#postCornerRadius").style.display = "";
+    } else {
+      document.querySelector("#postCornerRadiusLabel").style.display = "none";
+      document.querySelector("#postCornerRadius").style.display = "none";
+    }
+
+    if (post.variant === "Rural" || post.variant === "Center") {
+      document.querySelector("#postPositionLabel").style.display = "none";
+      document.querySelector("#postPosition").style.display = "none";
+      document.querySelector("#offsetPostLabel").style.display = "none";
+      document.querySelector("#offsetPost").style.display = "none";
+      document.querySelector("#postSpacingLabel").style.display = "none";
+      document.querySelector("#postSpacing").style.display = "none";
+      document.querySelector("#postPanelSpacingLabel").style.display = "none";
+      document.querySelector("#postPanelSpacing").style.display = "none";
+    } else {
+      document.querySelector("#postPositionLabel").style.display = "";
+      document.querySelector("#postPosition").style.display = "";
+      document.querySelector("#offsetPostLabel").style.display = "";
+      document.querySelector("#offsetPost").style.display = "";
+      document.querySelector("#postSpacingLabel").style.display = "";
+      document.querySelector("#postSpacing").style.display = "";
+      document.querySelector("#postPanelSpacingLabel").style.display = "";
+      document.querySelector("#postPanelSpacing").style.display = "";
+    }
 
     ColorLibrary.updateDefaultColors();
     document.getElementById("postColor").value = post.color;
@@ -1317,6 +1349,13 @@ const formHandler = (() => {
     document.querySelector("#blockPreview_marginBottom").style.width =
       `${5 + parseFloat(currentBlockProperties.leftPadding) + parseFloat(currentBlockProperties.rightPadding)}rem`;
 
+    document.querySelector("#blockPreview_stretchLeft").style.display =
+      currentBlockProperties.stretchLeft ? "flex" : "none";
+    document.querySelector("#blockPreview_stretchCenter").style.display =
+      currentBlockProperties.stretchCenter ? "flex" : "none";
+    document.querySelector("#blockPreview_stretchRight").style.display =
+      currentBlockProperties.stretchRight ? "flex" : "none";
+
     document.querySelector("#sdBlock_topPaddingSlider").value =
       currentBlockProperties.topPadding;
 
@@ -1360,6 +1399,8 @@ const formHandler = (() => {
       currentBlockProperties.stretchCenter;
     document.querySelector("#sdBlock_stretchRight").checked =
       currentBlockProperties.stretchRight;
+
+    document.querySelector("#sdBlock_gap").value = currentBlockProperties.gap;
 
     updateGuideArrowsSubform();
 
@@ -1460,6 +1501,28 @@ const formHandler = (() => {
       panel.exitTabs[app.vars.currentlySelectedExitTabRowIndex];
 
     if (!currentExitTabRow) {
+      document.querySelector(
+        'a[data-tab="sMET_VariantProperties"]',
+      ).style.display = "none";
+      document.querySelector(
+        'a[data-tab="sMExitTabProperties"]',
+      ).style.display = "none";
+      document.querySelector(
+        'a[data-tab="sMExitTabGroupProperties"]',
+      ).style.display = "";
+      document.querySelector('a[data-tab="sMExitTabGroupProperties"]').click();
+
+      document
+        .querySelector("#sMExitTabGroupProperties")
+        .classList.add("tabHidden");
+      document.querySelector("#sMExitTabVariant").classList.add("tabHidden");
+      document
+        .querySelector("#sMET_VariantProperties")
+        .classList.add("tabHidden");
+      document.querySelector("#sMExitTabProperties").classList.add("tabHidden");
+      document.querySelector('a[data-tab="sMExitTabVariant"]').style.display =
+        "none";
+
       document.querySelector("#sMExitTabGroupProperties").style.display =
         "none";
       return;
@@ -1541,7 +1604,6 @@ const formHandler = (() => {
 
       return;
     }
-
     const currentExitTab =
       currentExitTabRow.exitTabs[app.vars.currentlySelectedExitTabIndex];
 
