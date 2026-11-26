@@ -1704,10 +1704,14 @@
                   onchange="formHandler.readForm()"
                 />
                 <br />
+                <label for="usePanelLeftSpacing" data-toolTip="Use individual left spacing for this panel">Use Individual Left Spacing</label>
+                <input id="usePanelLeftSpacing" type="checkbox" onchange="formHandler.readForm();">
                 <label for="panelLeftSpacing" data-toolTip="Spacing between any left elements & the leftmost edge of the panel">Left Spacing (rem):</label>
                 <input type="range" min="0" max="5" step=".05" id="panelLeftSpacingSlider" value="0" onchange="document.getElementById('panelLeftSpacing').value = this.value; formHandler.readForm();" />
                 <input type="number" min="0" step=".05" id="panelLeftSpacing" value="0" onchange="formHandler.readForm()" />
                 <br />
+                <label for="usePanelRightSpacing" data-toolTip="Use individual right spacing for this panel">Use Individual Right Spacing</label>
+                <input id="usePanelRightSpacing" type="checkbox" onchange="formHandler.readForm();">
                 <label for="panelRightSpacing" data-toolTip="Spacing between any right elements & the rightmost edge of the panel">Right Spacing (rem):</label>
                 <input type="range" min="0" max="5" step=".05" id="panelRightSpacingSlider" value="0" onchange="document.getElementById('panelRightSpacing').value = this.value; formHandler.readForm();" />
                 <input type="number" min="0" step=".05" id="panelRightSpacing" value="0" onchange="formHandler.readForm()" />
@@ -5378,6 +5382,29 @@
               </button>
             </div>
             <div id="panelList" class="panelList"></div>
+            <div class="panelSpacingControl">
+              <label for="panelSpacingSlider" data-toolTip="Sets the gap between panels on the post.">Spacing</label>
+              <div class="panelSpacingInputs">
+                <input
+                  type="range"
+                  id="panelSpacingSlider"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  value="0"
+                  onchange="document.getElementById('panelSpacing').value = this.value; formHandler.readForm()"
+                />
+                <input
+                  type="number"
+                  class="num"
+                  id="panelSpacing"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  value="0"
+                  onchange="formHandler.readForm()" />
+              </div>
+            </div>
           </div>
         </div>
         <button type="button" id="panelStyleConfig" class="sMConfigOption">
