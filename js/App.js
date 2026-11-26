@@ -1926,6 +1926,10 @@ const App = (() => {
           const aplHolder = document.createElement("div");
           aplHolder.className = "sMGA_APLHolder " + (subpanel ? "" : "divider");
 
+          if (arrowVariant.subpanelConfigs[i].justify) {
+            aplHolder.style.justifyContent = "right";
+          }
+
           if (!subpanel) {
             aplHolder.style.width = `${arrowVariant.gap * 2}rem`;
           } else {
@@ -1998,9 +2002,6 @@ const App = (() => {
             aplHolder.appendChild(arrowElmt);
           }
         }
-
-        console.log(aplHolderList);
-        console.log(subpanelList);
 
         // assign a dividerParent yadaaydayaydya im going insaneeeee
         for (let i = 0; i < dividerList.length; i++) {
