@@ -96,7 +96,7 @@ const FormNavigation = (() => {
         document.querySelector("#selectMUTCDVersion"),
         mutcdVariant,
         {
-          selected: mutcdVariant === post?.mutcdVariant || "MUTCD",
+          selected: mutcdVariant === "MUTCD",
         },
       );
     }
