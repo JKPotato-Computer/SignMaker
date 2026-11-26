@@ -154,14 +154,15 @@
   width: -moz-max-content;
   width: -webkit-max-content;
   width: intrinsic;
-  gap: var(--panelSpacing, 0rem);
+  gap: 0;
 }
 
 .panel {
   --signBorderRadius: 0.75rem;
   text-align: center;
   display: block;
-  padding: 0rem;
+  padding-left: var(--leftSpacing, 0);
+  padding-right: var(--rightSpacing, 0);
   position: relative;
   background: var(--bgColor);
 }

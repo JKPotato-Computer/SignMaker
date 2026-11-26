@@ -1167,7 +1167,15 @@ const initializeDiagramModals = () => {
     });
   }
 
-  for (const modal of [keyboardShortcutsModal, presetsModal]) {
+  const helpModal = document.querySelector("#diagramHelp");
+  document
+    .querySelector("#diagrammicDrawingHelp")
+    .addEventListener("click", () => {
+      helpModal.showModal();
+      isModalOpen = true;
+    });
+
+  for (const modal of [keyboardShortcutsModal, presetsModal, helpModal]) {
     modal
       .querySelector("[data-diagram-modal-close]")
       .addEventListener("click", () => modal.close());
@@ -1222,7 +1230,7 @@ const DiagramDrawing = (() => {
       1,
       Math.min(
         parseInt(document.querySelector("#roadwayNumberLanes").value),
-        parentRoad ? parentRoad.numLanes : Infinity,
+        /*parentRoad ? parentRoad.numLanes :*/ Infinity,
       ),
     );
     selectedRoad.curveIntensity = parseFloat(

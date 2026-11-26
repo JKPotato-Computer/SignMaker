@@ -58,7 +58,6 @@ const MUTCDVariants = (() => {
         showPost: true,
         offsetPost: true,
         variant: "Standard",
-        panelSpacing: 0.5,
         postPanelSpacing: 1,
         thickness: 1,
         spacing: 5,
@@ -77,6 +76,8 @@ const MUTCDVariants = (() => {
         appearanceBorderThickness: 8,
         appearancePadding: 2,
         appearancePixelSize: 0.05,
+        leftSpacing: .5,
+        rightSpacing: .5,
         tagToReplace: ["corner", "borderRadius"],
       },
       Sign: {

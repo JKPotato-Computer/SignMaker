@@ -10,6 +10,8 @@ class Panel {
       appearanceBorderThickness,
       appearancePadding,
       appearancePixelSize,
+      leftSpacing,
+      rightSpacing,
     } = MUTCDVariants.get("Panel", options);
     this.color = color;
     this.corner = corner;

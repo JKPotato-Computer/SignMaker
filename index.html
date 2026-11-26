@@ -746,6 +746,7 @@
             >
               Keyboard Shortcuts
             </button>
+            <button type="button" id="diagrammicDrawingHelp">Help</button>
             <button type="button" id="diagrammicDrawingClose">Close</button>
           </div>
         </header>
@@ -1183,6 +1184,28 @@
             </button>
           </footer>
         </dialog>
+        <dialog id="diagramHelp" class="diagramSubModal diagramHelpModal">
+          <header>
+            <h3>Diagrammatic Drawing Help</h3>
+            <button type="button" data-diagram-modal-close>Close</button>
+          </header>
+          <div class="diagramHelpContent">
+            <p>
+              The Diagrammatic Drawing tool allows you to create custom
+              diagrammatic drawings for your signs. You can add roads, arrows,
+              and subpanels to create a visual representation of a road layout.
+            </p>
+            <p>
+              Use the object list to select and edit individual elements. You
+              can move, duplicate, or delete objects as needed. Adjust the
+              properties of each object using the controls in the right panel.
+            </p>
+            <p>
+              Remember to save your work frequently, and you can export your
+              diagram as an image or JSON file for later use.
+            </p>
+          </div>
+        </dialog>
       </dialog>
       <dialog id="signMakerSettings">
         <div id="sMSettingsHeader">
@@ -1527,7 +1550,7 @@
                 onchange="formHandler.readForm()"
               />
               <label for="postPanelSpacing" id="postPanelSpacingLabel" data-toolTip="Spacing between post edges and panels">
-                Post-Panel Spacing:
+                Post-Panel Spacing (rem):
               </label>
               <input
                 type="number"
@@ -1580,7 +1603,6 @@
                   <label for="appearancePixelSize" data-toolTip="Size of pixel 'gaps' between the panel and the border.">Pixel Size (rem):</label>
                   <input type="number" min="0" id="appearancePixelSize" step=".001" onchange="formHandler.readForm()" />
                 </div>
-                <br />
                 <label for="panelColor">Panel Color: </label>
                 <button type="button" id="panelColor" class="smColorDropdownButton" data-color="Green">Green</button>
                 <br />
@@ -1589,7 +1611,6 @@
                   id="panelCorner"
                   onchange="formHandler.readForm()"
                 ></select>
-                <br />
                 <label for="panelBorderRadius" data-toolTip="Sets how rounded the sign panel corners appear.">Sign Roundness (rem): </label>
                 <input
                   type="number"
@@ -1601,6 +1622,14 @@
                   step=".05"
                   onchange="formHandler.readForm()"
                 />
+                <br />
+                <label for="panelLeftSpacing" data-toolTip="Spacing between any left elements & the leftmost edge of the panel">Left Spacing (rem):</label>
+                <input type="range" min="0" max="5" step=".05" id="panelLeftSpacingSlider" value="0" onchange="document.getElementById('panelLeftSpacing').value = this.value; formHandler.readForm();" />
+                <input type="number" min="0" step=".05" id="panelLeftSpacing" value="0" onchange="formHandler.readForm()" />
+                <br />
+                <label for="panelRightSpacing" data-toolTip="Spacing between any right elements & the rightmost edge of the panel">Right Spacing (rem):</label>
+                <input type="range" min="0" max="5" step=".05" id="panelRightSpacingSlider" value="0" onchange="document.getElementById('panelRightSpacing').value = this.value; formHandler.readForm();" />
+                <input type="number" min="0" step=".05" id="panelRightSpacing" value="0" onchange="formHandler.readForm()" />
                 <br />
                 <label for="panelLaneSize" data-toolTip="Sets lane size in pixels; use 0 to size automatically.">Lane Size (px):</label>
                 <input
@@ -5268,29 +5297,6 @@
               </button>
             </div>
             <div id="panelList" class="panelList"></div>
-            <div class="panelSpacingControl">
-              <label for="panelSpacingSlider" data-toolTip="Sets the gap between panels on the post.">Spacing</label>
-              <div class="panelSpacingInputs">
-                <input
-                  type="range"
-                  id="panelSpacingSlider"
-                  min="0"
-                  max="4"
-                  step="0.25"
-                  value="0"
-                  onchange="document.getElementById('panelSpacing').value = this.value; formHandler.readForm()"
-                />
-                <input
-                  type="number"
-                  class="num"
-                  id="panelSpacing"
-                  min="0"
-                  max="4"
-                  step="0.25"
-                  value="0"
-                  onchange="formHandler.readForm()" />
-              </div>
-            </div>
           </div>
         </div>
         <button type="button" id="panelStyleConfig" class="sMConfigOption">

@@ -70,7 +70,6 @@ const formHandler = (() => {
     post.color = form["postColor"].value;
     post.showPost = form["showPost"].checked;
     post.thickness = parseFloat(form["postThickness"].value);
-    post.panelSpacing = parseFloat(form["panelSpacing"].value);
     post.postPanelSpacing = parseFloat(form["postPanelSpacing"].value);
     post.alignPanels = form["alignPanels"].value;
 
@@ -126,6 +125,8 @@ const formHandler = (() => {
     currentPanel.appearancePixelSize = parseFloat(
       form["appearancePixelSize"].value,
     );
+    currentPanel.leftSpacing = parseFloat(form["panelLeftSpacing"].value);
+    currentPanel.rightSpacing = parseFloat(form["panelRightSpacing"].value);
 
     // Exit Tab
     if (app.vars.currentlySelectedExitTabRowIndex != -1) {
@@ -686,7 +687,7 @@ const formHandler = (() => {
           standardArrow.flip = document.querySelector(
             "#guideStandardArrow_flip",
           ).checked;
-        } 
+        }
       } else if (standardArrowConfig.variant.includes("Exit Only")) {
         // set arrows
         const exitOnlyArrow = exitOnlyConfigs.arrow;
@@ -908,8 +909,6 @@ const formHandler = (() => {
     document.getElementById("offsetPost").checked = post.offsetPost;
     document.getElementById("postCornerRadius").value = post.cornerRadius;
     document.getElementById("postSpacing").value = post.spacing || 1;
-    document.getElementById("panelSpacing").value = post.panelSpacing;
-    document.getElementById("panelSpacing").value = post.panelSpacing;
     document.getElementById("postThickness").value = post.thickness;
     document.getElementById("postPanelSpacing").value = post.postPanelSpacing;
     document.getElementById("alignPanels").value = post.alignPanels;
@@ -931,6 +930,15 @@ const formHandler = (() => {
       document.querySelector("#postSpacing").style.display = "none";
       document.querySelector("#postPanelSpacingLabel").style.display = "none";
       document.querySelector("#postPanelSpacing").style.display = "none";
+    } else if (post.variant.includes("Curved")) {
+      document.querySelector("#offsetPostLabel").style.display = "none";
+      document.querySelector("#offsetPost").style.display = "none";
+      document.querySelector("#postPositionLabel").style.display = "";
+      document.querySelector("#postPosition").style.display = "";
+      document.querySelector("#postSpacingLabel").style.display = "";
+      document.querySelector("#postSpacing").style.display = "";
+      document.querySelector("#postPanelSpacingLabel").style.display = "";
+      document.querySelector("#postPanelSpacing").style.display = "";
     } else {
       document.querySelector("#postPositionLabel").style.display = "";
       document.querySelector("#postPosition").style.display = "";
@@ -955,6 +963,12 @@ const formHandler = (() => {
       panel.appearancePadding;
     document.querySelector("#appearancePixelSize").value =
       panel.appearancePixelSize;
+    document.querySelector("#panelLeftSpacing").value = panel.leftSpacing;
+    document.querySelector("#panelRightSpacing").value = panel.rightSpacing;
+
+    document.querySelector("#panelLeftSpacingSlider").value = panel.leftSpacing;
+    document.querySelector("#panelRightSpacingSlider").value =
+      panel.rightSpacing;
 
     // reload color dropdown
     const colorDropdown = document.querySelector("#smColorDropdownItems");
