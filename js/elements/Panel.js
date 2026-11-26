@@ -12,6 +12,8 @@ class Panel {
       appearancePixelSize,
       leftSpacing,
       rightSpacing,
+      useLeftSpacing,
+      useRightSpacing,
     } = MUTCDVariants.get("Panel", options);
     this.color = color;
     this.corner = corner;
@@ -23,6 +25,11 @@ class Panel {
     this.appearanceBorderThickness = appearanceBorderThickness;
     this.appearancePadding = appearancePadding;
     this.appearancePixelSize = appearancePixelSize;
+
+    this.leftSpacing = leftSpacing;
+    this.rightSpacing = rightSpacing;
+    this.useLeftSpacing = useLeftSpacing;
+    this.useRightSpacing = useRightSpacing;
   }
 
   newExitTabRow() {
