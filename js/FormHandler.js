@@ -2089,6 +2089,9 @@ const formHandler = (() => {
     if (isHOVVariant1) {
       document.querySelector("#sMET_textContent").disabled = true;
       document.querySelector("#smET_subTextContent").disabled = true;
+    } else {
+      document.querySelector("#sMET_textContent").disabled = false;
+      document.querySelector("#smET_subTextContent").disabled = false;
     }
 
     const iconDisabledInputIds = [
