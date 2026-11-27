@@ -973,10 +973,12 @@ const formHandler = (() => {
       document.querySelector("#panelLeftSpacing").style.display = "none";
       document.querySelector('label[for="panelLeftSpacing"]').style.display =
         "none";
+      document.querySelector("#panelLeftSpacingSlider").style.display = "none";
     } else {
       document.querySelector("#panelLeftSpacing").style.display = "";
       document.querySelector('label[for="panelLeftSpacing"]').style.display =
         "";
+      document.querySelector("#panelLeftSpacingSlider").style.display = "";
     }
 
     document.querySelector("#panelLeftSpacing").value = panel.leftSpacing;
@@ -987,10 +989,12 @@ const formHandler = (() => {
       document.querySelector("#panelRightSpacing").style.display = "none";
       document.querySelector('label[for="panelRightSpacing"]').style.display =
         "none";
+      document.querySelector("#panelRightSpacingSlider").style.display = "none";
     } else {
       document.querySelector("#panelRightSpacing").style.display = "";
       document.querySelector('label[for="panelRightSpacing"]').style.display =
         "";
+      document.querySelector("#panelRightSpacingSlider").style.display = "";
     }
 
     document.querySelector("#panelRightSpacing").value = panel.rightSpacing;
