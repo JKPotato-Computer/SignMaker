@@ -1,282 +1,824 @@
-@font-face {
-	font-family: 'Arrows One';
-	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_1-webfont.eot');
-	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_1-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Misc/WOFF2/roadgeek_2005_arrows_1-webfont.woff2') format('woff2'),
-		 url('../fonts/Misc/WOFF/roadgeek_2005_arrows_1-webfont.woff') format('woff'),
-		 url('../fonts/Misc/TTF/roadgeek_2005_arrows_1-webfont.ttf') format('truetype'),
-		 url('../fonts/Misc/WEBFONT/roadgeek_2005_arrows_1-webfont.svg#roadgeek_2005_arrows_1regular') format('svg');
-	font-weight: normal;
-	font-style: normal;
+:root[data-theme="light"] {
+  --backgroundColor: rgb(144 181 255);
+  --hotbarColor: rgb(210, 225, 255);
+  --textColor: rgb(0, 0, 0);
+  --selectedColor: rgb(255, 255, 255);
+  --hoverColor: rgb(255, 255, 255, 0.5);
+  --baseColor: 255, 255, 255;
+  --baseColorInv: 0, 0, 0;
+  --inputColor: 240, 240, 240;
+  --linkColor: rgb(0, 0, 238);
+  --visitedLinkColor: rgb(85, 26, 139);
 }
 
-@font-face {
-	font-family: 'Arrows Two';
-	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_2-webfont.eot');
-	src: url('../fonts/Misc/EOT/roadgeek_2005_arrows_2-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Misc/WOFF2/roadgeek_2005_arrows_2-webfont.woff2') format('woff2'),
-		 url('../fonts/Misc/WOFF/roadgeek_2005_arrows_2-webfont.woff') format('woff'),
-		 url('../fonts/Misc/TTF/roadgeek_2005_arrows_2-webfont.ttf') format('truetype'),
-		 url('../fonts/Misc/WEBFONT/roadgeek_2005_arrows_2-webfont.svg#roadgeek_2005_arrows_2regular') format('svg');
-	font-weight: normal;
-	font-style: normal;
+:root[data-theme="dark"] {
+  --backgroundColor: rgb(10 28 77);
+  --hotbarColor: rgb(43 63 118);
+  --textColor: rgb(247 249 251);
+  --selectedColor: rgb(50, 50, 50);
+  --hoverColor: rgb(24 39 78);
+  --baseColor: 0, 0, 0;
+  --baseColorInv: 255, 255, 255;
+  --inputColor: 15, 15, 15;
+  --linkColor: #d3daec;
+  --visitedLinkColor: #cdc5e6;
 }
 
-@font-face {
-	font-family: 'Mittelschrift';
-	src: url('../fonts/Misc/EOT/roadgeek_2005_mittelschrift-webfont.eot');
-	src: url('../fonts/Misc/EOT/roadgeek_2005_mittelschrift-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Misc/WOFF2/roadgeek_2005_mittelschrift-webfont.woff2') format('woff2'),
-		 url('../fonts/Misc/WOFF/roadgeek_2005_mittelschrift-webfont.woff') format('woff'),
-		 url('../fonts/Misc/TTF/roadgeek_2005_mittelschrift-webfont.ttf') format('truetype'),
-		 url('../fonts/Misc/WEBFONT/roadgeek_2005_mittelschrift-webfont.svg#roadgeek_2005_mittelschriftRg') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Parks';
-	src: url('../fonts/Misc/EOT/roadgeek_2005_old_parks-webfont.eot');
-	src: url('../fonts/Misc/EOT/roadgeek_2005_old_parks-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Misc/WOFF2/roadgeek_2005_old_parks-webfont.woff2') format('woff2'),
-		 url('../fonts/Misc/WOFF/roadgeek_2005_old_parks-webfont.woff') format('woff'),
-		 url('../fonts/Misc/TTF/roadgeek_2005_old_parks-webfont.ttf') format('truetype'),
-		 url('../fonts/Misc/WEBFONT/roadgeek_2005_old_parks-webfont.svg#roadgeek_2005_old_parksRg') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Series C';
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_c-webfont.eot');
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_c-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_c-webfont.woff2') format('woff2'),
-		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_c-webfont.woff') format('woff'),
-		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_c-webfont.ttf') format('truetype'),
-		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_c-webfont.svg#roadgeek_2005_series_cregular') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Series D';
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_d-webfont.eot');
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_d-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_d-webfont.woff2') format('woff2'),
-		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_d-webfont.woff') format('woff'),
-		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_d-webfont.ttf') format('truetype'),
-		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_d-webfont.svg#roadgeek_2005_series_dregular') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Series E';
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_e-webfont.eot');
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_e-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_e-webfont.woff2') format('woff2'),
-		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_e-webfont.woff') format('woff'),
-		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_e-webfont.ttf') format('truetype'),
-		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_e-webfont.svg#roadgeek_2005_series_eregular') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Series EM';
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_em-webfont.eot');
-	src: url('../fonts/Roadgeek/EOT/roadgeek_2005_series_em-webfont.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Roadgeek/WOFF2/roadgeek_2005_series_em-webfont.woff2') format('woff2'),
-		 url('../fonts/Roadgeek/WOFF/roadgeek_2005_series_em-webfont.woff') format('woff'),
-		 url('../fonts/Roadgeek/TTF/roadgeek_2005_series_em-webfont.ttf') format('truetype'),
-		 url('../fonts/Roadgeek/WEBFONT/roadgeek_2005_series_em-webfont.svg#roadgeek_2005_series_emRg') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-    font-family: 'Series F';
-    src: url('../fonts/Roadgeek/EOT/Roadgeek2005SeriesF.eot');
-    src: url('../fonts/Roadgeek/EOT/Roadgeek2005SeriesF.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/Roadgeek/WOFF2/Roadgeek2005SeriesF.woff2') format('woff2'),
-        url('../fonts/Roadgeek/WOFF/Roadgeek2005SeriesF.woff') format('woff'),
-        url('../fonts/Roadgeek/TTF/Roadgeek2005SeriesF.ttf') format('truetype'),
-        url('../fonts/Roadgeek/WEBFONT/Roadgeek2005SeriesF.svg#Roadgeek2005SeriesF') format('svg');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-
-@font-face {
-	font-family: 'Clearview 4W';
-	src: url('../fonts/Clearview/EOT/ClearviewHwy-Four-w.eot');
-	src: url('../fonts/Clearview/EOT/ClearviewHwy-Four-W#iefix') format('rembedded-opentype'),
-		 url('../fonts/Clearview/WOFF2/ClearviewHwy-Four-W.woff2') format('woff2'),
-		 url('../fonts/Clearview/WOFF/ClearviewHwy-Four-W.woff') format('woff'),
-		 url('../fonts/Clearview/TTF/ClearviewHwy4W.ttf') format('truetype'),
-		 url('../fonts/Clearview/WEBFONT/ClearviewHwy-Four-W_emRg') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Clearview 5WR';
-	src: url('../fonts/Clearview/EOT/ClearviewHwy-Five-W-R.eot');
-	src: url('../fonts/Clearview/EOT/ClearviewHwy-Five-W-R.eot?#iefix') format('rembedded-opentype'),
-		 url('../fonts/Clearview/WOFF2/ClearviewHwy-Five-W-R.woff2') format('woff2'),
-		 url('../fonts/Clearview/WOFF/ClearviewHwy-Five-W-R.woff') format('woff'),
-		 url('../fonts/Clearview/TTF/ClearviewHwy5WR.ttf') format('truetype'),
-		 url('../fonts/Clearview/WEBFONT/ClearviewHwy-Five-W-R_emRg') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-
-
-
-
-@font-face {
-    font-family: 'Highway Gothic Narrow';
-    src: url('../fonts/Misc/EOT/HighwayGothicNarrow.eot');
-    src: url('../fonts/Misc/EOT/HighwayGothicNarrow.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/Misc/WOFF2/HighwayGothicNarrow.woff2') format('woff2'),
-        url('../fonts/Misc/WOFF/HighwayGothicNarrow.woff') format('woff'),
-        url('../fonts/Misc/TTF/HighwayGothicNarrow.ttf') format('truetype'),
-        url('../fonts/Misc/WEBFONT/HighwayGothicNarrow.svg#HighwayGothicNarrow') format('svg');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Highway Gothic Wide';
-    src: url('../fonts/Misc/EOT/HighwayGothicWide.eot');
-    src: url('../fonts/Misc/EOT/HighwayGothicWide.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/Misc/WOFF2/HighwayGothicWide.woff2') format('woff2'),
-        url('../fonts/Misc/WOFF/HighwayGothicWide.woff') format('woff'),
-        url('../fonts/Misc/TTF/HighwayGothicWide.ttf') format('truetype'),
-        url('../fonts/Misc/WEBFONT/HighwayGothicWide.svg#HighwayGothicWide') format('svg');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Highway Gothic';
-    src: url('../fonts/Misc/EOT/HighwayGothic.eot');
-    src: url('../fonts/Misc/EOT/HighwayGothic.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/Misc/WOFF2/HighwayGothic.woff2') format('woff2'),
-        url('../fonts/Misc/WOFF/HighwayGothic.woff') format('woff'),
-        url('../fonts/Misc/TTF/HighwayGothic.ttf') format('truetype'),
-        url('../fonts/Misc/WEBFONT/HighwayGothic.svg#HighwayGothic') format('svg');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Clearview 3W';
-    src: url('../fonts/Clearview/EOT/ClearviewHwy-Three-W.eot');
-    src: url('../fonts/Clearview/EOT/ClearviewHwy-Three-W.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/Clearview/WOFF2/ClearviewHwy-Three-W.woff2') format('woff2'),
-        url('./fonts/Clearview/WOFF/ClearviewHwy-Three-W.woff') format('woff'),
-        url('../fonts/Clearview/TTF/ClearviewHwy-Three-W.ttf') format('truetype'),
-        url('../fonts/Clearview/WEBFONT/ClearviewHwy-Three-W.svg#ClearviewHwy-Three-W') format('svg');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-
-
-
-
-
-
-:root {
-	--green: rgb(0, 95, 77);
-	--blue: rgb(0, 67, 123);
-	--brown: rgb(98, 51, 30);
-	--yellow: rgb(252, 207, 52);
-	--countyYellow: rgb(247,209,23);
-	--white: rgb(255, 255, 255);
-	--black: rgb(0, 0, 0);
-	--orange: rgb(255, 89, 4);
+:root[data-theme="kurumi"] {
+  --backgroundColor: #45d9ff;
+  --hotbarColor: #eaeaea;
+  --textColor: rgb(0, 0, 0);
+  --selectedColor: rgb(53, 255, 113);
+  --hoverColor: rgba(205, 205, 205, 0.5);
+  --baseColor: 255, 255, 255;
+  --baseColorInv: 0, 0, 0;
+  --inputColor: 240, 240, 240;
+  --linkColor: rgb(0, 0, 238);
+  --visitedLinkColor: rgb(85, 26, 139);
 }
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-html, body {
-	font-size: 16px;
+html,
+body {
+  width: 100%;
+  height: 100%;
 
-	width: 100%;
-	height: 100%;
+  margin: 0;
+  padding: 0;
 
-	margin: 0;
-	padding: 0;
+  font-family: "Inter";
+  font-size: 20px;
+  color: var(--textColor);
+}
+
+:root[data-theme="kurumi"],
+:root[data-theme="kurumi"] body {
+  font-family:
+    "Lucida Grande", "Arial", "Liberation Sans", "DejaVu Sans", sans-serif;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-	background-color: rgb(144,181,255);
-	font-family: "Series D";
-	font-size: 20px;
+  background-color: var(--backgroundColor);
+  transition: 0.15s ease-in-out background-color;
 }
 
-#postContainer {
-	transition: 1s ease-in-out;
+#signMakerLoadingScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--backgroundColor);
+  transition: opacity 0.75s ease-out;
+  width: 100%;
+  height: 100%;
 }
 
+#signMakerLoadingScreen.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.signMakerLoadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(18rem, 70vw);
+}
+
+.signMakerLoadingContent img {
+  width: 10rem;
+  max-width: 70vw;
+  height: auto;
+  transition: transform 0.75s ease-out;
+}
+
+.signMakerLoadingContent progress {
+  width: 100%;
+  height: 0.75rem;
+}
+
+main,
 footer {
-	border-top: solid rgba(255, 255, 255, 0.25) 0.25rem;
-
-	text-align: center;
-
-	margin-top: 1rem;
-	padding-top: 0.5rem;
-}
-footer a {
-	background-color: rgba(255, 255, 255, 0.25);
-	border-radius: 0.1rem;
-
-	color: black;
-	text-decoration: none;
-
-	display: inline-block;
-	margin: 0.25rem;
-	padding: 0 0.5rem 0;
-
-	transition: background-color 0.5s;
-}
-footer a:hover {
-	background-color: rgba(255, 255, 255, 0.75);
+  z-index: 0;
 }
 
-h1, h2 {
-	text-align: center;
-	margin-top: 0.25em;
-	margin-bottom: 0.75em;
+main#smRender {
+  width: max-content;
+  height: max-content;
+  display: flex;
+  flex-direction: row;
+  align-items: safe center;
+  justify-content: left;
+  min-height: max(calc(100svh * var(--zoomLevelDec, 1)), 100svh);
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
+main#smRender.wide {
+  left: 0;
+  transform: none;
+}
+
+main#smRender.modalOpen {
+  transform: translateX(50%);
+}
+
+body > footer > div:nth-child(1) > img {
+  height: 100px;
+  margin: -10px 0 -10px -10px;
+}
+
+body > footer {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  transition: none;
+}
+
+body > footer > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+body > footer > div:nth-child(1) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: max-content;
+  padding: 0.5rem 1rem;
+}
+
+footer > div > a > div:nth-child(1) {
+  padding: 0.5rem 0 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+body > footer a {
+  color: var(--textColor);
+}
+
+body > footer > div:nth-child(2) a {
+  border-radius: 0.1rem;
+  background-color: rgb(255, 255, 255, 0.15);
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 15rem;
+  transition: 0.2s;
+  font-size: 16px;
+  text-align: right;
+  transition: 0.15s ease-in-out;
+}
+
+body > footer > div:nth-child(2) a:hover {
+  background-color: rgb(255, 255, 255, 0.5);
+}
+
+body > footer p {
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
 p {
-	margin: 0;
+  margin: 0;
 }
 
-#signMaker {
-	display: inline-block;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Overpass";
+  font-weight: 600;
+}
 
+.warning {
+  background-color: rgb(252, 207, 52);
+  padding: 6px;
+  font-weight: bold;
+  font-weight: 400;
+  font-size: 16px;
+  margin: 16px;
 }
-#oSNum {
-	display: none;
+
+.material-symbols-outlined {
+  user-select: none;
 }
-.left {
-	text-align: left;
+
+input[type="checkbox"] {
+  width: auto;
 }
-.center {
-	text-align: center;
+
+input[type="range"] {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
 }
-.right {
-	text-align: right;
+
+.iconLink {
+  height: 32px;
+  aspect-ratio: 1 / 1;
+}
+
+:root[data-theme="light"] a:not(.discordInvite) .iconLink,
+:root[data-theme="kurumi"] a:not(.discordInvite) .iconLink {
+  filter: invert(1);
+}
+
+#githubStars,
+#discordMembers {
+  height: stretch;
+  padding: 0 0.5rem;
+  background-color: rgb(var(--baseColor), 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--textColor);
+}
+
+a.discordInvite {
+  background-color: #5865f2 !important;
+  color: white;
+}
+
+a.discordInvite:hover {
+  background-color: #b4bbff !important;
+}
+
+hr {
+  border-style: solid;
+  color: rgb(var(--baseColor));
+}
+
+div#introSlide {
+  background-color: rgb(162, 193, 255);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  transition: 1.25s ease-in-out;
+}
+
+div#welcomeAnim_gantry,
+div#welcomeAnim_background {
+  position: absolute;
+}
+
+div#welcomeAnim_gantry {
+  inset: 0;
+}
+
+div#welcomeAnim_grass {
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to bottom, rgb(0, 175, 0), green);
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+#welcomeAnim_signLogo {
+  height: 15svh;
+  width: 15svh;
+  aspect-ratio: 1 / 1;
+  transform: rotate(-45deg) scale(1);
+  opacity: 0;
+  transition: 1s ease-out;
+}
+
+#welcomeAnim_sign {
+  position: relative;
+  width: 70%;
+  left: 15%;
+  top: 10%;
+  height: 45%;
+  border: 1svh solid black;
+  background-color: #444444;
+  padding: 1svh;
+  z-index: 4;
+  transform-origin: center bottom;
+}
+
+.welcomeAnim_signHolder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1svh;
+  height: 100%;
+  background: black;
+}
+
+.welcomeAnim_signOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, transparent 0.109svh, black 0.109svh);
+  background-size: 0.24svh 0.24svh;
+  z-index: 4;
+}
+
+.welcomeAnim_signHolder > span {
+  font-family: "Series EEM";
+  font-size: 5svh;
+  color: white;
+  text-box-trim: trim-both;
+  text-box-edge: cap ex alphabetic;
+  opacity: 0;
+  transition: 0.5s ease-in-out;
+}
+
+.welcomeAnim_poleGantry {
+  height: 70%;
+  position: absolute;
+  width: 2%;
+  inset: 0;
+  top: 20%;
+  background: linear-gradient(
+    90deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  z-index: 4;
+}
+
+.welcomeAnim_poleHorizontal {
+  width: 80%;
+  height: 3%;
+  position: absolute;
+  inset: 0;
+  left: 10%;
+  background: linear-gradient(
+    0deg,
+    var(--post-color-mid) 0%,
+    var(--post-color-light) 40%,
+    var(--post-color-dark) 100%
+  );
+  --post-color-mid: rgb(191, 191, 191);
+  --post-color-light: rgb(240, 240, 240);
+  --post-color-dark: rgb(128, 128, 128);
+  z-index: 3;
+}
+
+.welcomeAnim_poleHorizontal.top {
+  top: 25%;
+}
+
+.welcomeAnim_poleHorizontal.bottom {
+  top: 40%;
+}
+
+.welcomeanim_poleGantry.left {
+  left: 10%;
+}
+
+.welcomeanim_poleGantry.right {
+  left: 90%;
+}
+
+#welcomeAnim_road {
+  background: #181818;
+  height: 100%;
+  width: 70%;
+  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcomeAnim_laneMarking {
+  height: 100%;
+  width: 1%;
+  position: absolute;
+  left: 50%;
+}
+
+.welcomeAnim_laneMarking.solid.white {
+  background-color: white;
+}
+
+.welcomeAnim_laneMarking.solid.yellow {
+  background-color: yellow;
+}
+
+.welcomeAnim_laneMarking.dashed {
+  background: linear-gradient(
+    to top,
+    white 0%,
+    white 24.9%,
+    transparent 25%,
+    transparent 49.9%,
+    white 50%,
+    white 74.9%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 100% 70%;
+  background-position-y: 40%;
+  width: 0.75%;
+}
+
+.welcomeAnim_laneMarking:nth-child(2) {
+  left: 30%;
+  rotate: 24deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_laneMarking:nth-child(3) {
+  height: 200%;
+  top: -47.5%;
+}
+
+.welcomeAnim_laneMarking:nth-child(4) {
+  left: 70%;
+  rotate: -24deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_laneMarking:nth-child(1) {
+  left: 12%;
+  rotate: 43deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_laneMarking:nth-child(5) {
+  left: 87%;
+  rotate: -43deg;
+  height: 200%;
+  top: -50%;
+}
+
+.welcomeAnim_triangle {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  position: absolute;
+  inset: 0;
+  align-self: end;
+  z-index: 0;
+  width: 50svh;
+  height: 30svh;
+  aspect-ratio: 1 / 2;
+  transform-origin: center bottom;
+}
+
+#welcomeAnim_background {
+  width: 100%;
+  top: 20%;
+  height: 50%;
+}
+
+.welcomeAnim_uncoverRoad.animate-out {
+  top: -100%;
+}
+
+#introSlide.animation-in-progress #welcomeAnim_background {
+  transition: 1.5s ease-in-out;
+}
+
+#introSlide.animation-in-progress #welcomeAnim_grass {
+  transition: 1.5s ease-in-out;
+}
+
+#introSlide.animation-in-progress .welcomeAnim_poleGantry {
+  transition: 1.25s ease-in-out;
+}
+
+#introSlide.animation-in-progress .welcomeAnim_poleHorizontal {
+  transition: 1.25s ease-in-out;
+}
+
+#introSlide.animation-in-progress #welcomeAnim_sign {
+  transition: 1.25s ease-in-out;
+}
+
+#introSlide_continue {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5svh 3svh;
+  z-index: 5;
+  background: var(--hotbarColor);
+  width: 40%;
+  font-size: 3svh;
+  top: 66%;
+  opacity: 0;
+  transition: 0.125s ease-out;
+  color: var(--textColor);
+}
+
+#introSlide_continue:hover {
+  background: var(--selectedColor);
+}
+
+#welcomeSlide {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    "image image"
+    "left right";
+  grid-template-columns: 3fr 1fr;
+  gap: 0.5rem;
+}
+
+#welcomeSlide > img {
+  grid-area: image;
+}
+
+#welcomeSlide > div:nth-child(2) {
+  grid-area: left;
+}
+
+#welcomeSlide > div:nth-child(3) {
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcomeSignMakerBanner {
+  width: 100%;
+}
+
+#takeMeOnATour {
+  padding: 1rem 6rem;
+  font-size: 1.5rem;
+}
+#sMSettings_About a {
+  color: var(--linkColor);
+}
+
+#sMSettings_About a:visited {
+  color: var(--visitedLinkColor);
+}
+
+div#smCredits_header {
+  width: 100%;
+  text-align: center;
+  background-color: rgb(var(--baseColor));
+  padding: 0.25rem 0;
+}
+
+div#smCredits_marqueeHolder {
+  width: 100%;
+  background: #333333;
+  border: 8px solid black;
+  padding: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+div#smCredits_marqueeHolder > div:nth-child(1) {
+  background: black;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+div#smCredits_marqueeText {
+  width: max-content;
+  font-size: 2rem;
+  text-wrap: nowrap;
+  color: rgb(255, 100, 0);
+  position: relative;
+  left: 100%;
+  font-family: "Series D";
+  word-spacing: -0.5rem;
+  animation: marqueeLeft 60s linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes marqueeLeft {
+  from {
+    left: 100%;
+  }
+
+  to {
+    left: -650%;
+  }
+}
+
+.smnCredits_marqueeElectronicOverlay {
+  background: radial-gradient(circle, transparent 0.05rem, black 0.05rem);
+  background-size: 0.12rem 0.12rem;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+#smCredits_gridArea {
+  display: grid;
+  grid-template-areas:
+    "contributor betaTesters"
+    "contributor pastMaintainers";
+  gap: 1rem;
+  width: 100%;
+  flex-grow: 1;
+  margin-top: 1rem;
+  justify-content: left;
+  grid-template-columns: 3fr 1fr;
+}
+
+.smCredits_contributorsBox {
+  background: rgb(var(--baseColorInv), 0.1);
+}
+
+div#smCredits_contributorsBox {
+  grid-area: contributor;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background-color: rgb(var(--baseColorInv), 0.05);
+  justify-content: space-evenly;
+}
+
+.smCredits_contributor {
+  background-color: var(--baseColor);
+  color: var(--textColor);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 25%;
+  text-align: center;
+  border: 5px solid white;
+  border-radius: 1rem;
+  outline: 5px solid var(--baseColor);
+  transition: 0.125s ease-in-out;
+}
+
+.smCredits_contributor:nth-child(odd):hover {
+  scale: 0.975;
+  rotate: -2deg;
+}
+
+.smCredits_contributor:nth-child(even):hover {
+  scale: 0.975;
+  rotate: 2deg;
+}
+
+.smCredits_contributor > h2 {
+  margin: 0;
+  line-height: 100%;
+  margin-top: 0.5rem;
+}
+
+.smCredits_profilePicture {
+  width: 100%;
+  border-radius: 1rem;
+  aspect-ratio: 1 / 1;
+}
+
+div#smCredits_betaTestersBox {
+  grid-area: betaTesters;
+  background-color: #fccf34;
+  border: 4px solid black;
+  outline: 4px solid #fccf34;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  color: black;
+  transition: 0.125s ease-in-out;
+}
+
+div#smCredits_betaTestersBox:hover {
+  scale: 0.95;
+  rotate: 2deg;
+}
+
+div#smCredits_pastMaintainersBox {
+  grid-area: pastMaintainers;
+  background: white;
+  border: 4px solid black;
+  outline: 4px solid white;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  color: black;
+  transition: 0.125s ease-in-out;
+}
+
+div#smCredits_pastMaintainersBox:hover {
+  scale: 0.95;
+  rotate: -2deg;
+}
+
+div#smCredits_pastMaintainersBox a {
+  color: black !important;
+}
+
+div#smSettingsAbout_credits {
+  display: flex;
+  flex-direction: column;
+}
+
+.smCredits_socialLinks > a {
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1 / 1;
+  color: white !important;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.smCredits_socialLinks img {
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1 / 1;
+}
+
+.smCredits_socialLinks {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.smCredits_discordUser {
+  background-color: rgb(0, 0, 0, 0.75) !important;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-top: auto;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+img.smCredits_discordImage {
+  height: 1rem;
+  width: 1rem;
+  aspect-ratio: 1 / 1;
+}
+
+.smCredits_discordHolder {
+  padding: 0.5rem;
+  background: #5865f2;
+  height: stretch;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.smCredits_discordUser > span {
+  padding: 0.25rem 0.5rem;
+  flex-grow: 1;
+}
+
+.smCredits_contributor > span {
+  flex-grow: 1;
+}
+
+#smCredits_pastMaintainersBox h2,
+#smCredits_betaTestersBox h2 {
+  text-align: center;
 }

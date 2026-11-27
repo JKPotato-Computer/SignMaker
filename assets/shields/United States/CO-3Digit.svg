@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="Shield" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"
+	 enable-background="new 0 0 512 512" xml:space="preserve">
+<path id="rect3001" fill="#FFFFFF" d="M32,0h448c17.7,0,32,14.3,32,32v448c0,17.7-14.3,32-32,32H32c-17.7,0-32-14.3-32-32V32
+	C0,14.3,14.3,0,32,0z"/>
+<path id="rect3771" d="M32,7.9h448c13.2,0,24,10.8,24,24v448c0,13.2-10.8,24-24,24H32c-13.2,0-24-10.8-24-24v-448
+	C8,18.7,18.8,7.9,32,7.9z"/>
+<path id="rect4" fill="#002868" d="M32,21.3h448c5.9,0,10.7,4.8,10.7,10.7v217.3l0,0H21.3l0,0V32C21.3,26,26.1,21.3,32,21.3z"/>
+<path id="rect6" fill="#FFFFFF" d="M21.3,97.3h469.3v76H21.3V97.3z"/>
+<path id="path8" fill="#BF0A30" d="M236.2,163.8c-15.7,38.9-60.1,57.7-99,42c-38.9-15.7-57.7-60.1-42-99s60.1-57.7,99-42
+	c19.1,7.8,34.2,22.9,42,42l-70.5,28.5"/>
+<path id="circle10" fill="#FFD700" d="M203.8,135.3c0,21-17,38-38,38s-38-17-38-38s17-38,38-38S203.8,114.3,203.8,135.3z"/>
+<path id="Background" fill="#FFFFFF" d="M32,490.7h448c5.9,0,10.7-4.8,10.7-10.7V262.7l0,0H21.3l0,0V480
+	C21.3,485.9,26.1,490.7,32,490.7z"/>
+</svg>

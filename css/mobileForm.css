@@ -1,0 +1,350 @@
+@media (max-width: 768px) {
+  .diagramEditor {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  #diagrammicDrawing {
+    width: max-content;
+  }
+
+  .diagrammicDrawingHolder {
+    flex-direction: column;
+  }
+
+  .sMModal {
+    width: 100%;
+  }
+
+  .diagramEditorCol:nth-child(1) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+
+  #modalHolder {
+    padding: 0 !important;
+  }
+
+  .canvasBackground {
+    width: 100%;
+    height: auto;
+    flex: 0 0 100%;
+  }
+
+  .diagramObjectList {
+    height: stretch;
+  }
+
+  .diagramObjList {
+    max-height: 10rem;
+  }
+
+  #diagrammicDrawing h2 {
+    font-size: 1rem;
+  }
+
+  .diagrammicDrawingHolder > footer {
+    flex-direction: column;
+  }
+
+  #diagramKeyboardShortcutsOpen {
+    display: none;
+  }
+
+  .diagrammicDrawingHolder > footer > div {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  #diagramFileName {
+    flex-grow: 1;
+  }
+
+  #importDiagram,
+  #exportDiagramImage,
+  #exportDiagramJSON {
+    flex-grow: 1;
+    margin-bottom: -0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .diagrammicDrawingHolder > footer > div > button {
+    width: calc(33% - 0.5rem);
+    height: 3rem;
+    font-size: 1rem;
+  }
+
+  .diagrammicDrawingHolder > footer > div > label {
+    margin: 0;
+  }
+
+  #diagramUse {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  #diagramPresetGallery {
+    justify-content: center;
+  }
+
+  .diagramPresetCard > img {
+    width: 8rem;
+  }
+
+  .diagramPresetActions {
+    justify-content: space-between;
+  }
+
+  .diagramPresetActions > button {
+    width: 33%;
+    font-size: 1.25rem;
+  }
+
+  #shieldImgSelectorClose,
+  #shieldImgLibraryClose,
+  #diagrammicDrawingClose,
+  button[data-diagram-modal-close] {
+    font-size: 30px;
+  }
+
+  .shieldLibraryButton {
+    width: 16vh !important;
+  }
+
+  #shieldImgSelector {
+    flex-direction: column;
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .shieldLibrary {
+    height: 40%;
+  }
+}
+
+@media (max-width: 768px) {
+  input:not([type="checkbox"]) {
+    padding: 0.5rem 0.25rem;
+  }
+
+  select {
+    padding: 0.5rem;
+  }
+
+  button,
+  input[type="button"] {
+    padding: 0.5rem;
+  }
+
+  #signMakerFooter {
+    flex-direction: column;
+  }
+
+  body > footer > div:nth-child(2) {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 768px) {
+  .modals {
+    inset: auto;
+    bottom: 5.5rem;
+    width: 100vw;
+    overflow: overlay;
+    max-height: calc(70% - 6rem);
+  }
+
+  body > form {
+    position: relative;
+  }
+
+  #sMConfigBar.invisible {
+    width: max-content !important;
+  }
+
+  #sMConfigBar {
+    inset: auto;
+    left: 0 !important;
+    transform: none !important;
+    height: 5.5rem !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    overflow: overlay;
+  }
+
+  .sMConfigOption > span:not(.material-symbols-outlined, .toolTip) {
+    font-size: 18px !important;
+    top: 0 !important;
+    position: static;
+  }
+
+  .sMConfigOption {
+    flex-direction: column !important;
+    height: stretch !important;
+    gap: 0.3rem;
+    line-height: unset !important;
+    text-wrap: nowrap;
+    width: auto !important;
+    aspect-ratio: 1 / 1;
+  }
+
+  #panelSelect {
+    bottom: 6rem;
+    top: auto;
+    left: 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  .panelPopoverHint {
+    top: -1.5rem;
+  }
+
+  nav.sMModalBar *:not(.material-symbols-outlined, select, button, input) {
+    font-size: 20px;
+  }
+
+  input[type="range"] {
+    padding: 0rem;
+  }
+
+  input[type="checkbox"] {
+    height: 1rem;
+    width: 1rem;
+    position: relative;
+    top: 0.25rem;
+  }
+
+  .smColorDropdownButton {
+    padding: 0.5rem;
+  }
+
+  .sMET_typeSelect {
+    flex-wrap: nowrap !important;
+    width: 100vw !important;
+    justify-content: left !important;
+  }
+
+  .sMET_typeSelect .sMET_typeVisual {
+    width: 10rem;
+  }
+
+  #smColorDropdownItems > button > span {
+    padding: 0.75rem 0;
+  }
+
+  #smColorDropdownHolder {
+    left: 1rem !important;
+    width: calc(100% - 2rem) !important;
+  }
+
+  #smColorDropdownHolder > * {
+    flex-grow: 1;
+  }
+
+  #smColorAddColor,
+  #smColorDropdownUpdate,
+  #smColorDropdownRemove {
+    padding: 0.75rem 0;
+  }
+
+  #smColorTheRealColor {
+    height: 5rem;
+  }
+
+  .textEditorBlock {
+    padding: 0.75rem;
+  }
+
+  #smSettings_MUTCDGallery {
+    flex-direction: column;
+  }
+
+  .mutcdOption {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .mutcdImage.selected {
+    margin-right: 0;
+    margin-bottom: 125%;
+  }
+
+  .mutcdImage:hover,
+  .mutcdImage:focus {
+    margin-right: 0;
+    margin-bottom: 110%;
+  }
+
+  .mutcdImage:hover .mutcdSlideInfo,
+  .mutcdImage:focus .mutcdSlideInfo,
+  .mutcdImage.selected .mutcdSlideInfo {
+    top: 100%;
+    left: 0;
+  }
+
+  #smSettings_Options {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  #smSettings_Options > button {
+    width: 100%;
+  }
+
+  #smSettings_Options > div > label,
+  #smSettings_searchVariant {
+    text-align: center;
+    width: 100%;
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  #smSettings_Options > div > label {
+    margin-bottom: 0.5rem;
+  }
+
+  #smSettings_Options > div {
+    width: 100%;
+  }
+
+  #sMSettings_MUTCDVariants {
+    flex-direction: column-reverse;
+  }
+
+  :root[data-theme="kurumi"] input[type="checkbox"]::before {
+    width: 16px;
+    height: 16px;
+  }
+
+  input[type="number"]:not(.smallval) {
+    width: 8rem;
+  }
+
+  .smallVal {
+    width: 4rem;
+  }
+
+  label:not(.noLabelAlignment) {
+    width: 4rem;
+  }
+
+  .sMModalContent {
+    padding: 0.25rem;
+  }
+
+  div#subPanelList {
+    padding: 0;
+  }
+
+  .exitTabButton {
+    height: stretch;
+  }
+
+  .exitTabNestedButton {
+    height: 90%;
+  }
+}
