@@ -1919,7 +1919,34 @@ const App = (() => {
 
         const subpanelPreRects = [];
         for (let i = 0; i < subpanelList.length; i++) {
-          subpanelPreRects[i] = subpanelList[i].getBoundingClientRect();
+          let rect = subpanelList[i].getBoundingClientRect();
+
+          // if arrowVariant.subpanels[i - 0.5] exists, then subtract by arrow gap to px
+          if (arrowVariant.subpanels[i - 0.5]) {
+            rect = {
+              ...rect,
+              width:
+                rect.width -
+                arrowVariant.gap *
+                  parseFloat(
+                    getComputedStyle(document.documentElement).fontSize,
+                  ),
+            };
+          }
+
+          if (arrowVariant.subpanels[i + 0.5]) {
+            rect = {
+              ...rect,
+              width:
+                rect.width -
+                arrowVariant.gap *
+                  parseFloat(
+                    getComputedStyle(document.documentElement).fontSize,
+                  ),
+            };
+          }
+
+          subpanelPreRects[i] = rect;
         }
 
         for (let i = 0; i <= subpanelList.length - 1; i += 0.5) {
@@ -2003,7 +2030,12 @@ const App = (() => {
               for (const child of arrowElmt.children) {
                 child.style.transform = `translateX(${sign / formHandler.vars.zoomLevel}px)`;
               }
-              arrowElmt.querySelector(".sMGA_APLArrow").style.setProperty("--translation", sign / formHandler.vars.zoomLevel);
+              arrowElmt
+                .querySelector(".sMGA_APLArrow")
+                .style.setProperty(
+                  "--translation",
+                  sign / formHandler.vars.zoomLevel,
+                );
 
               exitWidthChecker.remove();
             } else {
@@ -2041,7 +2073,12 @@ const App = (() => {
                   : -distanceToCenter;
               arrowElmt.querySelector(".sMGA_APLArrow").style.transform =
                 `translateX(${sign / formHandler.vars.zoomLevel}px)`;
-              arrowElmt.querySelector(".sMGA_APLArrow").style.setProperty("--translation", sign / formHandler.vars.zoomLevel);
+              arrowElmt
+                .querySelector(".sMGA_APLArrow")
+                .style.setProperty(
+                  "--translation",
+                  sign / formHandler.vars.zoomLevel,
+                );
               exitWidthChecker.remove();
             }
 
@@ -2094,6 +2131,14 @@ const App = (() => {
         for (let i = 0; i < subpanelList.length; i++) {
           const subpanel = subpanelList[i];
           const aplHolder = aplHolderList[2 * i];
+
+          if (
+            aplHolder.getBoundingClientRect().width <= 1 &&
+            i == subpanelList.length - 1
+          ) {
+            continue;
+          }
+
           subpanel.style.width = `${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
           subpanel.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
         }
@@ -2149,17 +2194,28 @@ const App = (() => {
 
           //add offsets for dividers
           for (let i = 0; i <= aplHolderList.length - 1; i += 1) {
-            if (aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
-                aplHolderList[i].querySelector(".sMGA_APLArrow").style.getPropertyValue("--translation") != 0) {
-                  aplHolderList[i-1].style.paddingRight = `${-1 * aplHolderList[i].querySelector(".sMGA_APLArrow").style.getPropertyValue("--translation")}px`;
-                }
-            if (aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
-                aplHolderList[i].querySelector(".sMGA_APLArrow.flipped") &&
-                aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation") != 0) {
-                  aplHolderList[i+1].style.paddingLeft = `${aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation")}px`;
-                }
+            if (
+              aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
+              aplHolderList[i].querySelector(".sMGA_APLArrow") &&
+              aplHolderList[i]
+                .querySelector(".sMGA_APLArrow")
+                .style.getPropertyValue("--translation") != 0
+            ) {
+              aplHolderList[i - 1].style.paddingRight =
+                `${-1 * aplHolderList[i].querySelector(".sMGA_APLArrow").style.getPropertyValue("--translation")}px`;
+            }
+            if (
+              aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
+              aplHolderList[i].querySelector(".sMGA_APLArrow") &&
+              aplHolderList[i].querySelector(".sMGA_APLArrow.flipped") &&
+              aplHolderList[i]
+                .querySelector(".sMGA_APLArrow.flipped")
+                .style.getPropertyValue("--translation") != 0
+            ) {
+              aplHolderList[i + 1].style.paddingLeft =
+                `${aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation")}px`;
+            }
           }
-          
         }
       } else {
         // uses lane panel size
