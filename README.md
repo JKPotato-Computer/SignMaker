@@ -169,6 +169,7 @@ And a massive thank you to the past maintainers [@dki_os](http://github.com/dki-
 - All SignMaker v2.2 assets were hand-made by @JKPotato-Computer.
 - All UI icons were sourced from Google's [Material Symbols](https://fonts.google.com/icons) and are licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
 - Other assets (icons, shields, etc.) were sourced from the [MUTCD](https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf) and other state DOTs.
+- Some sign SVG assets were obtained from [Wikimedia Commons](https://commons.wikimedia.org/wiki/Main_Page), with designs originating from the MUTCD.
 
 **Modules**
 
