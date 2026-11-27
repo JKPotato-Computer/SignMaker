@@ -2154,6 +2154,7 @@ const App = (() => {
                   aplHolderList[i-1].style.paddingRight = `${-1 * aplHolderList[i].querySelector(".sMGA_APLArrow").style.getPropertyValue("--translation")}px`;
                 }
             if (aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
+                aplHolderList[i].querySelector(".sMGA_APLArrow.flipped") &&
                 aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation") != 0) {
                   aplHolderList[i+1].style.paddingLeft = `${aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation")}px`;
                 }
