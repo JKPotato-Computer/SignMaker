@@ -2003,6 +2003,7 @@ const App = (() => {
               for (const child of arrowElmt.children) {
                 child.style.transform = `translateX(${sign / formHandler.vars.zoomLevel}px)`;
               }
+              arrowElmt.querySelector(".sMGA_APLArrow").style.setProperty("--translation", sign / formHandler.vars.zoomLevel);
 
               exitWidthChecker.remove();
             } else {
@@ -2040,6 +2041,7 @@ const App = (() => {
                   : -distanceToCenter;
               arrowElmt.querySelector(".sMGA_APLArrow").style.transform =
                 `translateX(${sign / formHandler.vars.zoomLevel}px)`;
+              arrowElmt.querySelector(".sMGA_APLArrow").style.setProperty("--translation", sign / formHandler.vars.zoomLevel);
               exitWidthChecker.remove();
             }
 
@@ -2144,6 +2146,19 @@ const App = (() => {
           const offset = newLeft - currentBoundX;
 
           subpanel.style.transform = `translateX(${offset}px)`;
+
+          //add offsets for dividers
+          for (let i = 0; i <= aplHolderList.length - 1; i += 1) {
+            if (aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
+                aplHolderList[i].querySelector(".sMGA_APLArrow").style.getPropertyValue("--translation") != 0) {
+                  aplHolderList[i-1].style.paddingRight = `${-1 * aplHolderList[i].querySelector(".sMGA_APLArrow").style.getPropertyValue("--translation")}px`;
+                }
+            if (aplHolderList[i].className == "sMGA_APLHolder manual divider" &&
+                aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation") != 0) {
+                  aplHolderList[i+1].style.paddingLeft = `${aplHolderList[i].querySelector(".sMGA_APLArrow.flipped").style.getPropertyValue("--translation")}px`;
+                }
+          }
+          
         }
       } else {
         // uses lane panel size
