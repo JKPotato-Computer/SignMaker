@@ -1,13 +1,17 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta  content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta  content="Brendon Strowe, Maplou, JK_Potato/Computer" />
-    <meta
-      
-      content="The ULTIMATE Sign Maker for highways, expressways, and everything!"
-    />
+    <meta name="author" content="Brendon Strowe, Maplou, JK_Potato/Computer & contributors" />
+    <meta property="og:title" content="Highway Sign Maker (V2.2)">
+    <meta property="og:description" content="SignMaker is an application to recreate realistic highway signage, primarily US states following the MUTCD, and other countries around the world.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/JKPotato-Computer/SignMaker/refs/heads/main/img/other-symbols/SignMakerIconRotated.png" />
+    <meta property="og:url" content="https://jkpotato.computer/SignMaker">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Highway Sign Maker">
+    <link rel="canonical" href="https://jkpotato-computer.github.io/SignMaker/">
+    <meta name="description" content="SignMaker is an application to recreate realistic highway signage, primarily US states following the MUTCD, and other countries around the world." />
     <title>Highway Sign Maker</title>
     <link
       rel="icon"
@@ -138,7 +142,7 @@
   <body onload="App.init()">
     <div id="signMakerLoadingScreen">
       <div class="signMakerLoadingContent">
-        <img src="assets/other-symbols/SignMakerIconRotated.png" alt="SignMaker v2.2" />
+        <img loading="lazy"src="assets/other-symbols/SignMakerIconRotated.png" alt="SignMaker v2.2" />
         <progress id="signMakerLoadingProgress" value="0" max="100"></progress>
       </div>
     </div>
@@ -171,7 +175,7 @@
               <div id="welcomeAnim_sign">
           <div class="welcomeAnim_signOverlay"></div>
                   <div class="welcomeAnim_signHolder">
-                      <img src="./assets/other-symbols/SignMakerIcon.png" id="welcomeAnim_signLogo">
+                      <img loading="lazy"src="./assets/other-symbols/SignMakerIcon.png" id="welcomeAnim_signLogo">
                       <span>Welcome to SignMaker!</span>
                   </div>
               </div>
@@ -191,7 +195,7 @@
           </div>
         </div>
         <div id="welcomeSlide" style="display: none;">
-          <img src="./assets/other-symbols/SignMakerBanner.png" class="welcomeSignMakerBanner" />
+          <img loading="lazy"src="./assets/other-symbols/SignMakerBanner.png" class="welcomeSignMakerBanner" />
           <div>
             <h2>Welcome to SignMaker v2.2! (at last!)</h2>
             <p>After over <b>250-300+ hours of development</b>, weeks of procrastination, and years since SignMaker v2.1 released, I am proud to announce that SignMaker v2.2 is now CANON and real. Hope y'all enjoy! - jkpotato-computer
@@ -1309,7 +1313,7 @@
             <div id="smSettings_MUTCDGallery">
               <div class="mutcdOption">
                 <button class="mutcdImage selected" data-variant="MUTCD">
-                  <img src="assets/form/mutcd/MUTCD.png" />
+                  <img loading="lazy"src="assets/form/mutcd/MUTCD.png" />
                   <div class="mutcdSlideInfo">
                     <h2>MUTCD: Standard Highway Designs*</h2>
                     <p>2023 Edition: Revision 1 Dec 2025</p>
@@ -1326,7 +1330,7 @@
                   </div>
                 </button>
                 <button class="mutcdImage" data-variant="TMUTCD">
-                  <img src="assets/form/mutcd/SHSD.jpg" />
+                  <img loading="lazy"src="assets/form/mutcd/SHSD.jpg" />
                   <div class="mutcdSlideInfo">
                     <h2>TMUTCD: Texas's Standard Highway Sign Designs</h2>
                     <p>2026 Edition</p>
@@ -1343,7 +1347,7 @@
                   </div>
                 </button>
                 <button class="mutcdImage" data-variant="CAMUTCD">
-                  <img src="assets/form/mutcd/CAMUTCD.png" />
+                  <img loading="lazy"src="assets/form/mutcd/CAMUTCD.png" />
                   <div class="mutcdSlideInfo">
                     <h2>CAMUTCD: California Sign Specification Drawings</h2>
                     <p>2026 Edition</p>
@@ -1361,7 +1365,7 @@
                   </div>
                 </button>
                 <button class="mutcdImage" data-variant="NVUTCDG">
-                  <img src="assets/form/mutcd/NVUTCDG.png" />
+                  <img loading="lazy"src="assets/form/mutcd/NVUTCDG.png" />
                   <div class="mutcdSlideInfo">
                     <h2>NVUTCDG: North Veridian Uniform Traffic Control Device Guidelines*</h2>
                     <p>2024 Edition: Revision 3 Tredec† 2024</p>
@@ -1435,6 +1439,9 @@
                       SHOUTOUT TO THE AAROADS COMMUNITY!!!
                       AND THE SIGNMAKER (V2.2) COMMUNITY FOR STICKING WITH ME!!!
                       ---
+                      THE PERSON WHO TRULY STARTED IT ALL
+                      @sheiis
+                      ---
                       PROUDLY MADE WITHOUT OVER-RELIANCE ON ARTIFICIAL INTELLIGENCE :D
                     </div>
                   </div>
@@ -1443,7 +1450,7 @@
                 <div id="smCredits_gridArea">
                   <div id="smCredits_contributorsBox">
                     <div class="smCredits_contributor" style="--baseColor: #14339b; --textColor: white;">
-                      <img src="https://github.com/JKPotato-Computer.png" class="smCredits_profilePicture">
+                      <img loading="lazy" src="https://github.com/JKPotato-Computer.png" class="smCredits_profilePicture">
                       <h2>jkpotato-computer</h2>
                       <span>Am I not a contributor? Did spend hundreds of hours after all... anyways, I am Cyber Quincy! Son of Quincy.</span>
                       <div class="smCredits_socialLinks">
@@ -1451,37 +1458,34 @@
                           <span class="material-symbols-outlined">web</span>
                         </a>
                         <a href="https://github.com/JKPotato-Computer">
-                          <img src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
+                          <img loading="lazy"src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
                         </a>
                       </div>
                       <div class="smCredits_discordUser">
                         <div class="smCredits_discordHolder">
-                          <img src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
+                          <img loading="lazy"src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
                         </div>
                         <span>@jkpotato_computer</span>
                       </div>
                     </div>
                     <div class="smCredits_contributor" style="--baseColor: #241547; --textColor: white;">
-                      <img src="https://github.com/obsidianguy21.png" class="smCredits_profilePicture">
+                      <img loading="lazy"src="https://github.com/obsidianguy21.png" class="smCredits_profilePicture">
                       <h2>obsidianguy21</h2>
                       <span>They say that on the internet, nobody knows you're a fox. Who says a fox can't be a roadgeek too?</span>
                       <div class="smCredits_socialLinks">
-                        <a href="">
-                          <span class="material-symbols-outlined">web</span>
-                        </a>
                         <a href="https://github.com/obsidianguy21">
-                          <img src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
+                          <img loading="lazy"src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
                         </a>
                       </div>
                       <div class="smCredits_discordUser">
                         <div class="smCredits_discordHolder">
-                          <img src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
+                          <img loading="lazy"src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
                         </div>
                         <span>@theobsidianguy</span>
                       </div>
                     </div>
                     <div class="smCredits_contributor" style="--baseColor: #80f; --textColor: white;">
-                      <img src="https://github.com/viv-ribbon.png" class="smCredits_profilePicture">
+                      <img loading="lazy"src="https://github.com/viv-ribbon.png" class="smCredits_profilePicture">
                       <h2>viv-ribbon</h2>
                       <span>"Oh how it's been so long
                         <br />
@@ -1491,35 +1495,35 @@ We were busy writing <s>songs</s> <code>code</code> for
 <br />
 YOU!"</span>
                       <div class="smCredits_socialLinks">
-                        <a href="">
+                        <a href="https://vivribbon.fyi">
                           <span class="material-symbols-outlined">web</span>
                         </a>
                         <a href="https://github.com/viv-ribbon">
-                          <img src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
+                          <img loading="lazy"src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
                         </a>
                       </div>
                       <div class="smCredits_discordUser">
                         <div class="smCredits_discordHolder">
-                          <img src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
+                          <img loading="lazy"src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
                         </div>
                         <span>@vivribbon</span>
                       </div>
                     </div>
                     <div class="smCredits_contributor" style="--baseColor: #005f4d; --textColor: white;">
-                      <img src="https://github.com/cjc30.png" class="smCredits_profilePicture">
+                      <img loading="lazy"src="https://github.com/cjc30.png" class="smCredits_profilePicture">
                       <h2>cjc30</h2>
                       <span>aussie aussie aussie oi oi oi</span>
                       <div class="smCredits_socialLinks">
-                        <a href="">
+                        <a href="https://polyhedra.au/">
                           <span class="material-symbols-outlined">web</span>
                         </a>
                         <a href="https://github.com/cjc30">
-                          <img src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
+                          <img loading="lazy"src="./assets/other-symbols/ui/GitHub.svg" alt="GitHub Logo" class="smCredits_socialIcon">
                         </a>
                       </div>
                       <div class="smCredits_discordUser">
                         <div class="smCredits_discordHolder">
-                          <img src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
+                          <img loading="lazy"src="./assets/other-symbols/ui/Discord.svg" alt="Discord" class="smCredits_discordImage">
                         </div>
                         <span>@_poly2</span>
                       </div>
@@ -1551,7 +1555,7 @@ YOU!"</span>
               </div>
               <div id="smSettingsAbout_aiUsage" class="smAIUsagePage">
                 <h3>Hey, let's talk about AI for a second… and that involves sharing a backstory.</h3>
-                <img src="./assets/other-symbols/ui/NoAI.svg" alt="No AI Sticker" class="noAiSticker"/>
+                <img loading="lazy"src="./assets/other-symbols/ui/NoAI.svg" alt="No AI Sticker" class="noAiSticker"/>
                 <blockquote>
                   "I do not need AI to create a for loop that does nothing inside of it.
                   I do not need AI to compare a boolean and a string, okay?
@@ -1573,7 +1577,7 @@ YOU!"</span>
                   experience beyond a few lessons on HTML and CSS in a middle school coding class (which is basically nothing), so it took me hours to figure it out. 
                   At last, I managed to get it working and learned how <code>@font-face</code> and web font embedding actually worked on websites. 
                 </p>
-                <img src="./assets/other-symbols/ui/speech_supplementary/Clearview.png" alt="Learning how to create @font-faces in HTML" class="clearviewImageSupplemental"/>
+                <img loading="lazy"src="./assets/other-symbols/ui/speech_supplementary/Clearview.png" alt="Learning how to create @font-faces in HTML" class="clearviewImageSupplemental"/>
                 <p>
                   And that one discovery led me the next: swapping out arrows created with characters in the Roadgeek Arrows 1 typeface with actual vector-based images, 
                   adding secondary banners on a shield and discovering flexbox (praise the CSS Working Group), creating multi-dimensional arrays for exit and nested exit tabs, 
@@ -1585,7 +1589,7 @@ YOU!"</span>
                   why I chose to give this site a massive overhaul and dedicate <b>well over 250 to 300+ hours</b> into building SignMaker v2.2, even numerous half-asleep nights to piece together the diagrammatic editor 
                   and exit tab system.
                 </p>
-                <img src="./assets/other-symbols/ui/speech_supplementary/DiagrammicDrawingIndevScreenshot.png" alt="Diagrammic System back in July 2026" class="diagrammicImageSupplemental"/>
+                <img loading="lazy"src="./assets/other-symbols/ui/speech_supplementary/DiagrammicDrawingIndevScreenshot.png" alt="Diagrammic System back in July 2026" class="diagrammicImageSupplemental"/>
                 <p>
                   However, I'm sure you are aware of where things stand right now when it comes to the use of generative large language models, which everyone commonly umbrellas the term into "artificial intelligence" including 
                   all the non-generative models. Now, I'm not a complete opponent of artificial intelligence (At least within the realm of coding. If it's asset, image, model, audio, or visual generation? Hell no.), and I'll be upfront: 
@@ -2037,7 +2041,7 @@ YOU!"</span>
                   class="smDropdownInputElement"
                 >
                   <button class="smDropdownSelectedButton" type="button">
-                    <img class="smDropdownSelectedImage" alt="" />
+                    <img loading="lazy"class="smDropdownSelectedImage" alt="" />
                     <span class="sdIcon_selectedLabel smDropdownSelectedLabel"
                       >AIRPORT</span
                     >
@@ -2063,7 +2067,7 @@ YOU!"</span>
                 </div>
                 <div id="sMET_variantTollIcon" class="smDropdownInputElement">
                   <button class="smDropdownSelectedButton" type="button">
-                    <img class="smDropdownSelectedImage" alt="" />
+                    <img loading="lazy"class="smDropdownSelectedImage" alt="" />
                     <span class="sdIcon_selectedLabel smDropdownSelectedLabel"
                       >AIRPORT</span
                     >
@@ -3867,7 +3871,7 @@ YOU!"</span>
                     <label for="sdArrow_arrow">Arrow:</label>
                     <div id="sdArrow_arrow" class="smDropdownInputElement">
                       <button class="smDropdownSelectedButton" type="button">
-                        <img class="smDropdownSelectedImage" alt="" />
+                        <img loading="lazy"class="smDropdownSelectedImage" alt="" />
                         <span class="smDropdownSelectedLabel"></span>
                         <span class="material-symbols-outlined smDropdownArrow"
                           >arrow_drop_down</span
@@ -4019,7 +4023,7 @@ YOU!"</span>
                     <label for="sdTollLogoHolder">Toll Logo:</label>
                     <div id="sdTollLogoHolder" class="smDropdownInputElement">
                       <button class="smDropdownSelectedButton" type="button">
-                        <img class="smDropdownSelectedImage" alt="" />
+                        <img loading="lazy"class="smDropdownSelectedImage" alt="" />
                         <span
                           class="sdTollLogo_selectedLabel smDropdownSelectedLabel"
                           >AIRPORT</span
@@ -4830,7 +4834,7 @@ YOU!"</span>
                   <label for="guideStandardArrow">Arrow:</label>
                   <div id="guideStandardArrow" class="smDropdownInputElement">
                     <button class="smDropdownSelectedButton" type="button">
-                      <img class="smDropdownSelectedImage" alt="" />
+                      <img loading="lazy"class="smDropdownSelectedImage" alt="" />
                       <span class="smDropdownSelectedLabel"></span>
                       <span class="material-symbols-outlined smDropdownArrow"
                         >arrow_drop_down</span
@@ -5005,7 +5009,7 @@ YOU!"</span>
                   <label for="exitOnlyArrowType">Arrow Type:</label>
                   <div id="exitOnlyArrowType" class="smDropdownInputElement">
                     <button class="smDropdownSelectedButton" type="button">
-                      <img class="smDropdownSelectedImage" alt="" />
+                      <img loading="lazy"class="smDropdownSelectedImage" alt="" />
                       <span class="smDropdownSelectedLabel"></span>
                       <span class="material-symbols-outlined smDropdownArrow"
                         >arrow_drop_down</span
@@ -5609,7 +5613,7 @@ YOU!"</span>
     </form>
     <footer id="signMakerFooter">
       <div>
-        <img src="assets/other-symbols/SignMakerIconRotated.png" />
+        <img loading="lazy"src="assets/other-symbols/SignMakerIconRotated.png" />
         <div>
           <h3>Highway Sign Maker (v2.2)</h3>
           <p>made by JK_Potato/Computer & the community*</p>
@@ -5630,7 +5634,7 @@ YOU!"</span>
           target="_blank"
         >
         <div>
-          <img src="./assets/other-symbols/ui/GitHub.svg" class="iconLink"/>
+          <img loading="lazy"src="./assets/other-symbols/ui/GitHub.svg" class="iconLink"/>
         <span>Github Repo</span>
         
         </div>
@@ -5642,7 +5646,7 @@ YOU!"</span>
           class="discordInvite"
         >
         <div>
-          <img src="./assets/other-symbols/ui/Discord.svg" class="iconLink"/>
+          <img loading="lazy"src="./assets/other-symbols/ui/Discord.svg" class="iconLink"/>
         <span>Discord Server</span>
         
         </div>
@@ -5661,7 +5665,7 @@ YOU!"</span>
               type="button"
               class="smAPLCat_aplSelectButton smDropdownSelectedButton"
             >
-              <img class="smAPL_arrowImage smDropdownSelectedImage" alt="" />
+              <img loading="lazy"class="smAPL_arrowImage smDropdownSelectedImage" alt="" />
               <span class="smAPL_arrowLabel smDropdownSelectedLabel"></span>
               <span class="material-symbols-outlined smDropdownArrow"
                 >arrow_drop_down</span
