@@ -22,7 +22,9 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   padding: 0 calc(var(--panelSpacing));
 }
 
-#postContainer:not(.postVariantCurved-2)  #panelContainer.start > .panelGroupContainer {
+#postContainer:not(.postVariantCurved-2)
+  #panelContainer.start
+  > .panelGroupContainer {
   align-self: start;
   top: -50%;
 }
@@ -31,12 +33,16 @@ Serves as the most minimum needed to support sign making before adopting MUTCDs
   align-self: center;
 }
 
-#postContainer:not(.postVariantCurved-2) #panelContainer.end > .panelGroupContainer {
+#postContainer:not(.postVariantCurved-2)
+  #panelContainer.end
+  > .panelGroupContainer {
   align-self: end;
   top: 50%;
 }
 
-#postContainer.postVariantCurved-2 #panelContainer.start > .panelGroupContainer {
+#postContainer.postVariantCurved-2
+  #panelContainer.start
+  > .panelGroupContainer {
   align-self: start;
 }
 
@@ -1336,20 +1342,40 @@ main#smRender.wide #postContainer {
   transform: translateX(var(--arrowOffset));
 }
 
+.smGA_APLArrowHolder.manual .sMGA_APLArrow.left-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.3) 0 calc(var(--arrowSize) * -0.3);
+  position: relative;
+  right: 50%;
+}
+
+.smGA_APLArrowHolder.manual .sMGA_APLArrow.cfx-left-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.4) 0 calc(var(--arrowSize) * -0.2);
+  position: relative;
+  right: 50%;
+}
+
+.smGA_APLArrowHolder.manual .sMGA_APLArrow.cfx-right-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.7) 0 calc(var(--arrowSize) * 0.1);
+  position: relative;
+  right: 50%;
+}
+
+.smGA_APLArrowHolder.manual .sMGA_APLArrow.right-choice-arrow {
+  position: relative;
+  right: 50%;
+  margin: 0 calc(var(--arrowSize) * -0.8) 0 calc(var(--arrowSize) * 0.2);
+}
+
+:not(.smGA_APLArrowHolder.manual) .smGA_APLArrow.flipped {
+  transform: scaleX(-1) translateX(calc(-1 * var(--arrowOffset)));
+}
+
+.right-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.55) 0 calc(var(--arrowSize) * -0.075);
+}
+
 .sMGA_APLArrow.left-choice-arrow {
-  margin: 0 0 0 calc(var(--arrowSize) * -0.5);
-}
-
-.sMGA_APLArrow.cfx-left-choice-arrow {
-  margin: 0 calc(var(--arrowSize) * -0.1) 0 calc(var(--arrowSize) * -0.4);
-}
-
-.sMGA_APLArrow.cfx-right-choice-arrow {
-  margin: 0 calc(var(--arrowSize) * -0.4) 0 calc(var(--arrowSize) * -0.1);
-}
-
-.sMGA_APLArrow.right-choice-arrow {
-  margin: 0 calc(var(--arrowSize) * -0.5) 0 0;
+  margin: 0 calc(var(--arrowSize) * -0.05) 0 calc(var(--arrowSize) * -0.55);
 }
 
 .sMGA_APLArrow.left-arrow {
@@ -1380,12 +1406,27 @@ main#smRender.wide #postContainer {
   margin-bottom: calc(var(--arrowSize) * -0.1);
 }
 
+.smGA_APLArrowHolder.manual .sMGA_APLArrow.alt-left-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.35) 0 calc(var(--arrowSize) * -0.25);
+  position: relative;
+  right: 50%;
+}
+
 .sMGA_APLArrow.alt-left-choice-arrow {
-  margin: 0 calc(var(--arrowSize) * -0.1) 0 calc(var(--arrowSize) * -0.5);
+  margin: 0 calc(var(--arrowSize) * -0.15) 0 calc(var(--arrowSize) * -0.55);
+}
+
+.sMGA_APLArrow.alt-right-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.55) 0 calc(var(--arrowSize) * -0.15);
+}
+
+.smGA_APLArrowHolder.manual .sMGA_APLArrow.alt-right-choice-arrow {
+  margin: 0 calc(var(--arrowSize) * -0.75) 0 calc(var(--arrowSize) * 0.1);
+  position: relative;
+  right: 50%;
 }
 
 .sMGA_APLArrow.flipped {
-  transform: scaleX(-1) translateX(calc(-1 * var(--arrowOffset)));
 }
 
 .sMGA_APLArrow_exitText {

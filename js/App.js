@@ -1597,8 +1597,14 @@ const App = (() => {
   const redrawPanel = (panel, panelContainerElmt, index) => {
     const panelElmt = document.createElement("div");
     panelElmt.className = `panel ${panel.corner.toLowerCase()} ${panel.panelAppearance.toLowerCase()}`;
-    panelElmt.style.setProperty("--leftSpacing", (panel.useLeftSpacing ? panel.leftSpacing : post.panelSpacing) + "rem");
-    panelElmt.style.setProperty("--rightSpacing", (panel.useRightSpacing ? panel.rightSpacing : post.panelSpacing) + "rem");
+    panelElmt.style.setProperty(
+      "--leftSpacing",
+      (panel.useLeftSpacing ? panel.leftSpacing : post.panelSpacing) + "rem",
+    );
+    panelElmt.style.setProperty(
+      "--rightSpacing",
+      (panel.useRightSpacing ? panel.rightSpacing : post.panelSpacing) + "rem",
+    );
 
     if (panel.panelAppearance.includes("Pixels")) {
       panelElmt.style.padding = `${panel.appearancePadding}rem`;
@@ -1920,9 +1926,13 @@ const App = (() => {
           const aplArrows = arrowVariant.subpanels[i] || [];
           const subpanel = i % 1 == 0 && subpanelList[i];
           const aplHolder = document.createElement("div");
-          aplHolder.className = "sMGA_APLHolder " + (subpanel ? "" : "divider");
+          aplHolder.className =
+            "sMGA_APLHolder manual " + (subpanel ? "" : "divider");
 
-          if (arrowVariant.subpanelConfigs[i].justify === true) {
+          if (
+            arrowVariant.subpanelConfigs[i] &&
+            arrowVariant.subpanelConfigs[i].justify === true
+          ) {
             aplHolder.style.justifyContent = "right";
           }
 
@@ -1963,7 +1973,11 @@ const App = (() => {
                   (arrowHolderRect.left + arrowHolderRect.width / 2),
               );
 
-              if (j === 0 && arrowElmt.children[0].tagName === "DIV") {
+              if (
+                j === 0 &&
+                i === 0 &&
+                arrowElmt.children[0].tagName === "DIV"
+              ) {
                 const divRect = arrowElmt.children[0].getBoundingClientRect();
                 const divDistToCenter = arrowHolderRect.left - divRect.left;
 
@@ -1972,6 +1986,7 @@ const App = (() => {
 
               if (
                 j === aplArrows.length - 1 &&
+                i === subpanelList.length - 1 &&
                 arrowElmt.children[2].tagName === "DIV"
               ) {
                 const divRect = arrowElmt.children[2].getBoundingClientRect();
@@ -1990,6 +2005,49 @@ const App = (() => {
               }
 
               exitWidthChecker.remove();
+            } else {
+              const exitWidthChecker = document.createElement("div");
+              document.body.appendChild(exitWidthChecker);
+
+              exitWidthChecker.appendChild(arrowElmt);
+
+              const arrowRect = arrowElmt
+                .querySelector(".sMGA_APLArrow")
+                .getBoundingClientRect();
+              const arrowHolderRect = arrowElmt.getBoundingClientRect();
+
+              const distanceToCenter = Math.abs(
+                arrowRect.left +
+                  arrowRect.width / 2 -
+                  (arrowHolderRect.left + arrowHolderRect.width / 2),
+              );
+
+              if (j === 0 && i === 0) {
+                const divDistToCenter = arrowHolderRect.left - arrowRect.left;
+                aplHolder.style.paddingLeft = `${divDistToCenter / 2 / formHandler.vars.zoomLevel}px`;
+              }
+
+              if (j === aplArrows.length - 1 && i === subpanelList.length - 1) {
+                const divDistToCenter = arrowHolderRect.right - arrowRect.right;
+
+                aplHolder.style.paddingRight = `${divDistToCenter / 2 / formHandler.vars.zoomLevel}px`;
+              }
+
+              const sign =
+                arrowRect.left + arrowRect.width / 2 <
+                arrowHolderRect.left + arrowHolderRect.width / 2
+                  ? distanceToCenter
+                  : -distanceToCenter;
+              arrowElmt.querySelector(".sMGA_APLArrow").style.transform =
+                `translateX(${sign / formHandler.vars.zoomLevel}px)`;
+              exitWidthChecker.remove();
+            }
+
+            if (arrowElmt.querySelector(".sMGA_APLArrow.flipped")) {
+              arrowElmt.querySelector(
+                ".sMGA_APLArrow.flipped",
+              ).style.transform +=
+                ` scaleX(-1) translateX(calc(-1 * var(--arrowOffset)))`;
             }
 
             aplHolder.appendChild(arrowElmt);
