@@ -186,4 +186,4 @@ Signs made with the FHWA font face, Overpass, Electronic Highway Sign, VCR Mono 
 (c) dki-os 2024.
 (c) JK_Potato/Computer and contributors 2026-2027.
 
-Licensed under the [GNU GPLv3 License](https://www.gnu.org/licenses/gpl-3.0.txt), see [LICENSE](LICENSE) for details.
+Licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.txt), see [LICENSE](LICENSE) for details.
