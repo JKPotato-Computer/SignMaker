@@ -219,6 +219,14 @@ const App = (() => {
           currentlySelectedPanelGroupIndex = newPanelGroupIndex;
           currentlySelectedPanelIndex = 0;
         }
+
+        ccurrentlySelectedSubPanelIndex = 0;
+        currentlySelectedRowIndex = 0;
+        currentlySelectedBlockIndex = 0;
+        currentlySelectedGroupIndex = -1;
+        currentlySelectedExitTabIndex = -1;
+        currentlySelectedExitTabRowIndex = -1;
+
         formHandler.updateForm();
         redraw();
       },

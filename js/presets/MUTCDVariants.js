@@ -4,7 +4,7 @@ const MUTCDVariants = (() => {
     // note: pls do not change MUTCD - the code sees these variables as the source of truth so don't like delete anything or else idk the entire program explodes
     MUTCD: {
       VariantInfo: {
-        FullName: "MUTCD: Standard Highway Designs",
+        FullName: "MUTCD: Standard Highway Signs",
         Tags: [
           "MUTCD",
           "SHS",
