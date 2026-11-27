@@ -155,7 +155,7 @@ And a massive thank you to the past maintainers [@dki_os](http://github.com/dki-
 
 **Font Faces**
 
-- Overpass / Inter typeface was sourced from [Google Fonts](https://fonts.google.com/specimen/Overpass) and is licensed under the [SIL Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
+- Overpass / Inter typeface was sourced from [Google Fonts](https://fonts.google.com/specimen/Overpass) and is licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
 - Clearview typeface was sourced from [Cofonts](https://cofonts.com/clearview-font/).
 - FHWA Series typeface was sourced from [Font Space](https://www.fontspace.com/highway-gothic-family-font-f151742) by Barry Stock and is public domain.
 - Transport typeface (and its variants) was sourced from [roads.org.uk](https://www.roads.org.uk/fonts).
@@ -167,7 +167,7 @@ And a massive thank you to the past maintainers [@dki_os](http://github.com/dki-
 **Images**
 
 - All SignMaker v2.2 assets were hand-made by @JKPotato-Computer.
-- All UI icons were sourced from Google's [Material Symbols](https://fonts.google.com/icons) and are licensed under the [SIL Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
+- All UI icons were sourced from Google's [Material Symbols](https://fonts.google.com/icons) and are licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
 - Other assets (icons, shields, etc.) were sourced from the [MUTCD](https://mutcd.fhwa.dot.gov/pdfs/11th_Edition/mutcd11thedition.pdf) and other state DOTs.
 
 **Modules**
