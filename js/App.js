@@ -1359,8 +1359,7 @@ const App = (() => {
           subPanel.dividerHeightUnit == "%"
         ) {
           subDivider.style.height = `${
-            (signContentContainerElmt.getBoundingClientRect().height /
-              formHandler.vars.zoomLevel) *
+            (signContentContainerElmt.getBoundingClientRect().height / 1) *
             (subPanel.dividerHeight / 100)
           }px`;
         }
@@ -1385,7 +1384,7 @@ const App = (() => {
     panel,
     signCorners,
   ) => {
-    const zoomScale = formHandler.vars.zoomLevel;
+    const zoomScale = 1;
     const getScaledRect = (element) => {
       const rect = element.getBoundingClientRect();
       return {
@@ -1780,7 +1779,7 @@ const App = (() => {
       const canvasSize = diagramData.canvasProperties.canvasWidth;
       const diagramClientRect = diagrammicImage.getBoundingClientRect();
 
-      const zoomScale = formHandler.vars.zoomLevel;
+      const zoomScale = 1;
       const diagramHeightScaled = diagramClientRect.height / zoomScale;
 
       let queue = [diagramData.roadData];
@@ -1921,6 +1920,16 @@ const App = (() => {
         for (let i = 0; i < subpanelList.length; i++) {
           let rect = subpanelList[i].getBoundingClientRect();
 
+          // apply a / 1 on all of rect
+          rect = {
+            top: rect.top / 1,
+            right: rect.right / 1,
+            bottom: rect.bottom / 1,
+            left: rect.left / 1,
+            width: rect.width / 1,
+            height: rect.height / 1,
+          };
+
           // if arrowVariant.subpanels[i - 0.5] exists, then subtract by arrow gap to px
           if (arrowVariant.subpanels[i - 0.5]) {
             rect = {
@@ -1967,7 +1976,7 @@ const App = (() => {
             aplHolder.style.width = `${arrowVariant.gap * 2}rem`;
           } else {
             aplHolder.style.width = `max-content`;
-            aplHolder.style.minWidth = `${subpanelPreRects[i].width / formHandler.vars.zoomLevel}px`;
+            aplHolder.style.minWidth = `${subpanelPreRects[i].width / 1}px`;
           }
 
           for (let j = 0; j <= aplArrows.length - 1; j += 1) {
@@ -2008,7 +2017,7 @@ const App = (() => {
                 const divRect = arrowElmt.children[0].getBoundingClientRect();
                 const divDistToCenter = arrowHolderRect.left - divRect.left;
 
-                aplHolder.style.paddingLeft = `${divDistToCenter / formHandler.vars.zoomLevel}px`;
+                aplHolder.style.paddingLeft = `${divDistToCenter / 1}px`;
               }
 
               if (
@@ -2019,7 +2028,7 @@ const App = (() => {
                 const divRect = arrowElmt.children[2].getBoundingClientRect();
                 const divDistToCenter = divRect.right - arrowHolderRect.right;
 
-                aplHolder.style.paddingRight = `${divDistToCenter / formHandler.vars.zoomLevel}px`;
+                aplHolder.style.paddingRight = `${divDistToCenter / 1}px`;
               }
 
               const sign =
@@ -2028,14 +2037,11 @@ const App = (() => {
                   ? distanceToCenter
                   : -distanceToCenter;
               for (const child of arrowElmt.children) {
-                child.style.transform = `translateX(${sign / formHandler.vars.zoomLevel}px)`;
+                child.style.transform = `translateX(${sign / 1}px)`;
               }
               arrowElmt
                 .querySelector(".sMGA_APLArrow")
-                .style.setProperty(
-                  "--translation",
-                  sign / formHandler.vars.zoomLevel,
-                );
+                .style.setProperty("--translation", sign / 1);
 
               exitWidthChecker.remove();
             } else {
@@ -2057,13 +2063,13 @@ const App = (() => {
 
               if (j === 0 && i === 0) {
                 const divDistToCenter = arrowHolderRect.left - arrowRect.left;
-                aplHolder.style.paddingLeft = `${divDistToCenter / 2 / formHandler.vars.zoomLevel}px`;
+                aplHolder.style.paddingLeft = `${divDistToCenter / 2 / 1}px`;
               }
 
               if (j === aplArrows.length - 1 && i === subpanelList.length - 1) {
                 const divDistToCenter = arrowHolderRect.right - arrowRect.right;
 
-                aplHolder.style.paddingRight = `${divDistToCenter / 2 / formHandler.vars.zoomLevel}px`;
+                aplHolder.style.paddingRight = `${divDistToCenter / 2 / 1}px`;
               }
 
               const sign =
@@ -2072,13 +2078,10 @@ const App = (() => {
                   ? distanceToCenter
                   : -distanceToCenter;
               arrowElmt.querySelector(".sMGA_APLArrow").style.transform =
-                `translateX(${sign / formHandler.vars.zoomLevel}px)`;
+                `translateX(${sign / 1}px)`;
               arrowElmt
                 .querySelector(".sMGA_APLArrow")
-                .style.setProperty(
-                  "--translation",
-                  sign / formHandler.vars.zoomLevel,
-                );
+                .style.setProperty("--translation", sign / 1);
               exitWidthChecker.remove();
             }
 
@@ -2098,7 +2101,7 @@ const App = (() => {
           document.body.appendChild(flexTest);
           flexTest.appendChild(aplHolder);
 
-          aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+          aplHolder.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / 1}px`;
 
           guideArrowsElmt.appendChild(aplHolder);
           flexTest.remove();
@@ -2139,16 +2142,15 @@ const App = (() => {
             continue;
           }
 
-          subpanel.style.width = `${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
-          subpanel.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / formHandler.vars.zoomLevel}px`;
+          subpanel.style.width = `${aplHolder.getBoundingClientRect().width / 1}px`;
+          subpanel.style.flex = `0 0 ${aplHolder.getBoundingClientRect().width / 1}px`;
         }
 
         const signHolderRects = signHolderElmt.getBoundingClientRect();
         for (let i = 0; i < subpanelList.length; i++) {
           const subpanel = subpanelList[i];
 
-          const currentBoundX =
-            subpanel.getBoundingClientRect().left / formHandler.vars.zoomLevel;
+          const currentBoundX = subpanel.getBoundingClientRect().left / 1;
           let leftBoundX;
           let rightBoundX;
 
@@ -2182,8 +2184,8 @@ const App = (() => {
               .getBoundingClientRect().left;
           }
 
-          leftBoundX /= formHandler.vars.zoomLevel;
-          rightBoundX /= formHandler.vars.zoomLevel;
+          leftBoundX /= 1;
+          rightBoundX /= 1;
 
           const newCenter = (leftBoundX + rightBoundX) / 2;
           const newLeft =
@@ -2296,8 +2298,7 @@ const App = (() => {
               arrowVariant.subpanels[i - 0.5].length == 0)
           ) {
             subpanel.style.width =
-              aplHolder.getBoundingClientRect().width /
-                formHandler.vars.zoomLevel -
+              aplHolder.getBoundingClientRect().width / 1 -
               panel.sign.lanePanelSize +
               "px";
           } else {
@@ -2311,8 +2312,7 @@ const App = (() => {
         for (let i = 0; i < subpanelList.length; i++) {
           const subpanel = subpanelList[i];
 
-          const currentBoundX =
-            subpanel.getBoundingClientRect().left / formHandler.vars.zoomLevel;
+          const currentBoundX = subpanel.getBoundingClientRect().left / 1;
           let leftBoundX;
           let rightBoundX;
 
@@ -2346,8 +2346,8 @@ const App = (() => {
               .getBoundingClientRect().left;
           }
 
-          leftBoundX /= formHandler.vars.zoomLevel;
-          rightBoundX /= formHandler.vars.zoomLevel;
+          leftBoundX /= 1;
+          rightBoundX /= 1;
 
           const newCenter = (leftBoundX + rightBoundX) / 2;
           const newLeft =
@@ -3035,7 +3035,7 @@ const App = (() => {
               outsideArrow.style.top = `${
                 (innerArrows.getBoundingClientRect().top -
                   outsideArrow.getBoundingClientRect().top) /
-                formHandler.vars.zoomLevel /
+                1 /
                 2
               }px`;
             }
@@ -3065,12 +3065,11 @@ const App = (() => {
 
     // redraw exit tab widths
     for (const container of considerWidth.keys()) {
-      let width =
-        container.getBoundingClientRect().width / formHandler.vars.zoomLevel;
+      let width = container.getBoundingClientRect().width / 1;
       container.style.left = `-${width / 2}px`;
       container.style.width = "0";
       container.style.position = "relative";
-      container.style.transform = `translateX(${signHolderElmt.getBoundingClientRect().width / 2 / formHandler.vars.zoomLevel}px)`;
+      container.style.transform = `translateX(${signHolderElmt.getBoundingClientRect().width / 2 / 1}px)`;
     }
   };
 
@@ -3079,6 +3078,7 @@ const App = (() => {
 
     // save sign to localstorage
     SavesNTemplates.updateAutoSave(post);
+    formHandler.tempResetZoom();
 
     post.renderPost(
       document.querySelector("#postContainer"),
@@ -3106,6 +3106,8 @@ const App = (() => {
         redrawPanel(panel, panelGroupContainer, ind++);
       }
     }
+
+    formHandler.zoom();
 
     recheckWidth();
     document

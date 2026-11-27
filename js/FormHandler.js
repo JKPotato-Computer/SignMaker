@@ -3291,7 +3291,15 @@ const formHandler = (() => {
     }
   };
 
-  const zoom = (val) => {
+  const tempResetZoom = () => {
+    document
+      .querySelector("#smRender")
+      .style.setProperty("--zoomLevel", 1 * 100 + "%");
+    document.querySelector("#smRender").style.setProperty("--zoomLevelDec", 1);
+    App.recheckWidth();
+  };
+
+  const zoom = (val = 0) => {
     zoomLevel = Math.min(Math.max(zoomLevel + val, 0), 5);
     document
       .querySelector("#smRender")
@@ -3447,6 +3455,7 @@ const formHandler = (() => {
     updateShieldSubform,
     updateExitTabSubform,
     zoom,
+    tempResetZoom,
     removeExitTabHelper,
     duplicateExitTabHelper,
     promptCustomIcon,
