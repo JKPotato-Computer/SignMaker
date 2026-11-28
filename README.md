@@ -2,7 +2,7 @@
 
 # <img src="assets/other-symbols/SignMakerIconRotated.png" height="80"> Highway SignMaker
 
-Version: 2.2_prerel
+Version: 2.2.0.1
 
 SignMaker is a JavaScript-based web application designed to render realistic highway guide signage for all states in the United States, neighboring countries, and any MUTCD-adjacent countries. Try out the website LIVE at [https://jkpotato.computer/SignMaker]()!
 
@@ -76,7 +76,7 @@ TIP: Use Lane Size to make signs somewhat "realistic" in size based off how many
 
 ### Diagrammatic Signage
 
-Diagrammatic signage, something once thought to be possible, is officially in SignMaker v2.2 with a relatively easy interface to work with. It'll be a learning curve, but once you figure it out, it is quite intuitive.
+Diagrammatic signage, something once thought to be impossible, is officially in SignMaker v2.2 with a relatively easy interface to work with. It'll be a learning curve, but once you figure it out, it is quite intuitive.
 
 ![Diagrammatic Example](assets/form/readme/GuideArrows_Image3.png)
 
